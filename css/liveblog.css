@@ -1,0 +1,61 @@
+.liveblog-hidden {
+	display: none;
+}
+
+.liveblog-message {
+	font: 13px "Helvetica Neue", sans-serif;
+	font-weight: 400;
+	padding: 6px 10px;
+	text-shadow: 1px 1px 0 #0074A2;
+	text-align: center;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+.liveblog-nag {
+	display: block;
+	cursor: pointer;
+	background: #2EA2CC;
+	color: white;
+}
+
+.liveblog-loading {
+	color: #AAA;
+	background: #F9F9F9;
+	border: 1px solid #EEE;
+}
+
+.liveblog-container {
+	margin-top: 20px;
+}
+
+.liveblog-entry {
+	overflow: hidden;
+	margin: 5px 0;
+	padding: 5px 0;
+	border-bottom: 1px dotted #ccc;
+}
+	.liveblog-entry-text {
+		font-size: 18px;
+		line-height: 22px;
+		padding-bottom: 10px;
+	}
+.liveblog-meta-time {
+	display: block;
+	font-size: 10px;
+	line-height: 12px;
+}
+	.liveblog-meta-time a {
+		color: #888;
+		text-decoration: none;
+		text-transform: uppercase;
+	}
+.liveblog-author-name {
+	display: block;
+	font-size: 15px;
+	line-height: 18px;
+}
+.liveblog-author-avatar {
+	float: left;
+	margin: 0 10px 0 0;
+}
