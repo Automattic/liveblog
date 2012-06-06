@@ -14,7 +14,6 @@ TODO (0.1):
 TODO (future):
 -- Manual refresh button
 -- Allow marking of liveblog as ended
--- SEO consideration (output entries server-side on initial load)
 -- Allow comment modifications; need to store modified date as comment_meta
 -- Drag-and-drop image uploading support
 
@@ -134,7 +133,7 @@ class WPCOM_Liveblog {
 		foreach( $entries as $entry ) {
 			$filtered_entry = new stdClass;
 			$filtered_entry->ID = $entry->comment_ID;
-			$filtered_entry->content = self::entry_output( $entry, array(), false );
+			$filtered_entry->content = self::entry_output( $entry, false );
 			array_push( $filtered_entries, $filtered_entry );
 		}
 
@@ -144,7 +143,7 @@ class WPCOM_Liveblog {
 		self::json_return( true, '', array( 'entries' => $filtered_entries, 'timestamp' => $last_timestamp ) );
 	}
 
-	function entry_output( $entry, $args = array(), $echo = true ) {
+	function entry_output( $entry, $echo = true ) {
 		$entry_id = $entry->comment_ID;
 		$post_id = $entry->comment_post_ID;
 		$output = '';
@@ -154,7 +153,7 @@ class WPCOM_Liveblog {
 		if ( $output )
 			return $output;
 
-		$args = wp_parse_args( $args, array(
+		$args = apply_filters( 'liveblog_entry_output_args', array(
 			'avatar_size' => 30,
 		) );
 
@@ -232,6 +231,7 @@ class WPCOM_Liveblog {
 			'nonce_key' => self::nonce_key,
 			'permalink' => get_permalink(),
 			'post_id' => get_the_ID(),
+			'last_timestamp' => self::get_last_entry_timestamp(),
 
 			'refresh_interval' => self::refresh_interval,
 			'max_retries' => self::max_retries,
@@ -249,9 +249,17 @@ class WPCOM_Liveblog {
 	}
 
 	function add_liveblog_to_content( $content ) {
+		$post_id = get_the_ID();
+		$entries = self::get_entries_since( $post_id );
+
 		$liveblog_output = '';
 		$liveblog_output .= self::get_entry_editor_output();
-		$liveblog_output .= '<div id="liveblog-entries" class="liveblog-container"></div>';
+		$liveblog_output .= '<div id="liveblog-entries" class="liveblog-container">';
+		foreach ( (array) $entries as $entry ) {
+			$liveblog_output .= self::entry_output( $entry, false );
+		}
+
+		$liveblog_output .= '</div>';
 
 		return $content . $liveblog_output;
 	}

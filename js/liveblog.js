@@ -3,6 +3,8 @@ var liveblog = {};
 ( function( $ ) {
 
 	liveblog.init = function() {
+		liveblog.set_timestamp( liveblog_settings.last_timestamp );
+
 		liveblog.$container = $( '#liveblog-entries' );
 
 		// Damn you wp_localize_script
@@ -11,7 +13,7 @@ var liveblog = {};
 		liveblog_settings.delay_threshold = parseInt( liveblog_settings.delay_threshold );
 		liveblog_settings.delay_multiplier = parseFloat( liveblog_settings.delay_multiplier );
 
-		liveblog.get_recent_entries();
+		liveblog.reset_timer();
 	}
 
 	liveblog.kill_timer = function() {
@@ -151,7 +153,7 @@ var liveblog = {};
 		// If the entry is already there, update it
 		var $entry = $( '#liveblog-entry-' + entry.ID );
 		if ( $entry.length ) {
-			$entry.html( entry.content )
+			$entry.replaceWith( entry.content )
 				.addClass( 'liveblog-updated' )
 				.one( 'mouseover', function() {
 					$( this ).removeClass( 'liveblog-updated' );
