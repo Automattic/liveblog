@@ -251,6 +251,7 @@ class WPCOM_Liveblog {
 	function add_liveblog_to_content( $content ) {
 		$post_id = get_the_ID();
 		$entries = self::get_entries_since( $post_id );
+		$entries = array_reverse( $entries );
 
 		$liveblog_output = '';
 		$liveblog_output .= self::get_entry_editor_output();
