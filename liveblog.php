@@ -193,6 +193,7 @@ class WPCOM_Liveblog {
 			'post_id' => $post_id,
 			'orderby' => 'comment_date_gmt',
 			'order' => 'ASC',
+			'type' => self::key,
 		) );
 		remove_filter( 'comments_clauses', array( __CLASS__, 'comments_where_include_liveblog_status' ), false );
 
