@@ -5,7 +5,7 @@ var liveblog = {};
 	liveblog.init = function() {
 		liveblog.set_timestamp( liveblog_settings.last_timestamp );
 
-		liveblog.$container = $( '#liveblog-entries' );
+		liveblog.$entry_container = $( '.liveblog-entries' );
 
 		// Damn you wp_localize_script
 		liveblog_settings.refresh_interval = parseInt( liveblog_settings.refresh_interval );
@@ -134,7 +134,7 @@ var liveblog = {};
 
 		liveblog.$update_nag
 			.html( nag_text )
-			.prependTo( liveblog.$container )
+			.prependTo( liveblog.$entry_container )
 			.one( 'click', function() {
 				liveblog.unhide_entries();
 				$( this ).hide();
@@ -160,12 +160,12 @@ var liveblog = {};
 				} );
 		} else {
 			$entry = $( entry.content );
-			$entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$container );
+			$entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container );
 		}
 	}
 
 	liveblog.get_all_entries = function() {
-		return liveblog.$container.find( '.liveblog-entry' );
+		return liveblog.$entry_container.find( '.liveblog-entry' );
 	}
 	liveblog.get_hidden_entries = function() {
 		return liveblog.get_all_entries().filter( '.liveblog-hidden' );
