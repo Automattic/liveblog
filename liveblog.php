@@ -8,10 +8,15 @@
 
 /*
 TODO (0.1):
--- Default styling
--- Max retries for ajax calls and delays
+-- Loading icon
+-- Prime caches on comment update (comment count)
+-- Added caching for get_recent_entries?
+-- Fix Batcache issues
+-- Show updates server-side on initial load? (problem is that batcache would show an old set; although, timestamp would also be old so we'd still fetch the necessary entries)
 
 TODO (future):
+-- PHP and JS Actions/Filters/Triggers
+-- Change "Read More" to "View Liveblog"
 -- Manual refresh button
 -- Allow marking of liveblog as ended
 -- Allow comment modifications; need to store modified date as comment_meta
@@ -29,10 +34,10 @@ class WPCOM_Liveblog {
 	const edit_cap = 'publish_posts';
 	const nonce_key = 'liveblog_nonce';
 
-	const refresh_interval = 5; // in seconds
-	const max_retries = 50;
-	const delay_threshold = 10;
-	const delay_multiplier = 1.5;
+	const refresh_interval = 15; // how often should we refresh
+	const max_retries = 100; // max number of failed tries before polling is disabled
+	const delay_threshold = 10; // how many failed tries after which we should increase the refresh interval
+	const delay_multiplier = 1.5; // by how much should we inscrease the refresh interval
 
 	function load() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
@@ -50,6 +55,8 @@ class WPCOM_Liveblog {
 	}
 
 	function init() {
+		// TODO filters for time and interval overrides
+
 		add_rewrite_endpoint( self::url_endpoint, EP_PERMALINK ); // /2012/01/01/post-name/liveblog/123456/ where 123456 is a timestamp
 
 		add_post_type_support( 'post', self::key );
