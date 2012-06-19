@@ -97,7 +97,7 @@ class WPCOM_Liveblog {
 		$entry = array(
 			'comment_post_ID' => $post_id,
 			'comment_content' => $entry_content,
-			
+
 			'comment_approved' => self::key,
 			'comment_type' => self::key,
 
@@ -120,7 +120,7 @@ class WPCOM_Liveblog {
 
 	function ajax_insert_image() {
 		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-		// 
+		//
 	}
 
 	function ajax_get_recent_entries( $timestamp = 0 ) {
@@ -168,12 +168,12 @@ class WPCOM_Liveblog {
 			$output .= '<div class="liveblog-entry-text">';
 				$output .= get_comment_text( $entry_id );
 			$output .= '</div>';
-			
+
 			$output .= '<header class="liveblog-meta">';
 				$output .= '<span class="liveblog-author-avatar">';
 					$output .= get_avatar( $entry->comment_author_email, $args['avatar_size'] );
 				$output .= '</span>';
-				
+
 				$output .= '<span class="liveblog-author-name">'. get_comment_author_link( $entry_id ) .'</span>';
 				$output .= '<span class="liveblog-meta-time">';
 					$output .= '<a href="#liveblog-entry-'. $entry_id .'">';
@@ -324,7 +324,7 @@ class WPCOM_Liveblog {
 		else
 			delete_post_meta( $post_id, self::key );
 	}
-	
+
 
 	function refresh_last_entry_timestamp( $timestamp = null ) {
 		if ( ! $timestamp )

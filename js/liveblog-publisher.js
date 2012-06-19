@@ -42,8 +42,8 @@
 
 	}
 	liveblog.publisher.insert_entry_error = function( data ) {
-		
+
 	}
-	
+
 	$( document ).ready( liveblog.publisher.init );
 } )( jQuery );

@@ -49,7 +49,7 @@ var liveblog = {};
 
 		var url = liveblog_settings.entriesurl,
 			timestamp = liveblog.get_timestamp();
-		
+
 		if ( timestamp )
 			url += timestamp + '/';
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );
