@@ -123,7 +123,11 @@ var liveblog = {};
 		if ( ! liveblog.original_title )
 			liveblog.original_title = document.title;
 
-		document.title = '(' + hidden_entries_count + ') ' + document.title;
+		count_string = '(' + hidden_entries_count + ')';
+
+		document.title = document.title.replace( /^\(\d+\)\s+/, '' );
+
+		document.title = count_string + ' ' + document.title;
 
 		if ( ! liveblog.$update_nag ) {
 			liveblog.$update_nag = $( '<div/>' );
