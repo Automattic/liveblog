@@ -4,16 +4,19 @@ var liveblog = {};
 
 	liveblog.init = function() {
 		liveblog.set_timestamp( liveblog_settings.last_timestamp );
-
 		liveblog.$entry_container = $( '.liveblog-entries' );
+		liveblog.cast_settings_numbers();
+		liveblog.reset_timer();
+	}
 
-		// Damn you wp_localize_script
+	// wp_localize_scripts makes all integers into strings, and in JS
+	// we need them to be real integers, so that we can use them in
+	// arithmetic operations
+	liveblog.cast_settings_numbers = function() {
 		liveblog_settings.refresh_interval = parseInt( liveblog_settings.refresh_interval );
 		liveblog_settings.max_retries = parseInt( liveblog_settings.max_retries );
 		liveblog_settings.delay_threshold = parseInt( liveblog_settings.delay_threshold );
 		liveblog_settings.delay_multiplier = parseFloat( liveblog_settings.delay_multiplier );
-
-		liveblog.reset_timer();
 	}
 
 	liveblog.kill_timer = function() {
