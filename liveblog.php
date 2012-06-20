@@ -262,10 +262,10 @@ class WPCOM_Liveblog {
 		$entries = array_reverse( $entries );
 
 		$liveblog_output = '';
-		$liveblog_output = '<div id="liveblog-'. $post_id .'" class="liveblog-container">';
-		$liveblog_output = '<div class="liveblog-actions">';
+		$liveblog_output .= '<div id="liveblog-'. $post_id .'" class="liveblog-container">';
+		$liveblog_output .= '<div class="liveblog-actions">';
 		$liveblog_output .= self::get_entry_editor_output();
-		$liveblog_output = '</div>';
+		$liveblog_output .= '</div>';
 		$liveblog_output .= '<div class="liveblog-entries">';
 		foreach ( (array) $entries as $entry ) {
 			$liveblog_output .= self::entry_output( $entry, false );
