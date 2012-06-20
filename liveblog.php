@@ -368,6 +368,7 @@ class WPCOM_Liveblog {
 		) );
 
 		if ( $echo_and_exit ) {
+			header( 'Content-Type: application/json' );
 			echo $return;
 			exit;
 		} else {
