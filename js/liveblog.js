@@ -123,11 +123,7 @@ var liveblog = {};
 		if ( ! liveblog.original_title )
 			liveblog.original_title = document.title;
 
-		count_string = '(' + hidden_entries_count + ')';
-
-		document.title = document.title.replace( /^\(\d+\)\s+/, '' );
-
-		document.title = count_string + ' ' + document.title;
+		liveblog.update_count_in_title( hidden_entries_count );
 
 		if ( ! liveblog.$update_nag ) {
 			liveblog.$update_nag = $( '<div/>' );
@@ -149,6 +145,13 @@ var liveblog = {};
 			} )
 			.slideDown();
 	}
+
+	liveblog.update_count_in_title( count ) {
+		count_string = '(' + count + ')';
+		document.title = document.title.replace( /^\(\d+\)\s+/, '' );
+		document.title = count_string + ' ' + document.title;
+	}
+
 	liveblog.disable_nag = function() {
 		liveblog.nag_disabled = true;
 	}
