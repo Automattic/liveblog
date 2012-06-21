@@ -10,7 +10,6 @@
 TODO (0.1):
 -- Loading icon
 -- Prime caches on comment update (comment count)
--- Added caching for get_recent_entries?
 -- Fix Batcache issues
 -- Show updates server-side on initial load? (problem is that batcache would show an old set; although, timestamp would also be old so we'd still fetch the necessary entries)
 
