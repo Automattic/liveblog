@@ -146,8 +146,8 @@ var liveblog = {};
 			.slideDown();
 	}
 
-	liveblog.update_count_in_title( count ) {
-		count_string = '(' + count + ')';
+	liveblog.update_count_in_title = function( count ) {
+		var count_string = '(' + count + ')';
 		document.title = document.title.replace( /^\(\d+\)\s+/, '' );
 		document.title = count_string + ' ' + document.title;
 	}
