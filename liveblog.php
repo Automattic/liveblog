@@ -44,7 +44,6 @@ class WPCOM_Liveblog {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
 		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
-		add_action( 'wp_ajax_liveblog_get_recent_entries', array( __CLASS__, 'ajax_get_recent_entries' ) );
 
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ) );
 
