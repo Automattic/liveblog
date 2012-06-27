@@ -61,11 +61,9 @@ class WPCOM_Liveblog {
 	}
 
 	function handle_request( $query ) {
-		// Check that current template is a liveblog
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
 
-		// Check that this isn't a liveblog AJAX request
 		if ( self::is_liveblog_request() ) {
 			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) );
 			return;
