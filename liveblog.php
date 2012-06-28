@@ -376,12 +376,13 @@ class WPCOM_Liveblog_Entries {
 		$this->key = $key;
 	}
 
-	function get( $args ) {
+	function get( $args = array() ) {
 		$defaults = array(
 			'post_id' => $this->post_id,
 			'orderby' => 'comment_date_gmt',
 			'order' => 'DESC',
 			'type' => $this->key,
+			'comment_approved' => $this->key,
 		);
 		$args = array_merge( $defaults, $args );
 		$entries = get_comments( $args );

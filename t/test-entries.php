@@ -31,12 +31,19 @@ class Test_Entries extends WP_UnitTestCase {
 		$this->assertEquals( 1325376000, $this->entries->get_latest_timestamp() );
 	}
 
+	function test_get_only_matches_comments_with_the_key_as_approved_status() {
+		$id = $this->create_comment( array( 'comment_approved' => 'wink' ) );
+		$entries = $this->entries->get();
+		$this->assertEquals( 0, count( $entries ) );
+	}
+
 	private function create_comment( $args = array() ) {
 		static $number = 0;
 		$number++;
 		$defaults = array(
 			'comment_post_ID' => $this->entries->post_id,
 			'comment_content' => 'Comment Text ' . $number,
+			'comment_approved' => $this->entries->key,
 			'comment_type' => $this->entries->key,
 			'user_id' => 1,
 			'comment_author' => 'Baba',
