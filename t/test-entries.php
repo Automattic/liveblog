@@ -31,7 +31,6 @@ class Test_Entries extends WP_UnitTestCase {
 		$this->assertEquals( 1325376000, $this->entries->get_latest_timestamp() );
 	}
 
-
 	private function create_comment( $args = array() ) {
 		static $number = 0;
 		$number++;
