@@ -20,8 +20,8 @@ class Test_Entries extends WP_UnitTestCase {
 	}
 
 	function test_get_latest_should_return_the_latest_comment_if_more_than_one() {
-		$id_first = $this->create_comment();
-		$id_second = $this->create_comment();
+		$id_first = $this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:00' ) );
+		$id_second = $this->create_comment( array( 'comment_date_gmt' => '2012-01-02 00:00:00' ) );
 		$latest_entry = $this->entries->get_latest();
 		$this->assertEquals( $id_second, $latest_entry->comment_ID );
 	}
