@@ -374,5 +374,40 @@ class WPCOM_Liveblog {
 
 }
 
+class WPCOM_Liveblog_Entries {
+
+	function __construct( $post_id, $key ) {
+		$this->post_id = $post_id;
+		$this->key = $key;
+	}
+
+	function get( $args ) {
+		$defaults = array(
+			'post_id' => $this->post_id,
+			'orderby' => 'comment_date_gmt',
+			'order' => 'DESC',
+			'type' => $this->key,
+		);
+		$args = array_merge( $defaults, $args );
+		$entries = get_comments( $args );
+		return $entries;
+	}
+
+	function get_latest() {
+		$entries = $this->get( array( 'number' => 1 ) );
+		if ( empty( $entries ) )
+			return null;
+		return $entries[0];
+	}
+
+	function get_latest_timestamp() {
+		$latest = $this->get_latest();
+		if ( is_null( $latest ) ) {
+			return null;
+		}
+		return strtotime( $latest->comment_date_gmt . ' UTC' );
+	}
+}
+
 WPCOM_Liveblog::load();
 endif;
