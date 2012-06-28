@@ -403,6 +403,35 @@ class WPCOM_Liveblog_Entries {
 		}
 		return mysql2date( 'G', $latest->comment_date_gmt );
 	}
+
+	function get_between_timestamps( $start_timestamp, $end_timestamp ) {
+		add_filter( 'comments_clauses', array( $this, 'add_between_conditions_for_where' ), false, 2 );
+		$start_date = $this->mysql_from_timestamp( $start_timestamp );
+		$end_date = $this->mysql_from_timestamp( $end_timestamp );
+
+		$entries = $this->get( compact( 'start_date', 'end_date' ) );
+
+		remove_filter( 'comments_clauses', array( $this, 'add_between_conditions_for_where' ), false );
+		return $entries;
+	}
+
+	function add_between_conditions_for_where( $clauses, $query ) {
+		global $wpdb;
+		$vars = $query->query_vars;
+		$clauses['where'] = $wpdb->prepare( "( {$clauses['where']} ) AND ( comment_date_gmt BETWEEN %s AND %s )", $vars['start_date'], $vars['end_date'] );
+		return $clauses;
+	}
+
+	function add_comment_approved_condition_for_where( $clauses, $query ) {
+		global $wpdb;
+		$vars = $query->query_vars;
+		$clauses['where'] = $wpdb->prepare( "( {$clauses['where']} ) AND ( comment_approved = %s )", $this->key );
+		return $clauses;
+	}
+
+	private function mysql_from_timestamp( $timestamp ) {
+		return gmdate( 'Y-m-d H:i:s', $timestamp );
+	}
 }
 
 WPCOM_Liveblog::load();

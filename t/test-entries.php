@@ -31,6 +31,16 @@ class Test_Entries extends WP_UnitTestCase {
 		$this->assertEquals( 1325376000, $this->entries->get_latest_timestamp() );
 	}
 
+	function test_get_between_timestamps_should_return_an_entry_between_two_timestamps() {
+		$id_first = $this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:00' ) );
+		$id_second = $this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:05' ) );
+		$entries = $this->entries->get_between_timestamps( 1325376000 - 10, 1325376000 + 10 );
+		$this->assertEquals( 2, count( $entries )  );
+		$ids = wp_list_pluck( $entries, 'comment_ID' );
+		$this->assertContains( $id_first, $ids );
+		$this->assertContains( $id_second, $ids );
+	}
+
 	function test_get_only_matches_comments_with_the_key_as_approved_status() {
 		$id = $this->create_comment( array( 'comment_approved' => 'wink' ) );
 		$entries = $this->entries->get();
