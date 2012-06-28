@@ -114,11 +114,6 @@ class WPCOM_Liveblog {
 		self::json_return( true, '' );
 	}
 
-	function ajax_insert_image() {
-		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-		//
-	}
-
 	function ajax_get_recent_entries( $timestamp = 0 ) {
 		// When a new update is added, a cache key should be set/updated to the current GMT timestamp.
 		// The AJAX call can then just check that value and immediately abort if it knows that there is no
