@@ -400,7 +400,7 @@ class WPCOM_Liveblog_Entries {
 		if ( is_null( $latest ) ) {
 			return null;
 		}
-		return strtotime( $latest->comment_date_gmt . ' UTC' );
+		return mysql2date( 'G', $latest->comment_date_gmt );
 	}
 }
 
