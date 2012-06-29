@@ -3,6 +3,12 @@
 class Test_Entries extends WP_UnitTestCase {
 	var $plugin_slug = 'liveblog';
 
+	const JAN_1_TIMESTAMP = 1325376000;
+	const JAN_1_MYSQL = '2012-01-01 00:00:00';
+
+	const JAN_2_TIMESTAMP = 1325462400;
+	const JAN_2_MYSQL = '2012-01-02 00:00:00';
+
 	function setUp() {
 		parent::setUp();
 		wp_delete_comment( 1, true );
@@ -20,21 +26,21 @@ class Test_Entries extends WP_UnitTestCase {
 	}
 
 	function test_get_latest_should_return_the_latest_comment_if_more_than_one() {
-		$id_first = $this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:00' ) );
-		$id_second = $this->create_comment( array( 'comment_date_gmt' => '2012-01-02 00:00:00' ) );
+		$id_first = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
+		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
 		$latest_entry = $this->entries->get_latest();
 		$this->assertEquals( $id_second, $latest_entry->comment_ID );
 	}
 
 	function test_get_latest_timestamp_should_properly_convert_to_unix_timestamp() {
-		$this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:00' ) );
-		$this->assertEquals( 1325376000, $this->entries->get_latest_timestamp() );
+		$this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL) );
+		$this->assertEquals( self::JAN_1_TIMESTAMP, $this->entries->get_latest_timestamp() );
 	}
 
 	function test_get_between_timestamps_should_return_an_entry_between_two_timestamps() {
-		$id_first = $this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:00' ) );
-		$id_second = $this->create_comment( array( 'comment_date_gmt' => '2012-01-01 00:00:05' ) );
-		$entries = $this->entries->get_between_timestamps( 1325376000 - 10, 1325376000 + 10 );
+		$id_first = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
+		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
+		$entries = $this->entries->get_between_timestamps( self::JAN_1_TIMESTAMP - 10, self::JAN_2_TIMESTAMP + 10 );
 		$this->assertEquals( 2, count( $entries )  );
 		$ids = wp_list_pluck( $entries, 'comment_ID' );
 		$this->assertContains( $id_first, $ids );
