@@ -47,6 +47,13 @@ class Test_Entries extends WP_UnitTestCase {
 		$this->assertContains( $id_second, $ids );
 	}
 
+	function test_get_between_timestamps_should_return_entries_on_the_border() {
+		$id= $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
+		$entries = $this->entries->get_between_timestamps( self::JAN_1_TIMESTAMP, self::JAN_1_TIMESTAMP + 1 );
+		$ids = wp_list_pluck( $entries, 'comment_ID' );
+		$this->assertEquals( array( $id ), $ids );
+	}
+
 	function test_get_only_matches_comments_with_the_key_as_approved_status() {
 		$id = $this->create_comment( array( 'comment_approved' => 'wink' ) );
 		$entries = $this->entries->get();

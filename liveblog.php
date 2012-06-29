@@ -405,14 +405,19 @@ class WPCOM_Liveblog_Entries {
 	}
 
 	function get_between_timestamps( $start_timestamp, $end_timestamp ) {
-		add_filter( 'comments_clauses', array( $this, 'add_between_conditions_for_where' ), false, 2 );
 		$start_date = $this->mysql_from_timestamp( $start_timestamp );
 		$end_date = $this->mysql_from_timestamp( $end_timestamp );
 
-		$entries = $this->get( compact( 'start_date', 'end_date' ) );
+		$all_entries = $this->get();
+		$entries_between = array();
 
-		remove_filter( 'comments_clauses', array( $this, 'add_between_conditions_for_where' ), false );
-		return $entries;
+		foreach( $all_entries as $entry ) {
+			if ( $entry->comment_date_gmt >= $start_date && $entry->comment_date_gmt <= $end_date ) {
+				$entries_between[] = $entry;
+			}
+		}
+
+		return $entries_between;
 	}
 
 	function add_between_conditions_for_where( $clauses, $query ) {
