@@ -92,7 +92,7 @@ class WPCOM_Liveblog {
 
 		$entries = self::$entries->get_between_timestamps( $start_timestamp, $end_timestamp );
 		if ( !$entries ) {
-			self::json_return( true, '', 'liveblog' ), array( 'entries' => array(), 'current_timestamp' => time(), 'latest_timestamp' => null ) );
+			self::json_return( true, '', array( 'entries' => array(), 'current_timestamp' => time(), 'latest_timestamp' => null ) );
 		}
 		$latest_timestamp = 0;
 		$entries_for_json = array();
