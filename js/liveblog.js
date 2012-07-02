@@ -93,7 +93,7 @@ var liveblog = {};
 
 	liveblog.display_entries = function( entries ) {
 
-		if (!entries) {
+		if (!entries.length) {
 			return;
 		}
 
