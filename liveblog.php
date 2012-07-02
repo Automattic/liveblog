@@ -38,6 +38,9 @@ class WPCOM_Liveblog {
 	const delay_threshold = 10; // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier = 1.5; // by how much should we inscrease the refresh interval
 
+	static $post_id = null;
+	static $entries = null;
+
 	function load() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
@@ -64,19 +67,78 @@ class WPCOM_Liveblog {
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
 
-		if ( self::is_liveblog_request() ) {
+		self::$post_id = get_the_ID();
+		self::$entries = new WPCOM_Liveblog_Entries( self::$post_id, self::key );
+
+		if ( self::is_initial_page_request() ) {
 			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) );
 			return;
 		}
 
-		$timestamp = get_query_var( 'liveblog' );
-		$entries = self::ajax_get_recent_entries( $timestamp );
+		if ( self::is_entries_ajax_request() ) {
+			self::handle_entries_ajax_request();
+			return;
+		}
+
+		wp_safe_redirect( get_permalink() );
+		exit;
 	}
-	function is_liveblog_request() {
+
+	function handle_entries_ajax_request() {
+		list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
+		if ( !$end_timestamp ) {
+			wp_safe_redirect( get_permalink() );
+		}
+
+		$entries = self::$entries->get_between_timestamps( $start_timestamp, $end_timestamp );
+		if ( !$entries ) {
+			self::json_return( true, __( 'No entries.', 'liveblog' ) );
+		}
+		$latest_timestamp = 0;
+		$entries_for_json = array();
+		foreach( $entries as $entry ) {
+			$entry_timestamp = mysql2date( 'G', $entry->comment_date_gmt );
+			$latest_timestamp = max( $latest_timestamp, $entry_timestamp );
+			$entries_for_json[] = (object)array(
+				'id' => $entry->comment_ID,
+				'content' => self::entry_output( $entry, false ),
+				'timestamp' => $entry_timestamp,
+			);
+		}
+
+		$result_for_json = array(
+			'entries' => $entries_for_json,
+			'current_timestamp' => time(),
+			'latest_timestamp' => $latest_timestamp,
+		);
+
+		self::json_return( true, '', $result_for_json );
+	}
+
+	function is_viewing_liveblog_post() {
+		return is_single() && self::is_liveblog_post();
+	}
+
+	function is_initial_page_request() {
 		global $wp_query;
 		// Not using get_query_var since it returns '' for all requests, which is a valid for /post-name/liveblog/
 		return ! isset( $wp_query->query_vars['liveblog'] );
 	}
+
+
+	function is_entries_ajax_request() {
+		return (bool)get_query_var( self::url_endpoint );
+	}
+
+	function get_timestamps_from_query() {
+		$timestamps = explode( '/', get_query_var( self::url_endpoint) );
+		if ( 2 != count( $timestamps ) ) {
+			return array( false, false );
+		}
+		$timestamps = array_map( 'intval', $timestamps );
+		return $timestamps;
+	}
+
 	function ajax_insert_entry() {
 		self::_ajax_current_user_can_edit_liveblog();
 		self::_ajax_check_nonce();
@@ -112,33 +174,6 @@ class WPCOM_Liveblog {
 		self::refresh_last_entry_timestamp();
 
 		self::json_return( true, '' );
-	}
-
-	function ajax_get_recent_entries( $timestamp = 0 ) {
-		// When a new update is added, a cache key should be set/updated to the current GMT timestamp.
-		// The AJAX call can then just check that value and immediately abort if it knows that there is no
-		// new data to get yet without having to actually ask WordPress if there are new posts.
-
-		$last_timestamp = self::get_last_entry_timestamp();
-		if ( $last_timestamp && $timestamp >= $last_timestamp ) {
-			self::json_return( true, '', array( 'timestamp' => $last_timestamp ) );
-		}
-
-		$entries_output = array();
-		$entries = self::get_entries_since( get_the_ID(), $timestamp );
-		$filtered_entries = array();
-
-		foreach( $entries as $entry ) {
-			$filtered_entry = new stdClass;
-			$filtered_entry->ID = $entry->comment_ID;
-			$filtered_entry->content = self::entry_output( $entry, false );
-			array_push( $filtered_entries, $filtered_entry );
-		}
-
-		if ( ! $last_timestamp )
-			self::refresh_last_entry_timestamp();
-
-		self::json_return( true, '', array( 'entries' => $filtered_entries, 'timestamp' => $last_timestamp ) );
 	}
 
 	function entry_output( $entry, $echo = true ) {
@@ -281,9 +316,6 @@ class WPCOM_Liveblog {
 		return $editor_output;
 	}
 
-	function is_viewing_liveblog_post() {
-		return is_single() && self::is_liveblog_post();
-	}
 
 	function is_liveblog_post( $post_id = null ) {
 		if ( empty( $post_id ) ) {
