@@ -108,6 +108,10 @@ var liveblog = {};
 		var hidden_entries = liveblog.get_hidden_entries(),
 			hidden_entries_count = hidden_entries.length;
 
+		if ( !entries.length ) {
+			return;
+		}
+
 		if ( liveblog.is_nag_disabled() ) {
 			liveblog.unhide_entries();
 			return;
