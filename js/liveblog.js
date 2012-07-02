@@ -3,10 +3,10 @@ var liveblog = {};
 ( function( $ ) {
 
 	liveblog.init = function() {
-		liveblog.set_timestamp( liveblog_settings.last_timestamp );
 		liveblog.$entry_container = $( '.liveblog-entries' );
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
+		liveblog.latest_entry_timestamp = liveblog_settings.latest_entry_timestamp;
 	}
 
 	// wp_localize_scripts makes all integers into strings, and in JS
@@ -17,6 +17,7 @@ var liveblog = {};
 		liveblog_settings.max_retries = parseInt( liveblog_settings.max_retries );
 		liveblog_settings.delay_threshold = parseInt( liveblog_settings.delay_threshold );
 		liveblog_settings.delay_multiplier = parseFloat( liveblog_settings.delay_multiplier );
+		liveblog_settings.latest_entry_timestamp = parseInt( liveblog_settings.latest_entry_timestamp );
 	}
 
 	liveblog.kill_timer = function() {
@@ -40,37 +41,30 @@ var liveblog = {};
 
 		console.log( 'delay timer', liveblog_settings.refresh_interval );
 	}
-	liveblog.set_timestamp = function( timestamp ) {
-		liveblog.last_timestamp = timestamp;
-	}
-	liveblog.get_timestamp = function( timestamp ) {
-		return liveblog.last_timestamp;
-	}
 
 	liveblog.get_recent_entries = function() {
 		// TODO: Show loading
 
-		var url = liveblog_settings.entriesurl,
-			timestamp = liveblog.get_timestamp();
+		var url = liveblog_settings.entriesurl;
+		var from = liveblog.latest_entry_timestamp + 1;
+		// TODO: instead of using the current time use the latest
+		// server time to reconstruct the difference
+		var to = Math.floor(Date.now() / 1000);
 
-		if ( timestamp )
-			url += timestamp + '/';
+		url += from + '/' + to + '/';
+
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );
 	}
 
 	liveblog.get_recent_entries_success = function( data ) {
-		console.log( 'SUCCESS - get_recent_entries_success', data );
-
-		if ( ! data.data.entries || ! data.data.entries.length ) {
-			liveblog.get_recent_entries_error( data );
-			return;
-		}
-
-		liveblog.display_entries( data.data.entries );
 
 		// TODO: highlight updated posts
 
-		liveblog.set_timestamp( data.data.timestamp );
+		if (data.data.entries.length)
+			liveblog.latest_entry_timestamp = data.data.latest_timestamp;
+
+		liveblog.display_entries( data.data.entries );
+
 		liveblog.reset_timer();
 		liveblog.undelay_timer();
 	}
