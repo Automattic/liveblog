@@ -98,7 +98,10 @@ var liveblog = {};
 	}
 
 	liveblog.display_entries = function( entries ) {
-		console.log( 'display_entries', entries );
+
+		if (!entries) {
+			return;
+		}
 
 		for ( var i in entries ) {
 			var entry = entries[i];
