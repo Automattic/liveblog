@@ -102,7 +102,6 @@ class WPCOM_Liveblog {
 			$entries_for_json[] = (object)array(
 				'id' => $entry->comment_ID,
 				'content' => self::entry_output( $entry, false ),
-				'timestamp' => $entry_timestamp,
 			);
 		}
 
