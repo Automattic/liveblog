@@ -101,18 +101,15 @@ var liveblog = {};
 			var entry = entries[i];
 			liveblog.display_entry( entry );
 		}
-
 		liveblog.show_nag( entries );
 	}
 
 	liveblog.show_nag = function( entries ) {
-		var show_nag = true == liveblog.did_first_request,
-			hidden_entries = liveblog.get_hidden_entries(),
+		var hidden_entries = liveblog.get_hidden_entries(),
 			hidden_entries_count = hidden_entries.length;
 
-		if ( ! show_nag || liveblog.is_nag_disabled() ) {
+		if ( liveblog.is_nag_disabled() ) {
 			liveblog.unhide_entries();
-			liveblog.did_first_request = true;
 			return;
 		}
 
