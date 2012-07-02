@@ -351,20 +351,16 @@ class WPCOM_Liveblog {
 		}
 	}
 
-	function json_return( $success, $message, $data = array(), $echo_and_exit = true ) {
+	function json_return( $success, $message, $data = array() ) {
 		$return = json_encode( array(
 			'status' => intval( $success ),
 			'message' => $message,
 			'data' => $data,
 		) );
 
-		if ( $echo_and_exit ) {
-			header( 'Content-Type: application/json' );
-			echo $return;
-			exit;
-		} else {
-			return $return;
-		}
+		header( 'Content-Type: application/json' );
+		echo $return;
+		exit;
 	}
 
 }
