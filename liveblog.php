@@ -170,8 +170,6 @@ class WPCOM_Liveblog {
 
 		wp_insert_comment( $entry );
 
-		self::refresh_last_entry_timestamp();
-
 		self::json_return( true, '' );
 	}
 
@@ -264,7 +262,7 @@ class WPCOM_Liveblog {
 			'nonce_key' => self::nonce_key,
 			'permalink' => get_permalink(),
 			'post_id' => get_the_ID(),
-			'last_timestamp' => self::get_last_entry_timestamp(),
+			'latest_entry_timestamp' => self::$entries->get_latest_timestamp(),
 
 			'refresh_interval' => self::refresh_interval,
 			'max_retries' => self::max_retries,
@@ -345,19 +343,6 @@ class WPCOM_Liveblog {
 			update_post_meta( $post_id, self::key, 1 );
 		else
 			delete_post_meta( $post_id, self::key );
-	}
-
-
-	function refresh_last_entry_timestamp( $timestamp = null ) {
-		if ( ! $timestamp )
-			$timestamp = current_time( 'timestamp', 1 ); // always work against gmt
-
-		set_transient( 'liveblog-last-entry-timestamp', $timestamp );
-
-		return $timestamp;
-	}
-	function get_last_entry_timestamp() {
-		return get_transient( 'liveblog-last-entry-timestamp' );
 	}
 
 	function get_entries_endpoint_url( $post_id = 0, $timestamp = '' ) {
