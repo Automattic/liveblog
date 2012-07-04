@@ -8,7 +8,6 @@
 
 /*
 TODO (0.1):
--- Loading icon
 -- Prime caches on comment update (comment count)
 -- Fix Batcache issues
 
