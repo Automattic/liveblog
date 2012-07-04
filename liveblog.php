@@ -194,7 +194,7 @@ class WPCOM_Liveblog {
 		$entry_id = $entry->comment_ID;
 		$post_id = $entry->comment_post_ID;
 		$css_classes = comment_class( '', $entry_id, $post_id, false );
-		$comment_text = get_comment_text( $entry_id );
+		$comment_text = apply_filters( 'comment_text', get_comment_text( $entry_id ), $entry );
 		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$avatar_img = get_avatar( $entry->comment_author_email, $avatar_size );
 		$author_link = get_comment_author_link( $entry_id );
