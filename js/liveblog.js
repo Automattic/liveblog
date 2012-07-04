@@ -156,7 +156,7 @@ var liveblog = {};
 
 	liveblog.display_entry = function( entry ) {
 		// If the entry is already there, update it
-		var $entry = $( '#liveblog-entry-' + entry.ID );
+		var $entry = $( '#liveblog-entry-' + entry.id );
 		if ( $entry.length ) {
 			$entry.replaceWith( entry.content )
 				.addClass( 'liveblog-updated' )
