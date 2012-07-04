@@ -16,8 +16,8 @@ class WPCOM_Liveblog_Entries {
 			'comment_approved' => $this->key,
 		);
 		$args = array_merge( $defaults, $args );
-		$entries = get_comments( $args );
-		return $entries;
+		$comments = get_comments( $args );
+		return self::entries_from_comments( $comments );
 	}
 
 	function get_latest() {
@@ -32,18 +32,15 @@ class WPCOM_Liveblog_Entries {
 		if ( is_null( $latest ) ) {
 			return null;
 		}
-		return mysql2date( 'G', $latest->comment_date_gmt );
+		return $latest->get_timestamp();
 	}
 
 	function get_between_timestamps( $start_timestamp, $end_timestamp ) {
-		$start_date = $this->mysql_from_timestamp( $start_timestamp );
-		$end_date = $this->mysql_from_timestamp( $end_timestamp );
-
 		$all_entries = $this->get();
 		$entries_between = array();
 
 		foreach( $all_entries as $entry ) {
-			if ( $entry->comment_date_gmt >= $start_date && $entry->comment_date_gmt <= $end_date ) {
+			if ( $entry->get_timestamp() >= $start_timestamp && $entry->get_timestamp() <= $end_timestamp ) {
 				$entries_between[] = $entry;
 			}
 		}
@@ -51,7 +48,10 @@ class WPCOM_Liveblog_Entries {
 		return $entries_between;
 	}
 
-	private function mysql_from_timestamp( $timestamp ) {
-		return gmdate( 'Y-m-d H:i:s', $timestamp );
+	static function entries_from_comments( $comments ) {
+		if ( !$comments ) {
+			return null;
+		}
+		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
 	}
 }

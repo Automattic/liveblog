@@ -22,14 +22,14 @@ class Test_Entries extends WP_UnitTestCase {
 	function test_get_latest_should_return_the_only_comment_if_one() {
 		$id = $this->create_comment();
 		$latest_entry = $this->entries->get_latest();
-		$this->assertEquals( $id, $latest_entry->comment_ID );
+		$this->assertEquals( $id, $latest_entry->get_id() );
 	}
 
 	function test_get_latest_should_return_the_latest_comment_if_more_than_one() {
 		$id_first = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
 		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
 		$latest_entry = $this->entries->get_latest();
-		$this->assertEquals( $id_second, $latest_entry->comment_ID );
+		$this->assertEquals( $id_second, $latest_entry->get_id() );
 	}
 
 	function test_get_latest_timestamp_should_properly_convert_to_unix_timestamp() {
@@ -42,7 +42,7 @@ class Test_Entries extends WP_UnitTestCase {
 		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
 		$entries = $this->entries->get_between_timestamps( self::JAN_1_TIMESTAMP - 10, self::JAN_2_TIMESTAMP + 10 );
 		$this->assertEquals( 2, count( $entries )  );
-		$ids = wp_list_pluck( $entries, 'comment_ID' );
+		$ids = $this->get_ids_from_entries( $entries );
 		$this->assertContains( $id_first, $ids );
 		$this->assertContains( $id_second, $ids );
 	}
@@ -50,7 +50,7 @@ class Test_Entries extends WP_UnitTestCase {
 	function test_get_between_timestamps_should_return_entries_on_the_border() {
 		$id= $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
 		$entries = $this->entries->get_between_timestamps( self::JAN_1_TIMESTAMP, self::JAN_1_TIMESTAMP + 1 );
-		$ids = wp_list_pluck( $entries, 'comment_ID' );
+		$ids = $this->get_ids_from_entries( $entries );
 		$this->assertEquals( array( $id ), $ids );
 	}
 
@@ -75,6 +75,10 @@ class Test_Entries extends WP_UnitTestCase {
 		$args = array_merge( $defaults, $args );
 		// TODO: addslashes deep
 		return wp_insert_comment( $args );
+	}
+
+	private function get_ids_from_entries( $entries ) {
+		return array_map( function( $entry ) { return $entry->get_id(); }, $entries );
 	}
 
 }
