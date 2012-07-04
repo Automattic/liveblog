@@ -111,7 +111,7 @@ class WPCOM_Liveblog {
 			$latest_timestamp = max( $latest_timestamp, $entry_timestamp );
 			$entries_for_json[] = (object)array(
 				'id' => $entry->comment_ID,
-				'content' => self::entry_output( $entry, false ),
+				'content' => self::entry_output( $entry ),
 			);
 		}
 
@@ -183,7 +183,7 @@ class WPCOM_Liveblog {
 		self::json_return( true, '' );
 	}
 
-	function entry_output( $entry, $echo = true ) {
+	function entry_output( $entry ) {
 		$output = '';
 
 		// Allow plugins to override the output
@@ -205,9 +205,8 @@ class WPCOM_Liveblog {
 		$output = ob_get_clean();
 
 		$output = apply_filters( 'liveblog_entry_output', $output, $entry );
-		if ( ! $echo )
-			return $output;
-		echo $output;
+
+		return $output;
 	}
 
 	function add_comment_class( $classes ) {
@@ -258,7 +257,7 @@ class WPCOM_Liveblog {
 		$liveblog_output .= '</div>';
 		$liveblog_output .= '<div class="liveblog-entries">';
 		foreach ( (array) $entries as $entry ) {
-			$liveblog_output .= self::entry_output( $entry, false );
+			$liveblog_output .= self::entry_output( $entry );
 		}
 
 		$liveblog_output .= '</div>';
