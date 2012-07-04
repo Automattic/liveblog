@@ -272,7 +272,7 @@ class WPCOM_Liveblog {
 
 		$editor_output = '';
 		$editor_output .= '<textarea id="liveblog-form-entry" name="liveblog-form-entry"></textarea>';
-		$editor_output .= '<input type="button" id="liveblog-form-entry-submit" class="button" value="'. __( 'Post Update' ) . '" />';
+		$editor_output .= '<input type="button" id="liveblog-form-entry-submit" class="button" value="'. esc_attr__( 'Post Update' ) . '" />';
 		$editor_output .= wp_nonce_field( self::nonce_key, self::nonce_key, false, false );
 
 		return $editor_output;
