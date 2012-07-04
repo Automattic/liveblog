@@ -13,6 +13,7 @@
 		liveblog.publisher.$nonce = $( '#liveblog_nonce' );
 		liveblog.publisher.$entry_button.bind( 'click', liveblog.publisher.submit_click );
 	}
+
 	liveblog.publisher.submit_click = function( e ) {
 		e.preventDefault();
 		liveblog.publisher.insert_entry();
@@ -34,6 +35,7 @@
 
 		liveblog.ajax_request( liveblog_settings.ajaxurl, data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	}
+
 	liveblog.publisher.insert_entry_success = function( data ) {
 		liveblog.publisher.$entry_text.val( '' );
 
@@ -41,6 +43,7 @@
 		liveblog.get_recent_entries();
 
 	}
+
 	liveblog.publisher.insert_entry_error = function( data ) {
 
 	}
