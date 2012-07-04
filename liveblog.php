@@ -311,11 +311,8 @@ class WPCOM_Liveblog {
 			delete_post_meta( $post_id, self::key );
 	}
 
-	function get_entries_endpoint_url( $post_id = 0, $timestamp = '' ) {
-		$url = trailingslashit( get_permalink( $post_id ) . self::url_endpoint );
-		if ( $timestamp )
-			$url .= trailingslashit( $timestamp );
-		return $url;
+	function get_entries_endpoint_url() {
+		return trailingslashit( get_permalink( self::$post_id ) . self::url_endpoint );
 	}
 
 	function ajax_current_user_can_edit_liveblog() {
