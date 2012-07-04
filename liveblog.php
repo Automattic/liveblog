@@ -147,8 +147,8 @@ class WPCOM_Liveblog {
 	}
 
 	function ajax_insert_entry() {
-		self::_ajax_current_user_can_edit_liveblog();
-		self::_ajax_check_nonce();
+		self::ajax_current_user_can_edit_liveblog();
+		self::ajax_check_nonce();
 
 		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 
@@ -232,7 +232,7 @@ class WPCOM_Liveblog {
 		wp_enqueue_script( 'liveblog', plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery' ), self::version, true );
 		wp_enqueue_style( 'liveblog', plugins_url( 'css/liveblog.css', __FILE__ ) );
 
-		if ( self::_current_user_can_edit_liveblog() )
+		if ( self::current_user_can_edit_liveblog() )
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( 'liveblog' ), self::version, true );
 
 		$liveblog_settings = apply_filters( 'liveblog_settings', array(
@@ -278,7 +278,7 @@ class WPCOM_Liveblog {
 	}
 
 	function get_entry_editor_output() {
-		if ( ! self::_current_user_can_edit_liveblog() )
+		if ( ! self::current_user_can_edit_liveblog() )
 			return;
 
 		$editor_output = '';
@@ -329,16 +329,16 @@ class WPCOM_Liveblog {
 		return $url;
 	}
 
-	function _ajax_current_user_can_edit_liveblog() {
-		if ( ! self::_current_user_can_edit_liveblog() ) {
+	function ajax_current_user_can_edit_liveblog() {
+		if ( ! self::current_user_can_edit_liveblog() ) {
 			self::json_return( false, __( 'Cheatin\', uh?', 'liveblog' ) );
 		}
 	}
-	function _current_user_can_edit_liveblog() {
+	function current_user_can_edit_liveblog() {
 		return current_user_can( apply_filters( 'liveblog_edit_cap', self::edit_cap ) );
 	}
 
-	function _ajax_check_nonce( $action = 'liveblog_nonce' ) {
+	function ajax_check_nonce( $action = 'liveblog_nonce' ) {
 		if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( $_REQUEST[ self::nonce_key ], $action ) ) {
 			self::json_return( false, __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
 		}
