@@ -155,7 +155,7 @@ class WPCOM_Liveblog {
 		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 
 		if ( ! $post_id )
-			self::json_return( false, __( 'Sorry, that\'s an invalid post_id', 'liveblog' ) );
+			self::json_return( false, __( "Sorry, that's an invalid post_id", 'liveblog' ) );
 
 		$user = wp_get_current_user();
 
