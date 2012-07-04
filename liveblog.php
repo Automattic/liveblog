@@ -224,36 +224,6 @@ class WPCOM_Liveblog {
 		return $classes;
 	}
 
-	function get_entries_since( $post_id, $timestamp = 0 ) {
-		add_filter( 'comments_clauses', array( __CLASS__, 'comments_where_include_liveblog_status' ), false, 2 );
-		$entries = get_comments( array(
-			'post_id' => $post_id,
-			'orderby' => 'comment_date_gmt',
-			'order' => 'ASC',
-			'type' => self::key,
-		) );
-		remove_filter( 'comments_clauses', array( __CLASS__, 'comments_where_include_liveblog_status' ), false );
-
-		$filtered_entries = array();
-
-		foreach( $entries as $entry ) {
-			if ( $timestamp && strtotime( $entry->comment_date_gmt ) <= $timestamp )
-				continue;
-
-			$filtered_entries[ $entry->comment_ID ] = $entry;
-		}
-		$entries = $filtered_entries;
-
-		return $entries;
-	}
-
-	function comments_where_include_liveblog_status( $clauses, $query ) {
-		global $wpdb;
-		// TODO: should we only fetch the posts we want based on the timestamp in the current context?
-		$clauses[ 'where' ] = $wpdb->prepare( 'comment_post_ID = %d AND comment_type = %s AND comment_approved = %s', $query->query_vars['post_id'], self::key, self::key );
-		return $clauses;
-	}
-
 	function enqueue_scripts() {
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
@@ -439,20 +409,6 @@ class WPCOM_Liveblog_Entries {
 		}
 
 		return $entries_between;
-	}
-
-	function add_between_conditions_for_where( $clauses, $query ) {
-		global $wpdb;
-		$vars = $query->query_vars;
-		$clauses['where'] = $wpdb->prepare( "( {$clauses['where']} ) AND ( comment_date_gmt BETWEEN %s AND %s )", $vars['start_date'], $vars['end_date'] );
-		return $clauses;
-	}
-
-	function add_comment_approved_condition_for_where( $clauses, $query ) {
-		global $wpdb;
-		$vars = $query->query_vars;
-		$clauses['where'] = $wpdb->prepare( "( {$clauses['where']} ) AND ( comment_approved = %s )", $this->key );
-		return $clauses;
 	}
 
 	private function mysql_from_timestamp( $timestamp ) {
