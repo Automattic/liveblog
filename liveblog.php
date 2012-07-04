@@ -11,7 +11,6 @@ TODO (0.1):
 -- Loading icon
 -- Prime caches on comment update (comment count)
 -- Fix Batcache issues
--- Show updates server-side on initial load? (problem is that batcache would show an old set; although, timestamp would also be old so we'd still fetch the necessary entries)
 
 TODO (future):
 -- PHP and JS Actions/Filters/Triggers
