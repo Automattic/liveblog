@@ -178,8 +178,11 @@ class WPCOM_Liveblog {
 			'comment_agent' => substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 ),
 		);
 
-		wp_insert_comment( $entry );
+		$new_comment_id = wp_insert_comment( $entry );
 
+		if ( !$new_comment_id ) {
+			self::json_return( false, __( 'Error posting entry!' ) );
+		}
 		self::json_return( true, '' );
 	}
 
