@@ -80,7 +80,7 @@ class WPCOM_Liveblog {
 		}
 
 		if ( self::is_entries_ajax_request() ) {
-			self::handle_entries_ajax_request();
+			self::ajax_entries_between();
 			return;
 		}
 
@@ -88,7 +88,7 @@ class WPCOM_Liveblog {
 		exit;
 	}
 
-	function handle_entries_ajax_request() {
+	function ajax_entries_between() {
 		$current_timestamp = time();
 
 		list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
