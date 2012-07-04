@@ -42,8 +42,6 @@ var liveblog = {};
 	}
 
 	liveblog.get_recent_entries = function() {
-		// TODO: Show loading
-
 		var url = liveblog_settings.entriesurl;
 		var from = liveblog.latest_entry_timestamp + 1;
 		// TODO: instead of using the current time use the latest
