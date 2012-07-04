@@ -39,6 +39,8 @@ class WPCOM_Liveblog {
 	const delay_threshold = 10; // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier = 1.5; // by how much should we inscrease the refresh interval
 
+	const default_avatar_size = 30;
+
 	static $post_id = null;
 	static $entries = null;
 	static $do_not_cache_response = false;
@@ -182,8 +184,6 @@ class WPCOM_Liveblog {
 	}
 
 	function entry_output( $entry, $echo = true ) {
-		$entry_id = $entry->comment_ID;
-		$post_id = $entry->comment_post_ID;
 		$output = '';
 
 		// Allow plugins to override the output
@@ -191,28 +191,18 @@ class WPCOM_Liveblog {
 		if ( $output )
 			return $output;
 
-		$args = apply_filters( 'liveblog_entry_output_args', array(
-			'avatar_size' => 30,
-		) );
+		$entry_id = $entry->comment_ID;
+		$post_id = $entry->comment_post_ID;
+		$css_classes = comment_class( '', $entry_id, $post_id, false );
+		$comment_text = get_comment_text( $entry_id );
+		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$avatar_img = get_avatar( $entry->comment_author_email, $avatar_size );
+		$author_link = get_comment_author_link( $entry_id );
+		$entry_time = sprintf( __('%1$s at %2$s'), get_comment_date( '', $entry_id ), get_comment_date( 'g:i a', $entry_id ) );
 
-		$output .= '<div id="liveblog-entry-'. $entry_id .'" '. comment_class( '', $entry_id, $post_id, false ) . '>';
-			$output .= '<div class="liveblog-entry-text">';
-				$output .= get_comment_text( $entry_id );
-			$output .= '</div>';
-
-			$output .= '<header class="liveblog-meta">';
-				$output .= '<span class="liveblog-author-avatar">';
-					$output .= get_avatar( $entry->comment_author_email, $args['avatar_size'] );
-				$output .= '</span>';
-
-				$output .= '<span class="liveblog-author-name">'. get_comment_author_link( $entry_id ) .'</span>';
-				$output .= '<span class="liveblog-meta-time">';
-					$output .= '<a href="#liveblog-entry-'. $entry_id .'">';
-					$output .= sprintf( __('%1$s at %2$s'), get_comment_date( '', $entry_id ), get_comment_date( 'g:i a', $entry_id ) );
-					$output .= '</a>';
-				$output .= '</time>';
-			$output .= '</header>';
-		$output .= '</div>';
+		ob_start();
+		include dirname( __FILE__ ) . '/entry.tmpl.php';
+		$output = ob_get_clean();
 
 		$output = apply_filters( 'liveblog_entry_output', $output, $entry );
 		if ( ! $echo )
