@@ -31,7 +31,6 @@ var liveblog = {};
 		if ( liveblog_settings.original_refresh_interval )
 			liveblog_settings.refresh_interval = liveblog_settings.original_refresh_interval;
 
-		console.log( 'undelay timer', liveblog_settings.refresh_interval );
 	}
 	liveblog.delay_timer = function() {
 		if ( ! liveblog_settings.original_refresh_interval )
@@ -39,7 +38,6 @@ var liveblog = {};
 
 		liveblog_settings.refresh_interval *= liveblog_settings.delay_multiplier;
 
-		console.log( 'delay timer', liveblog_settings.refresh_interval );
 	}
 
 	liveblog.get_recent_entries = function() {
@@ -70,7 +68,6 @@ var liveblog = {};
 	}
 
 	liveblog.get_recent_entries_error = function( data ) {
-		console.log( 'FAIL - get_recent_entries_error', arguments, liveblog.failure_count );
 
 		// Have a max number of checks, which causes the auto-update to shut off or slow down the auto-update
 		if ( ! liveblog.failure_count )
@@ -186,8 +183,6 @@ var liveblog = {};
 	}
 
 	liveblog.ajax_request = function( url, data, success_callback, error_callback, method ) {
-		console.log( 'Making liveblog ajax request', arguments );
-
 		if ( 'function' !== typeof( success_callback ) )
 			success_callback = liveblog.success_callback;
 
@@ -202,14 +197,12 @@ var liveblog = {};
 			type: method,
 			dataType: 'json',
 			success: function( data ) {
-				console.log( 'AJAX call success', arguments );
 				if ( 1 == data.status )
 					success_callback( data );
 				else
 					error_callback( data );
 			},
 			error: function( data ) {
-				console.log( 'AJAX call error', arguments );
 				error_callback( data );
 			}
 		} );
