@@ -210,6 +210,16 @@ var liveblog = {};
 	liveblog.success_callback = function() {}
 	liveblog.error_callback = function() {}
 
+	liveblog.add_error = function( data ) {
+		// TODO: show errors in a box near the nag
+		// TODO: throtle errors
+		console.log(data);
+		if ( data.message )
+			alert( 'Error: ' + data.message );
+		else if ( data.status && data.statusText )
+			alert( 'Error ' + data.status + ': ' + data.statusText );
+	}
+
 	// Initialize everything!
 	$( document ).ready( liveblog.init );
 

@@ -49,6 +49,7 @@
 	}
 
 	liveblog.publisher.insert_entry_error = function( data ) {
+		liveblog.add_error( data );
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.hide_spinner();
 	}
