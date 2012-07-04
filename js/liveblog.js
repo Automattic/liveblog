@@ -186,7 +186,7 @@ var liveblog = {};
 		if ( 'function' !== typeof( success_callback ) )
 			success_callback = liveblog.success_callback;
 
-		if ( 'function' === typeof( error_callback ) )
+		if ( 'function' !== typeof( error_callback ) )
 			error_callback = liveblog.error_callback;
 
 		method = method || 'GET';
