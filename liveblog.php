@@ -198,7 +198,7 @@ class WPCOM_Liveblog {
 		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$avatar_img = get_avatar( $entry->comment_author_email, $avatar_size );
 		$author_link = get_comment_author_link( $entry_id );
-		$entry_time = sprintf( __('%1$s at %2$s'), get_comment_date( '', $entry_id ), get_comment_date( 'g:i a', $entry_id ) );
+		$entry_time = sprintf( __('%1$s at %2$s'), get_comment_date( get_option( 'date_format' ), $entry_id ), get_comment_date( get_option( 'time_format' ), $entry_id ) );
 
 		ob_start();
 		include dirname( __FILE__ ) . '/entry.tmpl.php';
