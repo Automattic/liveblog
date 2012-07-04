@@ -40,6 +40,7 @@ class WPCOM_Liveblog {
 
 	static $post_id = null;
 	static $entries = null;
+	static $do_not_cache_response = false;
 
 	function load() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
@@ -90,6 +91,10 @@ class WPCOM_Liveblog {
 		list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
 		if ( !$end_timestamp ) {
 			wp_safe_redirect( get_permalink() );
+		}
+
+		if ( $end_timestamp > $current_timestamp ) {
+			self::$do_not_cache_response = true;
 		}
 
 		$entries = self::$entries->get_between_timestamps( $start_timestamp, $end_timestamp );
@@ -377,6 +382,9 @@ class WPCOM_Liveblog {
 		) );
 
 		header( 'Content-Type: application/json' );
+		if ( self::$do_not_cache_response ) {
+			nocache_headers();
+		}
 		echo $return;
 		exit;
 	}
