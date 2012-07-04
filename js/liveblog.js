@@ -4,6 +4,7 @@ var liveblog = {};
 
 	liveblog.init = function() {
 		liveblog.$entry_container = $( '.liveblog-entries' );
+		liveblog.$spinner = $( '#liveblog-update-spinner' );
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
 		liveblog.latest_entry_timestamp = liveblog_settings.latest_entry_timestamp;
@@ -50,13 +51,15 @@ var liveblog = {};
 		var to = Math.floor(Date.now() / 1000);
 
 		url += from + '/' + to + '/';
-
+		liveblog.show_spinner();
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );
 	}
 
 	liveblog.get_recent_entries_success = function( data ) {
 
 		// TODO: highlight updated posts
+
+		liveblog.hide_spinner();
 
 		if (data.data.entries.length)
 			liveblog.latest_entry_timestamp = data.data.latest_timestamp;
@@ -68,6 +71,8 @@ var liveblog = {};
 	}
 
 	liveblog.get_recent_entries_error = function( data ) {
+
+		liveblog.hide_spinner();
 
 		// Have a max number of checks, which causes the auto-update to shut off or slow down the auto-update
 		if ( ! liveblog.failure_count )
@@ -218,6 +223,14 @@ var liveblog = {};
 			alert( 'Error: ' + data.message );
 		else if ( data.status && data.statusText )
 			alert( 'Error ' + data.status + ': ' + data.statusText );
+	}
+
+	liveblog.show_spinner = function() {
+		liveblog.$spinner.spin( 'small' );
+	}
+
+	liveblog.hide_spinner = function() {
+		liveblog.$spinner.spin( false );
 	}
 
 	// Initialize everything!

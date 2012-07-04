@@ -240,6 +240,7 @@ class WPCOM_Liveblog {
 
 		$liveblog_output = '';
 		$liveblog_output .= '<div id="liveblog-'. self::$post_id .'" class="liveblog-container">';
+		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
 		$liveblog_output .= '<div class="liveblog-actions">';
 		$liveblog_output .= self::get_entry_editor_output();
 		$liveblog_output .= '</div>';
