@@ -224,6 +224,13 @@ class WPCOM_Liveblog {
 		if ( self::current_user_can_edit_liveblog() )
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( 'liveblog' ), self::version, true );
 
+		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
+			wp_enqueue_script( 'jquery.spin' );
+		} else {
+			wp_enqueue_script( 'spin', plugins_url( 'js/spin.js', __FILE__ ), false, '1.2.4' );
+			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' ) );
+		}
+
 		$liveblog_settings = apply_filters( 'liveblog_settings', array(
 			'key' => self::key,
 			'nonce_key' => self::nonce_key,
@@ -273,6 +280,7 @@ class WPCOM_Liveblog {
 		$editor_output = '';
 		$editor_output .= '<textarea id="liveblog-form-entry" name="liveblog-form-entry"></textarea>';
 		$editor_output .= '<input type="button" id="liveblog-form-entry-submit" class="button" value="'. esc_attr__( 'Post Update' ) . '" />';
+		$editor_output .= '<span id="liveblog-submit-spinner"></span>';
 		$editor_output .= wp_nonce_field( self::nonce_key, self::nonce_key, false, false );
 
 		return $editor_output;

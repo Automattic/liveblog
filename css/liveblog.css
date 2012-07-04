@@ -59,3 +59,7 @@
 	float: left;
 	margin: 0 10px 0 0;
 }
+
+#liveblog-submit-spinner {
+	margin-left: 16px;
+}
