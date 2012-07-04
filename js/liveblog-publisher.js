@@ -54,7 +54,6 @@
 		liveblog.publisher.$entry_text.attr( 'disabled', 'disabled' );
 	}
 
-
 	liveblog.publisher.enable_posting_interface = function() {
 		liveblog.publisher.$entry_button.attr( 'disabled', null );
 		liveblog.publisher.$entry_text.attr( 'disabled', null );
