@@ -181,7 +181,12 @@ class WPCOM_Liveblog {
 		if ( !$new_comment_id ) {
 			self::json_return( false, __( 'Error posting entry!' ) );
 		}
-		self::json_return( true, '' );
+
+		$entry = WPCOM_Liveblog_Entry::from_comment( get_comment( $new_comment_id ) );
+
+		// do not send latest_timestamp, because if we send it the client won't try to get older entries, but since we now send only the inserted
+		// one we don't know if there weren't any entries in between
+		self::json_return( true, '', array( 'entries' => array( $entry->for_json() ), 'current_timestamp' => time(), 'latest_timestamp' => null )  );
 	}
 
 	function entry_output( $entry ) {

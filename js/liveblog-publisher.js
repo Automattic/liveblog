@@ -44,8 +44,7 @@
 		liveblog.publisher.$entry_text.val( '' );
 
 		liveblog.reset_timer();
-		liveblog.get_recent_entries();
-
+		liveblog.get_recent_entries_success( data );
 	}
 
 	liveblog.publisher.insert_entry_error = function( data ) {
