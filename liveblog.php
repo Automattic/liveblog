@@ -85,6 +85,8 @@ class WPCOM_Liveblog {
 	}
 
 	function handle_entries_ajax_request() {
+		$current_timestamp = time();
+
 		list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
 		if ( !$end_timestamp ) {
 			wp_safe_redirect( get_permalink() );
@@ -92,7 +94,7 @@ class WPCOM_Liveblog {
 
 		$entries = self::$entries->get_between_timestamps( $start_timestamp, $end_timestamp );
 		if ( !$entries ) {
-			self::json_return( true, '', array( 'entries' => array(), 'current_timestamp' => time(), 'latest_timestamp' => null ) );
+			self::json_return( true, '', array( 'entries' => array(), 'current_timestamp' => $current_timestamp, 'latest_timestamp' => null ) );
 		}
 		$latest_timestamp = 0;
 		$entries_for_json = array();
@@ -107,7 +109,7 @@ class WPCOM_Liveblog {
 
 		$result_for_json = array(
 			'entries' => $entries_for_json,
-			'current_timestamp' => time(),
+			'current_timestamp' => $current_timestamp,
 			'latest_timestamp' => $latest_timestamp,
 		);
 
