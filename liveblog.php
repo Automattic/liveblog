@@ -151,7 +151,7 @@ class WPCOM_Liveblog {
 		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 
 		if ( ! $post_id )
-			self::json_return( false, __( "Sorry, that's an invalid post_id", 'liveblog' ) );
+			self::send_error( __( "Sorry, that's an invalid post_id", 'liveblog' ) );
 
 		$user = wp_get_current_user();
 
@@ -177,7 +177,7 @@ class WPCOM_Liveblog {
 		$new_comment_id = wp_insert_comment( $entry );
 
 		if ( !$new_comment_id ) {
-			self::json_return( false, __( 'Error posting entry!' ) );
+			self::send_error( __( 'Error posting entry!' ) );
 		}
 
 		$entry = WPCOM_Liveblog_Entry::from_comment( get_comment( $new_comment_id ) );
@@ -306,7 +306,7 @@ class WPCOM_Liveblog {
 
 	function ajax_current_user_can_edit_liveblog() {
 		if ( ! self::current_user_can_edit_liveblog() ) {
-			self::json_return( false, __( 'Cheatin\', uh?', 'liveblog' ) );
+			self::send_error( __( 'Cheatin\', uh?', 'liveblog' ) );
 		}
 	}
 	function current_user_can_edit_liveblog() {
@@ -315,7 +315,7 @@ class WPCOM_Liveblog {
 
 	function ajax_check_nonce( $action = 'liveblog_nonce' ) {
 		if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( $_REQUEST[ self::nonce_key ], $action ) ) {
-			self::json_return( false, __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
+			self::send_error( __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
 		}
 	}
 
@@ -326,17 +326,16 @@ class WPCOM_Liveblog {
 			'data' => $data,
 		) );
 
-		$success = intval( $success );
-		if ( !$success ) {
-			self::status_header_with_message( 500, $message );
-			exit;
-		}
-
 		header( 'Content-Type: application/json' );
 		if ( self::$do_not_cache_response ) {
 			nocache_headers();
 		}
 		echo $return;
+		exit;
+	}
+
+	function send_error( $message ) {
+		self::status_header_with_message( 500, $message );
 		exit;
 	}
 
