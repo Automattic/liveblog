@@ -59,10 +59,10 @@ var liveblog = {};
 
 		liveblog.hide_spinner();
 
-		if (response.data.entries.length)
-			liveblog.latest_entry_timestamp = response.data.latest_timestamp;
+		if (response.entries.length)
+			liveblog.latest_entry_timestamp = response.latest_timestamp;
 
-		liveblog.display_entries( response.data.entries );
+		liveblog.display_entries( response.entries );
 
 		liveblog.reset_timer();
 		liveblog.undelay_timer();
@@ -199,15 +199,8 @@ var liveblog = {};
 			data: data,
 			type: method,
 			dataType: 'json',
-			success: function( response ) {
-				if ( 1 == response.status )
-					success_callback( response );
-				else
-					error_callback( response );
-			},
-			error: function( response ) {
-				error_callback( response );
-			}
+			success: success_callback,
+			error: error_callback
 		} );
 	}
 	liveblog.success_callback = function() {}
@@ -216,11 +209,7 @@ var liveblog = {};
 	liveblog.add_error = function( response ) {
 		// TODO: show errors in a box near the nag
 		// TODO: throtle errors
-		console.log(response);
-		if ( response.message )
-			alert( 'Error: ' + response.message );
-		else if ( response.status && response.statusText )
-			alert( 'Error ' + response.status + ': ' + response.statusText );
+		alert( 'Error ' + response.status + ': ' + response.statusText );
 	}
 
 	liveblog.show_spinner = function() {

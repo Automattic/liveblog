@@ -320,17 +320,14 @@ class WPCOM_Liveblog {
 	}
 
 	function json_return( $data ) {
-		$return = json_encode( array(
-			'status' => 1,
-			'message' => '',
-			'data' => $data,
-		) );
+		$json_data = json_encode( $data );
 
 		header( 'Content-Type: application/json' );
 		if ( self::$do_not_cache_response ) {
 			nocache_headers();
 		}
-		echo $return;
+
+		echo $json_data;
 		exit;
 	}
 
