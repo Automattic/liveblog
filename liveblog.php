@@ -326,12 +326,27 @@ class WPCOM_Liveblog {
 			'data' => $data,
 		) );
 
+		$success = intval( $success );
+		if ( !$success ) {
+			self::status_header_with_message( 500, $message );
+			exit;
+		}
+
 		header( 'Content-Type: application/json' );
 		if ( self::$do_not_cache_response ) {
 			nocache_headers();
 		}
 		echo $return;
 		exit;
+	}
+
+	function status_header_with_message( $status, $message ) {
+		global $wp_header_to_desc;
+		$status = absint( $status );
+		$official_message = isset( $wp_header_to_desc[$status] )? $wp_header_to_desc[$status] : '';
+		$wp_header_to_desc[$status] = $message;
+		status_header( $status );
+		$wp_header_to_desc[$status] = $official_message;
 	}
 
 }
