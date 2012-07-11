@@ -100,7 +100,7 @@ class WPCOM_Liveblog {
 
 		$entries = self::$entries->get_between_timestamps( $start_timestamp, $end_timestamp );
 		if ( !$entries ) {
-			self::json_return( true, '', array( 'entries' => array(), 'current_timestamp' => $current_timestamp, 'latest_timestamp' => null ) );
+			self::json_return( array( 'entries' => array(), 'current_timestamp' => $current_timestamp, 'latest_timestamp' => null ) );
 		}
 
 		$latest_timestamp = 0;
@@ -117,7 +117,7 @@ class WPCOM_Liveblog {
 			'latest_timestamp' => $latest_timestamp,
 		);
 
-		self::json_return( true, '', $result_for_json );
+		self::json_return( $result_for_json );
 	}
 
 	function is_viewing_liveblog_post() {
@@ -184,7 +184,7 @@ class WPCOM_Liveblog {
 
 		// do not send latest_timestamp, because if we send it the client won't try to get older entries, but since we now send only the inserted
 		// one we don't know if there weren't any entries in between
-		self::json_return( true, '', array( 'entries' => array( $entry->for_json() ), 'current_timestamp' => time(), 'latest_timestamp' => null )  );
+		self::json_return( array( 'entries' => array( $entry->for_json() ), 'current_timestamp' => time(), 'latest_timestamp' => null )  );
 	}
 
 	function entry_output( $entry ) {
@@ -319,10 +319,10 @@ class WPCOM_Liveblog {
 		}
 	}
 
-	function json_return( $success, $message, $data = array() ) {
+	function json_return( $data ) {
 		$return = json_encode( array(
-			'status' => intval( $success ),
-			'message' => $message,
+			'status' => 1,
+			'message' => '',
 			'data' => $data,
 		) );
 
