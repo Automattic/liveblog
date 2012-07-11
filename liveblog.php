@@ -306,7 +306,7 @@ class WPCOM_Liveblog {
 
 	function ajax_current_user_can_edit_liveblog() {
 		if ( ! self::current_user_can_edit_liveblog() ) {
-			self::send_error( __( 'Cheatin\', uh?', 'liveblog' ) );
+			self::send_error( __( "Cheatin', uh?", 'liveblog' ) );
 		}
 	}
 	function current_user_can_edit_liveblog() {
