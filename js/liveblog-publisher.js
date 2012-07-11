@@ -38,17 +38,17 @@
 		liveblog.ajax_request( liveblog_settings.ajaxurl, data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	}
 
-	liveblog.publisher.insert_entry_success = function( data ) {
+	liveblog.publisher.insert_entry_success = function( response ) {
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.hide_spinner();
 		liveblog.publisher.$entry_text.val( '' );
 
 		liveblog.reset_timer();
-		liveblog.get_recent_entries_success( data );
+		liveblog.get_recent_entries_success( response );
 	}
 
-	liveblog.publisher.insert_entry_error = function( data ) {
-		liveblog.add_error( data );
+	liveblog.publisher.insert_entry_error = function( response ) {
+		liveblog.add_error( response );
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.hide_spinner();
 	}

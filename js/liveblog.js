@@ -53,22 +53,22 @@ var liveblog = {};
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );
 	}
 
-	liveblog.get_recent_entries_success = function( data ) {
+	liveblog.get_recent_entries_success = function( response ) {
 
 		// TODO: highlight updated posts
 
 		liveblog.hide_spinner();
 
-		if (data.data.entries.length)
-			liveblog.latest_entry_timestamp = data.data.latest_timestamp;
+		if (response.data.entries.length)
+			liveblog.latest_entry_timestamp = response.data.latest_timestamp;
 
-		liveblog.display_entries( data.data.entries );
+		liveblog.display_entries( response.data.entries );
 
 		liveblog.reset_timer();
 		liveblog.undelay_timer();
 	}
 
-	liveblog.get_recent_entries_error = function( data ) {
+	liveblog.get_recent_entries_error = function( response ) {
 
 		liveblog.hide_spinner();
 
@@ -199,28 +199,28 @@ var liveblog = {};
 			data: data,
 			type: method,
 			dataType: 'json',
-			success: function( data ) {
-				if ( 1 == data.status )
-					success_callback( data );
+			success: function( response ) {
+				if ( 1 == response.status )
+					success_callback( response );
 				else
-					error_callback( data );
+					error_callback( response );
 			},
-			error: function( data ) {
-				error_callback( data );
+			error: function( response ) {
+				error_callback( response );
 			}
 		} );
 	}
 	liveblog.success_callback = function() {}
 	liveblog.error_callback = function() {}
 
-	liveblog.add_error = function( data ) {
+	liveblog.add_error = function( response ) {
 		// TODO: show errors in a box near the nag
 		// TODO: throtle errors
-		console.log(data);
-		if ( data.message )
-			alert( 'Error: ' + data.message );
-		else if ( data.status && data.statusText )
-			alert( 'Error ' + data.status + ': ' + data.statusText );
+		console.log(response);
+		if ( response.message )
+			alert( 'Error: ' + response.message );
+		else if ( response.status && response.statusText )
+			alert( 'Error ' + response.status + ': ' + response.statusText );
 	}
 
 	liveblog.show_spinner = function() {
