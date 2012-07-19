@@ -21,7 +21,7 @@ TODO (future):
 */
 
 require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry.php';
-require dirname( __FILE__ ) . '/class-wpcom-liveblog-entries.php';
+require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-query.php';
 
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
@@ -40,7 +40,7 @@ class WPCOM_Liveblog {
 
 
 	static $post_id = null;
-	static $entries = null;
+	static $entry_query = null;
 	static $do_not_cache_response = false;
 
 	function load() {
@@ -70,7 +70,7 @@ class WPCOM_Liveblog {
 			return;
 
 		self::$post_id = get_the_ID();
-		self::$entries = new WPCOM_Liveblog_Entries( self::$post_id, self::key );
+		self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 
 		if ( self::is_initial_page_request() ) {
 			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) );
@@ -98,7 +98,7 @@ class WPCOM_Liveblog {
 			self::$do_not_cache_response = true;
 		}
 
-		$entries = self::$entries->get_between_timestamps( $start_timestamp, $end_timestamp );
+		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
 		if ( !$entries ) {
 			self::json_return( array( 'entries' => array(), 'current_timestamp' => $current_timestamp, 'latest_timestamp' => null ) );
 		}
@@ -217,7 +217,7 @@ class WPCOM_Liveblog {
 			'nonce_key' => self::nonce_key,
 			'permalink' => get_permalink(),
 			'post_id' => get_the_ID(),
-			'latest_entry_timestamp' => self::$entries->get_latest_timestamp(),
+			'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
 			'refresh_interval' => self::refresh_interval,
 			'max_retries' => self::max_retries,
@@ -235,7 +235,7 @@ class WPCOM_Liveblog {
 	}
 
 	function add_liveblog_to_content( $content ) {
-		$entries = self::$entries->get( array( 'order' => 'ASC' ) );
+		$entries = self::$entry_query->get( array( 'order' => 'ASC' ) );
 		$entries = array_reverse( $entries );
 
 		$liveblog_output = '';

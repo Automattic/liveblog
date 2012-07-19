@@ -1,6 +1,5 @@
 <?php
-
-class WPCOM_Liveblog_Entries {
+class WPCOM_Liveblog_Entry_Query {
 
 	function __construct( $post_id, $key ) {
 		$this->post_id = $post_id;
