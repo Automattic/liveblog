@@ -7,8 +7,15 @@ var liveblog = {};
 		liveblog.$spinner = $( '#liveblog-update-spinner' );
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
-		liveblog.latest_entry_timestamp = liveblog_settings.latest_entry_timestamp;
+		liveblog.set_initial_timestamps();
 	}
+
+	liveblog.set_initial_timestamps = function() {
+		var now = liveblog.current_timestamp();
+		liveblog.latest_entry_timestamp = liveblog_settings.latest_entry_timestamp;
+		liveblog.latest_response_local_timestamp = now;
+		liveblog.latest_response_server_timestamp = now;
+ }
 
 	// wp_localize_scripts makes all integers into strings, and in JS
 	// we need them to be real integers, so that we can use them in
@@ -46,7 +53,8 @@ var liveblog = {};
 		var from = liveblog.latest_entry_timestamp + 1;
 		// TODO: instead of using the current time use the latest
 		// server time to reconstruct the difference
-		var to = Math.floor(Date.now() / 1000);
+		var local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp;
+		var to = liveblog.latest_response_server_timestamp + local_diff;
 
 		url += from + '/' + to + '/';
 		liveblog.show_spinner();
@@ -61,6 +69,9 @@ var liveblog = {};
 
 		if (response.entries.length)
 			liveblog.latest_entry_timestamp = response.latest_timestamp;
+
+		liveblog.latest_response_server_timestamp = response.current_timestamp;
+		liveblog.latest_response_local_timestamp = liveblog.current_timestamp();
 
 		liveblog.display_entries( response.entries );
 
@@ -219,6 +230,10 @@ var liveblog = {};
 	liveblog.hide_spinner = function() {
 		liveblog.$spinner.spin( false );
 	}
+
+	liveblog.current_timestamp = function() {
+		return Math.floor( Date.now() / 1000 );
+ 	}
 
 	// Initialize everything!
 	$( document ).ready( liveblog.init );
