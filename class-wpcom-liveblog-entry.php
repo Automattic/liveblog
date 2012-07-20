@@ -45,6 +45,8 @@ class WPCOM_Liveblog_Entry {
 		$author_link = get_comment_author_link( $entry_id );
 		$entry_time = sprintf( __('%1$s at %2$s'), get_comment_date( get_option( 'date_format' ), $entry_id ), get_comment_date( get_option( 'time_format' ), $entry_id ) );
 
+		$can_edit_liveblog = WPCOM_Liveblog::current_user_can_edit_liveblog();
+
 		ob_start();
 		include dirname( __FILE__ ) . '/entry.tmpl.php';
 		$output = ob_get_clean();
@@ -53,4 +55,5 @@ class WPCOM_Liveblog_Entry {
 
 		return $output;
 	}
+
 }
