@@ -1,8 +1,6 @@
 <?php
 
 class Test_Entry_Query extends WP_UnitTestCase {
-	var $plugin_slug = 'liveblog';
-
 	const JAN_1_TIMESTAMP = 1325376000;
 	const JAN_1_MYSQL = '2012-01-01 00:00:00';
 
