@@ -59,20 +59,14 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	private function create_comment( $args = array() ) {
-		static $number = 0;
-		$number++;
 		$defaults = array(
 			'comment_post_ID' => $this->entry_query->post_id,
-			'comment_content' => 'Comment Text ' . $number,
 			'comment_approved' => $this->entry_query->key,
 			'comment_type' => $this->entry_query->key,
-			'user_id' => 1,
-			'comment_author' => 'Baba',
-			'comment_author_email' => 'baba@baba.net',
 		);
 		$args = array_merge( $defaults, $args );
 		// TODO: addslashes deep
-		return wp_insert_comment( $args );
+		return $this->factory->comment->create( $args );
 	}
 
 	private function get_ids_from_entries( $entries ) {
