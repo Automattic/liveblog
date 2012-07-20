@@ -1,11 +1,8 @@
 <?php
-define( 'WP_TESTS_PATH', 'Enter the path to your wordpress-tests' );
+define( 'WP_TESTS_PATH', 'Enter the path to your unit-tests checkout' );
 
 $GLOBALS['wp_tests_options'] = array(
-	/*
-    'active_plugins' => array( 'plugin-dir/plugin-file.php' ),
-	*/
-
+    'active_plugins' => array( 'liveblog/liveblog.php' ),
 );
 
-require rtrim( WP_TESTS_PATH, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . 'init.php';
+require rtrim( WP_TESTS_PATH, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . 'bootstrap.php';
