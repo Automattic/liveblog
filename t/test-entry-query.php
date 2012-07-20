@@ -1,6 +1,6 @@
 <?php
 
-class Test_Entries extends WP_UnitTestCase {
+class Test_Entry_Query extends WP_UnitTestCase {
 	var $plugin_slug = 'liveblog';
 
 	const JAN_1_TIMESTAMP = 1325376000;
@@ -12,35 +12,35 @@ class Test_Entries extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		wp_delete_comment( 1, true );
-		$this->entries = new WPCOM_Liveblog_Entries( 5, 'baba' );
+		$this->entry_query = new WPCOM_Liveblog_Entry_Query( 5, 'baba' );
 	}
 
 	function test_get_latest_should_return_null_if_no_comments() {
-		$this->assertNull( $this->entries->get_latest() );
+		$this->assertNull( $this->entry_query->get_latest() );
 	}
 
 	function test_get_latest_should_return_the_only_comment_if_one() {
 		$id = $this->create_comment();
-		$latest_entry = $this->entries->get_latest();
+		$latest_entry = $this->entry_query->get_latest();
 		$this->assertEquals( $id, $latest_entry->get_id() );
 	}
 
 	function test_get_latest_should_return_the_latest_comment_if_more_than_one() {
 		$id_first = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
 		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
-		$latest_entry = $this->entries->get_latest();
+		$latest_entry = $this->entry_query->get_latest();
 		$this->assertEquals( $id_second, $latest_entry->get_id() );
 	}
 
 	function test_get_latest_timestamp_should_properly_convert_to_unix_timestamp() {
 		$this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL) );
-		$this->assertEquals( self::JAN_1_TIMESTAMP, $this->entries->get_latest_timestamp() );
+		$this->assertEquals( self::JAN_1_TIMESTAMP, $this->entry_query->get_latest_timestamp() );
 	}
 
 	function test_get_between_timestamps_should_return_an_entry_between_two_timestamps() {
 		$id_first = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
 		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
-		$entries = $this->entries->get_between_timestamps( self::JAN_1_TIMESTAMP - 10, self::JAN_2_TIMESTAMP + 10 );
+		$entries = $this->entry_query->get_between_timestamps( self::JAN_1_TIMESTAMP - 10, self::JAN_2_TIMESTAMP + 10 );
 		$this->assertEquals( 2, count( $entries )  );
 		$ids = $this->get_ids_from_entries( $entries );
 		$this->assertContains( $id_first, $ids );
@@ -49,14 +49,14 @@ class Test_Entries extends WP_UnitTestCase {
 
 	function test_get_between_timestamps_should_return_entries_on_the_border() {
 		$id= $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
-		$entries = $this->entries->get_between_timestamps( self::JAN_1_TIMESTAMP, self::JAN_1_TIMESTAMP + 1 );
+		$entries = $this->entry_query->get_between_timestamps( self::JAN_1_TIMESTAMP, self::JAN_1_TIMESTAMP + 1 );
 		$ids = $this->get_ids_from_entries( $entries );
 		$this->assertEquals( array( $id ), $ids );
 	}
 
 	function test_get_only_matches_comments_with_the_key_as_approved_status() {
 		$id = $this->create_comment( array( 'comment_approved' => 'wink' ) );
-		$entries = $this->entries->get();
+		$entries = $this->entry_query->get();
 		$this->assertEquals( 0, count( $entries ) );
 	}
 
@@ -64,10 +64,10 @@ class Test_Entries extends WP_UnitTestCase {
 		static $number = 0;
 		$number++;
 		$defaults = array(
-			'comment_post_ID' => $this->entries->post_id,
+			'comment_post_ID' => $this->entry_query->post_id,
 			'comment_content' => 'Comment Text ' . $number,
-			'comment_approved' => $this->entries->key,
-			'comment_type' => $this->entries->key,
+			'comment_approved' => $this->entry_query->key,
+			'comment_type' => $this->entry_query->key,
 			'user_id' => 1,
 			'comment_author' => 'Baba',
 			'comment_author_email' => 'baba@baba.net',
