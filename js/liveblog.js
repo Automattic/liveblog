@@ -67,7 +67,7 @@ var liveblog = {};
 
 		liveblog.hide_spinner();
 
-		if (response.entries.length)
+		if (response.latest_timestamp)
 			liveblog.latest_entry_timestamp = response.latest_timestamp;
 
 		liveblog.latest_response_server_timestamp = response.current_timestamp;
