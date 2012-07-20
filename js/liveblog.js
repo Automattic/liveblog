@@ -15,7 +15,7 @@ var liveblog = {};
 		liveblog.latest_entry_timestamp = liveblog_settings.latest_entry_timestamp;
 		liveblog.latest_response_local_timestamp = now;
 		liveblog.latest_response_server_timestamp = now;
- }
+	}
 
 	// wp_localize_scripts makes all integers into strings, and in JS
 	// we need them to be real integers, so that we can use them in
@@ -152,7 +152,7 @@ var liveblog = {};
 				$( this ).hide();
 				document.title = liveblog.original_title;
 			} )
-			.slideDown();
+		.slideDown();
 	}
 
 	liveblog.update_count_in_title = function( count ) {
@@ -233,7 +233,7 @@ var liveblog = {};
 
 	liveblog.current_timestamp = function() {
 		return Math.floor( Date.now() / 1000 );
- 	}
+	}
 
 	// Initialize everything!
 	$( document ).ready( liveblog.init );
