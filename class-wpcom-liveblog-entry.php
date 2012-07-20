@@ -2,6 +2,7 @@
 
 class WPCOM_Liveblog_Entry {
 	const default_avatar_size = 30;
+	const replaces_meta_key = 'liveblog_replaces';
 	private $comment;
 
 	static function from_comment( $comment ) {
@@ -11,6 +12,10 @@ class WPCOM_Liveblog_Entry {
 
 	function __construct( $comment ) {
 		$this->comment = $comment;
+		$replaces_comment_id = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
+
+		$this->replaces = $replaces_comment_id && $comment->comment_content? $replaces_comment_id : false;
+		$this->deletes = $replaces_comment_id && !$comment->comment_content? $replaces_comment_id : false;
 	}
 
 	function get_id() {
@@ -25,6 +30,8 @@ class WPCOM_Liveblog_Entry {
 		return (object)array(
 			'id' => $this->get_id(),
 			'content' => $this->render(),
+			'replaces' => $this->replaces,
+			'deletes' => $this->deletes,
 		);
 	}
 
@@ -34,6 +41,9 @@ class WPCOM_Liveblog_Entry {
 		// Allow plugins to override the output
 		$output = apply_filters( 'liveblog_pre_entry_output', $output, $this );
 		if ( $output )
+			return $output;
+
+		if ( $this->deletes )
 			return $output;
 
 		$entry_id = $this->comment->comment_ID;
