@@ -23,7 +23,9 @@ class WPCOM_Liveblog_Entry_Query {
 		$entries = $this->get( array( 'number' => 1 ) );
 		if ( empty( $entries ) )
 			return null;
-		return $entries[0];
+		reset( $entries );
+		$first = current( $entries );
+		return $first;
 	}
 
 	function get_latest_timestamp() {
