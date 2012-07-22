@@ -94,6 +94,6 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	private function get_ids_from_entries( $entries ) {
-		return array_map( function( $entry ) { return $entry->get_id(); }, $entries );
+		return array_values( array_map( function( $entry ) { return $entry->get_id(); }, $entries ) );
 	}
 }
