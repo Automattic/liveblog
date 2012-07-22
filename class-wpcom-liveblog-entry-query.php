@@ -51,6 +51,26 @@ class WPCOM_Liveblog_Entry_Query {
 		if ( !$comments ) {
 			return null;
 		}
-		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
+		$entries = array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
+		$entries = self::filter_event_entries( $entries );
+		return $entries;
+	}
+
+	static function filter_event_entries( $entries ) {
+		$entries_by_id = self::key_by_get_id( $entries );
+		foreach( $entries_by_id as $id => $entry ) {
+			if ( $entry->replaces && isset( $entries_by_id[$entry->replaces] ) ) {
+				unset( $entries_by_id[$id] );
+			}
+		}
+		return $entries_by_id;
+	}
+
+	static function key_by_get_id( $entries ) {
+		$result = array();
+		foreach( $entries as $entry ) {
+			$result[$entry->get_id()] = $entry;
+		}
+		return $result;
 	}
 }
