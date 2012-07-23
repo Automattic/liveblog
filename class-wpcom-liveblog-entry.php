@@ -12,10 +12,7 @@ class WPCOM_Liveblog_Entry {
 
 	function __construct( $comment ) {
 		$this->comment = $comment;
-		$replaces_comment_id = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
-
-		$this->replaces = $replaces_comment_id && $comment->comment_content? $replaces_comment_id : false;
-		$this->deletes = $replaces_comment_id && !$comment->comment_content? $replaces_comment_id : false;
+		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
 	}
 
 	function get_id() {
@@ -28,10 +25,8 @@ class WPCOM_Liveblog_Entry {
 
 	function for_json() {
 		return (object)array(
-			'id' => $this->get_id(),
+			'id' => $this->replaces? $this->replaces : $this->get_id(),
 			'content' => $this->render(),
-			'replaces' => $this->replaces,
-			'deletes' => $this->deletes,
 		);
 	}
 
@@ -43,7 +38,7 @@ class WPCOM_Liveblog_Entry {
 		if ( $output )
 			return $output;
 
-		if ( $this->deletes )
+		if ( !$this->comment->comment_content )
 			return $output;
 
 		$entry_id = $this->comment->comment_ID;
