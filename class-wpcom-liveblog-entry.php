@@ -26,7 +26,7 @@ class WPCOM_Liveblog_Entry {
 	function for_json() {
 		return (object)array(
 			'id' => $this->replaces? $this->replaces : $this->get_id(),
-			'content' => $this->render(),
+			'html' => $this->render(),
 		);
 	}
 

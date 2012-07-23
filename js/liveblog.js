@@ -172,13 +172,13 @@ var liveblog = {};
 		// If the entry is already there, update it
 		var $entry = $( '#liveblog-entry-' + entry.id );
 		if ( $entry.length ) {
-			$entry.replaceWith( entry.content )
+			$entry.replaceWith( entry.html )
 				.addClass( 'liveblog-updated' )
 				.one( 'mouseover', function() {
 					$( this ).removeClass( 'liveblog-updated' );
 				} );
 		} else {
-			$entry = $( entry.content );
+			$entry = $( entry.html );
 			$entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container );
 		}
 	}
