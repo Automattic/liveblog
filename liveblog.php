@@ -149,6 +149,7 @@ class WPCOM_Liveblog {
 		self::ajax_check_nonce();
 
 		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+		$replaces_comment_id = isset( $_POST['replaces'] )? intval( $_POST['replaces'] ) : 0;
 
 		if ( ! $post_id )
 			self::send_error( __( "Sorry, that's an invalid post_id", 'liveblog' ) );
@@ -178,6 +179,14 @@ class WPCOM_Liveblog {
 
 		if ( !$new_comment_id ) {
 			self::send_error( __( 'Error posting entry!' ) );
+		}
+
+		if ( $replaces_comment_id ) {
+			add_comment_meta( $new_comment_id, WPCOM_Liveblog_Entry::replaces_meta_key, $replaces_comment_id );
+			if ( $_POST['entry_content'] )
+				wp_update_comment( array( 'comment_ID' => $replaces_comment_id, 'comment_content' => $entry_content ) );
+			else
+				wp_delete_comment( $replaces_comment_id );
 		}
 
 		$entry = WPCOM_Liveblog_Entry::from_comment( get_comment( $new_comment_id ) );
