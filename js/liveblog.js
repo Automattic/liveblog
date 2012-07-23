@@ -168,20 +168,29 @@ var liveblog = {};
 		return liveblog.nag_disabled;
 	}
 
-	liveblog.display_entry = function( entry ) {
-		// If the entry is already there, update it
-		var $entry = $( '#liveblog-entry-' + entry.id );
+	liveblog.display_entry = function( new_entry ) {
+		var $entry = $( '#liveblog-entry-' + new_entry.id );
 		if ( $entry.length ) {
-			$entry.replaceWith( entry.html )
-				.addClass( 'liveblog-updated' )
-				.one( 'mouseover', function() {
-					$( this ).removeClass( 'liveblog-updated' );
-				} );
+			liveblog.update_entry( $entry, new_entry );
 		} else {
-			$entry = $( entry.html );
-			$entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container );
+			liveblog.add_entry( new_entry );
 		}
 	}
+
+	liveblog.add_entry = function( new_entry ) {
+		var $new_entry = $( new_entry.html );
+		$new_entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container );
+ 	}
+
+	liveblog.update_entry = function( $entry, updated_entry ) {
+		var $updated_entry = $( updated_entry.html );
+		var updated_text = $( '.liveblog-entry-text', $updated_entry ).html();
+		if ( updated_text ) {
+			$( '.liveblog-entry-text', $entry ).html( updated_text );
+  		} else {
+			$entry.remove();
+    	}
+ 	}
 
 	liveblog.get_all_entries = function() {
 		return liveblog.$entry_container.find( '.liveblog-entry' );
