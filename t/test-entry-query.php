@@ -53,8 +53,8 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	function test_get_only_matches_comments_with_the_key_as_approved_status() {
-		$id = $this->create_comment( array( 'comment_approved' => 'wink' ) );
-		$entries = $this->entry_query->get();
+		$this->create_comment( array( 'comment_approved' => 'wink' ) );
+		$entries = $this->entry_query->get_all();
 		$this->assertEquals( 0, count( $entries ) );
 	}
 

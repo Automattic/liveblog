@@ -6,7 +6,7 @@ class WPCOM_Liveblog_Entry_Query {
 		$this->key = $key;
 	}
 
-	function get( $args = array() ) {
+	private function get( $args = array() ) {
 		$defaults = array(
 			'post_id' => $this->post_id,
 			'orderby' => 'comment_date_gmt',
@@ -17,6 +17,10 @@ class WPCOM_Liveblog_Entry_Query {
 		$args = array_merge( $defaults, $args );
 		$comments = get_comments( $args );
 		return self::entries_from_comments( $comments );
+	}
+
+	function get_all( $args = array() ) {
+		return self::filter_event_entries( $this->get( $args ) );
 	}
 
 	function get_latest() {
@@ -46,7 +50,7 @@ class WPCOM_Liveblog_Entry_Query {
 			}
 		}
 
-		return $entries_between;
+		return self::filter_event_entries( $entries_between );
 	}
 
 	static function entries_from_comments( $comments ) {
@@ -54,11 +58,13 @@ class WPCOM_Liveblog_Entry_Query {
 			return null;
 		}
 		$entries = array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
-		$entries = self::filter_event_entries( $entries );
 		return $entries;
 	}
 
 	static function filter_event_entries( $entries ) {
+		if ( !$entries ) {
+			return $entries;
+		}
 		$entries_by_id = self::key_by_get_id( $entries );
 		foreach( $entries_by_id as $id => $entry ) {
 			if ( $entry->replaces && isset( $entries_by_id[$entry->replaces] ) ) {
