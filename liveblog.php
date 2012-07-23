@@ -235,7 +235,7 @@ class WPCOM_Liveblog {
 	}
 
 	function add_liveblog_to_content( $content ) {
-		$entries = self::$entry_query->get( array( 'order' => 'ASC' ) );
+		$entries = self::$entry_query->get_all( array( 'order' => 'ASC' ) );
 		$entries = array_reverse( $entries );
 
 		$liveblog_output = '';
