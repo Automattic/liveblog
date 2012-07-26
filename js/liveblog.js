@@ -49,12 +49,13 @@ var liveblog = {};
 	}
 
 	liveblog.get_recent_entries = function() {
-		var url = liveblog_settings.entriesurl;
+		var url  = liveblog_settings.entriesurl;
 		var from = liveblog.latest_entry_timestamp + 1;
+
 		// TODO: instead of using the current time use the latest
 		// server time to reconstruct the difference
 		var local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp;
-		var to = liveblog.latest_response_server_timestamp + local_diff;
+		var to         = liveblog.latest_response_server_timestamp + local_diff;
 
 		url += from + '/' + to + '/';
 		liveblog.show_spinner();
@@ -67,11 +68,11 @@ var liveblog = {};
 
 		liveblog.hide_spinner();
 
-		if (response.latest_timestamp)
+		if ( response && response.latest_timestamp )
 			liveblog.latest_entry_timestamp = response.latest_timestamp;
 
 		liveblog.latest_response_server_timestamp = response.current_timestamp;
-		liveblog.latest_response_local_timestamp = liveblog.current_timestamp();
+		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
 
 		liveblog.display_entries( response.entries );
 
@@ -104,7 +105,7 @@ var liveblog = {};
 
 	liveblog.display_entries = function( entries ) {
 
-		if (!entries.length) {
+		if ( !entries || ! entries.length ) {
 			return;
 		}
 
@@ -112,6 +113,7 @@ var liveblog = {};
 			var entry = entries[i];
 			liveblog.display_entry( entry );
 		}
+
 		liveblog.show_nag( entries );
 	}
 
@@ -119,7 +121,7 @@ var liveblog = {};
 		var hidden_entries = liveblog.get_hidden_entries(),
 			hidden_entries_count = hidden_entries.length;
 
-		if ( !entries.length ) {
+		if ( !entries || !entries.length ) {
 			return;
 		}
 
@@ -164,6 +166,7 @@ var liveblog = {};
 	liveblog.disable_nag = function() {
 		liveblog.nag_disabled = true;
 	}
+
 	liveblog.is_nag_disabled = function() {
 		return liveblog.nag_disabled;
 	}
@@ -224,11 +227,13 @@ var liveblog = {};
 		} );
 	}
 	liveblog.success_callback = function() {}
-	liveblog.error_callback = function() {}
+	liveblog.error_callback   = function() {}
 
+	/**
+	 * @todo show errors in a box near the nag
+	 * @todo throtle errors
+	 */
 	liveblog.add_error = function( response ) {
-		// TODO: show errors in a box near the nag
-		// TODO: throtle errors
 		alert( 'Error ' + response.status + ': ' + response.statusText );
 	}
 
