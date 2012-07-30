@@ -1,24 +1,62 @@
 <?php
 
+/**
+ * Single Liveblog Entry class
+ *
+ * Currently inherted from comments, and assigned by the entry-query class.
+ */
 class WPCOM_Liveblog_Entry {
+
+	/**
+	 * @var int Default avatar size to use in template
+	 */
 	const default_avatar_size = 30;
+
+	/**
+	 * @var string Meta key to use when looking to replace an existing entry
+	 */
 	const replaces_meta_key   = 'liveblog_replaces';
+
+	/**
+	 * @var array Single comment to inherit data from
+	 */
 	private $comment;
 
+	/**
+	 * Sets up the comment and whether or not it's replacing an existing one
+	 *
+	 * @param array() $comment
+	 */
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
 		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
 	}
 
+	/**
+	 * Accepts a comment, and turns it into a WPCOM_Liveblog_Entry
+	 *
+	 * @param array $comment
+	 * @return WPCOM_Liveblog_Entry
+	 */
 	public static function from_comment( $comment ) {
 		$entry = new WPCOM_Liveblog_Entry( $comment );
 		return $entry;
 	}
 
+	/**
+	 * Get the WordPress comment ID to use as the liveblog ID
+	 *
+	 * @return int
+	 */
 	public function get_id() {
 		return $this->comment->comment_ID;
 	}
 
+	/**
+	 * Get the GMT timestamp for the comment
+	 *
+	 * @return string
+	 */
 	public function get_timestamp() {
 		return mysql2date( 'G', $this->comment->comment_date_gmt );
 	}
@@ -30,6 +68,11 @@ class WPCOM_Liveblog_Entry {
 		);
 	}
 
+	/**
+	 * Render a single liveblog entry
+	 *
+	 * @return string
+	 */
 	public function render() {
 
 		// Allow plugins to override the output
