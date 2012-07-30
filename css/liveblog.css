@@ -1,17 +1,86 @@
-.liveblog-hidden {
-	display: none;
+/* =Container
+-------------------------------------------------------------- */
+
+#liveblog-container {
+	margin: 10px 0;
+	width: 100%;
+	display: block;
+	position: relative;
 }
+
+/* =Form Actions
+-------------------------------------------------------------- */
+
+fieldset#liveblog-actions {
+	display: block;
+	padding: 5px 20px 20px 20px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid #ccc;
+	background: rgb(255,255,255); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(243,243,243,1) 33%, rgba(237,237,237,1) 34%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(33%,rgba(243,243,243,1)), color-stop(34%,rgba(237,237,237,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(243,243,243,1) 33%,rgba(237,237,237,1) 34%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(243,243,243,1) 33%,rgba(237,237,237,1) 34%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(243,243,243,1) 33%,rgba(237,237,237,1) 34%,rgba(255,255,255,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(243,243,243,1) 33%,rgba(237,237,237,1) 34%,rgba(255,255,255,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+}
+
+fieldset#liveblog-actions legend {
+	padding: 5px;
+	background: transparent;
+}
+
+textarea#liveblog-form-entry {
+	display: inline-block;
+	background: #fff;
+	width: 98%;
+	height: 50px;
+	margin-bottom: 10px;
+	padding: 5px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border: 1px solid #ddd;
+	-webkit-box-shadow: inset 1px 1px 1px 0px #f4f4f4;
+	-moz-box-shadow: inset 1px 1px 1px 0px #f4f4f4;
+	box-shadow: inset 1px 1px 1px 0px #f4f4f4;
+	outline-color: #acc;
+}
+
+#liveblog-actions div.liveblog-submit-wrapper {
+	text-align: right;
+	position: relative;
+}
+
+input#liveblog-form-entry-submit {
+	margin: 0;
+}
+
+span#liveblog-submit-spinner {
+	padding: 0;
+	position: absolute;
+	top: 50%;
+	right: 50%;
+}
+
+/* =Feedback and Nags
+-------------------------------------------------------------- */
 
 .liveblog-message {
 	font: 13px "Helvetica Neue", sans-serif;
 	font-weight: 400;
-	padding: 6px 10px;
+	padding: 7px 10px;
 	text-shadow: 1px 1px 0 #0074A2;
 	text-align: center;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
+	margin-bottom: 5px;
 }
+
 .liveblog-nag {
 	display: block;
 	cursor: pointer;
@@ -19,29 +88,53 @@
 	color: white;
 }
 
+.liveblog-hidden {
+	display: none;
+}
+
+/* =Entry Container
+-------------------------------------------------------------- */
+
+#liveblog-entries {
+	display: block;
+	padding: 10px 0 0 0;
+}
+
 .liveblog-loading {
 	color: #AAA;
 	background: #F9F9F9;
-	border: 1px solid #EEE;
+	border: 1px solid #ddd;
 }
 
-.liveblog-container {
-	margin-top: 20px;
-}
+/* =Single Entry
+-------------------------------------------------------------- */
 
 .liveblog-entry {
 	overflow: hidden;
-	margin: 5px 0;
-	padding: 5px 0;
-	border-bottom: 1px dotted #ccc;
+	margin: 0;
+	padding: 10px 0 0 0;
+	border-top: 1px solid #eee;
 }
 	.liveblog-entry-text {
 		font-size: 18px;
 		line-height: 22px;
-		padding-bottom: 10px;
+		padding: 10px 0 0;
+		margin-left: 40px;
 	}
+
+.liveblog-author-name {
+	font-size: 15px;
+	line-height: 18px;
+}
+
+.liveblog-author-avatar {
+	float: left;
+	margin: 0 10px 0 0;
+}
+
 .liveblog-meta-time {
-	display: block;
+	float: right;
+	margin-left: 10px;
 	font-size: 10px;
 	line-height: 12px;
 }
@@ -50,16 +143,3 @@
 		text-decoration: none;
 		text-transform: uppercase;
 	}
-.liveblog-author-name {
-	display: block;
-	font-size: 15px;
-	line-height: 18px;
-}
-.liveblog-author-avatar {
-	float: left;
-	margin: 0 10px 0 0;
-}
-
-#liveblog-submit-spinner {
-	margin-left: 16px;
-}

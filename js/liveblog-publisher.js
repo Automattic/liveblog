@@ -8,10 +8,11 @@
 	liveblog.publisher.init = function() {
 		liveblog.disable_nag();
 
-		liveblog.publisher.$entry_text = $( '#liveblog-form-entry' );
+		liveblog.publisher.$entry_text   = $( '#liveblog-form-entry'        );
 		liveblog.publisher.$entry_button = $( '#liveblog-form-entry-submit' );
-		liveblog.publisher.$nonce = $( '#liveblog_nonce' );
-		liveblog.publisher.$spinner = $( '#liveblog-submit-spinner' );
+		liveblog.publisher.$nonce        = $( '#liveblog_nonce'             );
+		liveblog.publisher.$spinner      = $( '#liveblog-submit-spinner'    );
+
 		liveblog.publisher.$entry_button.bind( 'click', liveblog.publisher.submit_click );
 	}
 

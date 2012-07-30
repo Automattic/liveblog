@@ -3,8 +3,8 @@ var liveblog = {};
 ( function( $ ) {
 
 	liveblog.init = function() {
-		liveblog.$entry_container = $( '.liveblog-entries' );
-		liveblog.$spinner = $( '#liveblog-update-spinner' );
+		liveblog.$entry_container = $( '#liveblog-entries'        );
+		liveblog.$spinner         = $( '#liveblog-update-spinner' );
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
 		liveblog.set_initial_timestamps();
@@ -12,8 +12,8 @@ var liveblog = {};
 
 	liveblog.set_initial_timestamps = function() {
 		var now = liveblog.current_timestamp();
-		liveblog.latest_entry_timestamp = liveblog_settings.latest_entry_timestamp;
-		liveblog.latest_response_local_timestamp = now;
+		liveblog.latest_entry_timestamp           = liveblog_settings.latest_entry_timestamp;
+		liveblog.latest_response_local_timestamp  = now;
 		liveblog.latest_response_server_timestamp = now;
 	}
 
@@ -21,10 +21,10 @@ var liveblog = {};
 	// we need them to be real integers, so that we can use them in
 	// arithmetic operations
 	liveblog.cast_settings_numbers = function() {
-		liveblog_settings.refresh_interval = parseInt( liveblog_settings.refresh_interval );
-		liveblog_settings.max_retries = parseInt( liveblog_settings.max_retries );
-		liveblog_settings.delay_threshold = parseInt( liveblog_settings.delay_threshold );
-		liveblog_settings.delay_multiplier = parseFloat( liveblog_settings.delay_multiplier );
+		liveblog_settings.refresh_interval       = parseInt( liveblog_settings.refresh_interval );
+		liveblog_settings.max_retries            = parseInt( liveblog_settings.max_retries );
+		liveblog_settings.delay_threshold        = parseInt( liveblog_settings.delay_threshold );
+		liveblog_settings.delay_multiplier       = parseFloat( liveblog_settings.delay_multiplier );
 		liveblog_settings.latest_entry_timestamp = parseInt( liveblog_settings.latest_entry_timestamp );
 	}
 
@@ -124,6 +124,10 @@ var liveblog = {};
 		if ( !entries || !entries.length ) {
 			return;
 		}
+		
+		if ( ! hidden_entries_count ) {
+			return;
+		}
 
 		if ( liveblog.is_nag_disabled() ) {
 			liveblog.unhide_entries();
@@ -140,7 +144,7 @@ var liveblog = {};
 			liveblog.$update_nag = $( '<div/>' );
 			liveblog.$update_nag
 				.addClass( 'liveblog-nag liveblog-message' )
-				.hide();
+				.slideUp();
 		}
 
 		var nag_text = 1 < hidden_entries_count ? liveblog_settings.update_nag_plural : liveblog_settings.update_nag_singular;
@@ -151,7 +155,7 @@ var liveblog = {};
 			.prependTo( liveblog.$entry_container )
 			.one( 'click', function() {
 				liveblog.unhide_entries();
-				$( this ).hide();
+				$( this ).slideUp();
 				document.title = liveblog.original_title;
 			} )
 		.slideDown();
@@ -182,12 +186,13 @@ var liveblog = {};
 
 	liveblog.add_entry = function( new_entry ) {
 		var $new_entry = $( new_entry.html );
-		$new_entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container );
+		$new_entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container ).slideDown();
  	}
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
 		var $updated_entry = $( updated_entry.html );
-		var updated_text = $( '.liveblog-entry-text', $updated_entry ).html();
+		var updated_text   = $( '.liveblog-entry-text', $updated_entry ).html();
+
 		if ( updated_text ) {
 			$( '.liveblog-entry-text', $entry ).html( updated_text );
   		} else {
