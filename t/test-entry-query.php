@@ -85,7 +85,7 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	private function create_comment( $args = array() ) {
 		$defaults = array(
 			'comment_post_ID'  => $this->entry_query->post_id,
-			'comment_approved' => 'approve',
+			'comment_approved' => $this->entry_query->key,
 			'comment_type'     => $this->entry_query->key,
 		);
 		$args = array_merge( $defaults, $args );

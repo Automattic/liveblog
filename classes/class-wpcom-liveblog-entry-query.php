@@ -14,7 +14,7 @@ class WPCOM_Liveblog_Entry_Query {
 			'orderby' => 'comment_date_gmt',
 			'order'   => 'DESC',
 			'type'    => $this->key,
-			'status'  => 'approve',
+			'status'  => $this->key,
 		);
 		$args     = wp_parse_args( $defaults, $args );
 		$comments = get_comments( $args );
