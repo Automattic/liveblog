@@ -1,6 +1,6 @@
 <div id="liveblog-entries">
 
-	<?php foreach ( (array) array_reverse( $entries ) as $entry ) : ?>
+	<?php foreach ( (array) $entries as $entry ) : ?>
 	
 		<?php echo $entry->render(); ?>
 
