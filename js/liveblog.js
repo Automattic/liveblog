@@ -186,7 +186,7 @@ var liveblog = {};
 
 	liveblog.add_entry = function( new_entry ) {
 		var $new_entry = $( new_entry.html );
-		$new_entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container ).slideDown();
+		$new_entry.addClass( 'liveblog-hidden' ).prependTo( liveblog.$entry_container );
  	}
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
