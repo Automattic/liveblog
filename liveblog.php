@@ -19,7 +19,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
  *
  * This class is a big container for a bunch of static methods, similar to a
  * factory but without object inheritance or instantiation.
- * 
+ *
  * Things yet to be implimented:
  *
  * -- PHP and JS Actions/Filters/Triggers
@@ -80,6 +80,7 @@ final class WPCOM_Liveblog {
 	 */
 	private static function add_actions() {
 		add_action( 'init',                          array( __CLASS__, 'init'              ) );
+		//add_action( 'wp_head',                       array( __CLASS__, 'wp_head'           ) );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
 	}
@@ -174,7 +175,7 @@ final class WPCOM_Liveblog {
 		 * If this is an ajax request to update the entries, call the method
 		 * responsible for updating entries between now and the last time they
 		 * were successfully returned.
-		 * 
+		 *
 		 * Once we've added them, bail.
 		 */
 		if ( self::is_entries_ajax_request() ) {
@@ -424,7 +425,7 @@ final class WPCOM_Liveblog {
 			return $clauses;
 
 		$clauses['where'] = "comment_approved = '" . self::key . "' AND comment_post_ID = " . self::$post_id . " AND comment_type = '" . self::key . "'";
-		
+
 		return $clauses;
 	}
 
@@ -446,8 +447,17 @@ final class WPCOM_Liveblog {
 		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery' ), self::version, true );
 
 		// Only for users that can publish liveblog content
-		if ( self::current_user_can_edit_liveblog() ) {
+		if ( self::current_user_can_edit_liveblog() )  {
+
+			// Publisher ajax
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
+
+			// Plupload
+			wp_enqueue_script( 'wp-plupload' );
+			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( 'wp-plupload', 'jquery' ) );
+
+			// Set the default Plupload settings
+			self::default_plupload_settings();
 		}
 
 		// Use the WordPress core jQuery spinner plugin
@@ -483,6 +493,48 @@ final class WPCOM_Liveblog {
 				'update_nag_plural'      => __( '%d new updates', 'liveblog' ),
 			) )
 		);
+	}
+
+	/**
+	 * Sets up some default Plupload settings so we can upload meda theme-side
+	 *
+	 * @global type $wp_scripts
+	 */
+	private static function default_plupload_settings() {
+		global $wp_scripts;
+
+		$defaults = array(
+			'runtimes'            => 'html5,silverlight,flash,html4',
+			'file_data_name'      => 'async-upload',
+			'multiple_queues'     => true,
+			'max_file_size'       => self::max_upload_size() . 'b',
+			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
+			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
+			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
+			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*') ),
+			'multipart'           => true,
+			'urlstream_upload'    => true,
+			'multipart_params'    => array(
+				'action'          => 'upload-attachment',
+				'_wpnonce'        => wp_create_nonce( 'media-form' )
+			)
+		);
+
+		$settings = array(
+			'defaults' => $defaults,
+			'browser'  => array(
+				'mobile'    => wp_is_mobile(),
+				'supported' => _device_can_upload(),
+			)
+		);
+
+		$script = 'var _wpPluploadSettings = ' . json_encode( $settings ) . ';';
+		$data   = $wp_scripts->get_data( 'wp-plupload', 'data' );
+
+		if ( ! empty( $data ) )
+			$script = "$data\n$script";
+
+		$wp_scripts->add_data( 'wp-plupload', 'data', $script );
 	}
 
 	/**
@@ -531,7 +583,7 @@ final class WPCOM_Liveblog {
 	 * Get all the liveblog entries for this post
 	 */
 	private static function get_all_entry_output() {
-		
+
 		// Get liveblog entries
 		$entries = (array) self::$entry_query->get_all( array( 'order' => 'ASC' ) );
 
@@ -553,7 +605,7 @@ final class WPCOM_Liveblog {
 		include( dirname( __FILE__ ) . '/templates/' . $template_name );
 		return ob_get_clean();
 	}
-	
+
 	/** Admin Methods *********************************************************/
 
 	/**
@@ -685,6 +737,57 @@ final class WPCOM_Liveblog {
 		status_header( $status );
 
 		$wp_header_to_desc[$status] = $official_message;
+	}
+
+	/** Plupload Helpers ******************************************************/
+
+	/**
+	 * Convert hours to bytes
+	 *
+	 * @param unknown_type $size
+	 * @return unknown
+	 */
+	private static function convert_hr_to_bytes( $size ) {
+		$size  = strtolower( $size );
+		$bytes = (int) $size;
+
+		if ( strpos( $size, 'k' ) !== false )
+			$bytes = intval( $size ) * 1024;
+		elseif ( strpos( $size, 'm' ) !== false )
+			$bytes = intval( $size ) * 1024 * 1024;
+		elseif ( strpos( $size, 'g' ) !== false )
+			$bytes = intval( $size ) * 1024 * 1024 * 1024;
+
+		return $bytes;
+	}
+
+	/**
+	 * Convert bytes to hour
+	 *
+	 * @param string $bytes
+	 * @return string
+	 */
+	private static function convert_bytes_to_hr( $bytes ) {
+		$units = array( 0 => 'B', 1 => 'kB', 2 => 'MB', 3 => 'GB' );
+		$log   = log( $bytes, 1024 );
+		$power = (int) $log;
+		$size  = pow( 1024, $log - $power );
+
+		return $size . $units[$power];
+	}
+
+	/**
+	 * Get the maximum upload file size
+	 *
+	 * @see wp_max_upload_size()
+	 * @return string
+	 */
+	private static function max_upload_size() {
+		$u_bytes = self::convert_hr_to_bytes( ini_get( 'upload_max_filesize' ) );
+		$p_bytes = self::convert_hr_to_bytes( ini_get( 'post_max_size'       ) );
+		$bytes   = apply_filters( 'upload_size_limit', min( $u_bytes, $p_bytes ), $u_bytes, $p_bytes );
+
+		return $bytes;
 	}
 }
 

@@ -28,6 +28,18 @@ fieldset#liveblog-actions {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 }
 
+fieldset#liveblog-actions.uploading {
+	border: 1px solid #ccc;
+	background: #f6f8f9; /* Old browsers */
+	background: -moz-linear-gradient(top, #f6f8f9 0%, #e5ebee 33%, #d7dee3 34%, #f5f7f9 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f6f8f9), color-stop(33%,#e5ebee), color-stop(34%,#d7dee3), color-stop(100%,#f5f7f9)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #f6f8f9 0%,#e5ebee 34%,#d7dee3 34%,#f5f7f9 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #f6f8f9 0%,#e5ebee 33%,#d7dee3 34%,#f5f7f9 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #f6f8f9 0%,#e5ebee 33%,#d7dee3 34%,#f5f7f9 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #f6f8f9 0%,#e5ebee 33%,#d7dee3 34%,#f5f7f9 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=0 ); /* IE6-9 */
+}
+
 fieldset#liveblog-actions legend {
 	padding: 5px;
 	background: transparent;
@@ -48,6 +60,11 @@ textarea#liveblog-form-entry {
 	-moz-box-shadow: inset 1px 1px 1px 0px #f4f4f4;
 	box-shadow: inset 1px 1px 1px 0px #f4f4f4;
 	outline-color: #acc;
+}
+
+textarea#liveblog-form-entry.drag-over {
+	background: #efe;
+	color: #333;
 }
 
 #liveblog-actions div.liveblog-submit-wrapper {
