@@ -5,6 +5,6 @@
 		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo $entry_id; ?>"><?php echo $entry_time; ?></a></span>
 	</header>
 	<div class="liveblog-entry-text">
-		<?php echo $comment_text; ?>
+		<?php echo $content; ?>
 	</div>
 </div>
