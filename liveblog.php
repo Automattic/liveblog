@@ -563,7 +563,7 @@ final class WPCOM_Liveblog {
 		$liveblog_output .= self::get_all_entry_output();
 		$liveblog_output .= '</div>';
 
-		return $liveblog_output . $content;
+		return $content . $liveblog_output;
 	}
 
 	/**
