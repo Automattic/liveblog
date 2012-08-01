@@ -7,4 +7,7 @@
 	<div class="liveblog-entry-text">
 		<?php echo $content; ?>
 	</div>
+	<ul class="liveblog-entry-actions">
+		<li><button class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></button></li>
+	</ul>
 </div>

@@ -491,6 +491,7 @@ final class WPCOM_Liveblog {
 				// i18n
 				'update_nag_singular'    => __( '%d new update',  'liveblog' ),
 				'update_nag_plural'      => __( '%d new updates', 'liveblog' ),
+				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
 			) )
 		);
 	}

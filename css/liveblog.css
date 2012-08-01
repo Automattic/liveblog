@@ -160,3 +160,6 @@ span#liveblog-submit-spinner {
 		text-decoration: none;
 		text-transform: uppercase;
 	}
+.liveblog-entry-actions {
+	list-style-type: none;
+}

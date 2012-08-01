@@ -175,8 +175,12 @@ var liveblog = {};
 		return liveblog.nag_disabled;
 	}
 
+	liveblog.get_entry_by_id = function( id ) {
+		return $( '#liveblog-entry-' + id )
+ 	}
+
 	liveblog.display_entry = function( new_entry ) {
-		var $entry = $( '#liveblog-entry-' + new_entry.id );
+		var $entry = liveblog.get_entry_by_id( new_entry.id );
 		if ( $entry.length ) {
 			liveblog.update_entry( $entry, new_entry );
 		} else {
@@ -196,8 +200,12 @@ var liveblog = {};
 		if ( updated_text ) {
 			$( '.liveblog-entry-text', $entry ).html( updated_text );
   		} else {
-			$entry.remove();
+			liveblog.delete_entry( $entry );
     	}
+ 	}
+
+	liveblog.delete_entry = function( $entry ) {
+		$entry.remove();
  	}
 
 	liveblog.get_all_entries = function() {
