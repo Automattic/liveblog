@@ -62,8 +62,7 @@ class WPCOM_Liveblog_Entry_Query {
 		if ( empty( $entries ) )
 			return null;
 
-		// Return the entry
-		return current( reset( $entries ) );
+		return reset( $entries );
 	}
 
 	/**
