@@ -93,7 +93,6 @@ final class WPCOM_Liveblog {
 	private static function add_filters() {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ) );
-		add_filter( 'comments_clauses',  array( __CLASS__, 'comments_clauses'  ) );
 	}
 
 	/**
@@ -408,26 +407,6 @@ final class WPCOM_Liveblog {
 		return $classes;
 	}
 
-	/**
-	 * Filter the comments query to include the special comment_approved status.
-	 *
-	 * @param array $clauses
-	 * @return array
-	 */
-	public static function comments_clauses( $clauses = array() ) {
-
-		// Setup the search clauses
-		$needle   = "comment_type = '" . self::key . "'";
-		$haystack = !empty( $clauses['where'] ) ? $clauses['where'] : '';
-
-		// Bail if not a liveblog query
-		if ( ! strstr( $haystack, $needle ) )
-			return $clauses;
-
-		$clauses['where'] = "comment_approved = '" . self::key . "' AND comment_post_ID = " . self::$post_id . " AND comment_type = '" . self::key . "'";
-
-		return $clauses;
-	}
 
 	/**
 	 * Enqueue the necessary CSS and JS that liveblog needs to function.
