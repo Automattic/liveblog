@@ -15,8 +15,6 @@ fieldset#liveblog-actions {
 	display: block;
 	padding: 5px 20px 20px 20px;
 	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
 	border: 1px solid #ccc;
 	background: rgb(255,255,255); /* Old browsers */
 	background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(243,243,243,1) 33%, rgba(237,237,237,1) 34%, rgba(255,255,255,1) 100%); /* FF3.6+ */
@@ -53,11 +51,7 @@ textarea#liveblog-form-entry {
 	margin-bottom: 10px;
 	padding: 5px;
 	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
 	border: 1px solid #ddd;
-	-webkit-box-shadow: inset 1px 1px 1px 0px #f4f4f4;
-	-moz-box-shadow: inset 1px 1px 1px 0px #f4f4f4;
 	box-shadow: inset 1px 1px 1px 0px #f4f4f4;
 	outline-color: #acc;
 }
@@ -90,10 +84,8 @@ span#liveblog-submit-spinner {
 	font: 13px "Helvetica Neue", sans-serif;
 	font-weight: 400;
 	padding: 7px 10px;
-	text-shadow: 1px 1px 0 #0074A2;
+	text-shadow: 1px 1px 0 #0074a2;
 	text-align: center;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
 	border-radius: 3px;
 	margin-bottom: 5px;
 }
@@ -101,7 +93,7 @@ span#liveblog-submit-spinner {
 .liveblog-nag {
 	display: block;
 	cursor: pointer;
-	background: #2EA2CC;
+	background: #2ea2cc;
 	color: white;
 }
 
@@ -118,8 +110,8 @@ span#liveblog-submit-spinner {
 }
 
 .liveblog-loading {
-	color: #AAA;
-	background: #F9F9F9;
+	color: #aaa;
+	background: #f9f9f9;
 	border: 1px solid #ddd;
 }
 
@@ -132,12 +124,13 @@ span#liveblog-submit-spinner {
 	padding: 10px 0 0 0;
 	border-top: 1px solid #eee;
 }
-	.liveblog-entry-text {
-		font-size: 18px;
-		line-height: 22px;
-		padding: 10px 0 0;
-		margin-left: 40px;
-	}
+
+.liveblog-entry-text {
+	font-size: 18px;
+	line-height: 22px;
+	padding: 10px 0 0;
+	margin-left: 40px;
+}
 
 .liveblog-author-name {
 	font-size: 15px;
@@ -155,11 +148,13 @@ span#liveblog-submit-spinner {
 	font-size: 10px;
 	line-height: 12px;
 }
-	.liveblog-meta-time a {
-		color: #888;
-		text-decoration: none;
-		text-transform: uppercase;
-	}
+
+.liveblog-meta-time a {
+	color: #888;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
 .liveblog-entry-actions {
 	list-style-type: none;
 }
