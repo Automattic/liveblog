@@ -125,6 +125,10 @@ span#liveblog-submit-spinner {
 	border-top: 1px solid #eee;
 }
 
+.liveblog-entry.highlight {
+	background-color: lightYellow;
+}
+
 .liveblog-entry-text {
 	font-size: 18px;
 	line-height: 22px;

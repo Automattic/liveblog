@@ -64,8 +64,6 @@ var liveblog = {};
 
 	liveblog.get_recent_entries_success = function( response ) {
 
-		// TODO: highlight updated posts
-
 		liveblog.hide_spinner();
 
 		if ( response && response.latest_timestamp )
@@ -218,7 +216,7 @@ var liveblog = {};
 		return liveblog.get_all_entries().not( '.liveblog-hidden' );
 	}
 	liveblog.unhide_entries = function() {
-		liveblog.get_hidden_entries().removeClass( 'liveblog-hidden' );
+		liveblog.get_hidden_entries().addClass('highlight').removeClass( 'liveblog-hidden' ).animate({backgroundColor: 'white'}, {duration: 5000});
 	}
 
 	liveblog.ajax_request = function( url, data, success_callback, error_callback, method ) {

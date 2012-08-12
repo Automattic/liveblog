@@ -419,7 +419,7 @@ final class WPCOM_Liveblog {
 			return;
 
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog.css', __FILE__ ) );
-		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery' ), self::version, true );
+		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color' ), self::version, true );
 
 		if ( self::current_user_can_edit_liveblog() )  {
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
