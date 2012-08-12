@@ -415,41 +415,26 @@ final class WPCOM_Liveblog {
 	 */
 	public static function enqueue_scripts() {
 
-		// Bail if not a liveblog post
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
 
-		// Styling
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog.css', __FILE__ ) );
-
-		// Scripts
 		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery' ), self::version, true );
 
-		// Only for users that can publish liveblog content
 		if ( self::current_user_can_edit_liveblog() )  {
-
-			// Publisher ajax
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
-
-			// Plupload
 			wp_enqueue_script( 'wp-plupload' );
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( 'wp-plupload', 'jquery' ) );
-
-			// Set the default Plupload settings
 			self::default_plupload_settings();
 		}
 
-		// Use the WordPress core jQuery spinner plugin
 		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
 			wp_enqueue_script( 'jquery.spin' );
-
-		// Use the bundled jQuery spinner plugin
 		} else {
 			wp_enqueue_script( 'spin',        plugins_url( 'js/spin.js',        __FILE__ ), false,                    '1.2.4' );
 			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' )         );
 		}
 
-		// Localize some script variables
 		wp_localize_script( self::key, 'liveblog_settings',
 			apply_filters( 'liveblog_settings', array(
 				'permalink'              => get_permalink(),
