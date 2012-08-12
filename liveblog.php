@@ -425,7 +425,7 @@ final class WPCOM_Liveblog {
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
 			wp_enqueue_script( 'wp-plupload' );
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( 'wp-plupload', 'jquery' ) );
-			self::default_plupload_settings();
+			self::add_default_plupload_settings();
 		}
 
 		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
@@ -465,7 +465,7 @@ final class WPCOM_Liveblog {
 	 *
 	 * @global type $wp_scripts
 	 */
-	private static function default_plupload_settings() {
+	private static function add_default_plupload_settings() {
 		global $wp_scripts;
 
 		$defaults = array(
