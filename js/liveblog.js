@@ -124,7 +124,7 @@ var liveblog = {};
 		if ( !entries || !entries.length ) {
 			return;
 		}
-		
+
 		if ( ! hidden_entries_count ) {
 			return;
 		}
