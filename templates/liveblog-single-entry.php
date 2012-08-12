@@ -7,7 +7,9 @@
 	<div class="liveblog-entry-text">
 		<?php echo $content; ?>
 	</div>
+<?php if ( $can_edit_liveblog ): ?>
 	<ul class="liveblog-entry-actions">
 		<li><button class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></button></li>
 	</ul>
+<?php endif; ?>
 </div>
