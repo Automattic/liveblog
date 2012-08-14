@@ -71,6 +71,12 @@ final class WPCOM_Liveblog {
 	private static function includes() {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php'       );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
+
+		// Manually include ms.php theme-side in multisite environments because
+		// we need its filesize and available space functions.
+		if ( ! is_admin() && is_multisite() ) {
+			require_once( ABSPATH . '/wp-admin/includes/ms.php' );
+		}
 	}
 
 	/**
@@ -753,7 +759,7 @@ final class WPCOM_Liveblog {
 		$bytes   = apply_filters( 'upload_size_limit', min( $u_bytes, $p_bytes ), $u_bytes, $p_bytes );
 
 		return $bytes;
-	}
+	}	
 }
 
 /**
