@@ -75,7 +75,7 @@ final class WPCOM_Liveblog {
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
 		if ( ! is_admin() && is_multisite() ) {
-			require_once( ABSPATH . '/wp-admin/includes/ms.php' );
+			require_once( ABSPATH . 'wp-admin/includes/ms.php' );
 		}
 	}
 
