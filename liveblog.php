@@ -89,6 +89,7 @@ final class WPCOM_Liveblog {
 		//add_action( 'wp_head',                       array( __CLASS__, 'wp_head'           ) );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
+		add_action( 'wp_ajax_liveblog_preview_entry', array( __CLASS__, 'ajax_preview_entry' ) );
 	}
 
 	/**
@@ -398,6 +399,15 @@ final class WPCOM_Liveblog {
 			'current_timestamp' => time(),
 			'latest_timestamp'  => null
 		) );
+	}
+
+	function ajax_preview_entry() {
+		self::ajax_current_user_can_edit_liveblog();
+		self::ajax_check_nonce();
+		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
+		$entry_content = wp_filter_post_kses( $entry_content );
+		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
+		self::json_return( array( 'html' => $entry_content ) );
 	}
 
 	/** Comment Methods *******************************************************/
