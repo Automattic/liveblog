@@ -759,7 +759,7 @@ final class WPCOM_Liveblog {
 		$bytes   = apply_filters( 'upload_size_limit', min( $u_bytes, $p_bytes ), $u_bytes, $p_bytes );
 
 		return $bytes;
-	}	
+	}
 }
 
 /**
