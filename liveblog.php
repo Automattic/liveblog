@@ -41,10 +41,10 @@ final class WPCOM_Liveblog {
 	const edit_cap         = 'publish_posts';
 	const nonce_key        = 'liveblog_nonce';
 
-	const refresh_interval = 3;   // how often should we refresh
-	const max_retries      = 100; // max number of failed tries before polling is disabled
-	const delay_threshold  = 5;  // how many failed tries after which we should increase the refresh interval
-	const delay_multiplier = 2; // by how much should we inscrease the refresh interval
+	const refresh_interval        = 3;   // how often should we refresh
+	const max_consecutive_retries = 100; // max number of failed tries before polling is disabled
+	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
+	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 
 	/** Variables *************************************************************/
 
@@ -451,7 +451,7 @@ final class WPCOM_Liveblog {
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
 				'refresh_interval'       => self::refresh_interval,
-				'max_retries'            => self::max_retries,
+				'max_consecutive_retries'=> self::max_consecutive_retries,
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
 

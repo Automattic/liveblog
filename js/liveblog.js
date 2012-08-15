@@ -21,11 +21,11 @@ var liveblog = {};
 	// we need them to be real integers, so that we can use them in
 	// arithmetic operations
 	liveblog.cast_settings_numbers = function() {
-		liveblog_settings.refresh_interval       = parseInt( liveblog_settings.refresh_interval );
-		liveblog_settings.max_retries            = parseInt( liveblog_settings.max_retries );
-		liveblog_settings.delay_threshold        = parseInt( liveblog_settings.delay_threshold );
-		liveblog_settings.delay_multiplier       = parseFloat( liveblog_settings.delay_multiplier );
-		liveblog_settings.latest_entry_timestamp = parseInt( liveblog_settings.latest_entry_timestamp );
+		liveblog_settings.refresh_interval        = parseInt( liveblog_settings.refresh_interval );
+		liveblog_settings.max_consecutive_retries = parseInt( liveblog_settings.max_consecutive_retries );
+		liveblog_settings.delay_threshold         = parseInt( liveblog_settings.delay_threshold );
+		liveblog_settings.delay_multiplier        = parseFloat( liveblog_settings.delay_multiplier );
+		liveblog_settings.latest_entry_timestamp  = parseInt( liveblog_settings.latest_entry_timestamp );
 	}
 
 	liveblog.kill_timer = function() {
@@ -38,7 +38,6 @@ var liveblog = {};
 	liveblog.undelay_timer = function() {
 		if ( liveblog_settings.original_refresh_interval )
 			liveblog_settings.refresh_interval = liveblog_settings.original_refresh_interval;
-
 	}
 	liveblog.delay_timer = function() {
 		if ( ! liveblog_settings.original_refresh_interval )
@@ -64,6 +63,8 @@ var liveblog = {};
 
 	liveblog.get_recent_entries_success = function( response ) {
 
+		liveblog.consecutive_failures_count = 0;
+
 		liveblog.hide_spinner();
 
 		if ( response && response.latest_timestamp )
@@ -83,16 +84,16 @@ var liveblog = {};
 		liveblog.hide_spinner();
 
 		// Have a max number of checks, which causes the auto-update to shut off or slow down the auto-update
-		if ( ! liveblog.failure_count )
-			liveblog.failure_count = 0;
+		if ( ! liveblog.consecutive_failures_count )
+			liveblog.consecutive_failures_count = 0;
 
-		liveblog.failure_count++;
+		liveblog.consecutive_failures_count++;
 
-		if ( 0 == liveblog.failure_count % liveblog_settings.delay_threshold ) {
+		if ( 0 == liveblog.consecutive_failures_count % liveblog_settings.delay_threshold ) {
 			liveblog.delay_timer();
 		}
 
-		if ( liveblog.failure_count >= liveblog_settings.max_retries ) {
+		if ( liveblog.consecutive_failures_count >= liveblog_settings.max_consecutive_retries ) {
 			liveblog.kill_timer();
 			// TODO: show message that live refresh is disabled; show click-to-enable
 			return;
