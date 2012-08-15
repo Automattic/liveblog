@@ -14,7 +14,7 @@
 		liveblog.publisher.$spinner      = $( '#liveblog-submit-spinner'    );
 
 		liveblog.publisher.$entry_button.click( liveblog.publisher.submit_click );
-		$( '.liveblog-entry-delete' ).click( liveblog.publisher.delete_click );
+		$('#liveblog-entries').on( 'click', '.liveblog-entry-delete', liveblog.publisher.delete_click );
 	}
 
 	liveblog.publisher.submit_click = function( e ) {
