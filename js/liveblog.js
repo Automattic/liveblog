@@ -108,7 +108,7 @@ var liveblog = {};
 			return;
 		}
 
-		for ( var i in entries ) {
+		for ( var i = 0; i < entries.length; i++ ) {
 			var entry = entries[i];
 			liveblog.display_entry( entry );
 		}
