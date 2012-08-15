@@ -68,6 +68,7 @@ textarea#liveblog-form-entry.drag-over {
 
 input#liveblog-form-entry-submit {
 	margin: 0;
+	font-size: 1.2em;
 }
 
 span#liveblog-submit-spinner {
