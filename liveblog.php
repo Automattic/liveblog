@@ -337,9 +337,9 @@ final class WPCOM_Liveblog {
 		self::ajax_check_nonce();
 
 		// Check POST data
-		$post_id             = isset( $_POST['post_id']       ) ? intval( $_POST['post_id']  )                   : 0;
-		$replaces_comment_id = isset( $_POST['replaces']      ) ? intval( $_POST['replaces'] )                   : 0;
-		$entry_content       = isset( $_POST['entry_content'] ) ? wp_filter_post_kses( $_POST['entry_content'] ) : '';
+		$post_id             = isset( $_POST['post_id']       ) ? intval( $_POST['post_id']  ) : 0;
+		$replaces_comment_id = isset( $_POST['replaces']      ) ? intval( $_POST['replaces'] ) : 0;
+		$entry_content       = isset( $_POST['entry_content'] ) ? $_POST['entry_content']      : '';
 
 		if ( empty( $post_id ) )
 			self::send_error( __( 'Sorry, that post is not accepting Liveblog entries.', 'liveblog' ) );
@@ -350,7 +350,7 @@ final class WPCOM_Liveblog {
 		// Insert new comment
 		$new_comment_id = wp_insert_comment( array(
 			'comment_post_ID'      => $post_id,
-			'comment_content'      => $entry_content,
+			'comment_content'      => wp_filter_post_kses( $entry_content ),
 			'comment_approved'     => self::key,
 			'comment_type'         => self::key,
 			'user_id'              => $user->ID,
@@ -379,7 +379,7 @@ final class WPCOM_Liveblog {
 			if ( !empty( $entry_content ) ) {
 				wp_update_comment( array(
 					'comment_ID'      => $replaces_comment_id,
-					'comment_content' => $entry_content
+					'comment_content' => wp_filter_post_kses( $entry_content ),
 				) );
 
 			// Delete this comment
