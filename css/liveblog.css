@@ -43,6 +43,24 @@ fieldset#liveblog-actions legend {
 	background: transparent;
 }
 
+fieldset#liveblog-actions legend ul,
+fieldset#liveblog-actions legend li {
+	display: inline;
+	list-style-type: none;
+	margin: 0;
+}
+
+.ui-tabs-hide {
+	display: none;
+}
+.ui-tabs-selected a {
+	font-weight: bold;
+	font-size: 1.2em;
+	cursor: text;
+	color: #333;
+	text-decoration: none;
+}
+
 textarea#liveblog-form-entry {
 	display: inline-block;
 	background: #fff;
@@ -68,7 +86,6 @@ textarea#liveblog-form-entry.drag-over {
 
 input#liveblog-form-entry-submit {
 	margin: 0;
-	font-size: 1.2em;
 }
 
 span#liveblog-submit-spinner {
