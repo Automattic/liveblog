@@ -88,7 +88,7 @@ class WPCOM_Liveblog_Entry {
 		$entry_id          = $this->comment->comment_ID;
 		$post_id           = $this->comment->comment_post_ID;
 		$css_classes       = comment_class( '', $entry_id, $post_id, false );
-		$content           = apply_filters( 'comment_text', get_comment_text( $entry_id ), $this->comment );
+		$content           = self::render_content( get_comment_text( $entry_id ) );
 		$avatar_size       = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$avatar_img        = get_avatar( $this->comment->comment_author_email, $avatar_size );
 		$author_link       = get_comment_author_link( $entry_id );
@@ -105,5 +105,9 @@ class WPCOM_Liveblog_Entry {
 			'entry_time',
 			'can_edit_liveblog'
 		) );
+	}
+
+	public static function render_content( $raw_content ) {
+		return apply_filters( 'comment_text', $raw_content );
 	}
 }
