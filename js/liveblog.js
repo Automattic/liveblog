@@ -185,6 +185,7 @@ var liveblog = {};
 		} else {
 			liveblog.add_entry( new_entry );
 		}
+		$( document.body ).trigger( 'post-load' );
 	}
 
 	liveblog.add_entry = function( new_entry ) {

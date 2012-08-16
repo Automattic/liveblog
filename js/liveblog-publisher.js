@@ -50,6 +50,7 @@
 	liveblog.publisher.preview_entry_success = function( response ) {
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.$preview.html( '<div class="liveblog-entry"><div class="liveblog-entry-text">' + response.html + '</div></div>' );
+		$( document.body ).trigger( 'post-load' );
 	}
 
 	liveblog.publisher.preview_entry_error = function( response ) {
