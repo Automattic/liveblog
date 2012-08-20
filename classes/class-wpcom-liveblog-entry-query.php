@@ -95,7 +95,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @return array()
 	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
-		$all_entries     = $this->get();
+		$all_entries     = $this->get( array( 'order' => 'ASC' ) );
 		$entries_between = array();
 
 		foreach ( (array) $all_entries as $entry ) {
