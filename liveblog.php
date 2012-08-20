@@ -206,8 +206,7 @@ final class WPCOM_Liveblog {
 
 		// Bail if there is no end timestamp
 		if ( empty( $end_timestamp ) ) {
-			wp_safe_redirect( get_permalink() );
-			die();
+			self::send_user_error( __( 'A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/' ) );
 		}
 
 		// Do not cache if it's too soon
