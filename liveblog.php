@@ -340,7 +340,7 @@ final class WPCOM_Liveblog {
 		$entry_content       = isset( $_POST['entry_content'] ) ? $_POST['entry_content']      : '';
 
 		if ( empty( $post_id ) )
-			self::send_error( __( 'Sorry, that post is not accepting Liveblog entries.', 'liveblog' ) );
+			self::send_user_error( __( 'Sorry, that post is not accepting Liveblog entries.', 'liveblog' ) );
 
 		// Get the current user
 		$user = wp_get_current_user();
@@ -365,7 +365,7 @@ final class WPCOM_Liveblog {
 
 		// Bail if comment could not be saved
 		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) )
-			self::send_error( __( 'Error posting entry', 'liveblog' ) );
+			self::send_server_error( __( 'Error posting entry', 'liveblog' ) );
 
 		// Are we replacing an existing comment?
 		if ( !empty( $replaces_comment_id ) ) {
@@ -655,7 +655,7 @@ final class WPCOM_Liveblog {
 	 */
 	public static function ajax_current_user_can_edit_liveblog() {
 		if ( ! self::current_user_can_edit_liveblog() ) {
-			self::send_error( __( "Cheatin', uh?", 'liveblog' ) );
+			self::send_forbidden_error( __( "Cheatin', uh?", 'liveblog' ) );
 		}
 	}
 
@@ -666,7 +666,7 @@ final class WPCOM_Liveblog {
 	 */
 	public static function ajax_check_nonce( $action = self::nonce_key ) {
 		if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( $_REQUEST[ self::nonce_key ], $action ) ) {
-			self::send_error( __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
+			self::send_forbidden_error( __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
 		}
 	}
 
@@ -676,8 +676,18 @@ final class WPCOM_Liveblog {
 	 * Send an error message
 	 * @param type $message
 	 */
-	private static function send_error( $message ) {
+	private static function send_server_error( $message ) {
 		self::status_header_with_message( 500, $message );
+		exit();
+	}
+
+	private static function send_user_error( $message ) {
+		self::status_header_with_message( 406, $message );
+		exit();
+	}
+
+	private static function send_forbidden_error( $message ) {
+		self::status_header_with_message( 403, $message );
 		exit();
 	}
 
