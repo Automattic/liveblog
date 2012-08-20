@@ -101,7 +101,6 @@ var liveblog = {};
 
 		if ( liveblog.consecutive_failures_count >= liveblog_settings.max_consecutive_retries ) {
 			liveblog.kill_timer();
-			// TODO: show message that live refresh is disabled; show click-to-enable
 			return;
 		}
 
