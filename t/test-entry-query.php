@@ -89,7 +89,6 @@ class Test_Entry_Query extends WP_UnitTestCase {
 			'comment_type'     => $this->entry_query->key,
 		);
 		$args = array_merge( $defaults, $args );
-		// TODO: addslashes deep
 		return $this->factory->comment->create( $args );
 	}
 
