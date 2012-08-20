@@ -22,7 +22,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
  *
  * Things yet to be implimented:
  *
- * -- PHP and JS Actions/Filters/Triggers
  * -- Change "Read More" to "View Liveblog"
  * -- Manual refresh button
  * -- Allow marking of liveblog as ended
@@ -123,8 +122,6 @@ final class WPCOM_Liveblog {
 	 * This is where Liveblog sets up any additional things it needs to run
 	 * inside of WordPress. Where some plugins would register post types or
 	 * taxonomies, we modify endpoints and add post type support for Liveblog.
-	 *
-	 * @todo filters for time and interval overrides
 	 */
 	public static function init() {
 
