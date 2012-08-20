@@ -59,8 +59,6 @@ var liveblog = {};
 		var url  = liveblog_settings.entriesurl;
 		var from = liveblog.latest_entry_timestamp + 1;
 
-		// TODO: instead of using the current time use the latest
-		// server time to reconstruct the difference
 		var local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp;
 		var to         = liveblog.latest_response_server_timestamp + local_diff;
 
