@@ -2,12 +2,17 @@ var liveblog = {};
 
 ( function( $ ) {
 
+	// A dummy proxy DOM element, which allows us to use arbitrary events
+	// via the jQuery events system
+	liveblog.$events = $( '<span />' );
+
 	liveblog.init = function() {
 		liveblog.$entry_container = $( '#liveblog-entries'        );
 		liveblog.$spinner         = $( '#liveblog-update-spinner' );
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
 		liveblog.set_initial_timestamps();
+		liveblog.$events.trigger( 'after-init' );
 	};
 
 	liveblog.set_initial_timestamps = function() {

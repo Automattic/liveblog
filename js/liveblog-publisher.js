@@ -4,7 +4,6 @@
 
 	liveblog.publisher = {};
 
-	// TODO: fire after liveblog.init
 	liveblog.publisher.init = function() {
 		liveblog.disable_nag();
 
@@ -135,5 +134,5 @@
 		liveblog.publisher.$spinner.spin( false );
 	};
 
-	$( document ).ready( liveblog.publisher.init );
+	liveblog.$events.bind( 'after-init', liveblog.publisher.init );
 } )( jQuery );
