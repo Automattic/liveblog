@@ -33,7 +33,7 @@ class WPCOM_Liveblog_Entry_Query {
 			'type'    => $this->key,
 			'comment_approved' => $this->key,
 		);
-		$args     = wp_parse_args( $defaults, $args );
+		$args     = wp_parse_args( $args, $defaults );
 		$comments = get_comments( $args );
 		return self::entries_from_comments( $comments );
 	}
