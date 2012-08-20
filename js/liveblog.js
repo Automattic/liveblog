@@ -251,10 +251,6 @@ var liveblog = {};
 	liveblog.success_callback = function() {};
 	liveblog.error_callback   = function() {};
 
-	/**
-	 * @todo show errors in a box near the nag
-	 * @todo throtle errors
-	 */
 	liveblog.add_error = function( response ) {
 		alert( 'Error ' + response.status + ': ' + response.statusText );
 	};
