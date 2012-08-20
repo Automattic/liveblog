@@ -321,8 +321,6 @@ final class WPCOM_Liveblog {
 
 	/**
 	 * Inserts, updates, or deletes a liveblog entry
-	 *
-	 * @todo break update/delete off into separate methods
 	 */
 	public static function ajax_insert_entry() {
 
