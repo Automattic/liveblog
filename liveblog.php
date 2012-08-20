@@ -566,8 +566,6 @@ final class WPCOM_Liveblog {
 	 *
 	 * @param string $template_name
 	 * @param array $template_variables
-	 *
-	 * @todo Rudementary part/child theme file_exists() checks
 	 */
 	public static function get_template_part( $template_name, $template_variables = array() ) {
 		ob_start();
