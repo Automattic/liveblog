@@ -352,7 +352,6 @@ final class WPCOM_Liveblog {
 			'comment_type'         => self::key,
 			'user_id'              => $user->ID,
 
-			// TODO: Should we be adding this or generating dynamically?
 			'comment_author'       => $user->display_name,
 			'comment_author_email' => $user->user_email,
 			'comment_author_url'   => $user->user_url,
