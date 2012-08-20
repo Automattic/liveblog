@@ -27,8 +27,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
  * -- Manual refresh button
  * -- Allow marking of liveblog as ended
  * -- Allow comment modifications; need to store modified date as comment_meta
- *
- * @todo more batcache testing
  */
 final class WPCOM_Liveblog {
 
