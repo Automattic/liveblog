@@ -194,7 +194,6 @@ final class WPCOM_Liveblog {
 	public static function ajax_entries_between() {
 
 		// Set some defaults
-		$current_timestamp = time();
 		$latest_timestamp  = 0;
 		$entries_for_json  = array();
 
@@ -207,15 +206,15 @@ final class WPCOM_Liveblog {
 		}
 
 		// Do not cache if it's too soon
-		if ( $end_timestamp > $current_timestamp )
+		if ( $end_timestamp > time() )
 			self::$do_not_cache_response = true;
+		error_log( 'diff ' + (time() - $end_timestamp ) );
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
 		if ( empty( $entries ) ) {
 			self::json_return( array(
 				'entries'           => array(),
-				'current_timestamp' => $current_timestamp,
 				'latest_timestamp'  => null
 			) );
 		}
@@ -232,7 +231,6 @@ final class WPCOM_Liveblog {
 		// Setup our data to return via JSON
 		$result_for_json = array(
 			'entries'           => $entries_for_json,
-			'current_timestamp' => $current_timestamp,
 			'latest_timestamp'  => $latest_timestamp,
 		);
 
@@ -386,7 +384,6 @@ final class WPCOM_Liveblog {
 		// weren't any entries in between.
 		self::json_return( array(
 			'entries'           => array( $entry->for_json() ),
-			'current_timestamp' => time(),
 			'latest_timestamp'  => null
 		) );
 	}

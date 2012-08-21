@@ -67,7 +67,7 @@ var liveblog = {};
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );
 	};
 
-	liveblog.get_recent_entries_success = function( response ) {
+	liveblog.get_recent_entries_success = function( response, status, xhr ) {
 
 		liveblog.consecutive_failures_count = 0;
 
@@ -76,7 +76,7 @@ var liveblog = {};
 		if ( response && response.latest_timestamp )
 			liveblog.latest_entry_timestamp = response.latest_timestamp;
 
-		liveblog.latest_response_server_timestamp = response.current_timestamp;
+		liveblog.latest_response_server_timestamp = liveblog.server_timestamp_from_xhr( xhr );
 		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
 
 		liveblog.display_entries( response.entries );
@@ -265,6 +265,11 @@ var liveblog = {};
 
 	liveblog.current_timestamp = function() {
 		return Math.floor( Date.now() / 1000 );
+	};
+
+	liveblog.server_timestamp_from_xhr = function(xhr) {
+		var timestamp_milliseconds = Date.parse( xhr.getResponseHeader( 'Date' ) );
+		return Math.floor( timestamp_milliseconds / 1000 );
 	};
 
 	// Initialize everything!
