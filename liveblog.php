@@ -208,7 +208,6 @@ final class WPCOM_Liveblog {
 		// Do not cache if it's too soon
 		if ( $end_timestamp > time() )
 			self::$do_not_cache_response = true;
-		error_log( 'diff ' + (time() - $end_timestamp ) );
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
