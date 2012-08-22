@@ -551,7 +551,7 @@ final class WPCOM_Liveblog {
 	private static function get_all_entry_output() {
 
 		// Get liveblog entries
-		$entries = (array) self::$entry_query->get_all( array( 'order' => 'ASC' ) );
+		$entries = (array) self::$entry_query->get_all();
 
 		// Get the template part
 		return self::get_template_part( 'liveblog-loop.php', compact( 'entries' ) );
