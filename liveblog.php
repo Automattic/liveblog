@@ -451,7 +451,7 @@ final class WPCOM_Liveblog {
 				'delay_multiplier'       => self::delay_multiplier,
 
 				'ajaxurl'                => admin_url( 'admin-ajax.php' ),
-				'entriesurl'             => self::get_entries_endpoint_url(),
+				'endpoint_url'             => self::get_entries_endpoint_url(),
 
 				// i18n
 				'update_nag_singular'    => __( '%d new update',  'liveblog' ),

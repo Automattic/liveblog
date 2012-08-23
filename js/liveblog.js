@@ -56,7 +56,7 @@ var liveblog = {};
 	};
 
 	liveblog.get_recent_entries = function() {
-		var url  = liveblog_settings.entriesurl;
+		var url  = liveblog_settings.endpoint_url;
 		var from = liveblog.latest_entry_timestamp + 1;
 
 		var local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp;
