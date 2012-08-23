@@ -17,7 +17,7 @@ var liveblog = {};
 
 	liveblog.set_initial_timestamps = function() {
 		var now = liveblog.current_timestamp();
-		liveblog.latest_entry_timestamp           = liveblog_settings.latest_entry_timestamp;
+		liveblog.latest_entry_timestamp           = liveblog_settings.latest_entry_timestamp || 0;
 		liveblog.latest_response_local_timestamp  = now;
 		liveblog.latest_response_server_timestamp = now;
 	};
