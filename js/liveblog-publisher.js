@@ -43,7 +43,7 @@
 
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.$preview.html('Loading preview…');
-		liveblog.ajax_request( liveblog_settings.ajaxurl, data, liveblog.publisher.preview_entry_success, liveblog.publisher.preview_entry_error, 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + '/preview', data, liveblog.publisher.preview_entry_success, liveblog.publisher.preview_entry_error, 'POST' );
 	};
 
 	liveblog.publisher.preview_entry_success = function( response ) {
@@ -85,7 +85,7 @@
 		data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.show_spinner();
-		liveblog.ajax_request( liveblog_settings.ajaxurl, data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + '/insert', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
 	liveblog.publisher.insert_entry_success = function( response ) {
@@ -113,7 +113,7 @@
 		data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.show_spinner();
-		liveblog.ajax_request( liveblog_settings.ajaxurl, data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + '/insert', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
 	liveblog.publisher.disable_posting_interface = function() {

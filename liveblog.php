@@ -152,40 +152,46 @@ final class WPCOM_Liveblog {
 	 */
 	public static function handle_request() {
 
-		// Bail if not a liveblog post
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
 
-		// Set the some useful bits based on the request
 		self::$post_id     = get_the_ID();
 		self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 
-		/**
-		 * If this is the first time this page is being requested, we know we
-		 * need to add all of the liveblog updates to the top of the post.
-		 *
-		 * Once we've added them, bail.
-		 */
-		if ( self::is_initial_page_request() ) {
+		if ( self::is_initial_page_request() )
 			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) );
-			return;
+		else
+			self::handle_ajax_request();
+	}
+
+	private static function handle_ajax_request() {
+
+		$endpoint_suffix = get_query_var( self::url_endpoint );
+
+		if ( !$endpoint_suffix ) {
+			// we redirect, because if somebody accessed <permalink>/liveblog
+			// they probably did that in the URL bar, not via AJAX
+			wp_safe_redirect( get_permalink() );
+			exit();
 		}
 
-		/**
-		 * If this is an ajax request to update the entries, call the method
-		 * responsible for updating entries between now and the last time they
-		 * were successfully returned.
-		 *
-		 * Once we've added them, bail.
-		 */
-		if ( self::is_entries_ajax_request() ) {
-			self::ajax_entries_between();
-			return;
+		$suffix_to_method = array(
+			'\d+/\d+' => 'ajax_entries_between',
+			'insert' => 'ajax_insert_entry',
+			'preview' => 'ajax_preview_entry',
+		);
+
+		$response_method = 'ajax_unknown';
+
+		foreach( $suffix_to_method as $suffix_re => $method ) {
+			if ( preg_match( "%^$suffix_re/?%", $endpoint_suffix ) ) {
+				$response_method = $method;
+				break;
+			}
 		}
 
-		// We haven't needed to do anything, so redirect back to the permalink
-		wp_safe_redirect( get_permalink() );
-		exit();
+		self::$response_method();
+
 	}
 
 	/**
@@ -396,6 +402,11 @@ final class WPCOM_Liveblog {
 		self::json_return( array( 'html' => $entry_content ) );
 	}
 
+	public function ajax_unknown() {
+		self::send_user_error( __( 'Unknown liveblog action', 'liveblog' ) );
+	}
+
+
 	/** Comment Methods *******************************************************/
 
 	/**
@@ -509,7 +520,7 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		return trailingslashit( get_permalink( self::$post_id ) . self::url_endpoint );
+		return get_permalink( self::$post_id ) . self::url_endpoint;
 	}
 
 	/** Display Methods *******************************************************/
