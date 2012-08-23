@@ -147,24 +147,24 @@ span#liveblog-submit-spinner {
 	background-color: lightYellow;
 }
 
-.liveblog-entry-text {
+.liveblog-entry .liveblog-entry-text {
 	font-size: 18px;
 	line-height: 22px;
 	padding: 10px 0 0;
 	margin-left: 40px;
 }
 
-.liveblog-author-name {
+.liveblog-entry .liveblog-meta .liveblog-author-name {
 	font-size: 15px;
 	line-height: 18px;
 }
 
-.liveblog-author-avatar {
+.liveblog-entry .liveblog-meta .liveblog-author-avatar {
 	float: left;
 	margin: 0 10px 0 0;
 }
 
-.liveblog-meta-time {
+.liveblog-entry .liveblog-meta .liveblog-meta-time {
 	float: right;
 	margin-left: 10px;
 	font-size: 10px;
@@ -177,6 +177,6 @@ span#liveblog-submit-spinner {
 	text-transform: uppercase;
 }
 
-.liveblog-entry-actions {
+.liveblog-entry .liveblog-entry-actions {
 	list-style-type: none;
 }
