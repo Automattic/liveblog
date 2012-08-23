@@ -88,13 +88,13 @@
 		liveblog.ajax_request( liveblog_settings.endpoint_url + '/insert', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
-	liveblog.publisher.insert_entry_success = function( response ) {
+	liveblog.publisher.insert_entry_success = function( response, status, xhr ) {
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.hide_spinner();
 		liveblog.publisher.$entry_text.val( '' );
 
 		liveblog.reset_timer();
-		liveblog.get_recent_entries_success( response );
+		liveblog.get_recent_entries_success( response, status, xhr );
 	};
 
 	liveblog.publisher.insert_entry_error = function( response ) {
