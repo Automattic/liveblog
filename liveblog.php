@@ -461,7 +461,6 @@ final class WPCOM_Liveblog {
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
 
-				'ajaxurl'                => admin_url( 'admin-ajax.php' ),
 				'endpoint_url'             => self::get_entries_endpoint_url(),
 
 				// i18n
