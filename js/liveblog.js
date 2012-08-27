@@ -16,7 +16,18 @@ var liveblog = {};
 		liveblog.set_initial_timestamps();
 		liveblog.$events.trigger( 'after-init' );
 
-		//liveblog.disable_nag();
+
+		liveblog.$container.on('click', '.pause-play', function( e ) {
+			e.preventDefault();
+	
+			if ( liveblog.$container.hasClass( 'paused' ) ) {
+				liveblog.play();
+			} else {
+				liveblog.pause();
+			}//end else
+		});
+
+		liveblog.disable_nag();
 	};
 
 	liveblog.set_initial_timestamps = function() {
@@ -62,6 +73,7 @@ var liveblog = {};
 	liveblog.pause = function() {
 		liveblog.paused = true;
 		liveblog.$container.addClass( 'paused' );
+		liveblog.$container.find('.pause-play').html( 'Play Stream' );
 		liveblog.enable_nag();
 		liveblog.$events.trigger( 'pause' );
 	};
@@ -69,7 +81,12 @@ var liveblog = {};
 	liveblog.play = function() {
 		liveblog.paused = false;
 		liveblog.$container.removeClass( 'paused' );
+		liveblog.$container.find('.pause-play').html( 'Pause Stream' );
+		
+		liveblog.unhide_entries();
 		liveblog.disable_nag();
+		liveblog.$update_nag.slideUp();
+		
 		liveblog.$events.trigger( 'play' );
 	};
 
@@ -176,8 +193,6 @@ var liveblog = {};
 			.html( nag_text )
 			.prependTo( liveblog.$entry_container )
 			.one( 'click', function() {
-				liveblog.unhide_entries();
-				$( this ).slideUp();
 				liveblog.play();
 				document.title = liveblog.original_title;
 			} )
