@@ -85,7 +85,7 @@ var liveblog = {};
 		
 		liveblog.unhide_entries();
 		liveblog.disable_nag();
-		liveblog.$update_nag.slideUp();
+		liveblog.$container.find('.liveblog-nag').slideUp();
 		
 		liveblog.$events.trigger( 'play' );
 	};
