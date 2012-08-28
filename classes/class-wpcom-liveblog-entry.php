@@ -92,7 +92,8 @@ class WPCOM_Liveblog_Entry {
 		$avatar_size       = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$avatar_img        = get_avatar( $this->comment->comment_author_email, $avatar_size );
 		$author_link       = get_comment_author_link( $entry_id );
-		$entry_time        = get_comment_date( 'M j, Y - g:i:s A', $entry_id );
+		$entry_date        = get_comment_date( get_option('date_format'), $entry_id );
+		$entry_time        = get_comment_date( get_option('time_format'), $entry_id );
 		$can_edit_liveblog = WPCOM_Liveblog::current_user_can_edit_liveblog();
 
 		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', compact(
@@ -102,6 +103,7 @@ class WPCOM_Liveblog_Entry {
 			'content',
 			'avatar_img',
 			'author_link',
+			'entry_date',
 			'entry_time',
 			'can_edit_liveblog'
 		) );
