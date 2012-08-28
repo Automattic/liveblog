@@ -7,10 +7,11 @@ var liveblog = {};
 	liveblog.$events = $( '<span />' );
 
 	liveblog.init = function() {
-		liveblog.$container       = $( '#liveblog-container'      );
-		liveblog.$entry_container = $( '#liveblog-entries'        );
-		liveblog.$spinner         = $( '#liveblog-update-spinner' );
-		liveblog.paused           = false;
+		liveblog.$container               = $( '#liveblog-container'      );
+		liveblog.$entry_container         = $( '#liveblog-entries'        );
+		liveblog.$spinner                 = $( '#liveblog-update-spinner' );
+		liveblog.paused                   = false;
+		liveblog.pause_on_scroll_distance = 150;
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
 		liveblog.set_initial_timestamps();
@@ -168,6 +169,12 @@ var liveblog = {};
 			return;
 		}
 
+		// if the user has scrolled down the page, pause the stream
+		// so the user doesn't lose their place
+		if ( liveblog.is_scrolled() ) {
+			liveblog.pause();
+		}
+
 		if ( liveblog.is_nag_disabled() ) {
 			liveblog.unhide_entries();
 			return;
@@ -215,6 +222,13 @@ var liveblog = {};
 
 	liveblog.is_nag_disabled = function() {
 		return liveblog.nag_disabled;
+	};
+
+	liveblog.is_scrolled = function() {
+		var offset          = liveblog.$entry_container.offset();
+		var scroll_position = $( document ).scrollTop();
+
+		return ( scroll_position - offset.top ) > liveblog.pause_on_scroll_distance;
 	};
 
 	liveblog.get_entry_by_id = function( id ) {
