@@ -177,6 +177,10 @@ span#liveblog-submit-spinner {
 	text-transform: uppercase;
 }
 
+.liveblog-meta-time .time:before {
+	content: " - ";
+}
+
 .liveblog-entry .liveblog-entry-actions {
 	list-style-type: none;
 }
