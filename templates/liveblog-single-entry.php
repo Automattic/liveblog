@@ -2,7 +2,7 @@
 	<header class="liveblog-meta">
 		<span class="liveblog-author-avatar"><?php echo $avatar_img; ?></span>
 		<span class="liveblog-author-name"><?php echo $author_link; ?></span>
-		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo $entry_id; ?>"><?php echo $entry_time; ?></a></span>
+		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo $entry_id; ?>"><span class="date"><?php echo $entry_date; ?></span><span class="time"><?php echo $entry_time; ?></span></a></span>
 	</header>
 	<div class="liveblog-entry-text">
 		<?php echo $content; ?>
