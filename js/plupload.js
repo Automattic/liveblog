@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	new wp.Uploader({
+	liveblog.uploader = new wp.Uploader({
 
 	    /* Selectors */
 		browser:   '#liveblog-messages',
