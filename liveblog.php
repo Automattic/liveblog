@@ -436,7 +436,7 @@ final class WPCOM_Liveblog {
 
 		if ( self::current_user_can_edit_liveblog() )  {
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key, 'jquery-ui-tabs' ), self::version, true );
-			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( 'wp-plupload', 'jquery' ) );
+			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
 		}
 
