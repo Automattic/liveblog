@@ -74,6 +74,10 @@ final class WPCOM_Liveblog {
 		if ( ! is_admin() && is_multisite() ) {
 			require_once( ABSPATH . 'wp-admin/includes/ms.php' );
 		}
+
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
+		}
 	}
 
 	/**
