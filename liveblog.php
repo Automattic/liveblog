@@ -31,7 +31,7 @@ final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
 
-	const version          = 0.1;
+	const version          = '1.0-beta';
 	const key              = 'liveblog';
 	const url_endpoint     = 'liveblog';
 	const edit_cap         = 'publish_posts';
