@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Liveblog
  * Description: Blogging: at the speed of live.
- * Version:     0.1
+ * Version:     1.0-beta
  * Author:      WordPress.com VIP, Automattic
  */
 
