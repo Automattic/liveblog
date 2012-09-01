@@ -32,6 +32,17 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Check the "This post is a liveblog" checkbox on a post edit page to make it a liveblog
 
+== Screenshots ==
+
+1. The entry form is the simplest possible
+2. Writers can preview before posting
+3. The user sees that there are new posts
+4. New posts are highlighted
+5. Adding images is a matter of just drag-and-drop
+6. Dragged photos are automatically inserted
+7. Any post can be turned into a liveblog
+8. Typical liveblog view
+
 == Changelog ==
 
 = 1.0 =
