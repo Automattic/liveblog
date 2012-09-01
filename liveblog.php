@@ -32,6 +32,7 @@ final class WPCOM_Liveblog {
 	/** Constants *************************************************************/
 
 	const version          = '1.0-beta';
+	const rewrites_version = 1;
 	const key              = 'liveblog';
 	const url_endpoint     = 'liveblog';
 	const edit_cap         = 'publish_posts';
@@ -125,20 +126,23 @@ final class WPCOM_Liveblog {
 	 */
 	public static function init() {
 
-		/**
-		 * Add a WordPress rewrite-rule enpoint.
-		 *
-		 * Looks like: /2012/01/01/post-name/liveblog/123456/
-		 *
-		 * where 123456 is a timestamp
-		 */
-		add_rewrite_endpoint( self::url_endpoint, EP_PERMALINK );
+		self::add_rewite_rules();
 
 		/**
 		 * Add liveblog support to the 'post' post type. This is done here so
 		 * we can possibly introduce this to other post types later.
 		 */
 		add_post_type_support( 'post', self::key );
+	}
+
+	public static function add_rewite_rules() {
+		add_rewrite_endpoint( self::url_endpoint, EP_PERMALINK );
+
+		if ( get_option( 'liveblog_rewrites_version' ) != self::rewrites_version ) {
+			flush_rewrite_rules();
+			update_option( 'liveblog_rewrites_version', self::rewrites_version );
+		}
+
 	}
 
 	/**
