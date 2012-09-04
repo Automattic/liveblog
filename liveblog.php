@@ -2,9 +2,12 @@
 
 /**
  * Plugin Name: Liveblog
+ * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
  * Version:     1.0-beta
  * Author:      WordPress.com VIP, Automattic
+ * Author URI: http://vip.wordpress.com/
+ * Text Domain: liveblog
  */
 
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
