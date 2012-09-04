@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.0-beta
+ * Version:     1.0
  * Author:      WordPress.com VIP, Automattic
  * Author URI: http://vip.wordpress.com/
  * Text Domain: liveblog
@@ -34,7 +34,7 @@ final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
 
-	const version          = '1.0-beta';
+	const version          = '1.0';
 	const rewrites_version = 1;
 	const key              = 'liveblog';
 	const url_endpoint     = 'liveblog';
