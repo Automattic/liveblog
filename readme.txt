@@ -15,7 +15,7 @@ Your readers want your updates as quickly as possible, and we think we provide t
 
 When you’re covering a fast-paced event — the latest Apple unveiling, an F1 Grand Prix, or the Super Bowl — a full blog post for each individual update is a poor experience for your authors and your audience.
 
-The WordPress.com VIP Liveblog Add-On was purpose-built to address these issues specifically.
+The [WordPress.com VIP Liveblog Add-On](http://vip.wordpress.com/liveblog-add-on/) was purpose-built to address these issues specifically.
 
 Here’s what makes it special:
 
