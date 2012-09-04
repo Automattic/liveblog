@@ -530,7 +530,7 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		return get_permalink( self::$post_id ) . self::url_endpoint;
+		return trailingslashit( get_permalink( self::$post_id ) ) . self::url_endpoint;
 	}
 
 	/** Display Methods *******************************************************/
