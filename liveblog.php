@@ -20,7 +20,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
  * This class is a big container for a bunch of static methods, similar to a
  * factory but without object inheritance or instantiation.
  *
- * Things yet to be implimented:
+ * Things yet to be implemented:
  *
  * -- Change "Read More" to "View Liveblog"
  * -- Manual refresh button
