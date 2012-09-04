@@ -8,6 +8,8 @@
  */
 class WPCOM_Liveblog_Entry_Query {
 
+	var $legacy_mode = false; // should we include backwards compat for 3.4?
+
 	/**
 	 * Set the post ID and key when a new object is created
 	 *
@@ -17,6 +19,12 @@ class WPCOM_Liveblog_Entry_Query {
 	public function __construct( $post_id, $key ) {
 		$this->post_id = $post_id;
 		$this->key     = $key;
+
+		// Backwards-compat for 3.4
+		if ( ! function_exists( 'get_edit_user_link' ) ) {
+			$this->legacy_mode = true;
+			add_filter( 'comments_clauses', array( $this, '_comments_clauses' ) );
+		}
 	}
 
 	/**
@@ -31,10 +39,18 @@ class WPCOM_Liveblog_Entry_Query {
 			'orderby' => 'comment_date_gmt',
 			'order'   => 'DESC',
 			'type'    => $this->key,
-			'comment_approved' => $this->key,
 		);
+
+		// 3.4 compat
+		if ( ! $this->legacy_mode ) {
+			$defaults['comment_approved'] = $this->key;
+		} else {
+			$defaults['status'] = $this->key; // just used to make the cache key more unique to avoid pollution
+		}
+
 		$args     = wp_parse_args( $args, $defaults );
 		$comments = get_comments( $args );
+
 		return self::entries_from_comments( $comments );
 	}
 
@@ -162,5 +178,28 @@ class WPCOM_Liveblog_Entry_Query {
 			$result[$entry->get_id()] = $entry;
 
 		return $result;
+	}
+
+	/**
+	 * Filter the comments query to include the special comment_approved status.
+	 * Required for backwards-compatibility with 3.4.x
+	 *
+	 * @param array $clauses
+	 * @return array
+	 */
+	public function _comments_clauses( $clauses = array() ) {
+		global $wpdb;
+
+		// Setup the search clauses
+		$needle   = $wpdb->prepare( "comment_type = %s", $this->key );
+		$haystack = !empty( $clauses['where'] ) ? $clauses['where'] : '';
+
+		// Bail if not a liveblog query
+		if ( ! strstr( $haystack, $needle ) )
+			return $clauses;
+
+		$clauses['where'] = $wpdb->prepare( "comment_approved = %s AND comment_post_ID = %d AND comment_type = %s", $this->key, $this->post_id, $this->key );
+
+		return $clauses;
 	}
 }
