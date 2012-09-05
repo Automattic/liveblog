@@ -318,7 +318,7 @@ final class WPCOM_Liveblog {
 	private static function get_timestamps_from_query() {
 
 		// Look for timestamps and bail if none
-		$stamps = get_query_var( self::url_endpoint );
+		$stamps = rtrim( get_query_var( self::url_endpoint ), '/' );
 		if ( empty( $stamps ) )
 			return array( false, false );
 
@@ -530,7 +530,12 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		return trailingslashit( get_permalink( self::$post_id ) ) . self::url_endpoint;
+		if ( get_option( 'permalink_structure' ) )
+			$url = trailingslashit( trailingslashit( get_permalink( self::$post_id ) ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
+		else
+			$url = add_query_arg( self::url_endpoint, '', get_permalink( self::$post_id ) ) . '='; // returns something like ?p=1&liveblog=
+
+		return $url;
 	}
 
 	/** Display Methods *******************************************************/

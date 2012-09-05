@@ -62,7 +62,7 @@ var liveblog = {};
 		var local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp;
 		var to         = liveblog.latest_response_server_timestamp + local_diff;
 
-		url += '/' + from + '/' + to + '/';
+		url += from + '/' + to + '/';
 		liveblog.show_spinner();
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );
 	};
