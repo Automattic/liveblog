@@ -1,9 +1,9 @@
 === Liveblog ===
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
-Requires at least: 3.5
+Requires at least: 3.4.1
 Tested up to: 3.5
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,12 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 8. Typical liveblog view
 
 == Changelog ==
+
+= 1.1 =
+* Backwards compatibility for 3.4
+* Support for non-pretty permalinks
+* Support for permalinks without trailing slashes
+* Fix preview tab
 
 = 1.0 =
 * Initial release
