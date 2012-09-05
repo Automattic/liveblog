@@ -26,7 +26,7 @@
 	};
 
 	liveblog.publisher.preview_select = function( e, ui ) {
-		if (1 != ui.index) {
+		if (2 != ui.index) {
 			return;
 		}
 
