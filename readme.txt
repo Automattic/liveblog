@@ -11,6 +11,8 @@ Quick and simple blogging for following fast-paced events.
 
 == Description ==
 
+[wpvideo tWpw6nCt]
+
 Your readers want your updates as quickly as possible, and we think we provide the easiest and the most flexible publishing environment to make that happen. Sometimes though, that’s just not enough.
 
 When you’re covering a fast-paced event — the latest Apple unveiling, an F1 Grand Prix, or the Super Bowl — a full blog post for each individual update is a poor experience for your authors and your audience.
