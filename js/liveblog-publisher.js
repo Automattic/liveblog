@@ -26,7 +26,7 @@
 	};
 
 	liveblog.publisher.preview_select = function( e, ui ) {
-		if (2 != ui.index) {
+		if ( -1 == ui.tab.href.search( '#liveblog-preview' ) ) {
 			return;
 		}
 
