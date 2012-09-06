@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the LiveBlog package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2012-09-06 08:22:37+0000\n"
+"PO-Revision-Date: 2012-09-06 08:44:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -68,12 +68,12 @@ msgstr "Preview"
 
 #: templates/liveblog-form.php:13
 msgid "Remember: keep it short! To insert an image, drag and drop it here."
-msgstr "Leet op: hou het kort! Sleep een afbeelding hier naar toe om deze toe te voegen. "
+msgstr "Korter is beter Sleep een afbeelding hier naar toe om deze toe te voegen. "
 
 #: templates/liveblog-form.php:16
 msgid "Publish Update"
-msgstr ""
+msgstr "Publiceer update"
 
 #: templates/liveblog-single-entry.php:12
 msgid "Delete"
-msgstr ""
+msgstr "Verwijder"
