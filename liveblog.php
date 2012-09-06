@@ -219,7 +219,7 @@ final class WPCOM_Liveblog {
 
 		// Bail if there is no end timestamp
 		if ( empty( $end_timestamp ) ) {
-			self::send_user_error( __( 'A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/' ) );
+			self::send_user_error( __( 'A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/', 'liveblog' ) );
 		}
 
 		// Do not cache if it's too soon
@@ -498,7 +498,7 @@ final class WPCOM_Liveblog {
 			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
 			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
 			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
-			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*') ),
+			'filters'             => array( array( 'title' => __( 'Allowed Files', 'liveblog' ), 'extensions' => '*') ),
 			'multipart'           => true,
 			'urlstream_upload'    => true,
 			'multipart_params'    => array(
