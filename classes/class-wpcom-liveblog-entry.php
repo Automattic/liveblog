@@ -109,7 +109,17 @@ class WPCOM_Liveblog_Entry {
 		) );
 	}
 
-	public static function render_content( $raw_content ) {
-		return apply_filters( 'comment_text', $raw_content );
+	public static function render_content( $content ) {
+		global $wp_embed;
+
+		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
+			if ( get_option( 'embed_autourls' ) )
+				$content = $wp_embed->autoembed( $content );
+			$content = do_shortcode( $content );
+		}
+
+		$content = apply_filters( 'comment_text', $content );
+
+		return $content;
 	}
 }
