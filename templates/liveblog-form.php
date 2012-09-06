@@ -4,9 +4,9 @@
 	<fieldset id="liveblog-actions">
 		<legend>
 			<ul>
-				<li><a href="#liveblog-new-entry">New Entry</a></li>
+				<li><a href="#liveblog-new-entry"><?php _e( 'New Entry', 'liveblog' ); ?></a></li>
 				<li>&bull;</li>
-				<li><a href="#liveblog-preview">Preview</a></li>
+				<li><a href="#liveblog-preview"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
 			<div id="liveblog-new-entry">
