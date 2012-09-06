@@ -59,6 +59,8 @@ final class WPCOM_Liveblog {
 	 * @uses add_filter() to hook methods into WordPress filters
 	 */
 	public static function load() {
+		load_plugin_textdomain( 'liveblog', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
 		self::includes();
 		self::add_actions();
 		self::add_filters();
