@@ -47,6 +47,12 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 
 == Changelog ==
 
+= 1.2 =
+
+* Internationalization support, props elarequi
+* Allow shortcodes and OEmbed in liveblog entries
+* Fix preview tab
+
 = 1.1 =
 * Backwards compatibility for 3.4
 * Support for non-pretty permalinks
