@@ -3,9 +3,9 @@
 
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby)
 * Tags: liveblog
-* Requires at least: 3.5
+* Requires at least: 3.4.1
 * Tested up to: 3.5
-* Stable tag: trunk
+* Stable tag: 1.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,11 +13,13 @@ Quick and simple blogging for following fast-paced events.
 
 ## Description
 
+[wpvideo tWpw6nCt]
+
 Your readers want your updates as quickly as possible, and we think we provide the easiest and the most flexible publishing environment to make that happen. Sometimes though, that’s just not enough.
 
 When you’re covering a fast-paced event — the latest Apple unveiling, an F1 Grand Prix, or the Super Bowl — a full blog post for each individual update is a poor experience for your authors and your audience.
 
-The WordPress.com VIP Liveblog Add-On was purpose-built to address these issues specifically.
+The [WordPress.com VIP Liveblog Add-On](http://vip.wordpress.com/liveblog-add-on/) was purpose-built to address these issues specifically.
 
 Here’s what makes it special:
 
@@ -46,6 +48,21 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
 
 ## Changelog
+
+### 1.2
+
+* Internationalization support, props @elarequi
+* Spanish translation, props @elarequi
+* Dutch translation, props @defries
+* Allow shortcodes and OEmbed in liveblog entries
+* Fix preview tab
+
+### 1.1
+
+* Backwards compatibility for 3.4
+* Support for non-pretty permalinks
+* Support for permalinks without trailing slashes
+* Fix preview tab
 
 ### 1.0
 
