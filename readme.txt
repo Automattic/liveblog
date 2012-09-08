@@ -49,7 +49,9 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 
 = 1.2 =
 
-* Internationalization support, props elarequi
+* Internationalization support, props @elarequi
+* Spanish translation, props @elarequi
+* Dutch translation, props @defries
 * Allow shortcodes and OEmbed in liveblog entries
 * Fix preview tab
 
