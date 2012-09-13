@@ -21,8 +21,8 @@ class WPCOM_Liveblog_Entry_Query {
 		$this->key     = $key;
 
 		// Backwards-compat for 3.4
-		if ( ! function_exists( 'get_edit_user_link' ) ) {
-			$this->legacy_mode = true;
+		$this->legacy_mode = apply_filters( 'liveblog_force_backwards_compat', (bool) ! function_exists( 'get_edit_user_link' ) );
+		if ( $this->legacy_mode ) {
 			add_filter( 'comments_clauses', array( $this, '_comments_clauses' ) );
 		}
 	}
