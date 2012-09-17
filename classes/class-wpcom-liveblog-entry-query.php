@@ -111,8 +111,8 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @return array()
 	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
-		$all_entries     = $this->get( array( 'order' => 'ASC' ) );
 		$entries_between = array();
+		$all_entries = $this->get_all_entries_asc();
 
 		foreach ( (array) $all_entries as $entry ) {
 			if ( $entry->get_timestamp() >= $start_timestamp && $entry->get_timestamp() <= $end_timestamp ) {
@@ -121,6 +121,17 @@ class WPCOM_Liveblog_Entry_Query {
 		}
 
 		return self::filter_liveblog_entries( $entries_between );
+	}
+
+	private function get_all_entries_asc() {
+		$cached_entries_asc_key =  $this->key . '_entries_asc_' . $this->post_id;
+		$cached_entries_asc = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
+		if ( false !== $cached_entries_asc ) {
+			return $cached_entries_asc;
+		}
+		$all_entries_asc = $this->get( array( 'order' => 'ASC' ) );
+		wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
+		return $all_entries_asc;
 	}
 
 	/**

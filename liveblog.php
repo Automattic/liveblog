@@ -187,6 +187,7 @@ final class WPCOM_Liveblog {
 			wp_safe_redirect( get_permalink() );
 			exit();
 		}
+		wp_cache_delete( self::key . '_entries_asc_' . self::$post_id, 'liveblog' ); 
 
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
@@ -371,6 +372,7 @@ final class WPCOM_Liveblog {
 			'comment_author_IP'    => preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] ),
 			'comment_agent'        => substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 ),
 		) );
+		wp_cache_delete( self::key . '_entries_asc_' . $post_id, 'liveblog' ); 
 
 		// Bail if comment could not be saved
 		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) )
