@@ -92,6 +92,9 @@ final class WPCOM_Liveblog {
 	 */
 	private static function add_actions() {
 		add_action( 'init',                          array( __CLASS__, 'init'              ) );
+		add_action( 'init',                          array( __CLASS__, 'add_rewrite_rules' ) );
+		add_action( 'permalink_structure_changed',   array( __CLASS__, 'add_rewrite_rules' ) );
+		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ) );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
 		add_action( 'wp_ajax_liveblog_preview_entry', array( __CLASS__, 'ajax_preview_entry' ) );
@@ -133,9 +136,6 @@ final class WPCOM_Liveblog {
 	 * taxonomies, we modify endpoints and add post type support for Liveblog.
 	 */
 	public static function init() {
-
-		self::add_rewite_rules();
-
 		/**
 		 * Add liveblog support to the 'post' post type. This is done here so
 		 * we can possibly introduce this to other post types later.
@@ -143,14 +143,15 @@ final class WPCOM_Liveblog {
 		add_post_type_support( 'post', self::key );
 	}
 
-	public static function add_rewite_rules() {
+	public function add_rewrite_rules() {
 		add_rewrite_endpoint( self::url_endpoint, EP_PERMALINK );
+	}
 
+	public static function flush_rewrite_rules() {
 		if ( get_option( 'liveblog_rewrites_version' ) != self::rewrites_version ) {
 			flush_rewrite_rules();
 			update_option( 'liveblog_rewrites_version', self::rewrites_version );
 		}
-
 	}
 
 	/**
