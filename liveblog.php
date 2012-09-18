@@ -94,7 +94,8 @@ final class WPCOM_Liveblog {
 		add_action( 'init',                          array( __CLASS__, 'init'              ) );
 		add_action( 'init',                          array( __CLASS__, 'add_rewrite_rules' ) );
 		add_action( 'permalink_structure_changed',   array( __CLASS__, 'add_rewrite_rules' ) );
-		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ) );
+		// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
+		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
 		add_action( 'wp_ajax_liveblog_preview_entry', array( __CLASS__, 'ajax_preview_entry' ) );
