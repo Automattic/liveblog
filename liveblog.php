@@ -92,7 +92,6 @@ final class WPCOM_Liveblog {
 	 */
 	private static function add_actions() {
 		add_action( 'init',                          array( __CLASS__, 'init'              ) );
-		//add_action( 'wp_head',                       array( __CLASS__, 'wp_head'           ) );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
 		add_action( 'wp_ajax_liveblog_preview_entry', array( __CLASS__, 'ajax_preview_entry' ) );
