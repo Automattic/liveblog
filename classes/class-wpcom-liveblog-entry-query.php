@@ -8,7 +8,7 @@
  */
 class WPCOM_Liveblog_Entry_Query {
 
-	var $legacy_mode = false; // should we include backwards compat for 3.4?
+	var $wp_has_comment_approved_query_support = false;
 
 	/**
 	 * Set the post ID and key when a new object is created
@@ -17,14 +17,16 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param string $key
 	 */
 	public function __construct( $post_id, $key ) {
+		global $wp_version;
 		$this->post_id = $post_id;
 		$this->key     = $key;
 
-		// Backwards-compat for 3.4
-		$this->legacy_mode = apply_filters( 'liveblog_force_backwards_compat', (bool) ! function_exists( 'get_edit_user_link' ) );
-		if ( $this->legacy_mode ) {
+		$this->wp_has_comment_approved_query_support = version_compare( $wp_version, '3.5-alpha-21548' ) > 0;
+
+		if ( !$this->wp_has_comment_approved_query_support ) {
 			add_filter( 'comments_clauses', array( $this, '_comments_clauses' ) );
 		}
+
 	}
 
 	/**
@@ -41,11 +43,10 @@ class WPCOM_Liveblog_Entry_Query {
 			'type'    => $this->key,
 		);
 
-		// 3.4 compat
-		if ( ! $this->legacy_mode ) {
+		if ( $this->wp_has_comment_approved_query_support ) {
 			$defaults['comment_approved'] = $this->key;
 		} else {
-			$defaults['status'] = $this->key; // just used to make the cache key more unique to avoid pollution
+			$defaults['status'] = $this->key; // just used to make the cache key unique to avoid pollution
 		}
 
 		$args     = wp_parse_args( $args, $defaults );
