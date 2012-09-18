@@ -535,11 +535,11 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		if ( get_option( 'permalink_structure' ) )
-			$url = trailingslashit( trailingslashit( get_permalink( self::$post_id ) ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
+		$post_permalink = get_permalink( self::$post_id );
+		if ( false !== strpos( $post_permalink, '?p=' ) )
+			$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
 		else
-			$url = add_query_arg( self::url_endpoint, '', get_permalink( self::$post_id ) ) . '='; // returns something like ?p=1&liveblog=
-
+			$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
 		return $url;
 	}
 
