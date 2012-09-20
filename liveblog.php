@@ -41,7 +41,7 @@ final class WPCOM_Liveblog {
 	const edit_cap         = 'publish_posts';
 	const nonce_key        = 'liveblog_nonce';
 
-	const refresh_interval        = 3;   // how often should we refresh
+	const refresh_interval        = 10;   // how often should we refresh
 	const max_consecutive_retries = 100; // max number of failed tries before polling is disabled
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
