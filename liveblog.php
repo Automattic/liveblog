@@ -108,7 +108,7 @@ final class WPCOM_Liveblog {
 	 */
 	private static function add_filters() {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
-		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ) );
+		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
 	}
 
 	/**
@@ -431,8 +431,9 @@ final class WPCOM_Liveblog {
 	 * @param array $classes
 	 * @return string
 	 */
-	public static function add_comment_class( $classes ) {
-		$classes[] = 'liveblog-entry';
+	public static function add_comment_class( $classes, $class, $comment_id ) {
+		if ( self::key == get_comment_type( $comment_id ) )
+			$classes[] = 'liveblog-entry';
 		return $classes;
 	}
 
