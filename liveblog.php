@@ -233,6 +233,8 @@ final class WPCOM_Liveblog {
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
 		if ( empty( $entries ) ) {
+			do_action( 'liveblog_entry_request_empty' );
+
 			self::json_return( array(
 				'entries'           => array(),
 				'latest_timestamp'  => null
@@ -253,6 +255,8 @@ final class WPCOM_Liveblog {
 			'entries'           => $entries_for_json,
 			'latest_timestamp'  => $latest_timestamp,
 		);
+
+		do_action( 'liveblog_entry_request', $result_for_json );
 
 		self::json_return( $result_for_json );
 	}
@@ -382,11 +386,11 @@ final class WPCOM_Liveblog {
 		// Are we replacing an existing comment?
 		if ( !empty( $replaces_comment_id ) ) {
 
-			//
 			add_comment_meta( $new_comment_id, WPCOM_Liveblog_Entry::replaces_meta_key, $replaces_comment_id );
 
 			// Update an existing comment
 			if ( !empty( $entry_content ) ) {
+				do_action( 'liveblog_update_entry', $replaces_comment_id, $new_comment_id, $post_id );
 				wp_update_comment( array(
 					'comment_ID'      => $replaces_comment_id,
 					'comment_content' => wp_filter_post_kses( $entry_content ),
@@ -394,8 +398,11 @@ final class WPCOM_Liveblog {
 
 			// Delete this comment
 			} else {
+				do_action( 'liveblog_delete_entry', $replaces_comment_id, $post_id );
 				wp_delete_comment( $replaces_comment_id );
 			}
+		} else {
+			do_action( 'liveblog_insert_entry', $new_comment_id, $post_id );
 		}
 
 		$entry = WPCOM_Liveblog_Entry::from_comment( get_comment( $new_comment_id ) );
@@ -412,9 +419,13 @@ final class WPCOM_Liveblog {
 	function ajax_preview_entry() {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
+
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = wp_filter_post_kses( $entry_content );
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
+
+		do_action( 'liveblog_preview_entry', $entry_content );
+
 		self::json_return( array( 'html' => $entry_content ) );
 	}
 
@@ -648,13 +659,13 @@ final class WPCOM_Liveblog {
 		if ( empty( $_POST[self::nonce_key] ) || ! wp_verify_nonce( $_POST[self::nonce_key], self::nonce_key ) )
 			return;
 
-		// Update liveblog beta
-		if ( ! empty( $_POST['is-liveblog'] ) )
+		if ( ! empty( $_POST['is-liveblog'] ) ) {
 			update_post_meta( $post_id, self::key, 1 );
-
-		// Delete liveblog meta
-		else
+			do_action( 'liveblog_enable_post', $post_id );
+		} else {
 			delete_post_meta( $post_id, self::key );
+			do_action( 'liveblog_disable_post', $post_id );
+		}
 	}
 
 	/** Error Methods *********************************************************/
