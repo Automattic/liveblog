@@ -661,10 +661,15 @@ final class WPCOM_Liveblog {
 		if ( empty( $_POST[self::nonce_key] ) || ! wp_verify_nonce( $_POST[self::nonce_key], self::nonce_key ) )
 			return;
 
-		if ( ! empty( $_POST['is-liveblog'] ) ) {
+		if ( wp_is_post_revision( $post_id ) )
+			return;
+
+		$is_liveblog = self::is_liveblog_post( $post_id );
+
+		if ( ! empty( $_POST['is-liveblog'] ) && ! $is_liveblog ) {
 			update_post_meta( $post_id, self::key, 1 );
 			do_action( 'liveblog_enable_post', $post_id );
-		} else {
+		} elseif ( empty( $_POST['is-liveblog'] ) && $is_liveblog ) {
 			delete_post_meta( $post_id, self::key );
 			do_action( 'liveblog_disable_post', $post_id );
 		}
