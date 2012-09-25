@@ -573,6 +573,8 @@ final class WPCOM_Liveblog {
 		$liveblog_output .= self::get_all_entry_output();
 		$liveblog_output .= '</div>';
 
+		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
+
 		return $content . $liveblog_output;
 	}
 
