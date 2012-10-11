@@ -41,13 +41,13 @@ class WPCOM_Liveblog_Entry_Query {
 			'orderby' => 'comment_date_gmt',
 			'order'   => 'DESC',
 			'type'    => $this->key,
+			/*
+			 * Even if the WordPress is 3.4 and doesn't support querying
+			 * arbitrary statuses, we include it so that it can be part of
+			 * the cache key
+			 */
+			'status'  => $this->key,
 		);
-
-		if ( $this->wp_has_comment_approved_query_support ) {
-			$defaults['comment_approved'] = $this->key;
-		} else {
-			$defaults['status'] = $this->key; // just used to make the cache key unique to avoid pollution
-		}
 
 		$args     = wp_parse_args( $args, $defaults );
 		$comments = get_comments( $args );
