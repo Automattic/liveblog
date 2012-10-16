@@ -421,7 +421,7 @@ final class WPCOM_Liveblog {
 		self::ajax_check_nonce();
 
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
-		$entry_content = wp_filter_post_kses( $entry_content );
+		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
 
 		do_action( 'liveblog_preview_entry', $entry_content );
