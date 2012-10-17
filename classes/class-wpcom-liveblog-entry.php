@@ -118,7 +118,7 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
-		$content = apply_filters( 'comment_text', $content );
+		$content = apply_filters( 'the_content', $content );
 
 		return $content;
 	}
