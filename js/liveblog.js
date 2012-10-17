@@ -264,7 +264,7 @@ var liveblog = {};
 	};
 
 	liveblog.current_timestamp = function() {
-		return Math.floor( Date.now() / 1000 );
+		return Math.floor( new Date().getTime() / 1000 );
 	};
 
 	liveblog.server_timestamp_from_xhr = function(xhr) {
