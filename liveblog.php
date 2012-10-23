@@ -142,6 +142,7 @@ final class WPCOM_Liveblog {
 		 * we can possibly introduce this to other post types later.
 		 */
 		add_post_type_support( 'post', self::key );
+		do_action( 'after_liveblog_init' );
 	}
 
 	public function add_rewrite_rules() {
