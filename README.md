@@ -56,6 +56,7 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 * Dutch translation, props @defries
 * Allow shortcodes and OEmbed in liveblog entries
 * Fix preview tab
+* Compatibility with plupload 1.5.4, props borkweb
 
 ### 1.1
 
