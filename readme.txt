@@ -49,12 +49,13 @@ If you'd like to check out the code and contribute, [join us on github](htts://g
 
 = 1.2 =
 
-* Internationalization support, props @elarequi
-* Spanish translation, props @elarequi
-* Dutch translation, props @defries
 * Allow shortcodes and OEmbed in liveblog entries
 * Fix preview tab
 * Compatibility with plupload 1.5.4, props borkweb
+* Internationalization support, props @elarequi
+* Spanish translation, props @elarequi
+* Dutch translation, props @defries
+* Catalan translations, props @gasparappa
 
 = 1.1 =
 * Backwards compatibility for 3.4
