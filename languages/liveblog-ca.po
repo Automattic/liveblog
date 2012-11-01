@@ -1,0 +1,84 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Liveblog 1.1\n"
+"POT-Creation-Date: 2012-10-28 12:00+0100\n"
+"PO-Revision-Date: 2012-10-28 15:04+0100\n"
+"Last-Translator: Gaspar Alomar Trias <gaspar.alomar@gmail.com>\n"
+"Language-Team: Gaspar Alomar Trias <gaspar.alomar@gmail.com>\n"
+"Language: Catalan\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e;esc_attr_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: C:\\Users\\Gaspar\\Desktop\\liveblog\n"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:222
+msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
+msgstr ""
+"Falta una marca de temps. URL correcta: <permalink>/liveblog/<from>/</to>/"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:351
+msgid "Sorry, that post is not accepting Liveblog entries."
+msgstr "Disculpa, aquesta entrada no accepta actualitzacions Liveblog."
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:375
+msgid "Error posting entry"
+msgstr "Error publicant l'entrada"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:417
+msgid "Unknown liveblog action"
+msgstr "Acció de Liveblog desconeguda"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:478
+#, php-format
+msgid "%d new update"
+msgstr "%d nova actualització"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:479
+#, php-format
+msgid "%d new updates"
+msgstr "%d noves actualitzacions"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:480
+msgid "Do you really want do delete this entry? There is no way back."
+msgstr "Realment vols esborrar aquesta entrada? No hi ha marxa enrera!"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:501
+msgid "Allowed Files"
+msgstr "Fitxers permesos"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:612
+msgid "Liveblog"
+msgstr "Liveblog"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:671
+msgid "Cheatin', uh?"
+msgstr "Xatejant, eh?"
+
+#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:682
+msgid "Sorry, we could not authenticate you."
+msgstr "Disculpa, però no t'hem pogut autenticar."
+
+#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:7
+msgid "New Entry"
+msgstr "Nova entrada"
+
+#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:9
+msgid "Preview"
+msgstr "Vista prèvia"
+
+#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:13
+msgid "Remember: keep it short! To insert an image, drag and drop it here."
+msgstr ""
+"Recorda ser breu! Per a inserir una imatge, arrossega-la i deixa-la anar "
+"aquí."
+
+#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:16
+msgid "Publish Update"
+msgstr "Publicar actualització"
+
+#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-single-entry.php:12
+msgid "Delete"
+msgstr "Esborrar"
