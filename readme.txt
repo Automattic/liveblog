@@ -49,13 +49,23 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 = 1.2 =
 
+New functionality:
+
+* Introduce many new hooks and filters, which help customization without changing the plugin code.
 * Allow shortcodes and OEmbed in liveblog entries
+* Translations:
+	- Spanish by [@elarequi](http://profiles.wordpress.org/elarequi)
+	- Dutch by [@defries](https://github.com/defries)
+	- Catalan by [@gasparappa](https://github.com/gasparappa)
+	- German by [@cfoellmann](https://github.com/cfoellmann)
+* Add github-friendly version of `readme.txt`
+* Optimize PNG files
+
+Fixed problems:
+
+* Fix JavaScript errors on IE8, props [@pippercameron](https://github.com/pippercameron)
 * Fix preview tab
-* Compatibility with plupload 1.5.4, props borkweb
-* Internationalization support, props @elarequi
-* Spanish translation, props @elarequi
-* Dutch translation, props @defries
-* Catalan translations, props @gasparappa
+* Compatibility with plupload 1.5.4, props [@borkweb](https://github.com/borkweb)
 
 = 1.1 =
 * Backwards compatibility for 3.4
