@@ -1,10 +1,9 @@
 <?php
 
 /**
- * The main Liveblog entry query class
+ * Responsible for querying the Liveblog entries.
  *
- * This class is responsible for querying the Liveblog entries. Much of the
- * work is currently done by WordPress's comments API.
+ * Much of the work is currently done by WordPress's comments API.
  */
 class WPCOM_Liveblog_Entry_Query {
 
@@ -32,8 +31,8 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Get the liveblog entries
 	 *
-	 * @param array $args
-	 * @return array()
+	 * @param array $args the same args for the core `get_comments()`.
+	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
 	private function get( $args = array() ) {
 		$defaults = array(
@@ -58,7 +57,7 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Get all of the liveblog entries
 	 *
-	 * @param array $args
+	 * @param array $args the same args for the core `get_comments()`
 	 * @return array
 	 */
 	public function get_all( $args = array() ) {
@@ -104,13 +103,6 @@ class WPCOM_Liveblog_Entry_Query {
 		return $latest->get_timestamp();
 	}
 
-	/**
-	 * Get the entries between two timestamps
-	 *
-	 * @param int $start_timestamp
-	 * @param int $end_timestamp
-	 * @return array()
-	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
 		$entries_between = array();
 		$all_entries = $this->get_all_entries_asc();
@@ -153,21 +145,18 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Filter entries by some specific criteria
+	 * Filter out replaced entries
 	 *
 	 * @param array $entries
 	 * @return array
 	 */
 	public static function filter_liveblog_entries( $entries = array() ) {
 
-		// Bail if no entries
 		if ( empty( $entries ) )
 			return $entries;
 
-		// Get the entry ID's
 		$entries_by_id = self::assoc_array_by_id( $entries );
 
-		// Loop through ID's and unset any that should be filtered out
 		foreach ( (array) $entries_by_id as $id => $entry ) {
 			if ( !empty( $entry->replaces ) && isset( $entries_by_id[$entry->replaces] ) ) {
 				unset( $entries_by_id[$id] );
@@ -177,12 +166,6 @@ class WPCOM_Liveblog_Entry_Query {
 		return $entries_by_id;
 	}
 
-	/**
-	 * Get liveblog entry key ID's
-	 *
-	 * @param array $entries
-	 * @return array
-	 */
 	public static function assoc_array_by_id( $entries ) {
 		$result = array();
 
