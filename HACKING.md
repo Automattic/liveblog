@@ -8,6 +8,12 @@ In this file you'll find technical overview of how the liveblog works.
 * Refresh interval – how often the client side checks for entries' updates.
 * Nag – when there's a new update, we show the nag to the users, instead of loading the new entries directly. The nag contains a link to load the new entries.
 
+# Major Design Decisions
+* **Each entry is a comment** – adding a lot of posts quickly leads to too much cache invalidations. Comments don't have cache entry per comment, so it's much easier to create a scalable liveblog.
+* **The frontend polls for new comments** – even though long-polling or pushing data to the browser is better and fatser it requires much different infrastructure, which few people have or are ready to invest in.
+* **The URLs of the polling endpoints are in the form `/liveblog/<start-timestamp>/<end-timestamp>/`** – it gives you all entries between those two timestamps. By having both timestamps, instead of just the start we can cache the result indefinitely and don't bother with cache invalidations.
+* **Each entry change is a new entry** – because of the previous decision, we can't allow changing an entry. Instead, we insert a nwe entry and mark it that it replaces the older entry.
+
 # Code Organization
 
 Pretty straight-forward:
@@ -17,3 +23,4 @@ Pretty straight-forward:
 * JavaScript is in `js/`.
 * Translations are in `languages/`.
 * Tests are in `t/`.
+
