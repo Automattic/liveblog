@@ -165,7 +165,7 @@ class WPCOM_Liveblog_Entry_Query {
 			return $entries;
 
 		// Get the entry ID's
-		$entries_by_id = self::key_by_get_id( $entries );
+		$entries_by_id = self::assoc_array_by_id( $entries );
 
 		// Loop through ID's and unset any that should be filtered out
 		foreach ( (array) $entries_by_id as $id => $entry ) {
@@ -183,7 +183,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $entries
 	 * @return array
 	 */
-	public static function key_by_get_id( $entries ) {
+	public static function assoc_array_by_id( $entries ) {
 		$result = array();
 
 		foreach ( (array) $entries as $entry )
