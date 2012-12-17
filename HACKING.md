@@ -24,3 +24,9 @@ Pretty straight-forward:
 * Translations are in `languages/`.
 * Tests are in `t/`.
 
+# Backend
+* The god class is `WPCOM_Liveblog`. Its members are used only as static. It's responsible for almost the whole backend. We shuld slowly split out parts of it.
+* `<permalink>/liveblog` URLs are handled by `handle_ajax_request()`.
+* The methods responsible for responding to AJAX requests are prefixed with `ajax_`. There's most of the action.
+* `WPCOM_Liveblog_Entry_Query` is responsible for searching for entries by different criteria. Its methods usually return arrays of instances of `WPCOM_Liveblog_Entry`.
+* `WPCOM_Liveblog_Entry` represents a liveblog entry. It contains all the comment data and some functionality, mostly around rendering it in different contexts.
