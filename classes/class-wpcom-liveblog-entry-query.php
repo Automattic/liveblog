@@ -145,7 +145,8 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Filter out replaced entries
+	 * Filter out entries, which have been replaced by other entries in
+	 * the same set.
 	 *
 	 * @param array $entries
 	 * @return array
