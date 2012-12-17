@@ -61,7 +61,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @return array
 	 */
 	public function get_all( $args = array() ) {
-		return self::filter_liveblog_entries( $this->get( $args ) );
+		return self::remove_replaced_entries( $this->get( $args ) );
 	}
 
 	/**
@@ -150,7 +150,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $entries
 	 * @return array
 	 */
-	public static function filter_liveblog_entries( $entries = array() ) {
+	public static function remove_replaced_entries( $entries = array() ) {
 
 		if ( empty( $entries ) )
 			return $entries;
