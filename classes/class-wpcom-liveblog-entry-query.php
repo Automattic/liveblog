@@ -113,7 +113,7 @@ class WPCOM_Liveblog_Entry_Query {
 			}
 		}
 
-		return self::filter_liveblog_entries( $entries_between );
+		return self::remove_replaced_entries( $entries_between );
 	}
 
 	private function get_all_entries_asc() {
