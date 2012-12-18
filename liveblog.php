@@ -615,7 +615,6 @@ final class WPCOM_Liveblog {
 	public static function display_meta_box( $post ) {
 		$entries_query = new WPCOM_Liveblog_Entry_Query( $post->ID, self::key );
 		$current_state = self::get_liveblog_state( $post->ID );
-		var_dump($current_state);
 		$primary_from_current = array(
 			'enable' => 'archive',
 			'disable' => 'enable',
