@@ -1,0 +1,6 @@
+div#liveblog span.disabled {
+	color: #bbb;
+}
+div#liveblog button {
+	margin-right: 4px;
+}
