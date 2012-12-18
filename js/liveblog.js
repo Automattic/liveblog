@@ -273,6 +273,8 @@ var liveblog = {};
 	};
 
 	// Initialize everything!
-	$( document ).ready( liveblog.init );
+	if ( 'archive' != liveblog_settings.state ) {
+		$( document ).ready( liveblog.init );
+	}
 
 } )( jQuery );
