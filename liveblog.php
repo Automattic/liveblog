@@ -622,9 +622,9 @@ final class WPCOM_Liveblog {
 		$default_button = array( 'primary' => false, 'current' => false, );
 		$buttons = array(
 			'enable' => array( 'value' => 'enable', 'text' => __( 'Activate', 'liveblog' ),
-				'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.' ), 'active-text' => __( 'There is an <strong>enabled</strong> liveblog on this post', 'liveblog' ), ),
+				'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.' ), 'active-text' => sprintf( __( 'There is an <strong>enabled</strong> liveblog on this post. <a href="%s">Visit the liveblog &rarr;</a>', 'liveblog' ), get_permalink( $post ) ), ),
 			'archive' => array( 'value' => 'archive', 'text' => __( 'Archive', 'liveblog' ),
-				'description' => __( 'Archives the liveblog on this post. Posting tools are hidden, visitors still see all the liveblog entries.' ), 'active-text' => __( 'There is an <strong>archived</strong> liveblog on this post', 'liveblog' ), ),
+				'description' => __( 'Archives the liveblog on this post. Posting tools are hidden, visitors still see all the liveblog entries.' ), 'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ) ),
 			'disable' => array( 'value' => 'disable', 'text' => __( 'Disable', 'liveblog' ),
 				'description' => __( 'Disables the liveblog on this post. Turns it into a normal WordPress post, without a liveblog.' ), 'active-text' => __( 'This is a normal WordPress post, without a liveblog', 'liveblog' ), ),
 		);
