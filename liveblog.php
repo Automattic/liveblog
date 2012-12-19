@@ -647,7 +647,8 @@ final class WPCOM_Liveblog {
 		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
 		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
 
-		//TODO: check if the user can edit the post and nonce the request
+		self::ajax_current_user_can_edit_liveblog();
+		self::ajax_check_nonce();
 
 		if ( !$REQUEST = get_post( $post_id ) ) {
 			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
