@@ -626,7 +626,7 @@ final class WPCOM_Liveblog {
 			'archive' => array( 'value' => 'archive', 'text' => __( 'Archive', 'liveblog' ),
 				'description' => __( 'Archives the liveblog on this post. Posting tools are hidden, visitors still see all the liveblog entries.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ) ),
 			'disable' => array( 'value' => 'disable', 'text' => __( 'Disable', 'liveblog' ),
-				'description' => __( 'Disables the liveblog on this post. Turns it into a normal WordPress post, without a liveblog.' , 'liveblog'), 'active-text' => __( 'This is a normal WordPress post, without a liveblog', 'liveblog' ), ),
+				'description' => __( 'Disables the liveblog on this post. Turns it into a normal WordPress post, without a liveblog.' , 'liveblog'), 'active-text' => __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' ), ),
 		);
 		foreach( $buttons as &$button ) {
 			$button = array_merge( $default_button, $button );
@@ -637,6 +637,7 @@ final class WPCOM_Liveblog {
 		}
 		if ( $entries_query->has_any() ) {
 			$buttons['disable']['description'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog');
+			$buttons['disable']['active-text'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog');
 		}
 		$active_text = $buttons[$current_state]['active-text'];
 		echo self::get_template_part( 'meta_box.php', compact( 'active_text', 'buttons' ) );
