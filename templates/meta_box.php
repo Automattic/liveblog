@@ -1,4 +1,5 @@
 <h2><?php echo $active_text; ?></h2>
+<p class="error"></p>
 <ul>
 <?php
 foreach( $buttons as $button ):

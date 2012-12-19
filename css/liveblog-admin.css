@@ -4,3 +4,10 @@ div#liveblog span.disabled {
 div#liveblog button {
 	margin-right: 4px;
 }
+div#liveblog p.error {
+	display: none;
+	background-color: #ffebe8;
+	border: 1px solid #c00;
+	padding: 4px;
+	border-radius: 3px;
+}
