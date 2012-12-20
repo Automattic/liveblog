@@ -92,4 +92,54 @@ class WPCOM_Liveblog_Entry {
 
 		return $content;
 	}
+
+	public static function insert( $args ) {
+		$comment = self::insert_comment( $args );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	private static function insert_comment( $args ) {
+		$valid_args = self::validate_args( $args );
+		if ( is_wp_error( $valid_args ) ) {
+			return $valid_args;
+		}
+		$new_comment_id = wp_insert_comment( array(
+			'comment_post_ID'      => $args['post_id'],
+			'comment_content'      => wp_filter_post_kses( $args['content'] ),
+			'comment_approved'     => 'liveblog',
+			'comment_type'         => 'liveblog',
+			'user_id'              => $args['user']->ID,
+
+			'comment_author'       => $args['user']->display_name,
+			'comment_author_email' => $args['user']->user_email,
+			'comment_author_url'   => $args['user']->user_url,
+
+			'comment_author_IP'    => $args['ip'],
+			'comment_agent'        => $args['user_agent'],
+		) );
+		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
+		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) ) {
+			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
+		}
+		$comment = get_comment( $new_comment_id );
+		if ( !$comment ) {
+		   return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
+		}
+		return $comment;
+	}
+
+	private static function validate_args( $args ) {
+		$required_keys = array( 'post_id', 'user', 'ip', 'user_agent' );
+		foreach( $required_keys as $key ) {
+			if ( !isset( $args[$key] ) || !$args[$key] ) {
+				return new WP_Error( 'invalid-entry-args', sprintf( __( 'Missing entry argument: %s', 'liveblog' ), $key ) );
+			}
+		}
+		return true;
+	}
 }

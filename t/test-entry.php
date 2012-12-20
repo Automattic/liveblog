@@ -13,6 +13,26 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertTrue( !$entry->replaces );
 	}
 
+	function test_insert_should_return_entry() {
+		$entry = $this->insert_entry();
+		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $entry );
+	}
+
+	function test_insert_should_fire_liveblog_insert_entry() {
+		unset( $GLOBALS['liveblog_hook_fired'] );
+		add_action( 'liveblog_insert_entry', function() { $GLOBALS['liveblog_hook_fired'] = true; } );
+		$this->insert_entry();
+		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
+	}
+
+	private function insert_entry( $args = array() ) {
+		$user = $this->factory->user->create_and_get();
+		$defaults = array( 'post_id' => 1, 'content' => 'baba', 'user' => $user, 'ip' => '127.0.0.1', 'user_agent' => 'phpunit'  );
+		$args = array_merge( $defaults, $args );
+		$entry = WPCOM_Liveblog_Entry::insert( $args );
+		return $entry;
+	}
+
 	private function create_and_get_comment_with_replaces( $replaces, $args = array() ) {
 		$comment = $this->factory->comment->create_and_get( $args );
 		add_comment_meta( $comment->comment_ID, WPCOM_Liveblog_Entry::replaces_meta_key, $replaces );
