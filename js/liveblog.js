@@ -7,12 +7,28 @@ var liveblog = {};
 	liveblog.$events = $( '<span />' );
 
 	liveblog.init = function() {
-		liveblog.$entry_container = $( '#liveblog-entries'        );
-		liveblog.$spinner         = $( '#liveblog-update-spinner' );
+		liveblog.$container               = $( '#liveblog-container'      );
+		liveblog.$entry_container         = $( '#liveblog-entries'        );
+		liveblog.$spinner                 = $( '#liveblog-update-spinner' );
+		liveblog.paused                   = false;
+		liveblog.pause_on_scroll_distance = 150;
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
 		liveblog.set_initial_timestamps();
 		liveblog.$events.trigger( 'after-init' );
+
+
+		liveblog.$container.on('click', '.pause-play', function( e ) {
+			e.preventDefault();
+	
+			if ( liveblog.$container.hasClass( 'paused' ) ) {
+				liveblog.play();
+			} else {
+				liveblog.pause();
+			}//end else
+		});
+
+		liveblog.disable_nag();
 	};
 
 	liveblog.set_initial_timestamps = function() {
@@ -53,6 +69,26 @@ var liveblog = {};
 
 		liveblog_settings.refresh_interval *= liveblog_settings.delay_multiplier;
 
+	};
+
+	liveblog.pause = function() {
+		liveblog.paused = true;
+		liveblog.$container.addClass( 'paused' );
+		liveblog.$container.find('.pause-play').html( 'Play Stream' );
+		liveblog.enable_nag();
+		liveblog.$events.trigger( 'pause' );
+	};
+
+	liveblog.play = function() {
+		liveblog.paused = false;
+		liveblog.$container.removeClass( 'paused' );
+		liveblog.$container.find('.pause-play').html( 'Pause Stream' );
+		
+		liveblog.unhide_entries();
+		liveblog.disable_nag();
+		liveblog.$container.find('.liveblog-nag').slideUp();
+		
+		liveblog.$events.trigger( 'play' );
 	};
 
 	liveblog.get_recent_entries = function() {
@@ -133,6 +169,12 @@ var liveblog = {};
 			return;
 		}
 
+		// if the user has scrolled down the page, pause the stream
+		// so the user doesn't lose their place
+		if ( liveblog.is_scrolled() ) {
+			liveblog.pause();
+		}
+
 		if ( liveblog.is_nag_disabled() ) {
 			liveblog.unhide_entries();
 			return;
@@ -158,8 +200,7 @@ var liveblog = {};
 			.html( nag_text )
 			.prependTo( liveblog.$entry_container )
 			.one( 'click', function() {
-				liveblog.unhide_entries();
-				$( this ).slideUp();
+				liveblog.play();
 				document.title = liveblog.original_title;
 			} )
 		.slideDown();
@@ -171,12 +212,23 @@ var liveblog = {};
 		document.title = count_string + ' ' + document.title;
 	};
 
+	liveblog.enable_nag = function() {
+		liveblog.nag_disabled = false;
+	};
+
 	liveblog.disable_nag = function() {
 		liveblog.nag_disabled = true;
 	};
 
 	liveblog.is_nag_disabled = function() {
 		return liveblog.nag_disabled;
+	};
+
+	liveblog.is_scrolled = function() {
+		var offset          = liveblog.$entry_container.offset();
+		var scroll_position = $( document ).scrollTop();
+
+		return ( scroll_position - offset.top ) > liveblog.pause_on_scroll_distance;
 	};
 
 	liveblog.get_entry_by_id = function( id ) {

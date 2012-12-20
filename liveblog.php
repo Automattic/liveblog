@@ -570,7 +570,7 @@ final class WPCOM_Liveblog {
 
 		$liveblog_output  = '<div id="liveblog-container" class="'. self::$post_id .'">';
 		$liveblog_output .= self::get_editor_output();
-		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
+		$liveblog_output .= self::get_toolbar_output();		
 		$liveblog_output .= self::get_all_entry_output();
 		$liveblog_output .= '</div>';
 
@@ -603,7 +603,17 @@ final class WPCOM_Liveblog {
 		// Get the template part
 		return self::get_template_part( 'liveblog-loop.php', compact( 'entries' ) );
 	}
-
+	
+	/**
+	 * Get the toolbar area that exists above the entries
+	 */
+	private function get_toolbar_output() {
+		$more_tools = '';
+		$more_tools = apply_filters( 'liveblog_toolbar', $more_tools );
+	
+		return self::get_template_part( 'liveblog-toolbar.php', compact( 'entries', 'more_tools' ) );
+	}
+	
 	/**
 	 * Get the template part in an output buffer and return it
 	 *
