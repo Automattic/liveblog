@@ -252,7 +252,7 @@ var liveblog = {};
 	liveblog.error_callback   = function() {};
 
 	liveblog.add_error = function( response ) {
-		alert( 'Error ' + response.status + ': ' + response.statusText );
+		alert( liveblog_settings.error_message_template.replace('{error-code}', response.status).replace('{error-message}', response.statusText));
 	};
 
 	liveblog.show_spinner = function() {

@@ -9,7 +9,7 @@ jQuery(function($) {
 		var url = ajaxurl + '?action=set_liveblog_state_for_post&post_id=' + encodeURIComponent(post_id) + '&state=' + encodeURIComponent($(this).val()) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
 		$('.inside', $meta_box).load(url, function(response, status, xhr) {
 			if ( status != 'error') return;
-			show_error('Error: ' + xhr.status + ' ' + xhr.statusText);
+			show_error( liveblog_admin_settings.error_message_template.replace('{error-code}', xhr.status).replace('{error-message}', xhr.statusText));
   		});
 	});
 });
