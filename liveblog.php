@@ -640,8 +640,8 @@ final class WPCOM_Liveblog {
 			$buttons[$primary_from_current[$current_state]]['primary'] = true;
 		}
 		if ( $entries_query->has_any() ) {
-			$buttons['disable']['description'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog');
-			$buttons['disable']['active-text'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog');
+			$buttons['disable']['description'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog' );
+			$buttons['disable']['active-text'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog' );
 		}
 		$active_text = $buttons[$current_state]['active-text'];
 		echo self::get_template_part( 'meta_box.php', compact( 'active_text', 'buttons' ) );
