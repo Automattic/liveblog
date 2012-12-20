@@ -3,12 +3,13 @@
 <ul>
 <?php
 foreach( $buttons as $button ):
-	if ( $button['current'] ) {
+	if ( $button['disabled'] ) {
+		$button['primary'] = false;
 		$button['description'] = '<span class="disabled">' . $button['description'] . '</span>';
 	}
 ?>
 <li>
-	<button class="button <?php echo $button['primary']? 'button-primary' : '' ?>" <?php echo $button['current']? 'disabled="disabled"' : '' ?> value="<?php echo esc_attr( $button['value'] ) ?>">
+	<button class="button <?php echo $button['primary']? 'button-primary' : '' ?>" <?php echo $button['disabled']? 'disabled="disabled"' : '' ?> value="<?php echo esc_attr( $button['value'] ) ?>">
 		<?php echo $button['text']; ?>
 	</button>
 	<?php echo $button['description'] ?>

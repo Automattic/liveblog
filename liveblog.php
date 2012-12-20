@@ -308,9 +308,12 @@ final class WPCOM_Liveblog {
 	 */
 	private static function is_liveblog_post( $post_id = null ) {
 		$state = self::get_liveblog_state( $post_id );
-		return $state && 'disable' != $state;
+		return (bool)$state;
 	}
 
+	/**
+	 * One of: 'enable', 'archive', false.
+	 */
 	private static function get_liveblog_state( $post_id = null ) {
 		if ( empty( $post_id ) ) {
 			global $post;
@@ -320,9 +323,6 @@ final class WPCOM_Liveblog {
 		// backwards compatibility with older values
 		if ( 1 == $state ) {
 			$state = 'enable';
-		}
-		if ( !$state ) {
-			$state = 'disable';
 		}
 		return $state;
 	}
@@ -619,33 +619,20 @@ final class WPCOM_Liveblog {
 	 * @param WP_Post $post
 	 */
 	public static function display_meta_box( $post ) {
-		$entries_query = new WPCOM_Liveblog_Entry_Query( $post->ID, self::key );
 		$current_state = self::get_liveblog_state( $post->ID );
-		$primary_from_current = array(
-			'enable' => 'archive',
-			'disable' => 'enable',
-		);
-		$default_button = array( 'primary' => false, 'current' => false, );
 		$buttons = array(
-			'enable' => array( 'value' => 'enable', 'text' => __( 'Activate', 'liveblog' ),
-				'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>enabled</strong> liveblog on this post. <a href="%s">Visit the liveblog &rarr;</a>', 'liveblog' ), get_permalink( $post ) ), ),
+			'enable' => array( 'value' => 'enable', 'text' => __( 'Enable', 'liveblog' ),
+				'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>enabled</strong> liveblog on this post. <a href="%s">Visit the liveblog &rarr;</a>', 'liveblog' ), get_permalink( $post ) ), 'primary' => true, 'disabled' => false, ),
 			'archive' => array( 'value' => 'archive', 'text' => __( 'Archive', 'liveblog' ),
-				'description' => __( 'Archives the liveblog on this post. Posting tools are hidden, visitors still see all the liveblog entries.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ) ),
-			'disable' => array( 'value' => 'disable', 'text' => __( 'Disable', 'liveblog' ),
-				'description' => __( 'Disables the liveblog on this post. Turns it into a normal WordPress post, without a liveblog.' , 'liveblog'), 'active-text' => __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' ), ),
+				'description' => __( 'Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ), 'primary' => false, 'disabled' => false ),
 		);
-		foreach( $buttons as &$button ) {
-			$button = array_merge( $default_button, $button );
+		if ( $current_state ) {
+			$active_text = $buttons[$current_state]['active-text'];
+			$buttons[$current_state]['disabled'] = true;
+		} else {
+			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
+			$buttons['archive']['disabled'] = true;
 		}
-		$buttons[$current_state]['current'] = true;
-		if ( isset( $primary_from_current[$current_state] ) ) {
-			$buttons[$primary_from_current[$current_state]]['primary'] = true;
-		}
-		if ( $entries_query->has_any() ) {
-			$buttons['disable']['description'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog' );
-			$buttons['disable']['active-text'] .= ' ' . __( 'Existing entries are kept, but hidden.' , 'liveblog' );
-		}
-		$active_text = $buttons[$current_state]['active-text'];
 		echo self::get_template_part( 'meta_box.php', compact( 'active_text', 'buttons' ) );
 	}
 
