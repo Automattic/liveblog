@@ -103,6 +103,17 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
+	public static function update( $entry_id, $args ) {
+		$comment = self::insert_comment( $args );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
+		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $entry_id );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
 	private static function insert_comment( $args ) {
 		$valid_args = self::validate_args( $args );
 		if ( is_wp_error( $valid_args ) ) {
