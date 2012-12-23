@@ -26,11 +26,14 @@ class Test_Entry extends WP_UnitTestCase {
 	}
 
 	private function insert_entry( $args = array() ) {
+		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
+		return $entry;
+	}
+
+	private function build_entry_args( $args = array() ) {
 		$user = $this->factory->user->create_and_get();
 		$defaults = array( 'post_id' => 1, 'content' => 'baba', 'user' => $user, 'ip' => '127.0.0.1', 'user_agent' => 'phpunit'  );
-		$args = array_merge( $defaults, $args );
-		$entry = WPCOM_Liveblog_Entry::insert( $args );
-		return $entry;
+		return array_merge( $defaults, $args );
 	}
 
 	private function create_and_get_comment_with_replaces( $replaces, $args = array() ) {
