@@ -123,6 +123,9 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public static function delete( $entry_id, $args ) {
+		if ( !$entry_id ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
 		$args['content'] = false;
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
