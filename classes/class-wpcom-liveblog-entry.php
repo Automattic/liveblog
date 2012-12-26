@@ -87,7 +87,7 @@ class WPCOM_Liveblog_Entry {
 		) );
 	}
 
-	public static function render_content( $content, $comment ) {
+	public static function render_content( $content, $comment = false ) {
 		global $wp_embed;
 
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {

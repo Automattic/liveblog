@@ -93,6 +93,15 @@ class Test_Entry_Query extends WP_UnitTestCase {
 		$this->assertNull( $this->entry_query->get_by_id( $comment_id ) );
 	}
 
+	function test_has_any_returns_false_if_no_entries() {
+		$this->assertFalse( $this->entry_query->has_any() );
+	}
+
+	function test_has_any_returns_true_if_we_add_some_entries() {
+		$this->create_comment();
+		$this->assertTrue( $this->entry_query->has_any() );
+	}
+
 	private function create_comment( $args = array() ) {
 		$defaults = array(
 			'comment_post_ID'  => $this->entry_query->post_id,

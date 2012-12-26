@@ -97,7 +97,8 @@ final class WPCOM_Liveblog {
 		// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
 		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
-		add_action( 'wp_ajax_liveblog_preview_entry', array( __CLASS__, 'ajax_preview_entry' ) );
+		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
+		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 	}
 
 	/**
@@ -123,7 +124,6 @@ final class WPCOM_Liveblog {
 			return;
 
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box'  ) );
-		add_action( 'save_post',      array( __CLASS__, 'save_meta_box' ) );
 	}
 
 	/** Public Methods ********************************************************/
@@ -307,12 +307,24 @@ final class WPCOM_Liveblog {
 	 * @return bool
 	 */
 	private static function is_liveblog_post( $post_id = null ) {
+		$state = self::get_liveblog_state( $post_id );
+		return (bool)$state;
+	}
+
+	/**
+	 * One of: 'enable', 'archive', false.
+	 */
+	private static function get_liveblog_state( $post_id = null ) {
 		if ( empty( $post_id ) ) {
 			global $post;
 			$post_id = $post->ID;
 		}
-
-		return (bool) get_post_meta( $post_id, self::key, true );
+		$state = get_post_meta( $post_id, self::key, true );
+		// backwards compatibility with older values
+		if ( 1 == $state ) {
+			$state = 'enable';
+		}
+		return $state;
 	}
 
 	/**
@@ -403,6 +415,15 @@ final class WPCOM_Liveblog {
 		return $classes;
 	}
 
+	public static function admin_enqueue_scripts() {
+		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
+		wp_enqueue_script( 'liveblog-admin',  plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
+		wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
+			'nonce_key' => self::nonce_key,
+			'nonce' => wp_create_nonce( self::nonce_key ),
+			'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
+		) );
+	}
 
 	/**
 	 * Enqueue the necessary CSS and JS that liveblog needs to function.
@@ -434,6 +455,7 @@ final class WPCOM_Liveblog {
 			apply_filters( 'liveblog_settings', array(
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
+				'state'                  => self::get_liveblog_state(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
@@ -444,12 +466,13 @@ final class WPCOM_Liveblog {
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
 
-				'endpoint_url'             => self::get_entries_endpoint_url(),
+				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				// i18n
 				'update_nag_singular'    => __( '%d new update',  'liveblog' ),
 				'update_nag_plural'      => __( '%d new updates', 'liveblog' ),
 				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
+				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 			) )
 		);
 	}
@@ -541,6 +564,9 @@ final class WPCOM_Liveblog {
 	private static function get_editor_output() {
 		if ( ! self::current_user_can_edit_liveblog() )
 			return;
+		if ( 'archive' == self::get_liveblog_state() ) {
+			return;
+		}
 
 		// Get the template part
 		return self::get_template_part( 'liveblog-form.php' );
@@ -593,40 +619,52 @@ final class WPCOM_Liveblog {
 	 * @param WP_Post $post
 	 */
 	public static function display_meta_box( $post ) {
-	?>
-
-		<label>
-			<input type="checkbox" name="is-liveblog" id="is-liveblog" value="1" <?php checked( self::is_liveblog_post( $post->ID ) ); ?> />
-			<?php esc_html_e( 'This is a liveblog', 'liveblog' ); ?>
-		</label>
-
-		<?php
-		wp_nonce_field( self::nonce_key, self::nonce_key, false );
+		$current_state = self::get_liveblog_state( $post->ID );
+		$buttons = array(
+			'enable' => array( 'value' => 'enable', 'text' => __( 'Enable', 'liveblog' ),
+				'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>enabled</strong> liveblog on this post. <a href="%s">Visit the liveblog &rarr;</a>', 'liveblog' ), get_permalink( $post ) ), 'primary' => true, 'disabled' => false, ),
+			'archive' => array( 'value' => 'archive', 'text' => __( 'Archive', 'liveblog' ),
+				'description' => __( 'Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden.' , 'liveblog'), 'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ), 'primary' => false, 'disabled' => false ),
+		);
+		if ( $current_state ) {
+			$active_text = $buttons[$current_state]['active-text'];
+			$buttons[$current_state]['disabled'] = true;
+		} else {
+			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
+			$buttons['archive']['disabled'] = true;
+		}
+		echo self::get_template_part( 'meta_box.php', compact( 'active_text', 'buttons' ) );
 	}
 
-	/**
-	 * Save the metabox when the post is saved
-	 *
-	 * @param type $post_id
-	 * @return type
-	 */
-	public function save_meta_box( $post_id ) {
+	public function admin_ajax_set_liveblog_state_for_post() {
+		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
+		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
 
-		// Bail if no liveblog nonce
-		if ( empty( $_POST[self::nonce_key] ) || ! wp_verify_nonce( $_POST[self::nonce_key], self::nonce_key ) )
-			return;
+		self::ajax_current_user_can_edit_liveblog();
+		self::ajax_check_nonce();
 
-		if ( wp_is_post_revision( $post_id ) )
-			return;
+		if ( !$REQUEST = get_post( $post_id ) ) {
+			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
+		}
 
-		$is_liveblog = self::is_liveblog_post( $post_id );
+		if ( wp_is_post_revision( $post_id ) ) {
+			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
+		}
 
-		if ( ! empty( $_POST['is-liveblog'] ) && ! $is_liveblog ) {
-			update_post_meta( $post_id, self::key, 1 );
-			do_action( 'liveblog_enable_post', $post_id );
-		} elseif ( empty( $_POST['is-liveblog'] ) && $is_liveblog ) {
+		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
+		self::display_meta_box( $REQUEST );
+		exit;
+	}
+
+	private function set_liveblog_state( $post_id, $state ) {
+		if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
+			update_post_meta( $post_id, self::key, $state );
+			do_action( "liveblog_{$state}_post", $post_id );
+		} elseif ( 'disable' == $state ) {
 			delete_post_meta( $post_id, self::key );
 			do_action( 'liveblog_disable_post', $post_id );
+		} else {
+			return false;
 		}
 	}
 
