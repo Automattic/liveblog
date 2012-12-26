@@ -118,6 +118,10 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $entry_id );
+		wp_update_comment( array(
+			'comment_ID'      => $entry_id,
+			'comment_content' => wp_filter_post_kses( $args['content'] ),
+		) );
 		$entry = self::from_comment( $comment );
 		return $entry;
 	}
