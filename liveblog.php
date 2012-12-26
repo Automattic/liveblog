@@ -358,8 +358,6 @@ final class WPCOM_Liveblog {
 		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 
 		$args['user'] = wp_get_current_user();
-		$args['ip'] = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
-		$args['user_agent'] = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
 
 		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
 

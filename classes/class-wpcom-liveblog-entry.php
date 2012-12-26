@@ -104,7 +104,7 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Inserts a new entry
 	 *
-	 * @param array $args The entry properties: content, post_id, user (current user object), ip, user_agent
+	 * @param array $args The entry properties: content, post_id, user (current user object)
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
@@ -122,7 +122,7 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * Inserts a new entry, which replaces the original entry.
 	 *
-	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id, user (current user object), ip, user_agent
+	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id, user (current user object)
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function update( $args ) {
@@ -148,7 +148,7 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * Inserts a new entry, which replaces the original entry.
 	 *
-	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object), ip, user_agent
+	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object)
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function delete( $args ) {
@@ -182,9 +182,6 @@ class WPCOM_Liveblog_Entry {
 			'comment_author'       => $args['user']->display_name,
 			'comment_author_email' => $args['user']->user_email,
 			'comment_author_url'   => $args['user']->user_url,
-
-			'comment_author_IP'    => $args['ip'],
-			'comment_agent'        => $args['user_agent'],
 		) );
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
 		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) ) {
@@ -198,7 +195,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	private static function validate_args( $args ) {
-		$required_keys = array( 'post_id', 'user', 'ip', 'user_agent' );
+		$required_keys = array( 'post_id', 'user', );
 		foreach( $required_keys as $key ) {
 			if ( !isset( $args[$key] ) || !$args[$key] ) {
 				return new WP_Error( 'entry-invalid-args', sprintf( __( 'Missing entry argument: %s', 'liveblog' ), $key ) );
