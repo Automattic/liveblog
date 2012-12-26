@@ -105,15 +105,14 @@
 
 	liveblog.publisher.delete_entry = function( id ) {
 		var data = {
-			action: 'liveblog_insert_entry',
+			action: 'liveblog_delete_entry',
 			post_id: liveblog_settings.post_id,
-			replaces: id,
-			entry_content: ''
+			entry_id: id,
 		};
 		data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.show_spinner();
-		liveblog.ajax_request( liveblog_settings.endpoint_url + 'insert', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + 'delete', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
 	liveblog.publisher.disable_posting_interface = function() {

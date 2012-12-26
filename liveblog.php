@@ -193,6 +193,7 @@ final class WPCOM_Liveblog {
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
 			'insert' => 'ajax_insert_entry',
+			'delete' => 'ajax_delete_entry',
 			'preview' => 'ajax_preview_entry',
 		);
 
@@ -357,6 +358,33 @@ final class WPCOM_Liveblog {
 		$user_agent = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
 
 		$entry = WPCOM_Liveblog_Entry::insert( array( 'post_id' => $post_id, 'content' => $entry_content, 'user' => $user, 'ip' => $ip, 'user_agent' => $user_agent ) );
+
+		if ( is_wp_error( $entry ) ) {
+			self::send_server_error( $entry->get_error_message() );
+		}
+
+		// Do not send latest_timestamp. If we send it the client won't get
+		// older entries. Since we send only the new one, we don't know if there
+		// weren't any entries in between.
+		self::json_return( array(
+			'entries'           => array( $entry->for_json() ),
+			'latest_timestamp'  => null
+		) );
+	}
+
+	public static function ajax_delete_entry() {
+
+		self::ajax_current_user_can_edit_liveblog();
+		self::ajax_check_nonce();
+
+		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id']  ) : 0;
+		$entry_id = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
+
+		$user = wp_get_current_user();
+		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
+		$user_agent = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
+
+		$entry = WPCOM_Liveblog_Entry::delete( $entry_id, array( 'post_id' => $post_id, 'user' => $user, 'ip' => $ip, 'user_agent' => $user_agent ) );
 
 		if ( is_wp_error( $entry ) ) {
 			self::send_server_error( $entry->get_error_message() );
