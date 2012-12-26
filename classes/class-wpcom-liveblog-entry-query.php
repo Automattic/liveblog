@@ -64,6 +64,15 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $this->get( $args ) );
 	}
 
+	public function get_by_id( $id ) {
+		$comment = get_comment( $id );
+		if ( $comment->comment_post_ID != $this->post_id || $comment->comment_type != $this->key || $comment->comment_approved != $this->key) {
+			return null;
+		}
+		$entries = self::entries_from_comments( array( $comment ) );
+		return $entries[0];
+	}
+
 	/**
 	 * Get the latest liveblog entry
 	 *

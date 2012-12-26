@@ -77,15 +77,15 @@
 			return;
 
 		var data = {
-			action: 'liveblog_insert_entry',
-			entry_content: entry_content,
+			crud_action: 'insert',
+			content: entry_content,
 			post_id: liveblog_settings.post_id
 		};
 
 		data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.show_spinner();
-		liveblog.ajax_request( liveblog_settings.endpoint_url + 'insert', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
 	liveblog.publisher.insert_entry_success = function( response, status, xhr ) {
@@ -105,15 +105,14 @@
 
 	liveblog.publisher.delete_entry = function( id ) {
 		var data = {
-			action: 'liveblog_insert_entry',
+			crud_action: 'delete',
 			post_id: liveblog_settings.post_id,
-			replaces: id,
-			entry_content: ''
+			entry_id: id,
 		};
 		data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.show_spinner();
-		liveblog.ajax_request( liveblog_settings.endpoint_url + 'insert', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
 	liveblog.publisher.disable_posting_interface = function() {
