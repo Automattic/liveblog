@@ -125,6 +125,10 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $entries_between );
 	}
 
+	public function has_any() {
+		return (bool)$this->get();
+	}
+
 	private function get_all_entries_asc() {
 		$cached_entries_asc_key =  $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
