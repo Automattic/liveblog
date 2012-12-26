@@ -192,8 +192,7 @@ final class WPCOM_Liveblog {
 
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
-			'insert' => 'ajax_insert_entry',
-			'delete' => 'ajax_delete_entry',
+			'crud' => 'ajax_crud_entry',
 			'preview' => 'ajax_preview_entry',
 		);
 
@@ -342,49 +341,27 @@ final class WPCOM_Liveblog {
 		return array_map( 'intval', $timestamps );
 	}
 
-	/**
-	 * Inserts, updates, or deletes a liveblog entry
-	 */
-	public static function ajax_insert_entry() {
-
+	public static function ajax_crud_entry() {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
 
-		$post_id             = isset( $_POST['post_id']       ) ? intval( $_POST['post_id']  ) : 0;
-		$entry_content       = isset( $_POST['entry_content'] ) ? $_POST['entry_content']      : '';
+		$args = array();
 
-		$user = wp_get_current_user();
-		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
-		$user_agent = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
+		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		$entry = WPCOM_Liveblog_Entry::insert( array( 'post_id' => $post_id, 'content' => $entry_content, 'user' => $user, 'ip' => $ip, 'user_agent' => $user_agent ) );
-
-		if ( is_wp_error( $entry ) ) {
-			self::send_server_error( $entry->get_error_message() );
+		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete' ) ) ) {
+			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 
-		// Do not send latest_timestamp. If we send it the client won't get
-		// older entries. Since we send only the new one, we don't know if there
-		// weren't any entries in between.
-		self::json_return( array(
-			'entries'           => array( $entry->for_json() ),
-			'latest_timestamp'  => null
-		) );
-	}
+		$args['post_id'] = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+		$args['content'] = isset( $_POST['content'] ) ? $_POST['content'] : '';
+		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 
-	public static function ajax_delete_entry() {
+		$args['user'] = wp_get_current_user();
+		$args['ip'] = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
+		$args['user_agent'] = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
 
-		self::ajax_current_user_can_edit_liveblog();
-		self::ajax_check_nonce();
-
-		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id']  ) : 0;
-		$entry_id = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
-
-		$user = wp_get_current_user();
-		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
-		$user_agent = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
-
-		$entry = WPCOM_Liveblog_Entry::delete( $entry_id, array( 'post_id' => $post_id, 'user' => $user, 'ip' => $ip, 'user_agent' => $user_agent ) );
+		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
 
 		if ( is_wp_error( $entry ) ) {
 			self::send_server_error( $entry->get_error_message() );
@@ -400,9 +377,6 @@ final class WPCOM_Liveblog {
 	}
 
 	function ajax_preview_entry() {
-		self::ajax_current_user_can_edit_liveblog();
-		self::ajax_check_nonce();
-
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
