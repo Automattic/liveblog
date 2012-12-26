@@ -39,6 +39,13 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
 	}
 
+	function test_delete_should_replace_the_content_in_the_query() {
+		$entry = $this->insert_entry();
+		$update_entry = WPCOM_Liveblog_Entry::delete( $entry->get_id(), $this->build_entry_args( array() ) );
+		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
+		$this->assertEquals( '', $update_entry->render() );
+	}
+
 	private function insert_entry( $args = array() ) {
 		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		return $entry;
