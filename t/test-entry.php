@@ -43,7 +43,14 @@ class Test_Entry extends WP_UnitTestCase {
 		$entry = $this->insert_entry();
 		$update_entry = WPCOM_Liveblog_Entry::delete( $entry->get_id(), $this->build_entry_args( array() ) );
 		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
-		$this->assertEquals( '', $update_entry->render() );
+		$this->assertEquals( '', $update_entry->get_content() );
+	}
+
+	function test_delete_should_delete_original_entry() {
+		$entry = $this->insert_entry();
+		$update_entry = WPCOM_Liveblog_Entry::delete( $entry->get_id(), $this->build_entry_args() );
+		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
+		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
 	}
 
 	private function insert_entry( $args = array() ) {
