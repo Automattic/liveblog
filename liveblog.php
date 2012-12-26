@@ -65,6 +65,7 @@ final class WPCOM_Liveblog {
 		self::add_actions();
 		self::add_filters();
 		self::add_admin_actions();
+		self::register_embed_handlers();
 	}
 
 	/**
@@ -124,6 +125,11 @@ final class WPCOM_Liveblog {
 			return;
 
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box'  ) );
+	}
+
+	private static function register_embed_handlers() {
+		// register it to run later, because the regex is pretty general and we don't want it to prevent more specific handlers from running
+		wp_embed_register_handler( 'liveblog_image', '/\.(png|jpe?g|gif)(\?.*)?$/', array( 'WPCOM_Liveblog', 'image_embed_handler' ), 99 );
 	}
 
 	/** Public Methods ********************************************************/
@@ -611,6 +617,11 @@ final class WPCOM_Liveblog {
 			return;
 
 		add_meta_box( self::key, __( 'Liveblog', 'liveblog' ), array( __CLASS__, 'display_meta_box' ) );
+	}
+
+	public static function image_embed_handler( $matches, $attr, $url, $rawattr ) {
+		$embed = sprintf( '<img src="%s" alt="" />', esc_url( $url ) );
+		return apply_filters( 'embed_liveblog_image', $embed, $matches, $attr, $url, $rawattr );
 	}
 
 	/**
