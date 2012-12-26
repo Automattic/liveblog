@@ -101,6 +101,12 @@ class WPCOM_Liveblog_Entry {
 		return $content;
 	}
 
+	/**
+	 * Inserts a new entry
+	 *
+	 * @param array $args The entry properties: content, post_id, user (current user object), ip, user_agent
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
+	 */
 	public static function insert( $args ) {
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -111,6 +117,14 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
+	/**
+	 * Updates an exsting entry
+	 *
+	 * Inserts a new entry, which replaces the original entry.
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id, user (current user object), ip, user_agent
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 */
 	public static function update( $args ) {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
@@ -129,6 +143,14 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
+	/**
+	 * Deletes an existing entry
+	 *
+	 * Inserts a new entry, which replaces the original entry.
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object), ip, user_agent
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 */
 	public static function delete( $args ) {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
