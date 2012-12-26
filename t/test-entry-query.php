@@ -82,6 +82,17 @@ class Test_Entry_Query extends WP_UnitTestCase {
 		$this->assertEquals( array( 1, 1000 ), $this->get_ids_from_entries( $filtered_entries ) );
 	}
 
+	function test_get_by_id_should_return_the_entry() {
+		$comment_id = $this->create_comment();
+		$this->assertEquals( $comment_id, $this->entry_query->get_by_id( $comment_id )->get_id() );
+	}
+
+	function test_get_by_id_should_not_return_entries_for_trashed_comments() {
+		$comment_id = $this->create_comment();
+		wp_delete_comment( $comment_id );
+		$this->assertNull( $this->entry_query->get_by_id( $comment_id ) );
+	}
+
 	private function create_comment( $args = array() ) {
 		$defaults = array(
 			'comment_post_ID'  => $this->entry_query->post_id,
