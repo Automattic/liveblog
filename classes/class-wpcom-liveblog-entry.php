@@ -29,6 +29,14 @@ class WPCOM_Liveblog_Entry {
 		return $this->comment->comment_ID;
 	}
 
+	public function get_post_id() {
+		return $this->comment->comment_post_ID;
+	}
+
+	public function get_content() {
+		return $this->comment->comment_content;
+	}
+
 	/**
 	 * Get the GMT timestamp for the comment
 	 *
