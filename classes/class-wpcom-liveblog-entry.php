@@ -170,7 +170,7 @@ class WPCOM_Liveblog_Entry {
 		}
 		$comment = get_comment( $new_comment_id );
 		if ( !$comment ) {
-		   return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
+			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
 		}
 		return $comment;
 	}
