@@ -29,6 +29,14 @@ class WPCOM_Liveblog_Entry {
 		return $this->comment->comment_ID;
 	}
 
+	public function get_post_id() {
+		return $this->comment->comment_post_ID;
+	}
+
+	public function get_content() {
+		return $this->comment->comment_content;
+	}
+
 	/**
 	 * Get the GMT timestamp for the comment
 	 *
@@ -91,5 +99,108 @@ class WPCOM_Liveblog_Entry {
 		$content = apply_filters( 'comment_text', $content, $comment );
 
 		return $content;
+	}
+
+	/**
+	 * Inserts a new entry
+	 *
+	 * @param array $args The entry properties: content, post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
+	 */
+	public static function insert( $args ) {
+		$comment = self::insert_comment( $args );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	/**
+	 * Updates an exsting entry
+	 *
+	 * Inserts a new entry, which replaces the original entry.
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 */
+	public static function update( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		$comment = self::insert_comment( $args );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
+		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+		wp_update_comment( array(
+			'comment_ID'      => $args['entry_id'],
+			'comment_content' => wp_filter_post_kses( $args['content'] ),
+		) );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	/**
+	 * Deletes an existing entry
+	 *
+	 * Inserts a new entry, which replaces the original entry.
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 */
+	public static function delete( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		$args['content'] = '';
+		$comment = self::insert_comment( $args );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
+		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+		wp_delete_comment( $args['entry_id'] );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	private static function insert_comment( $args ) {
+		$valid_args = self::validate_args( $args );
+		if ( is_wp_error( $valid_args ) ) {
+			return $valid_args;
+		}
+		$new_comment_id = wp_insert_comment( array(
+			'comment_post_ID'      => $args['post_id'],
+			'comment_content'      => wp_filter_post_kses( $args['content'] ),
+			'comment_approved'     => 'liveblog',
+			'comment_type'         => 'liveblog',
+			'user_id'              => $args['user']->ID,
+
+			'comment_author'       => $args['user']->display_name,
+			'comment_author_email' => $args['user']->user_email,
+			'comment_author_url'   => $args['user']->user_url,
+		) );
+		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
+		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) ) {
+			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
+		}
+		$comment = get_comment( $new_comment_id );
+		if ( !$comment ) {
+			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
+		}
+		return $comment;
+	}
+
+	private static function validate_args( $args ) {
+		$required_keys = array( 'post_id', 'user', );
+		foreach( $required_keys as $key ) {
+			if ( !isset( $args[$key] ) || !$args[$key] ) {
+				return new WP_Error( 'entry-invalid-args', sprintf( __( 'Missing entry argument: %s', 'liveblog' ), $key ) );
+			}
+		}
+		return true;
 	}
 }

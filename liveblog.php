@@ -97,7 +97,6 @@ final class WPCOM_Liveblog {
 		// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
 		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
-		add_action( 'wp_ajax_liveblog_insert_entry', array( __CLASS__, 'ajax_insert_entry' ) );
 		add_action( 'wp_ajax_liveblog_preview_entry', array( __CLASS__, 'ajax_preview_entry' ) );
 	}
 
@@ -193,7 +192,7 @@ final class WPCOM_Liveblog {
 
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
-			'insert' => 'ajax_insert_entry',
+			'crud' => 'ajax_crud_entry',
 			'preview' => 'ajax_preview_entry',
 		);
 
@@ -342,71 +341,29 @@ final class WPCOM_Liveblog {
 		return array_map( 'intval', $timestamps );
 	}
 
-	/**
-	 * Inserts, updates, or deletes a liveblog entry
-	 */
-	public static function ajax_insert_entry() {
-
-		// Capability and Intention Checks
+	public static function ajax_crud_entry() {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
 
-		// Check POST data
-		$post_id             = isset( $_POST['post_id']       ) ? intval( $_POST['post_id']  ) : 0;
-		$replaces_comment_id = isset( $_POST['replaces']      ) ? intval( $_POST['replaces'] ) : 0;
-		$entry_content       = isset( $_POST['entry_content'] ) ? $_POST['entry_content']      : '';
+		$args = array();
 
-		if ( empty( $post_id ) )
-			self::send_user_error( __( 'Sorry, that post is not accepting Liveblog entries.', 'liveblog' ) );
+		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		// Get the current user
-		$user = wp_get_current_user();
-
-		// Insert new comment
-		$new_comment_id = wp_insert_comment( array(
-			'comment_post_ID'      => $post_id,
-			'comment_content'      => wp_filter_post_kses( $entry_content ),
-			'comment_approved'     => self::key,
-			'comment_type'         => self::key,
-			'user_id'              => $user->ID,
-
-			'comment_author'       => $user->display_name,
-			'comment_author_email' => $user->user_email,
-			'comment_author_url'   => $user->user_url,
-
-			// Borrowed from core as wp_insert_comment does not generate them
-			'comment_author_IP'    => preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] ),
-			'comment_agent'        => substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 ),
-		) );
-		wp_cache_delete( self::key . '_entries_asc_' . $post_id, 'liveblog' );
-
-		// Bail if comment could not be saved
-		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) )
-			self::send_server_error( __( 'Error posting entry', 'liveblog' ) );
-
-		// Are we replacing an existing comment?
-		if ( !empty( $replaces_comment_id ) ) {
-
-			add_comment_meta( $new_comment_id, WPCOM_Liveblog_Entry::replaces_meta_key, $replaces_comment_id );
-
-			// Update an existing comment
-			if ( !empty( $entry_content ) ) {
-				do_action( 'liveblog_update_entry', $replaces_comment_id, $new_comment_id, $post_id );
-				wp_update_comment( array(
-					'comment_ID'      => $replaces_comment_id,
-					'comment_content' => wp_filter_post_kses( $entry_content ),
-				) );
-
-			// Delete this comment
-			} else {
-				do_action( 'liveblog_delete_entry', $replaces_comment_id, $post_id );
-				wp_delete_comment( $replaces_comment_id );
-			}
-		} else {
-			do_action( 'liveblog_insert_entry', $new_comment_id, $post_id );
+		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete' ) ) ) {
+			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 
-		$entry = WPCOM_Liveblog_Entry::from_comment( get_comment( $new_comment_id ) );
+		$args['post_id'] = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+		$args['content'] = isset( $_POST['content'] ) ? $_POST['content'] : '';
+		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
+
+		$args['user'] = wp_get_current_user();
+
+		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+
+		if ( is_wp_error( $entry ) ) {
+			self::send_server_error( $entry->get_error_message() );
+		}
 
 		// Do not send latest_timestamp. If we send it the client won't get
 		// older entries. Since we send only the new one, we don't know if there
@@ -418,9 +375,6 @@ final class WPCOM_Liveblog {
 	}
 
 	function ajax_preview_entry() {
-		self::ajax_current_user_can_edit_liveblog();
-		self::ajax_check_nonce();
-
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
