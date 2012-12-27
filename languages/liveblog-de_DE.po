@@ -13,6 +13,10 @@ msgstr ""
 "Last-Translator: Christian Foellmann <foellmann@foe-services.de>\n"
 "Language-Team: \n"
 
+#: liveblog.php:6
+msgid "Blogging: at the speed of live."
+msgstr "Blogging: in Echtzeit."
+
 #: liveblog.php:228
 msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
 msgstr "Ein Timestamp fehlt. Korrekte URL: <permalink>/liveblog/<from>/</to>/"
