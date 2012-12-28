@@ -1,4 +1,4 @@
-var liveblog = {};
+window.liveblog = {};
 
 ( function( $ ) {
 
