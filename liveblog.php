@@ -46,6 +46,7 @@ final class WPCOM_Liveblog {
 	const max_consecutive_retries = 100; // max number of failed tries before polling is disabled
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
+	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
 
 	/** Variables *************************************************************/
 
@@ -443,7 +444,8 @@ final class WPCOM_Liveblog {
 			return;
 
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog.css', __FILE__ ) );
-		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color' ), self::version, true );
+		wp_register_script( 'jquery-throttle',  plugins_url( 'js/jquery.ba-throttle-debounce.min.js', __FILE__ ) );
+		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle' ), self::version, true );
 
 		if ( self::current_user_can_edit_liveblog() )  {
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key, 'jquery-ui-tabs' ), self::version, true );
@@ -472,12 +474,11 @@ final class WPCOM_Liveblog {
 				'max_consecutive_retries'=> self::max_consecutive_retries,
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
+				'fade_out_duration'      => self::fade_out_duration,
 
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				// i18n
-				'update_nag_singular'    => __( '%d new update',  'liveblog' ),
-				'update_nag_plural'      => __( '%d new updates', 'liveblog' ),
 				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 			) )

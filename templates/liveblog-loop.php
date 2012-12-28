@@ -6,4 +6,12 @@
 
 	<?php endforeach; ?>
 
+	<div id="liveblog-fixed-nag">
+		<a href="#">
+			Click to see
+			<div class="num">5</div>
+			new updates.
+		</a>
+	</div>
+
 </div>
