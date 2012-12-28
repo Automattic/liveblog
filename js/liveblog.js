@@ -272,6 +272,10 @@ window.liveblog = {};
 		return Math.floor( timestamp_milliseconds / 1000 );
 	};
 
+	liveblog.is_at_the_top = function() {
+		return $(document).scrollTop()  < liveblog.$entry_container.offset().top;
+ 	}
+
 	// Initialize everything!
 	if ( 'archive' != liveblog_settings.state ) {
 		$( document ).ready( liveblog.init );
