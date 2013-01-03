@@ -69,6 +69,15 @@
 		liveblog.publisher.delete_entry( id );
 	};
 
+    liveblog.publisher.edit_click = function( e ) {
+        e.preventDefault();
+        var id = $( e.target ).closest( '.liveblog-entry' ).attr( 'id' ).replace( 'liveblog-entry-', '' );
+        if ( !id ) {
+            return;
+        }
+        liveblog.publisher.edit_entry( id );
+    };
+
 	liveblog.publisher.insert_entry = function() {
 		var entry_content = liveblog.publisher.$entry_text.val();
 
@@ -113,6 +122,15 @@
 		liveblog.publisher.show_spinner();
 		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
+
+    liveblog.publisher.edit_entry = function( id ) {
+        var data = {
+            crud_action: 'edit',
+            post_id: liveblog_settings.post_id,
+            entry_id: id,
+        }
+        data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
+    };
 
 	liveblog.publisher.disable_posting_interface = function() {
 		liveblog.publisher.$entry_button.attr( 'disabled', 'disabled' );
