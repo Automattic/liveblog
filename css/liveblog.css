@@ -226,18 +226,22 @@
 #liveblog-fixed-nag {
 	display: none;
 	position: fixed;
-	top: 40%;
-	left: 30px;
-	border: 2px solid #888;
+	top: 0;
+	left: 0;
+	width: 100%;
+	color: white;
 	text-align: center;
-	padding: 6px;
+	-webkit-box-shadow: 0px 0px 8px 0px #000000;
+	-moz-box-shadow: 0px 0px 8px 0px #000000;
+	box-shadow: 0px 0px 8px 0px #000000;
+	background-color: rgba(1, 1, 1, 0.6);
 }
 #liveblog-fixed-nag a {
 	text-decoration: none;
 	display: block;
+	color: white;
 }
 #liveblog-fixed-nag a .num {
-	font-size: 50px;
+	font-size: 30px;
 	font-weight: bold;
-	line-height: 1em;
 }

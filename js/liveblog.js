@@ -42,16 +42,29 @@ window.liveblog = {};
 		render: function() {
 			var entries_in_queue = liveblog.queue.length;
 			if ( entries_in_queue ) {
-				this.$el.show();
+				this.show();
 				this.$('.num', this.$el).text(liveblog.queue.length);
 			} else {
-				this.$el.hide();
+				this.hide();
 			}
+		},
+		show: function() {
+			this.$el.show();
+			this._moveBelowAdminBar();
+		},
+		hide: function() {
+			this.$el.hide();
 		},
 		flush: function(e) {
 			e.preventDefault();
 			liveblog.queue.flush();
-		}
+		},
+		_moveBelowAdminBar: function() {
+			var $adminbar = $('#wpadminbar');
+			if ($adminbar.length) {
+				this.$el.css('top', $adminbar.height());
+			}
+  		}
 	});
 
 	liveblog.TitleBarCountView = Backbone.View.extend({
