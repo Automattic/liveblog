@@ -148,6 +148,7 @@ window.liveblog = {};
 	};
 
 	liveblog.get_recent_entries_success = function( response, status, xhr ) {
+		var new_entries, existing_entries;
 
 		liveblog.consecutive_failures_count = 0;
 
@@ -164,7 +165,11 @@ window.liveblog = {};
 			if ( liveblog.is_at_the_top() && liveblog.queue.isEmpty() ) {
 				liveblog.display_entries( response.entries );
 			} else {
-				liveblog.queue.add( response.entries );
+				new_entries =  _.filter(response.entries, function(entry) { return 'new' == entry.type; } );
+				existing_entries =  _.filter(response.entries, function(entry) { return 'update' == entry.type || 'delete' == entry.type; } );
+				liveblog.queue.add(new_entries);
+				// updating and deleting entries is rare enough, so that we can screw the user's scroll and not queue those events
+				liveblog.display_entries(existing_entries);
 			}
 		}
 
