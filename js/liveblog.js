@@ -2,7 +2,7 @@ window.liveblog = {};
 
 ( function( $ ) {
 	liveblog.EntriesView = Backbone.View.extend({
-		el: $('#liveblog-container'),
+		el: '#liveblog-container',
 		initialize: function() {
 			var view = this;
 			liveblog.queue.on('reset', this.scrollToTop, this);
@@ -32,7 +32,7 @@ window.liveblog = {};
 	});
 
 	liveblog.FixedNagView = Backbone.View.extend({
-		el: $('#liveblog-fixed-nag'),
+		el: '#liveblog-fixed-nag',
 		events: {
 			'click a': 'flush'
 		},
