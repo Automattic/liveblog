@@ -219,12 +219,15 @@ window.liveblog = {};
 		if ( new_entry instanceof liveblog.Entry ) {
 			new_entry = new_entry.attributes
 		}
+
 		var $entry = liveblog.get_entry_by_id( new_entry.id );
-		if ( $entry.length ) {
-			liveblog.update_entry( $entry, new_entry );
-		} else {
+		if ('new' == new_entry.type && !$entry.length)
 			liveblog.add_entry( new_entry, duration );
-		}
+		else if ('update' == new_entry.type && $entry.length)
+			liveblog.update_entry( $entry, new_entry );
+		else if ('delete' == new_entry.type && $entry.length)
+			liveblog.delete_entry( $entry );
+
 		$( document.body ).trigger( 'post-load' );
 	};
 
@@ -237,11 +240,7 @@ window.liveblog = {};
 		var $updated_entry = $( updated_entry.html );
 		var updated_text   = $( '.liveblog-entry-text', $updated_entry ).html();
 
-		if ( updated_text ) {
-			$( '.liveblog-entry-text', $entry ).html( updated_text );
-		} else {
-			liveblog.delete_entry( $entry );
-		}
+		$( '.liveblog-entry-text', $entry ).html( updated_text );
 	};
 
 	liveblog.delete_entry = function( $entry ) {
