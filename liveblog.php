@@ -481,6 +481,8 @@ final class WPCOM_Liveblog {
 				// i18n
 				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
+				'new_update'             => __( 'Liveblog: {number} new update' ),
+				'new_updates'            => __( 'Liveblog: {number} new updates' ),
 			) )
 		);
 	}

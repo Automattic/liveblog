@@ -43,7 +43,7 @@ window.liveblog = {};
 			var entries_in_queue = liveblog.queue.length;
 			if ( entries_in_queue ) {
 				this.show();
-				this.$('.num', this.$el).text(liveblog.queue.length);
+				this.updateNumber(liveblog.queue.length);
 			} else {
 				this.hide();
 			}
@@ -58,6 +58,11 @@ window.liveblog = {};
 		flush: function(e) {
 			e.preventDefault();
 			liveblog.queue.flush();
+		},
+		updateNumber: function(number) {
+			var template = number==1? liveblog_settings.new_update : liveblog_settings.new_updates,
+				html = template.replace('{number}', '<span class="num">' + number + '</span>');
+			this.$('a').html(html);
 		},
 		_moveBelowAdminBar: function() {
 			var $adminbar = $('#wpadminbar');
