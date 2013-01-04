@@ -160,12 +160,7 @@
 	border-radius: 3px;
 	text-shadow: 1px 1px 0 #0074a2;
 }
-.liveblog-nag {
-	display: block;
-	color: white;
-	background: #2ea2cc;
-	cursor: pointer;
-}
+
 .liveblog-hidden {
 	display: none;
 }
@@ -227,4 +222,29 @@
 .liveblog-entry .liveblog-entry-actions,
 .liveblog-entry .liveblog-entry-actions li {
 	list-style: none;
+}
+#liveblog-fixed-nag {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	color: white;
+	text-align: center;
+	-webkit-box-shadow: 0px 0px 8px 0px #000000;
+	-moz-box-shadow: 0px 0px 8px 0px #000000;
+	box-shadow: 0px 0px 8px 0px #000000;
+	background-color: rgba(1, 1, 1, 0.6);
+}
+#liveblog-fixed-nag a {
+	text-decoration: none;
+	display: block;
+	color: white;
+}
+#liveblog-fixed-nag a .num {
+	font-size: 30px;
+	margin: 0 3px;
+	font-weight: bold;
+	display: inline-block;
+	vertical-align: middle;
 }

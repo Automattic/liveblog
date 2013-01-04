@@ -6,4 +6,9 @@
 
 	<?php endforeach; ?>
 
+	<div id="liveblog-fixed-nag">
+		<a href="#">
+		</a>
+	</div>
+
 </div>

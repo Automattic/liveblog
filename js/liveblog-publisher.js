@@ -5,7 +5,6 @@
 	liveblog.publisher = {};
 
 	liveblog.publisher.init = function() {
-		liveblog.disable_nag();
 
 		liveblog.publisher.$entry_text   = $( '#liveblog-form-entry'        );
 		liveblog.publisher.$entry_button = $( '#liveblog-form-entry-submit' );
