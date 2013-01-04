@@ -123,13 +123,16 @@
 		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
-    liveblog.publisher.edit_entry = function( id ) {
+    liveblog.publisher.update_entry = function( id ) {
         var data = {
-            crud_action: 'edit',
+            crud_action: 'update',
             post_id: liveblog_settings.post_id,
             entry_id: id,
-        }
+        };
         data[ liveblog_settings.nonce_key ] = liveblog.publisher.$nonce.val();
+        liveblog.publisher.disable_posting_interface();
+        liveblog.publisher.show_spinner();
+        liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
     };
 
 	liveblog.publisher.disable_posting_interface = function() {
