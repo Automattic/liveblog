@@ -14,10 +14,17 @@ class WPCOM_Liveblog_Entry {
 	const replaces_meta_key   = 'liveblog_replaces';
 
 	private $comment;
+	private $type = 'new';
 
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
 		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
+		if ( $this->replaces && $this->get_content() ) {
+			$this->type = 'update';
+		}
+		if ( $this->replaces && !$this->get_content() ) {
+			$this->type = 'delete';
+		}
 	}
 
 	public static function from_comment( $comment ) {
@@ -37,6 +44,10 @@ class WPCOM_Liveblog_Entry {
 		return $this->comment->comment_content;
 	}
 
+	public function get_type() {
+		return $this->type;
+	}
+
 	/**
 	 * Get the GMT timestamp for the comment
 	 *
@@ -49,6 +60,7 @@ class WPCOM_Liveblog_Entry {
 	public function for_json() {
 		return (object) array(
 			'id'   => $this->replaces ? $this->replaces : $this->get_id(),
+			'type' => $this->get_type(),
 			'html' => $this->render(),
 		);
 	}

@@ -18,6 +18,11 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $entry );
 	}
 
+	function test_insert_should_return_entry_with_type_new() {
+		$entry = $this->insert_entry();
+		$this->assertEquals( 'new', $entry->get_type() );
+	}
+
 	function test_insert_should_fire_liveblog_insert_entry() {
 		unset( $GLOBALS['liveblog_hook_fired'] );
 		add_action( 'liveblog_insert_entry', function() { $GLOBALS['liveblog_hook_fired'] = true; } );
@@ -29,6 +34,12 @@ class Test_Entry extends WP_UnitTestCase {
 		$entry = $this->insert_entry();
 		$update_entry = WPCOM_Liveblog_Entry::update( $this->build_entry_args( array( 'entry_id' => $entry->get_id(), 'content' => 'updated' ) ) );
 		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
+	}
+
+	function test_update_should_return_entry_with_type_update() {
+		$entry = $this->insert_entry();
+		$update_entry = WPCOM_Liveblog_Entry::update( $this->build_entry_args( array( 'entry_id' => $entry->get_id(), 'content' => 'updated' ) ) );
+		$this->assertEquals( 'update', $update_entry->get_type() );
 	}
 
 	function test_update_should_fire_liveblog_update_entry() {
@@ -51,6 +62,12 @@ class Test_Entry extends WP_UnitTestCase {
 		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id()) ) );
 		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
 		$this->assertEquals( '', $update_entry->get_content() );
+	}
+
+	function test_delete_should_return_entry_with_type_delete() {
+		$entry = $this->insert_entry();
+		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
+		$this->assertEquals( 'delete', $update_entry->get_type() );
 	}
 
 	function test_delete_should_delete_original_entry() {
