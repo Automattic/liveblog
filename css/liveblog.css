@@ -244,4 +244,6 @@
 #liveblog-fixed-nag a .num {
 	font-size: 30px;
 	font-weight: bold;
+	display: inline-block;
+	vertical-align: middle;
 }
