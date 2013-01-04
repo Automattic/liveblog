@@ -28,7 +28,27 @@ window.liveblog = {};
 			}
 			liveblog.display_entries(this.models);
 			this.reset([]);
-		}
+		},
+		applyModifyingEntries: function(entries) {
+			console.log(entries);
+			var collection = this;
+			_.each(entries, function(entry) {
+				collection.applyModifyingEntry(entry);
+			});
+		},
+		applyModifyingEntry: function(entry) {
+			var existing = this.get(entry.id);
+			if (!existing) {
+				return;
+			}
+			console.log(entry);
+			if ("delete" == entry.type) {
+				this.remove(existing);
+			}
+			if ("update" == entry.type) {
+				existing.set("html", entry.html);
+			}
+		},
 	});
 
 	liveblog.FixedNagView = Backbone.View.extend({
@@ -166,7 +186,7 @@ window.liveblog = {};
 	};
 
 	liveblog.get_recent_entries_success = function( response, status, xhr ) {
-		var new_entries, existing_entries;
+		var added, modifying;
 
 		liveblog.consecutive_failures_count = 0;
 
@@ -183,11 +203,12 @@ window.liveblog = {};
 			if ( liveblog.is_at_the_top() && liveblog.queue.isEmpty() ) {
 				liveblog.display_entries( response.entries );
 			} else {
-				new_entries =  _.filter(response.entries, function(entry) { return 'new' == entry.type; } );
-				existing_entries =  _.filter(response.entries, function(entry) { return 'update' == entry.type || 'delete' == entry.type; } );
-				liveblog.queue.add(new_entries);
+				added =  _.filter(response.entries, function(entry) { return 'new' == entry.type; } );
+				modifying =  _.filter(response.entries, function(entry) { return 'update' == entry.type || 'delete' == entry.type; } );
+				liveblog.queue.add(added);
+				liveblog.queue.applyModifyingEntries(modifying);
 				// updating and deleting entries is rare enough, so that we can screw the user's scroll and not queue those events
-				liveblog.display_entries(existing_entries);
+				liveblog.display_entries(modifying);
 			}
 		}
 
