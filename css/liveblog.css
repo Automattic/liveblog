@@ -243,6 +243,7 @@
 }
 #liveblog-fixed-nag a .num {
 	font-size: 30px;
+	margin: 0 3px;
 	font-weight: bold;
 	display: inline-block;
 	vertical-align: middle;
