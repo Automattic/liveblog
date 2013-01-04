@@ -51,8 +51,8 @@
 		$( document.body ).trigger( 'post-load' );
 	};
 
-	liveblog.publisher.preview_entry_error = function( response ) {
-		liveblog.add_error( response );
+	liveblog.publisher.preview_entry_error = function( response, status ) {
+		liveblog.add_error( response, status );
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.$tabs.tabs( 'select', 0 );
 	};
@@ -96,8 +96,8 @@
 		liveblog.get_recent_entries_success( response, status, xhr );
 	};
 
-	liveblog.publisher.insert_entry_error = function( response ) {
-		liveblog.add_error( response );
+	liveblog.publisher.insert_entry_error = function( response, status, error ) {
+		liveblog.add_error( response, status );
 		liveblog.publisher.enable_posting_interface();
 		liveblog.publisher.hide_spinner();
 	};

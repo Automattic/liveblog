@@ -329,8 +329,13 @@ window.liveblog = {};
 	liveblog.success_callback = function() {};
 	liveblog.error_callback   = function() {};
 
-	liveblog.add_error = function( response ) {
-		alert( liveblog_settings.error_message_template.replace('{error-code}', response.status).replace('{error-message}', response.statusText));
+	liveblog.add_error = function( response, status ) {
+		var message;
+		if (response.status && response.status > 200)
+			message = liveblog_settings.error_message_template.replace('{error-code}', response.status).replace('{error-message}', response.statusText)
+		else
+			message = liveblog_settings.short_error_message_template.replace('{error-message}', status);
+		alert(message);
 	};
 
 	liveblog.show_spinner = function() {

@@ -430,6 +430,7 @@ final class WPCOM_Liveblog {
 			'nonce_key' => self::nonce_key,
 			'nonce' => wp_create_nonce( self::nonce_key ),
 			'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
+			'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 		) );
 	}
 
@@ -481,6 +482,7 @@ final class WPCOM_Liveblog {
 				// i18n
 				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
+				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 				'new_update'             => __( 'Liveblog: {number} new update' ),
 				'new_updates'            => __( 'Liveblog: {number} new updates' ),
 			) )
