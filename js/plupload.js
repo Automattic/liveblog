@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
 			var filename, percent;
 
 			if ( 'undefined' === typeof( file ) )
-				file = upload.attributes.file;
+				file = upload.attributes? upload.attribues.file : upload.file;
 
 			if( 'undefined' === typeof( file ) )
 				return;
