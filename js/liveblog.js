@@ -30,7 +30,6 @@ window.liveblog = {};
 			this.reset([]);
 		},
 		applyModifyingEntries: function(entries) {
-			console.log(entries);
 			var collection = this;
 			_.each(entries, function(entry) {
 				collection.applyModifyingEntry(entry);
@@ -41,7 +40,6 @@ window.liveblog = {};
 			if (!existing) {
 				return;
 			}
-			console.log(entry);
 			if ("delete" == entry.type) {
 				this.remove(existing);
 			}
