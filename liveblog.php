@@ -44,6 +44,7 @@ final class WPCOM_Liveblog {
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
 	const max_consecutive_retries = 100; // max number of failed tries before polling is disabled
+	const human_time_diff_update_interval = 60; // how often we change the entry human timestamps: "a minute ago"
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
@@ -446,7 +447,26 @@ final class WPCOM_Liveblog {
 
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog.css', __FILE__ ) );
 		wp_register_script( 'jquery-throttle',  plugins_url( 'js/jquery.ba-throttle-debounce.min.js', __FILE__ ) );
-		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle' ), self::version, true );
+		wp_register_script( 'moment',  plugins_url( 'js/moment.min.js', __FILE__ ), array(), '1.7.2' );
+		wp_localize_script( 'moment', 'momentLang', array(
+			'locale' => get_locale(),
+			'relativeTime' => array(
+				'past' => __( '%s ago' ),
+				's' => __( 'a few seconds', 'liveblog' ),
+				'm' => __( 'a minute', 'liveblog' ),
+				'mm' => __( '%d minutes', 'liveblog' ),
+				'h' => __( 'an hour', 'liveblog' ),
+				'hh' => __( '%d hours', 'liveblog' ),
+				'd' => __( 'a day', 'liveblog' ),
+				'dd' => __( '%d days', 'liveblog' ),
+				'M' => __( 'a month', 'liveblog' ),
+				'MM' => __( '%d months', 'liveblog' ),
+				'y' => __( 'a year', 'liveblog' ),
+				'yy' => __( '%d years', 'liveblog' ),
+			),
+		));
+
+		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
 
 		if ( self::current_user_can_edit_liveblog() )  {
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key, 'jquery-ui-tabs' ), self::version, true );

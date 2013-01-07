@@ -1,4 +1,4 @@
-<div id="liveblog-entry-<?php echo $entry_id; ?>" <?php echo $css_classes; ?>>
+<div id="liveblog-entry-<?php echo $entry_id; ?>" <?php echo $css_classes; ?> data-timestamp="<?php echo $timestamp; ?>">
 	<header class="liveblog-meta">
 		<span class="liveblog-author-avatar"><?php echo $avatar_img; ?></span>
 		<span class="liveblog-author-name"><?php echo $author_link; ?></span>

@@ -84,6 +84,7 @@ class WPCOM_Liveblog_Entry {
 		$author_link       = get_comment_author_link( $entry_id );
 		$entry_date        = get_comment_date( get_option('date_format'), $entry_id );
 		$entry_time        = get_comment_date( get_option('time_format'), $entry_id );
+		$timestamp         = get_comment_date( 'U', $entry_id );
 		$can_edit_liveblog = WPCOM_Liveblog::current_user_can_edit_liveblog();
 
 		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', compact(
@@ -95,6 +96,7 @@ class WPCOM_Liveblog_Entry {
 			'author_link',
 			'entry_date',
 			'entry_time',
+			'timestamp',
 			'can_edit_liveblog'
 		) );
 	}

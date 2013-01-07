@@ -15,6 +15,14 @@ window.liveblog = {};
 			if (liveblog.is_at_the_top()) {
 				liveblog.queue.flush();
 			}
+		},
+		updateTimes: function() {
+			this.$('.liveblog-entry').each(function() {
+				var $entry = $(this),
+					timestamp = $entry.data('timestamp'),
+					human = moment.unix(timestamp).fromNow();
+				$('.liveblog-meta-time a', $entry).text(human);
+			});
 		}
 	});
 
@@ -121,12 +129,19 @@ window.liveblog = {};
 		liveblog.entriesContainer = new liveblog.EntriesView();
 		liveblog.titleBarCount = new liveblog.TitleBarCountView();
 
+		liveblog.init_moment_js();
+
 		liveblog.cast_settings_numbers();
 		liveblog.reset_timer();
 		liveblog.set_initial_timestamps();
+		liveblog.start_human_time_diff_timer();
 
 		liveblog.$events.trigger( 'after-init' );
 	};
+
+	liveblog.init_moment_js = function() {
+		moment.lang(momentLang.locale, momentLang);
+	}
 
 	liveblog.set_initial_timestamps = function() {
 		var now = liveblog.current_timestamp();
@@ -170,6 +185,12 @@ window.liveblog = {};
 		liveblog_settings.refresh_interval *= liveblog_settings.delay_multiplier;
 
 	};
+
+	liveblog.start_human_time_diff_timer = function() {
+		var tick = function(){ liveblog.entriesContainer.updateTimes(); };
+		tick();
+		setInterval(tick, 60 * 1000);
+	}
 
 	liveblog.get_recent_entries = function() {
 		var url  = liveblog_settings.endpoint_url;
@@ -276,6 +297,7 @@ window.liveblog = {};
 	liveblog.add_entry = function( new_entry, duration ) {
 		var $new_entry = $( new_entry.html );
 		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+		liveblog.entriesContainer.updateTimes();
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
@@ -283,6 +305,7 @@ window.liveblog = {};
 		var updated_text   = $( '.liveblog-entry-text', $updated_entry ).html();
 
 		$( '.liveblog-entry-text', $entry ).html( updated_text );
+		liveblog.entriesContainer.updateTimes();
 	};
 
 	liveblog.delete_entry = function( $entry ) {
