@@ -9,12 +9,12 @@ jQuery(document).ready(function($) {
 		success  : function( upload ) {
 			var url = upload.attributes.url || upload.url,
 				filename = upload.attributes.filename || upload.filename;
-			
+
 			$( '#liveblog-form-entry' ).val( $( '#liveblog-form-entry' ).val() + '<img src="' + url + '" />' );
 			$( '#liveblog-messages' ).html( filename + ' Finished' );
 			$( '#liveblog-actions' ).removeClass( 'uploading' );
 		},
- 
+
 		error    : function ( reason ) {
 			$( '#liveblog-messages' ).html( reason );
 		},
