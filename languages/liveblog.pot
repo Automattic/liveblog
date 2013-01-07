@@ -1,0 +1,200 @@
+# Copyright (C) 2013 Liveblog
+# This file is distributed under the same license as the Liveblog package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Liveblog 1.2\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/liveblog\n"
+"POT-Creation-Date: 2013-01-07 21:31:42+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: classes/class-wpcom-liveblog-entry.php:144
+#: classes/class-wpcom-liveblog-entry.php:170
+msgid "Missing entry ID"
+msgstr ""
+
+#: classes/class-wpcom-liveblog-entry.php:202
+msgid "Error posting entry"
+msgstr ""
+
+#: classes/class-wpcom-liveblog-entry.php:206
+msgid "Error retrieving comment"
+msgstr ""
+
+#: classes/class-wpcom-liveblog-entry.php:215
+msgid "Missing entry argument: %s"
+msgstr ""
+
+#: liveblog.php:235
+msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
+msgstr ""
+
+#: liveblog.php:374
+msgid "Invalid entry crud_action: %s"
+msgstr ""
+
+#: liveblog.php:409
+msgid "Unknown liveblog action"
+msgstr ""
+
+#: liveblog.php:433 liveblog.php:504
+msgid "Error {error-code}: {error-message}"
+msgstr ""
+
+#: liveblog.php:434 liveblog.php:505
+msgid "Error: {error-message}"
+msgstr ""
+
+#: liveblog.php:454
+msgid "%s ago"
+msgstr ""
+
+#: liveblog.php:455
+msgid "a few seconds"
+msgstr ""
+
+#: liveblog.php:456
+msgid "a minute"
+msgstr ""
+
+#: liveblog.php:457
+msgid "%d minutes"
+msgstr ""
+
+#: liveblog.php:458
+msgid "an hour"
+msgstr ""
+
+#: liveblog.php:459
+msgid "%d hours"
+msgstr ""
+
+#: liveblog.php:460
+msgid "a day"
+msgstr ""
+
+#: liveblog.php:461
+msgid "%d days"
+msgstr ""
+
+#: liveblog.php:462
+msgid "a month"
+msgstr ""
+
+#: liveblog.php:463
+msgid "%d months"
+msgstr ""
+
+#: liveblog.php:464
+msgid "a year"
+msgstr ""
+
+#: liveblog.php:465
+msgid "%d years"
+msgstr ""
+
+#: liveblog.php:503
+msgid "Do you really want do delete this entry? There is no way back."
+msgstr ""
+
+#: liveblog.php:506
+msgid "Liveblog: {number} new update"
+msgstr ""
+
+#: liveblog.php:507
+msgid "Liveblog: {number} new updates"
+msgstr ""
+
+#: liveblog.php:528
+msgid "Allowed Files"
+msgstr ""
+
+#. #-#-#-#-#  liveblog.pot (Liveblog 1.2)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: liveblog.php:645
+msgid "Liveblog"
+msgstr ""
+
+#: liveblog.php:661
+msgid "Enable"
+msgstr ""
+
+#: liveblog.php:662
+msgid ""
+"Enables liveblog on this post. Posting tools are enabled for editors, "
+"visitors get the latest updates."
+msgstr ""
+
+#: liveblog.php:662
+msgid ""
+"There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog &rarr;</a>"
+msgstr ""
+
+#: liveblog.php:663
+msgid "Archive"
+msgstr ""
+
+#: liveblog.php:664
+msgid ""
+"Archives the liveblog on this post. Visitors still see the liveblog entries, "
+"but posting tools are hidden."
+msgstr ""
+
+#: liveblog.php:664
+msgid ""
+"There is an <strong>archived</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog archive &rarr;</a>"
+msgstr ""
+
+#: liveblog.php:670
+msgid "This is a normal WordPress post, without a liveblog."
+msgstr ""
+
+#: liveblog.php:726
+msgid "Cheatin', uh?"
+msgstr ""
+
+#: liveblog.php:737
+msgid "Sorry, we could not authenticate you."
+msgstr ""
+
+#: templates/liveblog-form.php:7
+msgid "New Entry"
+msgstr ""
+
+#: templates/liveblog-form.php:9
+msgid "Preview"
+msgstr ""
+
+#: templates/liveblog-form.php:13
+msgid "Remember: keep it short! To insert an image, drag and drop it here."
+msgstr ""
+
+#: templates/liveblog-form.php:16
+msgid "Publish Update"
+msgstr ""
+
+#: templates/liveblog-single-entry.php:12
+msgid "Delete"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/extend/plugins/liveblog/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Blogging: at the speed of live."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "WordPress.com VIP, Automattic"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://vip.wordpress.com/"
+msgstr ""
