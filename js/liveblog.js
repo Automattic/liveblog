@@ -304,7 +304,7 @@ window.liveblog = {};
 		var $updated_entry = $( updated_entry.html );
 		var updated_text   = $( '.liveblog-entry-text', $updated_entry ).html();
 
-		$( '.liveblog-entry-text', $entry ).html( updated_text );
+		$entry.replaceWith( updated_entry.html );
 		liveblog.entriesContainer.updateTimes();
 	};
 
