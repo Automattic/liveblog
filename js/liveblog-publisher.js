@@ -6,12 +6,12 @@
 
 	liveblog.publisher.init = function() {
 
-		liveblog.publisher.$entry_text   = $( '#liveblog-form-entry'        );
-		liveblog.publisher.$entry_button = $( '#liveblog-form-entry-submit' );
+		liveblog.publisher.$entry_text   = $( '.liveblog-form-entry'        );
+		liveblog.publisher.$entry_button = $( '.liveblog-form-entry-submit' );
 		liveblog.publisher.$nonce        = $( '#liveblog_nonce'             );
-		liveblog.publisher.$spinner      = $( '#liveblog-submit-spinner'    );
-		liveblog.publisher.$preview      = $( '#liveblog-preview' );
-		liveblog.publisher.$tabs         = $( '#liveblog-tabs' );
+		liveblog.publisher.$spinner      = $( '.liveblog-submit-spinner'    );
+		liveblog.publisher.$preview      = $( '.liveblog-preview' );
+		liveblog.publisher.$tabs         = $( '.liveblog-tabs' );
 
 		liveblog.publisher.$entry_button.click( liveblog.publisher.submit_click );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-delete', liveblog.publisher.delete_click );
@@ -89,8 +89,8 @@
 
 		entry.html( liveblog.publisher.$tabs.clone() );
 		entry.find( '.liveblog-form-entry' ).val( entry_text );
-		entry.find( '#liveblog-form-entry-submit').addClass( 'edit-entry-submit' );
-		entry.find( '#liveblog-actions ul li:first-child a').text('Edit Entry');
+		entry.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' );
+		entry.find( '.liveblog-actions ul li:first-child a').text('Edit Entry');
 
 	};
 

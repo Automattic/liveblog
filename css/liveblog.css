@@ -10,52 +10,52 @@
 
 /* =Form Actions
 -------------------------------------------------------------- */
-#liveblog-actions {
+.liveblog-actions {
 	display: block;
 	padding: 5px 20px 16px 20px;
 	border-radius: 3px;
 	border: 1px solid #dfdfdf;
 	background: whiteSmoke;
 }
-#liveblog-actions.uploading {
+.liveblog-actions.uploading {
 	border-color: #ccc;
 	background: #e6e6e6;
 }
-#liveblog-actions legend {
+.liveblog-actions legend {
 	background: transparent;
 	margin: 6px 0 10px;
 	padding: 5px;
 	float: left;
 }
-#liveblog-actions legend ul,
-#liveblog-actions legend li {
+.liveblog-actions legend ul,
+.liveblog-actions legend li {
 	display: inline;
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
-#liveblog-actions legend ul a {
+.liveblog-actions legend ul a {
 	color: #21759B;
 	text-decoration: none;
 	border: none;
 }
-#liveblog-actions legend ul a:hover {
+.liveblog-actions legend ul a:hover {
 	color: #D54E21;
 	text-decoration: none;
 	border: none;
 }
-#liveblog-actions legend ul .ui-tabs-active a {
+.liveblog-actions legend ul .ui-tabs-active a {
 	color: #333;
 	font-weight: bold;
 	cursor: text;
 }
-#liveblog-actions legend ul .ui-tabs-active a:hover {
+.liveblog-actions legend ul .ui-tabs-active a:hover {
 	color: #333;
 }
-#liveblog-actions legend ul .ui-tabs-hide {
+.liveblog-actions legend ul .ui-tabs-hide {
 	display: none;
 }
-#liveblog-form-entry {
+.liveblog-form-entry {
 	color: #333;
 	background: #fff;
 	width: 98%;
@@ -69,24 +69,24 @@
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
 }
-#liveblog-form-entry:focus {
+.liveblog-form-entry:focus {
 	border-color: #AAA;
 	-moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	-webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
-#liveblog-form-entry.drag-over {
+.liveblog-form-entry.drag-over {
 	background: #efe;
 	color: #333;
 }
-#liveblog-actions .liveblog-submit-wrapper {
+.liveblog-actions .liveblog-submit-wrapper {
 	text-align: right;
 	position: relative;
 }
-#liveblog-form-entry-submit {
+.liveblog-form-entry-submit {
 	margin: 0;
 }
-#liveblog-submit-spinner {
+.liveblog-submit-spinner {
 	padding: 0;
 	position: absolute;
 	top: 50%;
