@@ -9,7 +9,7 @@
 				<li><a href="#liveblog-preview"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
-			<div class="liveblog-new-entry">
+			<div id="liveblog-new-entry">
 				<textarea placeholder="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>" class="liveblog-form-entry" name="liveblog-form-entry" cols="50" rows="5"></textarea>
 				<div class="liveblog-submit-wrapper">
 					<span class="liveblog-submit-spinner"></span>
@@ -17,7 +17,7 @@
 					<?php echo wp_nonce_field( self::nonce_key, self::nonce_key, false, false ); ?>
 				</div>
 			</div>
-			<div class="liveblog-preview">
+			<div id="liveblog-preview">
 			</div>
 	</fieldset>
 </div>

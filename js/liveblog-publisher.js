@@ -10,7 +10,7 @@
 		liveblog.publisher.$entry_button = $( '.liveblog-form-entry-submit' );
 		liveblog.publisher.$nonce        = $( '#liveblog_nonce'             );
 		liveblog.publisher.$spinner      = $( '.liveblog-submit-spinner'    );
-		liveblog.publisher.$preview      = $( '.liveblog-preview' );
+		liveblog.publisher.$preview      = $( '#liveblog-preview' );
 		liveblog.publisher.$tabs         = $( '.liveblog-tabs' );
 
 		liveblog.publisher.$entry_button.click( liveblog.publisher.submit_click );
