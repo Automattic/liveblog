@@ -87,11 +87,7 @@
 			return;
 		}
 
-		entry.html( liveblog.publisher.$tabs.clone() );
-		entry.find( '.liveblog-form-entry' ).val( entry_text );
-		entry.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' );
-		entry.find( '.liveblog-actions ul li:first-child a').text('Edit Entry');
-
+		liveblog.publisher.clone_entry_form( entry, entry_text );
 	};
 
 	liveblog.publisher.insert_entry = function() {
@@ -155,6 +151,13 @@
 		liveblog.publisher.disable_posting_interface();
 		liveblog.publisher.show_spinner();
 		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
+	};
+
+	liveblog.publisher.clone_entry_form = function( entry, entry_text ) {
+		entry.html( liveblog.publisher.$tabs.clone() );
+		entry.find( '.liveblog-form-entry' ).val( entry_text );
+		entry.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' );
+		entry.find( '.liveblog-actions ul li:first-child a').text('Edit Entry');
 	};
 
 	liveblog.publisher.disable_posting_interface = function() {
