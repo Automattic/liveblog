@@ -136,7 +136,8 @@
 	};
 
 	liveblog.publisher.update_entry = function( id ) {
-		var entry_content = liveblog.publisher.$entry_text.val();
+		var entry = $( '#liveblog-entry-' + id );
+		var entry_content = entry.find( '.liveblog-form-entry' ).val();
 
 		if ( ! entry_content )
 			return;
