@@ -13,7 +13,7 @@
 		liveblog.publisher.$preview      = $( '#liveblog-preview' );
 		liveblog.publisher.$tabs         = $( '.liveblog-tabs' );
 
-		$('#liveblog-entries').on( 'click', '.liveblog-form-entry-submit', liveblog.publisher.submit_click );
+		$('#liveblog-container').on( 'click', '.liveblog-form-entry-submit', liveblog.publisher.submit_click );
 		$('#liveblog-entries').on( 'click', 'a.cancel', liveblog.publisher.close_enclosing_edit_form );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-delete', liveblog.publisher.delete_click );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-edit', liveblog.publisher.edit_click );
