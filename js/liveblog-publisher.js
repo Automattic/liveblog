@@ -14,6 +14,7 @@
 		liveblog.publisher.$tabs         = $( '.liveblog-tabs' );
 
 		$('#liveblog-entries').on( 'click', '.liveblog-form-entry-submit', liveblog.publisher.submit_click );
+		$('#liveblog-entries').on( 'click', 'a.cancel', liveblog.publisher.close_enclosing_edit_form );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-delete', liveblog.publisher.delete_click );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-edit', liveblog.publisher.edit_click );
 
@@ -88,7 +89,13 @@
 		}
 
 		liveblog.publisher.clone_entry_form( entry, entry_text );
+		entry.find( '.liveblog-form-entry' ).focus();
 	};
+
+	liveblog.publisher.close_enclosing_edit_form = function( e ) {
+		e.preventDefault();
+		var entry = $( e.target ).closest( '.liveblog-entry' ).find('.liveblog-tabs').remove().end().find('.liveblog-entry-text').show();
+	}
 
 	liveblog.publisher.insert_entry = function() {
 		var entry_content = liveblog.publisher.$entry_text.val();
@@ -155,10 +162,11 @@
 	};
 
 	liveblog.publisher.clone_entry_form = function( entry, entry_text ) {
-		entry.html( liveblog.publisher.$tabs.clone() );
-		entry.find( '.liveblog-form-entry' ).val( entry_text );
-		entry.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' );
-		entry.find( '.liveblog-actions ul li:first-child a').text('Edit Entry');
+		var form = liveblog.publisher.$tabs.clone();
+		form.find( '.liveblog-form-entry' ).val( entry_text );
+		form.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' ).val('Update Entry');
+		form.find( 'a.cancel').show();
+		entry.find( '.liveblog-entry-text' ).hide().after(form);
 	};
 
 	liveblog.publisher.disable_posting_interface = function() {

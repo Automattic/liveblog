@@ -14,6 +14,7 @@
 				<div class="liveblog-submit-wrapper">
 					<span class="liveblog-submit-spinner"></span>
 					<input type="button" class="liveblog-form-entry-submit button" value="<?php esc_attr_e( 'Publish Update', 'liveblog' ); ?>" />
+					<a href="#" class="cancel">Cancel</a>
 					<?php echo wp_nonce_field( self::nonce_key, self::nonce_key, false, false ); ?>
 				</div>
 			</div>
