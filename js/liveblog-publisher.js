@@ -163,6 +163,7 @@
 		form.find( '.liveblog-form-entry' ).val( entry.find('.liveblog-entry-text').data('original-content') );
 		form.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' ).val('Update Entry');
 		form.find( 'a.cancel').show();
+		form.find( '.liveblog-actions ul li:first-child a').text('Edit Entry');
 		entry.find( '.liveblog-entry-text' ).hide().after(form);
 	};
 
