@@ -80,15 +80,11 @@
 	liveblog.publisher.edit_click = function( e ) {
 		e.preventDefault();
 		var entry = $( e.target ).closest( '.liveblog-entry' );
-		var entry_text = entry.children( '.liveblog-entry-text' ).html();
-		entry_text = entry_text.trim();
-
 		var id = entry.attr( 'id' ).replace( 'liveblog-entry-', '' );
 		if ( !id ) {
 			return;
 		}
-
-		liveblog.publisher.clone_entry_form( entry, entry_text );
+		liveblog.publisher.clone_entry_form( entry );
 		entry.find( '.liveblog-form-entry' ).focus();
 	};
 
@@ -161,9 +157,9 @@
 		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, liveblog.publisher.insert_entry_success, liveblog.publisher.insert_entry_error, 'POST' );
 	};
 
-	liveblog.publisher.clone_entry_form = function( entry, entry_text ) {
+	liveblog.publisher.clone_entry_form = function( entry ) {
 		var form = liveblog.publisher.$tabs.clone();
-		form.find( '.liveblog-form-entry' ).val( entry_text );
+		form.find( '.liveblog-form-entry' ).val( entry.find('.liveblog-entry-text').data('original-content') );
 		form.find( '.liveblog-form-entry-submit').addClass( 'edit-entry-submit' ).val('Update Entry');
 		form.find( 'a.cancel').show();
 		entry.find( '.liveblog-entry-text' ).hide().after(form);

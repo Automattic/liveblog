@@ -79,6 +79,7 @@ class WPCOM_Liveblog_Entry {
 		$post_id           = $this->comment->comment_post_ID;
 		$css_classes       = comment_class( '', $entry_id, $post_id, false );
 		$content           = self::render_content( get_comment_text( $entry_id ), $this->comment );
+		$original_content  = get_comment_text( $entry_id );
 		$avatar_size       = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$avatar_img        = get_avatar( $this->comment->comment_author_email, $avatar_size );
 		$author_link       = get_comment_author_link( $entry_id );
@@ -92,6 +93,7 @@ class WPCOM_Liveblog_Entry {
 			'entry_id',
 			'css_classes',
 			'content',
+			'original_content',
 			'avatar_img',
 			'author_link',
 			'entry_date',
