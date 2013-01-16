@@ -44,16 +44,13 @@
 	text-decoration: none;
 	border: none;
 }
-.liveblog-actions legend ul .ui-tabs-active a {
+.liveblog-actions legend ul .active a {
 	color: #333;
 	font-weight: bold;
 	cursor: text;
 }
-.liveblog-actions legend ul .ui-tabs-active a:hover {
+.liveblog-actions legend ul .active a:hover {
 	color: #333;
-}
-.liveblog-actions legend ul .ui-tabs-hide {
-	display: none;
 }
 .liveblog-form-entry {
 	color: #333;
@@ -146,7 +143,6 @@
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 #liveblog-container .cancel {
-	display: none;
 	margin-left: 4px;
 	font-size: 85%;
 }

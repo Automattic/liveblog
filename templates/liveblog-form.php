@@ -1,24 +1,23 @@
-<div class="liveblog-messages">
+<div id="liveblog-messages">
 </div>
-<div class="liveblog-tabs">
+<script type="text/template" id="liveblog-form-template">
 	<fieldset class="liveblog-actions">
 		<legend>
 			<ul>
-				<li><a href="#liveblog-new-entry"><?php _e( 'New Entry', 'liveblog' ); ?></a></li>
+				<li class="active"><a href="#">{{entry_tab_label}}</a></li>
 				<li>&bull;</li>
-				<li><a href="#liveblog-preview"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
+				<li><a href="#"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
-			<div id="liveblog-new-entry">
-				<textarea placeholder="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>" class="liveblog-form-entry" name="liveblog-form-entry" cols="50" rows="5"></textarea>
+			<div class="liveblog-edit-entry">
+				<textarea placeholder="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>" class="liveblog-form-entry" name="liveblog-form-entry" cols="50" rows="5">{{content}}</textarea>
 				<div class="liveblog-submit-wrapper">
 					<span class="liveblog-submit-spinner"></span>
-					<input type="button" class="liveblog-form-entry-submit button" value="<?php esc_attr_e( 'Publish Update', 'liveblog' ); ?>" />
+					<input type="button" class="liveblog-form-entry-submit button" value="{{submit_label}}" />
 					<a href="#" class="cancel">Cancel</a>
-					<?php echo wp_nonce_field( self::nonce_key, self::nonce_key, false, false ); ?>
 				</div>
 			</div>
-			<div id="liveblog-preview">
+			<div class="liveblog-preview">
 			</div>
 	</fieldset>
-</div>
+</script>
