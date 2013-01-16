@@ -4,9 +4,9 @@
 	<fieldset class="liveblog-actions">
 		<legend>
 			<ul>
-				<li class="active"><a href="#">{{entry_tab_label}}</a></li>
+				<li class="active entry"><a href="#">{{entry_tab_label}}</a></li>
 				<li>&bull;</li>
-				<li><a href="#"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
+				<li class="preview"><a href="#"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
 			<div class="liveblog-edit-entry">
