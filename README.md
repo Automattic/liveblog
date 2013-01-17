@@ -51,8 +51,7 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 New functionality:
 * Liveblog archiving.
-* Shows automatically new entries, with a slick notification bar if we
-* have scrolled out of view.
+* Shows automatically new entries, with a slick notification bar if we have scrolled out of view.
 * Front-end editing.
 * Pasting an image URL embeds the image.
 
