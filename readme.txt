@@ -32,7 +32,7 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 1. Upload the `liveblog` folder to your plugins directory (e.g. `/wp-content/plugins/`)
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Check the "This post is a liveblog" checkbox on a post edit page to make it a liveblog
+3. You can enable the liveblog on any post's edit page
 
 == Screenshots ==
 
