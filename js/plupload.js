@@ -3,14 +3,14 @@ jQuery(document).ready(function($) {
 
 		/* Selectors */
 		browser: '#liveblog-messages',
-		dropzone: '#liveblog-form-entry',
+		dropzone: '#liveblog-container',
 
 		/* Callbacks */
 		success  : function( upload ) {
 			var url = upload.attributes? upload.attributes.url : upload.url,
 				filename = upload.attributes? upload.attributes.filename : upload.filename;
 
-			$( '#liveblog-form-entry' ).val( $( '#liveblog-form-entry' ).val() + '<img src="' + url + '" />' );
+			$( '.liveblog-form-entry' ).val( $( '.liveblog-form-entry' ).val() + '<img src="' + url + '" />' );
 			$( '#liveblog-messages' ).html( filename + ' Finished' );
 			$( '#liveblog-actions' ).removeClass( 'uploading' );
 		},
