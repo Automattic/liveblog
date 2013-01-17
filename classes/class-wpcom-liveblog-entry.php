@@ -85,7 +85,7 @@ class WPCOM_Liveblog_Entry {
 		$author_link       = get_comment_author_link( $entry_id );
 		$entry_date        = get_comment_date( get_option('date_format'), $entry_id );
 		$entry_time        = get_comment_date( get_option('time_format'), $entry_id );
-		$timestamp         = get_comment_date( 'U', $entry_id );
+		$timestamp         = $this->get_timestamp();
 		$is_liveblog_editable = WPCOM_Liveblog::is_liveblog_editable();
 
 		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', compact(
