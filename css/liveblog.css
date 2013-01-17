@@ -179,6 +179,12 @@
 .liveblog-preview {
 	clear: both;
 }
+.liveblog-archived-message {
+	background-color: lightYellow;
+	padding: 12px;
+	border: orange;
+	border-radius: 4px;
+}
 
 /* =Single Entry
 -------------------------------------------------------------- */

@@ -608,9 +608,10 @@ final class WPCOM_Liveblog {
 
 		// Get liveblog entries
 		$entries = (array) self::$entry_query->get_all();
+		$show_archived_message = 'archive' == self::get_liveblog_state() && self::current_user_can_edit_liveblog();
 
 		// Get the template part
-		return self::get_template_part( 'liveblog-loop.php', compact( 'entries' ) );
+		return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
 	}
 
 	/**
