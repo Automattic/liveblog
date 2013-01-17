@@ -668,7 +668,7 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
-		echo self::get_template_part( 'meta_box.php', compact( 'active_text', 'buttons' ) );
+		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
 	}
 
 	public function admin_ajax_set_liveblog_state_for_post() {
