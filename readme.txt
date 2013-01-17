@@ -45,6 +45,18 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 == Changelog ==
 
+= 1.3 =
+
+New functionality:
+* Liveblog archiving.
+* Shows automatically new entries, with a slick notification bar if we
+* have scrolled out of view.
+* Front-end editing.
+* Pasting an image URL embeds the image.
+
+Also a lot of internal improvements and bug fixes. See the [full list of
+closed issues](https://github.com/Automattic/liveblog/issues?milestone=3&state=closed).
+
 = 1.2 =
 
 New functionality:
