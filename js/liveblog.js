@@ -140,6 +140,7 @@ window.liveblog = {};
 	};
 
 	liveblog.init_moment_js = function() {
+		momentLang.relativeTime = _.extend(moment().lang().relativeTime, momentLang.relativeTime);
 		moment.lang(momentLang.locale, momentLang);
 	}
 
