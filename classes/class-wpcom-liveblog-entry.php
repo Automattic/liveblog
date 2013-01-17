@@ -86,7 +86,7 @@ class WPCOM_Liveblog_Entry {
 		$entry_date        = get_comment_date( get_option('date_format'), $entry_id );
 		$entry_time        = get_comment_date( get_option('time_format'), $entry_id );
 		$timestamp         = get_comment_date( 'U', $entry_id );
-		$can_edit_liveblog = WPCOM_Liveblog::current_user_can_edit_liveblog();
+		$is_liveblog_editable = WPCOM_Liveblog::is_liveblog_editable();
 
 		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', compact(
 			'post_id',
@@ -99,7 +99,7 @@ class WPCOM_Liveblog_Entry {
 			'entry_date',
 			'entry_time',
 			'timestamp',
-			'can_edit_liveblog'
+			'is_liveblog_editable'
 		) );
 	}
 

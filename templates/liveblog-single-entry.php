@@ -7,7 +7,7 @@
 	<div class="liveblog-entry-text" data-original-content="<?php echo esc_attr( $original_content ); ?>">
 		<?php echo $content; ?>
 	</div>
-<?php if ( $can_edit_liveblog ): ?>
+<?php if ( $is_liveblog_editable ): ?>
 	<ul class="liveblog-entry-actions">
 		<li><button class="liveblog-entry-edit"><?php _e( 'Edit', 'liveblog' ); ?></button><button class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></button></li>
 	</ul>

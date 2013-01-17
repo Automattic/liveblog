@@ -468,7 +468,7 @@ final class WPCOM_Liveblog {
 
 		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
 
-		if ( self::current_user_can_edit_liveblog() )  {
+		if ( self::is_liveblog_editable() )  {
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
@@ -595,13 +595,9 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_editor_output() {
-		if ( ! self::current_user_can_edit_liveblog() )
+		if ( !self::is_liveblog_editable() )
 			return;
-		if ( 'archive' == self::get_liveblog_state() ) {
-			return;
-		}
 
-		// Get the template part
 		return self::get_template_part( 'liveblog-form.php' );
 	}
 
@@ -715,6 +711,10 @@ final class WPCOM_Liveblog {
 	 */
 	public static function current_user_can_edit_liveblog() {
 		return (bool) current_user_can( apply_filters( 'liveblog_edit_cap', self::edit_cap ) );
+	}
+
+	public static function is_liveblog_editable() {
+		return self::current_user_can_edit_liveblog() && 'enable' == self::get_liveblog_state();
 	}
 
 	/**
