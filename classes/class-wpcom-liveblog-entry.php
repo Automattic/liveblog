@@ -145,6 +145,11 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
+
+		// Maintain authorship of the entry
+		$original_comment = get_comment( $args['entry_id'] );
+		$args['user'] = get_userdata( $original_comment->user_id );
+
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
