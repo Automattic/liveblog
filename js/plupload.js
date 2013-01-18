@@ -8,11 +8,19 @@ jQuery(document).ready(function($) {
 		/* Callbacks */
 		success  : function( upload ) {
 			var url = upload.attributes? upload.attributes.url : upload.url,
-				filename = upload.attributes? upload.attributes.filename : upload.filename;
+				filename = upload.attributes? upload.attributes.filename : upload.filename,
+				$form = $( '.liveblog-form-entry' ),
+				entry_text = $form.val();
 
-			$( '.liveblog-form-entry' ).val( $( '.liveblog-form-entry' ).val() + '<img src="' + url + '" />' );
+			if ( entry_text )
+				entry_text += "\n";
+			entry_text += url + "\n";
+
+			$form.val( entry_text );
 			$( '#liveblog-messages' ).html( filename + ' Finished' );
 			$( '#liveblog-actions' ).removeClass( 'uploading' );
+
+			$form.focus();
 		},
 
 		error    : function ( reason ) {
