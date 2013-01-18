@@ -7,10 +7,19 @@ jQuery(document).ready(function($) {
 
 		/* Callbacks */
 		success  : function( upload ) {
-			var url = upload.attributes? upload.attributes.url : upload.url,
+			var url,
 				filename = upload.attributes? upload.attributes.filename : upload.filename,
 				$form = $( '.liveblog-form-entry' ),
 				entry_text = $form.val();
+
+			if ( upload.attributes ) {
+				if ( upload.attributes.sizes && upload.attributes.sizes.large )
+					url = upload.attributes.sizes.large.url;
+				else
+					url = upload.attributes.url;
+			} else {
+				url = upload.url;
+			}
 
 			if ( entry_text )
 				entry_text += "\n";
