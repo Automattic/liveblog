@@ -22,16 +22,16 @@
 			this.render_template();
 			this.$('.cancel').hide();
 			$('#liveblog-messages').after(this.$el);
-  		},
+		},
 		render_template: function() {
 			this.$el.html(this.template({
 				content: this.get_content_for_form(),
 				entry_tab_label: this.entry_tab_label,
-		   		submit_label: this.submit_label
+				submit_label: this.submit_label
 			}));
 			this.install_shortcuts_to_elements();
 			this.preview = new liveblog.PreviewView({form: this, el: this.$('.liveblog-preview')});
-  		},
+		},
 		install_shortcuts_to_elements: function() {
 			this.$textarea = this.$('.liveblog-form-entry');
 			this.$submit_button = this.$('.liveblog-form-entry-submit');
@@ -128,7 +128,7 @@
 			return this.$entry_text.data('original-content');
 		},
 		get_id_for_ajax_request: function() {
-			 return this.$entry.attr('id').replace('liveblog-entry-', '');
+			return this.$entry.attr('id').replace('liveblog-entry-', '');
 		},
 		render: function() {
 			this.render_template();

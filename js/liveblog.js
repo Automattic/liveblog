@@ -95,7 +95,7 @@ window.liveblog = {};
 			if ($adminbar.length) {
 				this.$el.css('top', $adminbar.height());
 			}
-  		}
+		}
 	});
 
 	liveblog.TitleBarCountView = Backbone.View.extend({
