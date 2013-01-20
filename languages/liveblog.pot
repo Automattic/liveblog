@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Liveblog package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Liveblog 1.2\n"
+"Project-Id-Version: Liveblog 1.3-alpha\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/liveblog\n"
-"POT-Creation-Date: 2013-01-07 21:31:42+00:00\n"
+"POT-Creation-Date: 2013-01-20 21:59:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,21 +12,26 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: classes/class-wpcom-liveblog-entry.php:144
-#: classes/class-wpcom-liveblog-entry.php:170
+#: classes/class-wpcom-liveblog-entry.php:146
+#: classes/class-wpcom-liveblog-entry.php:180
 msgid "Missing entry ID"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:202
+#: classes/class-wpcom-liveblog-entry.php:212
 msgid "Error posting entry"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:206
+#: classes/class-wpcom-liveblog-entry.php:216
+#: classes/class-wpcom-liveblog-entry.php:234
 msgid "Error retrieving comment"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:215
+#: classes/class-wpcom-liveblog-entry.php:225
 msgid "Missing entry argument: %s"
+msgstr ""
+
+#: classes/class-wpcom-liveblog-entry.php:238
+msgid "Error retrieving user"
 msgstr ""
 
 #: liveblog.php:235
@@ -41,11 +46,11 @@ msgstr ""
 msgid "Unknown liveblog action"
 msgstr ""
 
-#: liveblog.php:433 liveblog.php:504
+#: liveblog.php:433 liveblog.php:505
 msgid "Error {error-code}: {error-message}"
 msgstr ""
 
-#: liveblog.php:434 liveblog.php:505
+#: liveblog.php:434 liveblog.php:506
 msgid "Error: {error-message}"
 msgstr ""
 
@@ -97,74 +102,90 @@ msgstr ""
 msgid "%d years"
 msgstr ""
 
-#: liveblog.php:503
+#: liveblog.php:504
 msgid "Do you really want do delete this entry? There is no way back."
 msgstr ""
 
-#: liveblog.php:506
+#: liveblog.php:507
 msgid "Liveblog: {number} new update"
 msgstr ""
 
-#: liveblog.php:507
+#: liveblog.php:508
 msgid "Liveblog: {number} new updates"
 msgstr ""
 
-#: liveblog.php:528
+#: liveblog.php:512
+msgid "Loading preview…"
+msgstr ""
+
+#: liveblog.php:513
+msgid "New Entry"
+msgstr ""
+
+#: liveblog.php:514
+msgid "Publish Update"
+msgstr ""
+
+#: liveblog.php:515
+msgid "Edit Entry"
+msgstr ""
+
+#: liveblog.php:516
+msgid "Update"
+msgstr ""
+
+#: liveblog.php:536
 msgid "Allowed Files"
 msgstr ""
 
-#. #-#-#-#-#  liveblog.pot (Liveblog 1.2)  #-#-#-#-#
+#. #-#-#-#-#  liveblog.pot (Liveblog 1.3-alpha)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: liveblog.php:645
+#: liveblog.php:650
 msgid "Liveblog"
 msgstr ""
 
-#: liveblog.php:661
+#: liveblog.php:666
 msgid "Enable"
 msgstr ""
 
-#: liveblog.php:662
+#: liveblog.php:667
 msgid ""
 "Enables liveblog on this post. Posting tools are enabled for editors, "
 "visitors get the latest updates."
 msgstr ""
 
-#: liveblog.php:662
+#: liveblog.php:667
 msgid ""
 "There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s"
 "\">Visit the liveblog &rarr;</a>"
 msgstr ""
 
-#: liveblog.php:663
+#: liveblog.php:668
 msgid "Archive"
 msgstr ""
 
-#: liveblog.php:664
+#: liveblog.php:669
 msgid ""
 "Archives the liveblog on this post. Visitors still see the liveblog entries, "
 "but posting tools are hidden."
 msgstr ""
 
-#: liveblog.php:664
+#: liveblog.php:669
 msgid ""
 "There is an <strong>archived</strong> liveblog on this post. <a href=\"%s"
 "\">Visit the liveblog archive &rarr;</a>"
 msgstr ""
 
-#: liveblog.php:670
+#: liveblog.php:675
 msgid "This is a normal WordPress post, without a liveblog."
 msgstr ""
 
-#: liveblog.php:726
+#: liveblog.php:735
 msgid "Cheatin', uh?"
 msgstr ""
 
-#: liveblog.php:737
+#: liveblog.php:746
 msgid "Sorry, we could not authenticate you."
-msgstr ""
-
-#: templates/liveblog-form.php:7
-msgid "New Entry"
 msgstr ""
 
 #: templates/liveblog-form.php:9
@@ -175,8 +196,15 @@ msgstr ""
 msgid "Remember: keep it short! To insert an image, drag and drop it here."
 msgstr ""
 
-#: templates/liveblog-form.php:16
-msgid "Publish Update"
+#: templates/liveblog-loop.php:3
+msgid ""
+"<strong>This liveblog is archived.</strong> If you need to publish new "
+"updates or edit or delete the old ones, you need to <a href=\"%s\">enable it "
+"first</a>."
+msgstr ""
+
+#: templates/liveblog-single-entry.php:12
+msgid "Edit"
 msgstr ""
 
 #: templates/liveblog-single-entry.php:12
