@@ -16,7 +16,7 @@
 			'click .cancel': 'cancel',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
-			'click li.preview a': 'tab_preview',
+			'click li.preview a': 'tab_preview'
 		},
 		render: function() {
 			this.render_template();
@@ -27,7 +27,7 @@
 			this.$el.html(this.template({
 				content: this.get_content_for_form(),
 				entry_tab_label: this.entry_tab_label,
-		   		submit_label: this.submit_label,
+		   		submit_label: this.submit_label
 			}));
 			this.install_shortcuts_to_elements();
 			this.preview = new liveblog.PreviewView({form: this, el: this.$('.liveblog-preview')});
@@ -46,7 +46,7 @@
 		},
 		cancel: function(e) {
 			e.preventDefault();
-			this.$entry_text.show()
+			this.$entry_text.show();
 			this.$entry.find('.liveblog-entry-edit').show();
 			this.remove();
 		},
@@ -84,7 +84,7 @@
 				crud_action: action,
 				post_id: liveblog_settings.post_id,
 				entry_id: this.get_id_for_ajax_request(),
-				content: new_entry_content,
+				content: new_entry_content
 			};
 			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
 			this.disable();
@@ -139,7 +139,7 @@
 		submit: function(e) {
 			e.preventDefault();
 			this.crud('update');
-		},
+		}
 	});
 
 	liveblog.PreviewView = Backbone.View.extend({
@@ -213,7 +213,7 @@
 		var data = {
 			crud_action: 'delete',
 			post_id: liveblog_settings.post_id,
-			entry_id: id,
+			entry_id: id
 		};
 		data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
 		liveblog.publisher.insert_form.disable();

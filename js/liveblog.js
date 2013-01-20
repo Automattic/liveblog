@@ -54,7 +54,7 @@ window.liveblog = {};
 			if ("update" == entry.type) {
 				existing.set("html", entry.html);
 			}
-		},
+		}
 	});
 
 	liveblog.FixedNagView = Backbone.View.extend({
@@ -142,7 +142,7 @@ window.liveblog = {};
 	liveblog.init_moment_js = function() {
 		momentLang.relativeTime = _.extend(moment().lang().relativeTime, momentLang.relativeTime);
 		moment.lang(momentLang.locale, momentLang);
-	}
+	};
 
 	liveblog.set_initial_timestamps = function() {
 		var now = liveblog.current_timestamp();
@@ -191,7 +191,7 @@ window.liveblog = {};
 		var tick = function(){ liveblog.entriesContainer.updateTimes(); };
 		tick();
 		setInterval(tick, 60 * 1000);
-	}
+	};
 
 	liveblog.get_recent_entries = function() {
 		var url  = liveblog_settings.endpoint_url;
@@ -281,7 +281,7 @@ window.liveblog = {};
 
 	liveblog.display_entry = function( new_entry, duration ) {
 		if ( new_entry instanceof liveblog.Entry ) {
-			new_entry = new_entry.attributes
+			new_entry = new_entry.attributes;
 		}
 
 		var $entry = liveblog.get_entry_by_id( new_entry.id );
@@ -354,7 +354,7 @@ window.liveblog = {};
 	liveblog.add_error = function( response, status ) {
 		var message;
 		if (response.status && response.status > 200)
-			message = liveblog_settings.error_message_template.replace('{error-code}', response.status).replace('{error-message}', response.statusText)
+			message = liveblog_settings.error_message_template.replace('{error-code}', response.status).replace('{error-message}', response.statusText);
 		else
 			message = liveblog_settings.short_error_message_template.replace('{error-message}', status);
 		alert(message);
@@ -379,7 +379,7 @@ window.liveblog = {};
 
 	liveblog.is_at_the_top = function() {
 		return $(document).scrollTop()  < liveblog.$entry_container.offset().top;
-	}
+	};
 
 	// Initialize everything!
 	if ( 'archive' != liveblog_settings.state ) {
