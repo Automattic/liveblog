@@ -10,8 +10,8 @@
 		tagName: "div",
 		className: "liveblog-form",
 		template: _.template($('#liveblog-form-template').html()),
-		entry_tab_label: 'New Entry',
-		submit_label: 'Publish Update',
+		entry_tab_label: liveblog_publisher_settings.new_entry_tab_label,
+		submit_label: liveblog_publisher_settings.new_entry_submit_label,
 		events: {
 			'click .cancel': 'cancel',
 			'click .liveblog-form-entry-submit': 'submit',
@@ -118,8 +118,8 @@
 	});
 
 	liveblog.EditEntryView = liveblog.InsertEntryView.extend({
-		entry_tab_label: 'Edit Entry',
-		submit_label: 'Update',
+		entry_tab_label: liveblog_publisher_settings.edit_entry_tab_label,
+		submit_label: liveblog_publisher_settings.edit_entry_submit_label,
 		initialize: function(options) {
 			this.$entry = options.entry;
 			this.$entry_text = this.$entry.find('.liveblog-entry-text');
@@ -153,7 +153,7 @@
 			};
 			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
 			this.form.disable();
-			this.$el.html('Loading preview…');
+			this.$el.html(liveblog_publisher_settings.loading_preview);
 			liveblog.ajax_request( liveblog_settings.endpoint_url + 'preview', data, _.bind(this.success, this), _.bind(this.error, this), 'POST' );
 		},
 		success: function(response) {

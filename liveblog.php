@@ -504,10 +504,17 @@ final class WPCOM_Liveblog {
 				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
-				'new_update'             => __( 'Liveblog: {number} new update' ),
-				'new_updates'            => __( 'Liveblog: {number} new updates' ),
+				'new_update'             => __( 'Liveblog: {number} new update' , 'liveblog'),
+				'new_updates'            => __( 'Liveblog: {number} new updates' , 'liveblog'),
 			) )
 		);
+		wp_localize_script( 'liveblog-publisher', 'liveblog_publisher_settings', array(
+			'loading_preview' => __( 'Loading preview…', 'liveblog' ),
+			'new_entry_tab_label' => __( 'New Entry', 'liveblog' ),
+			'new_entry_submit_label' => __( 'Publish Update', 'liveblog' ),
+			'edit_entry_tab_label' => __( 'Edit Entry', 'liveblog' ),
+			'edit_entry_submit_label' => __( 'Update', 'liveblog' ),
+		) );
 	}
 
 	/**
