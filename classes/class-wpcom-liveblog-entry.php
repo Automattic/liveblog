@@ -138,7 +138,7 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * Inserts a new entry, which replaces the original entry.
 	 *
-	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id, user (current user object)
+	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function update( $args ) {
@@ -146,9 +146,12 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
-		// Maintain authorship of the entry
-		$original_comment = get_comment( $args['entry_id'] );
-		$args['user'] = get_userdata( $original_comment->user_id );
+		// always use the original author for the update entry, otherwise until refresh
+		// users will see the user who editd the entry as  the author
+		$args['user'] = self::user_object_from_comment_id( $args['entry_id'] );
+		if ( is_wp_error( $args['user'] ) ) {
+			return $args['user'];
+		}
 
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -223,5 +226,17 @@ class WPCOM_Liveblog_Entry {
 			}
 		}
 		return true;
+	}
+
+	private static function user_object_from_comment_id( $comment_id ) {
+		$original_comment = get_comment( $comment_id );
+		if ( !$original_comment ) {
+			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
+		}
+		$user_object = get_userdata( $original_comment->user_id );
+		if ( !$user_object ) {
+			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
+		}
+		return $user_object;
 	}
 }
