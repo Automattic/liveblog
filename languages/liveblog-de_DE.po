@@ -1,71 +1,188 @@
-# Translation of LiveBlog in Dutch
-# This file is distributed under the same license as the LiveBlog package.
+# Translation of Liveblog in German
+# This file is distributed under the same license as the Liveblog package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2012-09-11 09:07+0100\n"
+"PO-Revision-Date: 2013-01-21 05:52:33+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/0.1\n"
-"Project-Id-Version: LiveBlog\n"
-"POT-Creation-Date: \n"
-"Last-Translator: Christian Foellmann <foellmann@foe-services.de>\n"
-"Language-Team: \n"
+"X-Generator: translate.foe-services.de/ReGlot/0.1\n"
+"Project-Id-Version: Liveblog\n"
+"Language-Team: Translate.foe-services.de <translate@foe-services.de>\n"
+"Language: German\n"
 
-#: liveblog.php:6
+#: liveblog.php:669
+msgid "Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden."
+msgstr "Archiviert den Liveblog dieses Beitrags. Besucher sehen immer noch die Beiträge des Liveblogs, aber Posting-Tools sind verborgen."
+
+#: liveblog.php:669
+msgid "There is an <strong>archived</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog archive &rarr;</a>"
+msgstr "Es existiert eine <strong>archivierter</strong> Liveblog für diesen Beitrag. <a href=\"%s\">Rufe das Liveblog-Archiv auf &rarr;</a>"
+
+#: liveblog.php:675
+msgid "This is a normal WordPress post, without a liveblog."
+msgstr "Dies ist ein normaler WordPress-Beitrag ohne einen Liveblog."
+
+#: templates/liveblog-loop.php:3
+msgid "<strong>This liveblog is archived.</strong> If you need to publish new updates or edit or delete the old ones, you need to <a href=\"%s\">enable it first</a>."
+msgstr "<strong>Dieser Liveblog ist archiviert.</strong> Solltest du neue Updates veröffentlichen oder alte Beiträge bearbeiten oder löschen wollen, musst du dies <a href=\"%s\">zuerst aktivieren</a>."
+
+#: templates/liveblog-single-entry.php:12
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "http://wordpress.org/extend/plugins/liveblog/"
+msgstr "http://wordpress.org/extend/plugins/liveblog/"
+
+msgid "WordPress.com VIP, Automattic"
+msgstr "WordPress.com VIP, Automattic"
+
+msgid "http://vip.wordpress.com/"
+msgstr "http://vip.wordpress.com/"
+
+#: liveblog.php:463
+msgid "%d months"
+msgstr "%d Monate"
+
+#: liveblog.php:464
+msgid "a year"
+msgstr "ein Jahr"
+
+#: liveblog.php:465
+msgid "%d years"
+msgstr "%d Jahre"
+
+#: liveblog.php:507
+msgid "Liveblog: {number} new update"
+msgstr "Liveblog: {number} neues Update"
+
+#: liveblog.php:508
+msgid "Liveblog: {number} new updates"
+msgstr "Liveblog: {number} neue Updates"
+
+#: liveblog.php:512
+msgid "Loading preview…"
+msgstr "Vorschau wird geladen..."
+
+#: liveblog.php:515
+msgid "Edit Entry"
+msgstr "Eintrag bearbeiten"
+
+#: liveblog.php:516
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: liveblog.php:666
+msgid "Enable"
+msgstr "Aktivieren"
+
+#: liveblog.php:667
+msgid "Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates."
+msgstr "Aktiviert Liveblog für diesen Beitrag. Posting-Tools werden für Redakteure aktiviert, Besucher bekommen die neuesten Updates."
+
+#: liveblog.php:667
+msgid "There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog &rarr;</a>"
+msgstr "Es existiert eine <strong>aktivierter</strong> Liveblog für diesen Beitrag. <a href=\"%s\">Rufe den Liveblog auf &rarr;</a>"
+
+#: liveblog.php:668
+msgid "Archive"
+msgstr "Archiv"
+
+#: liveblog.php:456
+msgid "a minute"
+msgstr "eine Minute"
+
+#: liveblog.php:457
+msgid "%d minutes"
+msgstr "%d Minuten"
+
+#: liveblog.php:458
+msgid "an hour"
+msgstr "eine Stunde"
+
+#: liveblog.php:459
+msgid "%d hours"
+msgstr "%d Stunden"
+
+#: liveblog.php:460
+msgid "a day"
+msgstr "ein Tag"
+
+#: liveblog.php:461
+msgid "%d days"
+msgstr "%d Tage"
+
+#: liveblog.php:462
+msgid "a month"
+msgstr "ein Monat"
+
+#: liveblog.php:374
+msgid "Invalid entry crud_action: %s"
+msgstr "Ungültiger Beitrag crud_action: %s"
+
+#: liveblog.php:433 liveblog.php:505
+msgid "Error {error-code}: {error-message}"
+msgstr "Error {error-code}: {error-message}"
+
+#: liveblog.php:434 liveblog.php:506
+msgid "Error: {error-message}"
+msgstr "Error: {error-message}"
+
+#: liveblog.php:454
+msgid "%s ago"
+msgstr "vor %s"
+
+#: liveblog.php:455
+msgid "a few seconds"
+msgstr "ein paar Sekunden"
+
+#: classes/class-wpcom-liveblog-entry.php:216
+#: classes/class-wpcom-liveblog-entry.php:234
+msgid "Error retrieving comment"
+msgstr "Fehler beim Abrufen des Kommentars"
+
+#: classes/class-wpcom-liveblog-entry.php:225
+msgid "Missing entry argument: %s"
+msgstr "Fehlender Eintrags-Parameter: %s"
+
+#: classes/class-wpcom-liveblog-entry.php:238
+msgid "Error retrieving user"
+msgstr "Fehler beim Abrufen des Benutzers"
+
+#: classes/class-wpcom-liveblog-entry.php:146
+#: classes/class-wpcom-liveblog-entry.php:180
+msgid "Missing entry ID"
+msgstr "Fehlende Beitrags-ID"
+
 msgid "Blogging: at the speed of live."
 msgstr "Blogging: in Echtzeit."
 
-#: liveblog.php:228
-msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
-msgstr "Ein Timestamp fehlt. Korrekte URL: <permalink>/liveblog/<from>/</to>/"
-
-#: liveblog.php:357
-msgid "Sorry, that post is not accepting Liveblog entries."
-msgstr "Dieser Post unterstützt keine Liveblog Einträge."
-
-#: liveblog.php:381
-msgid "Error posting entry"
-msgstr "Fehler beim hinzufügen."
-
-#: liveblog.php:423
+#: liveblog.php:409
 msgid "Unknown liveblog action"
 msgstr "Unbekannte Liveblog-Aktion"
 
-#: liveblog.php:484
-msgid "%d new update"
-msgstr "%d neues Update"
-
-#: liveblog.php:485
-msgid "%d new updates"
-msgstr "%d neue Updates"
-
-#: liveblog.php:486
+#: liveblog.php:504
 msgid "Do you really want do delete this entry? There is no way back."
 msgstr "Willst du diesen Eintrag wirklich löschen? Das Löschen ist entgültig."
 
-#: liveblog.php:507
+#: liveblog.php:536
 msgid "Allowed Files"
 msgstr "Zulässige Dateien"
 
-#: liveblog.php:618
+#: liveblog.php:650
 msgid "Liveblog"
 msgstr "Liveblog"
 
-#: liveblog.php:631
-msgid "This is a liveblog"
-msgstr "Dies ist ein Liveblog"
-
-#: liveblog.php:677
+#: liveblog.php:735
 msgid "Cheatin', uh?"
 msgstr "Das ist nicht zulässig."
 
-#: liveblog.php:688
+#: liveblog.php:746
 msgid "Sorry, we could not authenticate you."
 msgstr "Du konntest nicht authentifiziert werden."
 
-#: templates/liveblog-form.php:7
+#: liveblog.php:513
 msgid "New Entry"
 msgstr "Neuer Eintrag"
 
@@ -75,13 +192,20 @@ msgstr "Vorschau"
 
 #: templates/liveblog-form.php:13
 msgid "Remember: keep it short! To insert an image, drag and drop it here."
-msgstr ""
-"Fasse dich kurz! Um ein Bild einzufügen, ziehe es einfach auf dieses Feld."
+msgstr "Fasse dich kurz! Um ein Bild einzufügen, ziehe es einfach auf dieses Feld."
 
-#: templates/liveblog-form.php:16
+#: liveblog.php:514
 msgid "Publish Update"
 msgstr "Update veröffentlichen"
 
 #: templates/liveblog-single-entry.php:12
 msgid "Delete"
 msgstr "Löschen"
+
+#: liveblog.php:235
+msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
+msgstr "Ein Timestamp fehlt. Korrekte URL: <permalink>/liveblog/<from>/</to>/"
+
+#: classes/class-wpcom-liveblog-entry.php:212
+msgid "Error posting entry"
+msgstr "Fehler beim hinzufügen."
