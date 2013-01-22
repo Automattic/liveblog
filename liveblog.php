@@ -36,6 +36,7 @@ final class WPCOM_Liveblog {
 
 	const version          = '1.3-alpha';
 	const rewrites_version = 1;
+	const min_wp_version   = '3.5';
 	const key              = 'liveblog';
 	const url_endpoint     = 'liveblog';
 	const edit_cap         = 'publish_posts';
@@ -64,11 +65,25 @@ final class WPCOM_Liveblog {
 	public static function load() {
 		load_plugin_textdomain( 'liveblog', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
+		if ( self::is_wp_too_old() ) {
+			self::add_old_wp_notice();
+			return;
+		}
 		self::includes();
 		self::add_actions();
 		self::add_filters();
 		self::add_admin_actions();
 		self::register_embed_handlers();
+	}
+
+	private static function add_old_wp_notice() {
+		add_action( 'admin_notices', array( 'WPCOM_Liveblog', 'show_old_wp_notice' ) );
+	}
+
+	public static function show_old_wp_notice() {
+		global $wp_version;
+		$min_version = self::min_wp_version;
+		echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) );
 	}
 
 	/**
@@ -852,6 +867,11 @@ final class WPCOM_Liveblog {
 		$bytes   = apply_filters( 'upload_size_limit', min( $u_bytes, $p_bytes ), $u_bytes, $p_bytes );
 
 		return $bytes;
+	}
+
+	private static function is_wp_too_old() {
+		global $wp_version;
+		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
 }
 
