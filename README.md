@@ -49,11 +49,18 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 ### 1.3
 
+**The liveblog plugin now requires WordPress 3.5.**
+
 New functionality:
-* Liveblog archiving.
-* Shows automatically new entries, with a slick notification bar if we have scrolled out of view.
-* Front-end editing.
-* Pasting an image URL embeds the image.
+
+* Liveblog archiving
+* Shows automatically new entries, with a slick notification bar if we have scrolled out of view. With the help of [@borkweb](https://github.com/borkweb) and [@zbtirrell](https://github.com/zbtirrell)
+* Front-end editing
+* Pasting an image URL embeds the image
+
+Translations:
+
+* German by [@cfoellmann](https://github.com/cfoellmann)
 
 Also a lot of internal improvements and bug fixes. See the [full list of
 closed issues](https://github.com/Automattic/liveblog/issues?milestone=3&state=closed).
