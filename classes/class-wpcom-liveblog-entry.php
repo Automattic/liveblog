@@ -65,6 +65,29 @@ class WPCOM_Liveblog_Entry {
 		);
 	}
 
+	public function get_fields_for_render() {
+		$entry_id     = $this->comment->comment_ID;
+		$post_id      = $this->comment->comment_post_ID;
+		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+
+		$entry = array(
+			'entry_id'              => $entry_id,
+			'post_id'               => $entry_id,
+			'css_classes'           => comment_class( '', $entry_id, $post_id, false ),
+			'content'               => self::render_content( get_comment_text( $entry_id ), $this->comment ),
+			'original_content'      => get_comment_text( $entry_id ),
+			'avatar_size'           => $avatar_size,
+			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'author_link'           => get_comment_author_link( $entry_id ),
+			'entry_date'            => get_comment_date( get_option('date_format'), $entry_id ),
+			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
+			'timestamp'             => $this->get_timestamp(),
+			'is_liveblog_editable'  => WPCOM_Liveblog::is_liveblog_editable(),
+		);
+
+		return $entry;
+	}
+
 	public function render() {
 
 		$output = apply_filters( 'liveblog_pre_entry_output', '', $this );
@@ -74,33 +97,14 @@ class WPCOM_Liveblog_Entry {
 		if ( empty( $this->comment->comment_content ) )
 			return $output;
 
-		// These variables are used in the liveblog-single-entry.php template
-		$entry_id          = $this->comment->comment_ID;
-		$post_id           = $this->comment->comment_post_ID;
-		$css_classes       = comment_class( '', $entry_id, $post_id, false );
-		$content           = self::render_content( get_comment_text( $entry_id ), $this->comment );
-		$original_content  = get_comment_text( $entry_id );
-		$avatar_size       = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
-		$avatar_img        = get_avatar( $this->comment->comment_author_email, $avatar_size );
-		$author_link       = get_comment_author_link( $entry_id );
-		$entry_date        = get_comment_date( get_option('date_format'), $entry_id );
-		$entry_time        = get_comment_date( get_option('time_format'), $entry_id );
-		$timestamp         = $this->get_timestamp();
-		$is_liveblog_editable = WPCOM_Liveblog::is_liveblog_editable();
+		$entry = $this->get_fields_for_render();
 
-		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', compact(
-			'post_id',
-			'entry_id',
-			'css_classes',
-			'content',
-			'original_content',
-			'avatar_img',
-			'author_link',
-			'entry_date',
-			'entry_time',
-			'timestamp',
-			'is_liveblog_editable'
-		) );
+		// used to ensure that no keys are unset
+		$empty_entry = array_fill_keys( array_keys( $entry ), '' );
+		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
+		$entry = wp_parse_args( $entry, $empty_entry );
+
+		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', $entry );
 	}
 
 	public static function render_content( $content, $comment = false ) {
