@@ -7,8 +7,6 @@
  */
 class WPCOM_Liveblog_Entry_Query {
 
-	var $wp_has_comment_approved_query_support = false;
-
 	/**
 	 * Set the post ID and key when a new object is created
 	 *
@@ -19,13 +17,6 @@ class WPCOM_Liveblog_Entry_Query {
 		global $wp_version;
 		$this->post_id = $post_id;
 		$this->key     = $key;
-
-		$this->wp_has_comment_approved_query_support = version_compare( $wp_version, '3.5-alpha-21548' ) > 0;
-
-		if ( !$this->wp_has_comment_approved_query_support ) {
-			add_filter( 'comments_clauses', array( $this, '_comments_clauses' ) );
-		}
-
 	}
 
 	/**
@@ -40,11 +31,6 @@ class WPCOM_Liveblog_Entry_Query {
 			'orderby' => 'comment_date_gmt',
 			'order'   => 'DESC',
 			'type'    => $this->key,
-			/*
-			 * Even if the WordPress is 3.4 and doesn't support querying
-			 * arbitrary statuses, we include it so that it can be part of
-			 * the cache key
-			 */
 			'status'  => $this->key,
 		);
 
@@ -187,28 +173,5 @@ class WPCOM_Liveblog_Entry_Query {
 			$result[$entry->get_id()] = $entry;
 
 		return $result;
-	}
-
-	/**
-	 * Filter the comments query to include the special comment_approved status.
-	 * Required for backwards-compatibility with 3.4.x
-	 *
-	 * @param array $clauses
-	 * @return array
-	 */
-	public function _comments_clauses( $clauses = array() ) {
-		global $wpdb;
-
-		// Setup the search clauses
-		$needle   = $wpdb->prepare( "comment_type = %s", $this->key );
-		$haystack = !empty( $clauses['where'] ) ? $clauses['where'] : '';
-
-		// Bail if not a liveblog query
-		if ( ! strstr( $haystack, $needle ) )
-			return $clauses;
-
-		$clauses['where'] = $wpdb->prepare( "comment_approved = %s AND comment_post_ID = %d AND comment_type = %s", $this->key, $this->post_id, $this->key );
-
-		return $clauses;
 	}
 }
