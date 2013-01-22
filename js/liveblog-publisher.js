@@ -14,6 +14,7 @@
 		submit_label: liveblog_publisher_settings.new_entry_submit_label,
 		events: {
 			'click .cancel': 'cancel',
+			'keypress .liveblog-form-entry': 'entry_keyhandler',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
 			'click li.preview a': 'tab_preview'
@@ -43,6 +44,25 @@
 		submit: function(e) {
 			e.preventDefault();
 			this.crud('insert');
+		},
+		entry_keyhandler: function(e) {
+			var cmd_ctrl_key = (e.metaKey && !e.ctrlKey) || e.ctrlKey;
+
+			// cmd/ctrl + enter
+			if( cmd_ctrl_key && (e.keyCode == 10 || e.keyCode == 13) ) {
+				e.preventDefault();
+				this.$submit_button.click();
+				return false;
+			}
+
+			// Escape Key
+			if( e.keyCode == 27 ) {
+				if( this.get_id_for_ajax_request() ) {
+					e.preventDefault();
+					this.$('.cancel').click();
+					return false;
+				}
+			}
 		},
 		cancel: function(e) {
 			e.preventDefault();
