@@ -285,7 +285,17 @@ final class WPCOM_Liveblog {
 		self::json_return( $result_for_json );
 	}
 
-	/** Private _is_ Methods **************************************************/
+	/**
+	 * Is a given post_id a liveblog enabled post?
+	 *
+	 * @global WP_Post $post
+	 * @param int $post_id
+	 * @return bool
+	 */
+	public static function is_liveblog_post( $post_id = null ) {
+		$state = self::get_liveblog_state( $post_id );
+		return (bool)$state;
+	}
 
 	/**
 	 * Are we viewing a liveblog post?
@@ -294,9 +304,27 @@ final class WPCOM_Liveblog {
 	 * @uses is_liveblog_post()
 	 * @return bool
 	 */
-	private static function is_viewing_liveblog_post() {
+	public static function is_viewing_liveblog_post() {
 		return (bool) ( is_single() && self::is_liveblog_post() );
 	}
+
+	/**
+	 * One of: 'enable', 'archive', false.
+	 */
+	public static function get_liveblog_state( $post_id = null ) {
+		if ( empty( $post_id ) ) {
+			global $post;
+			$post_id = $post->ID;
+		}
+		$state = get_post_meta( $post_id, self::key, true );
+		// backwards compatibility with older values
+		if ( 1 == $state ) {
+			$state = 'enable';
+		}
+		return $state;
+	}
+
+	/** Private _is_ Methods **************************************************/
 
 	/**
 	 * Is this the initial page request?
@@ -321,34 +349,6 @@ final class WPCOM_Liveblog {
 	 */
 	private static function is_entries_ajax_request() {
 		return (bool) get_query_var( self::url_endpoint );
-	}
-
-	/**
-	 * Is a given post_id a liveblog enabled post?
-	 *
-	 * @global WP_Post $post
-	 * @param int $post_id
-	 * @return bool
-	 */
-	private static function is_liveblog_post( $post_id = null ) {
-		$state = self::get_liveblog_state( $post_id );
-		return (bool)$state;
-	}
-
-	/**
-	 * One of: 'enable', 'archive', false.
-	 */
-	private static function get_liveblog_state( $post_id = null ) {
-		if ( empty( $post_id ) ) {
-			global $post;
-			$post_id = $post->ID;
-		}
-		$state = get_post_meta( $post_id, self::key, true );
-		// backwards compatibility with older values
-		if ( 1 == $state ) {
-			$state = 'enable';
-		}
-		return $state;
 	}
 
 	/**
