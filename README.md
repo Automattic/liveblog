@@ -61,6 +61,7 @@ New functionality:
 Translations:
 
 * German by [@cfoellmann](https://github.com/cfoellmann)
+* Spanish by [@elarequi](http://profiles.wordpress.org/elarequi)
 
 Also a lot of internal improvements and bug fixes. See the [full list of
 closed issues](https://github.com/Automattic/liveblog/issues?milestone=3&state=closed).
