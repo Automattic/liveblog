@@ -5,7 +5,7 @@
 * Tags: liveblog
 * Requires at least: 3.5
 * Tested up to: 3.5
-* Stable tag: 1.2
+* Stable tag: 1.3
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,8 @@ Here’s what makes it special:
  * Viewers of your Liveblog get new entries served to them instantly and automatically, without needing to refresh their browser.
  * Your authors can drag-and-drop photos right into the Liveblog area, without needing to navigate to separate browser tabs or windows.
  * There’s no need for a separate site dedicated to liveblogging: *every* post can be a liveblog, even existing ones.
+
+[Check out our in-depth documentation.](http://vip.wordpress.com/documentation/using-the-liveblog-plugin/)
 
 If you'd like to check out the code and contribute, [join us on github](https://github.com/Automattic/liveblog), pull requests are more than welcome.
 
