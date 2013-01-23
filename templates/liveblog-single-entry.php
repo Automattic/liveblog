@@ -9,7 +9,7 @@
 	</div>
 <?php if ( $is_liveblog_editable ): ?>
 	<ul class="liveblog-entry-actions">
-		<li><button class="liveblog-entry-edit"><?php _e( 'Edit', 'liveblog' ); ?></button><button class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></button></li>
+		<li><button class="liveblog-entry-edit button-secondary"><?php _e( 'Edit', 'liveblog' ); ?></button><button class="liveblog-entry-delete button-secondary"><?php _e( 'Delete', 'liveblog' ); ?></button></li>
 	</ul>
 <?php endif; ?>
 </div>
