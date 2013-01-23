@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Liveblog package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2013-01-21 05:52:33+0000\n"
+"PO-Revision-Date: 2013-01-23 06:57:27+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,15 +12,19 @@ msgstr ""
 "Language-Team: Translate.foe-services.de <translate@foe-services.de>\n"
 "Language: German\n"
 
-#: liveblog.php:669
+#: templates/old-wp-notice.php:3
+msgid "Your current WordPress is version %1$s, which is too old to run the liveblog plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s\">update WordPress</a>, or <a href=\"%4$s\">deactivate the liveblog plugin</a>."
+msgstr "Du nutzt WordPress in der Version %1$s, was zu alt ist um das Liveblog Plugin zu nutzen. Die minimal benötigte Version ist %2$s. Entweder <a href=\"%3$s\">update WordPress</a> oder <a href=\"%4$s\">deaktiviere das Liveblog Plugin</a>."
+
+#: liveblog.php:684
 msgid "Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden."
 msgstr "Archiviert den Liveblog dieses Beitrags. Besucher sehen immer noch die Beiträge des Liveblogs, aber Posting-Tools sind verborgen."
 
-#: liveblog.php:669
+#: liveblog.php:684
 msgid "There is an <strong>archived</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog archive &rarr;</a>"
 msgstr "Es existiert eine <strong>archivierter</strong> Liveblog für diesen Beitrag. <a href=\"%s\">Rufe das Liveblog-Archiv auf &rarr;</a>"
 
-#: liveblog.php:675
+#: liveblog.php:690
 msgid "This is a normal WordPress post, without a liveblog."
 msgstr "Dies ist ein normaler WordPress-Beitrag ohne einen Liveblog."
 
@@ -41,99 +45,99 @@ msgstr "WordPress.com VIP, Automattic"
 msgid "http://vip.wordpress.com/"
 msgstr "http://vip.wordpress.com/"
 
-#: liveblog.php:463
+#: liveblog.php:478
 msgid "%d months"
 msgstr "%d Monate"
 
-#: liveblog.php:464
+#: liveblog.php:479
 msgid "a year"
 msgstr "ein Jahr"
 
-#: liveblog.php:465
+#: liveblog.php:480
 msgid "%d years"
 msgstr "%d Jahre"
 
-#: liveblog.php:507
+#: liveblog.php:522
 msgid "Liveblog: {number} new update"
 msgstr "Liveblog: {number} neues Update"
 
-#: liveblog.php:508
+#: liveblog.php:523
 msgid "Liveblog: {number} new updates"
 msgstr "Liveblog: {number} neue Updates"
 
-#: liveblog.php:512
+#: liveblog.php:527
 msgid "Loading preview…"
 msgstr "Vorschau wird geladen..."
 
-#: liveblog.php:515
+#: liveblog.php:530
 msgid "Edit Entry"
 msgstr "Eintrag bearbeiten"
 
-#: liveblog.php:516
+#: liveblog.php:531
 msgid "Update"
 msgstr "Aktualisieren"
 
-#: liveblog.php:666
+#: liveblog.php:681
 msgid "Enable"
 msgstr "Aktivieren"
 
-#: liveblog.php:667
+#: liveblog.php:682
 msgid "Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates."
 msgstr "Aktiviert Liveblog für diesen Beitrag. Posting-Tools werden für Redakteure aktiviert, Besucher bekommen die neuesten Updates."
 
-#: liveblog.php:667
+#: liveblog.php:682
 msgid "There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog &rarr;</a>"
 msgstr "Es existiert eine <strong>aktivierter</strong> Liveblog für diesen Beitrag. <a href=\"%s\">Rufe den Liveblog auf &rarr;</a>"
 
-#: liveblog.php:668
+#: liveblog.php:683
 msgid "Archive"
 msgstr "Archiv"
 
-#: liveblog.php:456
+#: liveblog.php:471
 msgid "a minute"
 msgstr "eine Minute"
 
-#: liveblog.php:457
+#: liveblog.php:472
 msgid "%d minutes"
 msgstr "%d Minuten"
 
-#: liveblog.php:458
+#: liveblog.php:473
 msgid "an hour"
 msgstr "eine Stunde"
 
-#: liveblog.php:459
+#: liveblog.php:474
 msgid "%d hours"
 msgstr "%d Stunden"
 
-#: liveblog.php:460
+#: liveblog.php:475
 msgid "a day"
 msgstr "ein Tag"
 
-#: liveblog.php:461
+#: liveblog.php:476
 msgid "%d days"
 msgstr "%d Tage"
 
-#: liveblog.php:462
+#: liveblog.php:477
 msgid "a month"
 msgstr "ein Monat"
 
-#: liveblog.php:374
+#: liveblog.php:389
 msgid "Invalid entry crud_action: %s"
 msgstr "Ungültiger Beitrag crud_action: %s"
 
-#: liveblog.php:433 liveblog.php:505
+#: liveblog.php:448 liveblog.php:520
 msgid "Error {error-code}: {error-message}"
 msgstr "Error {error-code}: {error-message}"
 
-#: liveblog.php:434 liveblog.php:506
+#: liveblog.php:449 liveblog.php:521
 msgid "Error: {error-message}"
 msgstr "Error: {error-message}"
 
-#: liveblog.php:454
+#: liveblog.php:469
 msgid "%s ago"
 msgstr "vor %s"
 
-#: liveblog.php:455
+#: liveblog.php:470
 msgid "a few seconds"
 msgstr "ein paar Sekunden"
 
@@ -158,31 +162,31 @@ msgstr "Fehlende Beitrags-ID"
 msgid "Blogging: at the speed of live."
 msgstr "Blogging: in Echtzeit."
 
-#: liveblog.php:409
+#: liveblog.php:424
 msgid "Unknown liveblog action"
 msgstr "Unbekannte Liveblog-Aktion"
 
-#: liveblog.php:504
+#: liveblog.php:519
 msgid "Do you really want do delete this entry? There is no way back."
 msgstr "Willst du diesen Eintrag wirklich löschen? Das Löschen ist entgültig."
 
-#: liveblog.php:536
+#: liveblog.php:551
 msgid "Allowed Files"
 msgstr "Zulässige Dateien"
 
-#: liveblog.php:650
+#: liveblog.php:665
 msgid "Liveblog"
 msgstr "Liveblog"
 
-#: liveblog.php:735
+#: liveblog.php:750
 msgid "Cheatin', uh?"
 msgstr "Das ist nicht zulässig."
 
-#: liveblog.php:746
+#: liveblog.php:761
 msgid "Sorry, we could not authenticate you."
 msgstr "Du konntest nicht authentifiziert werden."
 
-#: liveblog.php:513
+#: liveblog.php:528
 msgid "New Entry"
 msgstr "Neuer Eintrag"
 
@@ -194,7 +198,7 @@ msgstr "Vorschau"
 msgid "Remember: keep it short! To insert an image, drag and drop it here."
 msgstr "Fasse dich kurz! Um ein Bild einzufügen, ziehe es einfach auf dieses Feld."
 
-#: liveblog.php:514
+#: liveblog.php:529
 msgid "Publish Update"
 msgstr "Update veröffentlichen"
 
@@ -202,7 +206,7 @@ msgstr "Update veröffentlichen"
 msgid "Delete"
 msgstr "Löschen"
 
-#: liveblog.php:235
+#: liveblog.php:250
 msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
 msgstr "Ein Timestamp fehlt. Korrekte URL: <permalink>/liveblog/<from>/</to>/"
 
