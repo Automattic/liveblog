@@ -99,10 +99,7 @@ class WPCOM_Liveblog_Entry {
 
 		$entry = $this->get_fields_for_render();
 
-		// used to ensure that no keys are unset
-		$empty_entry = array_fill_keys( array_keys( $entry ), '' );
 		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
-		$entry = wp_parse_args( $entry, $empty_entry );
 
 		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', $entry );
 	}
