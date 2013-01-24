@@ -14,7 +14,7 @@
 		submit_label: liveblog_publisher_settings.new_entry_submit_label,
 		events: {
 			'click .cancel': 'cancel',
-			'keypress .liveblog-form-entry': 'entry_keyhandler',
+			'keydown .liveblog-form-entry': 'entry_keyhandler',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
 			'click li.preview a': 'tab_preview'
@@ -57,11 +57,9 @@
 
 			// Escape Key
 			if( e.keyCode == 27 ) {
-				if( this.get_id_for_ajax_request() ) {
-					e.preventDefault();
-					this.$('.cancel').click();
-					return false;
-				}
+				e.preventDefault();
+				this.$('.cancel:visible').click();
+				return false;
 			}
 		},
 		cancel: function(e) {
