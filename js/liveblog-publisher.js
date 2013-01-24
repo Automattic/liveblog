@@ -21,6 +21,7 @@
 		render: function() {
 			this.render_template();
 			this.$('.cancel').hide();
+			this.$('.liveblog-entry-delete').hide();
 			$('#liveblog-messages').after(this.$el);
 		},
 		render_template: function() {
@@ -48,6 +49,7 @@
 			e.preventDefault();
 			this.$entry_text.show();
 			this.$entry.find('.liveblog-entry-edit').show();
+			this.$entry.find('.liveblog-entry-actions .liveblog-entry-delete').show();
 			this.remove();
 		},
 		tab_entry: function(e) {
@@ -207,6 +209,7 @@
 		var form = new liveblog.EditEntryView({entry: entry});
 		form.render();
 		entry.find( '.liveblog-entry-edit' ).hide();
+		entry.find('.liveblog-entry-actions .liveblog-entry-delete').hide();
 	};
 
 	liveblog.publisher.delete_entry = function( id ) {

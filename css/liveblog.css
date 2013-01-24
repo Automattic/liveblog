@@ -72,12 +72,25 @@
 	-webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
+/* normalize placeholder text color - mainly for IE/Firefox, Webkit added for consistency */
+a.liveblog-form-entry::-webkit-input-placeholder {
+  color: #A9A9A9;
+}
+.liveblog-form-entry:-moz-placeholder {
+  color: #A9A9A9;
+}
+.liveblog-form-entry:-ms-input-placeholder {
+  color: #A9A9A9;
+}
+
 .liveblog-form-entry.drag-over {
 	background: #efe;
 	color: #333;
 }
 .liveblog-actions .liveblog-submit-wrapper {
 	position: relative;
+	line-height: 24px;
+	overflow: hidden;
 }
 .liveblog-form-entry-submit {
 	margin: 0;
@@ -88,6 +101,22 @@
 	top: 50%;
 	right: 50%;
 }
+#liveblog-container .button-secondary,
+#liveblog-container .button {
+	display: inline-block;
+	margin: 5px 0 0;
+	padding: 2px 10px;
+	border-width: 1px;
+	border-style: solid;
+	text-decoration: none;
+	text-indent: 0;
+	line-height: 24px;
+	cursor: pointer;
+	white-space: nowrap;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
 #liveblog-container .button {
 	color: white;
 	background-color: #21759B;
@@ -97,19 +126,8 @@
 	background-image: -ms-linear-gradient(top,#2A95C5,#21759B);
 	background-image: -o-linear-gradient(top,#2A95C5,#21759B);
 	background-image: linear-gradient(to bottom,#2A95C5,#21759B);
-	display: inline-block;
-	margin: 5px 0 0;
-	padding: 0 10px;
-	border-width: 1px;
-	border-style: solid;
 	border-color: #21759B;
 	border-bottom-color: #1E6A8D;
-	text-decoration: none;
-	line-height: 24px;
-	cursor: pointer;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
 	-webkit-box-shadow: inset 0 1px 0 rgba(120, 200, 230, 0.5);
 	box-shadow: inset 0 1px 0 rgba(120, 200, 230, 0.5);
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
@@ -142,9 +160,96 @@
 	box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
+#liveblog-container .liveblog-actions .liveblog-submit-wrapper .liveblog-form-entry-submit.button {
+	display: block;
+	margin-top: 0;
+	float: left;
+}
+.liveblog-actions .liveblog-submit-wrapper a {
+	display: block;
+	margin-top: 3px;
+	font-size: 85%;
+}
 #liveblog-container .cancel {
 	margin-left: 4px;
-	font-size: 85%;
+	float: left;
+}
+.liveblog-actions .liveblog-submit-wrapper .liveblog-entry-delete {
+	float: right;
+}
+/* Remove the dotted border on :focus and the extra padding in Firefox */
+#liveblog-container .button-secondary::-moz-focus-inner {
+	border-width: 1px 0;
+	border-style: solid none;
+	border-color: transparent;
+	padding: 0;
+}
+#liveblog-container .button-secondary {
+	font-size: 12px;
+	line-height: 23px;
+	height: 24px;
+	margin: 0 10px 0 0;
+	padding: 0 8px 1px;
+	background: #f3f3f3;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#fefefe), to(#f4f4f4));
+	background-image: -webkit-linear-gradient(top, #fefefe, #f4f4f4);
+	background-image:    -moz-linear-gradient(top, #fefefe, #f4f4f4);
+	background-image:      -o-linear-gradient(top, #fefefe, #f4f4f4);
+	background-image:   linear-gradient(to bottom, #fefefe, #f4f4f4);
+	border-color: #bbb;
+ 	color: #333;
+	text-shadow: 0 1px 0 #fff;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing:    border-box;
+	box-sizing:         border-box;
+}
+#liveblog-container .button-secondary:hover,
+#liveblog-container .button-secondary:focus {
+	background: #f3f3f3;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f3f3f3));
+	background-image: -webkit-linear-gradient(top, #fff, #f3f3f3);
+	background-image:    -moz-linear-gradient(top, #fff, #f3f3f3);
+	background-image:     -ms-linear-gradient(top, #fff, #f3f3f3);
+	background-image:      -o-linear-gradient(top, #fff, #f3f3f3);
+	background-image:   linear-gradient(to bottom, #fff, #f3f3f3);
+	border-color: #999;
+	color: #222;
+}
+#liveblog-container .button-secondary:focus {
+	-webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.2);
+	box-shadow: 1px 1px 1px rgba(0,0,0,.2);
+}
+#liveblog-container .button-secondary:active {
+	background: #eee;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#fefefe));
+	background-image: -webkit-linear-gradient(top, #f4f4f4, #fefefe);
+	background-image:    -moz-linear-gradient(top, #f4f4f4, #fefefe);
+	background-image:     -ms-linear-gradient(top, #f4f4f4, #fefefe);
+	background-image:      -o-linear-gradient(top, #f4f4f4, #fefefe);
+	background-image:   linear-gradient(to bottom, #f4f4f4, #fefefe);
+	border-color: #999;
+	color: #333;
+	text-shadow: 0 -1px 0 #fff;
+	-webkit-box-shadow: inset 0 2px 5px -3px rgba( 0, 0, 0, 0.5 );
+ 	box-shadow: inset 0 2px 5px -3px rgba( 0, 0, 0, 0.5 );
+}
+
+#liveblog-container .liveblog-entry-delete:hover,
+#liveblog-container .liveblog-entry-delete:focus,
+#liveblog-container .liveblog-entry-delete:active,
+#liveblog-container .liveblog-entry-delete {
+	color:#bc0b0b;
+	border: none;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	text-shadow: none;
+}
+#liveblog-container .liveblog-entry-delete:active,
+#liveblog-container .liveblog-entry-delete:focus,
+#liveblog-container .liveblog-entry-delete:hover {
+	color:#ff0000;
+	text-decoration:underline;
 }
 
 /* =Feedback and Nags
