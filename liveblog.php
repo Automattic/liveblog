@@ -196,10 +196,14 @@ final class WPCOM_Liveblog {
 		self::$post_id     = get_the_ID();
 		self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 
-		if ( self::is_initial_page_request() )
-			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) );
-		else
+		if ( self::is_initial_page_request() ) {
+			// we need to add the liveblog after the shortcodes are run, because we already
+			// process shortcodes in the comment contents and if we left any (like in the original content)
+			// we wouldn't like them to be processed
+			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
+		} else {
 			self::handle_ajax_request();
+		}
 	}
 
 	private static function handle_ajax_request() {
