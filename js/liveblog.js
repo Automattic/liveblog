@@ -16,13 +16,17 @@ window.liveblog = {};
 				liveblog.queue.flush();
 			}
 		},
-		updateTimes: function() {
+		updateTimes: function() {        
+			var self = this;
 			this.$('.liveblog-entry').each(function() {
 				var $entry = $(this),
 					timestamp = $entry.data('timestamp'),
-					human = moment.unix(timestamp).fromNow();
+					human = self.formatTimestamp(timestamp);
 				$('.liveblog-meta-time a', $entry).text(human);
 			});
+		},
+		formatTimestamp: function(timestamp) {
+			return moment.unix(timestamp).fromNow();
 		}
 	});
 
@@ -128,6 +132,7 @@ window.liveblog = {};
 		liveblog.fixedNag = new liveblog.FixedNagView();
 		liveblog.entriesContainer = new liveblog.EntriesView();
 		liveblog.titleBarCount = new liveblog.TitleBarCountView();
+		liveblog.$events.trigger( 'after-views-init' );
 
 		liveblog.init_moment_js();
 
