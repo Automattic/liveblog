@@ -16,7 +16,7 @@ window.liveblog = {};
 				liveblog.queue.flush();
 			}
 		},
-		updateTimes: function() {        
+		updateTimes: function() {
 			var self = this;
 			this.$('.liveblog-entry').each(function() {
 				var $entry = $(this),
