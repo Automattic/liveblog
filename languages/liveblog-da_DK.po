@@ -1,0 +1,256 @@
+# Copyright (C) 2013 Liveblog
+# This file is distributed under the same license as the Liveblog package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Liveblog\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/liveblog\n"
+"POT-Creation-Date: 2013-01-22 23:20:41+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-01-25 09:39+0100\n"
+"Last-Translator: Thomas Clausen <kontakt@thomasclausen.dk>\n"
+"Language-Team: Thomas Clausen <kontakt@thomasclausen.dk>\n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: da_DK\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e\n"
+
+#: classes/class-wpcom-liveblog-entry.php:146
+#: classes/class-wpcom-liveblog-entry.php:180
+msgid "Missing entry ID"
+msgstr "Manglende opdaterings-ID"
+
+#: classes/class-wpcom-liveblog-entry.php:212
+msgid "Error posting entry"
+msgstr "Fejl ved udgivelse af opdatering"
+
+#: classes/class-wpcom-liveblog-entry.php:216
+#: classes/class-wpcom-liveblog-entry.php:234
+msgid "Error retrieving comment"
+msgstr "Fejl ved hentning af kommentar"
+
+#: classes/class-wpcom-liveblog-entry.php:225
+msgid "Missing entry argument: %s"
+msgstr "Manglende opdateringsargument: %s"
+
+#: classes/class-wpcom-liveblog-entry.php:238
+msgid "Error retrieving user"
+msgstr "Fejl ved genkendelse af bruger"
+
+#: liveblog.php:250
+msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
+msgstr "Tidsstemplet mangler. Korrekt URL: <permalink>/liveblog/<from>/</to>/"
+
+#: liveblog.php:389
+msgid "Invalid entry crud_action: %s"
+msgstr "Ugyldig opdaterings crud_action: %s"
+
+#: liveblog.php:424
+msgid "Unknown liveblog action"
+msgstr "Ukendt liveblog handling"
+
+#: liveblog.php:448 liveblog.php:520
+msgid "Error {error-code}: {error-message}"
+msgstr "Fejl {error-code}: {error-message}"
+
+#: liveblog.php:449 liveblog.php:521
+msgid "Error: {error-message}"
+msgstr "Fejl: {error-message}"
+
+#: liveblog.php:469
+msgid "%s ago"
+msgstr "%s ago"
+
+#: liveblog.php:470
+msgid "a few seconds"
+msgstr "få sekunder"
+
+#: liveblog.php:471
+msgid "a minute"
+msgstr "et minut"
+
+#: liveblog.php:472
+msgid "%d minutes"
+msgstr "%d minutter"
+
+#: liveblog.php:473
+msgid "an hour"
+msgstr "en time"
+
+#: liveblog.php:474
+msgid "%d hours"
+msgstr "%d timer"
+
+#: liveblog.php:475
+msgid "a day"
+msgstr "en dag"
+
+#: liveblog.php:476
+msgid "%d days"
+msgstr "%d dage"
+
+#: liveblog.php:477
+msgid "a month"
+msgstr "en måned"
+
+#: liveblog.php:478
+msgid "%d months"
+msgstr "%d måneder"
+
+#: liveblog.php:479
+msgid "a year"
+msgstr "et år"
+
+#: liveblog.php:480
+msgid "%d years"
+msgstr "%d år"
+
+#: liveblog.php:519
+msgid "Do you really want do delete this entry? There is no way back."
+msgstr "Vil du virkelig slette denne opdatering? Det kan ikke fortrydes."
+
+#: liveblog.php:522
+msgid "Liveblog: {number} new update"
+msgstr "Liveblog: {number} ny opdatering"
+
+#: liveblog.php:523
+msgid "Liveblog: {number} new updates"
+msgstr "Liveblog: {number} nye opdateringer"
+
+#: liveblog.php:527
+msgid "Loading preview…"
+msgstr "Indlæser forhåndsvisning..."
+
+#: liveblog.php:528
+msgid "New Entry"
+msgstr "Ny opdatering"
+
+#: liveblog.php:529
+msgid "Publish Update"
+msgstr "Udgiv opdatering"
+
+#: liveblog.php:530
+msgid "Edit Entry"
+msgstr "Rediger opdatering"
+
+#: liveblog.php:531
+msgid "Update"
+msgstr "Opdater"
+
+#: liveblog.php:551
+msgid "Allowed Files"
+msgstr "Tilladte filer"
+
+#. #-#-#-#-#  liveblog.pot (Liveblog 1.3-alpha)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: liveblog.php:665
+msgid "Liveblog"
+msgstr "Liveblog"
+
+#: liveblog.php:681
+msgid "Enable"
+msgstr "Aktiver"
+
+#: liveblog.php:682
+msgid ""
+"Enables liveblog on this post. Posting tools are enabled for editors, "
+"visitors get the latest updates."
+msgstr ""
+"Aktiverer liveblog for dette indlæg. Udgivelsesværktøjerne er aktiveret for "
+"redaktører. Besøgende får vist de nyeste opdateringer."
+
+#: liveblog.php:682
+msgid ""
+"There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog &rarr;</a>"
+msgstr ""
+"Liveblog er aktiveret for dette indlæg. <a href=\"%s\">Vis liveblog &rarr;</"
+"a>"
+
+#: liveblog.php:683
+msgid "Archive"
+msgstr "Arkiv"
+
+#: liveblog.php:684
+msgid ""
+"Archives the liveblog on this post. Visitors still see the liveblog entries, "
+"but posting tools are hidden."
+msgstr ""
+"Arkiverer livebloggen for dette indlæg. Besøgende vil stadig se liveblog "
+"opdateringerne, men udgivelsesværktøjerne er skjulte."
+
+#: liveblog.php:684
+msgid ""
+"There is an <strong>archived</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog archive &rarr;</a>"
+msgstr ""
+"Der er en <strong>arkiveret</strong> liveblog for dette indlæg. <a href=\"%s"
+"\">Vis liveblog arkivet &rarr;</a>"
+
+#: liveblog.php:690
+msgid "This is a normal WordPress post, without a liveblog."
+msgstr "Dette er et normalt WordPress indlæg uden liveblog."
+
+#: liveblog.php:750
+msgid "Cheatin', uh?"
+msgstr "Snyder du?"
+
+#: liveblog.php:761
+msgid "Sorry, we could not authenticate you."
+msgstr "Beklager, vi kunne ikke genkende dig."
+
+#: templates/liveblog-form.php:9
+msgid "Preview"
+msgstr "Forhåndsvisning"
+
+#: templates/liveblog-form.php:13
+msgid "Remember: keep it short! To insert an image, drag and drop it here."
+msgstr "Husk: gør det kort! Træk og slip dit billede her for at indsætte det."
+
+#: templates/liveblog-loop.php:3
+msgid ""
+"<strong>This liveblog is archived.</strong> If you need to publish new "
+"updates or edit or delete the old ones, you need to <a href=\"%s\">enable it "
+"first</a>."
+msgstr ""
+"<strong>Denne liveblog er arkiveret.</strong> Har du behov for at udgive nye "
+"opdateringer eller redigere eller slette nuværende opdateringer skal du <a "
+"href=\"%s\">aktivere liveblog igen</a>."
+
+#: templates/liveblog-single-entry.php:12
+msgid "Edit"
+msgstr "Rediger"
+
+#: templates/liveblog-single-entry.php:12
+msgid "Delete"
+msgstr "Slet"
+
+#: templates/old-wp-notice.php:3
+msgid ""
+"Your current WordPress is version %1$s, which is too old to run the liveblog "
+"plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s"
+"\">update WordPress</a>, or <a href=\"%4$s\">deactivate the liveblog plugin</"
+"a>."
+msgstr ""
+"Din WordPress er version %1$s, hvilket er for gammel til at kunne benytte "
+"liveblog pluginet. The minimum required version is %2$s. Please, either <a "
+"href=\"%3$s\">update WordPress</a>, or <a href=\"%4$s\">deactivate the "
+"liveblog plugin</a>."
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/extend/plugins/liveblog/"
+msgstr "http://wordpress.org/extend/plugins/liveblog/"
+
+#. Description of the plugin/theme
+msgid "Blogging: at the speed of live."
+msgstr "Blogging: med live hastighed."
+
+#. Author of the plugin/theme
+msgid "WordPress.com VIP, Automattic"
+msgstr "WordPress.com VIP, Automattic"
+
+#. Author URI of the plugin/theme
+msgid "http://vip.wordpress.com/"
+msgstr "http://vip.wordpress.com/"
