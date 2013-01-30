@@ -55,6 +55,7 @@ final class WPCOM_Liveblog {
 	private static $post_id               = null;
 	private static $entry_query           = null;
 	private static $do_not_cache_response = false;
+	private static $custom_template_path  = null;
 
 	/** Load Methods **********************************************************/
 
@@ -194,6 +195,15 @@ final class WPCOM_Liveblog {
 			return;
 
 		self::$post_id     = get_the_ID();
+
+		self::$custom_template_path = apply_filters( 'liveblog_template_path', self::$custom_template_path, self::$post_id );
+		if( ! is_dir( self::$custom_template_path ) ) {
+			self::$custom_template_path = null;
+		} else {
+			// realpath is used here to ensure we have an absolute path which is necessary to avoid APC related bugs
+			self::$custom_template_path = untrailingslashit( realpath( self::$custom_template_path ) );
+		}
+
 		self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 
 		if ( self::is_initial_page_request() ) {
@@ -649,7 +659,11 @@ final class WPCOM_Liveblog {
 	public static function get_template_part( $template_name, $template_variables = array() ) {
 		ob_start();
 		extract( $template_variables );
-		include( dirname( __FILE__ ) . '/templates/' . $template_name );
+		if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
+			include( self::$custom_template_path . '/' . $template_name );
+		} else {
+			include( dirname( __FILE__ ) . '/templates/' . $template_name );
+		}
 		return ob_get_clean();
 	}
 
