@@ -169,7 +169,7 @@ final class WPCOM_Liveblog {
 		do_action( 'after_liveblog_init' );
 	}
 
-	public function add_rewrite_rules() {
+	public static function add_rewrite_rules() {
 		add_rewrite_endpoint( self::url_endpoint, EP_PERMALINK );
 	}
 
@@ -424,7 +424,7 @@ final class WPCOM_Liveblog {
 		) );
 	}
 
-	function ajax_preview_entry() {
+	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
@@ -434,7 +434,7 @@ final class WPCOM_Liveblog {
 		self::json_return( array( 'html' => $entry_content ) );
 	}
 
-	public function ajax_unknown() {
+	public static function ajax_unknown() {
 		self::send_user_error( __( 'Unknown liveblog action', 'liveblog' ) );
 	}
 
@@ -711,7 +711,7 @@ final class WPCOM_Liveblog {
 		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
 	}
 
-	public function admin_ajax_set_liveblog_state_for_post() {
+	public static function admin_ajax_set_liveblog_state_for_post() {
 		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
 		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
 
@@ -731,7 +731,7 @@ final class WPCOM_Liveblog {
 		exit;
 	}
 
-	private function set_liveblog_state( $post_id, $state ) {
+	private static function set_liveblog_state( $post_id, $state ) {
 		if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
 			update_post_meta( $post_id, self::key, $state );
 			do_action( "liveblog_{$state}_post", $post_id );
