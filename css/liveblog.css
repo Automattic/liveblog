@@ -302,11 +302,12 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry.highlight {
 	background-color: lightYellow;
 }
+.liveblog-entries header {
+	margin: 0;
+	padding: 0;
+}
 .liveblog-entry .liveblog-entry-text {
-	font-size: 18px;
-	line-height: 22px;
-	padding: 10px 0 0;
-	margin-left: 40px;
+	margin: 10px 0 0 40px;
 }
 .liveblog-entry .liveblog-meta .liveblog-author-name {
 	font-size: 15px;
@@ -315,6 +316,10 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry .liveblog-meta .liveblog-author-avatar {
 	float: left;
 	margin: 0 10px 0 0;
+}
+.liveblog-entry .liveblog-meta .liveblog-author-avatar img {
+	width: 30px;
+	height: 30px;
 }
 .liveblog-entry .liveblog-meta .liveblog-meta-time {
 	float: right;
