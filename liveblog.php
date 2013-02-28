@@ -889,6 +889,11 @@ final class WPCOM_Liveblog {
 
 	private static function is_wp_too_old() {
 		global $wp_version;
+		// if WordPress is loaded in a function the version variables aren't globalized
+		// see: http://core.trac.wordpress.org/ticket/17749#comment:40
+		if ( !isset( $wp_version ) || !$wp_version ) {
+			return false;
+		}
 		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
 }
