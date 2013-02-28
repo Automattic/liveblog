@@ -25,9 +25,13 @@ class Test_Entry extends WP_UnitTestCase {
 
 	function test_insert_should_fire_liveblog_insert_entry() {
 		unset( $GLOBALS['liveblog_hook_fired'] );
-		add_action( 'liveblog_insert_entry', function() { $GLOBALS['liveblog_hook_fired'] = true; } );
+		add_action( 'liveblog_insert_entry', array( __CLASS__, 'set_liveblog_hook_fired' ) );
 		$this->insert_entry();
 		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
+	}
+
+	function set_liveblog_hook_fired() {
+		$GLOBALS['liveblog_hook_fired'] = true;
 	}
 
 	function test_update_should_replace_the_content_in_the_query() {
