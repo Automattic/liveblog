@@ -30,10 +30,6 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
 	}
 
-	function set_liveblog_hook_fired() {
-		$GLOBALS['liveblog_hook_fired'] = true;
-	}
-
 	function test_update_should_replace_the_content_in_the_query() {
 		$entry = $this->insert_entry();
 		$update_entry = WPCOM_Liveblog_Entry::update( $this->build_entry_args( array( 'entry_id' => $entry->get_id(), 'content' => 'updated' ) ) );
@@ -48,7 +44,7 @@ class Test_Entry extends WP_UnitTestCase {
 
 	function test_update_should_fire_liveblog_update_entry() {
 		unset( $GLOBALS['liveblog_hook_fired'] );
-		add_action( 'liveblog_update_entry', function() { $GLOBALS['liveblog_hook_fired'] = true; } );
+		add_action( 'liveblog_update_entry', array( __CLASS__, 'set_liveblog_hook_fired' ) );
 		$entry = $this->insert_entry();
 		WPCOM_Liveblog_Entry::update( $this->build_entry_args( array( 'entry_id' => $entry->get_id(), 'content' => 'updated' ) ) );
 		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
@@ -79,6 +75,10 @@ class Test_Entry extends WP_UnitTestCase {
 		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
 		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
+	}
+
+	function set_liveblog_hook_fired() {
+		$GLOBALS['liveblog_hook_fired'] = true;
 	}
 
 	private function insert_entry( $args = array() ) {
