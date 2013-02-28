@@ -898,14 +898,6 @@ final class WPCOM_Liveblog {
 	}
 }
 
-/**
- * Load the one true WPCOM_Liveblog instance
- *
- * Loaded late on the 'plugins_loaded' hook to allow any other plugin to sneak
- * in ahead of it, to add actions, filters, etc...
- *
- * @uses WPCOM_Liveblog::load()
- */
 function wpcom_liveblog_load() {
 	WPCOM_Liveblog::load();
 }
