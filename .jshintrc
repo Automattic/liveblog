@@ -1,6 +1,6 @@
 {
 	"browser": true,
-	"camelcase": true,
+	/*"camelcase": true, */
 	"boss": true,
 	"curly": true,
 	"eqeqeq": true,
