@@ -111,9 +111,7 @@ window.liveblog = {};
 			var entries_in_queue = liveblog.queue.length,
 				count_string;
 			if ( entries_in_queue ) {
-				count_string = '(' + entries_in_queue + ')';
-				document.title = document.title.replace( /^\(\d+\)\s+/, '' );
-				document.title = count_string + ' ' + document.title;
+				document.title = '(' + entries_in_queue + ') ' + this.originalTitle;
 			} else {
 				document.title = this.originalTitle;
 			}
