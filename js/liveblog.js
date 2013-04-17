@@ -47,16 +47,16 @@ window.liveblog = {};
 				collection.applyModifyingEntry(entry);
 			});
 		},
-		applyModifyingEntry: function(entry) {
-			var existing = this.get(entry.id);
+		applyModifyingEntry: function(modifying) {
+			var existing = this.get(modifying.id);
 			if (!existing) {
 				return;
 			}
-			if ('delete' === entry.type) {
+			if ('delete' === modifying.type) {
 				this.remove(existing);
 			}
-			if ('update' === entry.type) {
-				existing.set('html', entry.html);
+			if ('update' === modifying.type) {
+				existing.set('html', modifying.html);
 			}
 		}
 	});
