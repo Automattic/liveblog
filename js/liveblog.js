@@ -109,12 +109,8 @@ window.liveblog = {};
 		},
 		render: function() {
 			var entries_in_queue = liveblog.queue.length,
-				count_string;
-			if ( entries_in_queue ) {
-				document.title = '(' + entries_in_queue + ') ' + this.originalTitle;
-			} else {
-				document.title = this.originalTitle;
-			}
+				count_string = entries_in_queue? '(' + entries_in_queue + ') ' : '';
+			document.title = count_string + this.originalTitle;
 		}
 	});
 
