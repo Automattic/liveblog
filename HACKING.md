@@ -8,7 +8,7 @@ In this file you'll find technical overview of how the liveblog works.
 * Liveblog post – a WordPress post, which has the liveblog checkbox checked, shows the liveblog entries in real time, and offers authorized users to insert new entries.
 * Refresh interval – how often the client side checks for entries' updates.
 * Nag – when there's a new update, we show the nag to the users, instead of loading the new entries directly. The nag contains a link to load the new entries.
-* Modifying Entry – an entry, which is not an actual entry, but updates or deletes (replaces) an existing entry.
+* Modifying Entry – an entry, which updates or deletes (replaces) an existing entry.
 
 # Major Design Decisions
 
