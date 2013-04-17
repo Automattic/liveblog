@@ -20,6 +20,7 @@ In this file you'll find technical overview of how the liveblog works.
 # Code Organization
 
 Pretty straight-forward:
+
 * Most of the code is in `liveblog.php` with the intention of moving more and more to `classes/`.
 * HTML templates are in `templates/`.
 * CSS is in `css/`.
