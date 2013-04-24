@@ -1,5 +1,5 @@
 /* global liveblog, liveblog_settings, _, alert, jQuery, moment, momentLang, Backbone */
-window.liveblog = {};
+window.liveblog = window.liveblog || {};
 
 ( function( $ ) {
 	liveblog.EntriesView = Backbone.View.extend({
