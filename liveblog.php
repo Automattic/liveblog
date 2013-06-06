@@ -506,8 +506,8 @@ final class WPCOM_Liveblog {
 		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
 			wp_enqueue_script( 'jquery.spin' );
 		} else {
-			wp_enqueue_script( 'spin',        plugins_url( 'js/spin.js',        __FILE__ ), false,                    '1.2.4' );
-			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' )         );
+			wp_enqueue_script( 'spin',        plugins_url( 'js/spin.js',        __FILE__ ), false,                     '1.3' );
+			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' ), '1.3' );
 		}
 
 		wp_localize_script( self::key, 'liveblog_settings',
