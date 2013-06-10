@@ -455,7 +455,7 @@ final class WPCOM_Liveblog {
 
 	public static function admin_enqueue_scripts() {
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
-		wp_enqueue_script( 'liveblog-admin',  plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
+		wp_enqueue_script( 'liveblog-admin',  plugins_url( 'js/liveblog-admin.js', __FILE__ ), array( 'jquery', 'backbone' ), false, true );
 		wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
 			'nonce_key' => self::nonce_key,
 			'nonce' => wp_create_nonce( self::nonce_key ),
