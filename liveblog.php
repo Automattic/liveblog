@@ -74,6 +74,7 @@ final class WPCOM_Liveblog {
 		self::add_actions();
 		self::add_filters();
 		self::add_admin_actions();
+		self::add_admin_filters();
 		self::register_embed_handlers();
 	}
 
@@ -144,6 +145,21 @@ final class WPCOM_Liveblog {
 			return;
 
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box'  ) );
+	}
+
+	/**
+	 * Hook filters in that run on every admin page-load
+	 *
+	 * @uses add_filter()
+	 * @uses is_admin()
+	 */
+	private static function add_admin_filters() {
+
+		// Bail if not in admin area
+		if ( ! is_admin() )
+			return;
+
+		add_filter( 'display_post_states', array( __CLASS__, 'add_display_post_state' ), 10, 2 );
 	}
 
 	private static function register_embed_handlers() {
@@ -741,6 +757,20 @@ final class WPCOM_Liveblog {
 		} else {
 			return false;
 		}
+	}
+
+	public static function add_display_post_state( $post_states, $post = null ) {
+		if ( is_null( $post ) ) {
+			$post = get_post();
+		}
+		$liveblog_state = self::get_liveblog_state( $post->ID );
+		if ( $liveblog_state === 'enable' ) {
+			$post_states[] = __( 'Liveblog', 'liveblog' );
+		}
+		else if ( $liveblog_state === 'archive' ) {
+			$post_states[] = __( 'Liveblog (archived)', 'liveblog' );
+		}
+		return $post_states;
 	}
 
 	/** Error Methods *********************************************************/
