@@ -774,12 +774,14 @@ final class WPCOM_Liveblog {
 		if ( is_null( $post ) ) {
 			$post = get_post();
 		}
-		$liveblog_state = self::get_liveblog_state( $post->ID );
-		if ( $liveblog_state === 'enable' ) {
-			$post_states[] = __( 'Liveblog', 'liveblog' );
-		}
-		else if ( $liveblog_state === 'archive' ) {
-			$post_states[] = __( 'Liveblog (archived)', 'liveblog' );
+		if ( self::is_liveblog_post( $post->ID ) ) {
+			$liveblog_state = self::get_liveblog_state( $post->ID );
+			if ( 'enable' === $liveblog_state ) {
+				$post_states[] = __( 'Liveblog', 'liveblog' );
+			}
+			else if ( 'archive' === $liveblog_state ) {
+				$post_states[] = __( 'Liveblog (archived)', 'liveblog' );
+			}
 		}
 		return $post_states;
 	}
