@@ -145,8 +145,8 @@ final class WPCOM_Liveblog {
 			return;
 
 		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
-		add_action( 'restrict_manage_posts', array( __CLASS__, 'restrict_manage_posts_for_post_filtering' ) );
-		add_action( 'pre_get_posts',         array( __CLASS__, 'pre_get_posts_for_post_filtering' ) );
+		add_action( 'restrict_manage_posts', array( __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ) );
+		add_action( 'pre_get_posts',         array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
 	}
 
 	/**
@@ -768,7 +768,7 @@ final class WPCOM_Liveblog {
 	 * @param array $post_states
 	 * @param mixed $post
 	 * @return array
-	 * @filter display_post_state
+	 * @filter display_post_states
 	 */
 	public static function add_display_post_state( $post_states, $post = null ) {
 		if ( is_null( $post ) ) {
@@ -803,7 +803,7 @@ final class WPCOM_Liveblog {
 	 *
 	 * @action restrict_manage_posts
 	 */
-	public static function restrict_manage_posts_for_post_filtering() {
+	public static function add_post_filtering_dropdown_to_manage_posts() {
 		$current_screen = get_current_screen();
 		if ( ! post_type_supports( $current_screen->post_type, self::key ) ) {
 			return;
@@ -824,7 +824,7 @@ final class WPCOM_Liveblog {
 	 *
 	 * @param WP_Query $query
 	 */
-	public static function pre_get_posts_for_post_filtering( $query ) {
+	public static function handle_query_vars_for_post_filtering( $query ) {
 		if ( ! $query->is_main_query() ) {
 			return;
 		}
