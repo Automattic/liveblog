@@ -828,32 +828,33 @@ final class WPCOM_Liveblog {
 		if ( ! $query->is_main_query() ) {
 			return;
 		}
-		$old_meta_query = $query->get( 'meta_query' );
-		if ( empty( $old_meta_query ) ) {
-			$old_meta_query = array();
-		}
-		$new_meta_query = array();
 		$state = $query->get( 'liveblog_state' );
 		if ( 'any' === $state ) {
-			$new_meta_query[] = array(
+			$new_meta_query_clause = array(
 				'key' => self::key,
 				'compare' => 'EXISTS',
 			);
 		}
 		else if ( 'none' === $state ) {
-			$new_meta_query[] = array(
+			$new_meta_query_clause = array(
 				'key' => self::key,
 				'compare' => 'NOT EXISTS',
 			);
 		}
 		else if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
-			$new_meta_query[] = array(
+			$new_meta_query_clause = array(
 				'key' => self::key,
 				'value' => $state,
 			);
 		}
-		if ( ! empty( $new_meta_query ) ) {
-			$query->set( 'meta_query', array_merge( $old_meta_query, $new_meta_query ) );
+
+		if ( isset( $new_meta_query_clause ) ) {
+			$meta_query = $query->get( 'meta_query' );
+			if ( empty( $meta_query ) ) {
+				$meta_query = array();
+			}
+			array_push( $meta_query, $new_meta_query_clause );
+			$query->set( 'meta_query', $meta_query );
 		}
 	}
 
