@@ -825,6 +825,9 @@ final class WPCOM_Liveblog {
 	 * @param WP_Query $query
 	 */
 	public static function pre_get_posts_for_post_filtering( $query ) {
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
 		$old_meta_query = $query->get( 'meta_query' );
 		if ( empty( $old_meta_query ) ) {
 			$old_meta_query = array();
