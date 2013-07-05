@@ -130,7 +130,6 @@ final class WPCOM_Liveblog {
 	private static function add_filters() {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
-		add_filter( 'query_vars',        array( __CLASS__, 'add_query_var_for_post_filtering' ) );
 	}
 
 	/**
@@ -163,6 +162,7 @@ final class WPCOM_Liveblog {
 			return;
 
 		add_filter( 'display_post_states', array( __CLASS__, 'add_display_post_state' ), 10, 2 );
+		add_filter( 'query_vars',          array( __CLASS__, 'add_query_var_for_post_filtering' ) );
 	}
 
 	private static function register_embed_handlers() {
