@@ -52,7 +52,24 @@
 .liveblog-actions legend ul .active a:hover {
 	color: #333;
 }
-.liveblog-form-entry {
+
+.liveblog-rich-form-entry {
+	display: none;
+}
+.liveblog-form.rich-text-enabled .liveblog-rich-form-entry {
+	display: block;
+}
+.liveblog-html-edit-toggle {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+.liveblog-edit-commands {
+	clear: both;
+}
+
+.liveblog-form-entry,
+.liveblog-form-rich-entry {
 	color: #333;
 	background: #fff;
 	width: 98%;
@@ -66,12 +83,19 @@
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
 }
-.liveblog-form-entry:focus {
+.liveblog-form-entry:focus,
+.liveblog-form-rich-entry:focus {
 	border-color: #AAA;
 	-moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	-webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
+.liveblog-form-rich-entry {
+	overflow:auto;
+	line-height: 1.2em;
+	display: block; /* if display:inline-block, then Chrome sometimes has a rendering quirk with scrolling */
+}
+
 /* normalize placeholder text color - mainly for IE/Firefox, Webkit added for consistency */
 a.liveblog-form-entry::-webkit-input-placeholder {
   color: #A9A9A9;
@@ -83,7 +107,16 @@ a.liveblog-form-entry::-webkit-input-placeholder {
   color: #A9A9A9;
 }
 
-.drag-over .liveblog-form-entry {
+/* @todo Supply with proper icons */
+.liveblog-formatting-command[data-command="bold"] { font-weight: bold; }
+.liveblog-formatting-command[data-command="italic"] { font-style: italics; }
+.liveblog-formatting-command[data-command="underline"] { text-decoration: underline; }
+.liveblog-formatting-command[data-command="strikeThrough"] { text-decoration: line-through; }
+.liveblog-formatting-command[data-command="insertImage"] { font-family: monospace; }
+.liveblog-formatting-command[data-command="insertLink"] { font-family: monospace; }
+
+.drag-over .liveblog-form-entry,
+.drag-over .liveblog-form-rich-entry {
 	background: #efe;
 	color: #333;
 }

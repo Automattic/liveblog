@@ -26,6 +26,7 @@ jQuery(document).ready(function($) {
 			entry_text += url + "\n";
 
 			$form.val( entry_text );
+			$form.trigger('input');
 			$( '#liveblog-messages' ).html( filename + ' Finished' );
 			$( '#liveblog-actions' ).removeClass( 'uploading' );
 

@@ -14,9 +14,15 @@
 		template: _.template($('#liveblog-form-template').html()),
 		entry_tab_label: liveblog_publisher_settings.new_entry_tab_label,
 		submit_label: liveblog_publisher_settings.new_entry_submit_label,
+		is_rich_text_enabled: false,
 		events: {
 			'click .cancel': 'cancel',
-			'keydown .liveblog-form-entry': 'entry_keyhandler',
+			'keydown .liveblog-form-entry': 'entry_keyhandle_submit_cancel',
+			'input .liveblog-form-entry': 'entry_inputhandler_textarea',
+			'keydown .liveblog-form-rich-entry': 'entry_keyhandler_contenteditable',
+			'input .liveblog-form-rich-entry': 'entry_inputhandler_contenteditable',
+			'click .liveblog-html-edit-toggle input': 'toggled_rich_text',
+			'click .liveblog-formatting-command': 'rich_formatting_btn_click',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
 			'click li.preview a': 'tab_preview'
@@ -35,11 +41,34 @@
 			}));
 			this.install_shortcuts_to_elements();
 			this.preview = new liveblog.PreviewView({form: this, el: this.$('.liveblog-preview')});
+			this.setup_rich_editing();
 		},
 		install_shortcuts_to_elements: function() {
 			this.$textarea = this.$('.liveblog-form-entry');
+			this.$richarea = this.$('.liveblog-rich-form-entry');
+			this.$contenteditable = this.$('.liveblog-form-rich-entry');
+			this.$html_edit_toggle = this.$('.liveblog-html-edit-toggle input');
 			this.$submit_button = this.$('.liveblog-form-entry-submit');
 			this.$spinner = this.$('.liveblog-submit-spinner');
+		},
+		setup_rich_editing: function () {
+			this.is_rich_text_enabled = (
+				// check if WordPress prevented rich text via liveblog_rich_text_editing_allowed filter
+				this.$contenteditable.length > 0
+				&&
+				// check if browser supports contenteditable
+				typeof this.$contenteditable[0].contentEditable !== 'undefined'
+				&&
+				typeof document.execCommand !== 'undefined'
+			);
+			if (this.is_rich_text_enabled) {
+				this.$el.addClass('rich-text-enabled');
+				this.toggled_rich_text();
+			}
+		},
+		toggled_rich_text: function (e) {
+			this.$textarea.toggle( this.$html_edit_toggle.prop('checked') );
+			this.$richarea.toggle( !this.$html_edit_toggle.prop('checked') );
 		},
 		get_content_for_form: function() {
 			return '';
@@ -48,7 +77,7 @@
 			e.preventDefault();
 			this.crud('insert');
 		},
-		entry_keyhandler: function(e) {
+		entry_keyhandle_submit_cancel: function (e) {
 			var cmd_ctrl_key = (e.metaKey && !e.ctrlKey) || e.ctrlKey;
 
 			// cmd/ctrl + enter
@@ -64,6 +93,82 @@
 				this.$('.cancel:visible').click();
 				return false;
 			}
+
+			return true;
+		},
+		entry_inputhandler_textarea: function (e) {
+			if (!this.is_rich_text_enabled) {
+				return;
+			}
+			var html = this.$textarea.val();
+			html = html.replace(/\n/g, '<br>');
+			// @todo replace image URLs with <img> elements
+			this.$contenteditable.html(html);
+		},
+
+		entry_keyhandler_contenteditable: function(e) {
+			if ( ! this.entry_keyhandle_submit_cancel(e) ) {
+				return false;
+			}
+			var cmd_ctrl_key = (e.metaKey && !e.ctrlKey) || e.ctrlKey;
+			var key_command_map = {
+				'b': 'bold',
+				'i': 'italic',
+				'u': 'underline',
+				'k': 'createLink'
+			};
+			var char_code = String.fromCharCode(e.keyCode).toLowerCase();
+			if (key_command_map[char_code]) {
+				this.entry_command( key_command_map[char_code] );
+				return false;
+			}
+			return true;
+		},
+
+		entry_inputhandler_contenteditable: function (e) {
+			// Remove any straggling br (Chrome likes to leave one)
+			this.$contenteditable.find('> br:only-child').filter(function() {
+				// :only-child only considers elements, not text nodes before or after
+				return !this.previousSibling && !this.nextSibling;
+			}).remove();
+			var text = this.$contenteditable.html();
+			// @todo Replace <div>(.+?)</div> with $1\n
+			// @todo Replace <p>(.+?)</p> with $1\n\n
+			// @todo also should convert <img> elements into bare URLs?
+			text = text.replace(/<br>/g, "\n");
+			this.$textarea.val(text);
+		},
+
+		rich_formatting_btn_click: function (e) {
+			var $btn = $(e.target);
+			var command = $btn.data('command');
+			this.entry_command(command);
+		},
+		entry_command: function (command, value) {
+			value = value || '';
+			this.$contenteditable.focus();
+
+			if (command === 'insertImage') {
+				// @todo Localize
+				// @todo if value is empty, prep-populate with selected image URL
+				value = prompt( 'Provide URL to image:', value );
+				if (value === null) {
+					return;
+				}
+			}
+			else if (command === 'createLink') {
+				// @todo Localize
+				// @todo if value is empty, prep-populate with selected link URL
+				value = prompt( 'Provide URL for link:', value );
+				if (value === null) {
+					return;
+				}
+				if (value === '') {
+					command = 'unlink';
+				}
+			}
+
+			document.execCommand( command, false, value );
 		},
 		cancel: function(e) {
 			e.preventDefault();
@@ -84,10 +189,16 @@
 		disable: function() {
 			this.$submit_button.attr( 'disabled', 'disabled' );
 			this.$textarea.attr( 'disabled', 'disabled' );
+			if (this.is_rich_text_enabled) {
+				this.$contenteditable.attr( 'contenteditable', 'false' );
+			}
 		},
 		enable: function() {
 			this.$submit_button.attr( 'disabled', null);
 			this.$textarea.attr( 'disabled', null);
+			if (this.is_rich_text_enabled) {
+				this.$contenteditable.attr( 'contenteditable', 'true' );
+			}
 		},
 		show_spinner: function() {
 			this.$spinner.spin('small');
