@@ -83,7 +83,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
   color: #A9A9A9;
 }
 
-.liveblog-form-entry.drag-over {
+.drag-over .liveblog-form-entry {
 	background: #efe;
 	color: #333;
 }
