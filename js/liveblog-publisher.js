@@ -286,7 +286,10 @@
 		success: function(response, status, xhr) {
 			this.enable();
 			this.hide_spinner();
-			this.$textarea.val('');
+			this.$textarea.val('').trigger('input');
+			if ( this.is_rich_text_enabled ) {
+				this.resize_contenteditable();
+			}
 			liveblog.reset_timer();
 			liveblog.get_recent_entries_success(response, status, xhr);
 		},
