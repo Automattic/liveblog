@@ -23,6 +23,7 @@
 			'input .liveblog-form-rich-entry': 'entry_inputhandler_contenteditable',
 			'click .liveblog-html-edit-toggle input': 'toggled_rich_text',
 			'click .liveblog-formatting-command': 'rich_formatting_btn_click',
+			'mousedown .liveblog-formatting-command': 'rich_formatting_btn_mousedown_preventdefault',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
 			'click li.preview a': 'tab_preview'
@@ -135,18 +136,22 @@
 			// @todo Replace <div>(.+?)</div> with $1\n
 			// @todo Replace <p>(.+?)</p> with $1\n\n
 			// @todo also should convert <img> elements into bare URLs?
-			text = text.replace(/<br>/g, "\n");
+			text = text.replace(/<br\s*\/?>/g, "\n");
 			this.$textarea.val(text);
 		},
 
+		rich_formatting_btn_mousedown_preventdefault: function (e) {
+			// Note: This is not needed if the toolbar button is a <button>
+			e.preventDefault();
+		},
 		rich_formatting_btn_click: function (e) {
-			var $btn = $(e.target);
+			e.preventDefault();
+			var $btn = $(e.currentTarget);
 			var command = $btn.data('command');
 			this.entry_command(command);
 		},
 		entry_command: function (command, value) {
 			value = value || '';
-			this.$contenteditable.focus();
 
 			if (command === 'insertImage') {
 				// @todo Localize
