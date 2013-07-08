@@ -216,9 +216,7 @@
 			value = value || '';
 
 			if (command === 'createLink') {
-				// @todo Localize
-				// @todo if value is empty, prep-populate with selected link URL
-				value = prompt( 'Provide URL for link:', value );
+				value = prompt( liveblog_settings.create_link_prompt, value );
 				if (value === null) {
 					return;
 				}
