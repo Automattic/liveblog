@@ -26,7 +26,12 @@
 							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="unlink" title="<?php esc_attr_e( 'Unlink (Ctrl/Cmd + L)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Unlink', 'liveblog' ); ?></span>
 							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="removeFormat" title="<?php esc_attr_e( 'Remove formatting (Ctrl/Cmd + \\)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Remove formatting', 'liveblog' ); ?></span>
 						</div>
-						<div class="liveblog-form-rich-entry" contenteditable="true" title="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>"></div>
+						<div class="liveblog-rich-text-wrapper">
+							<div class="liveblog-rich-text-placeholder">
+								<?php esc_html_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>
+							</div>
+							<div class="liveblog-form-rich-entry" contenteditable="true" title="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>"></div>
+						</div>
 					</div>
 				<?php endif; ?>
 				<div class="liveblog-submit-wrapper">

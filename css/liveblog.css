@@ -121,6 +121,20 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-form-entry:-ms-input-placeholder {
   color: #A9A9A9;
 }
+.liveblog-rich-text-wrapper {
+	position: relative;
+}
+.liveblog-rich-text-placeholder {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	color: #aaa;
+	display: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
 
 .liveblog-formatting-command {
 	display: inline-block;
