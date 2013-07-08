@@ -112,7 +112,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
   color: #A9A9A9;
 }
 
-/* @todo Supply with proper icons */
 .liveblog-formatting-command {
 	display: inline-block;
 	text-indent: 100%;
@@ -128,7 +127,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	cursor: pointer;
 }
 .liveblog-formatting-command .icon {
-	background-image: url(../images/icons.png);
+	background-image: url('../images/icons.png?ver=0.1');
 	width: 20px;
 	height: 20px;
 	display: block;
@@ -171,6 +170,19 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-formatting-command[data-command="unlink"]:hover .icon { background-position: -180px 0; }
 .liveblog-formatting-command[data-command="removeFormat"] .icon { background-position: -380px -20px; }
 .liveblog-formatting-command[data-command="removeFormat"]:hover .icon { background-position: -380px 0; }
+
+
+/* HiDPI */
+@media print,
+  (-o-min-device-pixel-ratio: 5/4),
+  (-webkit-min-device-pixel-ratio: 1.25),
+  (min-resolution: 120dpi) {
+	.liveblog-formatting-command .icon {
+		background-image: url('../images/icons-2x.png?ver=0.1');
+		background-size: 560px 40px;
+	}
+}
+
 
 .drag-over .liveblog-form-entry,
 .drag-over .liveblog-form-rich-entry {
