@@ -153,15 +153,7 @@
 		entry_command: function (command, value) {
 			value = value || '';
 
-			if (command === 'insertImage') {
-				// @todo Localize
-				// @todo if value is empty, prep-populate with selected image URL
-				value = prompt( 'Provide URL to image:', value );
-				if (value === null) {
-					return;
-				}
-			}
-			else if (command === 'createLink') {
+			if (command === 'createLink') {
 				// @todo Localize
 				// @todo if value is empty, prep-populate with selected link URL
 				value = prompt( 'Provide URL for link:', value );

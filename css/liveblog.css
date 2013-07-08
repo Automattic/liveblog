@@ -161,9 +161,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-formatting-command[data-command="underline"]:hover .icon { background-position: -280px 0; }
 .liveblog-formatting-command[data-command="strikeThrough"] .icon { background-position: -540px -20px; }
 .liveblog-formatting-command[data-command="strikeThrough"]:hover .icon { background-position: -540px 0; }
-.liveblog-formatting-command[data-command="insertImage"] .icon { background-position: -260px -20px; /* @todo needs proper icon */ }
-.liveblog-formatting-command[data-command="insertImage"]:hover .icon { background-position: -260px 0; /* @todo needs proper icon */ }
-
 .liveblog-formatting-command[data-command="createLink"] .icon { background-position: -160px -20px; }
 .liveblog-formatting-command[data-command="createLink"]:hover .icon { background-position: -160px 0; }
 .liveblog-formatting-command[data-command="unlink"] .icon { background-position: -180px -20px; }
