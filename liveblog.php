@@ -498,6 +498,9 @@ final class WPCOM_Liveblog {
 		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
 
 		if ( self::is_liveblog_editable() )  {
+			if ( apply_filters( 'liveblog_rich_text_editing_allowed', true ) ) {
+				wp_enqueue_script( 'editor' );
+			}
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();

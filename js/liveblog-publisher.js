@@ -63,13 +63,18 @@
 				typeof document.execCommand !== 'undefined'
 			);
 			if (this.is_rich_text_enabled) {
+				this.entry_inputhandler_textarea();
 				this.$el.addClass('rich-text-enabled');
 				this.toggled_rich_text();
 			}
 		},
 		toggled_rich_text: function (e) {
-			this.$textarea.toggle( this.$html_edit_toggle.prop('checked') );
-			this.$richarea.toggle( !this.$html_edit_toggle.prop('checked') );
+			var is_html_mode = this.$html_edit_toggle.prop('checked');
+			this.$textarea.toggle( is_html_mode );
+			this.$richarea.toggle( !is_html_mode );
+			if ( ! is_html_mode ) {
+				this.resize_contenteditable();
+			}
 		},
 		get_content_for_form: function() {
 			return '';
@@ -97,16 +102,30 @@
 
 			return true;
 		},
+
+		/**
+		 * input event handler for textarea
+		 * Convert oEmbedish image URLs into <img> elements, and do wpautop(ish)
+		 */
 		entry_inputhandler_textarea: function (e) {
-			if (!this.is_rich_text_enabled) {
+			if ( ! this.is_rich_text_enabled ) {
 				return;
 			}
 			var html = this.$textarea.val();
-			html = html.replace(/\n/g, '<br>');
-			// @todo replace image URLs with <img> elements
+			if ( ! html ) {
+				html = '<p><br></p>'; // the BR is needed to make sure browsers will land inside the <p>
+			}
+			else {
+				html = html.replace(/(^|\n)(https?:\/\/\S+?\.(?:png|gif|jpe?g))($|\n)/ig, '$1<img src="$2">$3');
+				html = switchEditors.wpautop(html);
+			}
 			this.$contenteditable.html(html);
 		},
 
+		/**
+		 * keydown event handler for contenteditable
+		 * Handle the keyboard shortcuts for submit, cancel, and formatting
+		 */
 		entry_keyhandler_contenteditable: function(e) {
 			var self = this;
 			if ( ! this.entry_keyhandle_submit_cancel(e) ) {
@@ -148,30 +167,51 @@
 			return !found_command;
 		},
 
-		entry_inputhandler_contenteditable: function (e) {
-			// Remove any straggling br (Chrome likes to leave one)
-			this.$contenteditable.find('> br:only-child').filter(function() {
-				// :only-child only considers elements, not text nodes before or after
-				return !this.previousSibling && !this.nextSibling;
-			}).remove();
-			var text = this.$contenteditable.html();
-			// @todo Replace <div>(.+?)</div> with $1\n
-			// @todo Replace <p>(.+?)</p> with $1\n\n
-			// @todo also should convert <img> elements into bare URLs?
-			text = text.replace(/<br\s*\/?>/g, "\n");
-			this.$textarea.val(text);
+		/**
+		 * Make the rich text area big enough for the contents
+		 */
+		resize_contenteditable: function () {
+			var height = 0;
+			this.$contenteditable.children().each(function () {
+				height += $(this).outerHeight(true);
+			});
+			this.$contenteditable.css( 'min-height', height );
 		},
 
+		/**
+		 * input event handler for contenteditble area, populates textarea value with HTML
+		 * normalized and transformed (e.g. un-wpautop'ed) for saving and  editing in HTML mode
+		 */
+		entry_inputhandler_contenteditable: function (e) {
+			var text = this.$contenteditable.html();
+			text = switchEditors.pre_wpautop(text);
+			this.$textarea.val(text);
+
+			// @todo debounce?
+			this.resize_contenteditable();
+		},
+
+		/**
+		 * Prevent defailt event when clicking on a rich formatting button so that selection
+		 * is not lost in the contenteditable (not needed if toolbar buttons were <button>s)
+		 */
 		rich_formatting_btn_mousedown_preventdefault: function (e) {
-			// Note: This is not needed if the toolbar button is a <button>
 			e.preventDefault();
 		},
+
+		/**
+		 * click event handler for a formatting command button
+		 */
 		rich_formatting_btn_click: function (e) {
 			e.preventDefault();
 			var $btn = $(e.currentTarget);
 			var command = $btn.data('command');
 			this.entry_command(command);
 		},
+
+		/**
+		 * Pass along formatting command with argument to document.execCommand
+		 */
 		entry_command: function (command, value) {
 			value = value || '';
 
@@ -189,6 +229,7 @@
 
 			document.execCommand( command, false, value );
 		},
+
 		cancel: function(e) {
 			e.preventDefault();
 			this.$entry_text.show();

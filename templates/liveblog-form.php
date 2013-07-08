@@ -18,15 +18,15 @@
 					</label>
 					<div class="liveblog-rich-form-entry">
 						<div class="liveblog-edit-commands">
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="bold" title="<?php esc_attr_e( 'Bold (Ctrl/Cmd + B)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Bold', 'liveblog' ); ?></span></span>
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="italic" title="<?php esc_attr_e( 'Italics (Ctrl/Cmd + I)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Italics', 'liveblog' ); ?></span></span>
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="underline" title="<?php esc_attr_e( 'Underline (Ctrl/Cmd + U)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Underline', 'liveblog' ); ?></span></span>
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="strikeThrough" title="<?php esc_attr_e( 'Srike-through (Ctrl/Cmd + S)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Srike-through', 'liveblog' ); ?></span></span>
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="createLink" title="<?php esc_attr_e( 'Link (Ctrl/Cmd + K)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Link', 'liveblog' ); ?></span></span>
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="unlink" title="<?php esc_attr_e( 'Unlink (Ctrl/Cmd + L)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Unlink', 'liveblog' ); ?></span></span>
-							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="removeFormat" title="<?php esc_attr_e( 'Remove formatting (Ctrl/Cmd + \\)', 'liveblog' ); ?>"><span class="icon"><?php esc_html_e( 'Remove formatting', 'liveblog' ); ?></span></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="bold" title="<?php esc_attr_e( 'Bold (Ctrl/Cmd + B)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Bold', 'liveblog' ); ?></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="italic" title="<?php esc_attr_e( 'Italics (Ctrl/Cmd + I)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Italics', 'liveblog' ); ?></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="underline" title="<?php esc_attr_e( 'Underline (Ctrl/Cmd + U)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Underline', 'liveblog' ); ?></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="strikeThrough" title="<?php esc_attr_e( 'Srike-through (Ctrl/Cmd + S)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Srike-through', 'liveblog' ); ?></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="createLink" title="<?php esc_attr_e( 'Link (Ctrl/Cmd + K)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Link', 'liveblog' ); ?></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="unlink" title="<?php esc_attr_e( 'Unlink (Ctrl/Cmd + L)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Unlink', 'liveblog' ); ?></span>
+							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="removeFormat" title="<?php esc_attr_e( 'Remove formatting (Ctrl/Cmd + \\)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Remove formatting', 'liveblog' ); ?></span>
 						</div>
-						<div class="liveblog-form-rich-entry" contenteditable="true" title="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>">{{content}}</div>
+						<div class="liveblog-form-rich-entry" contenteditable="true" title="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>"></div>
 					</div>
 				<?php endif; ?>
 				<div class="liveblog-submit-wrapper">
