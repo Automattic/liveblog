@@ -108,22 +108,44 @@
 		},
 
 		entry_keyhandler_contenteditable: function(e) {
+			var self = this;
 			if ( ! this.entry_keyhandle_submit_cancel(e) ) {
 				return false;
 			}
 			var cmd_ctrl_key = (e.metaKey && !e.ctrlKey) || e.ctrlKey;
-			var key_command_map = {
-				'b': 'bold',
-				'i': 'italic',
-				'u': 'underline',
-				'k': 'createLink'
-			};
 			var char_code = String.fromCharCode(e.keyCode).toLowerCase();
-			if (key_command_map[char_code]) {
-				this.entry_command( key_command_map[char_code] );
-				return false;
-			}
-			return true;
+			var command_key_map = {
+				'bold': function () {
+					return cmd_ctrl_key && char_code === 'b';
+				},
+				'italic': function () {
+					return cmd_ctrl_key && char_code === 'i';
+				},
+				'underline': function () {
+					return cmd_ctrl_key && char_code === 'u';
+				},
+				'strikeThrough': function () {
+					return cmd_ctrl_key && char_code === 's';
+				},
+				'createLink': function () {
+					return cmd_ctrl_key && char_code === 'k';
+				},
+				'unlink': function () {
+					return cmd_ctrl_key && char_code === 'l';
+				},
+				'removeFormat': function () {
+					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
+				}
+			};
+			var found_command = false;
+			$.each(command_key_map, function (command, test) {
+				if (test.call()) {
+					self.entry_command(command);
+					found_command = true;
+				}
+				return !found_command;
+			});
+			return !found_command;
 		},
 
 		entry_inputhandler_contenteditable: function (e) {
