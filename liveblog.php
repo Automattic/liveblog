@@ -118,6 +118,7 @@ final class WPCOM_Liveblog {
 		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
+		add_action( 'comment_post',                  array( __CLASS__, 'fixup_comment_parent' ), 10, 2 );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 	}
 
@@ -127,8 +128,9 @@ final class WPCOM_Liveblog {
 	 * @uses add_filter()
 	 */
 	private static function add_filters() {
-		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
-		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
+		add_filter( 'template_redirect',  array( __CLASS__, 'handle_request'    ) );
+		add_filter( 'comment_class',      array( __CLASS__, 'add_comment_class' ), 10, 3 );
+		add_filter( 'preprocess_comment', array( __CLASS__, 'save_original_comment_parent_for_fixup' ) );
 	}
 
 	/**
@@ -453,6 +455,43 @@ final class WPCOM_Liveblog {
 		return $classes;
 	}
 
+	private static $_original_comment_parent_at_preprocess;
+
+	/**
+	 * Save the original comment_parent since we can't filter it
+	 * @see wp_new_comment()
+	 * @filter preprocess_comment
+	 */
+	public static function save_original_comment_parent_for_fixup( $commentdata ) {
+		if ( self::is_liveblog_post( $commentdata['comment_post_ID'] ) ) {
+			self::$_original_comment_parent_at_preprocess = $commentdata['comment_parent'];
+		}
+		return $commentdata;
+	}
+
+	/**
+	 * Aggravatingly, the wp_filter_comment() function does not provide a pre_comment_parent filter,
+	 * and neither does wp_insert_comment() provide a way to filter the comment_parent field.
+	 * So we have to fixup the comment_parent right after the comment is posted.
+	 * @see wp_new_comment()
+	 * @action comment_post
+	 */
+	public static function fixup_comment_parent( $comment_ID, $comment_approved ) {
+		$comment = (array) get_comment( $comment_ID );
+		$should_fixup = (
+			self::is_liveblog_post( $comment['comment_post_ID'] )
+			&&
+			! empty( self::$_original_comment_parent_at_preprocess )
+			&&
+			WPCOM_Liveblog_Entry::is_commenting_enabled( $comment['comment_post_ID'] )
+		);
+		if ( $should_fixup ) {
+			$comment['comment_parent'] = self::$_original_comment_parent_at_preprocess;
+			wp_update_comment( $comment );
+		}
+		self::$_original_comment_parent_at_preprocess = null;
+	}
+
 	public static function admin_enqueue_scripts() {
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
 		wp_enqueue_script( 'liveblog-admin',  plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
@@ -502,6 +541,9 @@ final class WPCOM_Liveblog {
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
 		}
+		if ( WPCOM_Liveblog_Entry::is_commenting_enabled() ) {
+			wp_enqueue_script( 'comment-reply' );
+		}
 
 		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
 			wp_enqueue_script( 'jquery.spin' );
@@ -515,6 +557,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
+				'commenting_enabled'     => WPCOM_Liveblog_Entry::is_commenting_enabled(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,

@@ -135,7 +135,23 @@ window.liveblog = {};
 		liveblog.set_initial_timestamps();
 		liveblog.start_human_time_diff_timer();
 
+		if ( liveblog_settings.commenting_enabled ) {
+			liveblog.init_commenting();
+		}
 		liveblog.$events.trigger( 'after-init' );
+	};
+
+	liveblog.init_commenting = function () {
+		liveblog.entriesContainer.$el.on('click', '.comment-reply-link', function (e) {
+			var $reply_link = $(this);
+			addComment.moveForm(
+				$reply_link.data('commentElementId'),
+				$reply_link.data('commentId'),
+				$reply_link.data('respondElementId'),
+				$reply_link.data('postId')
+			);
+			e.preventDefault();
+		});
 	};
 
 	liveblog.init_moment_js = function() {

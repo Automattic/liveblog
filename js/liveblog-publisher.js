@@ -69,6 +69,7 @@
 			e.preventDefault();
 			this.$entry_text.show();
 			this.$entry.find('.liveblog-entry-edit').show();
+			this.$entry.find('.liveblog-entry-reply').show();
 			this.$entry.find('.liveblog-entry-actions .liveblog-entry-delete').show();
 			this.remove();
 		},
@@ -232,6 +233,7 @@
 		}
 		form.render();
 		entry.find( '.liveblog-entry-edit' ).hide();
+		entry.find( '.liveblog-entry-reply' ).hide();
 		entry.find('.liveblog-entry-actions .liveblog-entry-delete').hide();
 	};
 

@@ -177,6 +177,9 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-actions .liveblog-submit-wrapper .liveblog-entry-delete {
 	float: right;
 }
+.liveblog-actions .liveblog-submit-wrapper .liveblog-entry-reply {
+	display: none;
+}
 /* Remove the dotted border on :focus and the extra padding in Firefox */
 #liveblog-container .button-secondary::-moz-focus-inner {
 	border-width: 1px 0;
