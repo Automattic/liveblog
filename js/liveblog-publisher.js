@@ -351,7 +351,13 @@
 		render: function() {
 			this.render_template();
 			this.$entry_text.hide().after(this.$el);
-			this.$('.liveblog-form-entry').focus();
+			this.resize_contenteditable();
+			if (this.is_rich_text_enabled) {
+				this.$contenteditable.focus();
+			}
+			else {
+				this.$textarea.focus();
+			}
 			return this;
 		},
 		submit: function(e) {
