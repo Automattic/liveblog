@@ -66,8 +66,9 @@
 
 .liveblog-html-edit-toggle {
 	position: absolute;
-	bottom: 20px;
+	top: 20px;
 	right: 20px;
+	font-size: smaller;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
@@ -130,8 +131,8 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 }
 .liveblog-rich-text-placeholder {
 	position: absolute;
-	left: 10px;
-	top: 10px;
+	left: 6px;
+	top: 2px;
 	color: #aaa;
 	display: none;
 	-moz-user-select: none;
