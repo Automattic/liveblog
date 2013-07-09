@@ -63,11 +63,24 @@
 				typeof this.$contenteditable[0].contentEditable !== 'undefined'
 				&&
 				typeof document.execCommand !== 'undefined'
+				&&
+				('oninput' in document.createElement('input')) // MSIE<=8
 			);
 			if (this.is_rich_text_enabled) {
 				this.entry_inputhandler_textarea();
 				this.$el.addClass('rich-text-enabled');
 				this.toggled_rich_text();
+			}
+			else {
+				var noop = function () {};
+				this.toggled_rich_text = noop;
+				this.entry_inputhandler_textarea = noop;
+				this.entry_keyhandler_contenteditable = noop;
+				this.resize_contenteditable = noop;
+				this.update_rich_placeholder_display = noop;
+				this.rich_formatting_btn_click = noop;
+				this.rich_formatting_btn_mousedown_preventdefault = noop;
+				this.rich_formatting_placeholder_click = noop;
 			}
 		},
 		toggled_rich_text: function (e) {
@@ -111,9 +124,6 @@
 		 * Convert oEmbedish image URLs into <img> elements, and do wpautop(ish)
 		 */
 		entry_inputhandler_textarea: function (e) {
-			if ( ! this.is_rich_text_enabled ) {
-				return;
-			}
 			var html = this.$textarea.val();
 			if ( ! html ) {
 				html = '<p><br></p>'; // the BR is needed to make sure browsers will land inside the <p>
@@ -302,9 +312,7 @@
 			this.enable();
 			this.hide_spinner();
 			this.$textarea.val('').trigger('input');
-			if ( this.is_rich_text_enabled ) {
-				this.resize_contenteditable();
-			}
+			this.resize_contenteditable();
 			liveblog.reset_timer();
 			liveblog.get_recent_entries_success(response, status, xhr);
 		},

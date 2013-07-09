@@ -55,20 +55,24 @@
 	color: #333;
 }
 
+.liveblog-html-edit-toggle,
 .liveblog-rich-form-entry {
 	display: none;
 }
-.liveblog-form.rich-text-enabled .liveblog-rich-form-entry {
+.liveblog-form.rich-text-enabled .liveblog-rich-form-entry,
+.liveblog-form.rich-text-enabled .liveblog-html-edit-toggle {
 	display: block;
 }
+
 .liveblog-html-edit-toggle {
 	position: absolute;
-	top: 20px;
+	bottom: 20px;
 	right: 20px;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	z-index: 2;
 }
 .liveblog-edit-commands {
 	margin-bottom: 5px;
