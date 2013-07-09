@@ -292,7 +292,7 @@ window.liveblog = {};
 	};
 
 	liveblog.get_entry_by_id = function( id ) {
-		return $( '#liveblog-entry-' + id );
+		return $( '#' + liveblog_settings.comment_element_id_base + id );
 	};
 
 	liveblog.display_entry = function( new_entry, duration ) {

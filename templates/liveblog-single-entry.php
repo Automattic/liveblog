@@ -1,9 +1,9 @@
-<?php $div_id = "liveblog-entry-$entry_id" ?>
+<?php $div_id = WPCOM_Liveblog::comment_element_id_base . $entry_id ?>
 <div id="<?php echo esc_attr( $div_id ); ?>" <?php echo $css_classes; ?> data-timestamp="<?php echo $timestamp; ?>">
 	<header class="liveblog-meta">
 		<span class="liveblog-author-avatar"><?php echo $avatar_img; ?></span>
 		<span class="liveblog-author-name"><?php echo $author_link; ?></span>
-		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo $entry_id; ?>"><span class="date"><?php echo $entry_date; ?></span><span class="time"><?php echo $entry_time; ?></span></a></span>
+		<span class="liveblog-meta-time"><a href="<?php echo esc_url( '#' . $div_id ); ?>"><span class="date"><?php echo $entry_date; ?></span><span class="time"><?php echo $entry_time; ?></span></a></span>
 	</header>
 	<div class="liveblog-entry-text" data-original-content="<?php echo esc_attr( $original_content ); ?>">
 		<?php echo $content; ?>

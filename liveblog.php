@@ -41,6 +41,7 @@ final class WPCOM_Liveblog {
 	const url_endpoint     = 'liveblog';
 	const edit_cap         = 'publish_posts';
 	const nonce_key        = 'liveblog_nonce';
+	const comment_element_id_base = 'liveblog-entry-';
 
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
@@ -131,6 +132,7 @@ final class WPCOM_Liveblog {
 		add_filter( 'template_redirect',  array( __CLASS__, 'handle_request'    ) );
 		add_filter( 'comment_class',      array( __CLASS__, 'add_comment_class' ), 10, 3 );
 		add_filter( 'preprocess_comment', array( __CLASS__, 'save_original_comment_parent_for_fixup' ) );
+		add_filter( 'get_comment_link',   array( __CLASS__, 'fix_target_for_liveblog_comment_link' ), 10, 3 );
 	}
 
 	/**
@@ -477,11 +479,16 @@ final class WPCOM_Liveblog {
 	 * @action comment_post
 	 */
 	public static function fixup_comment_parent( $comment_ID, $comment_approved ) {
+		if ( empty( self::$_original_comment_parent_at_preprocess ) ) {
+			return;
+		}
+
 		$comment = (array) get_comment( $comment_ID );
+		$parent_comment = (array) get_comment( self::$_original_comment_parent_at_preprocess );
 		$should_fixup = (
 			self::is_liveblog_post( $comment['comment_post_ID'] )
 			&&
-			! empty( self::$_original_comment_parent_at_preprocess )
+			$parent_comment['comment_type'] === self::key
 			&&
 			WPCOM_Liveblog_Entry::is_commenting_enabled( $comment['comment_post_ID'] )
 		);
@@ -491,6 +498,17 @@ final class WPCOM_Liveblog {
 		}
 		self::$_original_comment_parent_at_preprocess = null;
 	}
+
+	/**
+	 * @filter get_comment_link
+	 */
+	public static function fix_target_for_liveblog_comment_link( $link, $comment, $args ) {
+		if ( $comment->comment_type === self::key ) {
+			$link = preg_replace( '/#.+/', '#' . self::comment_element_id_base . $comment->comment_ID, $link );
+		}
+		return $link;
+	}
+
 
 	public static function admin_enqueue_scripts() {
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
@@ -558,6 +576,7 @@ final class WPCOM_Liveblog {
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
 				'commenting_enabled'     => WPCOM_Liveblog_Entry::is_commenting_enabled(),
+				'comment_element_id_base' => self::comment_element_id_base,
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
