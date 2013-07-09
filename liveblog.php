@@ -42,6 +42,7 @@ final class WPCOM_Liveblog {
 	const edit_cap         = 'publish_posts';
 	const nonce_key        = 'liveblog_nonce';
 	const comment_element_id_base = 'liveblog-entry-';
+	const reply_comment_type = 'liveblog-reply';
 
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
@@ -465,8 +466,18 @@ final class WPCOM_Liveblog {
 	 * @filter preprocess_comment
 	 */
 	public static function save_original_comment_parent_for_fixup( $commentdata ) {
-		if ( self::is_liveblog_post( $commentdata['comment_post_ID'] ) ) {
+		$is_liveblog_comment_reply = (
+			self::is_liveblog_post( $commentdata['comment_post_ID'] )
+			&&
+			! empty( $commentdata['comment_parent'] )
+			&&
+			is_object( $comment_parent = get_comment( $commentdata['comment_parent'] ) )
+			&&
+			self::key === $comment_parent->comment_type
+		);
+		if ( $is_liveblog_comment_reply ) {
 			self::$_original_comment_parent_at_preprocess = $commentdata['comment_parent'];
+			$commentdata['comment_type'] = self::reply_comment_type;
 		}
 		return $commentdata;
 	}
@@ -479,24 +490,12 @@ final class WPCOM_Liveblog {
 	 * @action comment_post
 	 */
 	public static function fixup_comment_parent( $comment_ID, $comment_approved ) {
-		if ( empty( self::$_original_comment_parent_at_preprocess ) ) {
-			return;
-		}
-
-		$comment = (array) get_comment( $comment_ID );
-		$parent_comment = (array) get_comment( self::$_original_comment_parent_at_preprocess );
-		$should_fixup = (
-			self::is_liveblog_post( $comment['comment_post_ID'] )
-			&&
-			$parent_comment['comment_type'] === self::key
-			&&
-			WPCOM_Liveblog_Entry::is_commenting_enabled( $comment['comment_post_ID'] )
-		);
-		if ( $should_fixup ) {
+		if ( ! empty( self::$_original_comment_parent_at_preprocess ) ) {
+			$comment = (array) get_comment( $comment_ID );
 			$comment['comment_parent'] = self::$_original_comment_parent_at_preprocess;
 			wp_update_comment( $comment );
+			self::$_original_comment_parent_at_preprocess = null;
 		}
-		self::$_original_comment_parent_at_preprocess = null;
 	}
 
 	/**
