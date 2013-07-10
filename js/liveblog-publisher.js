@@ -1,4 +1,4 @@
-/* global liveblog, liveblog_settings, liveblog_publisher_settings, _, confirm, jQuery, Backbone */
+/* global liveblog, liveblog_settings, liveblog_publisher_settings, _, confirm, jQuery, Backbone, switchEditors, prompt */
 ( function( $ ) {
 	if ( typeof( liveblog ) === 'undefined' ) {
 		return;
@@ -57,13 +57,10 @@
 		setup_rich_editing: function () {
 			this.is_rich_text_enabled = (
 				// check if WordPress prevented rich text via liveblog_rich_text_editing_allowed filter
-				this.$contenteditable.length > 0
-				&&
+				this.$contenteditable.length > 0 &&
 				// check if browser supports contenteditable
-				typeof this.$contenteditable[0].contentEditable !== 'undefined'
-				&&
-				typeof document.execCommand !== 'undefined'
-				&&
+				typeof this.$contenteditable[0].contentEditable !== 'undefined' &&
+				typeof document.execCommand !== 'undefined' &&
 				('oninput' in document.createElement('input')) // MSIE<=8
 			);
 			if (this.is_rich_text_enabled) {
@@ -83,7 +80,7 @@
 				this.rich_formatting_placeholder_click = noop;
 			}
 		},
-		toggled_rich_text: function (e) {
+		toggled_rich_text: function () {
 			var is_html_mode = this.$html_edit_toggle.prop('checked');
 			this.$textarea.toggle( is_html_mode );
 			this.$richarea.toggle( !is_html_mode );
@@ -123,7 +120,7 @@
 		 * input event handler for textarea
 		 * Convert oEmbedish image URLs into <img> elements, and do wpautop(ish)
 		 */
-		entry_inputhandler_textarea: function (e) {
+		entry_inputhandler_textarea: function () {
 			var html = this.$textarea.val();
 			if ( ! html ) {
 				html = '<p><br></p>'; // the BR is needed to make sure browsers will land inside the <p>
@@ -142,13 +139,14 @@
 		 * Handle the keyboard shortcuts for submit, cancel, and formatting
 		 */
 		entry_keyhandler_contenteditable: function(e) {
-			var self = this;
+			var self, command_key_map, char_code, cmd_ctrl_key, found_command;
+			self = this;
 			if ( ! this.entry_keyhandle_submit_cancel(e) ) {
 				return false;
 			}
-			var cmd_ctrl_key = (e.metaKey && !e.ctrlKey) || e.ctrlKey;
-			var char_code = String.fromCharCode(e.keyCode).toLowerCase();
-			var command_key_map = {
+			cmd_ctrl_key = (e.metaKey && !e.ctrlKey) || e.ctrlKey;
+			char_code = String.fromCharCode(e.keyCode).toLowerCase();
+			command_key_map = {
 				'bold': function () {
 					return cmd_ctrl_key && char_code === 'b';
 				},
@@ -171,7 +169,7 @@
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
 				}
 			};
-			var found_command = false;
+			found_command = false;
 			$.each(command_key_map, function (command, test) {
 				if (test.call()) {
 					self.entry_command(command);
@@ -206,7 +204,7 @@
 		 * input event handler for contenteditble area, populates textarea value with HTML
 		 * normalized and transformed (e.g. un-wpautop'ed) for saving and  editing in HTML mode
 		 */
-		entry_inputhandler_contenteditable: function (e) {
+		entry_inputhandler_contenteditable: function () {
 			var text = this.$contenteditable.html();
 			text = switchEditors.pre_wpautop(text);
 			this.$textarea.val(text);
@@ -229,8 +227,8 @@
 		 */
 		rich_formatting_btn_click: function (e) {
 			e.preventDefault();
-			var $btn = $(e.currentTarget);
-			var command = $btn.data('command');
+			var $btn = $(e.currentTarget),
+			    command = $btn.data('command');
 			this.entry_command(command);
 		},
 
