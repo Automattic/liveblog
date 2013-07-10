@@ -1,4 +1,4 @@
-/* global liveblog, liveblog_settings, _, alert, jQuery, moment, momentLang, Backbone */
+/* global liveblog, liveblog_settings, _, alert, jQuery, moment, momentLang, Backbone, addComment */
 window.liveblog = {};
 
 ( function( $ ) {
