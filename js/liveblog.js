@@ -163,6 +163,19 @@ window.liveblog = {};
 				$comment_reply[0].scrollIntoView( true );
 			}
 		}
+
+		// Polyfill HTML5 details[open]>summary support
+		if ( typeof document.createElement('details').open === 'undefined' ) {
+			liveblog.entriesContainer.$el.on('click', 'details > summary', function () {
+				var $details = $(this).parent( 'details' );
+				if ( $details.attr( 'open' ) ) {
+					$details.removeAttr( 'open' );
+				}
+				else {
+					$details.attr( 'open', 'open' );
+				}
+			});
+		}
 	};
 
 	liveblog.init_moment_js = function() {

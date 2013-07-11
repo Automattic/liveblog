@@ -379,8 +379,13 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-reply-comments[hidden] {
 	display: none;
 }
+
+.liveblog-reply-comments ol {
+	display: none;
+}
 .liveblog-reply-comments[open] ol {
 	border-left: solid 1px #ccc;
+	display: block;
 }
 .liveblog-reply-comments summary {
 	font-weight: bold;
@@ -390,6 +395,9 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	-ms-user-select: none;
 	user-select: none;
 	cursor: pointer;
+}
+.liveblog-reply-comments summary:hover {
+	text-decoration: underline;
 }
 
 .liveblog-reply-comments .comments-title {
