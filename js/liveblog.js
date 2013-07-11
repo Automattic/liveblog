@@ -142,6 +142,8 @@ window.liveblog = {};
 	};
 
 	liveblog.init_commenting = function () {
+		var $comment_reply;
+
 		liveblog.entriesContainer.$el.on('click', '.comment-reply-link', function (e) {
 			var $reply_link = $(this);
 			addComment.moveForm(
@@ -152,6 +154,15 @@ window.liveblog = {};
 			);
 			e.preventDefault();
 		});
+
+		// Auto-open a liveblog's comment replies if comment inside was linked to
+		if ( /^#comment-\d+$/.test( location.hash ) ) {
+			liveblog.entriesContainer.$el.find( '.liveblog-reply-comments:has(' + location.hash + ')' ).attr( 'open', 'open' );
+			$comment_reply = $(location.hash);
+			if ( $comment_reply.length ) {
+				$comment_reply[0].scrollIntoView( true );
+			}
+		}
 	};
 
 	liveblog.init_moment_js = function() {
