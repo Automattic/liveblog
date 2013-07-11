@@ -319,7 +319,15 @@ window.liveblog = {};
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
-		$entry.replaceWith( updated_entry.html );
+		var $updated_entry = $(updated_entry.html),
+		    $reply_comments_container = $entry.find( '.liveblog-reply-comments' );
+
+		// Maintain comment reply open state
+		if ( $reply_comments_container.attr( 'open' ) ) {
+			$updated_entry.find( '.liveblog-reply-comments' ).attr( 'open', 'open' );
+		}
+
+		$entry.replaceWith( $updated_entry );
 		liveblog.entriesContainer.updateTimes();
 	};
 
