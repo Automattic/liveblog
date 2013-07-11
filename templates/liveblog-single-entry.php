@@ -33,7 +33,7 @@
 
 <?php if ( WPCOM_Liveblog::is_liveblog_commenting_supported() ): ?>
 	<details class="liveblog-reply-comments"  <?php if (empty( $reply_comments )): ?> hidden <?php endif; ?>>
-		<summary><?php esc_html_e( 'Replies', 'liveblog' ) ?></summary>
+		<summary><?php echo esc_html( sprintf( _n( '%s Reply', '%s Replies', count( $reply_comments ), 'liveblog' ), count( $reply_comments ) ) ) ?></summary>
 		<ol>
 			<?php global $comment, $post; ?>
 			<?php foreach( $reply_comments as $comment ): ?>
