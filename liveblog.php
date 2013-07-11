@@ -346,6 +346,38 @@ final class WPCOM_Liveblog {
 		return $state;
 	}
 
+	/**
+	 * Is liveblog commenting supported?
+	 *
+	 * Filter liveblog_commenting_supported to false to disable all liveblog commenting
+	 * @return bool
+	 */
+	public static function is_liveblog_commenting_supported() {
+		return apply_filters( 'liveblog_commenting_supported', true );
+	}
+
+	/**
+	 * One of: 'open', 'closed'
+	 */
+	public static function get_liveblog_comment_status( $post = null ) {
+		if ( ! self::is_liveblog_commenting_supported() ) {
+			return 'closed';
+		}
+		$post = get_post( $post );
+		$comment_status = get_post_meta( $post->ID, '_liveblog_comment_status', true );
+		if ( empty( $comment_status ) ) {
+			$comment_status = comments_open( $post->ID ) ? 'open' : 'closed';
+			$comment_status = apply_filters( 'liveblog_default_comment_status', $comment_status, $post );
+		}
+		$comment_status = apply_filters( 'liveblog_comment_status', $comment_status, $post );
+		// We must force comments to be closed if they aren't allowed on the post,
+		// as the comment form will not be loaded.
+		if ( ! comments_open( $post->ID ) ) {
+			$comment_status = 'closed';
+		}
+		return $comment_status;
+	}
+
 	/** Private _is_ Methods **************************************************/
 
 	/**
@@ -471,6 +503,8 @@ final class WPCOM_Liveblog {
 	 */
 	public static function save_original_comment_parent_for_fixup( $commentdata ) {
 		$is_liveblog_comment_reply = (
+			self::is_liveblog_commenting_supported()
+			&&
 			self::is_liveblog_post( $commentdata['comment_post_ID'] )
 			&&
 			! empty( $commentdata['comment_parent'] )
@@ -595,7 +629,7 @@ final class WPCOM_Liveblog {
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
 		}
-		if ( WPCOM_Liveblog_Entry::is_commenting_enabled() ) {
+		if ( self::is_liveblog_commenting_supported() ) {
 			wp_enqueue_script( 'comment-reply' );
 		}
 
@@ -611,7 +645,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
-				'commenting_enabled'     => WPCOM_Liveblog_Entry::is_commenting_enabled(),
+				'commenting_supported'   => self::is_liveblog_commenting_supported(),
 				'comment_element_id_base' => self::comment_element_id_base,
 
 				'key'                    => self::key,
@@ -806,17 +840,46 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
+
+		$is_commenting_toggle_disabled = ! comments_open( $post->ID );
+		$current_comment_status = self::get_liveblog_comment_status( $post );
+		if ( $current_comment_status === 'open' ) {
+			$comment_status_description = __( 'Comments are currently open on your liveblog entries.', 'liveblog' );
+			$toggle_comment_status = 'closed';
+			$toggle_comment_btn_text = __( 'Close Commenting', 'liveblog' );
+		}
+		else {
+			if ( $is_commenting_toggle_disabled ) {
+				$comment_status_description = __( 'Comments are currently closed on this post entirely. You must first update the post to "Allow Comments" before you can enable liveblog commenting.', 'liveblog' );
+			}
+			else {
+				$comment_status_description = __( 'Comments are currently closed on your liveblog entries.', 'liveblog' );
+			}
+			$toggle_comment_status = 'open';
+			$toggle_comment_btn_text = __( 'Open Commenting', 'liveblog' );
+		}
+
+		echo self::get_template_part( 'meta-box.php', compact(
+			'active_text',
+			'buttons',
+			'current_comment_status',
+			'comment_status_description',
+			'toggle_comment_status',
+			'toggle_comment_btn_text',
+			'is_commenting_toggle_disabled'
+		) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
 		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
 		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
+		$new_comment_status = isset( $_REQUEST['comment_status'] )? $_REQUEST['comment_status'] : '';
 
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
 
-		if ( !$REQUEST = get_post( $post_id ) ) {
+		$post = get_post( $post_id );
+		if ( empty( $post ) ) {
 			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
 		}
 
@@ -824,8 +887,13 @@ final class WPCOM_Liveblog {
 			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
 		}
 
-		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
-		self::display_meta_box( $REQUEST );
+		if ( $new_state ) {
+			self::set_liveblog_state( $post_id, $new_state );
+		}
+		if ( $new_comment_status ) {
+			self::set_liveblog_comment_status( $post_id, $new_comment_status );
+		}
+		self::display_meta_box( $post );
 		exit;
 	}
 
@@ -836,6 +904,15 @@ final class WPCOM_Liveblog {
 		} elseif ( 'disable' == $state ) {
 			delete_post_meta( $post_id, self::key );
 			do_action( 'liveblog_disable_post', $post_id );
+		} else {
+			return false;
+		}
+	}
+
+	private static function set_liveblog_comment_status( $post_id, $comment_status ) {
+		if ( in_array( $comment_status, array( 'open', 'closed' ) ) ) {
+			update_post_meta( $post_id, '_liveblog_comment_status', $comment_status );
+			do_action( "liveblog_{$comment_status}_commenting", $post_id );
 		} else {
 			return false;
 		}

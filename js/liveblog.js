@@ -135,7 +135,7 @@ window.liveblog = {};
 		liveblog.set_initial_timestamps();
 		liveblog.start_human_time_diff_timer();
 
-		if ( liveblog_settings.commenting_enabled ) {
+		if ( liveblog_settings.commenting_supported ) {
 			liveblog.init_commenting();
 		}
 		liveblog.$events.trigger( 'after-init' );

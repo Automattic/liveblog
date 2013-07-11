@@ -31,7 +31,7 @@
 	</ul>
 <?php endif; ?>
 
-<?php if ( $is_liveblog_commenting_open ): ?>
+<?php if ( WPCOM_Liveblog::is_liveblog_commenting_supported() ): ?>
 	<details class="liveblog-reply-comments"  <?php if (empty( $reply_comments )): ?> hidden <?php endif; ?>>
 		<summary><?php esc_html_e( 'Replies', 'liveblog' ) ?></summary>
 		<ol>

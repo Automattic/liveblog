@@ -90,7 +90,7 @@ class WPCOM_Liveblog_Entry {
 			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
 			'timestamp'             => $this->get_timestamp(),
 			'is_liveblog_editable'  => WPCOM_Liveblog::is_liveblog_editable(),
-			'is_liveblog_commenting_open' => self::is_commenting_enabled( $post_id ),
+			'is_liveblog_commenting_open' => ( 'open' === WPCOM_Liveblog::get_liveblog_comment_status( $post_id) ),
 			'reply_comments'        => $this->reply_comments,
 		);
 
@@ -206,11 +206,6 @@ class WPCOM_Liveblog_Entry {
 		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
-	}
-
-	public static function is_commenting_enabled( $post = null ) {
-		$post = get_post( $post );
-		return apply_filters( 'liveblog_commenting_enabled', comments_open( $post ) );
 	}
 
 	private static function insert_comment( $args ) {
