@@ -30,4 +30,44 @@
 		</li>
 	</ul>
 <?php endif; ?>
+
+<?php if ( $is_liveblog_commenting_open ): ?>
+	<details class="liveblog-reply-comments"  <?php if (empty( $reply_comments )): ?> hidden <?php endif; ?>>
+		<summary><?php esc_html_e( 'Replies', 'liveblog' ) ?></summary>
+		<ol>
+			<?php global $comment, $post; ?>
+			<?php foreach( $reply_comments as $comment ): ?>
+				<li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>">
+					<article id="comment-<?php comment_ID(); ?>" class="comment">
+						<header class="comment-meta comment-author vcard">
+							<?php
+								echo get_avatar( $comment, 44 );
+								printf( '<cite class="fn">%1$s %2$s</cite>',
+									get_comment_author_link(),
+									// If current post author is also comment author, make it known visually.
+									( $comment->user_id === $post->post_author ) ? '<span> ' . __( 'Post author', 'liveblog' ) . '</span>' : ''
+								);
+								printf( '<a href="%1$s"><time datetime="%2$s">%3$s</time></a>',
+									esc_url( get_comment_link( $comment->comment_ID ) ),
+									get_comment_time( 'c' ),
+									/* translators: 1: date, 2: time */
+									sprintf( __( '%1$s at %2$s', 'liveblog' ), get_comment_date(), get_comment_time() )
+								);
+							?>
+						</header><!-- .comment-meta -->
+
+						<?php if ( '0' == $comment->comment_approved ) : ?>
+							<p class="comment-awaiting-moderation"><?php _e( 'Your comment is awaiting moderation.', 'liveblog' ); ?></p>
+						<?php endif; ?>
+
+						<section class="comment-content comment">
+							<?php comment_text(); ?>
+							<?php edit_comment_link( __( 'Edit', 'liveblog' ), '<p class="edit-link">', '</p>' ); ?>
+						</section><!-- .comment-content -->
+
+					</article><!-- #comment-## -->
+			<?php endforeach; ?>
+		</ol>
+	</details>
+<?php endif; ?>
 </div>

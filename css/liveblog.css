@@ -367,3 +367,110 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	display: inline-block;
 	vertical-align: middle;
 }
+
+/* =Reply Comments
+-------------------------------------------------------------- */
+
+#liveblog-entries #respond,
+.liveblog-reply-comments {
+	margin-left: 40px;
+	margin-bottom: 1em;
+}
+.liveblog-reply-comments[hidden] {
+	display: none;
+}
+.liveblog-reply-comments[open] ol {
+	border-left: solid 1px #ccc;
+}
+.liveblog-reply-comments summary {
+	font-weight: bold;
+	font-size: larger;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: pointer;
+}
+
+.liveblog-reply-comments .comments-title {
+	margin-bottom: 48px;
+	font-size: 16px;
+	line-height: 1.5;
+	font-weight: normal;
+}
+.liveblog-reply-comments .comment {
+	margin: 24px 0;
+}
+.liveblog-reply-comments article header {
+	margin: 0 0 10px;
+	overflow: hidden;
+	position: relative;
+}
+.liveblog-reply-comments article header img {
+	float: left;
+	padding: 0;
+	line-height: 0;
+}
+.liveblog-reply-comments article header cite,
+.liveblog-reply-comments article header time {
+	display: block;
+	margin-left: 60px;
+}
+.liveblog-reply-comments article header cite {
+	font-style: normal;
+	font-size: 15px;
+	line-height: 1.42857143;
+}
+.liveblog-reply-comments article header time {
+	line-height: 1.714285714;
+	text-decoration: none;
+	font-size: 12px;
+	color: #5e5e5e;
+}
+.liveblog-reply-comments article header a {
+	text-decoration: none;
+	color: #5e5e5e;
+}
+.liveblog-reply-comments article header a:hover {
+	color: #21759b;
+}
+.liveblog-reply-comments article header cite a {
+	color: #444;
+}
+.liveblog-reply-comments article header cite a:hover {
+	text-decoration: underline;
+}
+.liveblog-reply-comments article header h4 {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 6px 12px;
+	font-size: 12px;
+	font-weight: normal;
+	color: #fff;
+	background-color: #0088d0;
+	background-repeat: repeat-x;
+	background-image: -moz-linear-gradient(top, #009cee, #0088d0);
+	background-image: -ms-linear-gradient(top, #009cee, #0088d0);
+	background-image: -webkit-linear-gradient(top, #009cee, #0088d0);
+	background-image: -o-linear-gradient(top, #009cee, #0088d0);
+	background-image: linear-gradient(top, #009cee, #0088d0);
+	border-radius: 3px;
+	border: 1px solid #007cbd;
+}
+.liveblog-reply-comments li.bypostauthor cite span {
+	position: absolute;
+	margin-left: 5px;
+	padding: 2px 5px;
+	font-size: 10px;
+}
+.liveblog-reply-comments a.comment-reply-link,
+.liveblog-reply-comments a.comment-edit-link {
+	color: #686868;
+	font-size: 13px;
+	line-height: 1.846153846;
+}
+.liveblog-reply-comments a.comment-reply-link:hover,
+.liveblog-reply-comments a.comment-edit-link:hover {
+	color: #21759b;
+}

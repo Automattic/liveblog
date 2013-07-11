@@ -85,7 +85,8 @@ class WPCOM_Liveblog_Entry {
 			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
 			'timestamp'             => $this->get_timestamp(),
 			'is_liveblog_editable'  => WPCOM_Liveblog::is_liveblog_editable(),
-			'is_liveblog_commenting_open' => self::is_commenting_enabled( $post_id )
+			'is_liveblog_commenting_open' => self::is_commenting_enabled( $post_id ),
+			'reply_comments'        => $this->reply_comments,
 		);
 
 		return $entry;
