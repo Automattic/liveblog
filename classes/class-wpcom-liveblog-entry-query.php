@@ -37,7 +37,7 @@ class WPCOM_Liveblog_Entry_Query {
 		$args     = wp_parse_args( $args, $defaults );
 		$comments = get_comments( $args );
 
-		return self::entries_from_comments( $comments );
+		return $this->entries_from_comments( $comments );
 	}
 
 	/**
@@ -55,7 +55,7 @@ class WPCOM_Liveblog_Entry_Query {
 		if ( $comment->comment_post_ID != $this->post_id || $comment->comment_type != $this->key || $comment->comment_approved != $this->key) {
 			return null;
 		}
-		$entries = self::entries_from_comments( array( $comment ) );
+		$entries = $this->entries_from_comments( array( $comment ) );
 		return $entries[0];
 	}
 
@@ -116,6 +116,7 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	private function get_all_entries_asc() {
+		// @todo is the caching here necessary? WP_Comment_Query::query() does caching already
 		$cached_entries_asc_key =  $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
 		if ( false !== $cached_entries_asc ) {
@@ -132,15 +133,26 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $comments
 	 * @return array
 	 */
-	public static function entries_from_comments( $comments = array() ) {
+	public function entries_from_comments( $comments = array() ) {
 
 		// Bail if no comments
 		if ( empty( $comments ) )
 			return null;
 
+		$reply_comments_by_parent = self::group_reply_comments_by_parent( $this->get_reply_comments() );
+
 		// Map each comment to a new Liveblog Entry class, so that they inherit
 		// some neat helper methods.
-		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
+		$entries = array();
+		foreach ( $comments as $comment ) {
+			$reply_comments = array();
+			if ( ! empty( $reply_comments_by_parent[$comment->comment_ID] ) ) {
+				$reply_comments = $reply_comments_by_parent[$comment->comment_ID];
+			}
+			array_push( $entries, new WPCOM_Liveblog_Entry( $comment, $reply_comments ) );
+		}
+
+		return $entries;
 	}
 
 	/**
@@ -174,4 +186,93 @@ class WPCOM_Liveblog_Entry_Query {
 
 		return $result;
 	}
+
+	/**
+	 * Get the liveblog reply comments for this post
+	 * @param array|string $args
+	 */
+	public function get_reply_comments( $args = array() ) {
+		$defaults = array(
+			'post_id' => $this->post_id,
+			'orderby' => 'comment_date_gmt',
+			'order'   => 'DESC',
+			'type'    => WPCOM_Liveblog::reply_comment_type,
+		);
+		$args = wp_parse_args( $args, $defaults );
+		$comments = get_comments( $args );
+		$comments = self::filter_out_undisplayable_comments( $comments );
+		return $comments;
+	}
+
+	/**
+	 * Remove comments that are not approved or ones which are unapproved and
+	 * yet not authored by the current commenter
+	 * @see comments_template()
+	 */
+	private static function filter_out_undisplayable_comments( array $comments ) {
+		global $user_ID;
+
+		/**
+		 * Comment author information fetched from the comment cookies.
+		 *
+		 * @uses wp_get_current_commenter()
+		 */
+		$commenter = wp_get_current_commenter();
+
+		/**
+		 * The name of the current comment author escaped for use in attributes.
+		 */
+		$comment_author = $commenter['comment_author']; // Escaped by sanitize_comment_cookies()
+
+		/**
+		 * The email address of the current comment author escaped for use in attributes.
+		 */
+		$comment_author_email = $commenter['comment_author_email'];  // Escaped by sanitize_comment_cookies()
+
+		$displayable_comments = array();
+		foreach ( $comments as $comment ) {
+			$is_displayable = (
+				$comment->comment_approved == '1'
+				||
+				(
+					$user_ID
+					&&
+					$comment->comment_approved == '0'
+					&&
+					$comment->user_id == $user_ID
+				)
+				||
+				(
+					! empty( $comment_author )
+					&&
+					$comment->comment_approved == '0'
+					&&
+					$comment->comment_author == wp_specialchars_decode( $comment_author,ENT_QUOTES )
+					&&
+					$comment->comment_author_email == $comment_author_email
+				)
+			);
+			if ( $is_displayable ) {
+				array_push( $displayable_comments, $comment );
+			}
+		}
+		return $displayable_comments;
+	}
+
+	/**
+	 * Organize comments into an associative array keyed by the comment_parent
+	 * @param array $comments
+	 * @return array
+	 */
+	public static function group_reply_comments_by_parent( array $comments ) {
+		$grouped_comments = array();
+		foreach ( $comments as $comment ) {
+			if ( ! isset( $grouped_comments[$comment->comment_parent] ) ) {
+				$grouped_comments[$comment->comment_parent] = array();
+			}
+			array_push( $grouped_comments[$comment->comment_parent], $comment );
+		}
+		return $grouped_comments;
+	}
+
 }

@@ -14,10 +14,12 @@ class WPCOM_Liveblog_Entry {
 	const replaces_meta_key   = 'liveblog_replaces';
 
 	private $comment;
+	private $reply_comments;
 	private $type = 'new';
 
-	public function __construct( $comment ) {
+	public function __construct( $comment, $reply_comments = array() ) {
 		$this->comment  = $comment;
+		$this->reply_comments  = $reply_comments;
 		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
 		if ( $this->replaces && $this->get_content() ) {
 			$this->type = 'update';
@@ -27,8 +29,8 @@ class WPCOM_Liveblog_Entry {
 		}
 	}
 
-	public static function from_comment( $comment ) {
-		$entry = new WPCOM_Liveblog_Entry( $comment );
+	public static function from_comment( $comment, $reply_comments = array() ) {
+		$entry = new WPCOM_Liveblog_Entry( $comment, $reply_comments );
 		return $entry;
 	}
 
@@ -164,6 +166,7 @@ class WPCOM_Liveblog_Entry {
 			'comment_ID'      => $args['entry_id'],
 			'comment_content' => wp_filter_post_kses( $args['content'] ),
 		) );
+		// @todo UPDATE comments SET comment_parent = $comment->comment_ID WHERE comment_parent = $args['entry_id']
 		$entry = self::from_comment( $comment );
 		return $entry;
 	}

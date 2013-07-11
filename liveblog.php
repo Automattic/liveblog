@@ -134,6 +134,8 @@ final class WPCOM_Liveblog {
 		add_filter( 'comment_class',      array( __CLASS__, 'add_comment_class' ), 10, 3 );
 		add_filter( 'preprocess_comment', array( __CLASS__, 'save_original_comment_parent_for_fixup' ) );
 		add_filter( 'get_comment_link',   array( __CLASS__, 'fix_target_for_liveblog_comment_link' ), 10, 3 );
+		add_filter( 'comments_array',     array( __CLASS__, 'filter_out_liveblog_comments_from_template' ), 10, 2 );
+		add_filter( 'get_avatar_comment_types', array( __CLASS__, 'allow_avatars_on_liveblog_comment_types' ) );
 	}
 
 	/**
@@ -275,6 +277,7 @@ final class WPCOM_Liveblog {
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
+		// @todo merge reply comments?
 		if ( empty( $entries ) ) {
 			do_action( 'liveblog_entry_request_empty' );
 
@@ -463,6 +466,7 @@ final class WPCOM_Liveblog {
 	/**
 	 * Save the original comment_parent since we can't filter it
 	 * @see wp_new_comment()
+	 * @see self::fixup_comment_parent()
 	 * @filter preprocess_comment
 	 */
 	public static function save_original_comment_parent_for_fixup( $commentdata ) {
@@ -495,6 +499,7 @@ final class WPCOM_Liveblog {
 			$comment['comment_parent'] = self::$_original_comment_parent_at_preprocess;
 			wp_update_comment( $comment );
 			self::$_original_comment_parent_at_preprocess = null;
+			// @todo If we cache comments, here we need to flush
 		}
 	}
 
@@ -506,6 +511,38 @@ final class WPCOM_Liveblog {
 			$link = preg_replace( '/#.+/', '#' . self::comment_element_id_base . $comment->comment_ID, $link );
 		}
 		return $link;
+	}
+
+	/**
+	 * @filter comments_array
+	 * @uses self::_is_non_liveblog_comment_or_reply()
+	 */
+	public static function filter_out_liveblog_comments_from_template( array $comments, $post_id ) {
+		$post = get_post( $post_id );
+		if ( self::is_liveblog_post( $post->ID )  ) {
+			$comments = array_values(array_filter(
+				$comments,
+				array( __CLASS__, '_is_non_liveblog_comment_or_reply' )
+			));
+		}
+		return $comments;
+	}
+
+	/**
+	 * Callback for array_filter
+	 * @see self::filter_out_liveblog_comments_from_template()
+	 */
+	private static function _is_non_liveblog_comment_or_reply( $comment ) {
+		return ! in_array( $comment->comment_type, array( self::key, 'liveblog-reply' ) );
+	}
+
+	/**
+	 * @filter get_avatar_comment_types
+	 */
+	public static function allow_avatars_on_liveblog_comment_types( $comment_types ) {
+		array_push( $comment_types, self::key );
+		array_push( $comment_types, self::reply_comment_type );
+		return $comment_types;
 	}
 
 
@@ -580,7 +617,7 @@ final class WPCOM_Liveblog {
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_key ),
-				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
+				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(), // @todo max( X, most-recent reply comment )
 
 				'refresh_interval'       => WP_DEBUG? self::debug_refresh_interval : self::refresh_interval,
 				'max_consecutive_retries'=> self::max_consecutive_retries,
