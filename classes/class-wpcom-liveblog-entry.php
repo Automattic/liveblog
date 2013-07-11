@@ -72,10 +72,15 @@ class WPCOM_Liveblog_Entry {
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 
+		$underlying_entry_id = $entry_id;
+		if ( $this->replaces ) {
+			$underlying_entry_id = $this->replaces;
+		}
+
 		$entry = array(
-			'entry_id'              => $entry_id,
-			'post_id'               => $entry_id,
-			'css_classes'           => comment_class( '', $entry_id, $post_id, false ),
+			'entry_id'              => $underlying_entry_id,
+			'post_id'               => $post_id,
+			'css_classes'           => comment_class( '', $underlying_entry_id, $post_id, false ),
 			'content'               => self::render_content( get_comment_text( $entry_id ), $this->comment ),
 			'original_content'      => get_comment_text( $entry_id ),
 			'avatar_size'           => $avatar_size,
@@ -167,8 +172,15 @@ class WPCOM_Liveblog_Entry {
 			'comment_ID'      => $args['entry_id'],
 			'comment_content' => wp_filter_post_kses( $args['content'] ),
 		) );
-		// @todo UPDATE comments SET comment_parent = $comment->comment_ID WHERE comment_parent = $args['entry_id']
-		$entry = self::from_comment( $comment );
+
+		// Include reply comments in response
+		// @todo Better to encapsulate inside of WPCOM_Liveblog_Entry
+		$reply_comments = WPCOM_Liveblog_Entry_Query::get_reply_comments( array(
+			'parent' => $args['entry_id'],
+			'post_id' => $args['post_id'],
+		) );
+
+		$entry = self::from_comment( $comment, $reply_comments );
 		return $entry;
 	}
 

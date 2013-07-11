@@ -139,15 +139,22 @@ class WPCOM_Liveblog_Entry_Query {
 		if ( empty( $comments ) )
 			return null;
 
-		$reply_comments_by_parent = self::group_reply_comments_by_parent( $this->get_reply_comments() );
+		$reply_comments = self::get_reply_comments( array( 'post_id' => $this->post_id ) );
+		$reply_comments_by_parent = self::group_reply_comments_by_parent( $reply_comments );
 
 		// Map each comment to a new Liveblog Entry class, so that they inherit
 		// some neat helper methods.
 		$entries = array();
 		foreach ( $comments as $comment ) {
 			$reply_comments = array();
-			if ( ! empty( $reply_comments_by_parent[$comment->comment_ID] ) ) {
-				$reply_comments = $reply_comments_by_parent[$comment->comment_ID];
+
+			// @todo Logic here would be better encapsulated inside WPCOM_Liveblog_Entry
+			$underlying_entry_id = get_comment_meta( $comment->comment_ID, WPCOM_Liveblog_Entry::replaces_meta_key, true );
+			if ( empty( $underlying_entry_id ) ) {
+				$underlying_entry_id = $comment->comment_ID;
+			}
+			if ( ! empty( $reply_comments_by_parent[$underlying_entry_id] ) ) {
+				$reply_comments = $reply_comments_by_parent[$underlying_entry_id];
 			}
 			array_push( $entries, new WPCOM_Liveblog_Entry( $comment, $reply_comments ) );
 		}
@@ -193,7 +200,6 @@ class WPCOM_Liveblog_Entry_Query {
 	 */
 	public function get_reply_comments( $args = array() ) {
 		$defaults = array(
-			'post_id' => $this->post_id,
 			'orderby' => 'comment_date_gmt',
 			'order'   => 'DESC',
 			'type'    => WPCOM_Liveblog::reply_comment_type,
@@ -273,6 +279,22 @@ class WPCOM_Liveblog_Entry_Query {
 			array_push( $grouped_comments[$comment->comment_parent], $comment );
 		}
 		return $grouped_comments;
+	}
+
+	/**
+	 * Remove all comments that do not have the comment_parent of $entry_id
+	 * @param int $entry_id
+	 * @param array $comments
+	 * return array
+	 */
+	public static function filter_reply_comments_by_parent( $entry_id, array $comments ) {
+		$filtered_comments = array();
+		foreach ( $comments as $comment ) {
+			if ( $comment->comment_parent == $entry_id ) {
+				array_push( $filtered_comments, $comment );
+			}
+		}
+		return $filtered_comments;
 	}
 
 }
