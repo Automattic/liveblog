@@ -69,6 +69,7 @@
 			e.preventDefault();
 			this.$entry_text.show();
 			this.$entry.find('.liveblog-entry-edit').show();
+			this.$entry.find('.liveblog-entry-reply').show();
 			this.$entry.find('.liveblog-entry-actions .liveblog-entry-delete').show();
 			this.remove();
 		},
@@ -151,7 +152,7 @@
 			return this.$entry_text.data('original-content');
 		},
 		get_id_for_ajax_request: function() {
-			return this.$entry.attr('id').replace('liveblog-entry-', '');
+			return this.$entry.attr('id').replace(liveblog_settings.comment_element_id_base, '');
 		},
 		render: function() {
 			this.render_template();
@@ -225,13 +226,14 @@
 	liveblog.publisher.edit_click = function( e ) {
 		e.preventDefault();
 		var entry = $( e.target ).closest( '.liveblog-entry' ),
-			id = entry.attr( 'id' ).replace( 'liveblog-entry-', '' ),
+			id = entry.attr( 'id' ).replace( liveblog_settings.comment_element_id_base, '' ),
 			form = new liveblog.EditEntryView({entry: entry});
 		if ( !id ) {
 			return;
 		}
 		form.render();
 		entry.find( '.liveblog-entry-edit' ).hide();
+		entry.find( '.liveblog-entry-reply' ).hide();
 		entry.find('.liveblog-entry-actions .liveblog-entry-delete').hide();
 	};
 

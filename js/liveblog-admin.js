@@ -9,8 +9,15 @@ jQuery( function( $ ) {
 		};
 	$meta_box.on( 'click', 'button', function( e ) {
 		e.preventDefault();
-		var url = ajaxurl + '?action=set_liveblog_state_for_post&post_id=' + encodeURIComponent( post_id ) + '&state=' + encodeURIComponent( $( this ).val() ) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
-		$( '.inside', $meta_box ).load( url, function( response, status, xhr ) {
+
+		var data = {
+			action: 'set_liveblog_state_for_post',
+			post_id: post_id
+		};
+		data[liveblog_admin_settings.nonce_key] = liveblog_admin_settings.nonce;
+		data[ $(this).attr('name') ] = $(this).val();
+
+		$( '.inside', $meta_box ).load( ajaxurl, data, function( response, status, xhr ) {
 			if ( status === 'success') {
 				return;
 			}

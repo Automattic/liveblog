@@ -41,6 +41,8 @@ final class WPCOM_Liveblog {
 	const url_endpoint     = 'liveblog';
 	const edit_cap         = 'publish_posts';
 	const nonce_key        = 'liveblog_nonce';
+	const comment_element_id_base = 'liveblog-entry-';
+	const reply_comment_type = 'liveblog-reply';
 
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
@@ -118,6 +120,7 @@ final class WPCOM_Liveblog {
 		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
+		add_action( 'comment_post',                  array( __CLASS__, 'fixup_comment_parent' ), 10, 2 );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 	}
 
@@ -127,8 +130,12 @@ final class WPCOM_Liveblog {
 	 * @uses add_filter()
 	 */
 	private static function add_filters() {
-		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
-		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
+		add_filter( 'template_redirect',  array( __CLASS__, 'handle_request'    ) );
+		add_filter( 'comment_class',      array( __CLASS__, 'add_comment_class' ), 10, 3 );
+		add_filter( 'preprocess_comment', array( __CLASS__, 'save_original_comment_parent_for_fixup' ) );
+		add_filter( 'get_comment_link',   array( __CLASS__, 'fix_target_for_liveblog_comment_link' ), 10, 3 );
+		add_filter( 'comments_array',     array( __CLASS__, 'filter_out_liveblog_comments_from_template' ), 10, 2 );
+		add_filter( 'get_avatar_comment_types', array( __CLASS__, 'allow_avatars_on_liveblog_comment_types' ) );
 	}
 
 	/**
@@ -270,6 +277,7 @@ final class WPCOM_Liveblog {
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
+		// @todo merge reply comments?
 		if ( empty( $entries ) ) {
 			do_action( 'liveblog_entry_request_empty' );
 
@@ -336,6 +344,38 @@ final class WPCOM_Liveblog {
 			$state = 'enable';
 		}
 		return $state;
+	}
+
+	/**
+	 * Is liveblog commenting supported?
+	 *
+	 * Filter liveblog_commenting_supported to false to disable all liveblog commenting
+	 * @return bool
+	 */
+	public static function is_liveblog_commenting_supported() {
+		return apply_filters( 'liveblog_commenting_supported', true );
+	}
+
+	/**
+	 * One of: 'open', 'closed'
+	 */
+	public static function get_liveblog_comment_status( $post = null ) {
+		if ( ! self::is_liveblog_commenting_supported() ) {
+			return 'closed';
+		}
+		$post = get_post( $post );
+		$comment_status = get_post_meta( $post->ID, '_liveblog_comment_status', true );
+		if ( empty( $comment_status ) ) {
+			$comment_status = comments_open( $post->ID ) ? 'open' : 'closed';
+			$comment_status = apply_filters( 'liveblog_default_comment_status', $comment_status, $post );
+		}
+		$comment_status = apply_filters( 'liveblog_comment_status', $comment_status, $post );
+		// We must force comments to be closed if they aren't allowed on the post,
+		// as the comment form will not be loaded.
+		if ( ! comments_open( $post->ID ) ) {
+			$comment_status = 'closed';
+		}
+		return $comment_status;
 	}
 
 	/** Private _is_ Methods **************************************************/
@@ -453,6 +493,93 @@ final class WPCOM_Liveblog {
 		return $classes;
 	}
 
+	private static $_original_comment_parent_at_preprocess;
+
+	/**
+	 * Save the original comment_parent since we can't filter it
+	 * @see wp_new_comment()
+	 * @see self::fixup_comment_parent()
+	 * @filter preprocess_comment
+	 */
+	public static function save_original_comment_parent_for_fixup( $commentdata ) {
+		$is_liveblog_comment_reply = (
+			self::is_liveblog_commenting_supported()
+			&&
+			self::is_liveblog_post( $commentdata['comment_post_ID'] )
+			&&
+			! empty( $commentdata['comment_parent'] )
+			&&
+			is_object( $comment_parent = get_comment( $commentdata['comment_parent'] ) )
+			&&
+			self::key === $comment_parent->comment_type
+		);
+		if ( $is_liveblog_comment_reply ) {
+			self::$_original_comment_parent_at_preprocess = $commentdata['comment_parent'];
+			$commentdata['comment_type'] = self::reply_comment_type;
+		}
+		return $commentdata;
+	}
+
+	/**
+	 * Aggravatingly, the wp_filter_comment() function does not provide a pre_comment_parent filter,
+	 * and neither does wp_insert_comment() provide a way to filter the comment_parent field.
+	 * So we have to fixup the comment_parent right after the comment is posted.
+	 * @see wp_new_comment()
+	 * @action comment_post
+	 */
+	public static function fixup_comment_parent( $comment_ID, $comment_approved ) {
+		if ( ! empty( self::$_original_comment_parent_at_preprocess ) ) {
+			$comment = (array) get_comment( $comment_ID );
+			$comment['comment_parent'] = self::$_original_comment_parent_at_preprocess;
+			wp_update_comment( $comment );
+			self::$_original_comment_parent_at_preprocess = null;
+			// @todo If we cache comments, here we need to flush
+		}
+	}
+
+	/**
+	 * @filter get_comment_link
+	 */
+	public static function fix_target_for_liveblog_comment_link( $link, $comment, $args ) {
+		if ( $comment->comment_type === self::key ) {
+			$link = preg_replace( '/#.+/', '#' . self::comment_element_id_base . $comment->comment_ID, $link );
+		}
+		return $link;
+	}
+
+	/**
+	 * @filter comments_array
+	 * @uses self::_is_non_liveblog_comment_or_reply()
+	 */
+	public static function filter_out_liveblog_comments_from_template( array $comments, $post_id ) {
+		$post = get_post( $post_id );
+		if ( self::is_liveblog_post( $post->ID )  ) {
+			$comments = array_values(array_filter(
+				$comments,
+				array( __CLASS__, '_is_non_liveblog_comment_or_reply' )
+			));
+		}
+		return $comments;
+	}
+
+	/**
+	 * Callback for array_filter
+	 * @see self::filter_out_liveblog_comments_from_template()
+	 */
+	private static function _is_non_liveblog_comment_or_reply( $comment ) {
+		return ! in_array( $comment->comment_type, array( self::key, 'liveblog-reply' ) );
+	}
+
+	/**
+	 * @filter get_avatar_comment_types
+	 */
+	public static function allow_avatars_on_liveblog_comment_types( $comment_types ) {
+		array_push( $comment_types, self::key );
+		array_push( $comment_types, self::reply_comment_type );
+		return $comment_types;
+	}
+
+
 	public static function admin_enqueue_scripts() {
 		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
 		wp_enqueue_script( 'liveblog-admin',  plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
@@ -502,6 +629,9 @@ final class WPCOM_Liveblog {
 			wp_enqueue_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
 		}
+		if ( self::is_liveblog_commenting_supported() ) {
+			wp_enqueue_script( 'comment-reply' );
+		}
 
 		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
 			wp_enqueue_script( 'jquery.spin' );
@@ -515,11 +645,13 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
+				'commenting_supported'   => self::is_liveblog_commenting_supported(),
+				'comment_element_id_base' => self::comment_element_id_base,
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_key ),
-				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
+				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(), // @todo max( X, most-recent reply comment )
 
 				'refresh_interval'       => WP_DEBUG? self::debug_refresh_interval : self::refresh_interval,
 				'max_consecutive_retries'=> self::max_consecutive_retries,
@@ -708,17 +840,46 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
+
+		$is_commenting_toggle_disabled = ! comments_open( $post->ID );
+		$current_comment_status = self::get_liveblog_comment_status( $post );
+		if ( $current_comment_status === 'open' ) {
+			$comment_status_description = __( 'Comments are currently open on your liveblog entries.', 'liveblog' );
+			$toggle_comment_status = 'closed';
+			$toggle_comment_btn_text = __( 'Close Commenting', 'liveblog' );
+		}
+		else {
+			if ( $is_commenting_toggle_disabled ) {
+				$comment_status_description = __( 'Comments are currently closed on this post entirely. You must first update the post to "Allow Comments" before you can enable liveblog commenting.', 'liveblog' );
+			}
+			else {
+				$comment_status_description = __( 'Comments are currently closed on your liveblog entries.', 'liveblog' );
+			}
+			$toggle_comment_status = 'open';
+			$toggle_comment_btn_text = __( 'Open Commenting', 'liveblog' );
+		}
+
+		echo self::get_template_part( 'meta-box.php', compact(
+			'active_text',
+			'buttons',
+			'current_comment_status',
+			'comment_status_description',
+			'toggle_comment_status',
+			'toggle_comment_btn_text',
+			'is_commenting_toggle_disabled'
+		) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
 		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
 		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
+		$new_comment_status = isset( $_REQUEST['comment_status'] )? $_REQUEST['comment_status'] : '';
 
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
 
-		if ( !$REQUEST = get_post( $post_id ) ) {
+		$post = get_post( $post_id );
+		if ( empty( $post ) ) {
 			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
 		}
 
@@ -726,8 +887,13 @@ final class WPCOM_Liveblog {
 			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
 		}
 
-		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
-		self::display_meta_box( $REQUEST );
+		if ( $new_state ) {
+			self::set_liveblog_state( $post_id, $new_state );
+		}
+		if ( $new_comment_status ) {
+			self::set_liveblog_comment_status( $post_id, $new_comment_status );
+		}
+		self::display_meta_box( $post );
 		exit;
 	}
 
@@ -738,6 +904,15 @@ final class WPCOM_Liveblog {
 		} elseif ( 'disable' == $state ) {
 			delete_post_meta( $post_id, self::key );
 			do_action( 'liveblog_disable_post', $post_id );
+		} else {
+			return false;
+		}
+	}
+
+	private static function set_liveblog_comment_status( $post_id, $comment_status ) {
+		if ( in_array( $comment_status, array( 'open', 'closed' ) ) ) {
+			update_post_meta( $post_id, '_liveblog_comment_status', $comment_status );
+			do_action( "liveblog_{$comment_status}_commenting", $post_id );
 		} else {
 			return false;
 		}

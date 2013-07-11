@@ -1,4 +1,4 @@
-/* global liveblog, liveblog_settings, _, alert, jQuery, moment, momentLang, Backbone */
+/* global liveblog, liveblog_settings, _, alert, jQuery, moment, momentLang, Backbone, addComment */
 window.liveblog = {};
 
 ( function( $ ) {
@@ -135,7 +135,47 @@ window.liveblog = {};
 		liveblog.set_initial_timestamps();
 		liveblog.start_human_time_diff_timer();
 
+		if ( liveblog_settings.commenting_supported ) {
+			liveblog.init_commenting();
+		}
 		liveblog.$events.trigger( 'after-init' );
+	};
+
+	liveblog.init_commenting = function () {
+		var $comment_reply;
+
+		liveblog.entriesContainer.$el.on('click', '.comment-reply-link', function (e) {
+			var $reply_link = $(this);
+			addComment.moveForm(
+				$reply_link.data('commentElementId'),
+				$reply_link.data('commentId'),
+				$reply_link.data('respondElementId'),
+				$reply_link.data('postId')
+			);
+			e.preventDefault();
+		});
+
+		// Auto-open a liveblog's comment replies if comment inside was linked to
+		if ( /^#comment-\d+$/.test( location.hash ) ) {
+			liveblog.entriesContainer.$el.find( '.liveblog-reply-comments:has(' + location.hash + ')' ).attr( 'open', 'open' );
+			$comment_reply = $(location.hash);
+			if ( $comment_reply.length ) {
+				$comment_reply[0].scrollIntoView( true );
+			}
+		}
+
+		// Polyfill HTML5 details[open]>summary support
+		if ( typeof document.createElement('details').open === 'undefined' ) {
+			liveblog.entriesContainer.$el.on('click', 'details > summary', function () {
+				var $details = $(this).parent( 'details' );
+				if ( $details.attr( 'open' ) ) {
+					$details.removeAttr( 'open' );
+				}
+				else {
+					$details.attr( 'open', 'open' );
+				}
+			});
+		}
 	};
 
 	liveblog.init_moment_js = function() {
@@ -276,7 +316,7 @@ window.liveblog = {};
 	};
 
 	liveblog.get_entry_by_id = function( id ) {
-		return $( '#liveblog-entry-' + id );
+		return $( '#' + liveblog_settings.comment_element_id_base + id );
 	};
 
 	liveblog.display_entry = function( new_entry, duration ) {
@@ -303,7 +343,15 @@ window.liveblog = {};
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
-		$entry.replaceWith( updated_entry.html );
+		var $updated_entry = $(updated_entry.html),
+		    $reply_comments_container = $entry.find( '.liveblog-reply-comments' );
+
+		// Maintain comment reply open state
+		if ( $reply_comments_container.attr( 'open' ) ) {
+			$updated_entry.find( '.liveblog-reply-comments' ).attr( 'open', 'open' );
+		}
+
+		$entry.replaceWith( $updated_entry );
 		liveblog.entriesContainer.updateTimes();
 	};
 
