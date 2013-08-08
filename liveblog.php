@@ -74,6 +74,7 @@ final class WPCOM_Liveblog {
 		self::add_actions();
 		self::add_filters();
 		self::add_admin_actions();
+		self::add_admin_filters();
 		self::register_embed_handlers();
 	}
 
@@ -143,7 +144,25 @@ final class WPCOM_Liveblog {
 		if ( ! is_admin() )
 			return;
 
-		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box'  ) );
+		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
+		add_action( 'restrict_manage_posts', array( __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ) );
+		add_action( 'pre_get_posts',         array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
+	}
+
+	/**
+	 * Hook filters in that run on every admin page-load
+	 *
+	 * @uses add_filter()
+	 * @uses is_admin()
+	 */
+	private static function add_admin_filters() {
+
+		// Bail if not in admin area
+		if ( ! is_admin() )
+			return;
+
+		add_filter( 'display_post_states', array( __CLASS__, 'add_display_post_state' ), 10, 2 );
+		add_filter( 'query_vars',          array( __CLASS__, 'add_query_var_for_post_filtering' ) );
 	}
 
 	private static function register_embed_handlers() {
@@ -740,6 +759,102 @@ final class WPCOM_Liveblog {
 			do_action( 'liveblog_disable_post', $post_id );
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Indicate in the post list that a post is a liveblog
+	 *
+	 * @param array $post_states
+	 * @param mixed $post
+	 * @return array
+	 * @filter display_post_states
+	 */
+	public static function add_display_post_state( $post_states, $post = null ) {
+		if ( is_null( $post ) ) {
+			$post = get_post();
+		}
+		if ( self::is_liveblog_post( $post->ID ) ) {
+			$liveblog_state = self::get_liveblog_state( $post->ID );
+			if ( 'enable' === $liveblog_state ) {
+				$post_states[] = __( 'Liveblog', 'liveblog' );
+			}
+			else if ( 'archive' === $liveblog_state ) {
+				$post_states[] = __( 'Liveblog (archived)', 'liveblog' );
+			}
+		}
+		return $post_states;
+	}
+
+	/**
+	 * Register the query_var for filtering posts by liveblog state
+	 *
+	 * @param array $query_vars
+	 * @return array
+	 * @filter query_vars
+	 */
+	public static function add_query_var_for_post_filtering( $query_vars ) {
+		$query_vars[] = 'liveblog_state';
+		return $query_vars;
+	}
+
+	/**
+	 * Render the liveblog state select to filter posts in the post table
+	 *
+	 * @action restrict_manage_posts
+	 */
+	public static function add_post_filtering_dropdown_to_manage_posts() {
+		$current_screen = get_current_screen();
+		if ( ! post_type_supports( $current_screen->post_type, self::key ) ) {
+			return;
+		}
+
+		$options = array(
+			'' => __( 'Filter liveblogs', 'liveblog' ),
+			'any' => __( 'Any liveblogs', 'liveblog' ),
+			'enable' => __( 'Enabled liveblogs', 'liveblog' ),
+			'archive' => __( 'Archived liveblogs', 'liveblog' ),
+			'none' => __( 'No liveblogs', 'liveblog' ),
+		);
+		echo self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) );
+	}
+
+	/**
+	 * Translate the liveblog_state query_var into a meta_query
+	 *
+	 * @param WP_Query $query
+	 */
+	public static function handle_query_vars_for_post_filtering( $query ) {
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
+		$state = $query->get( 'liveblog_state' );
+		if ( 'any' === $state ) {
+			$new_meta_query_clause = array(
+				'key' => self::key,
+				'compare' => 'EXISTS',
+			);
+		}
+		else if ( 'none' === $state ) {
+			$new_meta_query_clause = array(
+				'key' => self::key,
+				'compare' => 'NOT EXISTS',
+			);
+		}
+		else if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
+			$new_meta_query_clause = array(
+				'key' => self::key,
+				'value' => $state,
+			);
+		}
+
+		if ( isset( $new_meta_query_clause ) ) {
+			$meta_query = $query->get( 'meta_query' );
+			if ( empty( $meta_query ) ) {
+				$meta_query = array();
+			}
+			array_push( $meta_query, $new_meta_query_clause );
+			$query->set( 'meta_query', $meta_query );
 		}
 	}
 
