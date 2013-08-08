@@ -198,7 +198,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * Get the liveblog reply comments for this post
 	 * @param array|string $args
 	 */
-	public function get_reply_comments( $args = array() ) {
+	public static function get_reply_comments( $args = array() ) {
 		$defaults = array(
 			'orderby' => 'comment_date_gmt',
 			'order'   => 'DESC',
