@@ -2,6 +2,7 @@ jQuery(document).ready(function($) {
 	liveblog.uploader = new wp.Uploader({
 
 		/* Selectors */
+		// @todo selctors need to be class-based and the upload.dropzone needs to be used to select the current message and container
 		browser: '#liveblog-messages',
 		dropzone: '#liveblog-container',
 
@@ -9,8 +10,9 @@ jQuery(document).ready(function($) {
 		success  : function( upload ) {
 			var url,
 				filename = upload.attributes? upload.attributes.filename : upload.filename,
-				$form = $( '.liveblog-form-entry' ),
-				entry_text = $form.val();
+				$textarea = this.dropzone.find( '.liveblog-form-entry:first' ),
+				$contenteditable = this.dropzone.find( '.liveblog-form-rich-entry:first' ),
+				entry_text = $textarea.val();
 
 			if ( upload.attributes ) {
 				if ( upload.attributes.sizes && upload.attributes.sizes.large )
@@ -25,11 +27,17 @@ jQuery(document).ready(function($) {
 				entry_text += "\n";
 			entry_text += url + "\n";
 
-			$form.val( entry_text );
+			$textarea.val( entry_text );
+			$textarea.trigger('input');
 			$( '#liveblog-messages' ).html( filename + ' Finished' );
 			$( '#liveblog-actions' ).removeClass( 'uploading' );
 
-			$form.focus();
+			if ($contenteditable.is(':visible')) {
+				$contenteditable.focus();
+			}
+			else {
+				$textarea.focus();
+			}
 		},
 
 		error    : function ( reason ) {
