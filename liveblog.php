@@ -870,7 +870,8 @@ final class WPCOM_Liveblog {
 	 * @return bool
 	 */
 	public static function current_user_can_edit_liveblog() {
-		return (bool) current_user_can( apply_filters( 'liveblog_edit_cap', self::edit_cap ) );
+		$retval = current_user_can( apply_filters( 'liveblog_edit_cap', self::edit_cap ) );
+		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
 	}
 
 	public static function is_liveblog_editable() {
