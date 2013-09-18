@@ -949,11 +949,21 @@ final class WPCOM_Liveblog {
 
 		$status                     = absint( $status );
 		$official_message           = isset( $wp_header_to_desc[$status] ) ? $wp_header_to_desc[$status] : '';
-		$wp_header_to_desc[$status] = $message;
+		$wp_header_to_desc[$status] = self::sanitize_http_header( $message );
 
 		status_header( $status );
 
 		$wp_header_to_desc[$status] = $official_message;
+	}
+
+	/**
+	 * Removes newlines from headers
+	 *
+	 * The only forbidden value in a header is a newline. PHP has a safe
+	 * guard against header splitting, but it doesn't set the header at all.
+	 */
+	private static function sanitize_http_header( $text ) {
+		return str_replace( "\n", '', $text );
 	}
 
 	/** Plupload Helpers ******************************************************/
