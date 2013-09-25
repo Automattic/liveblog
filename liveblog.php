@@ -962,8 +962,8 @@ final class WPCOM_Liveblog {
 	 * The only forbidden value in a header is a newline. PHP has a safe
 	 * guard against header splitting, but it doesn't set the header at all.
 	 */
-	private static function sanitize_http_header( $text ) {
-		return str_replace( "\n", '', $text );
+	public static function sanitize_http_header( $text ) {
+		return str_replace( array( "\n", "\r", chr( 0 ) ), '', $text );
 	}
 
 	/** Plupload Helpers ******************************************************/
