@@ -7,12 +7,6 @@
  */
 class WPCOM_Liveblog_Entry_Query {
 
-	/**
-	 * Set the post ID and key when a new object is created
-	 *
-	 * @param int $post_id
-	 * @param string $key
-	 */
 	public function __construct( $post_id, $key ) {
 		global $wp_version;
 		$this->post_id = $post_id;
@@ -20,7 +14,7 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Get the liveblog entries
+	 * Query the database for specific liveblog entries
 	 *
 	 * @param array $args the same args for the core `get_comments()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
@@ -44,7 +38,6 @@ class WPCOM_Liveblog_Entry_Query {
 	 * Get all of the liveblog entries
 	 *
 	 * @param array $args the same args for the core `get_comments()`
-	 * @return array
 	 */
 	public function get_all( $args = array() ) {
 		return self::remove_replaced_entries( $this->get( $args ) );
@@ -59,42 +52,26 @@ class WPCOM_Liveblog_Entry_Query {
 		return $entries[0];
 	}
 
-	/**
-	 * Get the latest liveblog entry
-	 *
-	 * @return null
-	 */
 	public function get_latest() {
 
-		// Get the latest liveblog entry
 		$entries = $this->get( array( 'number' => 1 ) );
 
-		// Bail if none were found
 		if ( empty( $entries ) )
 			return null;
 
 		return reset( $entries );
 	}
 
-	/**
-	 * Get the latest liveblog timestamp
-	 *
-	 * @return mixed Null if error, timestamp if successful
-	 */
 	public function get_latest_timestamp() {
 
-		// Get the latest entry
 		$latest = $this->get_latest();
 
-		// Bail if none were found
 		if ( is_null( $latest ) )
 			return null;
 
-		// Bail if not a WPCOM_Liveblog_Entry class
 		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) )
 			return null;
 
-		// Return the timestamp of the latest entry
 		return $latest->get_timestamp();
 	}
 
@@ -126,30 +103,14 @@ class WPCOM_Liveblog_Entry_Query {
 		return $all_entries_asc;
 	}
 
-	/**
-	 * Convert each comment into a Liveblog entry
-	 *
-	 * @param array $comments
-	 * @return array
-	 */
 	public static function entries_from_comments( $comments = array() ) {
 
-		// Bail if no comments
 		if ( empty( $comments ) )
 			return null;
 
-		// Map each comment to a new Liveblog Entry class, so that they inherit
-		// some neat helper methods.
 		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
 	}
 
-	/**
-	 * Filter out entries, which have been replaced by other entries in
-	 * the same set.
-	 *
-	 * @param array $entries
-	 * @return array
-	 */
 	public static function remove_replaced_entries( $entries = array() ) {
 
 		if ( empty( $entries ) )
