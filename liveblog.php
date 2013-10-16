@@ -76,6 +76,19 @@ final class WPCOM_Liveblog {
 		self::add_admin_actions();
 		self::add_admin_filters();
 		self::register_embed_handlers();
+		add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
+	}
+
+	public static function add_custom_post_type_support( $query ) {
+		if ( ! get_query_var( 'liveblog' ) )
+			return;
+
+		$post_types = array_filter( get_post_types(), array( __CLASS__, 'liveblog_post_type' ) );
+		$query->set( 'post_type', $post_types );
+	}
+
+	public static function liveblog_post_type( $post_type ) {
+		return post_type_supports( $post_type, self::key );
 	}
 
 	private static function add_old_wp_notice() {
