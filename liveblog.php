@@ -80,7 +80,7 @@ final class WPCOM_Liveblog {
 	}
 
 	public static function add_custom_post_type_support( $query ) {
-		if ( ! get_query_var( 'liveblog' ) )
+		if ( ! self::is_entries_ajax_request() )
 			return;
 
 		$post_types = array_filter( get_post_types(), array( __CLASS__, 'liveblog_post_type' ) );
