@@ -469,7 +469,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 }
 
 #liveblog-fixed-nag {
-	display: block;
+	display: none;
 	position: fixed;
 	z-index: 3;
 	top: 0;
