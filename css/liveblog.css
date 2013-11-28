@@ -467,28 +467,76 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry .liveblog-entry-actions li {
 	list-style: none;
 }
+
 #liveblog-fixed-nag {
-	display: none;
+	display: block;
 	position: fixed;
+	z-index: 3;
 	top: 0;
 	left: 0;
 	width: 100%;
 	color: white;
 	text-align: center;
-	-webkit-box-shadow: 0px 0px 8px 0px #000000;
-	-moz-box-shadow: 0px 0px 8px 0px #000000;
-	box-shadow: 0px 0px 8px 0px #000000;
-	background-color: rgba(1, 1, 1, 0.6);
 }
+
 #liveblog-fixed-nag a {
 	text-decoration: none;
 	display: block;
 	color: white;
+	text-align: center;
+	-webkit-box-shadow: -4px 0px 8px 0px #000000;
+	-moz-box-shadow: -4px 0px 8px 0px #000000;
+	box-shadow: -4px 0px 8px 0px #000000;
+	background-color: rgba(1, 1, 1, 0.6);
 }
+
 #liveblog-fixed-nag a .num {
 	font-size: 30px;
 	margin: 0 3px;
 	font-weight: bold;
 	display: inline-block;
 	vertical-align: middle;
+}
+
+/* The following are default settings for the Twenty Fourteen theme which uses a fixed header.
+ * Please note that in practice these are often overriden by the _moveBelowAdminBar() function
+ * in ../js/liveblog.js
+ */
+
+.admin-bar #liveblog-fixed-nag {
+	top: 28px;
+}
+
+.masthead-fixed #liveblog-fixed-nag {
+	top: 48px;
+}
+
+.admin-bar.masthead-fixed #liveblog-fixed-nag {
+	top: 80px;
+}
+
+@media screen and (max-width: 782px) {
+	.admin-bar.masthead-fixed #liveblog-fixed-nag,
+	.masthead-fixed #liveblog-fixed-nag {
+		top: 0px;
+	}
+}
+
+@media screen and (min-width: 1008px) {
+	.masthead-fixed #liveblog-fixed-nag a {
+		margin-left: 182px;
+	}
+}
+
+@media screen and (min-width: 1040px) {
+	.masthead-fixed #liveblog-fixed-nag a {
+		margin-left: 182px;
+	}
+}
+
+@media screen and (min-width: 1080px) {
+	.masthead-fixed #liveblog-fixed-nag a {
+		margin-left: 222px;
+		max-width: 1038px;
+	}
 }

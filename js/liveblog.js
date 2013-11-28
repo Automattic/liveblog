@@ -95,9 +95,20 @@ window.liveblog = window.liveblog || {};
 			this.$('a').html(html);
 		},
 		_moveBelowAdminBar: function() {
-			var $adminbar = $('#wpadminbar');
-			if ($adminbar.length) {
-				this.$el.css('top', $adminbar.height());
+			/* The yearly theme Twenty Fourteen has a fixed header so we need to check for it and offset accordingly.
+			 * If your custom theme has a fixed element, change the following line from "header#masthead" to the CSS
+			 * selector that you would like to consider when positioning the nag bar.
+			 */
+			var $fixed_header = $( 'header#masthead' );
+			var $adminbar = $( '#wpadminbar' );
+			if ( $fixed_header.length > 0 && 'fixed' == $fixed_header.css( 'position') ) {
+					this.$el.css( 'top', $fixed_header.position().top + $fixed_header.height() );
+			}
+			else if ( $adminbar.length > 0 ) {
+				this.$el.css( 'top', $adminbar.height() );
+			}
+			else {
+				this.$el.css( 'top', 0 );
 			}
 		}
 	});
