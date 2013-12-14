@@ -394,6 +394,9 @@ final class WPCOM_Liveblog {
 	 * @return bool
 	 */
 	private static function is_entries_ajax_request() {
+		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX )
+			return false;
+		
 		return (bool) get_query_var( self::url_endpoint );
 	}
 
