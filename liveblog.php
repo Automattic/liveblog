@@ -76,7 +76,6 @@ final class WPCOM_Liveblog {
 		self::add_admin_actions();
 		self::add_admin_filters();
 		self::register_embed_handlers();
-		add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -133,6 +132,7 @@ final class WPCOM_Liveblog {
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
+		add_action( 'pre_get_posts',                 array( __CLASS__, 'add_custom_post_type_support' ) );
 	}
 
 	/**
