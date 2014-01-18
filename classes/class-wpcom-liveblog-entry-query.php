@@ -43,6 +43,10 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $this->get( $args ) );
 	}
 
+	public function count( $args = array() ) {
+		return count( $this->get_all( $args ) );
+	}
+
 	public function get_by_id( $id ) {
 		$comment = get_comment( $id );
 		if ( $comment->comment_post_ID != $this->post_id || $comment->comment_type != $this->key || $comment->comment_approved != $this->key) {

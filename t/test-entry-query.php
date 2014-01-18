@@ -102,6 +102,22 @@ class Test_Entry_Query extends WP_UnitTestCase {
 		$this->assertTrue( $this->entry_query->has_any() );
 	}
 
+	function test_count_counts_all_entries() {
+		$this->create_comment();
+		$this->create_comment();
+		$this->assertEquals( 2, $this->entry_query->count() );
+	}
+
+	function test_count_returns_0_on_no_entries() {
+		$this->assertEquals( 0, $this->entry_query->count() );
+	}
+
+	function test_count_honors_the_query_args() {
+		$this->create_comment( array( 'comment_author_email' => 'baba@example.org' ) );
+		$this->create_comment( array( 'comment_author_email' => 'dyado@example.org' ) );
+		$this->assertEquals( 1, $this->entry_query->count( array( 'author_email' => 'baba@example.org' ) ) );
+	}
+
 	private function create_comment( $args = array() ) {
 		$defaults = array(
 			'comment_post_ID'  => $this->entry_query->post_id,
