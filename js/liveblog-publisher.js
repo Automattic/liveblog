@@ -407,6 +407,7 @@
 
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-delete', liveblog.publisher.delete_click );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-edit', liveblog.publisher.edit_click );
+		$('#liveblog-entries').on( 'click', '.liveblog-entry-upload', liveblog.publisher.upload_click );
 	};
 
 	liveblog.publisher.delete_click = function( e ) {
@@ -433,6 +434,19 @@
 		entry.find( '.liveblog-entry-edit' ).hide();
 		entry.find('.liveblog-entry-actions .liveblog-entry-delete').hide();
 	};
+
+ 	liveblog.publisher.upload_click = function( e ) {
+		e.preventDefault();
+		var entry = $( e.target ).closest( '.liveblog-entry' );
+		var id = entry.attr( 'id' ).replace( 'liveblog-entry-', '' );
+		if ( !id ) {
+			return;
+		}
+
+		liveblog.uploader.init();
+		jQuery('#liveblog-messages').click();
+		form.render();
+	}
 
 	liveblog.publisher.delete_entry = function( id ) {
 		var data = {

@@ -7,6 +7,8 @@
 				<li class="active entry"><a href="#">{{entry_tab_label}}</a></li>
 				<li>&bull;</li>
 				<li class="preview"><a href="#"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
+				<li>&bull;</li>
+				<li class="liveblog-entry-upload"><a href="#"><?php _e( 'Upload Image', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
 			<div class="liveblog-edit-entry">

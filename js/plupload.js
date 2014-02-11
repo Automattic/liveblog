@@ -67,4 +67,10 @@ jQuery(document).ready(function($) {
 			$( '#liveblog-messages' ).html( 'All done!' );
 		}
 	});
+
+	jQuery('.liveblog-entry-upload').click(function() {
+		liveblog.uploader.init();
+		jQuery('#liveblog-messages').click();
+	});
+
 });
