@@ -678,9 +678,17 @@ final class WPCOM_Liveblog {
 	 */
 	private static function get_all_entry_output() {
 
-		// Get liveblog entries
-		$entries = (array) self::$entry_query->get_all();
-		$show_archived_message = 'archive' == self::get_liveblog_state() && self::current_user_can_edit_liveblog();
+		// Get liveblog entries.
+		$args = array();
+		$state = self::get_liveblog_state();
+
+		if ( 'archive' == $state ) {
+			$args['order'] = 'ASC';
+		}
+
+		$args = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
+		$entries = (array) self::$entry_query->get_all( $args );
+		$show_archived_message = 'archive' == $state && self::current_user_can_edit_liveblog();
 
 		// Get the template part
 		return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
