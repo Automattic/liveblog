@@ -512,7 +512,7 @@ final class WPCOM_Liveblog {
 		wp_localize_script( 'moment', 'momentLang', array(
 			'locale' => get_locale(),
 			'relativeTime' => array(
-				'past' => __( '%s ago' ),
+				'past' => __( '%s ago', 'liveblog' ),
 				's' => __( 'a few seconds', 'liveblog' ),
 				'm' => __( 'a minute', 'liveblog' ),
 				'mm' => __( '%d minutes', 'liveblog' ),
