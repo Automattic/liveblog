@@ -74,7 +74,9 @@ class Test_Entry extends WP_UnitTestCase {
 		$entry = $this->insert_entry();
 		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
 		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
-		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
+		$entries = $query->get_all();
+		$query_entry = array_shift( $entries );
+		$this->assertEquals( 'delete', $query_entry->get_type() );
 	}
 
 	function test_update_then_delete_should_return_delete_entry() {
