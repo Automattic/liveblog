@@ -38,6 +38,7 @@ final class WPCOM_Liveblog {
 	const rewrites_version = 1;
 	const min_wp_version   = '3.5';
 	const key              = 'liveblog';
+	const order_key	 			 = '_liveblog_order';
 	const url_endpoint     = 'liveblog';
 	const edit_cap         = 'publish_posts';
 	const nonce_key        = 'liveblog_nonce';
@@ -132,6 +133,7 @@ final class WPCOM_Liveblog {
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
+		add_action( 'wp_ajax_set_liveblog_order_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_order_for_post' ) );
 		add_action( 'pre_get_posts',                 array( __CLASS__, 'add_custom_post_type_support' ) );
 	}
 
@@ -370,6 +372,23 @@ final class WPCOM_Liveblog {
 		return $state;
 	}
 
+	/**
+	 * Return the '_liveblog_order' value
+	 * 
+	 * @global WP_Post $post
+	 * @param  int $post_id
+	 * @return int
+	 */
+	public static function get_liveblog_order_option( $post_id = null ) {
+		if ( empty( $post_id ) ) {
+			global $post;
+			$post_id = $post->ID;
+		}
+		
+		$order = get_post_meta( $post_id, self::order_key, true );
+		return (int)$order;
+	}
+
 	/** Private _is_ Methods **************************************************/
 
 	/**
@@ -550,6 +569,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
+				'order'									 => self::get_liveblog_order_option(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
@@ -651,9 +671,18 @@ final class WPCOM_Liveblog {
 	 public static function add_liveblog_to_content( $content ) {
 
 		$liveblog_output  = '<div id="liveblog-container" class="'. self::$post_id .'">';
-		$liveblog_output .= self::get_editor_output();
-		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
+
+		if ( 1 !== self::get_liveblog_order_option() ) {
+			$liveblog_output .= self::get_editor_output();
+			$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
+		}
+
 		$liveblog_output .= self::get_all_entry_output();
+
+		if ( 1 === self::get_liveblog_order_option() ) {
+			$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
+			$liveblog_output .= self::get_editor_output();
+		}
 		$liveblog_output .= '</div>';
 
 		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
@@ -681,13 +710,17 @@ final class WPCOM_Liveblog {
 		// Get liveblog entries.
 		$args = array();
 		$state = self::get_liveblog_state();
-
+		
 		if ( 'archive' == $state ) {
 			$args['order'] = 'ASC';
 		}
 
 		$args = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
 		$entries = (array) self::$entry_query->get_all( $args );
+
+		if ( 'archive' != $state && 1 == self::get_liveblog_order_option() && !empty( $entries ) ) {
+			$entries = array_reverse($entries);
+		}
 		$show_archived_message = 'archive' == $state && self::current_user_can_edit_liveblog();
 
 		// Get the template part
@@ -752,25 +785,37 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
+
+		$order_option =  array(
+			'title' 			=> __( 'Comments Order', 'liveblog' ),
+			'description' => __( 'Select which order new comments show at the Liveblog page.', 'liveblog' ),
+			'option' 			=> array ( 
+				'value' => 1,
+				'name' => self::order_key,
+				'text' => __( 'Show new comments at the bottom', 'liveblog' ),
+				'checked' => self::get_liveblog_order_option( $post->ID ) ? 'checked' : ''
+			)
+		);
+
+		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'order_option' ) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
-		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
+		$REQUEST = self::check_ajax_request();
+
 		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
 
-		self::ajax_current_user_can_edit_liveblog();
-		self::ajax_check_nonce();
+		self::set_liveblog_state( $_REQUEST['post_id'], $_REQUEST['state'] );
+		self::display_meta_box( $REQUEST );
+		exit;
+	}
 
-		if ( !$REQUEST = get_post( $post_id ) ) {
-			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
-		}
+	public static function admin_ajax_set_liveblog_order_for_post() {
+		$REQUEST = self::check_ajax_request();
 
-		if ( wp_is_post_revision( $post_id ) ) {
-			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
-		}
+		$new_order = isset( $_REQUEST['order'] )? $_REQUEST['order'] : 1;
 
-		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
+		self::set_liveblog_order( $_REQUEST['post_id'], $new_order );
 		self::display_meta_box( $REQUEST );
 		exit;
 	}
@@ -785,6 +830,33 @@ final class WPCOM_Liveblog {
 		} else {
 			return false;
 		}
+	}
+
+	private static function set_liveblog_order( $post_id, $order ) {
+		$order = (int)$order;
+
+		if ( 1 === $order ) {
+			update_post_meta( $post_id, self::order_key, $order );
+		} else {
+			delete_post_meta( $post_id, self::order_key );
+		}
+	}
+
+	private static function check_ajax_request() {
+		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
+
+		self::ajax_current_user_can_edit_liveblog();
+		self::ajax_check_nonce();
+
+		if ( !$REQUEST = get_post( $post_id ) ) {
+			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
+		}
+
+		if ( wp_is_post_revision( $post_id ) ) {
+			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
+		}
+
+		return $REQUEST;
 	}
 
 	/**

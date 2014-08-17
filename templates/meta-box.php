@@ -17,3 +17,7 @@ foreach( $buttons as $button ):
 <?php endforeach; ?>
 </ul>
 
+<h4><?php echo $order_option['title']; ?></h4>
+<p><?php echo $order_option['description']; ?></p>
+<input type="checkbox" name="<?php echo esc_attr( $order_option['option']['name'] ) ?>" id="<?php echo esc_attr( $order_option['option']['name'] ) ?>" value="<?php echo esc_attr( $order_option['option']['value'] ) ?>" <?php echo $order_option['option']['checked'] ?> />
+<?php echo $order_option['option']['text']; ?>

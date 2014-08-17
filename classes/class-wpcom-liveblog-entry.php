@@ -69,13 +69,15 @@ class WPCOM_Liveblog_Entry {
 		$entry_id     = $this->comment->comment_ID;
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$comment_text = get_comment_text( $entry_id );
+		$css_classes  = comment_class( '', $entry_id, $post_id, false );
 
 		$entry = array(
 			'entry_id'              => $entry_id,
 			'post_id'               => $entry_id,
-			'css_classes'           => comment_class( '', $entry_id, $post_id, false ),
-			'content'               => self::render_content( get_comment_text( $entry_id ), $this->comment ),
-			'original_content'      => get_comment_text( $entry_id ),
+			'css_classes'           => $css_classes ,
+			'content'               => self::render_content( $comment_text, $this->comment ),
+			'original_content'      => $comment_text,
 			'avatar_size'           => $avatar_size,
 			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'           => get_comment_author_link( $entry_id ),
@@ -160,9 +162,11 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+
 		wp_update_comment( array(
 			'comment_ID'      => $args['entry_id'],
 			'comment_content' => wp_filter_post_kses( $args['content'] ),
+			'comment_approved' => 'updated',
 		) );
 		$entry = self::from_comment( $comment );
 		return $entry;
@@ -180,6 +184,7 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
+		
 		$args['content'] = '';
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -187,6 +192,7 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+
 		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;

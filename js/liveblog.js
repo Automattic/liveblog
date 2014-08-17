@@ -135,6 +135,10 @@ window.liveblog = window.liveblog || {};
 		liveblog.set_initial_timestamps();
 		liveblog.start_human_time_diff_timer();
 
+		if( liveblog_settings.order == '1' && $(".liveblog-entry").length > 0 ) {
+			liveblog.scroll_to_last_element();
+		}
+
 		liveblog.$events.trigger( 'after-init' );
 	};
 
@@ -298,7 +302,14 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.add_entry = function( new_entry, duration ) {
 		var $new_entry = $( new_entry.html );
-		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+
+		if ( liveblog_settings.order == '1'  ) {
+			$new_entry.addClass('highlight').appendTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+			liveblog.scroll_to_last_element();
+		} else {
+			$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+		}		
+
 		liveblog.entriesContainer.updateTimes();
 	};
 
@@ -381,6 +392,10 @@ window.liveblog = window.liveblog || {};
 	liveblog.is_at_the_top = function() {
 		return $(document).scrollTop()  < liveblog.$entry_container.offset().top;
 	};
+
+	liveblog.scroll_to_last_element = function() {
+		$( 'html, body' ).animate({ scrollTop: $(".liveblog-entry").last().offset().top - 200 }, 2000);		
+	}
 
 	// Initialize everything!
 	if ( 'archive' !== liveblog_settings.state ) {
