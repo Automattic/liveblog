@@ -4,14 +4,10 @@
 		return;
 	}
 
-	_.templateSettings = {
-		interpolate : /\{\{(.+?)\}\}/g
-	};
-
 	liveblog.InsertEntryView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'liveblog-form',
-		template: _.template($('#liveblog-form-template').html()),
+		template: _.template($('#liveblog-form-template').html(), null, { interpolate : /\{\{(.+?)\}\}/g }),
 		entry_tab_label: liveblog_publisher_settings.new_entry_tab_label,
 		submit_label: liveblog_publisher_settings.new_entry_submit_label,
 		is_rich_text_enabled: false,

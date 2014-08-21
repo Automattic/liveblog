@@ -9,6 +9,9 @@
 .liveblog-form {
 	position: relative;
 }
+#liveblog-update-spinner {
+	padding: 10px;
+}
 
 /* =Form Actions
 -------------------------------------------------------------- */

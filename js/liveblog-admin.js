@@ -21,4 +21,22 @@ jQuery( function( $ ) {
 			}
 		} );
 	} );
+
+	$meta_box.on( 'change', '#_liveblog_order', function( e ) {
+		e.preventDefault();
+		var order = $( this ).is( ':checked' ) ? 1 : 0;
+
+		var url = ajaxurl + '?action=set_liveblog_order_for_post&post_id=' + encodeURIComponent( post_id ) + '&order=' + encodeURIComponent( order ) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
+		$( '.inside', $meta_box ).load( url, function( response, status, xhr ) {
+			if ( status === 'success') {
+				return;
+			}
+			if (xhr.status && xhr.status > 200) {
+				show_error( xhr.statusText, xhr.status );
+			} else {
+				show_error( status );
+			}
+		} );
+	} );
+
 } );
