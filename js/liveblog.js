@@ -394,7 +394,7 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.scroll_to_last_element = function() {
-		$( 'html, body' ).animate({ scrollTop: $(".liveblog-entry").last().offset().top - 200 }, 2000);		
+		$( 'html, body' ).animate({ scrollTop: $(".liveblog-entry").last().offset().top - 200 }, 1000);		
 	}
 
 	// Initialize everything!
