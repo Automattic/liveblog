@@ -222,7 +222,7 @@ window.liveblog = window.liveblog || {};
 		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
 
 		if ( response.entries.length ) {
-			if ( liveblog.is_at_the_top() && liveblog.queue.isEmpty() ) {
+			if ( liveblog.queue.isEmpty() ) {
 				liveblog.display_entries( response.entries );
 			} else {
 				added =  _.filter(response.entries, function(entry) { return 'new' === entry.type; } );
