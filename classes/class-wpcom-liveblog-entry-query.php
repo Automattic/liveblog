@@ -88,8 +88,7 @@ class WPCOM_Liveblog_Entry_Query {
 				$entries_between[] = $entry;
 			}
 		}
-
-		return self::remove_replaced_entries( $entries_between );
+		return self::remove_replaced_entries( $entries_between, true);
 	}
 
 	public function has_any() {
@@ -115,7 +114,7 @@ class WPCOM_Liveblog_Entry_Query {
 		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
 	}
 
-	public static function remove_replaced_entries( $entries = array() ) {
+	public static function remove_replaced_entries( $entries = array(), $hide_trashed_replaced_ids = false ) {
 
 		if ( empty( $entries ) )
 			return $entries;
@@ -123,8 +122,16 @@ class WPCOM_Liveblog_Entry_Query {
 		$entries_by_id = self::assoc_array_by_id( $entries );
 
 		foreach ( (array) $entries_by_id as $id => $entry ) {
+
 			if ( !empty( $entry->replaces ) && isset( $entries_by_id[$entry->replaces] ) ) {
 				unset( $entries_by_id[$id] );
+			}
+
+			if ( !$hide_trashed_replaced_ids ) {
+				$comment = get_comment( $entry->replaces );
+				if ( $comment && isset( $comment->comment_approved )  && 'trash' === $comment->comment_approved ) {
+					unset( $entries_by_id[$id] );
+				}
 			}
 		}
 
