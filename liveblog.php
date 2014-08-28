@@ -258,7 +258,6 @@ final class WPCOM_Liveblog {
 			wp_safe_redirect( get_permalink() );
 			exit();
 		}
-		wp_cache_delete( self::key . '_entries_asc_' . self::$post_id, 'liveblog' );
 
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
@@ -446,6 +445,8 @@ final class WPCOM_Liveblog {
 		if ( is_wp_error( $entry ) ) {
 			self::send_server_error( $entry->get_error_message() );
 		}
+
+		wp_cache_delete( self::get_cache_key(), self::key );
 
 		// Do not send latest_timestamp. If we send it the client won't get
 		// older entries. Since we send only the new one, we don't know if there
@@ -686,12 +687,26 @@ final class WPCOM_Liveblog {
 			$args['order'] = 'ASC';
 		}
 
-		$args = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
-		$entries = (array) self::$entry_query->get_all( $args );
+		$cached_entries = wp_cache_get( self::get_cache_key(), self::key );
+
+		if ( false == $cached_entries ) {
+			$args = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
+			$entries = (array) self::$entry_query->get_all( $args );
+
+			$processed_entries = array();
+			foreach ( (array) $entries as $entry ) {
+				$processed_entries[] = $entry->render();
+			}			
+
+			wp_cache_set( self::get_cache_key(), $processed_entries, self::key );
+		} else {
+			$processed_entries = $cached_entries;
+		}			
+
 		$show_archived_message = 'archive' == $state && self::current_user_can_edit_liveblog();
 
 		// Get the template part
-		return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
+		return self::get_template_part( 'liveblog-loop.php', compact( 'processed_entries', 'show_archived_message' ) );		
 	}
 
 	/**
@@ -786,6 +801,17 @@ final class WPCOM_Liveblog {
 			return false;
 		}
 	}
+
+	private static function get_cache_key() {
+		$state = self::get_liveblog_state();
+		
+		if ( 'archive' == $state ) {
+			$args['order'] = 'ASC';
+		}
+
+		$cache_key =  self::key . '_entries_' . $state . '_'  . self::$post_id;	
+		return $cache_key;	
+	}	
 
 	/**
 	 * Indicate in the post list that a post is a liveblog
