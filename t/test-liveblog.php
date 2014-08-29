@@ -13,7 +13,7 @@ class Test_Liveblog extends WP_UnitTestCase {
 		$this->assertEquals( 'baba', WPCOM_Liveblog::sanitize_http_header( 'ba' . chr(0) . 'ba' ) );
 	}
 
-	function test_is_protected_meta_should_return_true() {
+	function test_protected_liveblog_meta_should_return_true() {
 		$this->assertEquals( true, is_protected_meta( WPCOM_Liveblog::key ) );
 	}	
 }

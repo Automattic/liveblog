@@ -143,7 +143,7 @@ final class WPCOM_Liveblog {
 	private static function add_filters() {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
-		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_meta_key'	 ), 10, 2 );		
+		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );		
 	}
 
 	/**
@@ -994,7 +994,7 @@ final class WPCOM_Liveblog {
 	 * @param  String $meta_key
 	 * @return Boolean
 	 */
-	public static function protect_meta_key( $protected, $meta_key ) {
+	public static function protect_liveblog_meta_key( $protected, $meta_key ) {
 		if ( self::key === $meta_key )
 			return true;
 		
