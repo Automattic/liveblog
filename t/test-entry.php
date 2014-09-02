@@ -77,7 +77,7 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
 	}
 
-	function set_liveblog_hook_fired() {
+	static function set_liveblog_hook_fired() {
 		$GLOBALS['liveblog_hook_fired'] = true;
 	}
 
