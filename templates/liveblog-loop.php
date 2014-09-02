@@ -5,9 +5,9 @@
 <?php endif; ?>
 <div id="liveblog-entries">
 
-	<?php foreach ( (array) $entries as $entry ) : ?>
+	<?php foreach ( (array) $processed_entries as $processed_entry ) : ?>
 
-		<?php echo $entry->render(); ?>
+		<?php echo $processed_entry; ?>
 
 	<?php endforeach; ?>
 
