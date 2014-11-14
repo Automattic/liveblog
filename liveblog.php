@@ -566,7 +566,7 @@ final class WPCOM_Liveblog {
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				// i18n
-				'delete_confirmation'    => __( 'Do you really want do delete this entry? There is no way back.', 'liveblog' ),
+				'delete_confirmation'    => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 				'new_update'             => __( 'Liveblog: {number} new update' , 'liveblog'),
