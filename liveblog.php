@@ -643,6 +643,22 @@ final class WPCOM_Liveblog {
 	/** Display Methods *******************************************************/
 
 	/**
+	 * Constructs the live blog HTML
+	 *
+	 * @return string HTML for the liveblog
+	 */
+	public static function get_liveblog_output() {
+
+		$liveblog_output  = '<div id="liveblog-container" class="'. (int) self::$post_id .'">';
+		$liveblog_output .= self::get_editor_output();
+		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
+		$liveblog_output .= self::get_all_entry_output();
+		$liveblog_output .= '</div>';
+
+		return $liveblog_output;
+	}
+
+	/**
 	 * Filter the_content and add the liveblog theme-side UI above the normal
 	 * content area.
 	 *
@@ -651,21 +667,17 @@ final class WPCOM_Liveblog {
 	 */
 	 public static function add_liveblog_to_content( $content ) {
 
-		// We don't want to add the liveblog to other loops
-		// on the same page
-		if ( ! self::is_viewing_liveblog_post() ) {
-			return $content;
-		}
+		 // We don't want to add the liveblog to other loops
+		 // on the same page
+		 if ( ! self::is_viewing_liveblog_post() ) {
+			 return $content;
+		 }
 
-		$liveblog_output  = '<div id="liveblog-container" class="'. self::$post_id .'">';
-		$liveblog_output .= self::get_editor_output();
-		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
-		$liveblog_output .= self::get_all_entry_output();
-		$liveblog_output .= '</div>';
+		 $liveblog_output = self::get_liveblog_output();
 
-		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
+		 $liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
 
-		return $content . $liveblog_output;
+		 return $content . $liveblog_output;
 	}
 
 	/**
@@ -1067,6 +1079,16 @@ final class WPCOM_Liveblog {
 		}
 		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
+}
+
+/**
+ * Provides the ability for Live Blogs to be output into a theme manually. Useful
+ * for themes that may disable the the_content filter
+ */
+function wpcom_liveblog_get_output() {
+	$liveblog = new WPCOM_Liveblog;
+
+	return $liveblog::get_liveblog_output();
 }
 
 function wpcom_liveblog_load() {
