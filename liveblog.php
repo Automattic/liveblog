@@ -651,6 +651,12 @@ final class WPCOM_Liveblog {
 	 */
 	 public static function add_liveblog_to_content( $content ) {
 
+		// We don't want to add the liveblog to other loops
+		// on the same page
+		if ( ! self::is_viewing_liveblog_post() ) {
+			return $content;
+		}
+
 		$liveblog_output  = '<div id="liveblog-container" class="'. self::$post_id .'">';
 		$liveblog_output .= self::get_editor_output();
 		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
