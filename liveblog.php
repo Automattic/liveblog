@@ -649,10 +649,10 @@ final class WPCOM_Liveblog {
 	 */
 	public static function get_liveblog_output() {
 
-		$liveblog_output  = '<div id="liveblog-container" class="'. (int) self::$post_id .'">';
-		$liveblog_output .= self::get_editor_output();
+		$liveblog_output  = '<div id="liveblog-container" class="'. (int) $this->post_id .'">';
+		$liveblog_output .= $this->get_editor_output();
 		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
-		$liveblog_output .= self::get_all_entry_output();
+		$liveblog_output .= $this->get_all_entry_output();
 		$liveblog_output .= '</div>';
 
 		return $liveblog_output;
@@ -669,13 +669,13 @@ final class WPCOM_Liveblog {
 
 		 // We don't want to add the liveblog to other loops
 		 // on the same page
-		 if ( ! self::is_viewing_liveblog_post() ) {
+		 if ( ! $this->is_viewing_liveblog_post() ) {
 			 return $content;
 		 }
 
-		 $liveblog_output = self::get_liveblog_output();
+		 $liveblog_output = $this->get_liveblog_output();
 
-		 $liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
+		 $liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, $this->post_id );
 
 		 return $content . $liveblog_output;
 	}
