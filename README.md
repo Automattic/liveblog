@@ -5,7 +5,7 @@
 * Tags: liveblog
 * Requires at least: 3.5
 * Tested up to: 4.1.1
-* Stable tag: 1.3.1
+* Stable tag: 1.4
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,13 @@ If you'd like to check out the code and contribute, [join us on github](https://
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
 
 ## Changelog
+
+### 1.4
+
+* Rich-text editing!
+* Archived liveblogs now display in chronological order (live ones show reverse chron)
+* New and udpated translations
+* Bump to fix SVN sync issues (thanks @kevinlisota)
 
 ### 1.3.1
 
