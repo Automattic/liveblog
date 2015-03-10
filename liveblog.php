@@ -432,7 +432,7 @@ final class WPCOM_Liveblog {
 
 		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete' ) ) ) {
+		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete', 'lock', 'unlock' ) ) ) {
 			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 

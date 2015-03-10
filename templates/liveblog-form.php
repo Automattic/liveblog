@@ -37,7 +37,7 @@
 				<div class="liveblog-submit-wrapper">
 					<span class="liveblog-submit-spinner"></span>
 					<input type="button" class="liveblog-form-entry-submit button" value="{{submit_label}}" />
-					<a href="#" class="cancel"><?php _e( 'Cancel', 'liveblog' ); ?></a>
+					<a href="#" class="liveblog-form-entry-cancel cancel"><?php _e( 'Cancel', 'liveblog' ); ?></a>
 					<a href="#" class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></a>
 				</div>
 			</div>

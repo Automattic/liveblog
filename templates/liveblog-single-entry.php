@@ -3,6 +3,10 @@
 		<span class="liveblog-author-avatar"><?php echo $avatar_img; ?></span>
 		<span class="liveblog-author-name"><?php echo $author_link; ?></span>
 		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo $entry_id; ?>"><span class="date"><?php echo $entry_date; ?></span><span class="time"><?php echo $entry_time; ?></span></a></span>
+        <span class="liveblog-meta-locked alert alert-error hide"><small><em>
+            <span class="liveblog-locked-status"></span>
+            <button class="liveblog-locked-kick btn btn-mini btn-danger" type="button">Kick</button>
+        </em></small></span>
 	</header>
 	<div class="liveblog-entry-text" data-original-content="<?php echo esc_attr( $original_content ); ?>">
 		<?php echo $content; ?>

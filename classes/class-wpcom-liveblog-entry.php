@@ -12,6 +12,7 @@ class WPCOM_Liveblog_Entry {
 	 * another entry, we store the other entry's ID in this meta key.
 	 */
 	const replaces_meta_key   = 'liveblog_replaces';
+	const locked_meta_key   = 'liveblog_locked';
 
 	private $comment;
 	private $type = 'new';
@@ -137,6 +138,69 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
+	 * Locks an entry for update
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to lock), post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The locked entry
+	 */
+	public static function lock( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		$locked = self::locked( $args['entry_id'] );
+		if ( !empty( $locked ) ) {
+			$error = 'Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] . '! ' );
+			return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
+		}
+
+		$comment = get_comment( $args['entry_id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_lock_entry', $comment->comment_ID, $args['post_id'], $args['user'] );
+		$lock_args = array(
+			'user_id' => $args['user']->ID,
+			'user_login' => $args['user']->user_login,
+			'locked_at' => time(),
+		);
+		add_comment_meta( $comment->comment_ID, self::locked_meta_key, $lock_args );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	private static function _format_locked_at( $time )
+	{
+		$seconds = time() - $time;
+		$minutes = floor( $seconds / 60 );
+		$seconds = $seconds % 60;
+		$hours = floor( $minutes / 60 );
+		$minutes = $minutes % 60;
+		return ( $hours > 0 ? $hours . ' hour' . ( $hours > 1 ? 's' : '' ) . ' and ' : '' ) . ( $minutes > 0 ? $minutes . ' minute' . ( $minutes > 1 ? 's' : '' ) . ' ' : ( $hours < 1 && $minutes < 1 ? ' less than a minute ' : '' ) ) . 'ago';
+	}
+
+	/**
+	 * Unlocks an entry for update
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to lock), post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The unlocked entry
+	 */
+	public static function unlock( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+
+		$comment = get_comment( $args['entry_id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_unlock_entry', $comment->comment_ID, $args['post_id'] );
+		delete_comment_meta( $comment->comment_ID, self::locked_meta_key );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+
+	/**
 	 * Updates an exsting entry
 	 *
 	 * Inserts a new entry, which replaces the original entry.
@@ -147,6 +211,13 @@ class WPCOM_Liveblog_Entry {
 	public static function update( $args ) {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		$locked = self::locked( $args['entry_id'] );
+		if ( !empty( $locked ) ) {
+			if ( $locked['user_id'] != $args['user']->ID ) {
+				$error = 'Not allowed to update as you have been kicked by ' . $locked['user_login'] . '. Entry locked ' . self::_format_locked_at( $locked['locked_at'] . '! ' );
+				return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
+			}
 		}
 
 		// always use the original author for the update entry, otherwise until refresh
@@ -161,6 +232,7 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
+		delete_comment_meta( $args['entry_id'], self::locked_meta_key );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_update_comment( array(
 			'comment_ID'      => $args['entry_id'],
@@ -241,5 +313,9 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
+	}
+
+	private static function locked( $comment_id ) {
+		return get_comment_meta( $comment_id, self::locked_meta_key, true );
 	}
 }
