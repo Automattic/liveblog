@@ -89,7 +89,7 @@ class WPCOM_Liveblog_Entry_Query {
 			}
 		}
 
-		return self::remove_replaced_entries( $entries_between );
+		return $entries_between;
 	}
 
 	public function has_any() {
@@ -122,9 +122,17 @@ class WPCOM_Liveblog_Entry_Query {
 
 		$entries_by_id = self::assoc_array_by_id( $entries );
 
+		$removed = array();
 		foreach ( (array) $entries_by_id as $id => $entry ) {
-			if ( !empty( $entry->replaces ) && isset( $entries_by_id[$entry->replaces] ) ) {
-				unset( $entries_by_id[$id] );
+			if ( !empty( $entry->replaces ) ) {
+				if ( isset( $entries_by_id[$entry->replaces] ) ) {
+					unset( $entries_by_id[$entry->replaces] );
+					$removed[$entry->replaces] = $id;
+				}
+				else if ( isset( $removed[$entry->replaces] ) ) {
+					unset( $entries_by_id[$id] );
+					$removed[$id] = $id;
+				}
 			}
 		}
 
