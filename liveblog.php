@@ -982,6 +982,7 @@ final class WPCOM_Liveblog {
 		status_header( $status );
 
 		$wp_header_to_desc[$status] = $official_message;
+        echo $message ? json_encode( $message ) : '';
 	}
 
 	/**

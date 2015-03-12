@@ -456,7 +456,7 @@
                 liveblog.publisher.insert_form.hide_spinner();
             },
             function ( response, status ) {
-                entry.find('.liveblog-locked-status').html(response.statusText);
+                entry.find('.liveblog-locked-status').html(response.responseJSON);
                 entry.find('.liveblog-meta-locked').show();
 
                 liveblog.publisher.insert_form.hide_spinner();

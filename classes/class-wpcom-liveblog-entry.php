@@ -71,7 +71,7 @@ class WPCOM_Liveblog_Entry {
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = comment_class( '', $entry_id, $post_id, false );		
+		$css_classes  = comment_class( '', $entry_id, $post_id, false );
 
 		$entry = array(
 			'entry_id'              => $entry_id,
@@ -148,7 +148,7 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 		$locked = self::locked( $args['entry_id'] );
-		if ( !empty( $locked ) ) {
+		if ( !empty( $locked ) && empty( $locked['updated_at'] ) ) {
 			$error = 'Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] . '! ' );
 			return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
 		}
@@ -162,6 +162,7 @@ class WPCOM_Liveblog_Entry {
 			'user_id' => $args['user']->ID,
 			'user_login' => $args['user']->user_login,
 			'locked_at' => time(),
+			'updated_at' => false,
 		);
 		add_comment_meta( $comment->comment_ID, self::locked_meta_key, $lock_args );
 		$entry = self::from_comment( $comment );
@@ -214,8 +215,15 @@ class WPCOM_Liveblog_Entry {
 		}
 		$locked = self::locked( $args['entry_id'] );
 		if ( !empty( $locked ) ) {
-			if ( $locked['user_id'] != $args['user']->ID ) {
-				$error = 'Not allowed to update as you have been kicked by ' . $locked['user_login'] . '. Entry locked ' . self::_format_locked_at( $locked['locked_at'] . '! ' );
+			if ( $locked['user_id'] != $args['user']->ID || !empty( $locked['updated_at'] ) ) {
+				$error = 'Not allowed to update.';
+				if ( !empty( $locked['updated_at'] ) ) {
+					$error .= ' Entry updated by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['updated_at'] ) . '! ';
+					$error .= ' Wait for the next refresh and try editing again... ';
+				}
+				else {
+					$error .= ' Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] ) . '! ';
+				}
 				return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
 			}
 		}
@@ -232,7 +240,7 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
-		delete_comment_meta( $args['entry_id'], self::locked_meta_key );
+		self::lock_updated( $args['entry_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_update_comment( array(
 			'comment_ID'      => $args['entry_id'],
@@ -317,5 +325,12 @@ class WPCOM_Liveblog_Entry {
 
 	private static function locked( $comment_id ) {
 		return get_comment_meta( $comment_id, self::locked_meta_key, true );
+	}
+	private static function lock_updated( $comment_id ) {
+		$locked = self::locked( $comment_id );
+		if ( !empty( $locked ) ) {
+			$locked['updated_at'] = time();
+			update_comment_meta( $comment_id, self::locked_meta_key, $locked )			;
+		}
 	}
 }
