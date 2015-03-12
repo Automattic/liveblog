@@ -437,6 +437,13 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry .liveblog-entry-text {
 	margin: 10px 0 0 40px;
 }
+.liveblog-entry .liveblog-meta .liveblog-locked-status {
+    padding: 0 0.5em;
+}
+.liveblog-entry .liveblog-meta .liveblog-locked-kick {
+    margin-top: -0.4em;
+    margin-left: 0.4em;
+}
 .liveblog-entry .liveblog-meta .liveblog-author-name {
 	font-size: 15px;
 	line-height: 18px;

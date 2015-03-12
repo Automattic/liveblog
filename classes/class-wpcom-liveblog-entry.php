@@ -12,6 +12,7 @@ class WPCOM_Liveblog_Entry {
 	 * another entry, we store the other entry's ID in this meta key.
 	 */
 	const replaces_meta_key   = 'liveblog_replaces';
+	const locked_meta_key   = 'liveblog_locked';
 
 	private $comment;
 	private $type = 'new';
@@ -70,7 +71,7 @@ class WPCOM_Liveblog_Entry {
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = comment_class( '', $entry_id, $post_id, false );		
+		$css_classes  = comment_class( '', $entry_id, $post_id, false );
 
 		$entry = array(
 			'entry_id'              => $entry_id,
@@ -137,6 +138,70 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
+	 * Locks an entry for update
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to lock), post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The locked entry
+	 */
+	public static function lock( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		$locked = self::locked( $args['entry_id'] );
+		if ( !empty( $locked ) && empty( $locked['updated_at'] ) ) {
+			$error = 'Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] . '! ' );
+			return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
+		}
+
+		$comment = get_comment( $args['entry_id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_lock_entry', $comment->comment_ID, $args['post_id'], $args['user'] );
+		$lock_args = array(
+			'user_id' => $args['user']->ID,
+			'user_login' => $args['user']->user_login,
+			'locked_at' => time(),
+			'updated_at' => false,
+		);
+		add_comment_meta( $comment->comment_ID, self::locked_meta_key, $lock_args );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	private static function _format_locked_at( $time )
+	{
+		$seconds = time() - $time;
+		$minutes = floor( $seconds / 60 );
+		$seconds = $seconds % 60;
+		$hours = floor( $minutes / 60 );
+		$minutes = $minutes % 60;
+		return ( $hours > 0 ? $hours . ' hour' . ( $hours > 1 ? 's' : '' ) . ' and ' : '' ) . ( $minutes > 0 ? $minutes . ' minute' . ( $minutes > 1 ? 's' : '' ) . ' ' : ( $hours < 1 && $minutes < 1 ? ' less than a minute ' : '' ) ) . 'ago';
+	}
+
+	/**
+	 * Unlocks an entry for update
+	 *
+	 * @param array $args The entry properties: entry_id (which entry to lock), post_id, user (current user object)
+	 * @return WPCOM_Liveblog_Entry|WP_Error The unlocked entry
+	 */
+	public static function unlock( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+
+		$comment = get_comment( $args['entry_id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+		do_action( 'liveblog_unlock_entry', $comment->comment_ID, $args['post_id'] );
+		delete_comment_meta( $comment->comment_ID, self::locked_meta_key );
+		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+
+	/**
 	 * Updates an exsting entry
 	 *
 	 * Inserts a new entry, which replaces the original entry.
@@ -147,6 +212,20 @@ class WPCOM_Liveblog_Entry {
 	public static function update( $args ) {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		$locked = self::locked( $args['entry_id'] );
+		if ( !empty( $locked ) ) {
+			if ( $locked['user_id'] != $args['user']->ID || !empty( $locked['updated_at'] ) ) {
+				$error = 'Not allowed to update.';
+				if ( !empty( $locked['updated_at'] ) ) {
+					$error .= ' Entry updated by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['updated_at'] ) . '! ';
+					$error .= ' Wait for the next refresh and try editing again... ';
+				}
+				else {
+					$error .= ' Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] ) . '! ';
+				}
+				return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
+			}
 		}
 
 		// always use the original author for the update entry, otherwise until refresh
@@ -161,6 +240,7 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
+		self::lock_updated( $args['entry_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_update_comment( array(
 			'comment_ID'      => $args['entry_id'],
@@ -182,6 +262,21 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
+		$locked = self::locked( $args['entry_id'] );
+		if ( !empty( $locked ) ) {
+			if ( $locked['user_id'] != $args['user']->ID || !empty( $locked['updated_at'] ) ) {
+				$error = 'Not allowed to delete.';
+				if ( !empty( $locked['updated_at'] ) ) {
+					$error .= ' Entry updated by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['updated_at'] ) . '! ';
+					$error .= ' Wait for the next refresh and try deleting again... ';
+				}
+				else {
+					$error .= ' Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] ) . '! ';
+				}
+				return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
+			}
+		}
+
 		$args['content'] = '';
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -241,5 +336,16 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
+	}
+
+	private static function locked( $comment_id ) {
+		return get_comment_meta( $comment_id, self::locked_meta_key, true );
+	}
+	private static function lock_updated( $comment_id ) {
+		$locked = self::locked( $comment_id );
+		if ( !empty( $locked ) ) {
+			$locked['updated_at'] = time();
+			update_comment_meta( $comment_id, self::locked_meta_key, $locked )			;
+		}
 	}
 }
