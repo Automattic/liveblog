@@ -262,6 +262,21 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
+		$locked = self::locked( $args['entry_id'] );
+		if ( !empty( $locked ) ) {
+			if ( $locked['user_id'] != $args['user']->ID || !empty( $locked['updated_at'] ) ) {
+				$error = 'Not allowed to delete.';
+				if ( !empty( $locked['updated_at'] ) ) {
+					$error .= ' Entry updated by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['updated_at'] ) . '! ';
+					$error .= ' Wait for the next refresh and try deleting again... ';
+				}
+				else {
+					$error .= ' Entry locked by ' . $locked['user_login'] . ' ' . self::_format_locked_at( $locked['locked_at'] ) . '! ';
+				}
+				return new WP_Error( 'entry-lock', __( $error, 'liveblog' ) );
+			}
+		}
+
 		$args['content'] = '';
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
