@@ -1,0 +1,10 @@
+{
+    "name"       : "automattic/liveblog",
+    "description": "Liveblogging done right. Using WordPress.",
+    "homepage"   : "https://github.com/Automattic/liveblog",
+    "type"       : "wordpress-plugin",
+    "license"    : "GPL-2.0+",
+    "require"    : {
+        "composer/installers": "~1.0"
+    }
+}
