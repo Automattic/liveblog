@@ -4,8 +4,8 @@
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby), [philipjohn](http://profiles.wordpress.org/philipjohn)
 * Tags: liveblog
 * Requires at least: 3.5
-* Tested up to: 4.1.1
-* Stable tag: 1.4
+* Tested up to: 4.2.2
+* Stable tag: 1.4.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,11 @@ If you'd like to check out the code and contribute, [join us on github](https://
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
 
 ## Changelog
+
+### 1.4.1
+
+* Bump tested tag to 4.2.2.
+* Added Composer support!
 
 ### 1.4
 
