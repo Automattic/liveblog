@@ -49,6 +49,11 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 ## Changelog
 
+### 1.4.1
+
+* Bump tested tag to 4.2.2.
+* Added Composer support!
+
 ### 1.4
 
 * Rich-text editing!
