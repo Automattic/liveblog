@@ -9,6 +9,8 @@
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
+[![Build Status](https://travis-ci.org/Automattic/liveblog.svg?branch=master)](https://travis-ci.org/Automattic/liveblog)
+
 Quick and simple blogging for following fast-paced events.
 
 ## Description
