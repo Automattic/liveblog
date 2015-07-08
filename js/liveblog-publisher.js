@@ -30,7 +30,7 @@
 			this.$('.cancel').hide();
 			this.$('.liveblog-entry-delete').hide();
 			$('#liveblog-messages').after(this.$el);
-            liveblog.publisher.autocomplete(this.$contenteditable);
+			liveblog.publisher.autocomplete(this.$contenteditable);
 		},
 		render_template: function() {
 			this.$el.html(this.template({
@@ -225,7 +225,7 @@
 		rich_formatting_btn_click: function (e) {
 			e.preventDefault();
 			var $btn = $(e.currentTarget),
-			    command = $btn.data('command');
+				command = $btn.data('command');
 			this.entry_command(command);
 		},
 
@@ -288,7 +288,7 @@
 			return null;
 		},
 		crud: function(action) {
-            this.$contenteditable.trigger('input');
+			this.$contenteditable.trigger('input');
 			var new_entry_content = this.$textarea.val().trim(),
 				data = {
 					crud_action: action,
@@ -354,7 +354,7 @@
 			else {
 				this.$textarea.focus();
 			}
-            liveblog.publisher.autocomplete(this.$contenteditable);
+			liveblog.publisher.autocomplete(this.$contenteditable);
 			return this;
 		},
 		submit: function(e) {
@@ -445,17 +445,17 @@
 		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, _.bind(liveblog.publisher.insert_form.success, liveblog.publisher.insert_form), _.bind(liveblog.publisher.insert_form.error, liveblog.publisher.insert_form), 'POST' );
 	};
 
-    /**
-     * Build autocomplete, called by both EditEntryView
-     * and InsertEntryView renders.
-     *
-     * @param elm
-     */
-    liveblog.publisher.autocomplete = function( elm ) {
-        for (var i = 0; i < liveblog_settings.autocomplete.length; i++) {
-            elm.atwho(liveblog_settings.autocomplete[i]);
-        }
-    }
+	/**
+	 * Build autocomplete, called by both EditEntryView
+	 * and InsertEntryView renders.
+	 *
+	 * @param elm
+	 */
+	liveblog.publisher.autocomplete = function( elm ) {
+		for (var i = 0; i < liveblog_settings.autocomplete.length; i++) {
+			elm.atwho(liveblog_settings.autocomplete[i]);
+		}
+	}
 
 	liveblog.$events.bind( 'after-init', liveblog.publisher.init );
 } )( jQuery );
