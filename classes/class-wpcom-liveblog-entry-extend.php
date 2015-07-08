@@ -14,15 +14,39 @@ class WPCOM_Liveblog_Entry_Extend {
     public static $autocomplete = array();
 
     /**
+     * Autocomplete features
+     */
+    protected static $features = array( 'hashtags', 'commands', 'emojis' );
+
+    /**
      * Called by WPCOM_Liveblog::load(),
      * it attaches the new command.
      */
     public static function load() {
-        self::$autocomplete = apply_filters( 'liveblog_extend_autocomplete', self::$autocomplete );
-
         add_action( 'wp_enqueue_scripts',           array( __CLASS__, 'enqueue_scripts' ) );
         add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
         add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
+
+        $regex_prefix  = '~(?<!\S)(?=.{2,140}$)(?:';
+        $regex_postfix = '){1}([0-9_\p{L}]*[_\p{L}][0-9_\p{L}]*)~um';
+
+        foreach ( self::$features as $name ) {
+        	$class = __CLASS__.'_Feature_'.ucfirst($name);
+        	$feature = new $class;
+
+	        add_filter( 'liveblog_extend_autocomplete', array( $feature, 'get_config' ), 10 );
+	        add_filter( 'liveblog_before_insert_entry', array( $feature, 'filter' ), 10 );
+	        add_filter( 'liveblog_before_update_entry', array( $feature, 'filter' ), 10 );
+
+	        $feature->set_prefixes( apply_filters( 'liveblog_'.$name.'_character', $feature->get_prefixes() ) );
+
+	        $regex = $regex_prefix.implode( '|', $feature->get_prefixes() ).$regex_postfix;
+	        $feature->set_regex( $regex );
+
+        	$feature->load();
+        }
+
+        self::$autocomplete = apply_filters( 'liveblog_extend_autocomplete', self::$autocomplete );
     }
 
     /**
@@ -54,6 +78,7 @@ class WPCOM_Liveblog_Entry_Extend {
     public static function strip_input( $entry ) {
         $entry['content'] = str_replace( '&nbsp;', ' ', $entry['content'] );
         $entry['content'] = preg_replace( '~\\<span\\s+class\\=\\\\?"atwho\\-\\w+\\\\?"\\s*>([^<]*)\\</span\\>~', '$1', $entry['content'] );
+
         return $entry;
     }
 

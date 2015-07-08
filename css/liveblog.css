@@ -576,3 +576,9 @@ a.liveblog-form-entry::-webkit-input-placeholder {
  	width: 100%;
 }
 
+/* =Emoji
+-------------------------------------------------------------- */
+.liveblog-emoji {
+	width: 18px;
+	height: 18px;
+}
