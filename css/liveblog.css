@@ -544,3 +544,10 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-notification-settings-toggle {
 	font-size: 12px;
 }
+
+/* =Emoji
+-------------------------------------------------------------- */
+.liveblog-emoji {
+	width: 18px;
+	height: 18px;
+}
