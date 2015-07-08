@@ -119,8 +119,9 @@ window.liveblog = window.liveblog || {};
 	liveblog.$events = $( '<span />' );
 
 	liveblog.init = function() {
-		liveblog.$entry_container = $( '#liveblog-entries'        );
-		liveblog.$spinner         = $( '#liveblog-update-spinner' );
+        liveblog.$entry_container     = $( '#liveblog-entries'        );
+        liveblog.$key_entry_container = $( '#liveblog-key-entries'    );
+        liveblog.$spinner             = $( '#liveblog-update-spinner' );
 
 		liveblog.queue = new liveblog.EntriesQueue();
 		liveblog.fixedNag = new liveblog.FixedNagView();
@@ -298,6 +299,10 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.add_entry = function( new_entry, duration ) {
 		var $new_entry = $( new_entry.html );
+        if($new_entry.hasClass('type-key')) {
+            var $new_key_entry = $( new_entry.html );
+            $new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+        }
 		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
 		liveblog.entriesContainer.updateTimes();
 	};

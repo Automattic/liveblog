@@ -492,3 +492,27 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	display: inline-block;
 	vertical-align: middle;
 }
+
+/* =Hashtags
+-------------------------------------------------------------- */
+.liveblog-hash {
+    color: #55acee;
+    font-weight: bold;
+}
+
+.liveblog-hash::before {
+    content: "#";
+}
+
+/* =Commands
+-------------------------------------------------------------- */
+.liveblog-command {
+    display:none;
+}
+
+/* =Key Events
+-------------------------------------------------------------- */
+.liveblog-key-events .liveblog-entry-actions {
+    display:none;
+}
+

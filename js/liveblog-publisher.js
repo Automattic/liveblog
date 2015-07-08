@@ -30,6 +30,7 @@
 			this.$('.cancel').hide();
 			this.$('.liveblog-entry-delete').hide();
 			$('#liveblog-messages').after(this.$el);
+            liveblog.publisher.autocomplete(this.$contenteditable);
 		},
 		render_template: function() {
 			this.$el.html(this.template({
@@ -287,7 +288,8 @@
 			return null;
 		},
 		crud: function(action) {
-			var new_entry_content = this.$textarea.val(),
+            this.$contenteditable.trigger('input');
+			var new_entry_content = this.$textarea.val().trim(),
 				data = {
 					crud_action: action,
 					post_id: liveblog_settings.post_id,
@@ -352,6 +354,7 @@
 			else {
 				this.$textarea.focus();
 			}
+            liveblog.publisher.autocomplete(this.$contenteditable);
 			return this;
 		},
 		submit: function(e) {
@@ -441,6 +444,18 @@
 		liveblog.publisher.insert_form.show_spinner();
 		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, _.bind(liveblog.publisher.insert_form.success, liveblog.publisher.insert_form), _.bind(liveblog.publisher.insert_form.error, liveblog.publisher.insert_form), 'POST' );
 	};
+
+    /**
+     * Build autocomplete, called by both EditEntryView
+     * and InsertEntryView renders.
+     *
+     * @param elm
+     */
+    liveblog.publisher.autocomplete = function( elm ) {
+        for (var i = 0; i < liveblog_settings.autocomplete.length; i++) {
+            elm.atwho(liveblog_settings.autocomplete[i]);
+        }
+    }
 
 	liveblog.$events.bind( 'after-init', liveblog.publisher.init );
 } )( jQuery );

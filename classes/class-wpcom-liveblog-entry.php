@@ -127,6 +127,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
+        $args = apply_filters( 'liveblog_before_insert_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
@@ -156,6 +157,7 @@ class WPCOM_Liveblog_Entry {
 			return $args['user'];
 		}
 
+        $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;

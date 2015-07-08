@@ -76,6 +76,12 @@ final class WPCOM_Liveblog {
 		self::add_admin_actions();
 		self::add_admin_filters();
 		self::register_embed_handlers();
+
+        WPCOM_Liveblog_Entry_Hashtags::load();
+        WPCOM_Liveblog_Entry_Key_Events::load();
+        WPCOM_Liveblog_Entry_Alerts::load();
+        WPCOM_Liveblog_Entry_Commands::load();
+        WPCOM_Liveblog_Entry_Extend::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -106,6 +112,11 @@ final class WPCOM_Liveblog {
 	private static function includes() {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php'       );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-hashtags.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-commands.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-alerts.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
@@ -565,7 +576,9 @@ final class WPCOM_Liveblog {
 
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
-				// i18n
+                'autocomplete'           => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
+
+                // i18n
 				'delete_confirmation'    => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
