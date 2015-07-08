@@ -21,7 +21,10 @@
 				<input type="checkbox" class="liveblog-notification-alerts"> <?php printf( __( 'Subscribe to author alerts ') ); ?>
 			</label>
 			<label> <?php printf( __( 'Tags to subscribe to (space separated):' ) ); ?>
-				<input type="text" class="liveblog-notification-tags">
+				<div class="liveblog-notification-tags-wrap">
+					<input type="text" class="liveblog-notification-tags">
+					<div class="liveblog-notification-saved"></div>
+				</div>
 			</label>
 		</form>
 	</div>

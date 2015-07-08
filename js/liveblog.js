@@ -595,6 +595,11 @@ window.liveblog = window.liveblog || {};
 		var tags_input_value = liveblog.$notification_tags.val(),
 			tags = tags_input_value.split(' ');
 
+		// Make sure data is new
+		if ( JSON.stringify(liveblog.stored_tags) === JSON.stringify(tags) ) {
+			return;
+		}
+
 		// Clean any empties / false values
 		tags = _.compact(tags);
 
@@ -606,6 +611,13 @@ window.liveblog = window.liveblog || {};
 
 		// Store as array in localStorage
 		localStorage.setItem('liveblog-tags', JSON.stringify(tags));
+
+		$('.liveblog-notification-saved').fadeIn(300)
+			.delay(750)
+			.queue(function() {
+				$(this).fadeOut(300);
+				$(this).dequeue();
+			});
 	};
 
 	// JSON parse localStorage key, useful for returning actual bool, array etc.

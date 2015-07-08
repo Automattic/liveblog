@@ -544,3 +544,35 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-notification-settings-toggle {
 	font-size: 12px;
 }
+
+.liveblog-notification-tags-wrap {
+	position: relative;
+}
+
+.liveblog-notification-saved {
+	position: absolute;
+	display: none;
+	top: 50%;
+	right: 10px;
+	line-height: 16px;
+	width: 55px;
+	height: 20px;
+	font-size: 10px;
+	line-height: 20px;
+	text-align: center;
+	font-weight: bold;
+	text-transform: uppercase;
+	color: rgba(255,255,255,.75);
+	background: #6dc152;
+	border-radius: 4px;
+	transform: translateY(-50%);
+}
+
+.liveblog-notification-saved::after {
+	content: "saved";
+	position: absolute;
+	left: 0;
+	top: 0;
+ 	width: 100%;
+}
+
