@@ -496,23 +496,51 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 /* =Hashtags
 -------------------------------------------------------------- */
 .liveblog-hash {
-    color: #55acee;
-    font-weight: bold;
+	color: #55acee;
+	font-weight: bold;
 }
 
 .liveblog-hash::before {
-    content: "#";
+	content: "#";
 }
 
 /* =Commands
 -------------------------------------------------------------- */
 .liveblog-command {
-    display:none;
+	display:none;
 }
 
 /* =Key Events
 -------------------------------------------------------------- */
 .liveblog-key-events .liveblog-entry-actions {
-    display:none;
+	display:none;
 }
 
+/* =Notification settings
+-------------------------------------------------------------- */
+.liveblog-notification-settings-container {
+	display: none;
+}
+
+.liveblog-notification-settings-container label {
+	display: block;
+	margin-bottom: 5px;
+	cursor: pointer;
+}
+
+.liveblog-notification-settings-container input {
+	font-family: inherit;
+}
+
+.liveblog-notification-settings-container label,
+.liveblog-notification-settings-container input {
+	font-size: 16px;
+}
+
+.liveblog-notification-settings {
+	margin-top: 10px;
+}
+
+.liveblog-notification-settings-toggle {
+	font-size: 12px;
+}

@@ -119,9 +119,9 @@ window.liveblog = window.liveblog || {};
 	liveblog.$events = $( '<span />' );
 
 	liveblog.init = function() {
-        liveblog.$entry_container     = $( '#liveblog-entries'        );
-        liveblog.$key_entry_container = $( '#liveblog-key-entries'    );
-        liveblog.$spinner             = $( '#liveblog-update-spinner' );
+	liveblog.$entry_container     = $( '#liveblog-entries'        );
+	liveblog.$key_entry_container = $( '#liveblog-key-entries'    );
+	liveblog.$spinner             = $( '#liveblog-update-spinner' );
 
 		liveblog.queue = new liveblog.EntriesQueue();
 		liveblog.fixedNag = new liveblog.FixedNagView();
@@ -135,6 +135,17 @@ window.liveblog = window.liveblog || {};
 		liveblog.reset_timer();
 		liveblog.set_initial_timestamps();
 		liveblog.start_human_time_diff_timer();
+
+		// Notifications if not admin
+		if ( ! liveblog_settings.is_admin ) {
+
+			// Return if Notificaion API is not supported
+			if ( ! ('Notification' in window) ) {
+				return;
+			}
+
+			liveblog.set_up_notification_settings();
+		}
 
 		liveblog.$events.trigger( 'after-init' );
 	};
@@ -299,12 +310,16 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.add_entry = function( new_entry, duration ) {
 		var $new_entry = $( new_entry.html );
-        if($new_entry.hasClass('type-key')) {
-            var $new_key_entry = $( new_entry.html );
-            $new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
-        }
+
+		if ( $new_entry.hasClass('type-key') ) {
+			var $new_key_entry = $( new_entry.html );
+			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+		}
+
 		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
 		liveblog.entriesContainer.updateTimes();
+
+		liveblog.notify($new_entry);
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
@@ -385,6 +400,217 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.is_at_the_top = function() {
 		return $(document).scrollTop()  < liveblog.$entry_container.offset().top;
+	};
+
+	liveblog.set_up_notification_settings = function() {
+
+		// Cache DOM elements
+		liveblog.$notification_tags = $('.liveblog-notification-tags'),
+		liveblog.$checkbox_enable = $('.liveblog-notification-enable'),
+		liveblog.$checkbox_key = $('.liveblog-notification-key'),
+		liveblog.$checkbox_alerts = $('.liveblog-notification-alerts'),
+		liveblog.$notification_options = $('.liveblog-notification-options'),
+		liveblog.$notification_settings = $('.liveblog-notification-settings'),
+		liveblog.$notification_settings_toggle = $('.liveblog-notification-settings-toggle'),
+		liveblog.$notification_settings_container = $('.liveblog-notification-settings-container');
+
+		// Get currently stored tags
+		liveblog.stored_tags = liveblog.parse_local_storage('liveblog-tags'),
+
+		// Show settings container if browser suppoorts the Notification API
+		liveblog.$notification_settings_container.show();
+
+		// Hide settings
+		liveblog.$notification_settings.hide();
+		liveblog.$notification_options.hide();
+
+		// Check notification status on load, use the `load` event
+		liveblog.check_notification_status('load');
+
+		// Populate tag input
+		if ( liveblog.stored_tags ) {
+			liveblog.$notification_tags.val(liveblog.stored_tags.join(' '));
+		}
+
+		// Populate key event checkbox
+		if ( liveblog.parse_local_storage('liveblog-key') ) {
+			liveblog.$checkbox_key.attr('checked', true);
+		} else {
+			liveblog.$checkbox_key.attr('checked', false);
+		}
+
+		// Populate alerts checkbox
+		if ( liveblog.parse_local_storage('liveblog-alerts') ) {
+			liveblog.$checkbox_alerts.attr('checked', true);
+		} else {
+			liveblog.$checkbox_alerts.attr('checked', false);
+		}
+
+		// Watch enable checkbox for any change
+		liveblog.$checkbox_enable.on( 'change', function() {
+			if ( this.checked ) {
+				liveblog.check_notification_status('checked');
+			} else {
+				liveblog.check_notification_status('unchecked');
+			}
+		} );
+
+		// Watch key checkbox for any change
+		liveblog.$checkbox_key.on( 'change', function() {
+			if ( this.checked ) {
+				localStorage.setItem('liveblog-key', true);
+			} else {
+				localStorage.setItem('liveblog-key', false);
+			}
+		} );
+
+		// Watch alerts checkbox for any change
+		liveblog.$checkbox_alerts.on( 'change', function() {
+			if ( this.checked ) {
+				localStorage.setItem('liveblog-alerts', true);
+			} else {
+				localStorage.setItem('liveblog-alerts', false);
+			}
+		} );
+
+		// Toggle notification settings
+		liveblog.$notification_settings_toggle.on( 'click', function( e ) {
+			e.preventDefault();
+			liveblog.$notification_settings.slideToggle(250);
+		} );
+
+		// Auto save with debounced keyup
+		liveblog.$notification_tags.on( 'keyup', _.debounce(liveblog.store_tags, 750) );
+	};
+
+	liveblog.set_notification_status = function( status ) {
+		var checked, animation;
+
+		if ( status === 'granted' ) {
+			checked = true;
+			animation = 'slideDown';
+		} else if ( status === 'denied' ) {
+			checked = false;
+			animation = 'slideUp';
+		}
+
+		liveblog.$checkbox_enable.attr('checked', checked);
+		liveblog.$notification_options[animation](250);
+		localStorage.setItem('liveblog-notifications', checked);
+	};
+
+	liveblog.check_notification_status = function( event ) {
+		if ( event === 'load' ) {
+
+			// Handle if notifications permissions are not granted on load
+			if ( Notification.permission !== 'granted' ) {
+				liveblog.set_notification_status('denied');
+
+			// If notifications are are granted and user enabled
+			} else if ( Notification.permission === 'granted' && liveblog.parse_local_storage('liveblog-notifications') ) {
+				liveblog.set_notification_status('granted');
+			}
+
+		} else if ( event === 'checked' ) {
+			if ( Notification.permission === 'granted' ) {
+				liveblog.set_notification_status('granted');
+
+			} else if ( Notification.permission === 'denied' ) {
+				liveblog.set_notification_status('denied');
+				alert(liveblog_settings.notification_blocked_message);
+
+			} else {
+				Notification.requestPermission(function (permission) {
+					if ( permission === 'granted' ) {
+						liveblog.set_notification_status('granted');
+					} else {
+						liveblog.set_notification_status('denied');
+					}
+				});
+			}
+
+		} else if ( event === 'unchecked' ) {
+			liveblog.set_notification_status('denied');
+		}
+	};
+
+	liveblog.notify = function( $new_entry ) {
+
+		/*
+		1. Make sure admins don't recieve notifications
+		2. Ensure user has enabled notifications (JSON parse for bool)
+		3. Make sure the document doesn't have focus
+		*/
+		if ( liveblog_settings.is_admin || ! liveblog.parse_local_storage('liveblog-notifications') || document.hasFocus() ) {
+			return;
+		}
+
+		var tags_length, notify,
+			entry_text = $new_entry.find('[data-original-content]').text().trim(),
+			type_key = liveblog.parse_local_storage('liveblog-key'),
+			type_alerts = liveblog.parse_local_storage('liveblog-alerts'),
+			icon = liveblog_settings.notification_icon ||
+				$new_entry.find('.liveblog-entry-text img:first').attr('src') ||
+				$new_entry.find('.liveblog-author-avatar .avatar').attr('src');
+
+		if ( type_alerts && $new_entry.hasClass(liveblog_settings.class_alert) ) {
+			notify = true
+		}
+
+		if ( type_key && $new_entry.hasClass(liveblog_settings.class_key) ) {
+			notify = true;
+		}
+
+		if ( liveblog.stored_tags ) {
+
+			// Loop tags
+			for ( var i = 0, tags_length = liveblog.stored_tags.length; i < tags_length; i++ ) {
+
+				// Make sure tag is a saved one
+				if ( $new_entry.hasClass(liveblog_settings.class_term_prefix + liveblog.stored_tags[i]) ) {
+					notify = true;
+
+					// Break out of loop as we limit to one notification at a time
+					break;
+				}
+			}
+		}
+
+		if ( notify ) {
+			liveblog.spawn_notification(liveblog_settings.notification_title, {body: entry_text, icon: icon});
+		}
+	};
+
+	liveblog.spawn_notification = function( title, opts ) {
+		var options = opts || {},
+			notification = new Notification(title, options);
+
+		// Make sure it closes as Chrome currently (v43.0.2357.130) doesn't auto-close
+		setTimeout(notification.close.bind(notification), 5000);
+	},
+
+	liveblog.store_tags = function( e ) {
+		e.preventDefault();
+
+		var tags_input_value = liveblog.$notification_tags.val(),
+			tags = tags_input_value.split(' ');
+
+		// Clean any empties / false values
+		tags = _.compact(tags);
+
+		// Filter out duplicates
+		tags = _.uniq(tags);
+
+		// Save to stored_tags
+		liveblog.stored_tags = tags;
+
+		// Store as array in localStorage
+		localStorage.setItem('liveblog-tags', JSON.stringify(tags));
+	};
+
+	// JSON parse localStorage key, useful for returning actual bool, array etc.
+	liveblog.parse_local_storage = function( key ) {
+		return JSON.parse(localStorage.getItem(key));
 	};
 
 	// Initialize everything!

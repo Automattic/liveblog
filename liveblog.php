@@ -154,7 +154,7 @@ final class WPCOM_Liveblog {
 	private static function add_filters() {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
-		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );		
+		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );
 	}
 
 	/**
@@ -576,15 +576,25 @@ final class WPCOM_Liveblog {
 
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
-                'autocomplete'           => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
+				'autocomplete'           => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
 
-                // i18n
+				// i18n
 				'delete_confirmation'    => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 				'new_update'             => __( 'Liveblog: {number} new update' , 'liveblog'),
 				'new_updates'            => __( 'Liveblog: {number} new updates' , 'liveblog'),
-				'create_link_prompt'     => __( 'Provide URL for link:', 'liveblog' )
+				'create_link_prompt'     => __( 'Provide URL for link:', 'liveblog' ),
+
+				// Notification strings
+				'notification_blocked_message' => __( 'Notifications are blocked. Please adjust your browser settings to enable notifications.', 'liveblog' ),
+				'notification_title'     => get_bloginfo('name'),
+				'notification_icon'      => false, // Notification icon override. Default to first image in posts, then author avatar.
+
+				// Classes
+				'class_term_prefix'      => __( 'term-', 'liveblog' ),
+				'class_alert'            => __( 'type-alert', 'liveblog' ),
+				'class_key'              => __( 'type-key', 'liveblog' ),
 			) )
 		);
 		wp_localize_script( 'liveblog-publisher', 'liveblog_publisher_settings', array(
@@ -1016,9 +1026,9 @@ final class WPCOM_Liveblog {
 	public static function protect_liveblog_meta_key( $protected, $meta_key ) {
 		if ( self::key === $meta_key )
 			return true;
-		
+
 		return $protected;
-	}	
+	}
 
 	/** Plupload Helpers ******************************************************/
 
