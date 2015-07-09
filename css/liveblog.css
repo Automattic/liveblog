@@ -504,6 +504,23 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	content: "#";
 }
 
+/* =Authors
+-------------------------------------------------------------- */
+.liveblog-author {
+	font-weight: bold;
+}
+
+.liveblog-author::before {
+	content: "@";
+}
+
+/* =Emoji
+-------------------------------------------------------------- */
+.liveblog-emoji {
+	width: 18px;
+	height: 18px;
+}
+
 /* =Commands
 -------------------------------------------------------------- */
 .liveblog-command {
@@ -574,11 +591,4 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	left: 0;
 	top: 0;
  	width: 100%;
-}
-
-/* =Emoji
--------------------------------------------------------------- */
-.liveblog-emoji {
-	width: 18px;
-	height: 18px;
 }

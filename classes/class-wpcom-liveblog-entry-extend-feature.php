@@ -79,7 +79,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Filters the input.
 	 *
-     * @param $entry
+     * @param mixed $entry
      * @return mixed
 	 */
 	public function filter( $entry ) {

@@ -10,13 +10,17 @@ class WPCOM_Liveblog_Entry_Extend {
 
     /**
      * Autocomplete settings
+     *
+     * @var array
      */
     public static $autocomplete = array();
 
     /**
      * Autocomplete features
+     *
+     * @var array
      */
-    protected static $features = array( 'hashtags', 'commands', 'emojis' );
+    protected static $features = array( 'hashtags', 'commands', 'emojis', 'authors' );
 
     /**
      * Called by WPCOM_Liveblog::load(),
@@ -38,10 +42,10 @@ class WPCOM_Liveblog_Entry_Extend {
 	        add_filter( 'liveblog_before_insert_entry', array( $feature, 'filter' ), 10 );
 	        add_filter( 'liveblog_before_update_entry', array( $feature, 'filter' ), 10 );
 
-	        $feature->set_prefixes( apply_filters( 'liveblog_'.$name.'_character', $feature->get_prefixes() ) );
+	        $feature->set_prefixes( apply_filters( 'liveblog_'.$name.'_prefixes', $feature->get_prefixes() ) );
 
 	        $regex = $regex_prefix.implode( '|', $feature->get_prefixes() ).$regex_postfix;
-	        $feature->set_regex( $regex );
+	        $feature->set_regex( apply_filters( 'liveblog_'.$name.'_regex', $regex ) );
 
         	$feature->load();
         }

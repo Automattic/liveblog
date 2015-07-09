@@ -117,6 +117,7 @@ final class WPCOM_Liveblog {
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.

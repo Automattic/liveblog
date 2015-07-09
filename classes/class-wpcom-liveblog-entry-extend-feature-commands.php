@@ -78,15 +78,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	/**
 	 * Filters the input.
 	 *
-	 * @param $entry
+	 * @param mixed $entry
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-		$hashtags         = array();
-		$filtered_content = strip_tags( $entry['content'] );
-
 		$entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) use ($entry) {
 			$type = apply_filters( 'liveblog_command_type', $match[1] );
+
+			if ( ! isset( $this->commands[$type] ) ) {
+				return $match[0];
+			}
 
 			if ( ! empty( $this->commands[$type][0] ) ) {
 				$entry['content'] = apply_filters( 'liveblog_command_filter_'.$type, $entry['content'] );
@@ -99,7 +100,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	}
 
 	/**
-	 * Adds type-{command-name} class to entry
+	 * Adds type-{command} class to entry
 	 *
 	 * @param array  $classes
 	 * @param string $class

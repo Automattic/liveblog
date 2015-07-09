@@ -59,13 +59,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	/**
 	 * Filters the input.
 	 *
-	 * @param $entry
+	 * @param mixed $entry
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-		$hashtags         = array();
-		$filtered_content = strip_tags( $entry['content'] );
-
 		$entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) {
 			$term = apply_filters( 'liveblog_hashtag_term', $match[1] );
 
@@ -82,9 +79,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	/**
 	 * Adds term-{hashtag} class to entry
 	 *
-	 * @param $classes
-	 * @param $class
-	 * @param $comment_id
+	 * @param array  $classes
+	 * @param string $class
+	 * @param int    $comment_id
 	 * @return array
 	 */
 	public function add_term_class_to_entry( $classes, $class, $comment_id ) {
