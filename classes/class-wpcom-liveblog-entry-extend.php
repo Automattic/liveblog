@@ -41,6 +41,7 @@ class WPCOM_Liveblog_Entry_Extend {
 	        add_filter( 'liveblog_extend_autocomplete', array( $feature, 'get_config' ), 10 );
 	        add_filter( 'liveblog_before_insert_entry', array( $feature, 'filter' ), 10 );
 	        add_filter( 'liveblog_before_update_entry', array( $feature, 'filter' ), 10 );
+	        add_filter( 'liveblog_before_preview_entry', array( $feature, 'filter' ), 10 );
 
 	        $feature->set_prefixes( apply_filters( 'liveblog_'.$name.'_prefixes', $feature->get_prefixes() ) );
 

@@ -262,6 +262,7 @@
 		tab_preview: function(e) {
 			e.preventDefault();
 			this.switch_to_preview();
+			this.$contenteditable.trigger('input');
 			this.preview.render(this.$textarea.val());
 		},
 		disable: function() {
