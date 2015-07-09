@@ -31,11 +31,11 @@ class WPCOM_Liveblog_Entry_Extend {
         add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
         add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
 
-        $regex_prefix  = '~(?<!\S)(?=.{2,140}$)(?:';
+        $regex_prefix  = '~(?<!\S)(?:';
         $regex_postfix = '){1}([0-9_\p{L}]*[_\p{L}][0-9_\p{L}]*)~um';
 
         foreach ( self::$features as $name ) {
-        	$class = __CLASS__.'_Feature_'.ucfirst($name);
+        	$class = __CLASS__.'_Feature_'.ucfirst( $name );
         	$feature = new $class;
 
 	        add_filter( 'liveblog_extend_autocomplete', array( $feature, 'get_config' ), 10 );

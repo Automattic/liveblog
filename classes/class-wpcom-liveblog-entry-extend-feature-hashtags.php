@@ -77,7 +77,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-		$entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) {
+		$entry['content'] = preg_replace_callback( $this->get_regex(), function ( $match ) {
 			$term = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[1] );
 
 			if ( ! term_exists( $term, self::$taxonomy ) ) {
@@ -85,7 +85,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			}
 
 			return '<span class="liveblog-hash '.$this->class_prefix.$term.'">'.$term.'</span>';
-		}, $entry['content']);
+		}, $entry['content'] );
 
 		return $entry;
 	}

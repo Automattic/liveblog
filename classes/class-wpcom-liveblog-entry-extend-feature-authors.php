@@ -34,9 +34,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'[^"]+',
 			preg_quote( '" class="liveblog-author ', '~' ),
 			preg_quote( $this->class_prefix, '~' ),
-			'[^"]+',
+			'([^"]+)',
 			preg_quote( '"', '~' ),
-			'[^>]*>([^<])+',
+			'[^>]*>\\1',
 			preg_quote( '</a>', '~' ),
 		) );
 
@@ -75,22 +75,22 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function filter( $entry ) {
 		$args = array(
 			'who'    => 'authors',
-			'fields' => ['user_nicename'],
+			'fields' => array( 'user_nicename' ),
 		);
 
-		$authors = array_map( function ($author) {
+		$authors = array_map( function ( $author ) {
 			return strtolower($author->user_nicename);
 		}, get_users( $args ) );
 
-		$entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) use ($authors) {
+		$entry['content'] = preg_replace_callback( $this->get_regex(), function ( $match ) use ( $authors ) {
 			$author = apply_filters( 'liveblog_author', $match[1] );
 
-			if ( ! in_array($author, $authors) ) {
+			if ( ! in_array( $author, $authors ) ) {
 				return $match[0];
 			}
 
-			return '<a href="/'.get_author_posts_url(-1, $author).'" class="liveblog-author '.$this->class_prefix.$author.'">'.$author.'</a>';
-		}, $entry['content']);
+			return '<a href="/'.get_author_posts_url( -1, $author ).'" class="liveblog-author '.$this->class_prefix.$author.'">'.$author.'</a>';
+		}, $entry['content'] );
 
 		return $entry;
 	}
@@ -137,18 +137,18 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'number' => 10,
 		);
 
-		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
+		$term = isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '';
 		if ( strlen( trim( $term ) ) > 0 ) {
 			$args['search'] = $term.'*';
 		}
 
-		$users = array_map( function ($user) {
-			return [
+		$users = array_map( function ( $user ) {
+			return array(
 				'id' => $user->ID,
 				'key' => strtolower($user->user_nicename),
 				'name' => $user->display_name,
-				'avatar' => get_avatar($user->ID, 20),
-			];
+				'avatar' => get_avatar( $user->ID, 20 ),
+			);
 		},  get_users( $args ) );
 
 		header( "Content-Type: application/json" );
