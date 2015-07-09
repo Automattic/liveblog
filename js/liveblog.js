@@ -550,7 +550,7 @@ window.liveblog = window.liveblog || {};
 			type_key = liveblog.parse_local_storage('liveblog-key'),
 			type_alerts = liveblog.parse_local_storage('liveblog-alerts'),
 			icon = liveblog_settings.notification_icon ||
-				$new_entry.find('.liveblog-entry-text img:first').attr('src') ||
+				$new_entry.find('.liveblog-entry-text img:not(.liveblog-emoji):first').attr('src') ||
 				$new_entry.find('.liveblog-author-avatar .avatar').attr('src');
 
 		if ( type_alerts && $new_entry.hasClass(liveblog_settings.class_alert) ) {
