@@ -922,10 +922,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$this->revert_regex = implode( '', array(
 			preg_quote( '<img src="', '~' ),
 			preg_quote( plugins_url('../images/emojis/', __FILE__ ), '~' ),
-			'([\w\-]+)',
-			preg_quote( '.png" class="liveblog-emoji ', '~' ),
+			'[^"]+',
+			preg_quote( '" class="liveblog-emoji ', '~' ),
 			preg_quote( $this->class_prefix, '~' ),
-			'([\w\-]+)',
+			'([^"]+)',
 			preg_quote( '">', '~' ),
 		) );
 
@@ -1016,7 +1016,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return mixed
 	 */
 	public function revert( $content ) {
-		return preg_replace( '~'.$this->revert_regex.'~', ':$2:', $content );
+		return preg_replace( '~'.$this->revert_regex.'~', ':$1:', $content );
 	}
 
 	/**

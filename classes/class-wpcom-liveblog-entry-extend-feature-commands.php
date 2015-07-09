@@ -60,7 +60,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	public function get_config( $config ) {
 		$config[] = apply_filters( 'liveblog_command_config', array(
 			'type' => 'static',
-			'regex' => '/(\w*)$',
+			'regex' => '[\S][\S\s]*/(\w*)$',
 			'data' => $this->get_commands(),
 			'replacement' => '/${term}',
 		) );

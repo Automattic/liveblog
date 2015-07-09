@@ -34,9 +34,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'[^"]+',
 			preg_quote( '" class="liveblog-author ', '~' ),
 			preg_quote( $this->class_prefix, '~' ),
-			'([\w\-]+)',
+			'[^"]+',
 			preg_quote( '"', '~' ),
-			'[^>]*>\1',
+			'[^>]*>([^<])+',
 			preg_quote( '</a>', '~' ),
 		) );
 
