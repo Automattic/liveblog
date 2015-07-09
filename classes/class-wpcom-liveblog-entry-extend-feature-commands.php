@@ -84,7 +84,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-        $filters = array();
+		$filters = array();
 
         $entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) use ($entry, &$filters) {
             $type = apply_filters( 'liveblog_command_type', $match[1] );
@@ -98,9 +98,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
             return '<span class="liveblog-command '.$this->class_prefix.$type.'">'.$type.'</span>';
         }, $entry['content']);
 
-        foreach ($filters as $filter) {
-            $entry['content'] = apply_filters( $filter, $entry['content'] );
-        }
+		foreach ($filters as $filter) {
+			$entry['content'] = apply_filters( $filter, $entry['content'] );
+		}
 
 		return $entry;
 	}
