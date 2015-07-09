@@ -937,7 +937,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$config[] = array(
 			'at'         => $this->get_prefixes()[0],
 			'data'       => $emojis,
-			'displayTpl' => '<li>${name} <img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png"  height="20" width="20" /></li>',
+			'displayTpl' => '<li><img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png"  height="20" width="20" /> ${name}</li>',
 			'insertTpl'  => '<img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png" class="liveblog-emoji '.$this->class_prefix.'${key}" data-emoji="${key}">',
 		);
 
