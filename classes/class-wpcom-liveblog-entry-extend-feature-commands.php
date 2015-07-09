@@ -58,10 +58,12 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function get_config( $config ) {
-		$config[] = array(
-			'at'   => $this->get_prefixes()[0],
+		$config[] = apply_filters( 'liveblog_command_config', array(
+			'type' => 'static',
+			'regex' => '/(\w*)$',
 			'data' => $this->get_commands(),
-		);
+			'replacement' => '/${term}',
+		) );
 
 		return $config;
 	}
@@ -82,19 +84,23 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-		$entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) use ($entry) {
-			$type = apply_filters( 'liveblog_command_type', $match[1] );
+		$filters = array();
 
-			if ( ! isset( $this->commands[$type] ) ) {
-				return $match[0];
-			}
+        $entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) use ($entry, &$filters) {
+            $type = apply_filters( 'liveblog_command_type', $match[1] );
 
-			if ( ! empty( $this->commands[$type][0] ) ) {
-				$entry['content'] = apply_filters( 'liveblog_command_filter_'.$type, $entry['content'] );
-			}
+            if ( ! isset( $this->commands[$type] ) ) {
+                return $match[0];
+            }
 
-			return '<span class="liveblog-command '.$this->class_prefix.$type.'">'.$type.'</span>';
-		}, $entry['content']);
+            $filters[] = 'liveblog_command_filter_'.$type;
+
+            return '<span class="liveblog-command '.$this->class_prefix.$type.'">'.$type.'</span>';
+        }, $entry['content']);
+
+		foreach ($filters as $filter) {
+			$entry['content'] = apply_filters( $filter, $entry['content'] );
+		}
 
 		return $entry;
 	}

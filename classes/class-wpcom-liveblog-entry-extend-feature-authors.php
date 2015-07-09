@@ -29,6 +29,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function load() {
 		$this->class_prefix = apply_filters( 'liveblog_author_class', $this->class_prefix );
 
+		$this->revert_regex = implode( '', array(
+			preg_quote( '<a href="', '~' ),
+			'[^"]+',
+			preg_quote( '" class="liveblog-author ', '~' ),
+			preg_quote( $this->class_prefix, '~' ),
+			'([\w\-]+)',
+			preg_quote( '"', '~' ),
+			'[^>]*>\1',
+			preg_quote( '</a>', '~' ),
+		) );
+
+		$this->revert_regex = apply_filters( 'liveblog_author_revert_regex', $this->revert_regex );
+
 		add_filter( 'comment_class',            array( $this, 'add_author_class_to_entry' ), 10, 3 );
 		add_action( 'wp_ajax_liveblog_authors', array( $this, 'ajax_authors') );
 	}
@@ -40,10 +53,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * @return array
 	 */
 	public function get_config( $config ) {
-		$config[] = array(
-			'at'   => $this->get_prefixes()[0],
-			'data' => admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors',
-		);
+		$config[] = apply_filters( 'liveblog_author_config', array(
+			'type'        => 'ajax',
+			'cache'       => 1000 * 60 * 30,
+			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors',
+			'search'      => 'key',
+			'regex'       => '@([\w\-]*)$',
+			'replacement' => '@${key}',
+			'template'    => '${avatar} ${name}',
+		) );
 
 		return $config;
 	}
@@ -78,6 +96,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	}
 
 	/**
+	 * Reverts the input.
+	 *
+	 * @param mixed $content
+	 * @return mixed
+	 */
+	public function revert( $content ) {
+		return preg_replace( '~'.$this->revert_regex.'~', '@$1', $content );
+	}
+
+	/**
 	 * Adds author-{author} class to entry
 	 *
 	 * @param array  $classes
@@ -105,11 +133,22 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function ajax_authors() {
 		$args = array(
 			'who'    => 'authors',
-			'fields' => ['user_nicename'],
+			'fields' => array( 'ID', 'user_nicename', 'display_name' ),
+			'number' => 10,
 		);
 
+		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
+		if ( strlen( trim( $term ) ) > 0 ) {
+			$args['search'] = $term.'*';
+		}
+
 		$users = array_map( function ($user) {
-			return strtolower($user->user_nicename);
+			return [
+				'id' => $user->ID,
+				'key' => strtolower($user->user_nicename),
+				'name' => $user->display_name,
+				'avatar' => get_avatar($user->ID, 20),
+			];
 		},  get_users( $args ) );
 
 		header( "Content-Type: application/json" );

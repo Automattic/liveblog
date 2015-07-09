@@ -36,6 +36,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	public function load() {
 		$this->class_prefix = apply_filters( 'liveblog_hashtag_class', $this->class_prefix );
 
+		$this->revert_regex = implode( '', array(
+			preg_quote( '<span class="liveblog-hash ', '~' ),
+			preg_quote( $this->class_prefix, '~' ),
+			'([\w\-]+)',
+			preg_quote( '">', '~' ),
+			'\1',
+			preg_quote( '</span>', '~' ),
+		) );
+
+		$this->revert_regex = apply_filters( 'liveblog_hashtag_revert_regex', $this->revert_regex );
+
 		add_filter( 'comment_class',          array( $this, 'add_term_class_to_entry' ), 10, 3 );
 		add_action( 'init',                   array( $this, 'add_hashtag_taxonomy') );
 		add_action( 'wp_ajax_liveblog_terms', array( $this, 'ajax_terms') );
@@ -48,10 +59,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function get_config( $config ) {
-		$config[] = array(
-			'at'   => $this->get_prefixes()[0],
-			'data' => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
-		);
+		$config[] = apply_filters( 'liveblog_hashtag_config', array(
+			'type'        => 'ajax',
+			'cache'       => 1000 * 60,
+			'regex'       => '#(\w*)$',
+			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
+			'replacement' => '#${term}',
+		) );
 
 		return $config;
 	}
@@ -74,6 +88,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		}, $entry['content']);
 
 		return $entry;
+	}
+
+	/**
+	 * Reverts the input.
+	 *
+	 * @param mixed $content
+	 * @return mixed
+	 */
+	public function revert( $content ) {
+		return preg_replace( '~'.$this->revert_regex.'~', '#$1', $content );
 	}
 
 	/**
@@ -105,7 +129,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$args = array(
 			'hide_empty' => false,
 			'fields'     => 'names',
+			'number' 	 => 10,
 		);
+
+		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
+		if ( strlen( trim( $term ) ) > 0 ) {
+			$args['search'] = $term;
+		}
 
 		$terms = get_terms( self::$taxonomy, $args );
 

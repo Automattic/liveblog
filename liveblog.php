@@ -79,6 +79,7 @@ final class WPCOM_Liveblog {
 
 		WPCOM_Liveblog_Entry_Alerts::load();
 		WPCOM_Liveblog_Entry_Key_Events::load();
+		WPCOM_Liveblog_Entry_Shortlink::load();
         WPCOM_Liveblog_Entry_Extend::load();
 	}
 
@@ -112,6 +113,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-alerts.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
+        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-shortlink.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
         require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
@@ -472,6 +474,7 @@ final class WPCOM_Liveblog {
 	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
+		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) )['content'];
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
 
 		do_action( 'liveblog_preview_entry', $entry_content );

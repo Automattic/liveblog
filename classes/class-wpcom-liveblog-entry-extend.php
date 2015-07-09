@@ -41,6 +41,8 @@ class WPCOM_Liveblog_Entry_Extend {
 	        add_filter( 'liveblog_extend_autocomplete', array( $feature, 'get_config' ), 10 );
 	        add_filter( 'liveblog_before_insert_entry', array( $feature, 'filter' ), 10 );
 	        add_filter( 'liveblog_before_update_entry', array( $feature, 'filter' ), 10 );
+	        add_filter( 'liveblog_before_preview_entry', array( $feature, 'filter' ), 10 );
+	        add_filter( 'liveblog_before_edit_entry', array( $feature, 'revert' ), 10 );
 
 	        $feature->set_prefixes( apply_filters( 'liveblog_'.$name.'_prefixes', $feature->get_prefixes() ) );
 
@@ -67,9 +69,8 @@ class WPCOM_Liveblog_Entry_Extend {
      */
     public static function enqueue_scripts() {
         if ( WPCOM_Liveblog::is_liveblog_editable() )  {
-            wp_enqueue_style(  'at.js-css',    plugins_url( '../css/jquery.atwho.css',   __FILE__ ) );
-            wp_enqueue_script( 'caret.js',     plugins_url( '../js/jquery.caret.min.js', __FILE__ ), false, true );
-            wp_enqueue_script( 'at.js-script', plugins_url( '../js/jquery.atwho.min.js', __FILE__ ), false, true );
+            wp_enqueue_style(  'textcomplete-css',    plugins_url( '../css/jquery.textcomplete.css',   __FILE__ ) );
+            wp_enqueue_script( 'textcomplete-script', plugins_url( '../js/jquery.textcomplete.min.js', __FILE__ ), false, true );
         }
     }
 
