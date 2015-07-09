@@ -916,16 +916,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return void
 	 */
 	public function load() {
-		$this->class_prefix = apply_filters( 'liveblog_emoji_class', $this->class_prefix );
+		$this->class_prefix = apply_filters( 'liveblog_emoji_class',   $this->class_prefix );
 		$this->emojis       = apply_filters( 'liveblog_active_emojis', $this->emojis );
 
 		$this->revert_regex = implode( '', array(
 			preg_quote( '<img src="', '~' ),
 			preg_quote( plugins_url('../images/emojis/', __FILE__ ), '~' ),
-			'([\w\-]+)',
-			preg_quote( '.png" class="liveblog-emoji ', '~' ),
+			'[^"]+',
+			preg_quote( '" class="liveblog-emoji ', '~' ),
 			preg_quote( $this->class_prefix, '~' ),
-			'([\w\-]+)',
+			'([^"]+)',
 			preg_quote( '">', '~' ),
 		) );
 
@@ -942,7 +942,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 */
 	public function get_config( $config ) {
 		$emojis = array();
-		foreach ($this->get_emojis() as $key => $val) {
+		foreach ( $this->get_emojis() as $key => $val ) {
 			$emojis[] = $this->map_emoji( $val, $key );
 		}
 
@@ -952,7 +952,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 			'search'      => 'key',
 			'regex'       => ':([\w\+\-]*):?$',
 			'replacement' => ':${key}:',
-			'template'    => '<img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png"  height="20" width="20" /> ${name}',
+			'template'    => '<img src="'.plugins_url( '../images/emojis', __FILE__ ).'/${key}.png"  height="20" width="20" /> ${name}',
 		) );
 
 		return $config;
@@ -985,10 +985,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return void
 	 */
 	public function set_regex( $regex ) {
-		$regex_prefix = substr($regex, 0, strlen($regex) - 3);
-		$regex_postfix = substr($regex, strlen($regex) - 3);
+		$regex_prefix = substr( $regex, 0, strlen( $regex ) - 3 );
+		$regex_postfix = substr( $regex, strlen( $regex ) - 3 );
 		$this->regex = $regex_prefix.'(?:'.implode( '|', $this->get_prefixes() ).')'.$regex_postfix;
-		$this->regex = str_replace('\p{L}', '\p{L}\\+\\-', $this->regex);
+		$this->regex = str_replace( '\p{L}', '\p{L}\\+\\-', $this->regex );
 	}
 
 	/**
@@ -998,13 +998,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-		$entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) {
+		$entry['content'] = preg_replace_callback( $this->get_regex(), function ( $match ) {
 			if ( ! isset( $this->emojis[$match[1]] ) ) {
 				return $match[0];
 			}
 
-			return '<img src="'.plugins_url('../images/emojis/'.$match[1].'.png', __FILE__).'" class="liveblog-emoji '.$this->class_prefix.$match[1].'" data-emoji="'.$match[1].'">';
-		}, $entry['content']);
+			return '<img src="'.plugins_url( '../images/emojis/'.$match[1].'.png', __FILE__ ).'" class="liveblog-emoji '.$this->class_prefix.$match[1].'" data-emoji="'.$match[1].'">';
+		}, $entry['content'] );
 
 		return $entry;
 	}
@@ -1016,7 +1016,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return mixed
 	 */
 	public function revert( $content ) {
-		return preg_replace( '~'.$this->revert_regex.'~', ':$2:', $content );
+		return preg_replace( '~'.$this->revert_regex.'~', ':$1:', $content );
 	}
 
 	/**

@@ -34,7 +34,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return void
 	 */
 	public function load() {
-		$this->class_prefix = apply_filters( 'liveblog_command_class', $this->class_prefix );
+		$this->class_prefix = apply_filters( 'liveblog_command_class',   $this->class_prefix );
 		$this->commands     = apply_filters( 'liveblog_active_commands', $this->commands );
 
 		foreach ( $this->commands as $name => $callbacks ) {
@@ -59,9 +59,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 */
 	public function get_config( $config ) {
 		$config[] = apply_filters( 'liveblog_command_config', array(
-			'type' => 'static',
-			'regex' => '/(\w*)$',
-			'data' => $this->get_commands(),
+			'type'        => 'static',
+			'regex'       => '[\S][\S\s]*/(\w*)$',
+			'data'        => $this->get_commands(),
 			'replacement' => '/${term}',
 		) );
 
@@ -86,7 +86,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	public function filter( $entry ) {
 		$filters = array();
 
-        $entry['content'] = preg_replace_callback( $this->get_regex(), function ($match) use ($entry, &$filters) {
+        $entry['content'] = preg_replace_callback( $this->get_regex(), function ( $match ) use ( $entry, &$filters ) {
             $type = apply_filters( 'liveblog_command_type', $match[1] );
 
             if ( ! isset( $this->commands[$type] ) ) {
@@ -96,9 +96,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
             $filters[] = 'liveblog_command_filter_'.$type;
 
             return '<span class="liveblog-command '.$this->class_prefix.$type.'">'.$type.'</span>';
-        }, $entry['content']);
+        }, $entry['content'] );
 
-		foreach ($filters as $filter) {
+		foreach ( $filters as $filter ) {
 			$entry['content'] = apply_filters( $filter, $entry['content'] );
 		}
 
@@ -119,7 +119,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		if ( 'liveblog' == $comment->comment_type ) {
 			preg_match_all( '/(?<!\w)'.$this->class_prefix.'\w+/', $comment->comment_content, $types );
-			$classes = array_merge($classes, $types[0]);
+			$classes = array_merge( $classes, $types[0] );
 		}
 
 		return $classes;
