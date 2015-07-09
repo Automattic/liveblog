@@ -574,22 +574,16 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_notification_entry_text = function( $entry ) {
-		var entry_text, original_content, $content;
+		var original_content, entry_text;
 
 		// Grab original content from data-attr
 		original_content = $entry.find('.liveblog-entry-text').data('original-content');
 
-		// Wrap original content so we can manipulate
-		$content = $('<div/>').html(original_content);
+		// Strip tags and emoji's (e.g. `:emoji_name:`)
+		entry_text = original_content.replace(/(?::\w+: | ?:\w+:|<span[^<]*<\/span>|<\/?[^>]*>)/g, '');
 
-		// Format tags
-		$content.find('.liveblog-hash').prepend('#');
-
-		// Remove liveblog-command elems from original content
-		$content.find('.liveblog-command').remove();
-
-		// Convert original content to text and trim spaces
-		entry_text = $content.text().replace(/\s\s+/g, ' ');
+		// Remove duplicate spaces
+		entry_text = entry_text.replace(/(?:^\s+|\s*$|(\s)\s+)/g, '$1');
 
 		return entry_text;
 	};
