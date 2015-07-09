@@ -919,6 +919,18 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$this->class_prefix = apply_filters( 'liveblog_emoji_class', $this->class_prefix );
 		$this->emojis       = apply_filters( 'liveblog_active_emojis', $this->emojis );
 
+		$this->revert_regex = implode( '', array(
+			preg_quote( '<img src="', '~' ),
+			preg_quote( plugins_url('../images/emojis/', __FILE__ ), '~' ),
+			'([\w\-]+)',
+			preg_quote( '.png" class="liveblog-emoji ', '~' ),
+			preg_quote( $this->class_prefix, '~' ),
+			'([\w\-]+)',
+			preg_quote( '">', '~' ),
+		) );
+
+		$this->revert_regex = apply_filters( 'liveblog_emoji_revert_regex', $this->revert_regex );
+
 		add_filter( 'comment_class', array( $this, 'add_emoji_class_to_entry' ), 10, 3 );
 	}
 
@@ -995,6 +1007,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		}, $entry['content']);
 
 		return $entry;
+	}
+
+	/**
+	 * Reverts the input.
+	 *
+	 * @param mixed $content
+	 * @return mixed
+	 */
+	public function revert( $content ) {
+		return preg_replace( '~'.$this->revert_regex.'~', ':$2:', $content );
 	}
 
 	/**

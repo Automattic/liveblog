@@ -77,7 +77,7 @@ class WPCOM_Liveblog_Entry {
 			'post_id'               => $entry_id,
 			'css_classes'           => $css_classes ,
 			'content'               => self::render_content( $comment_text, $this->comment ),
-			'original_content'      => $comment_text,
+			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
 			'avatar_size'           => $avatar_size,
 			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'           => get_comment_author_link( $entry_id ),

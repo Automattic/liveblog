@@ -15,6 +15,13 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	protected $regex = null;
 
 	/**
+	 * The revert regex.
+	 *
+	 * @var string
+	 */
+	protected $revert_regex = null;
+
+	/**
 	 * The character prefixes.
 	 *
 	 * @var array
@@ -83,6 +90,16 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
      * @return mixed
 	 */
 	public function filter( $entry ) {
+		return $entry;
+	}
+
+	/**
+	 * Reverts the input.
+	 *
+     * @param mixed $entry
+     * @return mixed
+	 */
+	public function revert( $entry ) {
 		return $entry;
 	}
 

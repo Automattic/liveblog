@@ -29,6 +29,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function load() {
 		$this->class_prefix = apply_filters( 'liveblog_author_class', $this->class_prefix );
 
+		$this->revert_regex = implode( '', array(
+			preg_quote( '<a href="', '~' ),
+			'[^"]+',
+			preg_quote( '" class="liveblog-author ', '~' ),
+			preg_quote( $this->class_prefix, '~' ),
+			'([\w\-]+)',
+			preg_quote( '"', '~' ),
+			'[^>]*>\1',
+			preg_quote( '</a>', '~' ),
+		) );
+
+		$this->revert_regex = apply_filters( 'liveblog_author_revert_regex', $this->revert_regex );
+
 		add_filter( 'comment_class',            array( $this, 'add_author_class_to_entry' ), 10, 3 );
 		add_action( 'wp_ajax_liveblog_authors', array( $this, 'ajax_authors') );
 	}
@@ -80,6 +93,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		}, $entry['content']);
 
 		return $entry;
+	}
+
+	/**
+	 * Reverts the input.
+	 *
+	 * @param mixed $content
+	 * @return mixed
+	 */
+	public function revert( $content ) {
+		return preg_replace( '~'.$this->revert_regex.'~', '@$1', $content );
 	}
 
 	/**
