@@ -48,10 +48,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function get_config( $config ) {
-		$config[] = array(
-			'at'   => $this->get_prefixes()[0],
-			'data' => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
-		);
+		$config[] = apply_filters( 'liveblog_hashtag_config', array(
+			'type'        => 'ajax',
+			'cache'       => 1000 * 60,
+			'regex'       => '#(\w*)$',
+			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
+			'replacement' => '#${term}',
+		) );
 
 		return $config;
 	}
@@ -105,7 +108,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$args = array(
 			'hide_empty' => false,
 			'fields'     => 'names',
+			'number' 	 => 10,
 		);
+
+		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
+		if ( strlen( trim( $term ) ) > 0 ) {
+			$args['search'] = $term;
+		}
 
 		$terms = get_terms( self::$taxonomy, $args );
 

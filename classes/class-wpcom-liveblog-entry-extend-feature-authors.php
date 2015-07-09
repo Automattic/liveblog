@@ -40,12 +40,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * @return array
 	 */
 	public function get_config( $config ) {
-		$config[] = array(
-			'at'         => $this->get_prefixes()[0],
-			'data'       => admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors',
-			'displayTpl' => '<li>${avatar} ${name}</li>',
-			'insertTpl'  => '@${key}',
-		);
+		$config[] = apply_filters( 'liveblog_author_config', array(
+			'type'        => 'ajax',
+			'cache'       => 1000 * 60 * 30,
+			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors',
+			'search'      => 'key',
+			'regex'       => '@([\w\-]*)$',
+			'replacement' => '@${key}',
+			'template'    => '${avatar} ${name}',
+		) );
 
 		return $config;
 	}
@@ -107,8 +110,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function ajax_authors() {
 		$args = array(
 			'who'    => 'authors',
-			'fields' => ['ID', 'user_nicename', 'display_name'],
+			'fields' => array( 'ID', 'user_nicename', 'display_name' ),
+			'number' => 10,
 		);
+
+		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
+		if ( strlen( trim( $term ) ) > 0 ) {
+			$args['search'] = $term.'*';
+		}
 
 		$users = array_map( function ($user) {
 			return [

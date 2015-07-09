@@ -706,7 +706,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		'ship' => 'ship',
 		'shipit' => 'shipit',
 		'shirt' => 'shirt',
-		'shit' => 'shit',
+		'poop' => 'poop',
 		'shoe' => 'shoe',
 		'shower' => 'shower',
 		'signal_strength' => 'signal_strength',
@@ -931,15 +931,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	public function get_config( $config ) {
 		$emojis = array();
 		foreach ($this->get_emojis() as $key => $val) {
-			$emojis[] = array( 'key' => $key, 'name' => $val );
+			$emojis[] = $this->map_emoji( $val, $key );
 		}
 
-		$config[] = array(
-			'at'         => $this->get_prefixes()[0],
-			'data'       => $emojis,
-			'displayTpl' => '<li><img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png"  height="20" width="20" /> ${name}</li>',
-			'insertTpl'  => '<img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png" class="liveblog-emoji '.$this->class_prefix.'${key}" data-emoji="${key}">',
-		);
+		$config[] = apply_filters( 'liveblog_emoji_config',  array(
+			'type'        => 'static',
+			'data'        => $emojis,
+			'search'      => 'key',
+			'regex'       => ':([\w\+\-]*):?$',
+			'replacement' => ':${key}:',
+			'template'    => '<img src="'.plugins_url('../images/emojis', __FILE__).'/${key}.png"  height="20" width="20" /> ${name}',
+		) );
 
 		return $config;
 	}
@@ -951,8 +953,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @param string $key
 	 * @return array
 	 */
-	public function map_emoji($val) {
-		return array( 'key' => $key, 'name' => $val );
+	public function map_emoji( $val, $key ) {
+		return apply_filters( 'liveblog_emoji_map', array( 'key' => $key, 'name' => $val ) );
 	}
 
 	/**
@@ -974,6 +976,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$regex_prefix = substr($regex, 0, strlen($regex) - 3);
 		$regex_postfix = substr($regex, strlen($regex) - 3);
 		$this->regex = $regex_prefix.'(?:'.implode( '|', $this->get_prefixes() ).')'.$regex_postfix;
+		$this->regex = str_replace('\p{L}', '\p{L}\\+\\-', $this->regex);
 	}
 
 	/**

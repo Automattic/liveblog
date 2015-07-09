@@ -452,9 +452,98 @@
 	 * @param elm
 	 */
 	liveblog.publisher.autocomplete = function( elm ) {
-		for (var i = 0; i < liveblog_settings.autocomplete.length; i++) {
-			elm.atwho(liveblog_settings.autocomplete[i]);
+		var do_replacement = function (term, matches, out) {
+        	_.each(matches, function (match) {
+        		var key = match.substr(2, match.length - 3);
+
+        		if (key === 'term') {
+        			out = out.replace(match, term);
+
+        			return;
+        		}
+
+        		out = out.replace(match, term[key]);
+        	});
+
+        	return out;
 		}
+
+		elm.textcomplete(_.map(liveblog_settings.autocomplete, function (conf) {
+			var template;
+			if (conf.template != null) {
+				template = function (term) {
+		        	var out = conf.template;
+		        	var matches = conf.template.match(/\$\{\w*\}/gi);
+
+					return do_replacement(term, matches, out);
+				}
+			}
+
+			switch (conf.type) {
+				case 'static':
+					return {
+				        terms: conf.data,
+				        match: new RegExp(conf.regex, 'i'),
+				        search: function (term, callback) {
+				            callback($.map(this.terms, function (_term) {
+				            	var search = _term;
+
+				            	if (conf.search != null) {
+				            		search = '' + search[conf.search];
+				            	}
+
+				                return search.indexOf(term) === 0 ? _term : null;
+				            }));
+				        },
+				        template: template,
+				        index: 1,
+				        replace: function (term) {
+				        	var out = conf.replacement;
+				        	var matches = conf.replacement.match(/\$\{\w*\}/gi);
+
+				            return do_replacement(term, matches, out)
+				        }
+				    };
+				case 'ajax':
+					return {
+						cache: {},
+				        match: new RegExp(conf.regex, 'i'),
+				        search: function (term, callback) {
+				        	if (conf.cache != null && this.cache[term] != null && this.cache[term].time < Date.now() - conf.cache) {
+				        		return this.cache[term].data;
+				        	}
+
+				        	var self = this;
+				        	$.ajax({
+								url: conf.url,
+								data: { autocomplete: term },
+								success: function (data) {
+									self.cache[term] = {
+										time: Date.now(),
+										data: data
+									};
+
+									callback(data);
+								},
+								error: function () {
+									callback([])
+								},
+								dataType: 'json'
+							});
+				        },
+				        template: template,
+				        index: 1,
+				        replace: function (term) {
+				        	var out = conf.replacement;
+				        	var matches = conf.replacement.match(/\$\{\w*\}/gi);
+
+				            return do_replacement(term, matches, out);
+				        }
+				    };
+			}
+
+			return null;
+		}));
 	}
 
 	liveblog.$events.bind( 'after-init', liveblog.publisher.init );
