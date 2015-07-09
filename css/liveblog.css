@@ -529,8 +529,33 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 
 /* =Key Events
 -------------------------------------------------------------- */
-.liveblog-key-events .liveblog-entry-actions {
+.liveblog-key-events .liveblog-entry-actions,
+.liveblog-key-events .liveblog-meta,
+.liveblog-key-events span,
+.liveblog-key-events img
+{
 	display:none;
+}
+
+.liveblog-key-events .liveblog-entry {
+	border: none;
+	cursor: pointer;
+}
+
+.liveblog-key-events .liveblog-entry:hover {
+	text-decoration: underline;
+}
+
+.liveblog-key-events .liveblog-entry-text {
+	margin: 0px;
+}
+
+.liveblog-key-events .liveblog-entry-text::before {
+	content: "\25A0";
+}
+
+.liveblog-key-events .liveblog-entry-text p {
+	display: inline;
 }
 
 /* =Notification settings

@@ -373,6 +373,9 @@ final class WPCOM_Liveblog {
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
+		if ( ! is_single() ) {
+			return false;
+		}
 		if ( empty( $post_id ) ) {
 			global $post;
 			$post_id = $post->ID;
@@ -496,8 +499,10 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	public static function add_comment_class( $classes, $class, $comment_id ) {
-		if ( self::key == get_comment_type( $comment_id ) )
+		if ( self::key == get_comment_type( $comment_id ) ) {
 			$classes[] = 'liveblog-entry';
+			$classes[] = 'liveblog-entry-class-' . $comment_id;
+		}
 		return $classes;
 	}
 
@@ -581,6 +586,7 @@ final class WPCOM_Liveblog {
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				'autocomplete'           => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
+				'command_class'          => 'type-',
 
 				// i18n
 				'delete_confirmation'    => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),

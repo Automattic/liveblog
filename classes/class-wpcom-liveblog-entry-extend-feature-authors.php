@@ -117,7 +117,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		$authors   = array();
 		$comment = get_comment( $comment_id );
 
-		if ( 'liveblog' == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
 			preg_match_all( '/(?<!\w)'.preg_quote( $this->class_prefix ).'\w+/', $comment->comment_content, $authors );
 			$classes = array_merge( $classes, $authors[0] );
 		}

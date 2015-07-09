@@ -1,10 +1,10 @@
 <div class="liveblog-key-events">
-    <h2>Key Events</h2>
-    <div id="liveblog-key-entries">
-        <?php foreach ( (array) $entries as $entry ) : ?>
+	<h2>Key Events</h2>
+	<div id="liveblog-key-entries">
+		<?php foreach ( (array) $entries as $entry ) : ?>
 
-            <?php echo $entry->render(); ?>
+			<?php echo $entry->render(); ?>
 
-        <?php endforeach; ?>
-    </div>
+	<?php endforeach; ?>
+	</div>
 </div>

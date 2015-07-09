@@ -119,9 +119,10 @@ window.liveblog = window.liveblog || {};
 	liveblog.$events = $( '<span />' );
 
 	liveblog.init = function() {
-		liveblog.$entry_container     = $( '#liveblog-entries'        );
-		liveblog.$key_entry_container = $( '#liveblog-key-entries'    );
-		liveblog.$spinner             = $( '#liveblog-update-spinner' );
+		liveblog.$entry_container     = $( '#liveblog-entries'                     );
+		liveblog.$key_entry_container = $( '#liveblog-key-entries'                 );
+		liveblog.$key_entries         = $( '#liveblog-key-entries .liveblog-entry' );
+		liveblog.$spinner             = $( '#liveblog-update-spinner'              );
 
 		liveblog.queue = new liveblog.EntriesQueue();
 		liveblog.fixedNag = new liveblog.FixedNagView();
@@ -282,7 +283,7 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_entry_by_id = function( id ) {
-		return $( '#liveblog-entry-' + id );
+		return $('.liveblog-entry-class-' + id );
 	};
 
 	liveblog.display_entry = function( new_entry, duration ) {
@@ -305,9 +306,11 @@ window.liveblog = window.liveblog || {};
 	liveblog.add_entry = function( new_entry, duration ) {
 		var $new_entry = $( new_entry.html );
 
-		if ( $new_entry.hasClass('type-key') ) {
+		if ( $new_entry.hasClass( liveblog_settings.command_class + 'key' ) ) {
 			var $new_key_entry = $( new_entry.html );
+			liveblog.key_event_handle_id( $new_key_entry );
 			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+			liveblog.key_event_scroll();
 		}
 
 		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
@@ -643,5 +646,50 @@ window.liveblog = window.liveblog || {};
 	if ( 'archive' !== liveblog_settings.state ) {
 		$( document ).ready( liveblog.init );
 	}
+
+	/**
+	 * This grabs any events in the key event box
+	 * store there id in a data attribute 'anchor'
+	 * and then sets the id to 'key'
+	 *
+	 */
+	liveblog.key_event_prepare = function() {
+		liveblog.$key_entries.each(function() {
+			liveblog.key_event_handle_id( $(this) );
+		});
+		liveblog.key_event_scroll();
+	};
+
+	/**
+	 * This grabs any events in the key event box
+	 * click event to them so they can be used
+	 * ad anchors
+	 */
+	liveblog.key_event_scroll = function() {
+		liveblog.$key_entries.click(function() {
+			var anchor = $(this).attr('id');
+			if(anchor == 'key') {
+				anchor = $(this).data('anchor');
+			} else {
+				liveblog.key_event_handle_id( $(this) );
+			}
+			window.location.hash = '';
+			window.location.hash = '#' + anchor;
+		})
+	};
+
+	/**
+	 * Stores there id in a data attribute 'anchor'
+	 * and then sets the id to 'key'
+	 */
+	liveblog.key_event_handle_id = function( $entry ) {
+		$entry.data('anchor', $entry .attr('id'));
+		$entry.attr('id', 'key');
+	}
+
+	/**
+	 * Trigger after view init
+	 */
+	liveblog.$events.bind( 'after-views-init', liveblog.key_event_prepare );
 
 } )( jQuery );

@@ -60,6 +60,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function shortcode( $commands ) {
 		global $post;
 
+		if ( ! is_single() ) {
+			return;
+		}
+
 		$args = array(
 			'meta_key'   => self::meta_key,
 			'meta_value' => self::meta_value,
@@ -67,7 +71,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$entry_query = new WPCOM_Liveblog_Entry_Query( $post->ID, WPCOM_Liveblog::key );
 		$entries     = (array) $entry_query->get_all( $args );
 
-		if ( is_single() && 'enable' == WPCOM_Liveblog::get_liveblog_state( $post->ID ) ) {
+		if ( WPCOM_Liveblog::get_liveblog_state( $post->ID ) ) {
 			echo WPCOM_Liveblog::get_template_part( 'liveblog-key-events.php', array(
 				'entries' => $entries
 			) );

@@ -1031,7 +1031,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$emojis   = array();
 		$comment = get_comment( $comment_id );
 
-		if ( 'liveblog' == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
 			preg_match_all( '/(?<!\w)'.preg_quote( $this->class_prefix ).'\w+/', $comment->comment_content, $emojis );
 			$classes = array_merge( $classes, $emojis[0] );
 		}
