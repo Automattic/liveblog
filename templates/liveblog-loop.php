@@ -9,8 +9,8 @@
 	<a class="liveblog-notification-settings-toggle" href="#"><?php printf( __( 'Notification settings' ) ); ?></a>
 
 	<div class="liveblog-notification-settings">
-		<label for="liveblog-notification-enable">
-			<input class="liveblog-notification-enable" type="checkbox"> <?php printf( __( 'Enable browser notifications' ) ); ?>
+		<label class="liveblog-notification-enable-label">
+			<input type="checkbox" class="liveblog-notification-enable"> <?php printf( __( 'Enable browser notifications' ) ); ?>
 		</label>
 
 		<form class="liveblog-notification-options">
