@@ -23,7 +23,7 @@
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
 			'click li.preview a': 'tab_preview',
-			'dragenter .liveblog-form-rich-entry': 'update_contenteditable_before_drop'
+			'dragenter .liveblog-form-rich-entry': 'update_contenteditable_before_drop',
 		},
 		render: function() {
 			this.render_template();
@@ -75,6 +75,7 @@
 			}
 		},
 		toggled_rich_text: function () {
+			this.$contenteditable.trigger('input');
 			var is_html_mode = this.$html_edit_toggle.prop('checked');
 			this.$textarea.toggle( is_html_mode );
 			this.$richarea.toggle( !is_html_mode );
