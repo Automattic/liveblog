@@ -68,7 +68,7 @@ class WPCOM_Liveblog_Entry_Extend {
      */
     public static function get_enabled_features()
     {
-    	return self::$features;
+    	return array_values( self::$features );
     }
 
     /**

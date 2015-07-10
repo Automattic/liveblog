@@ -532,8 +532,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-key-events .liveblog-entry-actions,
 .liveblog-key-events .liveblog-meta,
 .liveblog-key-events span,
-.liveblog-key-events img
-{
+.liveblog-key-events img {
 	display:none;
 }
 
