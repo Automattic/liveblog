@@ -20,7 +20,7 @@ class WPCOM_Liveblog_Entry_Extend {
      *
      * @var array
      */
-    protected static $features = array( 'hashtags', 'commands', 'emojis', 'authors' );
+    protected static $features = array();
 
     /**
      * Called by WPCOM_Liveblog::load(),
@@ -30,6 +30,8 @@ class WPCOM_Liveblog_Entry_Extend {
         add_action( 'wp_enqueue_scripts',           array( __CLASS__, 'enqueue_scripts' ) );
         add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
         add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
+
+        self::$features = apply_filters( 'liveblog_features', self::$features );
 
         $regex_prefix  = '~(?<!\S)(?:';
         $regex_postfix = '){1}([0-9_\p{L}]*[_\p{L}][0-9_\p{L}]*)~um';

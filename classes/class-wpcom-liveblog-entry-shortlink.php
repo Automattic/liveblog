@@ -67,15 +67,22 @@ class WPCOM_Liveblog_Entry_Shortlink {
 	 * @return mixed
 	 */
 	public static function add_shortlink_filter( $content ) {
-
-		$reg_exUrl = "/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
-
-		if ( preg_match_all( $reg_exUrl, $content, $urls ) ) {
-			foreach ($urls[0] as $key => $url) {
-				$content = str_replace( $url, self::generate_bitly_link( $url ), $content );
-			}
-		}
+		$content = preg_replace_callback(
+			"/(?<!\S)((http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?)/",
+			array( __CLASS__, 'preg_replace_callback' ),
+			$content
+		);
 
 		return $content;
+	}
+
+	/**
+	 * The preg replace callback for the filter.
+	 *
+	 * @param array $match
+	 * @return string
+	 */
+	public static function preg_replace_callback( $match ) {
+		return self::generate_bitly_link( $match[1] );
 	}
 }
