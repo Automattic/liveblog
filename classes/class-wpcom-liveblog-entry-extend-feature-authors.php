@@ -22,6 +22,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	protected $prefixes = array( '@', '\x{0040}' );
 
 	/**
+	 * An author cache for the filter.
+	 *
+	 * @var array
+	 */
+	protected $authors = array();
+
+	/**
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
@@ -78,21 +85,41 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'fields' => array( 'user_nicename' ),
 		);
 
-		$authors = array_map( function ( $author ) {
-			return strtolower($author->user_nicename);
-		}, get_users( $args ) );
+		$this->authors = array_map( array( $this, 'map_authors' ), get_users( $args ) );
 
-		$entry['content'] = preg_replace_callback( $this->get_regex(), function ( $match ) use ( $authors ) {
-			$author = apply_filters( 'liveblog_author', $match[1] );
-
-			if ( ! in_array( $author, $authors ) ) {
-				return $match[0];
-			}
-
-			return '<a href="/'.get_author_posts_url( -1, $author ).'" class="liveblog-author '.$this->class_prefix.$author.'">'.$author.'</a>';
-		}, $entry['content'] );
+		$entry['content'] = preg_replace_callback(
+			$this->get_regex(),
+			array( $this, 'preg_replace_callback' ),
+			$entry['content']
+		);
 
 		return $entry;
+	}
+
+	/**
+	 * Maps the authors.
+	 *
+	 * @param string $author
+	 * @return string
+	 */
+	public function map_authors( $author ) {
+		return strtolower( $author->user_nicename );
+	}
+
+	/**
+	 * The preg replace callback for the filter.
+	 *
+	 * @param array $match
+	 * @return string
+	 */
+	public function preg_replace_callback( $match ) {
+		$author = apply_filters( 'liveblog_author', $match[1] );
+
+		if ( ! in_array( $author, $this->authors ) ) {
+			return $match[0];
+		}
+
+		return '<a href="/'.get_author_posts_url( -1, $author ).'" class="liveblog-author '.$this->class_prefix.$author.'">'.$author.'</a>';
 	}
 
 	/**
@@ -142,19 +169,27 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			$args['search'] = $term.'*';
 		}
 
-		$users = array_map( function ( $user ) {
-			return array(
-				'id' => $user->ID,
-				'key' => strtolower($user->user_nicename),
-				'name' => $user->display_name,
-				'avatar' => get_avatar( $user->ID, 20 ),
-			);
-		},  get_users( $args ) );
+		$users = array_map( array( $this, 'map_ajax_authors' ),  get_users( $args ) );
 
 		header( "Content-Type: application/json" );
 		echo json_encode( $users );
 
 		exit;
+	}
+
+	/**
+	 * Maps the authors for ajax.
+	 *
+	 * @param string $author
+	 * @return string
+	 */
+	public function map_ajax_authors( $author ) {
+		return array(
+			'id' => $author->ID,
+			'key' => strtolower($author->user_nicename),
+			'name' => $author->display_name,
+			'avatar' => get_avatar( $author->ID, 20 ),
+		);
 	}
 
 }

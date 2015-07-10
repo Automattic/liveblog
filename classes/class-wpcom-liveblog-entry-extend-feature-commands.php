@@ -8,11 +8,18 @@
 class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_Extend_Feature {
 
 	/**
+	 * The static class prefix base.
+	 *
+	 * @var string
+	 */
+	public static $class_prefix = 'type-';
+
+	/**
 	 * The class prefix.
 	 *
 	 * @var string
 	 */
-	protected $class_prefix = 'type-';
+	protected $class_prefix_local;
 
 	/**
 	 * The commands.
@@ -29,13 +36,20 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	protected $prefixes = array( '/', '\x{002f}' );
 
 	/**
+	 * An filters cache for the filter.
+	 *
+	 * @var array
+	 */
+	protected $filters = array();
+
+	/**
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
 	 */
 	public function load() {
-		$this->class_prefix = apply_filters( 'liveblog_command_class',   $this->class_prefix );
-		$this->commands     = apply_filters( 'liveblog_active_commands', $this->commands );
+		$this->class_prefix_local = apply_filters( 'liveblog_command_class',   self::$class_prefix );
+		$this->commands     	  = apply_filters( 'liveblog_active_commands', $this->commands );
 
 		foreach ( $this->commands as $name => $callbacks ) {
 			if ( $callbacks[0] ) {
@@ -84,25 +98,37 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
-		$filters = array();
+		$this->filters = array();
 
-        $entry['content'] = preg_replace_callback( $this->get_regex(), function ( $match ) use ( $entry, &$filters ) {
-            $type = apply_filters( 'liveblog_command_type', $match[1] );
+        $entry['content'] = preg_replace_callback(
+        	$this->get_regex(),
+        	array( $this, 'preg_replace_callback' ),
+        	$entry['content']
+        );
 
-            if ( ! isset( $this->commands[$type] ) ) {
-                return $match[0];
-            }
-
-            $filters[] = 'liveblog_command_filter_'.$type;
-
-            return '<span class="liveblog-command '.$this->class_prefix.$type.'">'.$type.'</span>';
-        }, $entry['content'] );
-
-		foreach ( $filters as $filter ) {
+		foreach ( $this->filters as $filter ) {
 			$entry['content'] = apply_filters( $filter, $entry['content'] );
 		}
 
 		return $entry;
+	}
+
+	/**
+	 * The preg replace callback for the filter.
+	 *
+	 * @param array $match
+	 * @return string
+	 */
+	public function preg_replace_callback( $match ) {
+		$type = apply_filters( 'liveblog_command_type', $match[1] );
+
+		if ( ! isset( $this->commands[$type] ) ) {
+		    return $match[0];
+		}
+
+		$this->filters[] = 'liveblog_command_filter_'.$type;
+
+		return '<span class="liveblog-command '.$this->class_prefix_local.$type.'">'.$type.'</span>';
 	}
 
 	/**
@@ -118,7 +144,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$comment = get_comment( $comment_id );
 
 		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
-			preg_match_all( '/(?<!\w)'.$this->class_prefix.'\w+/', $comment->comment_content, $types );
+			preg_match_all( '/(?<!\w)'.$this->class_prefix_local.'\w+/', $comment->comment_content, $types );
 			$classes = array_merge( $classes, $types[0] );
 		}
 
@@ -136,10 +162,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$types   = array();
 		$content = get_comment_text( $id );
 
-		preg_match_all( '/(?<!\w)'.$this->class_prefix.'\w+/', $content, $types );
+		preg_match_all( '/(?<!\w)'.$this->class_prefix_local.'\w+/', $content, $types );
 
 		foreach ( $types[0] as $type ) {
-			$type = ltrim( $type, $this->class_prefix );
+			$type = ltrim( $type, $this->class_prefix_local );
 
 			if ( ! empty( $this->commands[$type][1] ) ) {
 				do_action( 'liveblog_command_action_' . $type, $content, $id, $post_id );
