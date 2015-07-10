@@ -485,7 +485,7 @@
 				        	var out = conf.replacement;
 				        	var matches = conf.replacement.match(/\$\{\w*\}/gi);
 
-				            return do_replacement(term, matches, out)
+				            return do_replacement(term, matches, out) + '\u00A0';
 				        }
 				    };
 				case 'ajax':
@@ -521,7 +521,7 @@
 				        	var out = conf.replacement;
 				        	var matches = conf.replacement.match(/\$\{\w*\}/gi);
 
-				            return do_replacement(term, matches, out);
+				            return do_replacement(term, matches, out) + '\u00A0';
 				        }
 				    };
 			}
