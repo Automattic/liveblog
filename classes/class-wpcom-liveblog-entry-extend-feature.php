@@ -26,7 +26,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	 *
 	 * @var array
 	 */
-	protected $prefixes = [];
+	protected $prefixes = array();
 
     /**
      * Called by WPCOM_Liveblog_Entry_Extend::load()

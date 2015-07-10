@@ -15,6 +15,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	protected $class_prefix = 'emoji-';
 
 	/**
+	 * Path to use with plugins_url
+	 *
+	 * @var string
+	 */
+	protected $path;
+
+	/**
 	 * The emojis.
 	 *
 	 * @var string
@@ -916,12 +923,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return void
 	 */
 	public function load() {
+		$this->path         = dirname(__FILE__);
 		$this->class_prefix = apply_filters( 'liveblog_emoji_class',   $this->class_prefix );
 		$this->emojis       = apply_filters( 'liveblog_active_emojis', $this->emojis );
 
 		$this->revert_regex = implode( '', array(
 			preg_quote( '<img src="', '~' ),
-			preg_quote( plugins_url('../images/emojis/', __FILE__ ), '~' ),
+			preg_quote( plugins_url('/images/emojis/', $this->path ), '~' ),
 			'[^"]+',
 			preg_quote( '" class="liveblog-emoji ', '~' ),
 			preg_quote( $this->class_prefix, '~' ),
@@ -952,7 +960,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 			'search'      => 'key',
 			'regex'       => ':([\w\+\-]*):?$',
 			'replacement' => ':${key}:',
-			'template'    => '<img src="'.plugins_url( '../images/emojis', __FILE__ ).'/${key}.png"  height="20" width="20" /> ${name}',
+			'template'    => '<img src="'.plugins_url( '/images/emojis', $this->path ).'/${key}.png"  height="20" width="20" /> ${name}',
 		) );
 
 		return $config;
@@ -1018,7 +1026,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 			return $match[0];
 		}
 
-		return '<img src="'.plugins_url( '../images/emojis/'.$match[1].'.png', __FILE__ ).'" class="liveblog-emoji '.$this->class_prefix.$match[1].'" data-emoji="'.$match[1].'">';
+		return '<img src="'.plugins_url( '/images/emojis/'.$match[1].'.png', $this->path ).'" class="liveblog-emoji '.$this->class_prefix.$match[1].'" data-emoji="'.$match[1].'">';
 	}
 
 	/**

@@ -477,7 +477,8 @@ final class WPCOM_Liveblog {
 	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
-		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) )['content'];
+		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
+		$entry_content = $entry_content['content'];
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
 
 		do_action( 'liveblog_preview_entry', $entry_content );
