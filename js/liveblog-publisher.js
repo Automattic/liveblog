@@ -69,7 +69,6 @@
 				this.toggled_rich_text = noop;
 				this.entry_inputhandler_textarea = noop;
 				this.entry_keyhandler_contenteditable = noop;
-				this.resize_contenteditable = noop;
 				this.rich_formatting_btn_click = noop;
 				this.rich_formatting_btn_mousedown_preventdefault = noop;
 			}
@@ -79,9 +78,6 @@
 			var is_html_mode = this.$html_edit_toggle.prop('checked');
 			this.$textarea.toggle( is_html_mode );
 			this.$richarea.toggle( !is_html_mode );
-			if ( ! is_html_mode ) {
-				this.resize_contenteditable();
-			}
 		},
 		get_content_for_form: function() {
 			return '';
@@ -173,17 +169,6 @@
 		},
 
 		/**
-		 * Make the rich text area big enough for the contents
-		 */
-		resize_contenteditable: function () {
-			var height = 0;
-			this.$contenteditable.children().each(function () {
-				height += $(this).outerHeight(true);
-			});
-			this.$contenteditable.css( 'min-height', height );
-		},
-
-		/**
 		 * input event handler for contenteditble area, populates textarea value with HTML
 		 * normalized and transformed (e.g. un-wpautop'ed) for saving and  editing in HTML mode
 		 */
@@ -191,9 +176,6 @@
 			var text = this.$contenteditable.html();
 			text = switchEditors.pre_wpautop(text);
 			this.$textarea.val(text);
-
-			// @todo debounce?
-			this.resize_contenteditable();
 		},
 
 		/**
@@ -294,7 +276,6 @@
 			this.enable();
 			this.hide_spinner();
 			this.$textarea.val('').trigger('input');
-			this.resize_contenteditable();
 			liveblog.reset_timer();
 			liveblog.get_recent_entries_success(response, status, xhr);
 		},
@@ -336,7 +317,6 @@
 		render: function() {
 			this.render_template();
 			this.$entry_text.hide().after(this.$el);
-			this.resize_contenteditable();
 			if (this.is_rich_text_enabled) {
 				this.$contenteditable.focus();
 			}
