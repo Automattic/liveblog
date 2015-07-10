@@ -58,6 +58,16 @@ class WPCOM_Liveblog_Entry_Extend {
     }
 
     /**
+     * Returns the enabled features
+     *
+     * @return array
+     */
+    public static function get_enabled_features()
+    {
+    	return self::$features;
+    }
+
+    /**
      * Returns the settings for autocomplete
      *
      * @return array

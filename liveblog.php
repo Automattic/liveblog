@@ -585,6 +585,7 @@ final class WPCOM_Liveblog {
 
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
+				'features'               => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
 				'autocomplete'           => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
 				'command_class'          => apply_filters( 'liveblog_command_class',   WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ),
 
