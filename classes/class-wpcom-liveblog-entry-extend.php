@@ -31,6 +31,10 @@ class WPCOM_Liveblog_Entry_Extend {
         add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
         add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
 
+        self::$features = defined( 'LIVEBLOG_FEATURES' ) ? LIVEBLOG_FEATURES : '';
+        self::$features = explode( ',', preg_replace( '~[ |]+~', ',', self::$features ) );
+        self::$features = array_filter( self::$features, 'strlen' );
+
         self::$features = apply_filters( 'liveblog_features', self::$features );
 
         $regex_prefix  = '~(?<!\S)(?:';
