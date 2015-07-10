@@ -642,11 +642,6 @@ window.liveblog = window.liveblog || {};
 		return JSON.parse(localStorage.getItem(key));
 	};
 
-	// Initialize everything!
-	if ( 'archive' !== liveblog_settings.state ) {
-		$( document ).ready( liveblog.init );
-	}
-
 	/**
 	 * This grabs any events in the key event box
 	 * store there id in a data attribute 'anchor'
@@ -691,5 +686,13 @@ window.liveblog = window.liveblog || {};
 	 * Trigger after view init
 	 */
 	liveblog.$events.bind( 'after-views-init', liveblog.key_event_prepare );
+
+	// Initialize everything!
+	if ( 'archive' !== liveblog_settings.state ) {
+		$( document ).ready( liveblog.init );
+	} else {
+		liveblog.$key_entries = $( '#liveblog-key-entries .liveblog-entry' );
+		liveblog.key_event_scroll();
+	}
 
 } )( jQuery );
