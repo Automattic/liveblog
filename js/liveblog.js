@@ -401,8 +401,8 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.set_up_notification_settings = function() {
 		var feature_list = liveblog_settings.features.join(' '),
-			feature_test = /(commands|hashtags)/.test(feature_list);
-			feature_hashtags = /(hashtags)/.test(feature_list);
+			feature_test = /(commands|hashtags)/.test(feature_list),
+			feature_hashtags = /(hashtags)/.test(feature_list),
 			feature_commands = /(commands)/.test(feature_list);
 
 		// Make sure settings are enabled for either commands or hashtags
@@ -560,14 +560,14 @@ window.liveblog = window.liveblog || {};
 			return;
 		}
 
-		var tags_length, notify, entry_text,
+		var tags_length, notify,
 			entry_text = liveblog.get_notification_entry_text($new_entry),
 			entry_icon = liveblog.get_notification_entry_icon($new_entry),
 			type_key = liveblog.parse_local_storage('liveblog-key'),
 			type_alerts = liveblog.parse_local_storage('liveblog-alerts');
 
 		if ( type_alerts && $new_entry.hasClass(liveblog_settings.class_alert) ) {
-			notify = true
+			notify = true;
 		}
 
 		if ( type_key && $new_entry.hasClass(liveblog_settings.class_key) ) {
@@ -713,8 +713,8 @@ window.liveblog = window.liveblog || {};
 			}
 			window.location.hash = '';
 			window.location.hash = '#' + anchor;
-		})
-	}
+		});
+	};
 
 	/**
 	 * Trigger after view init
