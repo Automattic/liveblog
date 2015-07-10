@@ -592,7 +592,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 
 .liveblog-notification-saved {
 	position: absolute;
-	display: none;
+	/*display: none;*/
 	top: 50%;
 	right: 10px;
 	line-height: 16px;
@@ -606,7 +606,9 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	color: rgba(255,255,255,.75);
 	background: #6dc152;
 	border-radius: 4px;
-	transform: translateY(-50%);
+	-webkit-transform: translateY(-50%);
+	    -ms-transform: translateY(-50%);
+	        transform: translateY(-50%);
 }
 
 .liveblog-notification-saved::after {
