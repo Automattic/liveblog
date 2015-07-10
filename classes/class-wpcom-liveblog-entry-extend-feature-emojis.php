@@ -996,7 +996,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$regex_prefix = substr( $regex, 0, strlen( $regex ) - 10 );
 		$regex_postfix = substr( $regex, strlen( $regex ) - 10 );
 		$this->regex = $regex_prefix.'(?:'.implode( '|', $this->get_prefixes() ).')'.$regex_postfix;
-		$this->regex = str_replace( '\p{L}', '\p{L}\\+\\-', $this->regex );
+		$this->regex = str_replace( '\p{L}', '\p{L}\\+\\-0-9', $this->regex );
 	}
 
 	/**

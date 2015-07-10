@@ -595,15 +595,22 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_notification_entry_text = function( $entry ) {
-		var original_content, entry_text;
+		var original_content, $original_content, entry_text;
 
 		// Grab original content from data-attr
 		original_content = $entry.find('.liveblog-entry-text').data('original-content');
 
-		// Strip tags and emoji's (e.g. `:emoji_name:`)
-		entry_text = original_content.replace(/(?::\w+: | ?:\w+:|<span[^<]*<\/span>|<\/?[^>]*>)/g, '');
+		// Convert to jQuery object and wrap it so we can manipulate it
+		$original_content = $('<div/>').html(original_content);
 
-		// Remove duplicate spaces
+		// Remove command spans
+		$original_content.find('.liveblog-command').remove();
+
+		// Convert to text string
+		entry_text = $original_content.text();
+
+		// Strip emoji's (e.g. `:emoji_name:`) and spaces
+		entry_text = entry_text.replace(/(?:\:[0-9\w\+\-]+\: | ?\:[0-9\w\+\-]+\:)/g, '');
 		entry_text = entry_text.replace(/(?:^\s+|\s*$|(\s)\s+)/g, '$1');
 
 		return entry_text;
