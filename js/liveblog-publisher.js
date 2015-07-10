@@ -20,7 +20,6 @@
 			'click .liveblog-html-edit-toggle input': 'toggled_rich_text',
 			'click .liveblog-formatting-command': 'rich_formatting_btn_click',
 			'mousedown .liveblog-formatting-command': 'rich_formatting_btn_mousedown_preventdefault',
-			'click .liveblog-rich-text-placeholder': 'rich_formatting_placeholder_click',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
 			'click li.preview a': 'tab_preview'
@@ -49,7 +48,6 @@
 			this.$html_edit_toggle = this.$('.liveblog-html-edit-toggle input');
 			this.$submit_button = this.$('.liveblog-form-entry-submit');
 			this.$spinner = this.$('.liveblog-submit-spinner');
-			this.$rich_placeholder = this.$('.liveblog-rich-text-placeholder');
 		},
 		setup_rich_editing: function () {
 			this.is_rich_text_enabled = (
@@ -71,10 +69,8 @@
 				this.entry_inputhandler_textarea = noop;
 				this.entry_keyhandler_contenteditable = noop;
 				this.resize_contenteditable = noop;
-				this.update_rich_placeholder_display = noop;
 				this.rich_formatting_btn_click = noop;
 				this.rich_formatting_btn_mousedown_preventdefault = noop;
-				this.rich_formatting_placeholder_click = noop;
 			}
 		},
 		toggled_rich_text: function () {
@@ -82,7 +78,6 @@
 			this.$textarea.toggle( is_html_mode );
 			this.$richarea.toggle( !is_html_mode );
 			if ( ! is_html_mode ) {
-				this.update_rich_placeholder_display();
 				this.resize_contenteditable();
 			}
 		},
@@ -120,15 +115,13 @@
 		entry_inputhandler_textarea: function () {
 			var html = this.$textarea.val();
 			if ( ! html ) {
-				html = '<p><br></p>'; // the BR is needed to make sure browsers will land inside the <p>
+				// html = '<p><br></p>'; // the BR is needed to make sure browsers will land inside the <p>
 			}
 			else {
 				html = html.replace(/(^|\n)(https?:\/\/\S+?\.(?:png|gif|jpe?g))($|\n)/ig, '$1<img src="$2">$3');
 				html = switchEditors.wpautop(html);
 			}
 			this.$contenteditable.html(html);
-
-			this.update_rich_placeholder_display();
 		},
 
 		/**
@@ -188,15 +181,6 @@
 			this.$contenteditable.css( 'min-height', height );
 		},
 
-		rich_formatting_placeholder_click: function () {
-			this.$contenteditable.focus();
-		},
-
-		update_rich_placeholder_display: function () {
-			var text = this.$textarea.val();
-			this.$rich_placeholder.toggle( !text );
-		},
-
 		/**
 		 * input event handler for contenteditble area, populates textarea value with HTML
 		 * normalized and transformed (e.g. un-wpautop'ed) for saving and  editing in HTML mode
@@ -205,7 +189,6 @@
 			var text = this.$contenteditable.html();
 			text = switchEditors.pre_wpautop(text);
 			this.$textarea.val(text);
-			this.update_rich_placeholder_display();
 
 			// @todo debounce?
 			this.resize_contenteditable();

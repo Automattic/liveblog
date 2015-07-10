@@ -113,13 +113,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * @return string
 	 */
 	public function preg_replace_callback( $match ) {
-		$author = apply_filters( 'liveblog_author', $match[1] );
+		$author = apply_filters( 'liveblog_author', $match[2] );
 
 		if ( ! in_array( $author, $this->authors ) ) {
 			return $match[0];
 		}
 
-		return '<a href="'.get_author_posts_url( -1, $author ).'" class="liveblog-author '.$this->class_prefix.$author.'">'.$author.'</a>';
+		return str_replace(
+			$match[1],
+			'<a href="'.get_author_posts_url( -1, $author ).'" class="liveblog-author '.$this->class_prefix.$author.'">'.$author.'</a>',
+			$match[0]
+		);
 	}
 
 	/**

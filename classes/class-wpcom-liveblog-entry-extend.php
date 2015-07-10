@@ -37,8 +37,8 @@ class WPCOM_Liveblog_Entry_Extend {
 
         self::$features = apply_filters( 'liveblog_features', self::$features );
 
-        $regex_prefix  = '~(?<!\S)(?:';
-        $regex_postfix = '){1}([0-9_\p{L}]*[_\p{L}][0-9_\p{L}]*)~um';
+        $regex_prefix  = '~(?:(?<!\S)|>?)((?:';
+        $regex_postfix = '){1}([0-9_\p{L}]*[_\p{L}][0-9_\p{L}]*))(?:<)?~um';
 
         foreach ( self::$features as $name ) {
         	$class = __CLASS__.'_Feature_'.ucfirst( $name );

@@ -120,7 +120,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return string
 	 */
 	public function preg_replace_callback( $match ) {
-		$type = apply_filters( 'liveblog_command_type', $match[1] );
+		$type = apply_filters( 'liveblog_command_type', $match[2] );
 
 		if ( ! isset( $this->commands[$type] ) ) {
 		    return $match[0];
@@ -128,7 +128,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		$this->filters[] = 'liveblog_command_filter_'.$type;
 
-		return '<span class="liveblog-command '.$this->class_prefix_local.$type.'">'.$type.'</span>';
+		return str_replace(
+			$match[1],
+			'<span class="liveblog-command '.$this->class_prefix_local.$type.'">'.$type.'</span>',
+			$match[0]
+		);
 	}
 
 	/**

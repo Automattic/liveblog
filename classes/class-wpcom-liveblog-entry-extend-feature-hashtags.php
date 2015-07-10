@@ -93,13 +93,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return string
 	 */
 	public function preg_replace_callback( $match ) {
-		$term = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[1] );
+		$term = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
 
 		if ( ! term_exists( $term, self::$taxonomy ) ) {
 			wp_insert_term( $term, self::$taxonomy );
 		}
 
-		return '<span class="liveblog-hash '.$this->class_prefix.$term.'">'.$term.'</span>';
+		return str_replace(
+			$match[1],
+			'<span class="liveblog-hash '.$this->class_prefix.$term.'">'.$term.'</span>',
+			$match[0]
+		);
 	}
 
 	/**
