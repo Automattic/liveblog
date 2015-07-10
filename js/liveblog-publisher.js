@@ -22,7 +22,8 @@
 			'mousedown .liveblog-formatting-command': 'rich_formatting_btn_mousedown_preventdefault',
 			'click .liveblog-form-entry-submit': 'submit',
 			'click li.entry a': 'tab_entry',
-			'click li.preview a': 'tab_preview'
+			'click li.preview a': 'tab_preview',
+			'dragenter .liveblog-form-rich-entry': 'update_contenteditable_before_drop'
 		},
 		render: function() {
 			this.render_template();
@@ -312,6 +313,9 @@
 			this.$('li.preview').removeClass('active');
 			this.$('li.entry').addClass('active');
 			this.$('.liveblog-edit-entry').show();
+		},
+		update_contenteditable_before_drop: function () {
+			this.$contenteditable.trigger('input');
 		}
 	});
 
