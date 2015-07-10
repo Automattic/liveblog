@@ -564,6 +564,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 }
 
 .liveblog-notification-settings-container label {
+	font-weight: normal;
 	display: block;
 	margin-bottom: 5px;
 	cursor: pointer;
@@ -588,6 +589,10 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 
 .liveblog-notification-tags-wrap {
 	position: relative;
+}
+
+.liveblog-notification-tags {
+	width: 100%;
 }
 
 .liveblog-notification-saved {
