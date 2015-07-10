@@ -560,7 +560,7 @@ window.liveblog = window.liveblog || {};
 			return;
 		}
 
-		var tags_length, notify,
+		var notify,
 			entry_text = liveblog.get_notification_entry_text($new_entry),
 			entry_icon = liveblog.get_notification_entry_icon($new_entry),
 			type_key = liveblog.parse_local_storage('liveblog-key'),
@@ -698,7 +698,7 @@ window.liveblog = window.liveblog || {};
 	liveblog.key_event_handle_id = function( $entry ) {
 		$entry.data('anchor', $entry .attr('id'));
 		$entry.attr('id', 'key');
-	}
+	};
 
 	/**
 	 * Adds the click event to key event entry
@@ -706,7 +706,7 @@ window.liveblog = window.liveblog || {};
 	liveblog.key_event_handle_click = function( $entry ) {
 		$entry.click(function() {
 			var anchor = $(this).attr('id');
-			if(anchor == 'key') {
+			if(anchor === 'key') {
 				anchor = $(this).data('anchor');
 			} else {
 				liveblog.key_event_handle_id( $(this) );

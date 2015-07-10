@@ -435,7 +435,7 @@
 			});
 
 			return out;
-		}
+		};
 
 		elm.textcomplete(_.map(liveblog_settings.autocomplete, function (conf) {
 			var template;
@@ -445,7 +445,7 @@
 					var matches = conf.template.match(/\$\{\w*\}/gi);
 
 					return do_replacement(term, matches, out);
-				}
+				};
 			}
 
 			switch (conf.type) {
@@ -495,7 +495,7 @@
 									callback(data);
 								},
 								error: function () {
-									callback([])
+									callback([]);
 								},
 								dataType: 'json'
 							});
@@ -513,7 +513,7 @@
 
 			return null;
 		}));
-	}
+	};
 
 	liveblog.$events.bind( 'after-init', liveblog.publisher.init );
 } )( jQuery );
