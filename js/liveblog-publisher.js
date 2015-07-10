@@ -437,27 +437,27 @@
 	 */
 	liveblog.publisher.autocomplete = function( elm ) {
 		var do_replacement = function (term, matches, out) {
-        	_.each(matches, function (match) {
-        		var key = match.substr(2, match.length - 3);
+			_.each(matches, function (match) {
+				var key = match.substr(2, match.length - 3);
 
-        		if (key === 'term') {
-        			out = out.replace(match, term);
+				if (key === 'term') {
+					out = out.replace(match, term);
 
-        			return;
-        		}
+					return;
+				}
 
-        		out = out.replace(match, term[key]);
-        	});
+				out = out.replace(match, term[key]);
+			});
 
-        	return out;
+			return out;
 		}
 
 		elm.textcomplete(_.map(liveblog_settings.autocomplete, function (conf) {
 			var template;
 			if (conf.template != null) {
 				template = function (term) {
-		        	var out = conf.template;
-		        	var matches = conf.template.match(/\$\{\w*\}/gi);
+					var out = conf.template;
+					var matches = conf.template.match(/\$\{\w*\}/gi);
 
 					return do_replacement(term, matches, out);
 				}
@@ -466,39 +466,39 @@
 			switch (conf.type) {
 				case 'static':
 					return {
-				        terms: conf.data,
-				        match: new RegExp(conf.regex, 'i'),
-				        search: function (term, callback) {
-				            callback($.map(this.terms, function (_term) {
-				            	var search = _term;
+						terms: conf.data,
+						match: new RegExp(conf.regex, 'i'),
+						search: function (term, callback) {
+							callback($.map(this.terms, function (_term) {
+								var search = _term;
 
-				            	if (conf.search != null) {
-				            		search = '' + search[conf.search];
-				            	}
+								if (conf.search != null) {
+									search = '' + search[conf.search];
+								}
 
-				                return search.indexOf(term) === 0 ? _term : null;
-				            }));
-				        },
-				        template: template,
-				        index: 1,
-				        replace: function (term) {
-				        	var out = conf.replacement;
-				        	var matches = conf.replacement.match(/\$\{\w*\}/gi);
+								return search.indexOf(term) === 0 ? _term : null;
+							}));
+						},
+						template: template,
+						index: 1,
+						replace: function (term) {
+							var out = conf.replacement;
+							var matches = conf.replacement.match(/\$\{\w*\}/gi);
 
-				            return do_replacement(term, matches, out) + '\u00A0';
-				        }
-				    };
+							return do_replacement(term, matches, out) + '\u00A0';
+						}
+					};
 				case 'ajax':
 					return {
 						cache: {},
-				        match: new RegExp(conf.regex, 'i'),
-				        search: function (term, callback) {
-				        	if (conf.cache != null && this.cache[term] != null && this.cache[term].time < Date.now() - conf.cache) {
-				        		return this.cache[term].data;
-				        	}
+						match: new RegExp(conf.regex, 'i'),
+						search: function (term, callback) {
+							if (conf.cache != null && this.cache[term] != null && this.cache[term].time < Date.now() - conf.cache) {
+								return this.cache[term].data;
+							}
 
-				        	var self = this;
-				        	$.ajax({
+							var self = this;
+							$.ajax({
 								url: conf.url,
 								data: { autocomplete: term },
 								success: function (data) {
@@ -514,16 +514,16 @@
 								},
 								dataType: 'json'
 							});
-				        },
-				        template: template,
-				        index: 1,
-				        replace: function (term) {
-				        	var out = conf.replacement;
-				        	var matches = conf.replacement.match(/\$\{\w*\}/gi);
+						},
+						template: template,
+						index: 1,
+						replace: function (term) {
+							var out = conf.replacement;
+							var matches = conf.replacement.match(/\$\{\w*\}/gi);
 
-				            return do_replacement(term, matches, out) + '\u00A0';
-				        }
-				    };
+							return do_replacement(term, matches, out) + '\u00A0';
+						}
+					};
 			}
 
 			return null;
