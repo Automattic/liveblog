@@ -309,8 +309,8 @@ window.liveblog = window.liveblog || {};
 		if ( $new_entry.hasClass( liveblog_settings.command_class + 'key' ) ) {
 			var $new_key_entry = $( new_entry.html );
 			liveblog.key_event_handle_id( $new_key_entry );
+			liveblog.key_event_handle_click( $new_key_entry );
 			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
-			liveblog.key_event_scroll();
 		}
 
 		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
@@ -669,8 +669,8 @@ window.liveblog = window.liveblog || {};
 	liveblog.key_event_prepare = function() {
 		liveblog.$key_entries.each(function() {
 			liveblog.key_event_handle_id( $(this) );
+			liveblog.key_event_handle_click( $(this) );
 		});
-		liveblog.key_event_scroll();
 	};
 
 	/**
@@ -679,16 +679,9 @@ window.liveblog = window.liveblog || {};
 	 * ad anchors
 	 */
 	liveblog.key_event_scroll = function() {
-		liveblog.$key_entries.click(function() {
-			var anchor = $(this).attr('id');
-			if(anchor == 'key') {
-				anchor = $(this).data('anchor');
-			} else {
-				liveblog.key_event_handle_id( $(this) );
-			}
-			window.location.hash = '';
-			window.location.hash = '#' + anchor;
-		})
+		liveblog.$key_entries.each(function() {
+			liveblog.key_event_handle_click( $(this) );
+		});
 	};
 
 	/**
@@ -698,6 +691,22 @@ window.liveblog = window.liveblog || {};
 	liveblog.key_event_handle_id = function( $entry ) {
 		$entry.data('anchor', $entry .attr('id'));
 		$entry.attr('id', 'key');
+	}
+
+	/**
+	 * Adds the click event to key event entry
+	 */
+	liveblog.key_event_handle_click = function( $entry ) {
+		$entry.click(function() {
+			var anchor = $(this).attr('id');
+			if(anchor == 'key') {
+				anchor = $(this).data('anchor');
+			} else {
+				liveblog.key_event_handle_id( $(this) );
+			}
+			window.location.hash = '';
+			window.location.hash = '#' + anchor;
+		})
 	}
 
 	/**
