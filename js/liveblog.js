@@ -400,8 +400,26 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.set_up_notification_settings = function() {
+		var feature_list = liveblog_settings.features.join(' '),
+			feature_test = /(commands|hashtags)/.test(feature_list);
+			feature_hashtags = /(hashtags)/.test(feature_list);
+			feature_commands = /(commands)/.test(feature_list);
 
-		// Cache DOM elements
+		// Make sure settings are enabled for either commands or hashtags
+		if ( ! feature_test ) {
+			return;
+		}
+
+		if ( ! feature_hashtags ) {
+			$('.liveblog-notification-tags-label').hide();
+		}
+
+		if ( ! feature_commands ) {
+			$('.liveblog-notification-key-label').hide();
+			$('.liveblog-notification-alerts-label').hide();
+		}
+
+		// Cache commonly used DOM elements
 		liveblog.$notification_tags = $('.liveblog-notification-tags'),
 		liveblog.$checkbox_enable = $('.liveblog-notification-enable'),
 		liveblog.$checkbox_key = $('.liveblog-notification-key'),

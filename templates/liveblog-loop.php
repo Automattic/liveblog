@@ -14,13 +14,13 @@
 		</label>
 
 		<form class="liveblog-notification-options">
-			<label>
+			<label class="liveblog-notification-key-label">
 				<input type="checkbox" class="liveblog-notification-key"> <?php printf( __( 'Subscribe to key events' ) ); ?>
 			</label>
-			<label>
+			<label class="liveblog-notification-alerts-label">
 				<input type="checkbox" class="liveblog-notification-alerts"> <?php printf( __( 'Subscribe to author alerts ') ); ?>
 			</label>
-			<label> <?php printf( __( 'Tags to subscribe to (space separated):' ) ); ?>
+			<label class="liveblog-notification-tags-label"> <?php printf( __( 'Tags to subscribe to (space separated):' ) ); ?>
 				<div class="liveblog-notification-tags-wrap">
 					<input type="text" class="liveblog-notification-tags">
 					<div class="liveblog-notification-saved"></div>
