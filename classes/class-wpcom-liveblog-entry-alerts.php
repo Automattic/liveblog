@@ -25,7 +25,8 @@ class WPCOM_Liveblog_Entry_Alerts {
 	 * @return mixed
 	 */
 	public static function add_alert_command( $commands ) {
-		$commands['alert'] = false;
+		$commands[] = 'alert';
+
 		return $commands;
 	}
 }

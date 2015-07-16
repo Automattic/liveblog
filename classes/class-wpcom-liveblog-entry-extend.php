@@ -20,7 +20,7 @@ class WPCOM_Liveblog_Entry_Extend {
      *
      * @var array
      */
-    protected static $features = array();
+    protected static $features = 'commands, emojis, hashtags, authors';
 
     /**
      * Called by WPCOM_Liveblog::load(),
@@ -31,7 +31,7 @@ class WPCOM_Liveblog_Entry_Extend {
         add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
         add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
 
-        self::$features = defined( 'LIVEBLOG_FEATURES' ) ? LIVEBLOG_FEATURES : '';
+        self::$features = defined( 'LIVEBLOG_FEATURES' ) ? LIVEBLOG_FEATURES : self::$features;
         self::$features = explode( ',', preg_replace( '~[ |]+~', ',', self::$features ) );
         self::$features = array_filter( self::$features, 'strlen' );
 

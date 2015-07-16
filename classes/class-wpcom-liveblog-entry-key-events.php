@@ -23,6 +23,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function load() {
 		add_filter( 'liveblog_active_commands', array( __CLASS__, 'add_key_command' ), 10 );
 		add_shortcode( 'liveblog_key_events', array( __CLASS__, 'shortcode' ) );
+		add_action( 'liveblog_command_key_after', array( __CLASS__, 'add_key_action' ), 10, 3 );
 	}
 
 	/**
@@ -33,10 +34,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @return mixed
 	 */
 	public static function add_key_command( $commands ) {
-		$commands['key'] = array(
-			false,
-			array( __CLASS__, 'add_key_action' ),
-		);
+		$commands[] = 'key';
+
 		return $commands;
 	}
 
