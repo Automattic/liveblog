@@ -56,8 +56,12 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 *
 	 * @param $commands
 	 */
-	public static function shortcode( $commands ) {
+	public static function shortcode( $atts ) {
 		global $post;
+
+		$atts = shortcode_atts( array(
+			'title' => 'Key Events',
+		), $atts );
 
 		if ( ! is_single() ) {
 			return;
@@ -71,8 +75,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$entries     = (array) $entry_query->get_all( $args );
 
 		if ( WPCOM_Liveblog::get_liveblog_state( $post->ID ) ) {
-			echo WPCOM_Liveblog::get_template_part( 'liveblog-key-events.php', array(
-				'entries' => $entries
+			return WPCOM_Liveblog::get_template_part( 'liveblog-key-events.php', array(
+				'entries' => $entries,
+				'title'   => $atts['title'],
 			) );
 		}
 	}
