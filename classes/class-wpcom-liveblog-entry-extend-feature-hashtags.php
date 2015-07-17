@@ -41,7 +41,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			preg_quote( $this->class_prefix, '~' ),
 			'([^"]+)',
 			preg_quote( '">', '~' ),
-			'\1',
+			'([^"]+)',
 			preg_quote( '</span>', '~' ),
 		) );
 
@@ -62,9 +62,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$config[] = apply_filters( 'liveblog_hashtag_config', array(
 			'type'        => 'ajax',
 			'cache'       => 1000 * 60,
-			'regex'       => '#(\w*)$',
+			'regex'       => '#([\w\d\-]*)$',
 			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
-			'replacement' => '#${term}',
+			'template'    => '${slug}',
+			'replacement' => '#${slug}',
 		) );
 
 		return $config;
@@ -93,15 +94,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return string
 	 */
 	public function preg_replace_callback( $match ) {
-		$term = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
+		$hashtag = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
 
-		if ( ! term_exists( $term, self::$taxonomy ) ) {
-			wp_insert_term( $term, self::$taxonomy );
+		if ( ! term_exists( $hashtag, self::$taxonomy ) ) {
+			wp_insert_term( $hashtag, self::$taxonomy );
 		}
 
 		return str_replace(
 			$match[1],
-			'<span class="liveblog-hash '.$this->class_prefix.$term.'">'.$term.'</span>',
+			'<span class="liveblog-hash '.$this->class_prefix.$hashtag.'">'.$hashtag.'</span>',
 			$match[0]
 		);
 	}
@@ -144,7 +145,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	public function ajax_terms() {
 		$args = array(
 			'hide_empty' => false,
-			'fields'     => 'names',
 			'number' 	 => 10,
 		);
 
