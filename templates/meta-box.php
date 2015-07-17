@@ -16,4 +16,9 @@ foreach( $buttons as $button ):
 </li>
 <?php endforeach; ?>
 </ul>
+<?php
+foreach( $extra_fields as $fields ):
+	echo $fields;
+endforeach;
+?>
 

@@ -10,6 +10,7 @@ jQuery( function( $ ) {
 	$meta_box.on( 'click', 'button', function( e ) {
 		e.preventDefault();
 		var url = ajaxurl + '?action=set_liveblog_state_for_post&post_id=' + encodeURIComponent( post_id ) + '&state=' + encodeURIComponent( $( this ).val() ) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
+		url += '&' + $('input, textarea, select', $meta_box).serialize();
 		$( '.inside', $meta_box ).load( url, function( response, status, xhr ) {
 			if ( status === 'success') {
 				return;

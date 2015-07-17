@@ -307,9 +307,7 @@ window.liveblog = window.liveblog || {};
 		var $new_entry = $( new_entry.html );
 
 		if ( $new_entry.hasClass( liveblog_settings.command_class + 'key' ) ) {
-			var $new_key_entry = $( new_entry.html );
-			liveblog.key_event_handle_id( $new_key_entry );
-			liveblog.key_event_handle_click( $new_key_entry );
+			var $new_key_entry = $( new_entry.key );
 			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
 		}
 
@@ -320,7 +318,8 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
-		$entry.replaceWith( updated_entry.html );
+		liveblog.$entry_container.find($entry).replaceWith( updated_entry.html );
+		liveblog.$key_entry_container.find($entry).replaceWith( updated_entry.key );
 		liveblog.entriesContainer.updateTimes();
 	};
 
@@ -667,66 +666,9 @@ window.liveblog = window.liveblog || {};
 		return JSON.parse(localStorage.getItem(key));
 	};
 
-	/**
-	 * This grabs any events in the key event box
-	 * store there id in a data attribute 'anchor'
-	 * and then sets the id to 'key'
-	 *
-	 */
-	liveblog.key_event_prepare = function() {
-		liveblog.$key_entries.each(function() {
-			liveblog.key_event_handle_id( $(this) );
-			liveblog.key_event_handle_click( $(this) );
-		});
-	};
-
-	/**
-	 * This grabs any events in the key event box
-	 * click event to them so they can be used
-	 * ad anchors
-	 */
-	liveblog.key_event_scroll = function() {
-		liveblog.$key_entries.each(function() {
-			liveblog.key_event_handle_click( $(this) );
-		});
-	};
-
-	/**
-	 * Stores there id in a data attribute 'anchor'
-	 * and then sets the id to 'key'
-	 */
-	liveblog.key_event_handle_id = function( $entry ) {
-		$entry.data('anchor', $entry .attr('id'));
-		$entry.attr('id', 'key');
-	};
-
-	/**
-	 * Adds the click event to key event entry
-	 */
-	liveblog.key_event_handle_click = function( $entry ) {
-		$entry.click(function() {
-			var anchor = $(this).attr('id');
-			if(anchor === 'key') {
-				anchor = $(this).data('anchor');
-			} else {
-				liveblog.key_event_handle_id( $(this) );
-			}
-			window.location.hash = '';
-			window.location.hash = '#' + anchor;
-		});
-	};
-
-	/**
-	 * Trigger after view init
-	 */
-	liveblog.$events.bind( 'after-views-init', liveblog.key_event_prepare );
-
 	// Initialize everything!
 	if ( 'archive' !== liveblog_settings.state ) {
 		$( document ).ready( liveblog.init );
-	} else {
-		liveblog.$key_entries = $( '#liveblog-key-entries .liveblog-entry' );
-		liveblog.key_event_scroll();
 	}
 
 } )( jQuery );

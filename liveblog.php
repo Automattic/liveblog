@@ -792,7 +792,9 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
+		$extra_fields = array();
+		$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
+		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'extra_fields' ) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
@@ -809,6 +811,8 @@ final class WPCOM_Liveblog {
 		if ( wp_is_post_revision( $post_id ) ) {
 			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
 		}
+
+		do_action( 'liveblog_admin_settings_update', $_REQUEST, $post_id );
 
 		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
 		self::display_meta_box( $REQUEST );

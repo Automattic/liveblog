@@ -3,7 +3,7 @@
 	<div id="liveblog-key-entries">
 		<?php foreach ( (array) $entries as $entry ) : ?>
 
-			<?php echo $entry->render(); ?>
+			<?php echo $entry->render( $template ); ?>
 
 	<?php endforeach; ?>
 	</div>

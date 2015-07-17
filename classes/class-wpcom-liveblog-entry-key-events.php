@@ -13,17 +13,40 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Set the meta_key and meta_value
 	 */
-	const meta_key   = 'liveblog_key_entry';
-	const meta_value = 'true';
+	const meta_key          = 'liveblog_key_entry';
+	const meta_value        = 'true';
+	const meta_key_template = 'liveblog_key_entry_template';
+	const meta_key_format   = 'liveblog_key_entry_format';
+
+	/**
+	 * Template to render entries
+	 */
+	protected static $template;
+	protected static $available_templates = array(
+		'list'     => 'liveblog-key-single-list.php',
+		'timeline' => 'liveblog-key-single-timeline.php',
+	);
+	protected static $available_formats = array(
+		'first-sentence'  => array( __CLASS__, 'format_content_first_sentence' ),
+		'first-linebreak' => array( __CLASS__, 'format_content_first_linebreak' ),
+		'full'            => false,
+	);
 
 	/**
 	 * Called by WPCOM_Liveblog::load(), it attaches the
 	 * new command and shortcode.
 	 */
 	public static function load() {
-		add_filter( 'liveblog_active_commands', array( __CLASS__, 'add_key_command' ), 10 );
-		add_shortcode( 'liveblog_key_events', array( __CLASS__, 'shortcode' ) );
-		add_action( 'liveblog_command_key_after', array( __CLASS__, 'add_key_action' ), 10, 3 );
+
+		self::$available_templates = apply_filters( 'liveblog_key_templates', self::$available_templates );
+		self::$available_formats   = apply_filters( 'liveblog_key_formats', self::$available_formats );
+
+		add_filter( 'liveblog_active_commands',       array( __CLASS__, 'add_key_command' ), 10 );
+		add_filter( 'liveblog_entry_for_json',        array( __CLASS__, 'render_key_template' ), 10, 2 );
+		add_filter( 'liveblog_admin_add_settings',    array( __CLASS__, 'add_admin_options' ), 10, 2 );
+		add_shortcode( 'liveblog_key_events',         array( __CLASS__, 'shortcode' ) );
+		add_action( 'liveblog_command_key_after',     array( __CLASS__, 'add_key_action' ), 10, 3 );
+		add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
 	}
 
 	/**
@@ -52,20 +75,144 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
+	 * Pass a separate template for key event shortcode
+	 *
+	 * @param $entry
+	 * @param $object
+	 * @return mixed
+     */
+	public static function render_key_template( $entry, $object ) {
+		$post_id      = $object->get_post_id();
+		$entry['key'] = $object->render( self::get_current_template( $post_id ) );
+		return $entry;
+	}
+
+	/**
+	 * Handle the save of the admin options related
+	 * to the key events template box
+	 *
+	 * @param $response
+	 * @param $post_id
+     */
+	public static function save_template_option( $response, $post_id ) {
+		if ( 'liveblog-key-template-save' == $response['state'] && ! empty( $response['liveblog-key-template-name'] ) ) {
+
+			$template = 'list';
+			if ( isset( self::$available_templates[ $response['liveblog-key-template-name'] ] ) ) {
+				$template = $response['liveblog-key-template-name'];
+			}
+			update_post_meta( $post_id, self::meta_key_template, $template );
+
+			$format = 'first-sentence';
+			if ( isset( self::$available_formats[ $response['liveblog-key-template-format'] ] ) ) {
+				$format = $response['liveblog-key-template-format'];
+			}
+			update_post_meta( $post_id, self::meta_key_format, $format );
+		}
+	}
+
+	/**
+	 * Add a input for the user to pick a template.
+	 *
+	 * @param $extra_fields
+	 * @param $post_id
+	 * @return array
+     */
+	public static function add_admin_options( $extra_fields, $post_id ) {
+		$extra_fields[] = WPCOM_Liveblog::get_template_part( 'liveblog-key-admin.php', array(
+			'current_key_template' => get_post_meta( $post_id, self::meta_key_template, true ),
+			'current_key_format'   => get_post_meta( $post_id, self::meta_key_format, true ),
+			'key_name'             => __( 'Template:', 'liveblog' ),
+			'key_format_name'      => __( 'Format:', 'liveblog' ),
+			'key_description'      => __( 'Set template for key events shortcode. And select a format.', 'liveblog' ),
+			'key_button'           => __( 'Save', 'liveblog' ),
+			'templates'			   => array_keys( self::$available_templates ),
+			'formats'              => array_keys( self::$available_formats ),
+		) );
+		return $extra_fields;
+	}
+
+	/**
+	 * Returns the current for template for that post
+	 *
+	 * @param $post_id
+	 * @return mixed
+     */
+	public static function get_current_template( $post_id ) {
+		$type = get_post_meta( $post_id, self::meta_key_template, true );
+		if ( ! empty( $type ) ) {
+			return self::$available_templates[$type];
+		}
+		return self::$available_templates['list'];
+	}
+
+	/**
+	 * Returns the current format of content
+	 *
+	 * @param $post_id
+	 * @return mixed
+     */
+	public static function get_current_format( $post_id ) {
+		$type = get_post_meta( $post_id, self::meta_key_format, true );
+		if ( ! empty( $type ) ) {
+			return self::$available_formats[$type];
+		}
+		return self::$available_formats['first-sentence'];
+	}
+
+	/**
+	 * Calls the function to format the content.
+	 *
+	 * @param $content
+	 * @param $post_id
+	 * @return mixed
+     */
+	public static function get_formatted_content( $content, $post_id ) {
+		if ( self::get_current_format( $post_id ) ) {
+			$content = call_user_func( self::get_current_format( $post_id ), $content );
+		}
+		return $content;
+	}
+
+	/**
+	 * Grab first sentence
+	 *
+	 * @param $content
+	 * @return string
+     */
+	public static function format_content_first_sentence( $content ) {
+		$content = preg_replace('/(.*?[?!.](?=\s|$)).*/', '\\1', $content);
+		return $content;
+	}
+
+
+	/**
+	 * Grab first paragraph/linebreak
+	 *
+	 * @param $content
+	 * @return string
+     */
+	public static function format_content_first_linebreak( $content ) {
+		$content = explode('</p>', $content);
+		return $content[0];
+	}
+
+	/**
 	 * Builds the box to display key entries
 	 *
-	 * @param $commands
+	 * @param $atts
+	 * @return mixed
 	 */
 	public static function shortcode( $atts ) {
 		global $post;
 
-		$atts = shortcode_atts( array(
-			'title' => 'Key Events',
-		), $atts );
-
 		if ( ! is_single() ) {
 			return;
 		}
+
+		$atts = shortcode_atts( array(
+			'title' => 'Key Events',
+		), $atts );
 
 		$args = array(
 			'meta_key'   => self::meta_key,
@@ -76,8 +223,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		if ( WPCOM_Liveblog::get_liveblog_state( $post->ID ) ) {
 			return WPCOM_Liveblog::get_template_part( 'liveblog-key-events.php', array(
-				'entries' => $entries,
-				'title'   => $atts['title'],
+				'entries'  => $entries,
+				'title'    => $atts['title'],
+				'template' => self::get_current_template( $post->ID ),
 			) );
 		}
 	}

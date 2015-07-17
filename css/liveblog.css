@@ -540,20 +540,12 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	cursor: pointer;
 }
 
-.liveblog-key-events .liveblog-entry:hover {
+.liveblog-key-events .liveblog-entry a:hover {
 	text-decoration: underline;
 }
 
-.liveblog-key-events .liveblog-entry-text {
-	margin: 0px;
-}
-
-.liveblog-key-events .liveblog-entry-text::before {
-	content: "\25A0";
-}
-
-.liveblog-key-events .liveblog-entry-text p {
-	display: inline;
+.liveblog-key-events li.liveblog-entry p {
+	margin-bottom: 0px;
 }
 
 /* =Notification settings
