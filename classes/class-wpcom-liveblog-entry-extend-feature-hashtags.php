@@ -95,9 +95,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function preg_replace_callback( $match ) {
 		$hashtag = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
+		$hashtag = sanitize_term( array( 'slug' => $hashtag ), self::$taxonomy, 'db' );
+		$hashtag = $hashtag['slug'];
 
-		if ( ! term_exists( $hashtag, self::$taxonomy ) ) {
-			wp_insert_term( $hashtag, self::$taxonomy );
+		if ( ! get_term_by( 'slug', $hashtag, self::$taxonomy ) ) {
+			$error = wp_insert_term( $hashtag, self::$taxonomy );
+
+			if ( $error ) {
+				wp_insert_term( $hashtag.'-'.time(), self::$taxonomy, array( 'slug' => $hashtag ) );
+			}
 		}
 
 		return str_replace(
@@ -153,12 +159,34 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			$args['search'] = $term;
 		}
 
+		add_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 		$terms = get_terms( self::$taxonomy, $args );
+		remove_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 
 		header( "Content-Type: application/json" );
 		echo json_encode( $terms );
 
 		exit;
+	}
+
+	/**
+	 * Removes the name search from the clauses.
+	 *
+	 * @param array $clauses
+	 *
+	 * @return array
+	 */
+	public function remove_name_search( $clauses ) {
+		$clauses['where'] = preg_replace(
+			array(
+				'~\\(\\(.*(?='.preg_quote("(t.slug LIKE '").')~',
+				'~(%\'\\))\\)~',
+			),
+			'$1',
+			$clauses['where']
+		);
+
+		return $clauses;
 	}
 
 	/**
