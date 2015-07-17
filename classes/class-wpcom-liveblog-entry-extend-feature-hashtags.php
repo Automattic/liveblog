@@ -41,7 +41,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			preg_quote( $this->class_prefix, '~' ),
 			'([^"]+)',
 			preg_quote( '">', '~' ),
-			'\1',
+			'([^"]+)',
 			preg_quote( '</span>', '~' ),
 		) );
 
@@ -62,9 +62,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$config[] = apply_filters( 'liveblog_hashtag_config', array(
 			'type'        => 'ajax',
 			'cache'       => 1000 * 60,
-			'regex'       => '#(\w*)$',
+			'regex'       => '#([\w\d\-]*)$',
 			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
-			'replacement' => '#${term}',
+			'template'    => '${slug}',
+			'replacement' => '#${slug}',
 		) );
 
 		return $config;
@@ -93,15 +94,21 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return string
 	 */
 	public function preg_replace_callback( $match ) {
-		$term = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
+		$hashtag = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
+		$hashtag = sanitize_term( array( 'slug' => $hashtag ), self::$taxonomy, 'db' );
+		$hashtag = $hashtag['slug'];
 
-		if ( ! term_exists( $term, self::$taxonomy ) ) {
-			wp_insert_term( $term, self::$taxonomy );
+		if ( ! get_term_by( 'slug', $hashtag, self::$taxonomy ) ) {
+			$error = wp_insert_term( $hashtag, self::$taxonomy );
+
+			if ( $error ) {
+				wp_insert_term( $hashtag.'-'.time(), self::$taxonomy, array( 'slug' => $hashtag ) );
+			}
 		}
 
 		return str_replace(
 			$match[1],
-			'<span class="liveblog-hash '.$this->class_prefix.$term.'">'.$term.'</span>',
+			'<span class="liveblog-hash '.$this->class_prefix.$hashtag.'">'.$hashtag.'</span>',
 			$match[0]
 		);
 	}
@@ -144,7 +151,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	public function ajax_terms() {
 		$args = array(
 			'hide_empty' => false,
-			'fields'     => 'names',
 			'number' 	 => 10,
 		);
 
@@ -153,12 +159,34 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			$args['search'] = $term;
 		}
 
+		add_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 		$terms = get_terms( self::$taxonomy, $args );
+		remove_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 
 		header( "Content-Type: application/json" );
 		echo json_encode( $terms );
 
 		exit;
+	}
+
+	/**
+	 * Removes the name search from the clauses.
+	 *
+	 * @param array $clauses
+	 *
+	 * @return array
+	 */
+	public function remove_name_search( $clauses ) {
+		$clauses['where'] = preg_replace(
+			array(
+				'~\\(\\(.*(?='.preg_quote("(t.slug LIKE '").')~',
+				'~(%\'\\))\\)~',
+			),
+			'$1',
+			$clauses['where']
+		);
+
+		return $clauses;
 	}
 
 	/**
