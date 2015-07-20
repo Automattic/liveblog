@@ -743,7 +743,10 @@ final class WPCOM_Liveblog {
 	public static function get_template_part( $template_name, $template_variables = array() ) {
 		ob_start();
 		extract( $template_variables );
-		if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
+		if ( 0 === strpos( $template_name, '{theme}' ) ) {
+			$template_name = str_replace('{theme}', get_template_directory(), $template_name);
+			include( $template_name );
+		} else if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
 			include( self::$custom_template_path . '/' . $template_name );
 		} else {
 			include( dirname( __FILE__ ) . '/templates/' . $template_name );
@@ -792,9 +795,10 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
+		$update_text  = __( 'Settings have been successfully updated.', 'liveblog' );
 		$extra_fields = array();
 		$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'extra_fields' ) );
+		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {

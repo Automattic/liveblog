@@ -1,5 +1,6 @@
-<h2><?php echo $active_text; ?></h2>
 <p class="error"></p>
+<p class="success"><?php echo $update_text; ?></p>
+<h2><?php echo $active_text; ?></h2>
 <ul>
 <?php
 foreach( $buttons as $button ):

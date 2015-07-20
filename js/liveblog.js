@@ -18,11 +18,11 @@ window.liveblog = window.liveblog || {};
 		},
 		updateTimes: function() {
 			var self = this;
-			this.$('.liveblog-entry').each(function() {
+			$('.liveblog-entry').each(function() {
 				var $entry = $(this),
 					timestamp = $entry.data('timestamp'),
 					human = self.formatTimestamp(timestamp);
-				$('.liveblog-meta-time a', $entry).text(human);
+				$('.liveblog-time-update', $entry).text(human);
 			});
 		},
 		formatTimestamp: function(timestamp) {

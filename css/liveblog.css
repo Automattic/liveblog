@@ -529,15 +529,16 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 
 /* =Key Events
 -------------------------------------------------------------- */
-.liveblog-key-events .liveblog-entry-actions,
-.liveblog-key-events .liveblog-meta,
-.liveblog-key-events img {
-	display:none;
+
+.liveblog-key-events h2 {
+	color: #333;
+	margin-bottom: 15px;
 }
 
 .liveblog-key-events .liveblog-entry {
 	border: none;
-	cursor: pointer;
+	overflow: visible;
+	padding: 0px;
 }
 
 .liveblog-key-events .liveblog-entry a:hover {
@@ -546,6 +547,50 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 
 .liveblog-key-events li.liveblog-entry p {
 	margin-bottom: 0px;
+}
+
+.liveblog-key-events .liveblog-key-timeline li {
+	display: block;
+	list-style: none;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .link {
+	position: relative;
+	display: block;
+	padding: 0 10px 20px;
+	border-left: 1px solid #dfdfdf;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .link:before {
+	display: block;
+	position: absolute;
+	content: ' ';
+	top: 2px;
+	left: -5px;
+	width: 10px;
+	height: 10px;
+	background-color: #bbb;
+ }
+
+.liveblog-key-events .liveblog-key-timeline li:first-child .link:before,
+.liveblog-key-events .liveblog-key-timeline li:last-child .link:before {
+	border-radius: 0;
+	top: 0;
+	height: 1px;
+}
+
+.liveblog-key-events .liveblog-key-timeline li:last-child .link {
+	border-color: transparent;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .title {
+	display: inline;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .date {
+	display: block;
+	font-size: 10px;
+	color: #333;
 }
 
 /* =Notification settings

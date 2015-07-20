@@ -13,6 +13,7 @@ jQuery( function( $ ) {
 		url += '&' + $('input, textarea, select', $meta_box).serialize();
 		$( '.inside', $meta_box ).load( url, function( response, status, xhr ) {
 			if ( status === 'success') {
+				$( 'p.success', $meta_box ).show(0).delay( 1000 ).hide(0);
 				return;
 			}
 			if (xhr.status && xhr.status > 200) {

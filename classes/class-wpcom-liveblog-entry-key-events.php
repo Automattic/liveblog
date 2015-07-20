@@ -21,10 +21,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Template to render entries
 	 */
-	protected static $template;
 	protected static $available_templates = array(
-		'list'     => 'liveblog-key-single-list.php',
-		'timeline' => 'liveblog-key-single-timeline.php',
+		'list'     => array( 'liveblog-key-single-list.php', 'ul', 'liveblog-key-list' ),
+		'timeline' => array( 'liveblog-key-single-timeline.php', 'ul', 'liveblog-key-timeline' ),
 	);
 	protected static $available_formats = array(
 		'first-sentence'  => array( __CLASS__, 'format_content_first_sentence' ),
@@ -37,16 +36,22 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * new command and shortcode.
 	 */
 	public static function load() {
-
-		self::$available_templates = apply_filters( 'liveblog_key_templates', self::$available_templates );
-		self::$available_formats   = apply_filters( 'liveblog_key_formats', self::$available_formats );
-
+		add_action( 'init',                           array( __CLASS__, 'add_templates' ), 11 );
 		add_filter( 'liveblog_active_commands',       array( __CLASS__, 'add_key_command' ), 10 );
 		add_filter( 'liveblog_entry_for_json',        array( __CLASS__, 'render_key_template' ), 10, 2 );
 		add_filter( 'liveblog_admin_add_settings',    array( __CLASS__, 'add_admin_options' ), 10, 2 );
 		add_shortcode( 'liveblog_key_events',         array( __CLASS__, 'shortcode' ) );
 		add_action( 'liveblog_command_key_after',     array( __CLASS__, 'add_key_action' ), 10, 3 );
 		add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
+	}
+
+	/**
+	 * Add templates for the key events on init
+	 * so theme templates can add their own
+     */
+	public static function add_templates() {
+		self::$available_templates = apply_filters( 'liveblog_key_templates', self::$available_templates );
+		self::$available_formats   = apply_filters( 'liveblog_key_formats', self::$available_formats );
 	}
 
 	/**
@@ -83,7 +88,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
      */
 	public static function render_key_template( $entry, $object ) {
 		$post_id      = $object->get_post_id();
-		$entry['key'] = $object->render( self::get_current_template( $post_id ) );
+		$template     = self::get_current_template( $post_id );
+		$entry['key'] = $object->render( $template[0] );
 		return $entry;
 	}
 
@@ -182,6 +188,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
      */
 	public static function format_content_first_sentence( $content ) {
 		$content = preg_replace('/(.*?[?!.](?=\s|$)).*/', '\\1', $content);
+		$content = strip_tags( $content , '<strong></strong><em></em><span></span><img>' );
 		return $content;
 	}
 
@@ -193,8 +200,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @return string
      */
 	public static function format_content_first_linebreak( $content ) {
-		$content = explode('</p>', $content);
-		return $content[0];
+		$content = str_replace( array( "\r", "\n" ), '<br />', $content);
+		$content = explode('<br />', $content);
+		$content = strip_tags( $content[0] , '<strong></strong><em></em><span></span><img>' );
+		return $content;
 	}
 
 	/**
@@ -220,12 +229,15 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		);
 		$entry_query = new WPCOM_Liveblog_Entry_Query( $post->ID, WPCOM_Liveblog::key );
 		$entries     = (array) $entry_query->get_all( $args );
+		$template    = self::get_current_template( $post->ID );
 
 		if ( WPCOM_Liveblog::get_liveblog_state( $post->ID ) ) {
 			return WPCOM_Liveblog::get_template_part( 'liveblog-key-events.php', array(
 				'entries'  => $entries,
 				'title'    => $atts['title'],
-				'template' => self::get_current_template( $post->ID ),
+				'template' => $template[0],
+				'wrap'     => $template[1],
+				'class'    => $template[2],
 			) );
 		}
 	}
