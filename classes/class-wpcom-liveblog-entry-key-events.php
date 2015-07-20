@@ -22,12 +22,12 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * Template to render entries
 	 */
 	protected static $available_templates = array(
-		'list'     => array( 'liveblog-key-single-list.php', 'ul', 'liveblog-key-list' ),
 		'timeline' => array( 'liveblog-key-single-timeline.php', 'ul', 'liveblog-key-timeline' ),
+		'list'     => array( 'liveblog-key-single-list.php', 'ul', 'liveblog-key-list' ),
 	);
 	protected static $available_formats = array(
-		'first-sentence'  => array( __CLASS__, 'format_content_first_sentence' ),
 		'first-linebreak' => array( __CLASS__, 'format_content_first_linebreak' ),
+		'first-sentence'  => array( __CLASS__, 'format_content_first_sentence' ),
 		'full'            => false,
 	);
 
@@ -103,13 +103,13 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function save_template_option( $response, $post_id ) {
 		if ( 'liveblog-key-template-save' == $response['state'] && ! empty( $response['liveblog-key-template-name'] ) ) {
 
-			$template = 'list';
+			$template = 'timeline';
 			if ( isset( self::$available_templates[ $response['liveblog-key-template-name'] ] ) ) {
 				$template = $response['liveblog-key-template-name'];
 			}
 			update_post_meta( $post_id, self::meta_key_template, $template );
 
-			$format = 'first-sentence';
+			$format = 'first-linebreak';
 			if ( isset( self::$available_formats[ $response['liveblog-key-template-format'] ] ) ) {
 				$format = $response['liveblog-key-template-format'];
 			}
@@ -149,7 +149,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		if ( ! empty( $type ) ) {
 			return self::$available_templates[$type];
 		}
-		return self::$available_templates['list'];
+		return self::$available_templates['timeline'];
 	}
 
 	/**
@@ -163,7 +163,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		if ( ! empty( $type ) ) {
 			return self::$available_formats[$type];
 		}
-		return self::$available_formats['first-sentence'];
+		return self::$available_formats['first-linebreak'];
 	}
 
 	/**
