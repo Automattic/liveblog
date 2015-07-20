@@ -15,8 +15,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 */
 	const meta_key          = 'liveblog_key_entry';
 	const meta_value        = 'true';
-	const meta_key_template = 'liveblog_key_entry_template';
-	const meta_key_format   = 'liveblog_key_entry_format';
+	const meta_key_template = '_liveblog_key_entry_template';
+	const meta_key_format   = '_liveblog_key_entry_format';
 
 	/**
 	 * Template to render entries
