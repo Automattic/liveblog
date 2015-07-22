@@ -549,48 +549,57 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	margin-bottom: 0px;
 }
 
+.liveblog-key-events .liveblog-key-timeline {
+	position: relative;
+	border-left: 1px solid #bbb;
+}
+
+.liveblog-key-events .liveblog-key-timeline:after {
+	content : "";
+	position: absolute;
+	left: -5px;
+	bottom: 0;
+	height: 1px;
+	width: 10px;
+	border-bottom:1px solid #bbb
+}
+
+.liveblog-key-events .liveblog-key-timeline:before {
+	content : "";
+	position: absolute;
+	left: -5px;
+	top: 0;
+	height: 1px;
+	width: 10px;
+	border-bottom:1px solid #bbb
+}
+
 .liveblog-key-events .liveblog-key-timeline li {
 	display: block;
 	list-style: none;
+	margin-bottom: 25px;
+	margin-left: -5px;
 }
 
-.liveblog-key-events .liveblog-key-timeline li .link {
-	position: relative;
-	display: block;
-	padding: 0 10px 20px;
-	border-left: 1px solid #dfdfdf;
-}
-
-.liveblog-key-events .liveblog-key-timeline li .link:before {
-	display: block;
-	position: absolute;
-	content: ' ';
-	top: 2px;
-	left: -5px;
-	width: 10px;
-	height: 10px;
-	background-color: #bbb;
+.liveblog-key-events .liveblog-key-timeline li:before {
+	content: '\25A0';
+	color: #bbb;
  }
 
-.liveblog-key-events .liveblog-key-timeline li:first-child .link:before,
-.liveblog-key-events .liveblog-key-timeline li:last-child .link:before {
-	border-radius: 0;
-	top: 0;
-	height: 1px;
-}
-
-.liveblog-key-events .liveblog-key-timeline li:last-child .link {
-	border-color: transparent;
-}
-
-.liveblog-key-events .liveblog-key-timeline li .title {
-	display: inline;
+.liveblog-key-events .liveblog-key-timeline li .link {
+	display: block;
+	margin-top: -26px;
 }
 
 .liveblog-key-events .liveblog-key-timeline li .date {
 	display: block;
 	font-size: 10px;
 	color: #333;
+	padding-left: 20px;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .title {
+	padding-left: 20px;
 }
 
 /* =Notification settings
