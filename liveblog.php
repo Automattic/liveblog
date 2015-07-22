@@ -77,9 +77,8 @@ final class WPCOM_Liveblog {
 		self::add_admin_filters();
 		self::register_embed_handlers();
 
-		WPCOM_Liveblog_Entry_Alerts::load();
 		WPCOM_Liveblog_Entry_Key_Events::load();
-        WPCOM_Liveblog_Entry_Extend::load();
+		WPCOM_Liveblog_Entry_Extend::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -110,14 +109,13 @@ final class WPCOM_Liveblog {
 	private static function includes() {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php'       );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-alerts.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
-        require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.

@@ -400,65 +400,23 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.set_up_notification_settings = function() {
 		var feature_list = liveblog_settings.features.join(' '),
-			feature_test = /(commands|hashtags)/.test(feature_list),
-			feature_hashtags = /(hashtags)/.test(feature_list),
 			feature_commands = /(commands)/.test(feature_list);
 
-		// Make sure settings are enabled for either commands or hashtags
-		if ( ! feature_test ) {
+		// Make sure settings are enabled for commands
+		if ( ! feature_commands ) {
+			$('.liveblog-notification-enable-label').hide();
+
 			return;
 		}
 
-		if ( ! feature_hashtags ) {
-			$('.liveblog-notification-tags-label').hide();
-		}
-
-		if ( ! feature_commands ) {
-			$('.liveblog-notification-key-label').hide();
-			$('.liveblog-notification-alerts-label').hide();
-		}
-
 		// Cache commonly used DOM elements
-		liveblog.$notification_tags = $('.liveblog-notification-tags'),
-		liveblog.$checkbox_enable = $('.liveblog-notification-enable'),
-		liveblog.$checkbox_key = $('.liveblog-notification-key'),
-		liveblog.$checkbox_alerts = $('.liveblog-notification-alerts'),
-		liveblog.$notification_options = $('.liveblog-notification-options'),
-		liveblog.$notification_settings = $('.liveblog-notification-settings'),
-		liveblog.$notification_settings_toggle = $('.liveblog-notification-settings-toggle'),
-		liveblog.$notification_settings_container = $('.liveblog-notification-settings-container');
-
-		// Get currently stored tags
-		liveblog.stored_tags = liveblog.parse_local_storage('liveblog-tags'),
+		liveblog.$checkbox_enable = $('.liveblog-notification-enable');
 
 		// Show settings container if browser suppoorts the Notification API
-		liveblog.$notification_settings_container.show();
-
-		// Hide settings
-		liveblog.$notification_settings.hide();
-		liveblog.$notification_options.hide();
+		$('.liveblog-notification-settings-container').show();
 
 		// Check notification status on load, use the `load` event
 		liveblog.check_notification_status('load');
-
-		// Populate tag input
-		if ( liveblog.stored_tags ) {
-			liveblog.$notification_tags.val(liveblog.stored_tags.join(' '));
-		}
-
-		// Populate key event checkbox
-		if ( liveblog.parse_local_storage('liveblog-key') ) {
-			liveblog.$checkbox_key.attr('checked', true);
-		} else {
-			liveblog.$checkbox_key.attr('checked', false);
-		}
-
-		// Populate alerts checkbox
-		if ( liveblog.parse_local_storage('liveblog-alerts') ) {
-			liveblog.$checkbox_alerts.attr('checked', true);
-		} else {
-			liveblog.$checkbox_alerts.attr('checked', false);
-		}
 
 		// Watch enable checkbox for any change
 		liveblog.$checkbox_enable.on( 'change', function() {
@@ -468,33 +426,6 @@ window.liveblog = window.liveblog || {};
 				liveblog.check_notification_status('unchecked');
 			}
 		} );
-
-		// Watch key checkbox for any change
-		liveblog.$checkbox_key.on( 'change', function() {
-			if ( this.checked ) {
-				localStorage.setItem('liveblog-key', true);
-			} else {
-				localStorage.setItem('liveblog-key', false);
-			}
-		} );
-
-		// Watch alerts checkbox for any change
-		liveblog.$checkbox_alerts.on( 'change', function() {
-			if ( this.checked ) {
-				localStorage.setItem('liveblog-alerts', true);
-			} else {
-				localStorage.setItem('liveblog-alerts', false);
-			}
-		} );
-
-		// Toggle notification settings
-		liveblog.$notification_settings_toggle.on( 'click', function( e ) {
-			e.preventDefault();
-			liveblog.$notification_settings.slideToggle(250);
-		} );
-
-		// Auto save with debounced keyup
-		liveblog.$notification_tags.on( 'keyup', _.debounce(liveblog.store_tags, 750) );
 	};
 
 	liveblog.set_notification_status = function( status ) {
@@ -502,14 +433,11 @@ window.liveblog = window.liveblog || {};
 
 		if ( status === 'granted' ) {
 			checked = true;
-			animation = 'slideDown';
 		} else if ( status === 'denied' ) {
 			checked = false;
-			animation = 'slideUp';
 		}
 
 		liveblog.$checkbox_enable.attr('checked', checked);
-		liveblog.$notification_options[animation](250);
 		localStorage.setItem('liveblog-notifications', checked);
 	};
 
@@ -562,33 +490,9 @@ window.liveblog = window.liveblog || {};
 		var notify,
 			entry_text = liveblog.get_notification_entry_text($new_entry),
 			entry_icon = liveblog.get_notification_entry_icon($new_entry),
-			type_key = liveblog.parse_local_storage('liveblog-key'),
-			type_alerts = liveblog.parse_local_storage('liveblog-alerts');
+			notifications_enabled = liveblog.parse_local_storage('liveblog-notifications');
 
-		if ( type_alerts && $new_entry.hasClass(liveblog_settings.class_alert) ) {
-			notify = true;
-		}
-
-		if ( type_key && $new_entry.hasClass(liveblog_settings.class_key) ) {
-			notify = true;
-		}
-
-		if ( liveblog.stored_tags ) {
-
-			// Loop tags
-			for ( var i = 0, tags_length = liveblog.stored_tags.length; i < tags_length; i++ ) {
-
-				// Make sure tag is a saved one
-				if ( $new_entry.hasClass(liveblog_settings.class_term_prefix + liveblog.stored_tags[i]) ) {
-					notify = true;
-
-					// Break out of loop as we limit to one notification at a time
-					break;
-				}
-			}
-		}
-
-		if ( notify ) {
+		if ( notifications_enabled && $new_entry.hasClass(liveblog_settings.class_key) ) {
 			liveblog.spawn_notification(liveblog_settings.notification_title, {body: entry_text, icon: entry_icon});
 		}
 	};
@@ -629,37 +533,6 @@ window.liveblog = window.liveblog || {};
 		// Make sure it closes as Chrome currently (v43.0.2357.130) doesn't auto-close
 		setTimeout(notification.close.bind(notification), 5000);
 	},
-
-	liveblog.store_tags = function( e ) {
-		e.preventDefault();
-
-		var tags_input_value = liveblog.$notification_tags.val(),
-			tags = tags_input_value.split(' ');
-
-		// Make sure data is new
-		if ( JSON.stringify(liveblog.stored_tags) === JSON.stringify(tags) ) {
-			return;
-		}
-
-		// Clean any empties / false values
-		tags = _.compact(tags);
-
-		// Filter out duplicates
-		tags = _.uniq(tags);
-
-		// Save to stored_tags
-		liveblog.stored_tags = tags;
-
-		// Store as array in localStorage
-		localStorage.setItem('liveblog-tags', JSON.stringify(tags));
-
-		$('.liveblog-notification-saved').fadeIn(300)
-			.delay(750)
-			.queue(function() {
-				$(this).fadeOut(300);
-				$(this).dequeue();
-			});
-	};
 
 	// JSON parse localStorage key, useful for returning actual bool, array etc.
 	liveblog.parse_local_storage = function( key ) {

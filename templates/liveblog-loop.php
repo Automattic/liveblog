@@ -6,27 +6,10 @@
 
 <?php if ( ! current_user_can( 'edit_posts' ) ): ?>
 <div class="liveblog-notification-settings-container">
-	<a class="liveblog-notification-settings-toggle" href="#"><?php printf( __( 'Notification settings' ) ); ?></a>
-
 	<div class="liveblog-notification-settings">
 		<label class="liveblog-notification-enable-label">
-			<input type="checkbox" class="liveblog-notification-enable"> <?php printf( __( 'Enable browser notifications' ) ); ?>
+			<input type="checkbox" class="liveblog-notification-enable"> <?php printf( __( 'Enable browser notifications for key events' ) ); ?>
 		</label>
-
-		<form class="liveblog-notification-options">
-			<label class="liveblog-notification-key-label">
-				<input type="checkbox" class="liveblog-notification-key"> <?php printf( __( 'Subscribe to key events' ) ); ?>
-			</label>
-			<label class="liveblog-notification-alerts-label">
-				<input type="checkbox" class="liveblog-notification-alerts"> <?php printf( __( 'Subscribe to author alerts ') ); ?>
-			</label>
-			<label class="liveblog-notification-tags-label"> <?php printf( __( 'Tags to subscribe to (space separated):' ) ); ?>
-				<div class="liveblog-notification-tags-wrap">
-					<input type="text" class="liveblog-notification-tags">
-					<div class="liveblog-notification-saved"></div>
-				</div>
-			</label>
-		</form>
 	</div>
 </div>
 <?php endif; ?>
