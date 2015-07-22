@@ -538,7 +538,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-key-events .liveblog-entry {
 	border: none;
 	overflow: visible;
-	padding: 0px;
+	padding: 0;
 }
 
 .liveblog-key-events .liveblog-entry a:hover {
@@ -546,49 +546,50 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 }
 
 .liveblog-key-events li.liveblog-entry p {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 
 .liveblog-key-events .liveblog-key-timeline {
 	position: relative;
 	border-left: 1px solid #bbb;
+	padding-top: 1px;
 }
 
-.liveblog-key-events .liveblog-key-timeline:after {
-	content : "";
-	position: absolute;
-	left: -5px;
-	bottom: 0;
-	height: 1px;
-	width: 10px;
-	border-bottom:1px solid #bbb
-}
 
+.liveblog-key-events .liveblog-key-timeline:after,
 .liveblog-key-events .liveblog-key-timeline:before {
 	content : "";
 	position: absolute;
 	left: -5px;
-	top: 0;
 	height: 1px;
 	width: 10px;
-	border-bottom:1px solid #bbb
+	border-bottom: 1px solid #bbb;
+}
+
+.liveblog-key-events .liveblog-key-timeline:after {
+	bottom: 0;
+}
+
+.liveblog-key-events .liveblog-key-timeline:before {
+	top: 0;
 }
 
 .liveblog-key-events .liveblog-key-timeline li {
+	position: relative;
 	display: block;
 	list-style: none;
 	margin-bottom: 25px;
-	margin-left: -5px;
 }
 
 .liveblog-key-events .liveblog-key-timeline li:before {
-	content: '\25A0';
-	color: #bbb;
- }
-
-.liveblog-key-events .liveblog-key-timeline li .link {
+	content: "";
+	position: absolute;
 	display: block;
-	margin-top: -26px;
+	top: 11px;
+	left: -4px;
+	height: 7px;
+	width: 7px;
+	background-color: #bbb;
 }
 
 .liveblog-key-events .liveblog-key-timeline li .date {
@@ -600,6 +601,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 
 .liveblog-key-events .liveblog-key-timeline li .title {
 	padding-left: 20px;
+	display: inline-block;
 }
 
 /* =Notification settings
@@ -661,7 +663,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 			transform: translateY(-50%);
 }
 
-.liveblog-notification-saved::after {
+.liveblog-notification-saved:after {
 	content: "saved";
 	position: absolute;
 	left: 0;
