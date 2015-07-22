@@ -120,8 +120,8 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.init = function() {
 		liveblog.$entry_container     = $( '#liveblog-entries'                     );
-		liveblog.$key_entry_container = $( '#liveblog-key-entries'                 );
-		liveblog.$key_entries         = $( '#liveblog-key-entries .liveblog-entry' );
+		liveblog.$key_entry_container = $( '.liveblog-key-entries'                 );
+		liveblog.$key_entries         = $( '.liveblog-key-entries .liveblog-entry' );
 		liveblog.$spinner             = $( '#liveblog-update-spinner'              );
 
 		liveblog.queue = new liveblog.EntriesQueue();
