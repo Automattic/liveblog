@@ -40,6 +40,147 @@ If you'd like to check out the code and contribute, [join us on github](https://
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. You can enable the liveblog on any post's edit page
 
+### Overview
+
+The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` with an autocomplete system to help speed up the process. On top of this there is also a HTML5 notification section for users. These extensions are filtered on save, for example a hashtag `#football` would be saved as `<span class="liveblog-hash term-football">football</span>` allowing easy styling. The container of the entry will also receive the same class `term-football`.
+
+If you only wish to enabled specific features, you can do so using the `wp-config.php`:
+
+``` php
+define('LIVEBLOG_FEATURES', 'commands, hashtags, emojis, authors');
+```
+
+The command system has one inbuilt command:
+
+`/key`: Which defines an entry to a key event, it adds the meta key to entry `liveblog_key_entry`. In your theme you can add the shortcode `[liveblog_key_events]` where entries used with the key command will be inserted - it acts an anchor system to jump to parts of the blog. If the user has enabled HTML5 notification and the window is not currently in focus they will receive a notification about that entry.
+
+You can add new commands easily with a filter, the most basic command will add a class to entry, so you could do a simple  `/highlight` which would add `type-highlight` to the entry container letting you style a new background color:
+
+``` php
+add_filter( 'liveblog_active_commands',  array( __CLASS__, 'add_highlight_command' ), 10 );
+
+
+public static function add_highlight_command( $commands ) {
+  $commands[] = highlight;
+  return $commands;
+}
+```
+
+A command can have both a filter called before the entry is saved, or an action that is called after it’s saved:
+
+``` php
+apply_filter( "liveblog_command_{$command}_before", $arg );
+do_action( "liveblog_command_{$command}_after", $arg );
+```
+
+#### Customizing Key Events Shortcode
+
+As mentioned earlier you can add the key events section by using `[liveblog_key_events]`. If you wish to change the title from the default `Key Events` then you a title attribute.
+
+ ``` php
+ [liveblog_key_events title="My New Title"]
+ ```
+ If want to remove the title, good example when placing the shortcode in a widget.
+
+ ``` php
+ [liveblog_key_events title="false"]
+ ```
+
+A key event entry can be altered in to two ways:
+
+**Template:** Is how each entry will be rendered, there are two inbuilt templates (list or timeline). You can add your own using a filter:
+
+```php
+add_filter( 'liveblog_key_templates', 'add_template', 'liveblog-key-custom-css-class');
+
+function add_template( $templates ) {
+  $templates['custom'] = array( '{theme}/key-events.php', 'div' );
+  return $templates;
+}
+```
+There's a few things to note here:
+
+* `{theme}` is a shorthand to point to the current active theme directory, in this case we our loading template file `key-events.php`.
+* `div` is where we set the element type the wraps all entries, in the case where you wanted to built a list you would set this to `ul`.
+* `liveblog-key-custom-css-class` is a class that will added the wrapper element of the entry to help with styling, in this case that'd look like: `<div class="liveblog-key-custom-css-class">...</div>`
+
+An example of a template file is:
+
+```php
+<div <?php echo $css_classes; ?> >
+	<a href="#liveblog-entry-<?php echo $entry_id; ?>">
+		<?php echo WPCOM_Liveblog_Entry_Key_Events::get_formatted_content( $content, $post_id ); ?>
+	</a>
+</div>
+```
+
+**Format:** Is how each entries content is filtered, there is three inbuilt formats:
+
+* Full - which shows content without filtering
+* First Sentence - which will return everything until it hits either `.?!`  
+* First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.  
+
+You can add your own using a filter:
+
+```php
+add_filter( 'liveblog_key_formats', 'add_format' );
+
+function add_format( $formats ) {
+  $formats['strip-tags'] = 'new_format';
+  return $formats;
+}
+
+function new_format( $content ) {
+  $content = strip_tags( $content );
+  return $content;
+}
+```
+In the example above we are adding a format `Strip Tags` which removes any HTML tags from the content.
+
+Below is the full example of adding both:
+
+``` php
+function liveblog_add_key_event_template() {
+
+	add_filter( 'liveblog_key_templates', 'add_template', 'liveblog-key-custom-css-class');
+	add_filter( 'liveblog_key_formats',   'add_format' );
+
+	function add_template( $templates ) {
+		$templates['custom'] = array( '{theme}/key-events.php', 'div' );
+		return $templates;
+	}
+
+	function add_format( $formats ) {
+		$formats['strip-tags'] = 'new_format';
+		return $formats;
+	}
+
+	function new_format( $content ) {
+		$content = strip_tags( $content );
+		return $content;
+	}
+}
+
+add_action( 'init', 'liveblog_add_key_event_template' );
+```
+
+Selecting which template or format to use for liveblog happens in the admin panel on the edit of page of the post:
+
+![Key Events Admin Options](http://share.agnew.co/Gyai+)
+
+#### Managing Hashtags
+Hashtags are manageable in the admin area under Posts you will see menu Hashtags. Please note that the slug is used not the name.
+
+#### HTML5 Notifications
+The notification checkbox for users will only appear if there browser supports Notification API, the checkbox looks like so:
+
+![Notifications Checkbox](http://share.agnew.co/17Em3+)
+
+#### Emjoi's
+When a `:emoji:` is inserted into an entry it is converted into:
+
+`<img src="//s.w.org/images/core/emoji/72x72/1f44d.png" class="liveblog-emoji emoji-+1">`
+
 ## Screenshots
 
 ![The entry form is the simplest possible](https://raw.github.com/Automattic/liveblog/master/screenshot-1.png)
@@ -116,5 +257,3 @@ Fixed problems:
 ### 1.0
 
 * Initial release
-
-
