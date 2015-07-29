@@ -741,9 +741,9 @@ final class WPCOM_Liveblog {
 	public static function get_template_part( $template_name, $template_variables = array() ) {
 		ob_start();
 		extract( $template_variables );
-		if ( 0 === strpos( $template_name, '{theme}' ) ) {
-			$template_name = str_replace('{theme}', get_template_directory(), $template_name);
-			include( $template_name );
+		$theme_template = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
+		if ( file_exists( $theme_template ) ) {
+			include( $theme_template );
 		} else if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
 			include( self::$custom_template_path . '/' . $template_name );
 		} else {

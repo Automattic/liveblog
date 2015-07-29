@@ -94,13 +94,13 @@ A key event entry can be altered in to two ways:
 add_filter( 'liveblog_key_templates', 'add_template' );
 
 function add_template( $templates ) {
-  $templates['custom'] = array( '{theme}/key-events.php', 'div', 'liveblog-key-custom-css-class' );
+  $templates['custom'] = array( 'key-events.php', 'div', 'liveblog-key-custom-css-class' );
   return $templates;
 }
 ```
 There's a few things to note here:
 
-* `{theme}` is a shorthand to point to the current active theme directory, in this case we our loading template file `key-events.php`.
+* `key-events.php` points to `liveblog` folder in the current active theme directory, in this case we our loading template file `liveblog/key-events.php`.
 * `div` is where we set the element type the wraps all entries, in the case where you wanted to built a list you would set this to `ul`.
 * `liveblog-key-custom-css-class` is a class that will added the wrapper element of the entry to help with styling, in this case that'd look like: `<div class="liveblog-key-custom-css-class">...</div>`
 
@@ -142,11 +142,11 @@ Below is the full example of adding both:
 ``` php
 function liveblog_add_key_event_template() {
 
-	add_filter( 'liveblog_key_templates', 'add_template', 'liveblog-key-custom-css-class');
+	add_filter( 'liveblog_key_templates', 'add_template' );
 	add_filter( 'liveblog_key_formats',   'add_format' );
 
 	function add_template( $templates ) {
-		$templates['custom'] = array( '{theme}/key-events.php', 'div' );
+		$templates['custom'] = array( 'key-events.php', 'div', 'liveblog-key-custom-css-class' );
 		return $templates;
 	}
 
