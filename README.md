@@ -91,10 +91,10 @@ A key event entry can be altered in to two ways:
 **Template:** Is how each entry will be rendered, there are two inbuilt templates (list or timeline). You can add your own using a filter:
 
 ```php
-add_filter( 'liveblog_key_templates', 'add_template', 'liveblog-key-custom-css-class');
+add_filter( 'liveblog_key_templates', 'add_template' );
 
 function add_template( $templates ) {
-  $templates['custom'] = array( '{theme}/key-events.php', 'div' );
+  $templates['custom'] = array( '{theme}/key-events.php', 'div', 'liveblog-key-custom-css-class' );
   return $templates;
 }
 ```
