@@ -30,8 +30,7 @@ class WPCOM_Liveblog_Entry_Extend {
         add_action( 'wp_enqueue_scripts',           array( __CLASS__, 'enqueue_scripts' ) );
         add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
         add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
-
-        self::$features = defined( 'LIVEBLOG_FEATURES' ) ? LIVEBLOG_FEATURES : self::$features;
+		
         self::$features = explode( ',', preg_replace( '~[ |]+~', ',', self::$features ) );
         self::$features = array_filter( self::$features, 'strlen' );
 

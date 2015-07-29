@@ -44,12 +44,6 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` with an autocomplete system to help speed up the process. On top of this there is also a HTML5 notification section for users. These extensions are filtered on save, for example a hashtag `#football` would be saved as `<span class="liveblog-hash term-football">football</span>` allowing easy styling. The container of the entry will also receive the same class `term-football`.
 
-If you only wish to enabled specific features, you can do so using the `wp-config.php`:
-
-``` php
-define('LIVEBLOG_FEATURES', 'commands, hashtags, emojis, authors');
-```
-
 The command system has one inbuilt command:
 
 `/key`: Which defines an entry to a key event, it adds the meta key to entry `liveblog_key_entry`. In your theme you can add the shortcode `[liveblog_key_events]` where entries used with the key command will be inserted - it acts an anchor system to jump to parts of the blog. If the user has enabled HTML5 notification and the window is not currently in focus they will receive a notification about that entry.
