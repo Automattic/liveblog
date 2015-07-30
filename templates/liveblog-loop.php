@@ -8,7 +8,7 @@
 <div class="liveblog-notification-settings-container">
 	<div class="liveblog-notification-settings">
 		<label class="liveblog-notification-enable-label">
-			<input type="checkbox" class="liveblog-notification-enable"> <?php printf( __( 'Enable browser notifications for key events' ) ); ?>
+			<input type="checkbox" class="liveblog-notification-enable"> <?php printf( __( 'Notify on key events' ) ); ?>
 		</label>
 	</div>
 </div>

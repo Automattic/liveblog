@@ -46,9 +46,19 @@ The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` wit
 
 The command system has one inbuilt command:
 
-`/key`: Which defines an entry to a key event, it adds the meta key to entry `liveblog_key_entry`. In your theme you can add the shortcode `[liveblog_key_events]` where entries used with the key command will be inserted - it acts an anchor system to jump to parts of the blog. If the user has enabled HTML5 notification and the window is not currently in focus they will receive a notification about that entry.
+`/key`: Which defines an entry to a key event, it adds the meta key to entry `liveblog_key_entry`. A key event can be styled using the `.type-key` class.
 
-You can add new commands easily with a filter, the most basic command will add a class to entry, so you could do a simple  `/highlight` which would add `type-highlight` to the entry container letting you style a new background color:
+To display a key event box you can add the `[liveblog_key_events]` shortcode in your theme, e.g. in the sidebar. Entries used with the key command will be inserted to both this box and the main feed. It also acts an anchor system to jump to parts of the main feed. It's not necessary to include the shortcode for the /key command to be enabled.
+
+If the user has enabled HTML5 notifications and the window is not currently in focus, they will receive a notification about that entry.
+
+An example of using the key command would be an author writing the following in the New Entry box:
+
+```
+New iPad announced, launching next week — more info to come. /key
+```
+
+You can add new commands easily with a filter, the most basic command will add a class to entry, so you could do a simple  `/highlight` which would add `type-highlight` to the entry container, letting you style the background color:
 
 ``` php
 add_filter( 'liveblog_active_commands',  array( __CLASS__, 'add_highlight_command' ), 10 );
@@ -69,7 +79,7 @@ do_action( "liveblog_command_{$command}_after", $arg );
 
 #### Customizing Key Events Shortcode
 
-As mentioned earlier you can add the key events section by using `[liveblog_key_events]`. If you wish to change the title from the default `Key Events` then you a title attribute.
+As mentioned earlier you can add the key events section by using `[liveblog_key_events]`. If you wish to change the title from the default `Key Events` then you can add a title attribute:
 
  ``` php
  [liveblog_key_events title="My New Title"]
@@ -82,7 +92,7 @@ As mentioned earlier you can add the key events section by using `[liveblog_key_
 
 A key event entry can be altered in to two ways:
 
-**Template:** Is how each entry will be rendered, there are two inbuilt templates (list or timeline). You can add your own using a filter:
+**Template:** This is how each entry will be rendered. There are two inbuilt templates: list and timeline, or you can add your own using a filter:
 
 ```php
 add_filter( 'liveblog_key_templates', 'add_template' );
@@ -92,11 +102,12 @@ function add_template( $templates ) {
   return $templates;
 }
 ```
+
 There's a few things to note here:
 
 * `key-events.php` points to `liveblog` folder in the current active theme directory, in this case we our loading template file `liveblog/key-events.php`.
-* `div` is where we set the element type the wraps all entries, in the case where you wanted to built a list you would set this to `ul`.
-* `liveblog-key-custom-css-class` is a class that will added the wrapper element of the entry to help with styling, in this case that'd look like: `<div class="liveblog-key-custom-css-class">...</div>`
+* `div` is where we set the element type that wraps all entries, in the case where you wanted to build a list, you would set this to `ul`.
+* `liveblog-key-custom-css-class` is a class that will be added to the wrapper element of the entry to help with styling, in this case it would look like: `<div class="liveblog-key-custom-css-class">...</div>`
 
 An example of a template file is:
 
@@ -108,7 +119,7 @@ An example of a template file is:
 </div>
 ```
 
-**Format:** Is how each entries content is filtered, there is three inbuilt formats:
+**Format:** This is how each entries content is filtered, there are three inbuilt formats:
 
 * Full - which shows content without filtering
 * First Sentence - which will return everything until it hits either `.?!`  
@@ -129,7 +140,8 @@ function new_format( $content ) {
   return $content;
 }
 ```
-In the example above we are adding a format `Strip Tags` which removes any HTML tags from the content.
+
+In the example above we are adding a format `Strip Tags`, which removes any HTML tags from the content.
 
 Below is the full example of adding both:
 
@@ -163,10 +175,10 @@ Selecting which template or format to use for liveblog happens in the admin pane
 ![Key Events Admin Options](http://share.agnew.co/Gyai+)
 
 #### Managing Hashtags
-Hashtags are manageable in the admin area under Posts you will see menu Hashtags. Please note that the slug is used not the name.
+Hashtags are manageable in the admin area. Under Posts there will be a menu for Hashtags. Please note that the slug is used, not the name.
 
 #### HTML5 Notifications
-The notification checkbox for users will only appear if there browser supports Notification API, the checkbox looks like so:
+The notification checkbox for users will only appear if their browser supports the Notification API, the checkbox looks like:
 
 ![Notifications Checkbox](http://share.agnew.co/17Em3+)
 
