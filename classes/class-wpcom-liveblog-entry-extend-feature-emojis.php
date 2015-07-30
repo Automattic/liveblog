@@ -895,11 +895,25 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 */
 	public function load()
 	{
+
+		// Store the path to the liveblog plugin.
 		$this->path = dirname( __FILE__ );
+
+		// Allow plugins, themes, etc. to change
+		// the generated emoji class.
 		$this->class_prefix = apply_filters( 'liveblog_emoji_class',   $this->class_prefix );
+
+		// Allow plugins, themes, etc. to change
+		// the active emojis.
 		$this->emojis       = apply_filters( 'liveblog_active_emojis', $this->emojis );
+
+		// Allow plugins, themes, etc. to change
+		// the emoji cdn url.
 		$this->emoji_cdn    = apply_filters( 'liveblog_cdn_emojis',    $this->emoji_cdn );
 
+		// This is the regex used to revert the
+		// generated emoji html back to the
+		// raw input format (e.g :poop:).
 		$this->revert_regex = implode( '', array(
 			preg_quote( '<img src="', '~' ),
 			preg_quote( $this->emoji_cdn, '~' ),
@@ -910,8 +924,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 			preg_quote( '">', '~' ),
 		) );
 
+		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_emoji_revert_regex', $this->revert_regex );
 
+		// We hook into the comment_class filter to
+		// be able to alter the comment content.
 		add_filter( 'comment_class', array( $this, 'add_emoji_class_to_entry' ), 10, 3 );
 	}
 
@@ -925,10 +942,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	public function get_config( $config )
 	{
 		$emojis = array();
+
+		// Map the emojis into the format the front end expects it.
 		foreach ( $this->get_emojis() as $key => $val ) {
 			$emojis[] = $this->map_emoji( $val, $key );
 		}
 
+		// Add our config to the front end autocomplete
+		// config, after first allowing other plugins,
+		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_emoji_config',  array(
 			'type' => 'static',
 			'data' => $emojis,
@@ -951,6 +973,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 */
 	public function map_emoji( $val, $key )
 	{
+		// Map the emojis into the format of:
+		// [ :key, :name, :image ]
+		//
+		// Then pass it into a filter to allow plugins,
+		// themes, etc. to customise the output.
 		return apply_filters( 'liveblog_emoji_map', array( 'key' => $key, 'name' => $key, 'image' => strtolower($val) ) );
 	}
 
@@ -973,6 +1000,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 */
 	public function set_regex( $regex )
 	{
+		// We alter the regex here to allow for a slightly
+		// extended set of characters at the start.
 		$regex_prefix  = substr( $regex, 0, strlen( $regex ) - 10 );
 		$regex_postfix = substr( $regex, strlen( $regex ) - 10 );
 		$this->regex   = $regex_prefix.'(?:'.implode( '|', $this->get_prefixes() ).')'.$regex_postfix;
@@ -988,6 +1017,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 */
 	public function filter( $entry )
 	{
+
+		// Map over every match and apply it via the
+		// preg_replace_callback method.
 		$entry['content'] = preg_replace_callback(
 			$this->get_regex(),
 			array( $this, 'preg_replace_callback' ),
@@ -1006,14 +1038,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 */
 	public function preg_replace_callback( $match )
 	{
+		// If the emoji doesn't exist then don't
+		// continue to match it and render it.
 		if ( ! isset( $this->emojis[$match[2]]) ) {
 			return $match[0];
 		}
 
 		$emoji = $match[2];
+
+		// Grab the image key from the set emojis.
 		$image = $this->map_emoji( $this->emojis[$emoji], $emoji );
 		$image = $image['image'];
 
+		// Replace the emoji with a img tag of the emoji.
 		return str_replace(
 			$match[1],
 			'<img src="'.$this->emoji_cdn.$image.'.png" class="liveblog-emoji '.$this->class_prefix.$emoji.'" data-emoji="'.$emoji.'">',
@@ -1047,8 +1084,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$emojis = array();
 		$comment = get_comment( $comment_id );
 
+		// Check if the comment is a live blog comment.
 		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+
+			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)'.preg_quote( $this->class_prefix ).'\w+/', $comment->comment_content, $emojis );
+
+			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $emojis[0] );
 		}
 
