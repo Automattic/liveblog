@@ -235,6 +235,72 @@ public static function save_template_option( $response, $post_id ) {
 }
 ```
 
+### Hooking into Entries
+There is five useful filters to alter entries at current stages:
+
+**Before inserting into the database**
+``` php
+add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $entry ) {}
+```
+
+**Before inserting updated entry into the database**
+``` php
+add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $entry ) {}
+```
+
+**Before we show preview (how we convert `:emoji:` back to `<img>`)**
+``` php
+add_filter( 'liveblog_preview_update_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $entry ) {}
+```
+
+**Before we allow the entry to edited (how we convert `<img>` back to `:emoji:`)**
+``` php
+add_filter( 'liveblog_before_edit_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $content ) {}
+```
+
+**Before the entry JSON is sent to the frontend**
+``` php
+add_filter( 'liveblog_entry_for_json', array( __CLASS__, 'filter' ), 10, 2 );
+
+public static function filter( $entry, $object ) {}
+```
+
+### Altering hashtags, commands, authors and emoji
+It is possible to set your own symbol and / or change the class prefix for `#hashtags`, `/commands`, `@authors` and `:emoji:`. These are handled by filters:
+
+``` php
+add_filter( 'liveblog_{type}_prefixes', array( __CLASS__, 'filter' ) );
+add_filter( 'liveblog_{type}_class', array( __CLASS__, 'filter' ) );
+```
+Let’s say you decide to use `!` instead of `#` for `#hashtags`, therefore you expect them to be `!hashtag`:
+
+``` php
+add_filter( 'liveblog_hashtags_prefixes', array( __CLASS__, 'filter' ) );
+
+public static function filter( $prefixes ) {
+  $prefixes = array( '!', '\x{21}' );
+  return $prefixes;
+}
+```
+Currently hashtags us the class prefix `term-`, you can change that to whatever you need - in this case let’s change to `hashtag-`:
+
+``` php
+add_filter( 'liveblog_hashtags_class', array( __CLASS__, 'filter' ) );
+
+public static function filter( $class_prefix ) {
+  $class_prefix = 'hashtag-';
+  return $class_prefix;
+}
+```
+
 ## Screenshots
 
 ![The entry form is the simplest possible](https://raw.github.com/Automattic/liveblog/master/screenshot-1.png)
