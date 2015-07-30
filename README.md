@@ -125,6 +125,16 @@ An example of a template file is:
 * First Sentence - which will return everything until it hits either `.?!`  
 * First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.  
 
+Formats add an extra level of control to how the key events section looks. If using the `timeline` template with `first sentence` and the following is entered into the new entry box:
+```
+New iPad announced. With plan to ship next month, pre-orders starting 23rd September retailing at $499 for 16gb $599 32gb. /key
+```
+
+The main feed and notification would show the full text, and the key events section would only show:
+```
+New iPad announced
+```
+
 You can add your own using a filter:
 
 ```php
