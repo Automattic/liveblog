@@ -112,13 +112,10 @@
 		 */
 		entry_inputhandler_textarea: function () {
 			var html = this.$textarea.val();
-			if ( ! html ) {
-				// html = '<p><br></p>'; // the BR is needed to make sure browsers will land inside the <p>
-			}
-			else {
-				html = html.replace(/(^|\n)(https?:\/\/\S+?\.(?:png|gif|jpe?g))($|\n)/ig, '$1<img src="$2">$3');
-				html = switchEditors.wpautop(html);
-			}
+
+			html = html.replace(/(^|\n)(https?:\/\/\S+?\.(?:png|gif|jpe?g))($|\n)/ig, '$1<img src="$2">$3');
+			html = switchEditors.wpautop(html);
+
 			this.$contenteditable.html(html);
 		},
 
