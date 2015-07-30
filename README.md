@@ -101,8 +101,8 @@ There's a few things to note here:
 An example of a template file is:
 
 ```php
-<div <?php echo $css_classes; ?> >
-	<a href="#liveblog-entry-<?php echo $entry_id; ?>">
+<div class="<?php echo esc_attr( $css_classes ); ?>" >
+	<a href="#liveblog-entry-<?php echo esc_attr( $entry_id ); ?>">
 		<?php echo WPCOM_Liveblog_Entry_Key_Events::get_formatted_content( $content, $post_id ); ?>
 	</a>
 </div>
