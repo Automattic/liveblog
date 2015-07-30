@@ -34,8 +34,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return void
 	 */
 	public function load() {
+
+		// Allow plugins, themes, etc. to change
+		// the generated hashtag class.
 		$this->class_prefix = apply_filters( 'liveblog_hashtag_class', $this->class_prefix );
 
+		// This is the regex used to revert the
+		// generated hashtag html back to the
+		// raw input format (e.g #hashtag).
 		$this->revert_regex = implode( '', array(
 			preg_quote( '<span class="liveblog-hash ', '~' ),
 			preg_quote( $this->class_prefix, '~' ),
@@ -45,10 +51,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			preg_quote( '</span>', '~' ),
 		) );
 
+		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_hashtag_revert_regex', $this->revert_regex );
 
+		// We hook into the comment_class filter to
+		// be able to alter the comment content.
 		add_filter( 'comment_class',          array( $this, 'add_term_class_to_entry' ), 10, 3 );
+
+		// Hook into the WordPress init method to
+		// make sure the taxonomy is created.
 		add_action( 'init',                   array( $this, 'add_hashtag_taxonomy') );
+
+		// Add an ajax endpoint to find the hashtags
+		// which is to be used on the front end.
 		add_action( 'wp_ajax_liveblog_terms', array( $this, 'ajax_terms') );
 	}
 
@@ -59,6 +74,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function get_config( $config ) {
+
+		// Add our config to the front end autocomplete
+		// config, after first allowing other plugins,
+		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_hashtag_config', array(
 			'type'        => 'ajax',
 			'cache'       => 1000 * 60,
@@ -78,6 +97,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
+
+		// Map over every match and apply it via the
+		// preg_replace_callback method.
 		$entry['content'] = preg_replace_callback(
 			$this->get_regex(),
 			array( $this, 'preg_replace_callback' ),
@@ -94,18 +116,31 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return string
 	 */
 	public function preg_replace_callback( $match ) {
+		// Remove any special characters and convert them
+		// to their non-accented equivalents
 		$hashtag = iconv( 'UTF-8', 'ASCII//TRANSLIT', $match[2] );
+
+		// Sanitize the hashtag in the way it's expected.
 		$hashtag = sanitize_term( array( 'slug' => $hashtag ), self::$taxonomy, 'db' );
+
+		// Grab the hastag as a slug.
 		$hashtag = $hashtag['slug'];
 
+		// If it doesn't exist, then make it.
 		if ( ! get_term_by( 'slug', $hashtag, self::$taxonomy ) ) {
 			$error = wp_insert_term( $hashtag, self::$taxonomy );
 
+			// If it fails to be made then it's probably due
+			// to the name already being taken so instead
+			// of giving up we try one more time but
+			// with the current timestamp appended.
 			if ( $error ) {
 				wp_insert_term( $hashtag.'-'.time(), self::$taxonomy, array( 'slug' => $hashtag ) );
 			}
 		}
 
+		// Replace the #hashtag content with a styled
+		// span with the hashtag as content.
 		return str_replace(
 			$match[1],
 			'<span class="liveblog-hash '.$this->class_prefix.$hashtag.'">'.$hashtag.'</span>',
@@ -135,8 +170,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$terms   = array();
 		$comment = get_comment( $comment_id );
 
+		// Check if the comment is a live blog comment.
 		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+
+			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)'.preg_quote( $this->class_prefix ).'\w+/', $comment->comment_content, $terms );
+
+			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $terms[0] );
 		}
 
@@ -149,18 +189,30 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function ajax_terms() {
+
+		// The args used in the get_terms query.
 		$args = array(
 			'hide_empty' => false,
 			'number' 	 => 10,
 		);
 
+		// If there is no search term then search
+		// for nothing to get everything.
 		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
+
+		// If there is a search term, then add it
+		// to the get_terms query args.
 		if ( strlen( trim( $term ) ) > 0 ) {
 			$args['search'] = $term;
 		}
 
+		// We add a filter to strip out the name search.
 		add_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
+
+		// Grab the terms from the query results.
 		$terms = get_terms( self::$taxonomy, $args );
+
+		// Remove the filter just to clean up.
 		remove_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 
 		header( "Content-Type: application/json" );
@@ -177,6 +229,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function remove_name_search( $clauses ) {
+
+		// Remove the where clause's section about the name.
 		$clauses['where'] = preg_replace(
 			array(
 				'~\\(\\(.*(?='.preg_quote("(t.slug LIKE '").')~',
@@ -195,6 +249,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return void
 	 */
 	public function add_hashtag_taxonomy() {
+
+		// All the taxonomy related labels.
 		$labels = array(
 			'name'              => _x( 'Hashtags', 'taxonomy general name' ),
 			'singular_name'     => _x( 'Hashtag', 'taxonomy singular name' ),
@@ -209,11 +265,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			'menu_name'         => __( 'Hashtags' ),
 		);
 
+		// The args to pass to the register_taxonomy function.
 		$args = array(
 			'show_ui' => true,
 			'labels'  => $labels
 		);
 
+		// Register the taxonomy.
 		register_taxonomy( self::$taxonomy, 'post', $args );
 	}
 
