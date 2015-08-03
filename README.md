@@ -125,6 +125,16 @@ An example of a template file is:
 * First Sentence - which will return everything until it hits either `.?!`  
 * First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.  
 
+Formats add an extra level of control to how the key events section looks. If using the `timeline` template with `first sentence` and the following is entered into the new entry box:
+```
+New iPad announced. With plan to ship next month, pre-orders starting 23rd September retailing at $499 for 16gb $599 32gb. /key
+```
+
+The main feed and notification would show the full text, and the key events section would only show:
+```
+New iPad announced
+```
+
 You can add your own using a filter:
 
 ```php
@@ -180,12 +190,116 @@ Hashtags are manageable in the admin area. Under Posts there will be a menu for 
 #### HTML5 Notifications
 The notification checkbox for users will only appear if their browser supports the Notification API, the checkbox looks like:
 
-![Notifications Checkbox](http://share.agnew.co/17Em3+)
+![Notifications Checkbox](http://share.agnew.co/1iwNZ+)
 
 #### Emjoi's
 When a `:emoji:` is inserted into an entry it is converted into:
 
 `<img src="//s.w.org/images/core/emoji/72x72/1f44d.png" class="liveblog-emoji emoji-+1">`
+
+#### Extending the Admin Meta Box
+If you need to extend the Admin Meta Box there are a few filters and actions to make this easier. As an example, let's add a section with a text input and a button to save. To start we need to add the fields:
+
+**Filter**
+``` php
+add_filter( 'liveblog_admin_add_settings', array( __CLASS__, 'add_admin_options' ), 10, 2 );
+
+public static function add_admin_options( $extra_fields, $post_id ) {
+  $args = array(
+    'new_label'  => __( 'My new field', 'liveblog' ),
+    'new_button' => __( 'Save', 'liveblog' ),
+  );
+
+  $extra_fields[] = WPCOM_Liveblog::get_template_part( 'template.php', $args );
+  return $extra_fields;
+}
+```
+**Template**
+``` php
+<hr/>
+<p>
+  <label for="liveblog-new-input"><?php echo esc_html( $new_label ); ?></label>
+  <input name="liveblog-new-input" type="text" value="" />
+  <button type="button" class="button button-primary" value="liveblog-new-input-save"><?php echo esc_html( $new_button ); ?></button>
+</p>
+```
+Next we catch when the user has clicked our new save button `liveblog-new-input-save`:
+
+``` php
+add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
+
+public static function save_template_option( $response, $post_id ) {
+  if ( 'liveblog-new-input-save' == $response['state'] && ! empty( $response['liveblog-new-input-save'] ) ) {
+      //handle your logic here
+  }
+}
+```
+
+### Hooking into Entries
+There is five useful filters to alter entries at current stages:
+
+**Before inserting into the database**
+``` php
+add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $entry ) {}
+```
+
+**Before inserting updated entry into the database**
+``` php
+add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $entry ) {}
+```
+
+**Before we show preview (how we convert `:emoji:` back to `<img>`)**
+``` php
+add_filter( 'liveblog_preview_update_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $entry ) {}
+```
+
+**Before we allow the entry to edited (how we convert `<img>` back to `:emoji:`)**
+``` php
+add_filter( 'liveblog_before_edit_entry', array( __CLASS__, 'filter' ), 10 );
+
+public static function filter( $content ) {}
+```
+
+**Before the entry JSON is sent to the frontend**
+``` php
+add_filter( 'liveblog_entry_for_json', array( __CLASS__, 'filter' ), 10, 2 );
+
+public static function filter( $entry, $object ) {}
+```
+
+### Altering hashtags, commands, authors and emoji
+It is possible to set your own symbol and / or change the class prefix for `#hashtags`, `/commands`, `@authors` and `:emoji:`. These are handled by filters:
+
+``` php
+add_filter( 'liveblog_{type}_prefixes', array( __CLASS__, 'filter' ) );
+add_filter( 'liveblog_{type}_class', array( __CLASS__, 'filter' ) );
+```
+Let’s say you decide to use `!` instead of `#` for `#hashtags`, therefore you expect them to be `!hashtag`:
+
+``` php
+add_filter( 'liveblog_hashtags_prefixes', array( __CLASS__, 'filter' ) );
+
+public static function filter( $prefixes ) {
+  $prefixes = array( '!', '\x{21}' );
+  return $prefixes;
+}
+```
+Currently hashtags us the class prefix `term-`, you can change that to whatever you need - in this case let’s change to `hashtag-`:
+
+``` php
+add_filter( 'liveblog_hashtags_class', array( __CLASS__, 'filter' ) );
+
+public static function filter( $class_prefix ) {
+  $class_prefix = 'hashtag-';
+  return $class_prefix;
+}
+```
 
 ## Screenshots
 
