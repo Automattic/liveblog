@@ -500,11 +500,8 @@ window.liveblog = window.liveblog || {};
 	liveblog.get_notification_entry_text = function( $entry ) {
 		var original_content, $original_content, entry_text;
 
-		// Grab original content from data-attr
-		original_content = $entry.find('.liveblog-entry-text').data('original-content');
-
-		// Convert to jQuery object and wrap it so we can manipulate it
-		$original_content = $('<div/>').html(original_content);
+		// Grab the liveblog entry text, clone to variable
+		$original_content = $entry.find('.liveblog-entry-text').clone();
 
 		// Remove command spans
 		$original_content.find('.liveblog-command').remove();
