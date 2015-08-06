@@ -137,11 +137,6 @@ window.liveblog = window.liveblog || {};
 		liveblog.set_initial_timestamps();
 		liveblog.start_human_time_diff_timer();
 
-		// Notifications if not admin
-		if ( ! liveblog_settings.is_admin && 'Notification' in window ) {
-			liveblog.set_up_notification_settings();
-		}
-
 		liveblog.$events.trigger( 'after-init' );
 	};
 
@@ -313,8 +308,6 @@ window.liveblog = window.liveblog || {};
 
 		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
 		liveblog.entriesContainer.updateTimes();
-
-		liveblog.notify($new_entry);
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
@@ -396,144 +389,6 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.is_at_the_top = function() {
 		return $(document).scrollTop()  < liveblog.$entry_container.offset().top;
-	};
-
-	liveblog.set_up_notification_settings = function() {
-		var feature_list = liveblog_settings.features.join(' '),
-			feature_commands = /(commands)/.test(feature_list);
-
-		// Make sure settings are enabled for commands
-		if ( ! feature_commands ) {
-			$('.liveblog-notification-enable-label').hide();
-
-			return;
-		}
-
-		// Cache commonly used DOM elements
-		liveblog.$checkbox_enable = $('.liveblog-notification-enable');
-
-		// Show settings container if browser suppoorts the Notification API
-		$('.liveblog-notification-settings-container').show();
-
-		// Check notification status on load, use the `load` event
-		liveblog.check_notification_status('load');
-
-		// Watch enable checkbox for any change
-		liveblog.$checkbox_enable.on( 'change', function() {
-			if ( this.checked ) {
-				liveblog.check_notification_status('checked');
-			} else {
-				liveblog.check_notification_status('unchecked');
-			}
-		} );
-	};
-
-	liveblog.set_notification_status = function( status ) {
-		var checked, animation;
-
-		if ( status === 'granted' ) {
-			checked = true;
-		} else if ( status === 'denied' ) {
-			checked = false;
-		}
-
-		liveblog.$checkbox_enable.attr('checked', checked);
-		localStorage.setItem('liveblog-notifications', checked);
-	};
-
-	liveblog.check_notification_status = function( event ) {
-		if ( event === 'load' ) {
-
-			// Handle if notifications permissions are not granted on load
-			if ( Notification.permission !== 'granted' ) {
-				liveblog.set_notification_status('denied');
-
-			// If notifications are are granted and user enabled
-			} else if ( Notification.permission === 'granted' && liveblog.parse_local_storage('liveblog-notifications') ) {
-				liveblog.set_notification_status('granted');
-			}
-
-		} else if ( event === 'checked' ) {
-			if ( Notification.permission === 'granted' ) {
-				liveblog.set_notification_status('granted');
-
-			} else if ( Notification.permission === 'denied' ) {
-				liveblog.set_notification_status('denied');
-				alert(liveblog_settings.notification_blocked_message);
-
-			} else {
-				Notification.requestPermission(function (permission) {
-					if ( permission === 'granted' ) {
-						liveblog.set_notification_status('granted');
-					} else {
-						liveblog.set_notification_status('denied');
-					}
-				});
-			}
-
-		} else if ( event === 'unchecked' ) {
-			liveblog.set_notification_status('denied');
-		}
-	};
-
-	liveblog.notify = function( $new_entry ) {
-
-		/*
-		1. Make sure admins don't recieve notifications
-		2. Ensure user has enabled notifications (JSON parse for bool)
-		3. Make sure the document doesn't have focus
-		*/
-		if ( liveblog_settings.is_admin || ! liveblog.parse_local_storage('liveblog-notifications') || document.hasFocus() ) {
-			return;
-		}
-
-		var notify,
-			entry_text = liveblog.get_notification_entry_text($new_entry),
-			entry_icon = liveblog.get_notification_entry_icon($new_entry),
-			notifications_enabled = liveblog.parse_local_storage('liveblog-notifications');
-
-		if ( notifications_enabled && $new_entry.hasClass(liveblog_settings.class_key) ) {
-			liveblog.spawn_notification(liveblog_settings.notification_title, {body: entry_text, icon: entry_icon});
-		}
-	};
-
-	liveblog.get_notification_entry_text = function( $entry ) {
-		var original_content, $original_content, entry_text;
-
-		// Grab the liveblog entry text, clone to variable
-		$original_content = $entry.find('.liveblog-entry-text').clone();
-
-		// Remove command spans
-		$original_content.find('.liveblog-command').remove();
-
-		// Convert to text string
-		entry_text = $original_content.text();
-
-		// Strip emoji's (e.g. `:emoji_name:`) and spaces
-		entry_text = entry_text.replace(/(?:\:[0-9\w\+\-]+\: | ?\:[0-9\w\+\-]+\:)/g, '');
-		entry_text = entry_text.replace(/(?:^\s+|\s*$|(\s)\s+)/g, '$1');
-
-		return entry_text;
-	};
-
-	liveblog.get_notification_entry_icon = function( $entry ) {
-		return liveblog_settings.notification_icon ||
-				$entry.find('.liveblog-entry-text img:not(.liveblog-emoji):first').attr('src') ||
-				$entry.find('.liveblog-author-avatar .avatar').attr('src') ||
-				false;
-	};
-
-	liveblog.spawn_notification = function( title, opts ) {
-		var options = opts || {},
-			notification = new Notification(title, options);
-
-		// Make sure it closes as Chrome currently (v43.0.2357.130) doesn't auto-close
-		setTimeout(notification.close.bind(notification), 5000);
-	},
-
-	// JSON parse localStorage key, useful for returning actual bool, array etc.
-	liveblog.parse_local_storage = function( key ) {
-		return JSON.parse(localStorage.getItem(key));
 	};
 
 	// Initialize everything!

@@ -4,16 +4,6 @@
 </div>
 <?php endif; ?>
 
-<?php if ( ! current_user_can( 'edit_posts' ) ): ?>
-<div class="liveblog-notification-settings-container">
-	<div class="liveblog-notification-settings">
-		<label class="liveblog-notification-enable-label">
-			<input type="checkbox" class="liveblog-notification-enable"> <?php printf( __( 'Notify on key events' ) ); ?>
-		</label>
-	</div>
-</div>
-<?php endif; ?>
-
 <div id="liveblog-entries">
 
 	<?php foreach ( (array) $entries as $entry ) : ?>

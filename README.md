@@ -42,15 +42,13 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 ### Overview
 
-The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` with an autocomplete system to help speed up the process. On top of this there is also a HTML5 notification section for users. These extensions are filtered on save, for example a hashtag `#football` would be saved as `<span class="liveblog-hash term-football">football</span>` allowing easy styling. The container of the entry will also receive the same class `term-football`.
+The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` with an autocomplete system to help speed up the process. These extensions are filtered on save, for example a hashtag `#football` would be saved as `<span class="liveblog-hash term-football">football</span>` allowing easy styling. The container of the entry will also receive the same class `term-football`.
 
 The command system has one inbuilt command:
 
 `/key`: Which defines an entry to a key event, it adds the meta key to entry `liveblog_key_entry`. A key event can be styled using the `.type-key` class.
 
 To display a key event box you can add the `[liveblog_key_events]` shortcode in your theme, e.g. in the sidebar. Entries used with the key command will be inserted to both this box and the main feed. It also acts an anchor system to jump to parts of the main feed. It's not necessary to include the shortcode for the /key command to be enabled.
-
-If the user has enabled HTML5 notifications and the window is not currently in focus, they will receive a notification about that entry.
 
 An example of using the key command would be an author writing the following in the New Entry box:
 
@@ -130,7 +128,7 @@ Formats add an extra level of control to how the key events section looks. If us
 New iPad announced. With plan to ship next month, pre-orders starting 23rd September retailing at $499 for 16gb $599 32gb. /key
 ```
 
-The main feed and notification would show the full text, and the key events section would only show:
+The main feed would show the full text, and the key events section would only show:
 ```
 New iPad announced
 ```
@@ -186,11 +184,6 @@ Selecting which template or format to use for liveblog happens in the admin pane
 
 #### Managing Hashtags
 Hashtags are manageable in the admin area. Under Posts there will be a menu for Hashtags. Please note that the slug is used, not the name.
-
-#### HTML5 Notifications
-The notification checkbox for users will only appear if their browser supports the Notification API, the checkbox looks like:
-
-![Notifications Checkbox](http://share.agnew.co/1iwNZ+)
 
 #### Emjoi's
 When a `:emoji:` is inserted into an entry it is converted into:

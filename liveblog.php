@@ -594,11 +594,6 @@ final class WPCOM_Liveblog {
 				'new_updates'            => __( 'Liveblog: {number} new updates' , 'liveblog'),
 				'create_link_prompt'     => __( 'Provide URL for link:', 'liveblog' ),
 
-				// Notification strings
-				'notification_blocked_message' => __( 'Notifications are blocked. Please adjust your browser settings to enable notifications.', 'liveblog' ),
-				'notification_title'     => get_bloginfo('name'),
-				'notification_icon'      => false, // Notification icon override. Default to first image in posts, then author avatar.
-
 				// Classes
 				'class_term_prefix'      => __( 'term-', 'liveblog' ),
 				'class_alert'            => __( 'type-alert', 'liveblog' ),
