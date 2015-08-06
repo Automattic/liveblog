@@ -89,7 +89,7 @@
 	color: #333;
 	background: #fff;
 	width: 98%;
-	height: 100px;
+	min-height: 100px;
 	display: inline-block;
 	margin-bottom: 10px;
 	padding: 5px;
@@ -491,4 +491,115 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	font-weight: bold;
 	display: inline-block;
 	vertical-align: middle;
+}
+
+/* =Hashtags
+-------------------------------------------------------------- */
+.liveblog-hash {
+	color: #55acee;
+	font-weight: bold;
+}
+
+.liveblog-hash::before {
+	content: "#";
+}
+
+/* =Authors
+-------------------------------------------------------------- */
+.liveblog-author {
+	font-weight: bold;
+}
+
+.liveblog-author::before {
+	content: "@";
+}
+
+/* =Emoji
+-------------------------------------------------------------- */
+.liveblog-emoji {
+	width: 18px;
+	height: 18px;
+}
+
+/* =Commands
+-------------------------------------------------------------- */
+.liveblog-command {
+	display:none;
+}
+
+/* =Key Events
+-------------------------------------------------------------- */
+
+.liveblog-key-events h2 {
+	color: #333;
+	margin-bottom: 15px;
+}
+
+.liveblog-key-events .liveblog-entry {
+	border: none;
+	overflow: visible;
+	padding: 0;
+}
+
+.liveblog-key-events .liveblog-entry a:hover {
+	text-decoration: underline;
+}
+
+.liveblog-key-events li.liveblog-entry p {
+	margin-bottom: 0;
+}
+
+.liveblog-key-events .liveblog-key-timeline {
+	position: relative;
+	border-left: 1px solid #bbb;
+	padding-top: 1px;
+}
+
+
+.liveblog-key-events .liveblog-key-timeline:after,
+.liveblog-key-events .liveblog-key-timeline:before {
+	content : "";
+	position: absolute;
+	left: -5px;
+	height: 1px;
+	width: 10px;
+	border-bottom: 1px solid #bbb;
+}
+
+.liveblog-key-events .liveblog-key-timeline:after {
+	bottom: 0;
+}
+
+.liveblog-key-events .liveblog-key-timeline:before {
+	top: 0;
+}
+
+.liveblog-key-events .liveblog-key-timeline li {
+	position: relative;
+	display: block;
+	list-style: none;
+	margin-bottom: 25px;
+}
+
+.liveblog-key-events .liveblog-key-timeline li:before {
+	content: "";
+	position: absolute;
+	display: block;
+	top: 11px;
+	left: -4px;
+	height: 7px;
+	width: 7px;
+	background-color: #bbb;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .date {
+	display: block;
+	font-size: 10px;
+	color: #333;
+	padding-left: 20px;
+}
+
+.liveblog-key-events .liveblog-key-timeline li .title {
+	padding-left: 20px;
+	display: inline-block;
 }
