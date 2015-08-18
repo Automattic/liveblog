@@ -1102,10 +1102,6 @@ final class WPCOM_Liveblog {
 		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
 }
-
-function wpcom_liveblog_load() {
-	WPCOM_Liveblog::load();
-}
-add_action( 'plugins_loaded', 'wpcom_liveblog_load', 999 );
+WPCOM_Liveblog::load();
 
 endif;
