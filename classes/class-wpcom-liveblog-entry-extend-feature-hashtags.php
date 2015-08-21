@@ -129,14 +129,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// If it doesn't exist, then make it.
 		if ( ! get_term_by( 'slug', $hashtag, self::$taxonomy ) ) {
 			$error = wp_insert_term( $hashtag, self::$taxonomy );
-
-			// If it fails to be made then it's probably due
-			// to the name already being taken so instead
-			// of giving up we try one more time but
-			// with the current timestamp appended.
-			if ( $error ) {
-				wp_insert_term( $hashtag.'-'.time(), self::$taxonomy, array( 'slug' => $hashtag ) );
-			}
 		}
 
 		// Replace the #hashtag content with a styled
