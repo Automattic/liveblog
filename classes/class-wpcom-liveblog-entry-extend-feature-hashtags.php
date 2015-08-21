@@ -134,7 +134,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			// to the name already being taken so instead
 			// of giving up we try one more time but
 			// with the current timestamp appended.
-			if ( $error ) {
+			if ( is_wp_error( $error ) ) {
 				wp_insert_term( $hashtag.'-'.time(), self::$taxonomy, array( 'slug' => $hashtag ) );
 			}
 		}
