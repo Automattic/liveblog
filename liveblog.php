@@ -107,7 +107,7 @@ final class WPCOM_Liveblog {
 	 * Include the necessary files
 	 */
 	private static function includes() {
-		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php'       );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );

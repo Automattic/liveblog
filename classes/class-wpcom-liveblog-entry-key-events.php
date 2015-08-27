@@ -17,6 +17,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	const meta_value        = 'true';
 	const meta_key_template = '_liveblog_key_entry_template';
 	const meta_key_format   = '_liveblog_key_entry_format';
+	const meta_key_limit    = '_liveblog_key_entry_limit';
 
 	/**
 	 * Template to render entries
@@ -167,6 +168,12 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 			// Store this format on the post.
 			update_post_meta( $post_id, self::meta_key_format, $format );
+
+			// If isn't a valid number turns it into 0, which returns all key events
+			$limit = absint( $response['liveblog-key-limit'] );
+			if ( isset( $limit ) ) {
+				update_post_meta( $post_id, self::meta_key_limit, $limit );
+			}
 		}
 	}
 
@@ -183,9 +190,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$extra_fields[] = WPCOM_Liveblog::get_template_part( 'liveblog-key-admin.php', array(
 			'current_key_template' => get_post_meta( $post_id, self::meta_key_template, true ),
 			'current_key_format'   => get_post_meta( $post_id, self::meta_key_format, true ),
+			'current_key_limit'    => get_post_meta( $post_id, self::meta_key_limit, true ),
 			'key_name'             => __( 'Template:', 'liveblog' ),
 			'key_format_name'      => __( 'Format:', 'liveblog' ),
-			'key_description'      => __( 'Set template for key events shortcode. And select a format.', 'liveblog' ),
+			'key_description'      => __( 'Set template for key events shortcode, select a format and restrict most recent shown.', 'liveblog' ),
+			'key_limit'            => __( 'Limit', 'liveblog' ),
 			'key_button'           => __( 'Save', 'liveblog' ),
 			'templates'			   => array_keys( self::$available_templates ),
 			'formats'              => array_keys( self::$available_formats ),
@@ -314,6 +323,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			'meta_key'   => self::meta_key,
 			'meta_value' => self::meta_value,
 		);
+
+		$limit = get_post_meta( $post->ID, self::meta_key_limit, true );
+		if ( isset( $limit ) ) {
+			$args['number'] = $limit;
+		}
 
 		// Build the entry query.
 		$entry_query = new WPCOM_Liveblog_Entry_Query( $post->ID, WPCOM_Liveblog::key );
