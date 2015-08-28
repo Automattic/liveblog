@@ -70,11 +70,11 @@ class WPCOM_Liveblog_Entry {
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = comment_class( '', $entry_id, $post_id, false );		
+		$css_classes  = comment_class( '', $entry_id, $post_id, false );
 
 		$entry = array(
 			'entry_id'              => $entry_id,
-			'post_id'               => $entry_id,
+			'post_id'               => $post_id,
 			'css_classes'           => $css_classes ,
 			'content'               => self::render_content( $comment_text, $this->comment ),
 			'original_content'      => $comment_text,
