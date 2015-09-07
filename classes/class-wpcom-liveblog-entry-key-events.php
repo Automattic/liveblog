@@ -113,6 +113,15 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
+	 * Remove key event entry
+	 *
+	 * @param $id
+	 */
+	public static function remove_key_action( $id ) {
+		return delete_comment_meta( $id, self::meta_key, self::meta_value );
+	}
+
+	/**
 	 * Pass a separate template for key event shortcode
 	 *
 	 * @param $entry

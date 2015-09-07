@@ -73,7 +73,6 @@ class WPCOM_Liveblog_Entry {
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
 		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
-
 		$entry = array(
 			'entry_id'              => $entry_id,
 			'post_id'               => $post_id,
@@ -196,6 +195,16 @@ class WPCOM_Liveblog_Entry {
 		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
+	}
+
+	public static function delete_key( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		if ( ! WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['entry_id'] ) ) {
+			return new WP_Error( 'entry-delete-key', __( 'Key event not deleted' ) );
+		}
+		self::update( $args );
 	}
 
 	private static function insert_comment( $args ) {

@@ -372,6 +372,7 @@
 
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-delete', liveblog.publisher.delete_click );
 		$('#liveblog-entries').on( 'click', '.liveblog-entry-edit', liveblog.publisher.edit_click );
+		$('.liveblog-key-entries').on( 'click', '.liveblog-key-event-delete', liveblog.publisher.delete_key );
 	};
 
 	liveblog.publisher.delete_click = function( e ) {
@@ -398,6 +399,25 @@
 		entry.find( '.liveblog-entry-edit' ).hide();
 		entry.find('.liveblog-entry-actions .liveblog-entry-delete').hide();
 	};
+
+	liveblog.publisher.delete_key = function( e ) {
+		e.preventDefault();
+		if ( !confirm( liveblog_settings.delete_key_confirm ) ) {
+			return;
+		}
+		id = $(this).data('entry-id');
+		content = $('#liveblog-entry-'+id+' .liveblog-entry-text').data('original-content').replace('<span class="liveblog-command type-key">key</span>', '');
+		var data = {
+			crud_action: 'delete_key',
+			post_id: liveblog_settings.post_id,
+			entry_id: id,
+			content: content
+		};
+		data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+		liveblog.publisher.insert_form.disable();
+		liveblog.publisher.insert_form.show_spinner();
+		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, '', '', 'POST' );
+	}
 
 	liveblog.publisher.delete_entry = function( id ) {
 		var data = {
