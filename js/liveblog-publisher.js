@@ -416,7 +416,8 @@
 		data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
 		liveblog.publisher.insert_form.disable();
 		liveblog.publisher.insert_form.show_spinner();
-		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, '', '', 'POST' );
+		liveblog.ajax_request( liveblog_settings.endpoint_url + 'crud', data, _.bind(liveblog.publisher.insert_form.success, liveblog.publisher.insert_form), _.bind(liveblog.publisher.insert_form.error, liveblog.publisher.insert_form), 'POST' );
+		liveblog.delete_entry($('.liveblog-key-events li.liveblog-entry-class-'+id));
 	}
 
 	liveblog.publisher.delete_entry = function( id ) {
