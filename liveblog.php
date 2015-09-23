@@ -445,7 +445,7 @@ final class WPCOM_Liveblog {
 
 		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete' ) ) ) {
+		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete', 'delete_key' ) ) ) {
 			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 
@@ -588,6 +588,7 @@ final class WPCOM_Liveblog {
 
 				// i18n
 				'delete_confirmation'    => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
+				'delete_key_confirm'     => __( 'Do you want to delete this key entry?', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 				'new_update'             => __( 'Liveblog: {number} new update' , 'liveblog'),

@@ -4,7 +4,7 @@
 	<?php endif; ?>
 	<<?php echo $wrap ?> class="<?php echo esc_attr( $class ) ?> liveblog-key-entries">
 	<?php foreach ( (array) $entries as $entry ) : ?>
-			<?php echo $entry->render( $template ); ?>
+		<?php echo $entry->render( $template ); ?>
 	<?php endforeach; ?>
 	</<?php echo $wrap ?>>
 </div>
