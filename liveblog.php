@@ -151,7 +151,7 @@ final class WPCOM_Liveblog {
 	 * @uses add_filter()
 	 */
 	private static function add_filters() {
-		add_filter( 'template_redirect', array( __CLASS__, 'handle_request'    ) );
+		add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
 		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );
 	}
