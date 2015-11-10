@@ -79,6 +79,7 @@ final class WPCOM_Liveblog {
 
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Extend::load();
+		WPCOM_Liveblog_Lazyloader::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -116,6 +117,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
@@ -274,6 +276,7 @@ final class WPCOM_Liveblog {
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
 			'crud' => 'ajax_crud_entry',
+			'lazyload' => 'ajax_lazyload_entries',
 			'preview' => 'ajax_preview_entry',
 		);
 
@@ -468,6 +471,41 @@ final class WPCOM_Liveblog {
 			'entries'           => array( $entry->for_json() ),
 			'latest_timestamp'  => null
 		) );
+	}
+
+	/**
+	 * Fetches all Liveblog entries that are to be lazyloaded, and returns them via JSON.
+	 */
+	public static function ajax_lazyload_entries() {
+
+		// Get all Liveblog entries that are to be lazyloaded.
+		$entries = self::$entry_query->get_all();
+		if ( ! is_array( $entries ) ) {
+			$entries = array();
+		} else {
+			$entries = array_slice( $entries, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+		}
+		if ( empty( $entries ) ) {
+			do_action( 'liveblog_entry_request_empty' );
+
+			self::json_return( array( 'entries' => array() ) );
+		}
+
+		$entries_for_json = array();
+
+		// Set up an array containing the JSON data for all Liveblog entries.
+		foreach ( $entries as $entry ) {
+			$entries_for_json[] = $entry->for_json();
+		}
+
+		// Set up the data to be returned via JSON.
+		$result_for_json = array( 'entries' => $entries_for_json );
+
+		do_action( 'liveblog_entry_request', $result_for_json );
+
+		self::$do_not_cache_response = true;
+
+		self::json_return( $result_for_json );
 	}
 
 	public static function ajax_preview_entry() {
