@@ -138,7 +138,7 @@ class WPCOM_Liveblog_Lazyloader {
 			$number = $number_of_default_entries;
 		}
 
-		$args['number'] = $number;
+		$args['number'] = (int) $number;
 
 		return $args;
 	}
@@ -163,7 +163,7 @@ class WPCOM_Liveblog_Lazyloader {
 		wp_enqueue_script( $handle, plugins_url( $path, $plugin_path ), array( 'liveblog' ), filemtime( $temp ), true );
 		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
 			'loadMoreButtonText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
-			'numberOfEntries'    => self::$number_of_entries,
+			'numberOfEntries'    => (int) self::$number_of_entries,
 		) );
 	}
 }
