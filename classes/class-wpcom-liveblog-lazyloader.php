@@ -71,6 +71,10 @@ class WPCOM_Liveblog_Lazyloader {
 		 * @param bool $enabled Enable the lazyload feature for Liveblog entries?
 		 */
 		self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', self::$enabled );
+		if ( self::$enabled && self::is_robot() ) {
+			// No lazyloading for robots.
+			self::$enabled = false;
+		}
 		if ( ! self::$enabled ) {
 			return;
 		}
@@ -97,6 +101,20 @@ class WPCOM_Liveblog_Lazyloader {
 	public static function admin_notices() {
 
 		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array( 'plugin' => 'Lazyload Liveblog Entries' ) );
+	}
+
+	/**
+	 * Checks if the current "visitor" is a robot.
+	 *
+	 * @return bool
+	 */
+	public static function is_robot() {
+
+		if ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return false;
+		}
+
+		return (bool) preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	/**
