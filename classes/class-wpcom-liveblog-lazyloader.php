@@ -57,7 +57,7 @@ class WPCOM_Liveblog_Lazyloader {
 	public static function late_load() {
 
 		if ( has_action( 'init', 'Lazyload_Liveblog_Entries' ) ) {
-			if ( is_admin() ) {
+			if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
 				add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 			}
 
