@@ -137,7 +137,7 @@ class WPCOM_Liveblog_Lazyloader {
 		 *
 		 * @param int $number_of_default_entries Number of initially displayed Liveblog entries.
 		 */
-		$number = (int) apply_filters( 'number_of_default_entries', 10 );
+		$number = (int) apply_filters( 'number_of_default_entries', $number_of_default_entries );
 		if ( $number < 0 ) {
 			$number = $number_of_default_entries;
 		}
