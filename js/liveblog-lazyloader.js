@@ -76,8 +76,9 @@
 			lazyloader.entrySets[ newSetIndex ] = lazyloader.entrySets[ setIndex ].slice( entryIndex );
 			lazyloader.entrySets[ setIndex ] = lazyloader.entrySets[ setIndex ].slice( 0, entryIndex );
 
-			liveblog.$entry_container.find( '.liveblog-load-more[data-set-index="' + setIndex + '"]' )
-				.after( $( '<button class="liveblog-load-more">' ).attr( 'data-set-index', newSetIndex ).html( settings.loadMoreButtonText ) );
+			var $button = $( '<button />' );
+			$button.addClass( 'liveblog-load-more' ).data( 'set-index', newSetIndex ).text( settings.loadMoreText );
+			liveblog.$entry_container.find( '.liveblog-load-more[data-set-index="' + setIndex + '"]' ).after( $button );
 
 			return newSetIndex;
 		},

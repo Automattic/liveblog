@@ -166,8 +166,8 @@ class WPCOM_Liveblog_Lazyloader {
 		$temp = plugin_dir_path( $plugin_path ) . $path;
 		wp_enqueue_script( $handle, plugins_url( $path, $plugin_path ), array( 'liveblog' ), filemtime( $temp ), true );
 		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
-			'loadMoreButtonText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
-			'numberOfEntries'    => (int) self::$number_of_entries,
+			'loadMoreText'    => __( 'Load more entries&hellip;', 'liveblog' ),
+			'numberOfEntries' => (int) self::$number_of_entries,
 		) );
 	}
 }
