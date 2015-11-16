@@ -1,4 +1,4 @@
-/* global jQuery, liveblog, liveblogLazyloaderSettings */
+/* global jQuery, liveblog, liveblog_settings, liveblogLazyloaderSettings */
 ( function ( $, settings ) {
 	"use strict";
 
@@ -21,7 +21,7 @@
 		fetchEntries: function() {
 			lazyloader.entrySets = [];
 
-			$.get( settings.url, {}, function( response ) {
+			$.get( liveblog_settings.endpoint_url + 'lazyload', {}, function( response ) {
 				if ( ! response.entries.length ) {
 					$( '.liveblog-load-more' ).remove();
 				} else {

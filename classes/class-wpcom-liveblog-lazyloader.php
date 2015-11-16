@@ -114,7 +114,7 @@ class WPCOM_Liveblog_Lazyloader {
 	}
 
 	/**
-	 * Enqueues the lazyload script file.
+	 * Enqueues the lazyloader script file.
 	 *
 	 * @wp-hook wp_enqueue_scripts
 	 *
@@ -134,7 +134,6 @@ class WPCOM_Liveblog_Lazyloader {
 		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
 			'loadMoreButtonText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
 			'numberOfEntries'    => self::$number_of_entries,
-			'url'                => get_permalink() . WPCOM_Liveblog::url_endpoint . '/lazyload/',
 		) );
 	}
 }
