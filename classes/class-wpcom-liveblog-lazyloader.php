@@ -126,7 +126,19 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function display_archive_query_args( $args ) {
 
-		$args['number'] = self::$number_of_entries;
+		$number_of_default_entries = 10;
+
+		/**
+		 * Filters the number of initially displayed Liveblog entries.
+		 *
+		 * @param int $number_of_default_entries Number of initially displayed Liveblog entries.
+		 */
+		$number = (int) apply_filters( 'number_of_default_entries', 10 );
+		if ( $number < 0 ) {
+			$number = $number_of_default_entries;
+		}
+
+		$args['number'] = $number;
 
 		return $args;
 	}
