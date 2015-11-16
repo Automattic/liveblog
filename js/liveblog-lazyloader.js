@@ -77,7 +77,7 @@
 			lazyloader.entrySets[ setIndex ] = lazyloader.entrySets[ setIndex ].slice( 0, entryIndex );
 
 			var $button = $( '<button />' );
-			$button.addClass( 'liveblog-load-more' ).data( 'set-index', newSetIndex ).text( settings.loadMoreText );
+			$button.addClass( 'liveblog-load-more' ).attr( 'data-set-index', newSetIndex ).text( settings.loadMoreText );
 			liveblog.$entry_container.find( '.liveblog-load-more[data-set-index="' + setIndex + '"]' ).after( $button );
 
 			return newSetIndex;
