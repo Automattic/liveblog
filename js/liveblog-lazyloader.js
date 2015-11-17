@@ -22,7 +22,7 @@
 			lazyloader.entrySets = [];
 
 			$.get( liveblog_settings.endpoint_url + 'lazyload', {}, function( response ) {
-				if ( ! response.entries.length ) {
+				if ( ! response.entries || ! response.entries.length ) {
 					$( '.liveblog-load-more' ).remove();
 				} else {
 					lazyloader.entrySets[0] = response.entries;
@@ -85,7 +85,7 @@
 
 		renderEntries: function() {
 			var $this = $( this ),
-				setIndex = $this.data( 'set-index' ) || 0;
+				setIndex = $this.data( 'set-index' );
 			$.each( lazyloader.entrySets[ setIndex ].slice( 0, settings.numberOfEntries ), function( i, entry ) {
 				$this.before( $( entry.html ) );
 			} );
