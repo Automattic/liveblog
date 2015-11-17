@@ -38,7 +38,7 @@ class WPCOM_Liveblog_Lazyloader {
 	}
 
 	/**
-	 * Called by WPCOM_Liveblog::load(), defers partloading to when Liveblog has been initialized.
+	 * Called by WPCOM_Liveblog::load(), defers loading to when Liveblog has been initialized.
 	 *
 	 * @return void
 	 */
