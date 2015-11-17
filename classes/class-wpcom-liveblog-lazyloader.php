@@ -80,14 +80,13 @@ class WPCOM_Liveblog_Lazyloader {
 		}
 
 		/**
-		 * Filters the number of Liveblog entries used both for initial display, and lazyloading.
+		 * Filters the number of Liveblog entries used for lazyloading.
 		 *
 		 * @param int $number_of_entries Number of Liveblog entries.
 		 */
-		$number_of_entries = (int) apply_filters( 'liveblog_number_of_entries', self::$number_of_entries );
-		// TODO: Limit number of entries to some not yet defined maximum value.
+		$number_of_entries = min( apply_filters( 'liveblog_number_of_entries', self::$number_of_entries ), 100 );
 		if ( $number_of_entries > 0 ) {
-			self::$number_of_entries = $number_of_entries;
+			self::$number_of_entries = (int) $number_of_entries;
 		}
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
@@ -137,7 +136,7 @@ class WPCOM_Liveblog_Lazyloader {
 		 *
 		 * @param int $number_of_default_entries Number of initially displayed Liveblog entries.
 		 */
-		$number = (int) apply_filters( 'number_of_default_entries', $number_of_default_entries );
+		$number = apply_filters( 'number_of_default_entries', $number_of_default_entries );
 		if ( $number < 0 ) {
 			$number = $number_of_default_entries;
 		}
