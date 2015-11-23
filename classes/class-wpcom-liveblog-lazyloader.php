@@ -10,29 +10,100 @@ class WPCOM_Liveblog_Lazyloader {
 	/**
 	 * @var bool
 	 */
-	private static $enabled = true;
+	private static $enabled;
 
 	/**
 	 * @var int
 	 */
-	protected static $number_of_entries = 5;
+	private static $number_of_default_entries;
 
 	/**
-	 * Checks if the lazyload feature is enabled.
+	 * @var int
+	 */
+	private static $number_of_entries;
+
+	/**
+	 * Checks if lazyloading is enabled.
 	 *
 	 * @return bool
 	 */
 	public static function is_enabled() {
 
+		if ( ! isset( self::$enabled ) ) {
+			/**
+			 * Enables/Disables lazyloading for Liveblog entries.
+			 *
+			 * @param bool $enabled Enable lazyloading for Liveblog entries?
+			 */
+			self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', true );
+			if ( self::$enabled && self::is_robot() ) {
+				// No lazyloading for robots.
+				self::$enabled = false;
+			}
+		}
+
 		return self::$enabled;
 	}
 
 	/**
-	 * Returns the number of Liveblog entries used both for initial display, and lazyloading.
+	 * Checks if the current user is a robot.
+	 *
+	 * @return bool
+	 */
+	private static function is_robot() {
+
+		if ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return false;
+		}
+
+		return (bool) preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	/**
+	 * Returns the number of initially displayed Liveblog entries.
+	 *
+	 * @return int
+	 */
+	private static function get_number_of_default_entries() {
+
+		if ( ! isset( self::$number_of_default_entries ) ) {
+			self::$number_of_default_entries = 5;
+
+			/**
+			 * Filters the number of initially displayed Liveblog entries.
+			 *
+			 * @param int $number_of_default_entries Number of initially displayed Liveblog entries.
+			 */
+			$number = (int) apply_filters( 'liveblog_number_of_default_entries', self::$number_of_default_entries );
+			if ( $number >= 0 ) {
+				self::$number_of_default_entries = $number;
+			}
+		}
+
+		return self::$number_of_default_entries;
+	}
+
+	/**
+	 * Returns the number of Liveblog entries used for lazyloading.
 	 *
 	 * @return int
 	 */
 	public static function get_number_of_entries() {
+
+		if ( ! isset( self::$number_of_entries ) ) {
+			self::$number_of_entries = 5;
+
+			/**
+			 * Filters the number of Liveblog entries used for lazyloading.
+			 *
+			 * @param int $number_of_entries Number of Liveblog entries.
+			 */
+			$number = (int) apply_filters( 'liveblog_number_of_entries', self::$number_of_entries );
+			if ( $number > 0 ) {
+				// Limit the number of Liveblog entries used for lazyloading to 100.
+				self::$number_of_entries = min( $number, 100 );
+			}
+		}
 
 		return self::$number_of_entries;
 	}
@@ -48,7 +119,7 @@ class WPCOM_Liveblog_Lazyloader {
 	}
 
 	/**
-	 * Wires up the lazyload functions.
+	 * Wires up the lazyloading functions.
 	 *
 	 * @wp-hook after_liveblog_init
 	 *
@@ -65,28 +136,8 @@ class WPCOM_Liveblog_Lazyloader {
 			remove_action( 'init', 'Lazyload_Liveblog_Entries' );
 		}
 
-		/**
-		 * Enables/Disables the lazyload feature for Liveblog entries.
-		 *
-		 * @param bool $enabled Enable the lazyload feature for Liveblog entries?
-		 */
-		self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', self::$enabled );
-		if ( self::$enabled && self::is_robot() ) {
-			// No lazyloading for robots.
-			self::$enabled = false;
-		}
-		if ( ! self::$enabled ) {
+		if ( ! self::is_enabled() ) {
 			return;
-		}
-
-		/**
-		 * Filters the number of Liveblog entries used for lazyloading.
-		 *
-		 * @param int $number_of_entries Number of Liveblog entries.
-		 */
-		$number_of_entries = min( apply_filters( 'liveblog_number_of_entries', self::$number_of_entries ), 100 );
-		if ( $number_of_entries > 0 ) {
-			self::$number_of_entries = (int) $number_of_entries;
 		}
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
@@ -103,47 +154,9 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function admin_notices() {
 
-		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array( 'plugin' => 'Lazyload Liveblog Entries' ) );
-	}
-
-	/**
-	 * Checks if the current "visitor" is a robot.
-	 *
-	 * @return bool
-	 */
-	public static function is_robot() {
-
-		if ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-			return false;
-		}
-
-		return (bool) preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
-	}
-
-	/**
-	 * Limits the initially displayed Liveblog entries.
-	 *
-	 * @param array $args Query args.
-	 *
-	 * @return array
-	 */
-	public static function display_archive_query_args( $args ) {
-
-		$number_of_default_entries = 10;
-
-		/**
-		 * Filters the number of initially displayed Liveblog entries.
-		 *
-		 * @param int $number_of_default_entries Number of initially displayed Liveblog entries.
-		 */
-		$number = apply_filters( 'number_of_default_entries', $number_of_default_entries );
-		if ( $number < 0 ) {
-			$number = $number_of_default_entries;
-		}
-
-		$args['number'] = (int) $number;
-
-		return $args;
+		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array(
+			'plugin' => 'Lazyload Liveblog Entries',
+		) );
 	}
 
 	/**
@@ -159,14 +172,27 @@ class WPCOM_Liveblog_Lazyloader {
 			return;
 		}
 
-		$handle = 'liveblog-lazyloader';
-		$path = 'js/liveblog-lazyloader.js';
+		$handle      = 'liveblog-lazyloader';
+		$path        = 'js/liveblog-lazyloader.js';
 		$plugin_path = dirname( __FILE__ );
-		$temp = plugin_dir_path( $plugin_path ) . $path;
+		$temp        = plugin_dir_path( $plugin_path ) . $path;
 		wp_enqueue_script( $handle, plugins_url( $path, $plugin_path ), array( 'liveblog' ), filemtime( $temp ), true );
 		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
-			'loadMoreText'    => __( 'Load more entries&hellip;', 'liveblog' ),
-			'numberOfEntries' => (int) self::$number_of_entries,
+			'loadMoreText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
 		) );
+	}
+
+	/**
+	 * Limits the initially displayed Liveblog entries.
+	 *
+	 * @param array $args Query args.
+	 *
+	 * @return array
+	 */
+	public static function display_archive_query_args( $args ) {
+
+		$args['number'] = (int) self::get_number_of_default_entries();
+
+		return $args;
 	}
 }

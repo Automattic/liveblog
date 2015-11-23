@@ -276,6 +276,7 @@ final class WPCOM_Liveblog {
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
 			'crud' => 'ajax_crud_entry',
+			'entry' => 'ajax_single_entry',
 			'lazyload' => 'ajax_lazyload_entries',
 			'preview' => 'ajax_preview_entry',
 		);
@@ -474,18 +475,41 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
-	 * Fetches all Liveblog entries that are to be lazyloaded, and returns them via JSON.
+	 * Fetches the Liveblog entry with the ID given in the $_GET superglobal, and returns it via JSON.
 	 */
-	public static function ajax_lazyload_entries() {
+	public static function ajax_single_entry() {
 
-		// Get all Liveblog entries that are to be lazyloaded.
-		$entries = self::$entry_query->get_all();
-		if ( ! is_array( $entries ) ) {
-			$entries = array();
-		} else {
-			$entries = array_slice( $entries, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+		// The URL is of the form "entry/entry_id".
+		$fragments = explode( '/', get_query_var( self::url_endpoint ) );
+
+		$entry_id = isset( $fragments[1] ) ? $fragments[1] : '';
+
+		$entries = array();
+		$previous_timestamp = 0;
+		$next_timestamp = 0;
+
+		$all_entries = array_values( self::$entry_query->get_all() );
+		foreach ( $all_entries as $key => $entry ) {
+			if ( $entry_id !== $entry->get_id() ) {
+				continue;
+			}
+
+			$entries = array( $entry );
+
+			if ( isset( $all_entries[ $key - 1 ] ) ) {
+				$previous_entry = $all_entries[ $key - 1 ];
+				$next_timestamp = $previous_entry->get_timestamp();
+			}
+
+			if ( isset( $all_entries[ $key + 1 ] ) ) {
+				$next_entry = $all_entries[ $key + 1 ];
+				$previous_timestamp = $next_entry->get_timestamp();
+			}
+
+			break;
 		}
-		if ( empty( $entries ) ) {
+
+		if ( ! $entries ) {
 			do_action( 'liveblog_entry_request_empty' );
 
 			self::json_return( array( 'entries' => array() ) );
@@ -499,7 +523,56 @@ final class WPCOM_Liveblog {
 		}
 
 		// Set up the data to be returned via JSON.
-		$result_for_json = array( 'entries' => $entries_for_json );
+		$result_for_json = array(
+			'entries'           => $entries_for_json,
+			'index'             => (int) filter_input( INPUT_GET, 'index' ),
+			'nextTimestamp'     => $next_timestamp,
+			'previousTimestamp' => $previous_timestamp,
+		);
+
+		do_action( 'liveblog_entry_request', $result_for_json );
+
+		self::$do_not_cache_response = true;
+
+		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Fetches all Liveblog entries that are to be lazyloaded, and returns them via JSON.
+	 */
+	public static function ajax_lazyload_entries() {
+
+		// The URL is of the form "lazyload/optional_max_timestamp/optional_min_timestamp".
+		$fragments = explode( '/', get_query_var( self::url_endpoint ) );
+
+		// Get all Liveblog entries that are to be lazyloaded.
+		$entries = self::$entry_query->get_for_lazyloading(
+			isset( $fragments[1] ) ? (int) $fragments[1] : 0,
+			isset( $fragments[2] ) ? (int) $fragments[2] : 0
+		);
+		if ( ! $entries ) {
+			do_action( 'liveblog_entry_request_empty' );
+
+			self::json_return( array(
+				'entries' => array(),
+				'index'   => (int) filter_input( INPUT_GET, 'index' ),
+			) );
+		}
+
+		$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+
+		$entries_for_json = array();
+
+		// Set up an array containing the JSON data for all Liveblog entries.
+		foreach ( $entries as $entry ) {
+			$entries_for_json[] = $entry->for_json();
+		}
+
+		// Set up the data to be returned via JSON.
+		$result_for_json = array(
+			'entries' => $entries_for_json,
+			'index'   => (int) filter_input( INPUT_GET, 'index' ),
+		);
 
 		do_action( 'liveblog_entry_request', $result_for_json );
 
