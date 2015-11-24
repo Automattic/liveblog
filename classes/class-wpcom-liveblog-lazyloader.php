@@ -52,11 +52,14 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	private static function is_robot() {
 
-		if ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-			return false;
+		// Variant determiner for caches.
+		if ( function_exists( 'vary_cache_on_function' ) ) {
+			vary_cache_on_function(
+				'return isset( $_SERVER[\'HTTP_USER_AGENT\'] ) && preg_match( \'/bot|crawl|slurp|spider/i\', $_SERVER[\'HTTP_USER_AGENT\'] );'
+			);
 		}
 
-		return (bool) preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
+		return isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	/**
