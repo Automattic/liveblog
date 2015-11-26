@@ -603,3 +603,13 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	padding-left: 20px;
 	display: inline-block;
 }
+
+/* =Load More Buttons
+-------------------------------------------------------------- */
+
+.liveblog-load-more {
+	display: block;
+	margin: 1em 0;
+	padding: 2em 0;
+	width: 100%;
+}
