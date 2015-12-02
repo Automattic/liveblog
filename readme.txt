@@ -2,8 +2,8 @@
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
 Requires at least: 3.5
-Tested up to: 4.2.4
-Stable tag: 1.4.1
+Tested up to: 4.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,14 @@ If you'd like to check out the code and contribute, [join us on github](https://
 8. Typical liveblog view
 
 == Changelog ==
+
+= 1.5 =
+
+* New "Key Events" feature
+* New "Lazyloading" feature
+* Improved escaping
+
+Contributors to this release: Jason Agnew, Josh Betz, Stephane Boisvert, Thorsten Frommen, Mark Goodyear, Philip John, Paul Kevan, Connor Parks
 
 = 1.4 =
 
