@@ -303,10 +303,10 @@ window.liveblog = window.liveblog || {};
 
 		if ( $new_entry.hasClass( liveblog_settings.command_class + 'key' ) ) {
 			var $new_key_entry = $( new_entry.key );
-			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'transparent'}, {duration: duration});
 		}
 
-		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'transparent'}, {duration: duration});
 		liveblog.entriesContainer.updateTimes();
 	};
 
@@ -333,7 +333,7 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.unhide_entries = function() {
-		liveblog.get_hidden_entries().addClass('highlight').removeClass( 'liveblog-hidden' ).animate({backgroundColor: 'white'}, {duration: 5000});
+		liveblog.get_hidden_entries().addClass('highlight').removeClass( 'liveblog-hidden' ).animate({backgroundColor: 'transparent'}, {duration: 5000});
 	};
 
 	liveblog.ajax_request = function( url, data, success_callback, error_callback, method ) {
