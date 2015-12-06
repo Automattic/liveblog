@@ -36,8 +36,14 @@ class WPCOM_Liveblog_Lazyloader {
 			 * @param bool $enabled Enable lazyloading for Liveblog entries?
 			 */
 			self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', true );
+
+			// Disable lazy loading for robots
 			if ( self::$enabled && self::is_robot() ) {
-				// No lazyloading for robots.
+				self::$enabled = false;
+			}
+
+			// Disable lazy loading on archived liveblogs
+			if ( 'enable' != WPCOM_Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
 			}
 		}
