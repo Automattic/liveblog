@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.4.1
+ * Version:     1.5
  * Author:      WordPress.com VIP, Automattic
  * Author URI: http://vip.wordpress.com/
  * Text Domain: liveblog
@@ -76,6 +76,10 @@ final class WPCOM_Liveblog {
 		self::add_admin_actions();
 		self::add_admin_filters();
 		self::register_embed_handlers();
+
+		WPCOM_Liveblog_Entry_Key_Events::load();
+		WPCOM_Liveblog_Entry_Extend::load();
+		WPCOM_Liveblog_Lazyloader::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -104,8 +108,16 @@ final class WPCOM_Liveblog {
 	 * Include the necessary files
 	 */
 	private static function includes() {
-		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php'       );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
@@ -143,7 +155,7 @@ final class WPCOM_Liveblog {
 	private static function add_filters() {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
-		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );		
+		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );
 	}
 
 	/**
@@ -264,6 +276,8 @@ final class WPCOM_Liveblog {
 		$suffix_to_method = array(
 			'\d+/\d+' => 'ajax_entries_between',
 			'crud' => 'ajax_crud_entry',
+			'entry' => 'ajax_single_entry',
+			'lazyload' => 'ajax_lazyload_entries',
 			'preview' => 'ajax_preview_entry',
 		);
 
@@ -359,6 +373,9 @@ final class WPCOM_Liveblog {
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
+		if ( ! is_single() && ! is_admin() ) {
+			return false;
+		}
 		if ( empty( $post_id ) ) {
 			global $post;
 			$post_id = $post->ID;
@@ -432,7 +449,7 @@ final class WPCOM_Liveblog {
 
 		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete' ) ) ) {
+		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete', 'delete_key' ) ) ) {
 			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 
@@ -457,9 +474,118 @@ final class WPCOM_Liveblog {
 		) );
 	}
 
+	/**
+	 * Fetches the Liveblog entry with the ID given in the $_GET superglobal, and returns it via JSON.
+	 */
+	public static function ajax_single_entry() {
+
+		// The URL is of the form "entry/entry_id".
+		$fragments = explode( '/', get_query_var( self::url_endpoint ) );
+
+		$entry_id = isset( $fragments[1] ) ? $fragments[1] : '';
+
+		$entries = array();
+		$previous_timestamp = 0;
+		$next_timestamp = 0;
+
+		$all_entries = array_values( self::$entry_query->get_all() );
+		foreach ( $all_entries as $key => $entry ) {
+			if ( $entry_id !== $entry->get_id() ) {
+				continue;
+			}
+
+			$entries = array( $entry );
+
+			if ( isset( $all_entries[ $key - 1 ] ) ) {
+				$previous_entry = $all_entries[ $key - 1 ];
+				$next_timestamp = $previous_entry->get_timestamp();
+			}
+
+			if ( isset( $all_entries[ $key + 1 ] ) ) {
+				$next_entry = $all_entries[ $key + 1 ];
+				$previous_timestamp = $next_entry->get_timestamp();
+			}
+
+			break;
+		}
+
+		if ( ! $entries ) {
+			do_action( 'liveblog_entry_request_empty' );
+
+			self::json_return( array( 'entries' => array() ) );
+		}
+
+		$entries_for_json = array();
+
+		// Set up an array containing the JSON data for all Liveblog entries.
+		foreach ( $entries as $entry ) {
+			$entries_for_json[] = $entry->for_json();
+		}
+
+		// Set up the data to be returned via JSON.
+		$result_for_json = array(
+			'entries'           => $entries_for_json,
+			'index'             => (int) filter_input( INPUT_GET, 'index' ),
+			'nextTimestamp'     => $next_timestamp,
+			'previousTimestamp' => $previous_timestamp,
+		);
+
+		do_action( 'liveblog_entry_request', $result_for_json );
+
+		self::$do_not_cache_response = true;
+
+		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Fetches all Liveblog entries that are to be lazyloaded, and returns them via JSON.
+	 */
+	public static function ajax_lazyload_entries() {
+
+		// The URL is of the form "lazyload/optional_max_timestamp/optional_min_timestamp".
+		$fragments = explode( '/', get_query_var( self::url_endpoint ) );
+
+		// Get all Liveblog entries that are to be lazyloaded.
+		$entries = self::$entry_query->get_for_lazyloading(
+			isset( $fragments[1] ) ? (int) $fragments[1] : 0,
+			isset( $fragments[2] ) ? (int) $fragments[2] : 0
+		);
+		if ( ! $entries ) {
+			do_action( 'liveblog_entry_request_empty' );
+
+			self::json_return( array(
+				'entries' => array(),
+				'index'   => (int) filter_input( INPUT_GET, 'index' ),
+			) );
+		}
+
+		$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+
+		$entries_for_json = array();
+
+		// Set up an array containing the JSON data for all Liveblog entries.
+		foreach ( $entries as $entry ) {
+			$entries_for_json[] = $entry->for_json();
+		}
+
+		// Set up the data to be returned via JSON.
+		$result_for_json = array(
+			'entries' => $entries_for_json,
+			'index'   => (int) filter_input( INPUT_GET, 'index' ),
+		);
+
+		do_action( 'liveblog_entry_request', $result_for_json );
+
+		self::$do_not_cache_response = true;
+
+		self::json_return( $result_for_json );
+	}
+
 	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
+		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
+		$entry_content = $entry_content['content'];
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
 
 		do_action( 'liveblog_preview_entry', $entry_content );
@@ -481,8 +607,10 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	public static function add_comment_class( $classes, $class, $comment_id ) {
-		if ( self::key == get_comment_type( $comment_id ) )
+		if ( self::key == get_comment_type( $comment_id ) ) {
 			$classes[] = 'liveblog-entry';
+			$classes[] = 'liveblog-entry-class-' . $comment_id;
+		}
 		return $classes;
 	}
 
@@ -565,13 +693,23 @@ final class WPCOM_Liveblog {
 
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
+				'features'               => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
+				'autocomplete'           => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
+				'command_class'          => apply_filters( 'liveblog_command_class',   WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ),
+
 				// i18n
 				'delete_confirmation'    => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
+				'delete_key_confirm'     => __( 'Do you want to delete this key entry?', 'liveblog' ),
 				'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 				'new_update'             => __( 'Liveblog: {number} new update' , 'liveblog'),
 				'new_updates'            => __( 'Liveblog: {number} new updates' , 'liveblog'),
-				'create_link_prompt'     => __( 'Provide URL for link:', 'liveblog' )
+				'create_link_prompt'     => __( 'Provide URL for link:', 'liveblog' ),
+
+				// Classes
+				'class_term_prefix'      => __( 'term-', 'liveblog' ),
+				'class_alert'            => __( 'type-alert', 'liveblog' ),
+				'class_key'              => __( 'type-key', 'liveblog' ),
 			) )
 		);
 		wp_localize_script( 'liveblog-publisher', 'liveblog_publisher_settings', array(
@@ -710,7 +848,10 @@ final class WPCOM_Liveblog {
 	public static function get_template_part( $template_name, $template_variables = array() ) {
 		ob_start();
 		extract( $template_variables );
-		if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
+		$theme_template = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
+		if ( file_exists( $theme_template ) ) {
+			include( $theme_template );
+		} else if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
 			include( self::$custom_template_path . '/' . $template_name );
 		} else {
 			include( dirname( __FILE__ ) . '/templates/' . $template_name );
@@ -759,7 +900,10 @@ final class WPCOM_Liveblog {
 			$active_text = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 			$buttons['archive']['disabled'] = true;
 		}
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons' ) );
+		$update_text  = __( 'Settings have been successfully updated.', 'liveblog' );
+		$extra_fields = array();
+		$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
+		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
@@ -776,6 +920,8 @@ final class WPCOM_Liveblog {
 		if ( wp_is_post_revision( $post_id ) ) {
 			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
 		}
+
+		do_action( 'liveblog_admin_settings_update', $_REQUEST, $post_id );
 
 		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
 		self::display_meta_box( $REQUEST );
@@ -1003,9 +1149,9 @@ final class WPCOM_Liveblog {
 	public static function protect_liveblog_meta_key( $protected, $meta_key ) {
 		if ( self::key === $meta_key )
 			return true;
-		
+
 		return $protected;
-	}	
+	}
 
 	/** Plupload Helpers ******************************************************/
 
@@ -1068,10 +1214,6 @@ final class WPCOM_Liveblog {
 		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
 }
-
-function wpcom_liveblog_load() {
-	WPCOM_Liveblog::load();
-}
-add_action( 'plugins_loaded', 'wpcom_liveblog_load', 999 );
+WPCOM_Liveblog::load();
 
 endif;

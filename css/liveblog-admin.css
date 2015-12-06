@@ -11,3 +11,11 @@ div#liveblog p.error {
 	padding: 4px;
 	border-radius: 3px;
 }
+
+div#liveblog p.success {
+	display: none;
+	background-color: #93DB70;
+	border: 1px solid #4CBB17;
+	padding: 4px;
+	border-radius: 3px;
+}

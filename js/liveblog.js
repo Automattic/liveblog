@@ -18,11 +18,11 @@ window.liveblog = window.liveblog || {};
 		},
 		updateTimes: function() {
 			var self = this;
-			this.$('.liveblog-entry').each(function() {
+			$('.liveblog-entry').each(function() {
 				var $entry = $(this),
 					timestamp = $entry.data('timestamp'),
 					human = self.formatTimestamp(timestamp);
-				$('.liveblog-meta-time a', $entry).text(human);
+				$('.liveblog-time-update', $entry).text(human);
 			});
 		},
 		formatTimestamp: function(timestamp) {
@@ -119,8 +119,10 @@ window.liveblog = window.liveblog || {};
 	liveblog.$events = $( '<span />' );
 
 	liveblog.init = function() {
-		liveblog.$entry_container = $( '#liveblog-entries'        );
-		liveblog.$spinner         = $( '#liveblog-update-spinner' );
+		liveblog.$entry_container     = $( '#liveblog-entries'                     );
+		liveblog.$key_entry_container = $( '.liveblog-key-entries'                 );
+		liveblog.$key_entries         = $( '.liveblog-key-entries .liveblog-entry' );
+		liveblog.$spinner             = $( '#liveblog-update-spinner'              );
 
 		liveblog.queue = new liveblog.EntriesQueue();
 		liveblog.fixedNag = new liveblog.FixedNagView();
@@ -276,7 +278,7 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_entry_by_id = function( id ) {
-		return $( '#liveblog-entry-' + id );
+		return $('.liveblog-entry-class-' + id );
 	};
 
 	liveblog.display_entry = function( new_entry, duration ) {
@@ -298,12 +300,19 @@ window.liveblog = window.liveblog || {};
 
 	liveblog.add_entry = function( new_entry, duration ) {
 		var $new_entry = $( new_entry.html );
-		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'white'}, {duration: duration});
+
+		if ( $new_entry.hasClass( liveblog_settings.command_class + 'key' ) ) {
+			var $new_key_entry = $( new_entry.key );
+			$new_key_entry.addClass('highlight').prependTo( liveblog.$key_entry_container ).animate({backgroundColor: 'transparent'}, {duration: duration});
+		}
+
+		$new_entry.addClass('highlight').prependTo( liveblog.$entry_container ).animate({backgroundColor: 'transparent'}, {duration: duration});
 		liveblog.entriesContainer.updateTimes();
 	};
 
 	liveblog.update_entry = function( $entry, updated_entry ) {
-		$entry.replaceWith( updated_entry.html );
+		liveblog.$entry_container.find($entry).replaceWith( updated_entry.html );
+		liveblog.$key_entry_container.find($entry).replaceWith( updated_entry.key );
 		liveblog.entriesContainer.updateTimes();
 	};
 
@@ -324,7 +333,7 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.unhide_entries = function() {
-		liveblog.get_hidden_entries().addClass('highlight').removeClass( 'liveblog-hidden' ).animate({backgroundColor: 'white'}, {duration: 5000});
+		liveblog.get_hidden_entries().addClass('highlight').removeClass( 'liveblog-hidden' ).animate({backgroundColor: 'transparent'}, {duration: 5000});
 	};
 
 	liveblog.ajax_request = function( url, data, success_callback, error_callback, method ) {

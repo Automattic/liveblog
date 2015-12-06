@@ -58,11 +58,13 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function for_json() {
-		return (object) array(
+		$entry = array(
 			'id'   => $this->replaces ? $this->replaces : $this->get_id(),
 			'type' => $this->get_type(),
 			'html' => $this->render(),
 		);
+		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
+		return (object) $entry;
 	}
 
 	public function get_fields_for_render() {
@@ -70,14 +72,13 @@ class WPCOM_Liveblog_Entry {
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = comment_class( '', $entry_id, $post_id, false );		
-
+		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
 		$entry = array(
 			'entry_id'              => $entry_id,
-			'post_id'               => $entry_id,
+			'post_id'               => $post_id,
 			'css_classes'           => $css_classes ,
 			'content'               => self::render_content( $comment_text, $this->comment ),
-			'original_content'      => $comment_text,
+			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
 			'avatar_size'           => $avatar_size,
 			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'           => get_comment_author_link( $entry_id ),
@@ -90,7 +91,7 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
-	public function render() {
+	public function render( $template = 'liveblog-single-entry.php' ) {
 
 		$output = apply_filters( 'liveblog_pre_entry_output', '', $this );
 		if ( ! empty( $output ) )
@@ -103,7 +104,7 @@ class WPCOM_Liveblog_Entry {
 
 		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
 
-		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', $entry );
+		return WPCOM_Liveblog::get_template_part( $template, $entry );
 	}
 
 	public static function render_content( $content, $comment = false ) {
@@ -127,6 +128,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
+        $args = apply_filters( 'liveblog_before_insert_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
@@ -156,6 +158,7 @@ class WPCOM_Liveblog_Entry {
 			return $args['user'];
 		}
 
+        $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
@@ -191,6 +194,17 @@ class WPCOM_Liveblog_Entry {
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
+		return $entry;
+	}
+
+	public static function delete_key( $args ) {
+		if ( !$args['entry_id'] ) {
+			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+		if ( ! WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['entry_id'] ) ) {
+			return new WP_Error( 'entry-delete-key', __( 'Key event not deleted' ) );
+		}
+		$entry = self::update( $args );
 		return $entry;
 	}
 

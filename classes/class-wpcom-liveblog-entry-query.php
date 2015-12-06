@@ -139,4 +139,35 @@ class WPCOM_Liveblog_Entry_Query {
 
 		return $result;
 	}
+
+	/**
+	 * Returns the Liveblog entries between the two given (optional) timestamps.
+	 *
+	 * @param int $max_timestamp Maximum timestamp for the Liveblog entries.
+	 * @param int $min_timestamp Minimum timestamp for the Liveblog entries.
+	 *
+	 * @return WPCOM_Liveblog_Entry[]
+	 */
+	public function get_for_lazyloading( $max_timestamp, $min_timestamp ) {
+
+		$entries = $this->get_all();
+		if ( ! $entries ) {
+			return array();
+		}
+
+		if ( $max_timestamp ) {
+			foreach ( $entries as $key => $entry ) {
+				$timestamp = $entry->get_timestamp();
+
+				if (
+					( $max_timestamp && $timestamp >= $max_timestamp )
+					|| ( $min_timestamp && $timestamp <= $min_timestamp )
+				) {
+					unset( $entries[ $key ] );
+				}
+			}
+		}
+
+		return $entries;
+	}
 }

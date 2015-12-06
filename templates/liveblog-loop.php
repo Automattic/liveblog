@@ -3,6 +3,7 @@
 	<?php printf( __( '<strong>This liveblog is archived.</strong> If you need to publish new updates or edit or delete the old ones, you need to <a href="%s">enable it first</a>.' , 'liveblog'), get_edit_post_link() . '#liveblog' ); ?>
 </div>
 <?php endif; ?>
+
 <div id="liveblog-entries">
 
 	<?php foreach ( (array) $entries as $entry ) : ?>
@@ -10,6 +11,12 @@
 		<?php echo $entry->render(); ?>
 
 	<?php endforeach; ?>
+
+	<?php if ( WPCOM_Liveblog_Lazyloader::is_enabled() ) : ?>
+
+		<button class="liveblog-load-more" data-set-index="0"><?php esc_html_e( 'Load more entries&hellip;', 'liveblog' ); ?></button>
+
+	<?php endif; ?>
 
 	<div id="liveblog-fixed-nag">
 		<a href="#">
