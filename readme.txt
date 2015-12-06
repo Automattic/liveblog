@@ -53,7 +53,7 @@ If you'd like to check out the code and contribute, [join us on github](https://
 * New "Lazyloading" feature
 * Improved escaping
 
-Contributors to this release: Jason Agnew, Josh Betz, Stephane Boisvert, Thorsten Frommen, Mark Goodyear, Philip John, Paul Kevan, Connor Parks
+People who helped make this happen: Jason Agnew, Josh Betz, Sarah Blackstock, Stephane Boisvert, Ian Dunn, Scott Evans, Thorsten Frommen, Mark Goodyear, Chris Hardie, Philip John, Paul Kevan, Connor Parks
 
 = 1.4 =
 
