@@ -1,3 +1,6 @@
+# This sudo thingy here will make sure that PHP 5.2 tests actually run on Travis
+sudo: false
+
 language: php
 
 php:
