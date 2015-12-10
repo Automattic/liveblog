@@ -378,6 +378,9 @@ final class WPCOM_Liveblog {
 		}
 		if ( empty( $post_id ) ) {
 			global $post;
+			if ( ! $post ){
+				return false;
+			}
 			$post_id = $post->ID;
 		}
 		$state = get_post_meta( $post_id, self::key, true );
