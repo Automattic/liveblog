@@ -283,7 +283,7 @@ public static function filter( $prefixes ) {
   return $prefixes;
 }
 ```
-Currently hashtags us the class prefix `term-`, you can change that to whatever you need - in this case let’s change to `hashtag-`:
+Currently hashtags use the class prefix `term-`, you can change that to whatever you need - in this case let’s change to `hashtag-`:
 
 ``` php
 add_filter( 'liveblog_hashtags_class', array( __CLASS__, 'filter' ) );
