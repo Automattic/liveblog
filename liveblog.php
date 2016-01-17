@@ -105,6 +105,16 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Use socket.io instead of AJAX to update clients
+	 * when new entries are created?
+	 *
+	 * @return bool whether socket.io is enabled or not
+	 */
+	public static function is_socketio_enabled() {
+		return defined( 'LIVEBLOG_USE_SOCKETIO' ) && LIVEBLOG_USE_SOCKETIO;
+	}
+
+	/**
 	 * Include the necessary files
 	 */
 	private static function includes() {
@@ -127,6 +137,10 @@ final class WPCOM_Liveblog {
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
+		}
+
+		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
+			require( dirname( __FILE__ ) . '/vendor/autoload.php' );
 		}
 	}
 
@@ -658,6 +672,10 @@ final class WPCOM_Liveblog {
 				'yy' => __( '%d years', 'liveblog' ),
 			),
 		));
+
+		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
+			wp_enqueue_script( 'socket.io', plugins_url( 'js/socket.io.min.js', __FILE__ ), array(), '1.4.4', true );
+		}
 
 		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
 
