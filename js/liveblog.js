@@ -169,6 +169,10 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.reset_timer = function() {
+		if ( liveblog_settings.socketio_enabled ) {
+			return;
+		}
+
 		liveblog.kill_timer();
 		liveblog.refresh_timeout = setTimeout( liveblog.get_recent_entries, ( liveblog_settings.refresh_interval * 1000 ) );
 	};

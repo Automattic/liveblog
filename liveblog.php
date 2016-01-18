@@ -105,6 +105,16 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Use socket.io instead of AJAX to update clients
+	 * when new entries are created?
+	 *
+	 * @return bool whether socket.io is enabled or not
+	 */
+	public static function is_socketio_enabled() {
+		return defined( 'LIVEBLOG_USE_SOCKETIO' ) && LIVEBLOG_USE_SOCKETIO;
+	}
+
+	/**
 	 * Include the necessary files
 	 */
 	private static function includes() {
@@ -127,6 +137,10 @@ final class WPCOM_Liveblog {
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
+		}
+
+		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
+			require( dirname( __FILE__ ) . '/vendor/autoload.php' );
 		}
 	}
 
@@ -468,13 +482,19 @@ final class WPCOM_Liveblog {
 			self::send_server_error( $entry->get_error_message() );
 		}
 
-		// Do not send latest_timestamp. If we send it the client won't get
-		// older entries. Since we send only the new one, we don't know if there
-		// weren't any entries in between.
-		self::json_return( array(
-			'entries'           => array( $entry->for_json() ),
-			'latest_timestamp'  => null
-		) );
+		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
+			$emitter = new SocketIO\Emitter();
+			$emitter->json->emit( 'new liveblog entry ' . $entry->get_post_id(), json_encode( $entry->for_json() ) );
+			exit;
+		} else {
+			// Do not send latest_timestamp. If we send it the client won't get
+			// older entries. Since we send only the new one, we don't know if there
+			// weren't any entries in between.
+			self::json_return( array(
+				'entries'          => array( $entry->for_json() ),
+				'latest_timestamp' => null
+			) );
+		}
 	}
 
 	/**
@@ -659,6 +679,11 @@ final class WPCOM_Liveblog {
 			),
 		));
 
+		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
+			wp_enqueue_script( 'socket.io', plugins_url( 'js/socket.io.min.js', __FILE__ ), array(), '1.4.4', true );
+			wp_enqueue_script( 'liveblog-socket.io', plugins_url( 'js/liveblog-socket.io.js', __FILE__ ), array( 'jquery', 'socket.io', self::key ), self::version, true );
+		}
+
 		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
 
 		if ( self::is_liveblog_editable() )  {
@@ -682,6 +707,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
+				'socketio_enabled'       => self::is_socketio_enabled(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
