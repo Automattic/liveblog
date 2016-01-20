@@ -617,15 +617,18 @@ final class WPCOM_Liveblog {
 		return $classes;
 	}
 
-	public static function admin_enqueue_scripts() {
-		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
-		wp_enqueue_script( 'liveblog-admin',  plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
-		wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
-			'nonce_key' => self::nonce_key,
-			'nonce' => wp_create_nonce( self::nonce_key ),
-			'error_message_template' => __( 'Error {error-code}: {error-message}', 'liveblog' ),
-			'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
-		) );
+	public static function admin_enqueue_scripts( $hook_suffix ) {
+		// Enqueue admin scripts only if adding or editing a supported post type.
+		if ( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) && post_type_supports( get_post_type(), self::key ) ) {
+			wp_enqueue_style( self::key, plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
+			wp_enqueue_script( 'liveblog-admin', plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
+			wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
+				'nonce_key'                    => self::nonce_key,
+				'nonce'                        => wp_create_nonce( self::nonce_key ),
+				'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
+				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
+			) );
+		}
 	}
 
 	/**
