@@ -21,26 +21,12 @@ class WPCOM_Liveblog_Socketio {
 	 * @return void
 	 */
 	public static function load() {
-		if ( ! self::is_enabled() ) {
-			return;
-		}
-
 		// load socket.io-php-emitter
 		require( dirname( __FILE__ ) . '/../vendor/autoload.php' );
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
 		self::$emitter = new SocketIO\Emitter();
-	}
-
-	/**
-	 * Use socket.io instead of AJAX to update clients
-	 * when new entries are created?
-	 *
-	 * @return bool whether socket.io is enabled or not
-	 */
-	public static function is_enabled() {
-		return defined( 'LIVEBLOG_USE_SOCKETIO' ) && LIVEBLOG_USE_SOCKETIO;
 	}
 
 	/**

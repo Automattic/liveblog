@@ -50,6 +50,11 @@ final class WPCOM_Liveblog {
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
 
+	/**
+	 * Minimum PHP version required to run socket.io-php-emitter.
+	 */
+	const socketio_min_php_version = '5.3.0';
+
 	/** Variables *************************************************************/
 
 	private static $post_id               = null;
@@ -80,7 +85,10 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
-		WPCOM_Liveblog_Socketio::load();
+
+		if ( self::is_socketio_enabled() ) {
+			WPCOM_Liveblog_Socketio::load();
+		}
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -106,6 +114,57 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Check whether the PHP version is too old to use
+	 * socket.io-php-emitter which requires at least PHP
+	 * 5.3.
+	 *
+	 * @return bool
+	 */
+	private static function is_php_too_old_for_socketio() {
+		return version_compare( PHP_VERSION, self::socketio_min_php_version, '<' );
+	}
+
+	/**
+	 * Check if the constant LIVEBLOG_USE_SOCKETIO is true
+	 *
+	 * @return bool
+	 */
+	private static function is_socketio_constant_enabled() {
+		return defined( 'LIVEBLOG_USE_SOCKETIO' ) && LIVEBLOG_USE_SOCKETIO;
+	}
+
+	/**
+	 * Use socket.io instead of AJAX to update clients
+	 * when new entries are created?
+	 *
+	 * @return bool whether socket.io is enabled or not
+	 */
+	public static function is_socketio_enabled() {
+		return self::is_socketio_constant_enabled() && ! self::is_php_too_old_for_socketio();
+	}
+
+	/**
+	 * Add message to warn the user that the PHP version is to old to run socket.io-php-emitter.
+	 *
+	 * @return void
+	 */
+	private static function add_old_php_for_socketio_notice() {
+		add_action( 'admin_notices', array( __CLASS__, 'show_old_php_for_socketio_notice' ) );
+	}
+
+	/**
+	 * Display message to warn the user that the PHP version is to old to run socket.io-php-emitter.
+	 *
+	 * @return void
+	 */
+	public static function show_old_php_for_socketio_notice() {
+		echo WPCOM_Liveblog::get_template_part(
+			'old-php-notice.php',
+			array( 'php_version' => PHP_VERSION, 'php_min_version' => self::socketio_min_php_version )
+		);
+	}
+
+	/**
 	 * Include the necessary files
 	 */
 	private static function includes() {
@@ -119,7 +178,14 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
-		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio.php' );
+
+		if ( self::is_socketio_constant_enabled() ) {
+			if ( self::is_php_too_old_for_socketio() ) {
+				self::add_old_php_for_socketio_notice();
+			} else {
+				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio.php' );
+			}
+		}
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
@@ -470,7 +536,7 @@ final class WPCOM_Liveblog {
 			self::send_server_error( $entry->get_error_message() );
 		}
 
-		if ( WPCOM_Liveblog_Socketio::is_enabled() ) {
+		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
 			WPCOM_Liveblog_Socketio::emit(
 				'new liveblog entry ' . $entry->get_post_id(),
 				json_encode( $entry->for_json() )
@@ -691,7 +757,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
-				'socketio_enabled'       => WPCOM_Liveblog_Socketio::is_enabled(),
+				'socketio_enabled'       => WPCOM_Liveblog::is_socketio_enabled(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
