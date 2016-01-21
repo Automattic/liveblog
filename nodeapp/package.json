@@ -1,5 +1,5 @@
 {
-  "name": "Liveblog Node.js App",
+  "name": "liveblog-socket.io-app",
   "version": "1.0.0",
   "description": "A simple Node.js app to start a socket.io server with Redis adapter.",
   "main": "app.js",
