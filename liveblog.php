@@ -165,6 +165,20 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Return true if viewing a liveblog post, Socket.io support is
+	 * enabled and post is public. For now we only support Socket.io
+	 * for public posts since there is no way to tell in the Socket.io
+	 * server if a client has permission or not to see a Liveblog post.
+	 *
+	 * @return bool
+	 */
+	public static function should_use_socketio() {
+		return self::is_viewing_liveblog_post()
+		       && self::is_socketio_enabled()
+		       && 'publish' === get_post_status();
+	}
+
+	/**
 	 * Include the necessary files
 	 */
 	private static function includes() {
@@ -536,7 +550,7 @@ final class WPCOM_Liveblog {
 			self::send_server_error( $entry->get_error_message() );
 		}
 
-		if ( WPCOM_Liveblog::is_socketio_enabled() ) {
+		if ( WPCOM_Liveblog::should_use_socketio() ) {
 			WPCOM_Liveblog_Socketio::emit(
 				'new liveblog entry ' . $entry->get_post_id(),
 				json_encode( $entry->for_json() )
@@ -757,7 +771,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
-				'socketio_enabled'       => WPCOM_Liveblog::is_socketio_enabled(),
+				'socketio_enabled'       => WPCOM_Liveblog::should_use_socketio(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,

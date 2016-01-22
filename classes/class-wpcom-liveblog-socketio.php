@@ -36,7 +36,7 @@ class WPCOM_Liveblog_Socketio {
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
+		if ( ! WPCOM_Liveblog::should_use_socketio() ) {
 			return;
 		}
 
