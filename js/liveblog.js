@@ -133,9 +133,12 @@ window.liveblog = window.liveblog || {};
 		liveblog.init_moment_js();
 
 		liveblog.cast_settings_numbers();
-		liveblog.reset_timer();
-		liveblog.set_initial_timestamps();
-		liveblog.start_human_time_diff_timer();
+
+		if ( ! liveblog_settings.socketio_enabled ) {
+			liveblog.reset_timer();
+			liveblog.set_initial_timestamps();
+			liveblog.start_human_time_diff_timer();
+		}
 
 		liveblog.$events.trigger( 'after-init' );
 	};
@@ -169,10 +172,6 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.reset_timer = function() {
-		if ( liveblog_settings.socketio_enabled ) {
-			return;
-		}
-
 		liveblog.kill_timer();
 		liveblog.refresh_timeout = setTimeout( liveblog.get_recent_entries, ( liveblog_settings.refresh_interval * 1000 ) );
 	};

@@ -273,8 +273,11 @@
 			this.enable();
 			this.hide_spinner();
 			this.$textarea.val('').trigger('input');
-			liveblog.reset_timer();
-			liveblog.get_recent_entries_success(response, status, xhr);
+
+			if ( ! liveblog_settings.socketio_enabled ) {
+				liveblog.reset_timer();
+				liveblog.get_recent_entries_success(response, status, xhr);
+			}
 		},
 		error: function(response, status) {
 			liveblog.add_error(response, status);
