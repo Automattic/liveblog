@@ -1,4 +1,4 @@
-var socket = new io('localhost:3000');
+var socket = new io( liveblog_socketio_settings.url );
 
 socket.on( 'liveblog entry ' + liveblog_settings.post_id, function( entry ) {
 	var entry_object = jQuery.parseJSON( entry );
