@@ -21,6 +21,16 @@ class WPCOM_Liveblog_Socketio {
 	private static $url;
 
 	/**
+	 * @var string Redis server host
+	 */
+	private static $redis_host;
+
+	/**
+	 * @var int Redis server port
+	 */
+	private static $redis_port;
+
+	/**
 	 * Load everything that is necessary to use WebSocket
 	 *
 	 * @return void
@@ -33,7 +43,7 @@ class WPCOM_Liveblog_Socketio {
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
-		self::$emitter = new SocketIO\Emitter();
+		self::$emitter = new SocketIO\Emitter( array( 'host' => self::$redis_host, 'post' => self::$redis_port ) );
 	}
 
 	/**
@@ -49,6 +59,9 @@ class WPCOM_Liveblog_Socketio {
 			$parsed_url = parse_url( site_url() );
 			self::$url = $parsed_url['scheme'] . '://' . $parsed_url['host'] . ':3000';
 		}
+
+		self::$redis_host = defined( 'LIVEBLOG_REDIS_HOST' ) ? LIVEBLOG_REDIS_HOST : 'localhost';
+		self::$redis_port = defined( 'LIVEBLOG_REDIS_PORT' ) ? LIVEBLOG_REDIS_PORT : 6379;
 	}
 
 	/**
