@@ -771,6 +771,7 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
+				'is_liveblog_editable'   => self::is_liveblog_editable(),
 				'socketio_enabled'       => WPCOM_Liveblog::should_use_socketio(),
 
 				'key'                    => self::key,
