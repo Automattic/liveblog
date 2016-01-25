@@ -1,6 +1,6 @@
 var socket = new io('localhost:3000');
 
-socket.on('new liveblog entry ' + liveblog_settings.post_id, function(entry) {
+socket.on( 'liveblog entry ' + liveblog_settings.post_id, function( entry ) {
 	var entry_object = jQuery.parseJSON( entry );
 
 	if ( ! liveblog_settings.is_liveblog_editable ) {

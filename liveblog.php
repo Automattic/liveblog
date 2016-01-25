@@ -552,7 +552,7 @@ final class WPCOM_Liveblog {
 
 		if ( WPCOM_Liveblog::should_use_socketio() ) {
 			WPCOM_Liveblog_Socketio::emit(
-				'new liveblog entry ' . $entry->get_post_id(),
+				'liveblog entry ' . $entry->get_post_id(),
 				json_encode( $entry->for_json() )
 			);
 		} else {
