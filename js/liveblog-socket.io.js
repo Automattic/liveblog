@@ -10,5 +10,5 @@ socket.on( 'liveblog entry ' + liveblog_settings.post_id, function( entry ) {
 		entry_object.html = entry_html.prop( 'outerHTML' );
 	}
 
-	liveblog.display_entry( entry_object, 5000 );
+	liveblog.maybe_display_entries( [ entry_object ], 5000 );
 });
