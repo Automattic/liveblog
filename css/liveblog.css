@@ -467,7 +467,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry .liveblog-entry-actions li {
 	list-style: none;
 }
-#liveblog-fixed-nag {
+.liveblog-fixed-bar {
 	display: none;
 	position: fixed;
 	top: 0;
@@ -485,7 +485,7 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	display: block;
 	color: white;
 }
-#liveblog-fixed-nag a .num {
+#liveblog-fixed-nag a .num, #liveblog-socketio-error {
 	font-size: 30px;
 	margin: 0 3px;
 	font-weight: bold;

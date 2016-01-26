@@ -90,6 +90,9 @@ class WPCOM_Liveblog_Socketio {
 			apply_filters( 'liveblog_socketio_settings',
 				array(
 					'url' => self::$url,
+
+					// i18n
+					'unable_to_connect' => esc_html__( 'Unable to connect to the server to get new entries', 'liveblog' ),
 				)
 			)
 		);
