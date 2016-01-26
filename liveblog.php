@@ -473,7 +473,7 @@ final class WPCOM_Liveblog {
 		if ( WPCOM_Liveblog_Socketio_Loader::should_use_socketio() ) {
 			WPCOM_Liveblog_Socketio::emit(
 				'liveblog entry ' . $entry->get_post_id(),
-				json_encode( $entry->for_json() )
+				$entry->for_json()
 			);
 		} else {
 			// Do not send latest_timestamp. If we send it the client won't get

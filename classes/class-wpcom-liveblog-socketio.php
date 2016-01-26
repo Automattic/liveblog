@@ -104,7 +104,7 @@ class WPCOM_Liveblog_Socketio {
 	 * @return void
 	 */
 	public static function emit( $name, $data ) {
-		self::$emitter->json->emit( $name, $data );
+		self::$emitter->json->emit( $name, json_encode( $data ) );
 		exit;
 	}
 }
