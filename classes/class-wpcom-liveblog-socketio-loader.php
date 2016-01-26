@@ -136,17 +136,25 @@ class WPCOM_Liveblog_Socketio_Loader {
 
 	/**
 	 * Return true if viewing a liveblog post, Socket.io support is
-	 * enabled, socket.io-php-emitter is installed and post is public.
-	 * For now we only support Socket.io for public posts since there
-	 * is no way to tell in the Socket.io server if a client has permission
-	 * or not to see a Liveblog post.
+	 * enabled, socket.io-php-emitter is installed and connected to the
+	 * Redis server and post is public. For now we only support Socket.io
+	 * for public posts since there is no way to tell in the Socket.io
+	 * server if a client has permission or not to see a Liveblog post.
 	 *
 	 * @return bool
 	 */
 	public static function should_use_socketio() {
+		$redis_client_connected = false;
+
+		// It is necessary to check if the class exists since if running PHP <= 5.2 we don't include it
+		if ( class_exists( 'WPCOM_Liveblog_Socketio' ) && WPCOM_Liveblog_Socketio::is_connected() ) {
+			$redis_client_connected = true;
+		}
+
 		return WPCOM_Liveblog::is_viewing_liveblog_post()
 		       && self::is_socketio_enabled()
 		       && self::socketio_emitter_exists()
+		       && $redis_client_connected
 		       && 'publish' === get_post_status();
 	}
 }

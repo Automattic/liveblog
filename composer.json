@@ -6,6 +6,7 @@
     "license"    : "GPL-2.0+",
     "require"    : {
         "composer/installers": "~1.0",
-        "rase/socket.io-emitter": "~0.7.0"
+        "rase/socket.io-emitter": "~0.7.0",
+        "predis/predis": "~1.0.3"
     }
 }

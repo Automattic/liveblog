@@ -31,6 +31,11 @@ class WPCOM_Liveblog_Socketio {
 	private static $redis_port;
 
 	/**
+	 * @var Predis\Client
+	 */
+	private static $redis_client;
+
+	/**
 	 * Load everything that is necessary to use WebSocket
 	 *
 	 * @return void
@@ -43,7 +48,41 @@ class WPCOM_Liveblog_Socketio {
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
-		self::$emitter = new SocketIO\Emitter( array( 'host' => self::$redis_host, 'post' => self::$redis_port ) );
+		self::$redis_client = new Predis\Client(
+			array(
+				'host'   => self::$redis_host,
+				'port'   => self::$redis_port,
+			)
+		);
+
+		try {
+			self::$redis_client->connect();
+			self::$emitter = new SocketIO\Emitter( self::$redis_client );
+		} catch ( Exception $exception ) {
+			self::add_redis_error();
+		}
+	}
+
+	/**
+	 * Add message to warn the user that it was not possible to
+	 * the Redis server.
+	 *
+	 * @return void
+	 */
+	private static function add_redis_error() {
+		add_action( 'admin_notices', array( __CLASS__, 'show_redis_error' ) );
+	}
+
+	/**
+	 * Display message to warn the user that it was not possible to
+	 * the Redis server.
+	 *
+	 * @return void
+	 */
+	public static function show_redis_error() {
+		$message = __( 'Liveblog was unable to connect to the Redis server. Please check your configuration.', 'liveblog' );
+
+		WPCOM_Liveblog_Socketio_Loader::show_error_message( $message );
 	}
 
 	/**
@@ -99,6 +138,17 @@ class WPCOM_Liveblog_Socketio {
 	}
 
 	/**
+	 * True if able to connect to the Redis server.
+	 *
+	 * @return bool
+	 */
+	public static function is_connected() {
+		return self::$redis_client->isConnected()
+		       && is_object( self::$emitter )
+		       && 'SocketIO\Emitter' === get_class( self::$emitter );
+	}
+
+	/**
 	 * Emits a message to all connected socket.io clients
 	 * via Redis.
 	 *
@@ -107,7 +157,10 @@ class WPCOM_Liveblog_Socketio {
 	 * @return void
 	 */
 	public static function emit( $name, $data ) {
-		self::$emitter->json->emit( $name, json_encode( $data ) );
+		if ( self::is_connected() ) {
+			self::$emitter->json->emit( $name, json_encode( $data ) );
+		}
+
 		exit;
 	}
 }
