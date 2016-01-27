@@ -124,7 +124,7 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function load() {
 
-		add_action( 'after_liveblog_init', array( __CLASS__, 'late_load' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'late_load' ) );
 	}
 
 	/**
