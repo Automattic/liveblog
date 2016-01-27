@@ -470,7 +470,7 @@ final class WPCOM_Liveblog {
 			self::send_server_error( $entry->get_error_message() );
 		}
 
-		if ( WPCOM_Liveblog_Socketio_Loader::should_use_socketio() ) {
+		if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) {
 			WPCOM_Liveblog_Socketio::emit(
 				'liveblog entry ' . $entry->get_post_id(),
 				$entry->for_json()
@@ -692,7 +692,7 @@ final class WPCOM_Liveblog {
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
 				'is_liveblog_editable'   => self::is_liveblog_editable(),
-				'socketio_enabled'       => WPCOM_Liveblog_Socketio_Loader::should_use_socketio(),
+				'socketio_enabled'       => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,

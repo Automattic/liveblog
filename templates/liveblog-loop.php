@@ -23,7 +23,7 @@
 		</a>
 	</div>
 
-	<?php if ( WPCOM_Liveblog_Socketio_Loader::should_use_socketio() ) : ?>
+	<?php if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) : ?>
 		<div id="liveblog-socketio-error-container" class="liveblog-fixed-bar">
 			<p id="liveblog-socketio-error"></p>
 		</div>

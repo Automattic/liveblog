@@ -57,16 +57,6 @@ class WPCOM_Liveblog_Socketio_Loader {
 	}
 
 	/**
-	 * Use socket.io instead of AJAX to update clients
-	 * when new entries are created?
-	 *
-	 * @return bool whether socket.io is enabled or not
-	 */
-	public static function is_socketio_enabled() {
-		return self::is_socketio_constant_enabled() && ! self::is_php_too_old_for_socketio();
-	}
-
-	/**
 	 * Check whether socket.io-php-emitter is installed.
 	 *
 	 * @return bool
@@ -143,7 +133,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 *
 	 * @return bool
 	 */
-	public static function should_use_socketio() {
+	public static function is_enabled() {
 		$redis_client_connected = false;
 
 		// It is necessary to check if the class exists since if running PHP <= 5.2 we don't include it
@@ -152,7 +142,8 @@ class WPCOM_Liveblog_Socketio_Loader {
 		}
 
 		return WPCOM_Liveblog::is_viewing_liveblog_post()
-		       && self::is_socketio_enabled()
+		       && self::is_socketio_constant_enabled()
+		       && ! self::is_php_too_old_for_socketio()
 		       && self::socketio_emitter_exists()
 		       && $redis_client_connected
 		       && 'publish' === get_post_status();
