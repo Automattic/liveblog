@@ -116,10 +116,10 @@ class WPCOM_Liveblog_Socketio {
 
 		$handle = 'liveblog-socket.io';
 
-		wp_enqueue_script( 'socket.io', plugins_url( '../js/socket.io.min.js', __FILE__ ), array(), '1.4.4', true );
+		wp_enqueue_script( 'socket.io', plugins_url( 'js/socket.io.min.js', dirname( __FILE__ ) ), array(), '1.4.4', true );
 		wp_enqueue_script(
 			$handle,
-			plugins_url( '../js/liveblog-socket.io.js', __FILE__ ),
+			plugins_url( 'js/liveblog-socket.io.js', dirname( __FILE__ ) ),
 			array( 'jquery', 'socket.io', WPCOM_Liveblog::key ),
 			WPCOM_Liveblog::version,
 			true
