@@ -228,6 +228,20 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Returns the ID of the Liveblog post.
+	 *
+	 * @throws Exception when called before post ID is set
+	 * @return int Liveblog post ID
+	 */
+	public static function get_post_id() {
+		if ( is_null( self::$post_id ) ) {
+			throw new Exception( __( 'No Liveblog post ID is set yet', 'liveblog' ) );
+		}
+
+		return self::$post_id;
+	}
+
+	/**
 	 * This is where a majority of the magic happens.
 	 *
 	 * Hooked to template_redirect, this method tries to add anything it can to
@@ -472,7 +486,7 @@ final class WPCOM_Liveblog {
 
 		if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) {
 			WPCOM_Liveblog_Socketio::emit(
-				'liveblog entry ' . $entry->get_post_id(),
+				'liveblog entry',
 				$entry->for_json()
 			);
 		} else {

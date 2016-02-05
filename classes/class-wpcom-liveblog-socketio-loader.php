@@ -145,7 +145,6 @@ class WPCOM_Liveblog_Socketio_Loader {
 		       && self::is_socketio_constant_enabled()
 		       && ! self::is_php_too_old_for_socketio()
 		       && self::socketio_emitter_exists()
-		       && $redis_client_connected
-		       && 'publish' === get_post_status();
+		       && $redis_client_connected;
 	}
 }

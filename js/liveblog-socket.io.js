@@ -10,11 +10,19 @@
 	 * and register callbacks for Socket.io events.
 	 */
 	liveblog.socketio.init = function() {
-		var socket = new io( liveblog_socketio_settings.url );
+		liveblog.socketio.socket = new io( liveblog_socketio_settings.url );
 
-		socket.io.on( 'connect_error', liveblog.socketio.connect_error );
-		socket.io.on( 'reconnect' , liveblog.socketio.reconnect );
-		socket.on( 'liveblog entry ' + liveblog_settings.post_id, liveblog.socketio.process_entry );
+		liveblog.socketio.socket.on( 'connect', liveblog.socketio.send_post_key );
+		liveblog.socketio.socket.io.on( 'connect_error', liveblog.socketio.connect_error );
+		liveblog.socketio.socket.io.on( 'reconnect' , liveblog.socketio.reconnect );
+		liveblog.socketio.socket.on( 'liveblog entry', liveblog.socketio.process_entry );
+	};
+
+	/**
+	 * Send the post key to the Socket.io server.
+	 */
+	liveblog.socketio.send_post_key = function() {
+		liveblog.socketio.socket.emit( 'post key', liveblog_socketio_settings.post_key );
 	};
 
 	/**
