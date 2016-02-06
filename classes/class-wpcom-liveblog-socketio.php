@@ -147,7 +147,9 @@ class WPCOM_Liveblog_Socketio {
 	public static function get_post_key() {
 		$post_id = WPCOM_Liveblog::get_post_id();
 
-		return wp_hash( $post_id . get_post_status( $post_id ), 'liveblog-socket' );
+		$post_key = wp_hash( $post_id . get_post_status( $post_id ), 'liveblog-socket' );
+
+		return apply_filters( 'liveblog_socketio_post_key', $post_key, $post_id );
 	}
 
 	/**
