@@ -139,13 +139,18 @@ class WPCOM_Liveblog_Socketio {
 	}
 
 	/**
-	 * Return a unique key for the current post. The key
+	 * Return a unique key for a post. If no post ID is
+	 * provided, the current post is used. The key
 	 * is generated using the post ID and its status.
+	 *
+	 * @param int|null $post_id
 	 *
 	 * @return string
 	 */
-	public static function get_post_key() {
-		$post_id = WPCOM_Liveblog::get_post_id();
+	public static function get_post_key( $post_id = null ) {
+		if ( is_null( $post_id ) ) {
+			$post_id = WPCOM_Liveblog::get_post_id();
+		}
 
 		$post_key = wp_hash( $post_id . get_post_status( $post_id ), 'liveblog-socket' );
 
