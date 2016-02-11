@@ -356,6 +356,12 @@ node nodeapp/app.js --help
 
 To test that everything is working, after following the steps above, open a Liveblog post in two different browser windows and check that whenever a user changes the list of entries in one window, the list in the other window is refreshed in "real-time". It is also possible to use the browser developer tools to verify that there are no AJAX requests being sent every few seconds to check for changes in the list of entries. Instead the browser is receiving changes using a single WebSocket connection whenever they occur.
 
+#### Important note about private Liveblog posts
+
+When using Liveblog with WebSocket, the plugin will create a unique key for each Liveblog post (based on the post ID and its status). This key is shared with the users with permission to see the corresponding post when the page is loaded. The key is then send by the user's browser to the Socket.io server when a connection is established. Whenever there is a new Liveblog entry (or a Liveblog entry is updated or deleted), the Socket.io server will send a message only to the clients that provided the right key. This system is enough to prevent someone without permission to see the post from receiving Liveblog entries emitted by the Socket.io server but it has an important limitation. Once a user with permission receives the post key, if he saves it somewhere, he will be able to receive messages from the Socket.io server for that particular post even if for some reason he loses access to the post (for example if the user is removed from WordPress).
+
+If you are using private Liveblog posts to share sensitive data and it is important that, once a user loses access to the post, he is not able to receive messages emitted by the Socket.io server anymore, consider using the 'liveblog_socketio_post_key' filter to implement your own criteria to generate the post key. For example, you could generate a random post key for each post that is saved as a post meta and that can be manually invalidated by an editor whenever necessary.
+
 #### Tips for debugging
 
 If for some reason the plugin is not able to use WebSockets to refresh the list of entries, below is a list of tips that might help you debug where is the problem:

@@ -149,6 +149,13 @@ class WPCOM_Liveblog_Socketio {
 
 		$post_key = wp_hash( $post_id . get_post_status( $post_id ), 'liveblog-socket' );
 
+		/**
+		 * Filter the post key. Can be used to change the
+		 * criteria employed to generate the post key.
+		 *
+		 * @param string $post_key generated post key
+		 * @param int $post_id
+		 */
 		return apply_filters( 'liveblog_socketio_post_key', $post_key, $post_id );
 	}
 
