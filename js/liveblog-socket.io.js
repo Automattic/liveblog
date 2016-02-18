@@ -48,7 +48,7 @@
 	};
 
 	/**
-	 * Receive a message from the Socket.io server with an new,
+	 * Receive a message from the Socket.io server with a new,
 	 * updated or deleted entry and call the method that will
 	 * decide whether to display it, add it to queue or remove it.
 	 *

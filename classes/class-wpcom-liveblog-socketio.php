@@ -65,7 +65,7 @@ class WPCOM_Liveblog_Socketio {
 
 	/**
 	 * Add message to warn the user that it was not possible to
-	 * the Redis server.
+	 * connect to the Redis server.
 	 *
 	 * @return void
 	 */
@@ -75,7 +75,7 @@ class WPCOM_Liveblog_Socketio {
 
 	/**
 	 * Display message to warn the user that it was not possible to
-	 * the Redis server.
+	 * connect to the Redis server.
 	 *
 	 * @return void
 	 */
