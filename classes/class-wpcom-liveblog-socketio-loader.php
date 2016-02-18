@@ -126,10 +126,8 @@ class WPCOM_Liveblog_Socketio_Loader {
 
 	/**
 	 * Return true if viewing a liveblog post, Socket.io support is
-	 * enabled, socket.io-php-emitter is installed and connected to the
-	 * Redis server and post is public. For now we only support Socket.io
-	 * for public posts since there is no way to tell in the Socket.io
-	 * server if a client has permission or not to see a Liveblog post.
+	 * enabled and socket.io-php-emitter is installed and connected to the
+	 * Redis server.
 	 *
 	 * @return bool
 	 */
