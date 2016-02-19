@@ -80,6 +80,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
+		WPCOM_Liveblog_Rest_Api::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -118,6 +119,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
