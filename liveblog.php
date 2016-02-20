@@ -42,6 +42,7 @@ final class WPCOM_Liveblog {
 	const url_endpoint            = 'liveblog';
 	const edit_cap                = 'publish_posts';
 	const nonce_key               = 'liveblog_nonce';
+	const nonce_key_rest_api      = 'wp_rest';
 
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
@@ -526,9 +527,7 @@ final class WPCOM_Liveblog {
 		$args['content'] = isset( $_POST['content'] ) ? $_POST['content'] : '';
 		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 
-		$args['user'] = wp_get_current_user();
-
-		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+		$entry = self::do_crud_entry($crud_action, $args);
 
 		if ( is_wp_error( $entry ) ) {
 			self::send_server_error( $entry->get_error_message() );
@@ -541,6 +540,31 @@ final class WPCOM_Liveblog {
 			'entries'           => array( $entry->for_json() ),
 			'latest_timestamp'  => null
 		) );
+	}
+
+	public static function rest_api_crud_entry( WP_REST_Request $request ) {
+		// All sanitization, validation and permission checks are done
+		// with callbacks when registering the endpoint in WPCOM_Liveblog_Rest_Api
+
+		// Get the required parameters from the request
+		$crud_action = $request->get_param( 'crud_action' );
+		$args = array(
+			'post_id'  => $request->get_param( 'post_id' ),
+			'content'  => $request->get_param( 'content' ),
+			'entry_id' => $request->get_param( 'entry_id' ),
+		);
+
+		// Attempt to perform the requested action
+		$entry = self::do_crud_entry( $crud_action, $args );
+
+		return $entry;
+	}
+
+	public static function do_crud_entry( $crud_action, $args ) {
+
+		$args['user'] = wp_get_current_user();
+		return call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+		
 	}
 
 	/**
@@ -755,6 +779,8 @@ final class WPCOM_Liveblog {
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_key ),
+				'nonce_key_rest_api'     => self::nonce_key_rest_api,
+				'nonce_rest_api'         => wp_create_nonce( self::nonce_key_rest_api ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
 				'refresh_interval'       => WP_DEBUG? self::debug_refresh_interval : self::refresh_interval,
@@ -841,13 +867,19 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		$post_permalink = get_permalink( self::$post_id );
-		if ( false !== strpos( $post_permalink, '?p=' ) )
-			$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
-		else
-			$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
-		$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
-		return $url;
+		if (self::can_use_rest_api()) {
+			// TODO: Create a common endpoint?
+			return WPCOM_Liveblog_Rest_Api::$endpoint_get_entries_by_date . '/' . self::$post_id . '/';
+			// return WPCOM_Liveblog_Rest_Api::$endpoint_crud;
+		} else {
+			$post_permalink = get_permalink( self::$post_id );
+			if ( false !== strpos( $post_permalink, '?p=' ) )
+				$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
+			else
+				$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
+			$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
+			return $url;
+		}
 	}
 
 	/** Display Methods *******************************************************/
