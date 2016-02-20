@@ -34,13 +34,14 @@ final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
 
-	const version          = '1.4';
-	const rewrites_version = 1;
-	const min_wp_version   = '3.5';
-	const key              = 'liveblog';
-	const url_endpoint     = 'liveblog';
-	const edit_cap         = 'publish_posts';
-	const nonce_key        = 'liveblog_nonce';
+	const version                 = '1.4';
+	const rewrites_version        = 1;
+	const min_wp_version          = '3.5';
+	const min_wp_rest_api_version = '4.4';
+	const key                     = 'liveblog';
+	const url_endpoint            = 'liveblog';
+	const edit_cap                = 'publish_posts';
+	const nonce_key               = 'liveblog_nonce';
 
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
@@ -56,6 +57,7 @@ final class WPCOM_Liveblog {
 	private static $entry_query           = null;
 	private static $do_not_cache_response = false;
 	private static $custom_template_path  = null;
+	private static $is_rest_api_call      = false;
 
 	/** Load Methods **********************************************************/
 
@@ -80,7 +82,10 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
-		WPCOM_Liveblog_Rest_Api::load();
+
+		if (self::can_use_rest_api()) {
+			WPCOM_Liveblog_Rest_Api::load();
+		}
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -119,7 +124,9 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
-		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
+		if (self::can_use_rest_api()) {
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
+		}
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
@@ -298,12 +305,9 @@ final class WPCOM_Liveblog {
 
 	/**
 	 * Look for any new Liveblog entries, and return them via JSON
+	 * Legacy endpoint for pre 4.4 installs
 	 */
 	public static function ajax_entries_between() {
-
-		// Set some defaults
-		$latest_timestamp  = 0;
-		$entries_for_json  = array();
 
 		// Look for entry boundaries
 		list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
@@ -313,13 +317,10 @@ final class WPCOM_Liveblog {
 			self::send_user_error( __( 'A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/', 'liveblog' ) );
 		}
 
-		// Do not cache if it's too soon
-		if ( $end_timestamp > time() )
-			self::$do_not_cache_response = true;
-
 		// Get liveblog entries within the start and end boundaries
-		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
-		if ( empty( $entries ) ) {
+		$result_for_json = self::get_entries_by_time( $start_timestamp, $end_timestamp );
+
+		if ( empty( $result_for_json ) ) {
 			do_action( 'liveblog_entry_request_empty' );
 
 			self::json_return( array(
@@ -328,24 +329,83 @@ final class WPCOM_Liveblog {
 			) );
 		}
 
-		/**
-		 * Loop through each liveblog entry, set the most recent timestamp, and
-		 * put the JSON data for each entry into a neat little array.
-		 */
-		foreach( $entries as $entry ) {
-			$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
-			$entries_for_json[] = $entry->for_json();
-		}
-
-		// Setup our data to return via JSON
-		$result_for_json = array(
-			'entries'           => $entries_for_json,
-			'latest_timestamp'  => $latest_timestamp,
-		);
-
 		do_action( 'liveblog_entry_request', $result_for_json );
 
 		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Look for any new Liveblog entries, and return them via JSON
+	 * Uses the new REST API framework added in 4.4
+	 * This is the callback for an API endpoint registered in WPCOM_Liveblog_Rest_Api
+	 *
+	 * @param WP_REST_Request $request  A REST request object
+	 *
+	 * @return An array of live blog entries
+	 */
+	public static function rest_api_entries_between( WP_REST_Request $request ) {
+
+		self::$is_rest_api_call = true;
+
+		// Get required parameters from the request
+		$post_id = $request->get_param('post_id');
+		$start_timestamp = $request->get_param('start_time');
+		$end_timestamp = $request->get_param('end_time');
+
+		self::$post_id = $post_id;
+
+		// Get liveblog entries within the start and end boundaries
+		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
+
+		return $entries;
+	}
+
+	/**
+	 * Get live blog entries between a start and end time for a post
+	 *
+	 * @param int $start_timestamp  The start time boundary
+	 * @param int $end_timestamp  	The end time boundary
+	 *
+	 * @return An array of live blog entries, possibly empty.
+	 */
+	public static function get_entries_by_time( $start_timestamp, $end_timestamp ) {
+
+		// Set some defaults
+		$latest_timestamp  = 0;
+		$entries_for_json  = array();
+		$result            = array();
+
+		// Do not cache if it's too soon
+		if ( $end_timestamp > time() ) {
+			self::$do_not_cache_response = true;
+		}
+
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
+		}
+
+		// Get liveblog entries within the start and end boundaries
+		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
+
+		if ( ! empty( $entries ) ) {
+			/**
+			 * Loop through each liveblog entry, set the most recent timestamp, and
+			 * put the JSON data for each entry into a neat little array.
+			 */
+			foreach( $entries as $entry ) {
+				$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
+				$entries_for_json[] = $entry->for_json();
+			}
+
+			// Create the result array
+			$result = array(
+				'entries'           => $entries_for_json,
+				'latest_timestamp'  => $latest_timestamp,
+			);
+		}
+
+		return $result;
+
 	}
 
 	/**
@@ -375,15 +435,19 @@ final class WPCOM_Liveblog {
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
-		if ( ! is_single() && ! is_admin() ) {
+		if ( ! is_single() && ! is_admin() && ! self::$is_rest_api_call) {
 			return false;
 		}
 		if ( empty( $post_id ) ) {
-			global $post;
-			if ( ! $post ){
-				return false;
+			if ( ! empty( self::$post_id ) ) {
+				$post_id = self::$post_id;
+			} else {
+				global $post;
+				if ( ! $post ){
+					return false;
+				}
+				$post_id = $post->ID;
 			}
-			$post_id = $post->ID;
 		}
 		$state = get_post_meta( $post_id, self::key, true );
 		// backwards compatibility with older values
@@ -1220,6 +1284,16 @@ final class WPCOM_Liveblog {
 			return false;
 		}
 		return version_compare( $wp_version, self::min_wp_version, '<' );
+	}
+
+	/**
+	 * Checks to see if the current WordPress version has REST API support
+	 *
+	 * @return bool true if supported, false otherwise
+	 */
+	private static function can_use_rest_api() {
+		global $wp_version;
+		return version_compare( $wp_version, self::min_wp_rest_api_version, '>=' );
 	}
 }
 WPCOM_Liveblog::load();
