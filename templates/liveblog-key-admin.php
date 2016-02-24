@@ -12,7 +12,7 @@
 			<option <?php if ( $format == $current_key_format ): ?> selected="selected" <?php endif; ?> value="<?php echo esc_attr( $format ) ?>"><?php echo esc_html( ucwords( str_replace( '-', ' ', $format ) ) ); ?></option>
 		<?php endforeach; ?>
 	</select>
-	<label for"liveblog-key-limit"><?php echo esc_html( $key_limit ); ?></label>
+	<label for="liveblog-key-limit"><?php echo esc_html( $key_limit ); ?></label>
 	<input id="liveblog-key-limit" type="text" name="liveblog-key-limit" value="<?php echo esc_attr( $current_key_limit ); ?>" />
 	<button type="button" class="button button-primary liveblog-key-template-save" value="liveblog-key-template-save"><?php echo esc_html( $key_button ); ?></button>
 </p>
