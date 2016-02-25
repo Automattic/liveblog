@@ -52,7 +52,7 @@ class WPCOM_Liveblog_Rest_Api {
 		register_rest_route( self::$api_namespace, '/' . '/entries_between/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)',
 			array(
 		        'methods' => WP_REST_Server::READABLE,
-		        'callback' => array( 'WPCOM_Liveblog', 'rest_api_entries_between' ),
+		        'callback' => array( __CLASS__, 'get_entries' ),
 		        'args' => array(
 		        	'post_id' => array(
 		            	'required' => true,
@@ -115,6 +115,31 @@ class WPCOM_Liveblog_Rest_Api {
 	    );
 
 
+	}
+
+	/**
+	 * Look for any new Liveblog entries, and return them via JSON
+	 * Uses the new REST API framework added in 4.4
+	 *
+	 * @param WP_REST_Request $request  A REST request object
+	 *
+	 * @return An array of live blog entries
+	 */
+	public static function get_entries( WP_REST_Request $request ) {
+
+		WPCOM_Liveblog::$is_rest_api_call = true;
+
+		// Get required parameters from the request
+		$post_id = $request->get_param('post_id');
+		$start_timestamp = $request->get_param('start_time');
+		$end_timestamp = $request->get_param('end_time');
+
+		WPCOM_Liveblog::$post_id = $post_id;
+
+		// Get liveblog entries within the start and end boundaries
+		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
+
+		return $entries;
 	}
 
 }

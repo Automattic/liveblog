@@ -54,11 +54,11 @@ final class WPCOM_Liveblog {
 
 	/** Variables *************************************************************/
 
-	private static $post_id               = null;
+	public static $post_id               = null;
 	private static $entry_query           = null;
 	private static $do_not_cache_response = false;
 	private static $custom_template_path  = null;
-	private static $is_rest_api_call      = false;
+	public static $is_rest_api_call       = false;
 
 	/** Load Methods **********************************************************/
 
@@ -333,32 +333,6 @@ final class WPCOM_Liveblog {
 		do_action( 'liveblog_entry_request', $result_for_json );
 
 		self::json_return( $result_for_json );
-	}
-
-	/**
-	 * Look for any new Liveblog entries, and return them via JSON
-	 * Uses the new REST API framework added in 4.4
-	 * This is the callback for an API endpoint registered in WPCOM_Liveblog_Rest_Api
-	 *
-	 * @param WP_REST_Request $request  A REST request object
-	 *
-	 * @return An array of live blog entries
-	 */
-	public static function rest_api_entries_between( WP_REST_Request $request ) {
-
-		self::$is_rest_api_call = true;
-
-		// Get required parameters from the request
-		$post_id = $request->get_param('post_id');
-		$start_timestamp = $request->get_param('start_time');
-		$end_timestamp = $request->get_param('end_time');
-
-		self::$post_id = $post_id;
-
-		// Get liveblog entries within the start and end boundaries
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
-
-		return $entries;
 	}
 
 	/**
