@@ -516,24 +516,6 @@ final class WPCOM_Liveblog {
 		) );
 	}
 
-	public static function rest_api_crud_entry( WP_REST_Request $request ) {
-		// All sanitization, validation and permission checks are done
-		// with callbacks when registering the endpoint in WPCOM_Liveblog_Rest_Api
-
-		// Get the required parameters from the request
-		$crud_action = $request->get_param( 'crud_action' );
-		$args = array(
-			'post_id'  => $request->get_param( 'post_id' ),
-			'content'  => $request->get_param( 'content' ),
-			'entry_id' => $request->get_param( 'entry_id' ),
-		);
-
-		// Attempt to perform the requested action
-		$entry = self::do_crud_entry( $crud_action, $args );
-
-		return $entry;
-	}
-
 	public static function do_crud_entry( $crud_action, $args ) {
 
 		$args['user'] = wp_get_current_user();
