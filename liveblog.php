@@ -842,9 +842,7 @@ final class WPCOM_Liveblog {
 	 */
 	private static function get_entries_endpoint_url() {
 		if (self::can_use_rest_api()) {
-			// TODO: Create a common endpoint?
-			return WPCOM_Liveblog_Rest_Api::$endpoint_get_entries_by_date . '/' . self::$post_id . '/';
-			// return WPCOM_Liveblog_Rest_Api::$endpoint_crud;
+			return trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::$endpoint_base ) . self::$post_id );
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
 			if ( false !== strpos( $post_permalink, '?p=' ) )

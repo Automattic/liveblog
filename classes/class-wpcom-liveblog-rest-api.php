@@ -39,8 +39,8 @@ class WPCOM_Liveblog_Rest_Api {
 	private static function init_endpoints() {
 
 		self::$endpoint_base = '/wp-json/' . self::$api_namespace . '/';
-		self::$endpoint_get_entries_by_date = self::$endpoint_base . 'entries_between';
-		self::$endpoint_crud = self::$endpoint_base;
+		// self::$endpoint_get_entries_by_date = self::$endpoint_base . 'entries_between';
+		// self::$endpoint_crud = self::$endpoint_base;
 
 	}
 
@@ -49,7 +49,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function register_routes() {
 
-		register_rest_route( self::$api_namespace, '/' . '/entries_between/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)',
 			array(
 		        'methods' => WP_REST_Server::READABLE,
 		        'callback' => array( __CLASS__, 'get_entries' ),
@@ -76,7 +76,7 @@ class WPCOM_Liveblog_Rest_Api {
 	    	)
 	    );
 
-		register_rest_route( self::$api_namespace, '/' . '/crud',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/crud',
 	    	array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( 'WPCOM_Liveblog', 'rest_api_crud_entry' ),
