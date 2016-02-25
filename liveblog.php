@@ -51,7 +51,7 @@ final class WPCOM_Liveblog {
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
-	const use_rest_api            = false; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
+	const use_rest_api            = true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
@@ -508,19 +508,24 @@ final class WPCOM_Liveblog {
 			self::send_server_error( $entry->get_error_message() );
 		}
 
-		// Do not send latest_timestamp. If we send it the client won't get
-		// older entries. Since we send only the new one, we don't know if there
-		// weren't any entries in between.
-		self::json_return( array(
-			'entries'           => array( $entry->for_json() ),
-			'latest_timestamp'  => null
-		) );
+		self::json_return( $entry );
 	}
 
 	public static function do_crud_entry( $crud_action, $args ) {
 
 		$args['user'] = wp_get_current_user();
-		return call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+		if ( ! is_wp_error( $entry ) ) {
+			// Do not send latest_timestamp. If we send it the client won't get
+			// older entries. Since we send only the new one, we don't know if there
+			// weren't any entries in between.
+			$entry = array(
+				'entries'           => array( $entry->for_json() ),
+				'latest_timestamp'  => null
+			);
+		}
+
+		return $entry;
 		
 	}
 
