@@ -41,8 +41,8 @@ final class WPCOM_Liveblog {
 	const key                     = 'liveblog';
 	const url_endpoint            = 'liveblog';
 	const edit_cap                = 'publish_posts';
-	const nonce_key               = 'liveblog_nonce';
-	const nonce_key_rest_api      = 'wp_rest';
+	const nonce_key               = '_wpnonce'; // Using these strings since they're hard coded in the rest api. It'll still work fine for < 4.4
+	const nonce_action            = 'wp_rest';
 
 	const refresh_interval        = 10;   // how often should we refresh
 	const debug_refresh_interval  = 2;   // how often we refresh in development mode
@@ -51,6 +51,7 @@ final class WPCOM_Liveblog {
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
+	const use_rest_api            = false; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
@@ -58,7 +59,7 @@ final class WPCOM_Liveblog {
 	private static $entry_query           = null;
 	private static $do_not_cache_response = false;
 	private static $custom_template_path  = null;
-	public static $is_rest_api_call       = false;
+	public static $is_rest_api_call       = false; // TODO: See about using get_query_var( 'rest_route' ) instead. It's set in rest-api.php
 
 	/** Load Methods **********************************************************/
 
@@ -670,7 +671,7 @@ final class WPCOM_Liveblog {
 			wp_enqueue_script( 'liveblog-admin', plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
 			wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
 				'nonce_key'                    => self::nonce_key,
-				'nonce'                        => wp_create_nonce( self::nonce_key ),
+				'nonce'                        => wp_create_nonce( self::nonce_action ),
 				'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 			) );
@@ -734,9 +735,7 @@ final class WPCOM_Liveblog {
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
-				'nonce'                  => wp_create_nonce( self::nonce_key ),
-				'nonce_key_rest_api'     => self::nonce_key_rest_api,
-				'nonce_rest_api'         => wp_create_nonce( self::nonce_key_rest_api ),
+				'nonce'                  => wp_create_nonce( self::nonce_action ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
 				'refresh_interval'       => WP_DEBUG? self::debug_refresh_interval : self::refresh_interval,
@@ -823,7 +822,7 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		if (self::can_use_rest_api()) {
+		if (self::use_rest_api && self::can_use_rest_api()) {
 			return trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::$endpoint_base ) . self::$post_id );
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
@@ -1126,7 +1125,7 @@ final class WPCOM_Liveblog {
 	 *
 	 * @param string $action
 	 */
-	public static function ajax_check_nonce( $action = self::nonce_key ) {
+	public static function ajax_check_nonce( $action = self::nonce_action ) {
 		if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( $_REQUEST[ self::nonce_key ], $action ) ) {
 			self::send_forbidden_error( __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
 		}
