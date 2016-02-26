@@ -1,7 +1,6 @@
 /* =Container
 -------------------------------------------------------------- */
 #liveblog-container {
-	font-family: sans-serif;
 	margin: 10px 0;
 	width: 100%;
 	display: block;
@@ -313,7 +312,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	padding: 0;
 }
 #liveblog-container .button-secondary {
-	font-size: 12px;
 	line-height: 23px;
 	height: 24px;
 	margin: 0 10px 0 0;
@@ -383,7 +381,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 /* =Feedback and Nags
 -------------------------------------------------------------- */
 .liveblog-message {
-	font-size: 13px;
 	font-weight: 400;
 	text-align: center;
 	margin-bottom: 5px;
@@ -437,10 +434,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry .liveblog-entry-text {
 	margin: 10px 0 0 40px;
 }
-.liveblog-entry .liveblog-meta .liveblog-author-name {
-	font-size: 15px;
-	line-height: 18px;
-}
 .liveblog-entry .liveblog-meta .liveblog-author-avatar {
 	float: left;
 	margin: 0 10px 0 0;
@@ -452,8 +445,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 .liveblog-entry .liveblog-meta .liveblog-meta-time {
 	float: right;
 	margin-left: 10px;
-	font-size: 10px;
-	line-height: 12px;
 }
 .liveblog-meta-time a {
 	color: #888;
@@ -486,7 +477,6 @@ a.liveblog-form-entry::-webkit-input-placeholder {
 	color: white;
 }
 #liveblog-fixed-nag a .num {
-	font-size: 30px;
 	margin: 0 3px;
 	font-weight: bold;
 	display: inline-block;
