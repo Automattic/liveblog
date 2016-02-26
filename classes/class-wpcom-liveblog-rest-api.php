@@ -127,14 +127,12 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function get_entries( WP_REST_Request $request ) {
 
-		WPCOM_Liveblog::$is_rest_api_call = true;
-
 		// Get required parameters from the request
 		$post_id = $request->get_param('post_id');
 		$start_timestamp = $request->get_param('start_time');
 		$end_timestamp = $request->get_param('end_time');
 
-		WPCOM_Liveblog::$post_id = $post_id;
+		self::set_liveblog_vars($post_id);
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
@@ -161,10 +159,20 @@ class WPCOM_Liveblog_Rest_Api {
 			'entry_id' => $request->get_param( 'entry_id' ),
 		);
 
+		self::set_liveblog_vars($args['post_id']);
+
 		// Attempt to perform the requested action
 		$entry = WPCOM_Liveblog::do_crud_entry( $crud_action, $args );
 
 		return $entry;
+	}
+
+	/**
+	 * Set a few static variables in the WPCOM_Liveblog class needed for callbacks to work
+	 */
+	private static function set_liveblog_vars($post_id) {
+		WPCOM_Liveblog::$is_rest_api_call = true;
+		WPCOM_Liveblog::$post_id = $post_id;
 	}
 
 }
