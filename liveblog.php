@@ -78,6 +78,7 @@ final class WPCOM_Liveblog {
 		self::register_embed_handlers();
 
 		WPCOM_Liveblog_Entry_Key_Events::load();
+		WPCOM_Liveblog_Entry_Key_Events_Widget::load();
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
 	}
@@ -111,6 +112,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events-widget.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
