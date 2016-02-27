@@ -46,6 +46,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 	/**
 	 * Register all of our endpoints
+	 * Any validation, sanitization, and permission checks can be done here using callbacks
 	 */
 	public static function register_routes() {
 
@@ -81,8 +82,8 @@ class WPCOM_Liveblog_Rest_Api {
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'crud_entry' ),
 				'permission_callback' => function() {
-					// TODO: Restrict with current_user_can_edit_liveblog()
-					return true;
+					// Check if the current user can edit the liveblog
+					return WPCOM_Liveblog::current_user_can_edit_liveblog();
 				},
 		        'args' => array(
 		        	'crud_action' => array(
@@ -148,8 +149,6 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return 
 	 */
 	public static function crud_entry( WP_REST_Request $request ) {
-		// All sanitization, validation and permission checks are done
-		// with callbacks when registering the endpoint above
 
 		// Get the required parameters from the request
 		$crud_action = $request->get_param( 'crud_action' );
