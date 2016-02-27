@@ -51,7 +51,7 @@ final class WPCOM_Liveblog {
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
-	const use_rest_api            = true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
+	const use_rest_api            = false; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
@@ -345,6 +345,7 @@ final class WPCOM_Liveblog {
 	 * @return An array of live blog entries, possibly empty.
 	 */
 	public static function get_entries_by_time( $start_timestamp, $end_timestamp ) {
+		// TODO: Refactor this method and the above to be closer to the style of get_lazyload_entries method
 
 		// Set some defaults
 		$latest_timestamp  = 0;
@@ -601,39 +602,56 @@ final class WPCOM_Liveblog {
 		$fragments = explode( '/', get_query_var( self::url_endpoint ) );
 
 		// Get all Liveblog entries that are to be lazyloaded.
-		$entries = self::$entry_query->get_for_lazyloading(
+		$result_for_json = self::get_lazyload_entries(
 			isset( $fragments[1] ) ? (int) $fragments[1] : 0,
 			isset( $fragments[2] ) ? (int) $fragments[2] : 0
 		);
-		if ( ! $entries ) {
-			do_action( 'liveblog_entry_request_empty' );
 
-			self::json_return( array(
-				'entries' => array(),
-				'index'   => (int) filter_input( INPUT_GET, 'index' ),
-			) );
+		// TODO: Should this be conditional? It matches the old functionality.
+		if ( ! empty( $result_for_json['entries'] ) ) {
+			self::$do_not_cache_response = true;
 		}
 
-		$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Get all Liveblog entries that are to be lazyloaded.
+	 *
+	 * @param int $max_timestamp Maximum timestamp for the Liveblog entries.
+	 * @param int $min_timestamp Minimum timestamp for the Liveblog entries.
+	 *
+	 * @return array An array of json encoded results
+	 */
+	public static function get_lazyload_entries( $max_timestamp, $min_timestamp ) {
+
+		// Get all Liveblog entries that are to be lazyloaded.
+		$entries = self::$entry_query->get_for_lazyloading( $max_timestamp, $min_timestamp );
 
 		$entries_for_json = array();
 
-		// Set up an array containing the JSON data for all Liveblog entries.
-		foreach ( $entries as $entry ) {
-			$entries_for_json[] = $entry->for_json();
-		}
+		if ( ! empty( $entries ) ) {
+			$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
 
-		// Set up the data to be returned via JSON.
-		$result_for_json = array(
+			// Populate an array containing the JSON data for all Liveblog entries.
+			foreach ( $entries as $entry ) {
+				$entries_for_json[] = $entry->for_json();
+			}
+		} 
+
+		$result = array(
 			'entries' => $entries_for_json,
 			'index'   => (int) filter_input( INPUT_GET, 'index' ),
 		);
 
-		do_action( 'liveblog_entry_request', $result_for_json );
+		if ( ! empty( $entries_for_json ) ) {
+			do_action( 'liveblog_entry_request', $result );
+		} else {
+			do_action( 'liveblog_entry_request_empty' );
+		}
 
-		self::$do_not_cache_response = true;
+		return $result;
 
-		self::json_return( $result_for_json );
 	}
 
 	public static function ajax_preview_entry() {
