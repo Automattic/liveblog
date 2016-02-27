@@ -2,8 +2,8 @@
 
 class Test_REST_API extends WP_UnitTestCase {
 
-	const HTTP_AUTH_USER = 'travis';
-	const HTTP_AUTH_PASS = 'pa$$w0rdd';
+	const HTTP_AUTH_USER = '';
+	const HTTP_AUTH_PASS = '';
 
 	/**
 	 * These are integration tests.
