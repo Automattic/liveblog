@@ -833,10 +833,11 @@ final class WPCOM_Liveblog {
 			return $url;
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
-			if ( false !== strpos( $post_permalink, '?p=' ) )
+			if ( false !== strpos( $post_permalink, '?p=' ) ) {
 				$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
-			else
+			} else {
 				$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
+			}
 			$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
 			return $url;
 		}
