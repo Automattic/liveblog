@@ -51,7 +51,7 @@ final class WPCOM_Liveblog {
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
-	const use_rest_api            = false; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
+	const use_rest_api            = true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
@@ -625,6 +625,10 @@ final class WPCOM_Liveblog {
 	 */
 	public static function get_lazyload_entries( $max_timestamp, $min_timestamp ) {
 
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
+		}
+		
 		// Get all Liveblog entries that are to be lazyloaded.
 		$entries = self::$entry_query->get_for_lazyloading( $max_timestamp, $min_timestamp );
 
