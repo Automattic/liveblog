@@ -12,7 +12,6 @@ class WPCOM_Liveblog_Rest_Api {
 	// TODO: Following REST conventions with method names such as register_routes, get_items, get_item, create_item, update_item and delete_item
 	// -- This might be helpful if further integration is needed when the full REST API is available in core
  	// -- See: http://v2.wp-api.org/extending/adding/
-	// TODO: use permission_callback for any restricted endpoints
 
 	private static $api_version;
 	private static $api_namespace;
@@ -39,8 +38,6 @@ class WPCOM_Liveblog_Rest_Api {
 	private static function init_endpoints() {
 
 		self::$endpoint_base = '/wp-json/' . self::$api_namespace . '/';
-		// self::$endpoint_get_entries_by_date = self::$endpoint_base . 'entries_between';
-		// self::$endpoint_crud = self::$endpoint_base;
 
 	}
 
