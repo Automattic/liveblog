@@ -828,7 +828,9 @@ final class WPCOM_Liveblog {
 	 */
 	private static function get_entries_endpoint_url() {
 		if (self::use_rest_api && self::can_use_rest_api()) {
-			return trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::$endpoint_base ) . self::$post_id );
+			$url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::$endpoint_base ) . self::$post_id );
+			$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
+			return $url;
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
 			if ( false !== strpos( $post_permalink, '?p=' ) )
