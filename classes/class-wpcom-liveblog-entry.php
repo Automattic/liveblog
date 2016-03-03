@@ -15,6 +15,7 @@ class WPCOM_Liveblog_Entry {
 
 	private $comment;
 	private $type = 'new';
+	private static $allowed_tags_for_entry;
 
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
@@ -25,6 +26,31 @@ class WPCOM_Liveblog_Entry {
 		if ( $this->replaces && !$this->get_content() ) {
 			$this->type = 'delete';
 		}
+	}
+
+	public static function generate_allowed_tags_for_entry() {
+		/**
+		 * Use html tags allowed for post as a base.
+		 */
+		self::$allowed_tags_for_entry = wp_kses_allowed_html( 'post' );
+		/**
+		 * Expand with additional tags that we want to allow.
+		*/
+		$additional_tags = array();
+		$additional_tags['iframe'] = array(
+			'src'             => array(),
+			'height'          => array(),
+			'width'           => array(),
+			'frameborder'     => array(),
+			'allowfullscreen' => array(),
+		);
+		$additional_tags['source'] = array(
+			'src'           => array(),
+			'type'          => array(),
+		);
+
+		self::$allowed_tags_for_entry = array_merge( $additional_tags,
+			self::$allowed_tags_for_entry);
 	}
 
 	public static function from_comment( $comment ) {
@@ -86,6 +112,7 @@ class WPCOM_Liveblog_Entry {
 			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
 			'timestamp'             => $this->get_timestamp(),
 			'is_liveblog_editable'  => WPCOM_Liveblog::is_liveblog_editable(),
+			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
 		);
 
 		return $entry;
@@ -116,9 +143,7 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
-		$content = apply_filters( 'comment_text', $content, $comment );
-
-		return $content;
+		return apply_filters( 'comment_text', $content, $comment );
 	}
 
 	/**
@@ -257,3 +282,5 @@ class WPCOM_Liveblog_Entry {
 		return $user_object;
 	}
 }
+
+WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();
