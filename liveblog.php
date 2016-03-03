@@ -322,17 +322,6 @@ final class WPCOM_Liveblog {
 		// Get liveblog entries within the start and end boundaries
 		$result_for_json = self::get_entries_by_time( $start_timestamp, $end_timestamp );
 
-		if ( empty( $result_for_json ) ) {
-			do_action( 'liveblog_entry_request_empty' );
-
-			self::json_return( array(
-				'entries'           => array(),
-				'latest_timestamp'  => null
-			) );
-		}
-
-		do_action( 'liveblog_entry_request', $result_for_json );
-
 		self::json_return( $result_for_json );
 	}
 
@@ -345,12 +334,10 @@ final class WPCOM_Liveblog {
 	 * @return An array of live blog entries, possibly empty.
 	 */
 	public static function get_entries_by_time( $start_timestamp, $end_timestamp ) {
-		// TODO: Refactor this method and the above to be closer to the style of get_lazyload_entries method
 
 		// Set some defaults
-		$latest_timestamp  = 0;
+		$latest_timestamp  = null;
 		$entries_for_json  = array();
-		$result            = array();
 
 		// Do not cache if it's too soon
 		if ( $end_timestamp > time() ) {
@@ -373,12 +360,18 @@ final class WPCOM_Liveblog {
 				$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
 				$entries_for_json[] = $entry->for_json();
 			}
+		}
 
-			// Create the result array
-			$result = array(
-				'entries'           => $entries_for_json,
-				'latest_timestamp'  => $latest_timestamp,
-			);
+		// Create the result array
+		$result = array(
+			'entries'           => $entries_for_json,
+			'latest_timestamp'  => $latest_timestamp,
+		);
+
+		if ( ! empty( $entries_for_json ) ) { 
+			do_action( 'liveblog_entry_request', $result );
+		} else {
+			do_action( 'liveblog_entry_request_empty' );
 		}
 
 		return $result;
