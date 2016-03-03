@@ -48,7 +48,7 @@ The command system has one inbuilt command:
 
 `/key`: Which defines an entry to a key event, it adds the meta key to entry `liveblog_key_entry`. A key event can be styled using the `.type-key` class.
 
-To display a key event box you can add the `[liveblog_key_events]` shortcode in your theme, e.g. in the sidebar. Entries used with the key command will be inserted to both this box and the main feed. It also acts an anchor system to jump to parts of the main feed. It's not necessary to include the shortcode for the /key command to be enabled.
+To display a key event box you can add the `[liveblog_key_events]` shortcode in your theme, e.g. in the sidebar, or you can use the Liveblog Key Events widget. Entries used with the key command will be inserted to both this box and the main feed. It also acts an anchor system to jump to parts of the main feed. It's not necessary to include the shortcode for the /key command to be enabled.
 
 An example of using the key command would be an author writing the following in the New Entry box:
 
