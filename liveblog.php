@@ -51,7 +51,7 @@ final class WPCOM_Liveblog {
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
-	const use_rest_api            = true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
+	const use_rest_api            = false; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
@@ -535,11 +535,20 @@ final class WPCOM_Liveblog {
 
 		$entry_id = isset( $fragments[1] ) ? $fragments[1] : '';
 
+		$result_for_json = self::get_single_entry( $entry_id );
+
+		self::json_return( $result_for_json );
+	}
+
+	public static function get_single_entry( $entry_id ) {
+
 		$entries = array();
 		$previous_timestamp = 0;
 		$next_timestamp = 0;
 
+		// Why not just get the single entry rather than all?
 		$all_entries = array_values( self::$entry_query->get_all() );
+
 		foreach ( $all_entries as $key => $entry ) {
 			if ( $entry_id !== $entry->get_id() ) {
 				continue;
@@ -560,32 +569,32 @@ final class WPCOM_Liveblog {
 			break;
 		}
 
-		if ( ! $entries ) {
-			do_action( 'liveblog_entry_request_empty' );
-
-			self::json_return( array( 'entries' => array() ) );
-		}
-
 		$entries_for_json = array();
 
-		// Set up an array containing the JSON data for all Liveblog entries.
+		// Set up an array containing the JSON data for Liveblog entry.
 		foreach ( $entries as $entry ) {
 			$entries_for_json[] = $entry->for_json();
 		}
 
 		// Set up the data to be returned via JSON.
 		$result_for_json = array(
-			'entries'           => $entries_for_json,
-			'index'             => (int) filter_input( INPUT_GET, 'index' ),
-			'nextTimestamp'     => $next_timestamp,
-			'previousTimestamp' => $previous_timestamp,
+			'entries' => $entries_for_json,
 		);
 
-		do_action( 'liveblog_entry_request', $result_for_json );
+		if ( ! empty( $entries_for_json ) ) {
+			// Entries found
+			$result_for_json['index']             = (int) filter_input( INPUT_GET, 'index' );
+			$result_for_json['nextTimestamp']     = $next_timestamp;
+			$result_for_json['previousTimestamp'] = $previous_timestamp;
 
-		self::$do_not_cache_response = true;
+			do_action( 'liveblog_entry_request', $result_for_json );
+			self::$do_not_cache_response = true;
+		} else {
+			// No entries
+			do_action( 'liveblog_entry_request_empty' );
+		}
 
-		self::json_return( $result_for_json );
+		return $result_for_json;
 	}
 
 	/**
