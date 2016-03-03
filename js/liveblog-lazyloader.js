@@ -82,6 +82,10 @@
 			var data = {
 				index: setIndex
 			};
+
+			// Add the nonce to the request
+			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+
 			$.get( url, data, function( response ) {
 				var index = response.index;
 
@@ -260,6 +264,10 @@
 			var data = {
 				index: newSetIndex
 			};
+
+			// Add the nonce to the
+			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+			
 			$.get( liveblog_settings.endpoint_url + 'entry/' + entryID, data, function( response ) {
 				if ( ! response.entries ) {
 					return;

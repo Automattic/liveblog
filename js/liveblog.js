@@ -347,6 +347,11 @@ window.liveblog = window.liveblog || {};
 
 		method = method || 'GET';
 
+		// Add nonce to all requests if it's not already there
+		if ( ! ( liveblog_settings.nonce_key in data ) ) {
+			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+		}
+
 		$.ajax( {
 			url: url,
 			data: data,
