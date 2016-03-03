@@ -77,6 +77,17 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
 	}
 
+	function test_user_input_sanity_check() {
+		$user_input  = "<iframe></iframe>";
+		$user_input .= "<script></script>";
+		$user_input .= "<applet></applet>";
+		$user_input .= "<embed></embed>";
+		$user_input .= "<object></object>";
+		$content = array( 'post_id' => 1, 'content' => $user_input );
+		$live_blog_entry = $this->insert_entry( $content );
+		$this->assertEmpty( $live_blog_entry->get_content() );
+	}
+
 	static function set_liveblog_hook_fired() {
 		$GLOBALS['liveblog_hook_fired'] = true;
 	}
