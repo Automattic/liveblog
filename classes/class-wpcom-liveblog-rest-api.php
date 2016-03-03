@@ -140,6 +140,30 @@ class WPCOM_Liveblog_Rest_Api {
 	    	)
 	    );
 
+		/*
+		 * /<post_id>/entry/<entry_id>
+		 */
+	    register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)',
+			array(
+		        'methods' => WP_REST_Server::READABLE,
+		        'callback' => array( __CLASS__, 'get_single_entry' ),
+		        'args' => array(
+		        	'post_id' => array(
+		            	'required' => true,
+		            	'validate_callback' => function( $param, $request, $key ) {
+		                    return is_numeric( $param );
+		                },
+		            ),
+		            'entry_id' => array(
+		            	'required' => true,
+		                'validate_callback' => function( $param, $request, $key ) {
+		                    return is_numeric( $param );
+		                },
+		            ),
+		        ),
+	    	)
+	    );
+
 	}
 
 	/**
@@ -201,6 +225,20 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get liveblog entries too be lazyloaded
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+
+		return $entries;
+	}
+
+	public static function get_single_entry( WP_REST_Request $request ) {
+
+		// Get required parameters from the request
+		$post_id  = $request->get_param('post_id');
+		$entry_id = $request->get_param('entry_id');
+
+		self::set_liveblog_vars($post_id);
+
+		// Get liveblog entry
+		$entries = WPCOM_Liveblog::get_single_entry( $entry_id );
 
 		return $entries;
 	}
