@@ -222,11 +222,11 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_entries( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id = $request->get_param('post_id');
-		$start_timestamp = $request->get_param('start_time');
-		$end_timestamp = $request->get_param('end_time');
+		$post_id         = $request->get_param( 'post_id' );
+		$start_timestamp = $request->get_param( 'start_time' );
+		$end_timestamp   = $request->get_param( 'end_time' );
 
-		self::set_liveblog_vars($post_id);
+		self::set_liveblog_vars( $post_id );
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
@@ -251,7 +251,7 @@ class WPCOM_Liveblog_Rest_Api {
 			'entry_id' => $request->get_param( 'entry_id' ),
 		);
 
-		self::set_liveblog_vars($args['post_id']);
+		self::set_liveblog_vars( $args['post_id'] );
 
 		// Attempt to perform the requested action
 		$entry = WPCOM_Liveblog::do_crud_entry( $crud_action, $args );
@@ -262,11 +262,11 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_lazyload_entries( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id = $request->get_param('post_id');
-		$max_timestamp = $request->get_param('max_time');
-		$min_timestamp = $request->get_param('min_time');
+		$post_id       = $request->get_param( 'post_id' );
+		$max_timestamp = $request->get_param( 'max_time' );
+		$min_timestamp = $request->get_param( 'min_time' );
 
-		self::set_liveblog_vars($post_id);
+		self::set_liveblog_vars( $post_id );
 
 		// Get liveblog entries too be lazyloaded
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
@@ -277,10 +277,10 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_single_entry( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id  = $request->get_param('post_id');
-		$entry_id = $request->get_param('entry_id');
+		$post_id  = $request->get_param( 'post_id' );
+		$entry_id = $request->get_param( 'entry_id' );
 
-		self::set_liveblog_vars($post_id);
+		self::set_liveblog_vars( $post_id );
 
 		// Get liveblog entry
 		$entries = WPCOM_Liveblog::get_single_entry( $entry_id );
@@ -294,10 +294,10 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function format_preview_entry( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id  = $request->get_param('post_id');
-		$entry_content = $request->get_param('entry_content');
+		$post_id       = $request->get_param( 'post_id' );
+		$entry_content = $request->get_param( 'entry_content' );
 
-		self::set_liveblog_vars($post_id);
+		self::set_liveblog_vars( $post_id );
 
 		// Get entry preview
 		$preview = WPCOM_Liveblog::format_preview_entry( $entry_content );
@@ -327,7 +327,7 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_hash_terms( WP_REST_Request $request ) {
 
 		// Get required parameters from the request		
-		$term = $request->get_param('term');
+		$term = $request->get_param( 'term' );
 
 		// Get a list of authors
 		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
@@ -341,7 +341,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	private static function set_liveblog_vars($post_id) {
 		WPCOM_Liveblog::$is_rest_api_call = true;
-		WPCOM_Liveblog::$post_id = $post_id;
+		WPCOM_Liveblog::$post_id          = $post_id;
 	}
 
 }
