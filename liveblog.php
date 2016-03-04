@@ -1209,8 +1209,7 @@ final class WPCOM_Liveblog {
 		$json_data = json_encode( $data );
 
 		header( 'Content-Type: application/json' );
-		if ( self::$do_not_cache_response )
-			nocache_headers();
+		self::prevent_caching_if_needed();
 
 		echo $json_data;
 		exit();
@@ -1256,6 +1255,15 @@ final class WPCOM_Liveblog {
 			return true;
 
 		return $protected;
+	}
+
+	/**
+	 * Tells browsers to not cache the response if $do_not_cache_response is true
+	 */
+	public static function prevent_caching_if_needed() {
+		if ( self::$do_not_cache_response ) {
+			nocache_headers();
+		}
 	}
 
 	/** Plupload Helpers ******************************************************/
