@@ -179,6 +179,21 @@ class WPCOM_Liveblog_Rest_Api {
 			)
 	    );
 
+	    /*
+		 * /authors/<autocomplete>
+		 */
+	    register_rest_route( self::$api_namespace, '/authors([/]*)(?P<autocomplete>.*)',
+	    	array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_authors' ),
+		        'args' => array(
+		            'autocomplete' => array(
+		            	'required' => false,
+		            ),
+		        )
+			)
+	    );
+
 	}
 
 	/**
@@ -273,6 +288,18 @@ class WPCOM_Liveblog_Rest_Api {
 		$preview = WPCOM_Liveblog::format_preview_entry( $entry_content );
 
 		return $preview;
+	}
+
+	public static function get_authors( WP_REST_Request $request ) {
+
+		// Get required parameters from the request		
+		$term = $request->get_param('autocomplete');
+
+		// Get a list of authors
+		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
+		$authors = $liveblog_authors->get_authors( $term );
+
+		return $authors;
 	}
 
 	/**
