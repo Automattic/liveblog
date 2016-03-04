@@ -22,7 +22,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function load() {
 
-		self::$api_version = '1';
+		self::$api_version   = '1';
 		self::$api_namespace = 'liveblog/v' . self::$api_version;
 		self::$endpoint_base = '/wp-json/' . self::$api_namespace . '/';
 
@@ -49,21 +49,15 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'start_time' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'end_time' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -80,35 +74,22 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'crud_entry' ),
-				'permission_callback' => function() {
-					// Check if the current user can edit the liveblog
-					return WPCOM_Liveblog::current_user_can_edit_liveblog();
-				},
+				'permission_callback' => array( __CLASS__, 'current_user_can_edit_liveblog' ),
 				'args' => array(
 					'crud_action' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							// Must be one of these values
-							return in_array( $param, array( 'insert', 'update', 'delete', 'delete_key' ) );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_crud_action' ),
 					),
 					'post_id' => array(
 						'required' => false,
-						'sanitize_callback' => function( $param, $request, $key ) {
-							return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
-						},
+						'sanitize_callback' => array( __CLASS__, 'sanitize_numeric' ),
 					),
 					'content' => array(
 						'required' => false,
-						'sanitize_callback' => function( $param, $request, $key ) {
-							return ( ! empty( $param ) ? $param : '' );
-						},
 					),
 					'entry_id' => array(
 						'required' => false,
-						'sanitize_callback' => function( $param, $request, $key ) {
-							return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
-						},
+						'sanitize_callback' => array( __CLASS__, 'sanitize_numeric' ),
 					),
 				)
 			)
@@ -127,21 +108,15 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'max_time' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'min_time' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -160,15 +135,11 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'entry_id' => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -411,6 +382,42 @@ class WPCOM_Liveblog_Rest_Api {
 	private static function set_liveblog_vars( $post_id ) {
 		WPCOM_Liveblog::$is_rest_api_call = true;
 		WPCOM_Liveblog::$post_id          = $post_id;
+	}
+
+	/**
+	 * Validation callback to check for numeric value
+	 *
+	 * @return bool true if $param is numeric. false otherwise.
+	 */
+	public static function validate_is_numeric( $param, $request, $key ) {
+		return is_numeric( $param );
+	}
+
+	/**
+	 * Validation callback to check for allowed crud action
+	 *
+	 * @return bool true if $param is one of insert|update|delete|delete_key. false otherwise
+	 */
+	public static function validate_crud_action( $param, $request, $key ) {
+		return in_array( $param, array( 'insert', 'update', 'delete', 'delete_key' ) );
+	}
+
+	/**
+	 * Sanitization callback to ensure an integer value
+	 *
+	 * @return int $param as an integer. 0 if $param is not numeric
+	 */
+	public static function sanitize_numeric( $param, $request, $key ) {
+		return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
+	}
+
+	/**
+	 * Permission callback to check if user can edit the Liveblog
+	 *
+	 * @return true if user has access. false otherwise
+	 */
+	public static function current_user_can_edit_liveblog() {
+		return WPCOM_Liveblog::current_user_can_edit_liveblog();
 	}
 
 }
