@@ -180,14 +180,14 @@ class WPCOM_Liveblog_Rest_Api {
 	    );
 
 	    /*
-		 * /authors/<autocomplete>
+		 * /authors/<term>
 		 */
-	    register_rest_route( self::$api_namespace, '/authors([/]*)(?P<autocomplete>.*)',
+	    register_rest_route( self::$api_namespace, '/authors([/]*)(?P<term>.*)',
 	    	array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_authors' ),
 		        'args' => array(
-		            'autocomplete' => array(
+		            'term' => array(
 		            	'required' => false,
 		            ),
 		        )
@@ -307,8 +307,8 @@ class WPCOM_Liveblog_Rest_Api {
 
 	public static function get_authors( WP_REST_Request $request ) {
 
-		// Get required parameters from the request		
-		$term = $request->get_param('autocomplete');
+		// Get required parameters from the request
+		$term = $request->get_param( 'term' );
 
 		// Get a list of authors
 		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
