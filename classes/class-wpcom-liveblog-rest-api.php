@@ -10,8 +10,6 @@
 
 class WPCOM_Liveblog_Rest_Api {
 
- 	// TODO: Make sure caching is handled the same way as in WPCOM_Liveblog
-
 	private static $api_version;
 	private static $api_namespace;
 
@@ -46,30 +44,30 @@ class WPCOM_Liveblog_Rest_Api {
 		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)',
 			array(
-		        'methods' => WP_REST_Server::READABLE,
-		        'callback' => array( __CLASS__, 'get_entries' ),
-		        'args' => array(
-		        	'post_id' => array(
-		            	'required' => true,
-		            	'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		            'start_time' => array(
-		            	'required' => true,
-		                'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		            'end_time' => array(
-		            	'required' => true,
-		            	'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		        ),
-	    	)
-	    );
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_entries' ),
+				'args' => array(
+					'post_id' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+					'start_time' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+					'end_time' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+				),
+			)
+		);
 
 		/*
 		 * Perform a specific CRUD action on an entry
@@ -79,42 +77,42 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/crud',
-	    	array(
+			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'crud_entry' ),
 				'permission_callback' => function() {
 					// Check if the current user can edit the liveblog
 					return WPCOM_Liveblog::current_user_can_edit_liveblog();
 				},
-		        'args' => array(
-		        	'crud_action' => array(
-		            	'required' => true,
-		            	'validate_callback' => function( $param, $request, $key ) {
-		            		// Must be one of these values
-		            		return in_array( $param, array( 'insert', 'update', 'delete', 'delete_key' ) );
-		                },
-		            ),
-		            'post_id' => array(
-		            	'required' => false,
-		            	'sanitize_callback' => function( $param, $request, $key ) {
-		            		return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
-		                },
-		            ),
-		            'content' => array(
-		            	'required' => false,
-		            	'sanitize_callback' => function( $param, $request, $key ) {
-		            		return ( ! empty( $param ) ? $param : '' );
-		                },
-		            ),
-		            'entry_id' => array(
-		            	'required' => false,
-		            	'sanitize_callback' => function( $param, $request, $key ) {
-		            		return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
-		                },
-		            ),
-		        )
+				'args' => array(
+					'crud_action' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							// Must be one of these values
+							return in_array( $param, array( 'insert', 'update', 'delete', 'delete_key' ) );
+						},
+					),
+					'post_id' => array(
+						'required' => false,
+						'sanitize_callback' => function( $param, $request, $key ) {
+							return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
+						},
+					),
+					'content' => array(
+						'required' => false,
+						'sanitize_callback' => function( $param, $request, $key ) {
+							return ( ! empty( $param ) ? $param : '' );
+						},
+					),
+					'entry_id' => array(
+						'required' => false,
+						'sanitize_callback' => function( $param, $request, $key ) {
+							return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
+						},
+					),
+				)
 			)
-	    );
+		);
 
 		/*
 		 * Get entries for a post for lazyloading on the page
@@ -124,30 +122,30 @@ class WPCOM_Liveblog_Rest_Api {
 		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)',
 			array(
-		        'methods' => WP_REST_Server::READABLE,
-		        'callback' => array( __CLASS__, 'get_lazyload_entries' ),
-		        'args' => array(
-		        	'post_id' => array(
-		            	'required' => true,
-		            	'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		            'max_time' => array(
-		            	'required' => true,
-		                'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		            'min_time' => array(
-		            	'required' => true,
-		            	'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		        ),
-	    	)
-	    );
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_lazyload_entries' ),
+				'args' => array(
+					'post_id' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+					'max_time' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+					'min_time' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+				),
+			)
+		);
 
 		/*
 		 * Get a single entry for a post by entry ID
@@ -155,26 +153,26 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/entry/<entry_id>
 		 *
 		 */
-	    register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)',
 			array(
-		        'methods' => WP_REST_Server::READABLE,
-		        'callback' => array( __CLASS__, 'get_single_entry' ),
-		        'args' => array(
-		        	'post_id' => array(
-		            	'required' => true,
-		            	'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		            'entry_id' => array(
-		            	'required' => true,
-		                'validate_callback' => function( $param, $request, $key ) {
-		                    return is_numeric( $param );
-		                },
-		            ),
-		        ),
-	    	)
-	    );
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_single_entry' ),
+				'args' => array(
+					'post_id' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+					'entry_id' => array(
+						'required' => true,
+						'validate_callback' => function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+					),
+				),
+			)
+		);
 
 		/*
 		 * Take entry content and return it with pretty formatting
@@ -182,61 +180,61 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/preview
 		 *
 		 */
-	    register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview',
-	    	array(
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview',
+			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'format_preview_entry' ),
-		        'args' => array(
-		            'entry_content' => array(
-		            	'required' => true,
-		            ),
-		        )
+				'args' => array(
+					'entry_content' => array(
+						'required' => true,
+					),
+				)
 			)
-	    );
+		);
 
-	    /*
-	     * Get a list of authors matching a search term.
-	     * Used to autocomplete @ mentions
-	     * 
+		/*
+		 * Get a list of authors matching a search term.
+		 * Used to autocomplete @ mentions
+		 * 
 		 * /authors/<term>
 		 *
 		 * TODO: The regex pattern will allow no slash between 'authors' and the search term.
 		 *       Look into requiring the slash
 		 *
 		 */
-	    register_rest_route( self::$api_namespace, '/authors([/]*)(?P<term>.*)',
-	    	array(
+		register_rest_route( self::$api_namespace, '/authors([/]*)(?P<term>.*)',
+			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_authors' ),
-		        'args' => array(
-		            'term' => array(
-		            	'required' => false,
-		            ),
-		        )
+				'args' => array(
+					'term' => array(
+						'required' => false,
+					),
+				)
 			)
-	    );
+		);
 
-	    /*
-	     * Get a list of hashtags matching a search term.
-	     * Used to autocomplete previously used #hashtags
-	     * 
+		/*
+		 * Get a list of hashtags matching a search term.
+		 * Used to autocomplete previously used #hashtags
+		 * 
 		 * /hashtags/<term>
 		 *
 		 * TODO: The regex pattern will allow no slash between 'hashtags' and the search term.
 		 *       Look into requiring the slash
 		 *
 		 */
-	    register_rest_route( self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
-	    	array(
+		register_rest_route( self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
+			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_hash_terms' ),
-		        'args' => array(
-		            'term' => array(
-		            	'required' => false,
-		            ),
-		        )
+				'args' => array(
+					'term' => array(
+						'required' => false,
+					),
+				)
 			)
-	    );
+		);
 
 	}
 
