@@ -630,11 +630,6 @@ final class WPCOM_Liveblog {
 			isset( $fragments[2] ) ? (int) $fragments[2] : 0
 		);
 
-		// TODO: Should this be conditional? It matches the old functionality.
-		if ( ! empty( $result_for_json['entries'] ) ) {
-			self::$do_not_cache_response = true;
-		}
-
 		self::json_return( $result_for_json );
 	}
 
@@ -673,6 +668,7 @@ final class WPCOM_Liveblog {
 
 		if ( ! empty( $entries_for_json ) ) {
 			do_action( 'liveblog_entry_request', $result );
+			self::$do_not_cache_response = true;
 		} else {
 			do_action( 'liveblog_entry_request_empty' );
 		}
