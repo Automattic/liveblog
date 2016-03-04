@@ -259,6 +259,9 @@ class WPCOM_Liveblog_Rest_Api {
 		// Get liveblog entries within the start and end boundaries
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
 
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
 		return $entries;
 	}
 
@@ -285,6 +288,9 @@ class WPCOM_Liveblog_Rest_Api {
 		// Attempt to perform the requested action
 		$entry = WPCOM_Liveblog::do_crud_entry( $crud_action, $args );
 
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
 		return $entry;
 	}
 
@@ -307,6 +313,9 @@ class WPCOM_Liveblog_Rest_Api {
 		// Get liveblog entries too be lazyloaded
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
 
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
 		return $entries;
 	}
 
@@ -328,6 +337,9 @@ class WPCOM_Liveblog_Rest_Api {
 		// Get liveblog entry
 		$entries = WPCOM_Liveblog::get_single_entry( $entry_id );
 
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
 		return $entries;
 	}
 
@@ -348,6 +360,9 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get entry preview
 		$preview = WPCOM_Liveblog::format_preview_entry( $entry_content );
+
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
 
 		return $preview;
 	}
