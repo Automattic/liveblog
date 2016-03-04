@@ -270,7 +270,7 @@ class WPCOM_Liveblog_Rest_Api {
 		self::set_liveblog_vars($post_id);
 
 		// Get entry preview
-		$preview = WPCOM_Liveblog::get_preview_entry( $entry_content );
+		$preview = WPCOM_Liveblog::format_preview_entry( $entry_content );
 
 		return $preview;
 	}

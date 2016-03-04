@@ -668,15 +668,15 @@ final class WPCOM_Liveblog {
 
 	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
-		$entry_content = self::get_preview_entry( $entry_content );
+		$entry_content = self::format_preview_entry( $entry_content );
 
 		self::json_return( $entry_content );
 	}
 
 	/**
-	 * Get the fomatted preview content for an entry
+	 * Format the passed in content and give it back in an array
 	 */
-	public static function get_preview_entry( $entry_content ) {
+	public static function format_preview_entry( $entry_content ) {
 		
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
