@@ -197,6 +197,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function ajax_authors() {
 
+		$term  = isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '';
+		$users = self::get_authors( $term );
+
+		header( "Content-Type: application/json" );
+		echo json_encode( $users );
+
+		exit;
+	}
+
+	public function get_authors( $term = '' ) {
+
 		// The args used in the get_users query.
 		$args = array(
 			'who'    => 'authors',
@@ -206,8 +217,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// If there is no search term then search
 		// for nothing to get everything.
-		$term = isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '';
-
 		// If there is a search term, then append
 		// '*' to match chars after the term.
 		if ( strlen( trim( $term ) ) > 0 ) {
@@ -217,10 +226,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// Map the authors into the expected format.
 		$users = array_map( array( $this, 'map_ajax_authors' ),  get_users( $args ) );
 
-		header( "Content-Type: application/json" );
-		echo json_encode( $users );
-
-		exit;
+		return $users;
 	}
 
 	/**
