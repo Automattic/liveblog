@@ -328,12 +328,12 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
-	 * Get live blog entries between a start and end time for a post
+	 * Get Liveblog entries between a start and end time for a post
 	 *
 	 * @param int $start_timestamp  The start time boundary
 	 * @param int $end_timestamp  	The end time boundary
 	 *
-	 * @return An array of live blog entries, possibly empty.
+	 * @return An array of Liveblog entries, possibly empty.
 	 */
 	public static function get_entries_by_time( $start_timestamp, $end_timestamp ) {
 
@@ -507,6 +507,14 @@ final class WPCOM_Liveblog {
 		self::json_return( $entry );
 	}
 
+	/**
+	 * Perform a specific CRUD action on an entry for a post
+	 *
+	 * @param string $crud_action Allowed actions are insert|update|delete|delete_key
+	 * @param array $args An array of data to be passed to the crud method
+	 *
+	 * @return mixed The result of the crud method
+	 */
 	public static function do_crud_entry( $crud_action, $args ) {
 
 		$args['user'] = wp_get_current_user();
@@ -540,6 +548,13 @@ final class WPCOM_Liveblog {
 		self::json_return( $result_for_json );
 	}
 
+	/**
+	 * Get a single Liveblog entry for a post by entry ID
+	 *
+	 * @param int $entry_id The ID of the entry
+	 *
+	 * @return array An array of entry data
+	 */
 	public static function get_single_entry( $entry_id ) {
 
 		$entries = array();
@@ -675,6 +690,10 @@ final class WPCOM_Liveblog {
 
 	/**
 	 * Format the passed in content and give it back in an array
+	 *
+	 * @param string $entry_content The entry content to be previewed
+	 *
+	 * @return array The entry content wrapped in HTML elements
 	 */
 	public static function format_preview_entry( $entry_content ) {
 		
