@@ -164,6 +164,21 @@ class WPCOM_Liveblog_Rest_Api {
 	    	)
 	    );
 
+		/*
+		 * /<post_id>/preview
+		 */
+	    register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview',
+	    	array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( __CLASS__, 'format_preview_entry' ),
+		        'args' => array(
+		            'entry_content' => array(
+		            	'required' => true,
+		            ),
+		        )
+			)
+	    );
+
 	}
 
 	/**
@@ -241,6 +256,23 @@ class WPCOM_Liveblog_Rest_Api {
 		$entries = WPCOM_Liveblog::get_single_entry( $entry_id );
 
 		return $entries;
+	}
+
+	/**
+	 * Format the passed in content and give it back
+	 */
+	public static function format_preview_entry( WP_REST_Request $request ) {
+
+		// Get required parameters from the request
+		$post_id  = $request->get_param('post_id');
+		$entry_content = $request->get_param('entry_content');
+
+		self::set_liveblog_vars($post_id);
+
+		// Get entry preview
+		$preview = WPCOM_Liveblog::get_preview_entry( $entry_content );
+
+		return $preview;
 	}
 
 	/**
