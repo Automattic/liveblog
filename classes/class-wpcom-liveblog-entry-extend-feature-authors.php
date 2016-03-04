@@ -198,7 +198,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function ajax_authors() {
 
 		$term  = isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '';
-		$users = self::get_authors( $term );
+		$users = $this->get_authors( $term );
 
 		header( "Content-Type: application/json" );
 		echo json_encode( $users );
