@@ -4,7 +4,8 @@
  * Class WPCOM_Liveblog_Rest_Api
  *
  * This class integrates with the REST API framework added in WordPress 4.4
- * It registers and required endpoints
+ * It registers endpoints matching the legacy functionality in the WPCOM_Liveblog ajax methods
+ *
  */
 
 class WPCOM_Liveblog_Rest_Api {
@@ -37,6 +38,12 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function register_routes() {
 
+		/*
+		 * Get all entries for a post in between two timestamps
+		 *
+		 * /<post_id>/<start_time>/end_time
+		 *
+		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)',
 			array(
 		        'methods' => WP_REST_Server::READABLE,
@@ -64,6 +71,13 @@ class WPCOM_Liveblog_Rest_Api {
 	    	)
 	    );
 
+		/*
+		 * Perform a specific CRUD action on an entry
+		 * Allowed actions are 'insert', 'update', 'delete', 'delete_key'
+		 *
+		 * /<post_id>/crud
+		 *
+		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/crud',
 	    	array(
 				'methods' => WP_REST_Server::CREATABLE,
@@ -102,6 +116,12 @@ class WPCOM_Liveblog_Rest_Api {
 			)
 	    );
 
+		/*
+		 * Get entries for a post for lazyloading on the page
+		 *
+		 * /<post_id>/lazyload/max_time/min_time
+		 *
+		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)',
 			array(
 		        'methods' => WP_REST_Server::READABLE,
@@ -130,7 +150,10 @@ class WPCOM_Liveblog_Rest_Api {
 	    );
 
 		/*
+		 * Get a single entry for a post by entry ID
+		 *
 		 * /<post_id>/entry/<entry_id>
+		 *
 		 */
 	    register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)',
 			array(
@@ -154,7 +177,10 @@ class WPCOM_Liveblog_Rest_Api {
 	    );
 
 		/*
+		 * Take entry content and return it with pretty formatting
+		 *
 		 * /<post_id>/preview
+		 *
 		 */
 	    register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview',
 	    	array(
@@ -169,7 +195,14 @@ class WPCOM_Liveblog_Rest_Api {
 	    );
 
 	    /*
+	     * Get a list of authors matching a search term.
+	     * Used to autocomplete @ mentions
+	     * 
 		 * /authors/<term>
+		 *
+		 * TODO: The regex pattern will allow no slash between 'authors' and the search term.
+		 *       Look into requiring the slash
+		 *
 		 */
 	    register_rest_route( self::$api_namespace, '/authors([/]*)(?P<term>.*)',
 	    	array(
@@ -184,7 +217,14 @@ class WPCOM_Liveblog_Rest_Api {
 	    );
 
 	    /*
+	     * Get a list of hashtags matching a search term.
+	     * Used to autocomplete previously used #hashtags
+	     * 
 		 * /hashtags/<term>
+		 *
+		 * TODO: The regex pattern will allow no slash between 'hashtags' and the search term.
+		 *       Look into requiring the slash
+		 *
 		 */
 	    register_rest_route( self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
 	    	array(
@@ -201,12 +241,11 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
-	 * Look for any new Liveblog entries, and return them via JSON
-	 * Uses the new REST API framework added in 4.4
+	 * Get all entries for a post in between two timestamps
 	 *
-	 * @param WP_REST_Request $request  A REST request object
+	 * @param WP_REST_Request $request A REST request object
 	 *
-	 * @return An array of live blog entries
+	 * @return array An array of entries
 	 */
 	public static function get_entries( WP_REST_Request $request ) {
 
@@ -224,11 +263,12 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
-	 * Perform a specific CRUD task on an entry
+	 * Perform a specific CRUD action on an entry
+	 * Allowed actions are 'insert', 'update', 'delete', 'delete_key'
 	 *
-	 * @param WP_REST_Request $request  A REST request object
+	 * @param WP_REST_Request $request A REST request object
 	 *
-	 * @return 
+	 * @return mixed
 	 */
 	public static function crud_entry( WP_REST_Request $request ) {
 
@@ -248,6 +288,13 @@ class WPCOM_Liveblog_Rest_Api {
 		return $entry;
 	}
 
+	/**
+	 * Get entries for a post for lazyloading on the page
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array An array of entries
+	 */
 	public static function get_lazyload_entries( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
@@ -263,6 +310,13 @@ class WPCOM_Liveblog_Rest_Api {
 		return $entries;
 	}
 
+	/**
+	 * Get a single entry for a post by entry ID
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array An array containing the entry if found
+	 */
 	public static function get_single_entry( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
@@ -278,7 +332,11 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
-	 * Format the passed in content and give it back
+	 * Take entry content and return it with pretty formatting
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array The entry content wrapped in HTML elements
 	 */
 	public static function format_preview_entry( WP_REST_Request $request ) {
 
@@ -294,6 +352,13 @@ class WPCOM_Liveblog_Rest_Api {
 		return $preview;
 	}
 
+	/**
+	 * Get a list of authors matching a search term.
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array An array of authors on the site
+	 */
 	public static function get_authors( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
@@ -307,9 +372,9 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
-	 * Get a list of hashtags matching the search term
+	 * Get a list of hashtags matching a search term
 	 *
-	 * @param WP_REST_Request $request  A REST request object
+	 * @param WP_REST_Request $request A REST request object
 	 *
 	 * @return array An array of matching hastags
 	 */
@@ -326,9 +391,11 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
-	 * Set a few static variables in the WPCOM_Liveblog class needed for callbacks to work
+	 * Set a few static variables in the WPCOM_Liveblog class needed for some callbacks to work
+	 *
+	 * @param int $post_id The post ID for the current request
 	 */
-	private static function set_liveblog_vars($post_id) {
+	private static function set_liveblog_vars( $post_id ) {
 		WPCOM_Liveblog::$is_rest_api_call = true;
 		WPCOM_Liveblog::$post_id          = $post_id;
 	}
