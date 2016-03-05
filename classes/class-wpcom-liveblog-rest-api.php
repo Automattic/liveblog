@@ -214,6 +214,39 @@ class WPCOM_Liveblog_Rest_Api {
 			)
 		);
 
+		/*
+		 * Save and retrieve Liveblog post state and meta-data
+		 *
+		 * /update_post_state/<post_id>/<state>/<template_name>/<template_format>/<limit>
+		 *
+		 */
+		register_rest_route( self::$api_namespace, '/update_post_state/(?P<post_id>\d+)/(?P<state>[\w-]+)/(?P<template_name>[\w-]+)/(?P<template_format>[\w-]+)/(?P<limit>\d+)([/]*)',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'update_post_state' ),
+				'permission_callback' => array( __CLASS__, 'current_user_can_edit_liveblog' ),
+				'args' => array(
+					'post_id' => array(
+						'required' => true,
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
+					),
+					'state' => array(
+						'required' => true,
+					),
+					'template_name' => array(
+						'required' => true,
+					),
+					'template_format' => array(
+						'required' => true,
+					),
+					'limit' => array(
+						'required' => true,
+						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
+					),
+				),
+			)
+		);
+
 	}
 
 	/**
@@ -379,6 +412,39 @@ class WPCOM_Liveblog_Rest_Api {
 		$hashtags = $liveblog_hashtags->get_hash_terms( $term );
 
 		return $hashtags;
+	}
+
+	/**
+	 * Set the Liveblog state of a post
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return string THe metabox markup to be displayed
+	 */
+	public static function update_post_state( WP_REST_Request $request ) {
+
+		// Get required parameters from the request		
+		$post_id         = $request->get_param( 'post_id' );
+		$state           = $request->get_param( 'state' );
+
+		// Additional request variables used in the liveblog_admin_settings_update action
+		$request_vars = array(
+			'state'                        => $state,
+			'liveblog-key-template-name'   => $request->get_param( 'template_name' ),
+			'liveblog-key-template-format' => $request->get_param( 'template_format' ),
+			'liveblog-key-limit'           => $request->get_param( 'limit' ),
+		);
+
+		self::set_liveblog_vars( $post_id );
+
+		// Get entry preview
+		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
+
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
+		return $meta_box;
+
 	}
 
 	/**

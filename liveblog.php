@@ -1048,13 +1048,13 @@ final class WPCOM_Liveblog {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
 
-		$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state );
+		$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST );
 
 		if ( ! $meta_box ) {
 
 			if ( wp_is_post_revision( $post_id ) ) {
 				self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
-			} 
+			}
 
 			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
 			
@@ -1070,9 +1070,9 @@ final class WPCOM_Liveblog {
 	 * @param int $post_id Post ID
 	 * @param string $new_state The new state to give the Liveblog post. One of enable|archive|disable
 	 *
-	 * @return string THe metabox markup
+	 * @return string The metabox markup
 	 */
-	public static function admin_set_liveblog_state_for_post( $post_id, $new_state ) {
+	public static function admin_set_liveblog_state_for_post( $post_id, $new_state, $request_vars ) {
 
 		$post = get_post( $post_id );
 
@@ -1080,7 +1080,7 @@ final class WPCOM_Liveblog {
 			return false;
 		}
 
-		do_action( 'liveblog_admin_settings_update', $_REQUEST, $post_id );
+		do_action( 'liveblog_admin_settings_update', $request_vars, $post_id );
 
 		self::set_liveblog_state( $post_id, $new_state );
 
