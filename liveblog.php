@@ -1006,6 +1006,20 @@ final class WPCOM_Liveblog {
 	 * @param WP_Post $post
 	 */
 	public static function display_meta_box( $post ) {
+
+		// Get and display the metabox content
+		echo self::get_meta_box( $post );
+
+	}
+
+	/**
+	 * Get the metabox for outputting
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return string The metabox markup
+	 */
+	public static function get_meta_box( $post ) {
 		$current_state = self::get_liveblog_state( $post->ID );
 		$buttons = array(
 			'enable' => array( 'value' => 'enable', 'text' => __( 'Enable', 'liveblog' ),
@@ -1023,7 +1037,8 @@ final class WPCOM_Liveblog {
 		$update_text  = __( 'Settings have been successfully updated.', 'liveblog' );
 		$extra_fields = array();
 		$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
+		
+		return self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
