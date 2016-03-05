@@ -24,7 +24,14 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::$api_version   = '1';
 		self::$api_namespace = 'liveblog/v' . self::$api_version;
-		self::$endpoint_base = '/wp-json/' . self::$api_namespace . '/';
+		if ( get_option( 'permalink_structure' ) ) {
+			// Pretty permalinks enabled 
+			self::$endpoint_base = '/wp-json/' . self::$api_namespace . '/';
+		} else {
+			// Pretty permalinks not enabled
+			self::$endpoint_base = '/?rest_route=/' . self::$api_namespace . '/';
+		}
+		
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
 
@@ -42,7 +49,7 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/<start_time>/end_time
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
 			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_entries' ),
@@ -70,7 +77,7 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/crud
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/crud',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/crud([/]*)',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'crud_entry' ),
@@ -101,7 +108,7 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/lazyload/max_time/min_time
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
 			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_lazyload_entries' ),
@@ -128,7 +135,7 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/entry/<entry_id>
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)([/]*)',
 			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_single_entry' ),
@@ -151,7 +158,7 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/preview
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview([/]*)',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'format_preview_entry' ),
