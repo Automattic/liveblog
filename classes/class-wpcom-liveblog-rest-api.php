@@ -46,7 +46,7 @@ class WPCOM_Liveblog_Rest_Api {
 		/*
 		 * Get all entries for a post in between two timestamps
 		 *
-		 * /<post_id>/<start_time>/end_time
+		 * /<post_id>/<start_time>/<end_time>
 		 *
 		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
