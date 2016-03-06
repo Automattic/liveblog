@@ -105,7 +105,7 @@ class WPCOM_Liveblog_Rest_Api {
 		/*
 		 * Get entries for a post for lazyloading on the page
 		 *
-		 * /<post_id>/lazyload/max_time/min_time
+		 * /<post_id>/lazyload/<max_time>/<min_time>
 		 *
 		 */
 		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
