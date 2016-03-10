@@ -349,7 +349,7 @@ window.liveblog = window.liveblog || {};
 
 		// Add nonce to all requests if it's not already there
 		if ( ! ( liveblog_settings.nonce_key in data ) ) {
-			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+			data[liveblog_settings.nonce_key] = liveblog_settings.nonce;
 		}
 
 		$.ajax( {

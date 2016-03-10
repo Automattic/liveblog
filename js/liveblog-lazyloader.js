@@ -84,7 +84,7 @@
 			};
 
 			// Add the nonce to the request
-			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+			data[liveblog_settings.nonce_key] = liveblog_settings.nonce;
 
 			$.get( url, data, function( response ) {
 				var index = response.index;
@@ -266,7 +266,7 @@
 			};
 
 			// Add the nonce to the
-			data[liveblog_settings.nonce_key] = liveblog.publisher.nonce;
+			data[liveblog_settings.nonce_key] = liveblog_settings.nonce;
 			
 			$.get( liveblog_settings.endpoint_url + 'entry/' + entryID, data, function( response ) {
 				if ( ! response.entries ) {
