@@ -500,12 +500,12 @@
 								return this.cache[term].data;
 							}
 
-							var _data = { autocomplete: term };
 							var _url  = conf.url;
+							var _data = { autocomplete: term };
 
 							if (conf.use_rest_api == 1) {
 								// Use the new REST API
-								_url = _url + term;
+								_url  = _url + term;
 								_data = null;
 							}
 
