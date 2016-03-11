@@ -66,15 +66,12 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'start_time' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'end_time' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -125,15 +122,12 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'max_time' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'min_time' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -152,11 +146,9 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'entry_id' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -238,7 +230,6 @@ class WPCOM_Liveblog_Rest_Api {
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 					'state' => array(
 						'required' => true,
@@ -251,7 +242,6 @@ class WPCOM_Liveblog_Rest_Api {
 					),
 					'limit' => array(
 						'required' => true,
-						'validate_callback' => array( __CLASS__, 'validate_is_numeric' ),
 					),
 				),
 			)
@@ -465,15 +455,6 @@ class WPCOM_Liveblog_Rest_Api {
 	private static function set_liveblog_vars( $post_id ) {
 		WPCOM_Liveblog::$is_rest_api_call = true;
 		WPCOM_Liveblog::$post_id          = $post_id;
-	}
-
-	/**
-	 * Validation callback to check for numeric value
-	 *
-	 * @return bool true if $param is numeric. false otherwise.
-	 */
-	public static function validate_is_numeric( $param, $request, $key ) {
-		return is_numeric( $param );
 	}
 
 	/**
