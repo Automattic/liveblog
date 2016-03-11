@@ -215,7 +215,7 @@ class WPCOM_Liveblog_Rest_Api {
 		register_rest_route( self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
 			array(
 				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_hash_terms' ),
+				'callback' => array( __CLASS__, 'get_hashtag_terms' ),
 				'args' => array(
 					'term' => array(
 						'required' => false,
@@ -412,14 +412,14 @@ class WPCOM_Liveblog_Rest_Api {
 	 *
 	 * @return array An array of matching hastags
 	 */
-	public static function get_hash_terms( WP_REST_Request $request ) {
+	public static function get_hashtag_terms( WP_REST_Request $request ) {
 
 		// Get required parameters from the request		
 		$term = $request->get_param( 'term' );
 
 		// Get a list of authors
 		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
-		$hashtags = $liveblog_hashtags->get_hash_terms( $term );
+		$hashtags = $liveblog_hashtags->get_hashtag_terms( $term );
 
 		return $hashtags;
 	}
