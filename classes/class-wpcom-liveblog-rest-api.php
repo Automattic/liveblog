@@ -14,8 +14,6 @@ class WPCOM_Liveblog_Rest_Api {
 	private static $api_namespace;
 
 	public static $endpoint_base;
-	public static $endpoint_get_entries_by_date;
-	public static $endpoint_crud;
 
 	/**
 	 * Load everything the class needs
