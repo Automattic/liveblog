@@ -75,6 +75,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function get_config( $config ) {
 
+		$endpoint = admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms';
+		$use_rest_api = 0;
+
+		if ( WPCOM_Liveblog::use_rest_api && WPCOM_Liveblog::can_use_rest_api() ) {
+			$endpoint = trailingslashit( trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . WPCOM_Liveblog::$post_id ) . 'hashtags');
+			$use_rest_api = 1;
+		}
+
 		// Add our config to the front end autocomplete
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
@@ -82,9 +90,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			'type'        => 'ajax',
 			'cache'       => 1000 * 60,
 			'regex'       => '#([\w\d\-]*)$',
-			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
+			'url'         => $endpoint,
 			'template'    => '${slug}',
 			'replacement' => '#${slug}',
+			'use_rest_api' => $use_rest_api
 		) );
 
 		return $config;

@@ -500,10 +500,19 @@
 								return this.cache[term].data;
 							}
 
+							var _data = { autocomplete: term };
+							var _url  = conf.url;
+
+							if (conf.use_rest_api == 1) {
+								// Use the new REST API
+								_url = _url + term;
+								_data = null;
+							}
+
 							var self = this;
 							$.ajax({
-								url: conf.url,
-								data: { autocomplete: term },
+								url: _url,
+								data: _data,
 								success: function (data) {
 									self.cache[term] = {
 										time: Date.now(),
