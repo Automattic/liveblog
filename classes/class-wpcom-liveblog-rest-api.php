@@ -22,18 +22,30 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function load() {
 
-		self::$api_version   = '1';
-		self::$api_namespace = 'liveblog/v' . self::$api_version;
-		if ( get_option( 'permalink_structure' ) ) {
-			// Pretty permalinks enabled 
-			self::$endpoint_base = '/wp-json/' . self::$api_namespace . '/';
-		} else {
-			// Pretty permalinks not enabled
-			self::$endpoint_base = '/?rest_route=/' . self::$api_namespace . '/';
-		}
-		
+		self::$endpoint_base = self::build_endpoint_base();
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+
+	}
+
+	public static function build_endpoint_base() {
+
+		if ( ! empty( self::$endpoint_base ) ) {
+			return self::$endpoint_base;
+		}
+
+		self::$api_version   = '1';
+		self::$api_namespace = 'liveblog/v' . self::$api_version;
+
+		if ( get_option( 'permalink_structure' ) ) {
+			// Pretty permalinks enabled 
+			$base = '/wp-json/' . self::$api_namespace . '/';
+		} else {
+			// Pretty permalinks not enabled
+			$base = '/?rest_route=/' . self::$api_namespace . '/';
+		}
+		
+		return $base;
 
 	}
 
