@@ -884,8 +884,6 @@ final class WPCOM_Liveblog {
 	private static function get_entries_endpoint_url() {
 		if (self::use_rest_api && self::can_use_rest_api()) {
 			$url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . self::$post_id );
-			$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
-			return $url;
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
 			if ( false !== strpos( $post_permalink, '?p=' ) ) {
@@ -893,9 +891,10 @@ final class WPCOM_Liveblog {
 			} else {
 				$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
 			}
-			$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
-			return $url;
 		}
+
+		return apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
+
 	}
 
 	/** Display Methods *******************************************************/
