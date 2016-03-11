@@ -79,7 +79,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$use_rest_api = 0;
 
 		if ( WPCOM_Liveblog::use_rest_api && WPCOM_Liveblog::can_use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . WPCOM_Liveblog::$post_id ) . 'hashtags');
+			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags');
 			$use_rest_api = 1;
 		}
 
