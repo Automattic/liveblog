@@ -490,7 +490,7 @@ final class WPCOM_Liveblog {
 
 		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete', 'delete_key' ) ) ) {
+		if ( ! self::is_valid_crud_action( $crud_action ) ) {
 			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 
@@ -1329,6 +1329,16 @@ final class WPCOM_Liveblog {
 	public static function can_use_rest_api() {
 		global $wp_version;
 		return version_compare( $wp_version, self::min_wp_rest_api_version, '>=' );
+	}
+
+	/**
+	 * Check for allowed crud action
+	 *
+	 * @param String $action The CRUD action to check
+	 * @return bool true if $action is one of insert|update|delete|delete_key. false otherwise
+	 */
+	public static function is_valid_crud_action( $action ) {
+		return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ) );
 	}
 
 	/** Plupload Helpers ******************************************************/

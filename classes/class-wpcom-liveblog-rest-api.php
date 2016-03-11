@@ -463,7 +463,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return bool true if $param is one of insert|update|delete|delete_key. false otherwise
 	 */
 	public static function validate_crud_action( $param, $request, $key ) {
-		return in_array( $param, array( 'insert', 'update', 'delete', 'delete_key' ) );
+		return WPCOM_Liveblog::is_valid_crud_action( $param );
 	}
 
 	/**
