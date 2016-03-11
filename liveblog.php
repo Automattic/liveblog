@@ -883,7 +883,7 @@ final class WPCOM_Liveblog {
 	 */
 	private static function get_entries_endpoint_url() {
 		if (self::use_rest_api && self::can_use_rest_api()) {
-			$url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::$endpoint_base ) . self::$post_id );
+			$url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . self::$post_id );
 			$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
 			return $url;
 		} else {
@@ -1321,6 +1321,16 @@ final class WPCOM_Liveblog {
 		}
 	}
 
+	/**
+	 * Checks to see if the current WordPress version has REST API support
+	 *
+	 * @return bool true if supported, false otherwise
+	 */
+	public static function can_use_rest_api() {
+		global $wp_version;
+		return version_compare( $wp_version, self::min_wp_rest_api_version, '>=' );
+	}
+
 	/** Plupload Helpers ******************************************************/
 
 	/**
@@ -1382,15 +1392,6 @@ final class WPCOM_Liveblog {
 		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
 
-	/**
-	 * Checks to see if the current WordPress version has REST API support
-	 *
-	 * @return bool true if supported, false otherwise
-	 */
-	private static function can_use_rest_api() {
-		global $wp_version;
-		return version_compare( $wp_version, self::min_wp_rest_api_version, '>=' );
-	}
 }
 WPCOM_Liveblog::load();
 
