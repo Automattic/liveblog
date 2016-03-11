@@ -206,7 +206,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		exit;
 	}
 
-	public function get_authors( $term = '' ) {
+	public function get_authors( $term ) {
 
 		// The args used in the get_users query.
 		$args = array(
