@@ -226,7 +226,7 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'update_post_state' ),
-				'permission_callback' => array( __CLASS__, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
 				'args' => array(
 					'post_id' => array(
 						'required' => true,
@@ -473,15 +473,6 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function sanitize_numeric( $param, $request, $key ) {
 		return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
-	}
-
-	/**
-	 * Permission callback to check if user can edit the Liveblog
-	 *
-	 * @return true if user has access. false otherwise
-	 */
-	public static function current_user_can_edit_liveblog() {
-		return WPCOM_Liveblog::current_user_can_edit_liveblog();
 	}
 
 }
