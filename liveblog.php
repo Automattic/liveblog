@@ -725,8 +725,19 @@ final class WPCOM_Liveblog {
 	}
 
 	public static function admin_enqueue_scripts( $hook_suffix ) {
+		global $post;
+
 		// Enqueue admin scripts only if adding or editing a supported post type.
 		if ( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) && post_type_supports( get_post_type(), self::key ) ) {
+
+			$endpoint_url = '';
+			$use_rest_api = 0;
+
+			if ( WPCOM_Liveblog::use_rest_api && WPCOM_Liveblog::can_use_rest_api() ) {
+				$endpoint_url = trailingslashit( trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'update_post_state' ) . $post->ID );
+				$use_rest_api = 1;
+			}
+
 			wp_enqueue_style( self::key, plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
 			wp_enqueue_script( 'liveblog-admin', plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
 			wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
@@ -734,6 +745,8 @@ final class WPCOM_Liveblog {
 				'nonce'                        => wp_create_nonce( self::nonce_action ),
 				'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
+				'use_rest_api'                 => $use_rest_api,
+				'endpoint_url'                 => $endpoint_url,
 			) );
 		}
 	}
@@ -1059,8 +1072,8 @@ final class WPCOM_Liveblog {
 			
 		}
 
-		echo $meta_box;
-		exit;
+		self::json_return($meta_box);
+
 	}
 
 	/**
