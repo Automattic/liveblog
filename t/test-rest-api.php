@@ -8,7 +8,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test for the expected array structure when getting entries
 	 */
-	function test_get_entries_by_time_response_structure() {
+	function test_get_entries_by_time_not_empty_response_structure() {
 
 		$this->setup_entry_test_state();
 
@@ -19,7 +19,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey('entries', $entries);
 		$this->assertArrayHasKey('latest_timestamp', $entries);
-		
+
 	}
 
 	/**
@@ -55,6 +55,72 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$this->assertEmpty($entries['entries']);
 		$this->assertNull($entries['latest_timestamp']);
+
+	}
+
+	/**
+	 * Test for valid return values when getting a single entry
+	 */
+	function test_get_single_entry_not_empty() {
+
+		$new_entry = $this->setup_entry_test_state();
+
+		$entry = WPCOM_Liveblog::get_single_entry( $new_entry[0]->get_id() );
+
+		$this->assertNotEmpty( $entry['entries'] );
+		$this->assertInternalType( 'int', $entry['index'] );
+		$this->assertInternalType( 'int', $entry['nextTimestamp'] );
+		$this->assertInternalType( 'int', $entry['previousTimestamp'] );
+
+	}
+
+	/**
+	 * Test for valid return values when getting a single entry that doesn't exist
+	 */
+	function test_get_single_entry_is_empty() {
+
+		$this->setup_entry_test_state();
+
+		$entry = WPCOM_Liveblog::get_single_entry( 1010 );
+
+		$this->assertEmpty( $entry['entries'] );
+
+	}
+
+	/**
+	 * Test for a non-empty response when getting entries for lazyloading
+	 */
+	function test_get_lazyload_entries_by_time_not_empty() {
+
+		// Create multiple entries
+		$this->setup_entry_test_state( 3 );
+
+		// A time window with entries
+		$max_timestamp = strtotime( '+1 day' );
+		$min_timestamp = 0;
+
+		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+
+		$this->assertNotEmpty( $entries['entries'] );
+		$this->assertInternalType( 'int', $entries['index'] );
+
+	}
+
+	/**
+	 * Test for an empty response when getting entries for lazyloading
+	 */
+	function test_get_lazyload_entries_by_time_is_empty() {
+
+		$this->setup_entry_test_state();
+
+		// A time window without entries
+		$max_timestamp = strtotime( '-1 day' );
+		$min_timestamp = 0;
+
+		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+
+		$this->assertEmpty( $entries['entries'] );
+		$this->assertInternalType( 'int', $entries['index'] );
 
 	}
 
@@ -160,22 +226,26 @@ class Test_REST_API extends WP_UnitTestCase {
 		return $_ch;
 	}
 
-	private function setup_entry_test_state() {
-		$entry = $this->insert_entry();
+	private function setup_entry_test_state( $number_of_entries = 1 ) {
+		$entries = $this->insert_entries( $number_of_entries );
 
 		WPCOM_Liveblog::$is_rest_api_call = true;
 		WPCOM_Liveblog::$post_id          = 1;
+
+		return $entries;
 	}
 
-	private function insert_entry( $args = array() ) {
-		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
-		return $entry;
-	}
+	private function insert_entries( $number_of_entries = 1, $args = array() ) {
+		$entries = array();
 
-	private function build_entry_args( $args = array() ) {
 		$user = $this->factory->user->create_and_get();
-		$defaults = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', 'user' => $user, );
-		return array_merge( $defaults, $args );
+		$args = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', 'user' => $user, );
+
+		for( $i = 0; $i < $number_of_entries; $i++ ) {
+			$entries[] = WPCOM_Liveblog_Entry::insert( $args );
+		}
+		
+		return $entries;
 	}
 
 }
