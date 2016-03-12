@@ -6,6 +6,59 @@ class Test_REST_API extends WP_UnitTestCase {
 	const HTTP_AUTH_PASS = '';
 
 	/**
+	 * Test for the expected array structure when getting entries
+	 */
+	function test_get_entries_by_time_response_structure() {
+
+		$this->setup_entry_test_state();
+
+		$start_time = strtotime('-1 hour');
+		$end_time   = strtotime('+1 hour');
+
+		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+
+		$this->assertArrayHasKey('entries', $entries);
+		$this->assertArrayHasKey('latest_timestamp', $entries);
+		
+	}
+
+	/**
+	 * Test for a non-empty response when getting entries
+	 */
+	function test_get_entries_by_time_not_empty() {
+
+		$this->setup_entry_test_state();
+
+		// A time window with entries
+		$start_time = strtotime('-1 hour');
+		$end_time   = strtotime('+1 hour');
+
+		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+
+		$this->assertNotEmpty($entries['entries']);
+		$this->assertNotNull($entries['latest_timestamp']);
+
+	}
+
+	/**
+	 * Test for an empty response when getting entries
+	 */
+	function test_get_entries_by_time_is_empty() {
+
+		$this->setup_entry_test_state();
+
+		// A time window without entries
+		$start_time = strtotime('-2 hour');
+		$end_time   = strtotime('-1 hour');
+
+		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+
+		$this->assertEmpty($entries['entries']);
+		$this->assertNull($entries['latest_timestamp']);
+
+	}
+
+	/**
 	 * These are integration tests.
 	 * They make real HTTP requests to the new and old endpoints and compare the results
 	 */
@@ -105,6 +158,24 @@ class Test_REST_API extends WP_UnitTestCase {
 		}
 
 		return $_ch;
+	}
+
+	private function setup_entry_test_state() {
+		$entry = $this->insert_entry();
+
+		WPCOM_Liveblog::$is_rest_api_call = true;
+		WPCOM_Liveblog::$post_id          = 1;
+	}
+
+	private function insert_entry( $args = array() ) {
+		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
+		return $entry;
+	}
+
+	private function build_entry_args( $args = array() ) {
+		$user = $this->factory->user->create_and_get();
+		$defaults = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', 'user' => $user, );
+		return array_merge( $defaults, $args );
 	}
 
 }
