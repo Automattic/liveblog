@@ -88,7 +88,7 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'crud_entry' ),
-				'permission_callback' => array( __CLASS__, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
 				'args' => array(
 					'crud_action' => array(
 						'required' => true,
