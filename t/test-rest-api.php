@@ -125,6 +125,78 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the insert CRUD action
+	 */
+	function test_crud_action_insert() {
+
+		$user  = $this->factory->user->create_and_get();
+		$args  = array( 'user' => $user, );
+		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
+
+		$this->assertInternalType( 'array', $entry );
+		$this->assertNotEmpty( $entry['entries'] );
+		$this->assertNull( $entry['latest_timestamp'] ); // Should this always be null?
+
+	}
+
+	/**
+	 * Test the update CRUD action
+	 */
+	function test_crud_action_update() {
+
+		$new_entry = $this->setup_entry_test_state();
+		$args      = array( 'entry_id' => $new_entry[0]->get_id(), 'content' => 'Updated Test Liveblog entry', );
+		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
+
+		$this->assertInternalType( 'array', $entry );
+		$this->assertNotEmpty( $entry['entries'] );
+		$this->assertNull( $entry['latest_timestamp'] );
+
+	}
+
+	/**
+	 * Test the delete CRUD action
+	 */
+	function test_crud_action_delete() {
+
+		// First create an entry
+		$new_entry = $this->setup_entry_test_state();
+
+		$this->assertInternalType( 'array', $new_entry );
+		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $new_entry[0] );
+		
+		$new_entry_id = $new_entry[0]->get_id();
+
+		// Then delete it
+		$args  = array( 'entry_id' => $new_entry_id, );
+		$entry = WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
+
+		// Check that it was sent to the trash
+		$deleted_entry = get_comment( $new_entry_id );
+
+		$this->assertEquals( 'trash', $deleted_entry->comment_approved);
+
+	}
+
+	/**
+	 * Test the delete_key CRUD action
+	 */
+	function test_crud_action_delete_key() {
+
+		// First create an entry with a key
+		$new_entry = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
+		$new_entry_id = $new_entry[0]->get_id();
+
+		// Then delete the key
+		$args      = array( 'entry_id' => $new_entry_id, );
+		$entry     = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
+
+		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error
+		$this->assertNotInstanceOf( 'WP_Error' , $entry);
+
+	}
+
+	/**
 	 * These are integration tests.
 	 * They make real HTTP requests to the new and old endpoints and compare the results
 	 */
@@ -226,8 +298,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		return $_ch;
 	}
 
-	private function setup_entry_test_state( $number_of_entries = 1 ) {
-		$entries = $this->insert_entries( $number_of_entries );
+	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
+		$entries = $this->insert_entries( $number_of_entries, $args );
 
 		WPCOM_Liveblog::$is_rest_api_call = true;
 		WPCOM_Liveblog::$post_id          = 1;
@@ -239,13 +311,18 @@ class Test_REST_API extends WP_UnitTestCase {
 		$entries = array();
 
 		$user = $this->factory->user->create_and_get();
-		$args = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', 'user' => $user, );
+		$args['user'] = $user;
 
 		for( $i = 0; $i < $number_of_entries; $i++ ) {
-			$entries[] = WPCOM_Liveblog_Entry::insert( $args );
+			$entries[] = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		}
 		
 		return $entries;
+	}
+
+	private function build_entry_args( $args = array() ) {
+		$defaults = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', );
+		return array_merge( $defaults, $args );
 	}
 
 }
