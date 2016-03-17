@@ -219,12 +219,12 @@ class WPCOM_Liveblog_Rest_Api {
 		/*
 		 * Save and retrieve Liveblog post state and meta-data
 		 *
-		 * /update_post_state/<post_id>/<state>/<template_name>/<template_format>/<limit>
+		 * /<post_id>/post_state
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/update_post_state/(?P<post_id>\d+)/(?P<state>[\w-]+)/(?P<template_name>[\w-]+)/(?P<template_format>[\w-]+)/(?P<limit>\d+)([/]*)',
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/post_state([/]*)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'update_post_state' ),
 				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
 				'args' => array(
