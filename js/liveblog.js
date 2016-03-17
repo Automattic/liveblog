@@ -200,6 +200,11 @@ window.liveblog = window.liveblog || {};
 			local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp,
 			to         = liveblog.latest_response_server_timestamp + local_diff;
 
+		if ( 1 == liveblog_settings.use_rest_api ) {
+			// Use REST API entries endpoint
+			url += 'entries/';
+		}
+
 		url += from + '/' + to + '/';
 		liveblog.show_spinner();
 		liveblog.ajax_request( url, {}, liveblog.get_recent_entries_success, liveblog.get_recent_entries_error );

@@ -817,6 +817,7 @@ final class WPCOM_Liveblog {
 				'delay_multiplier'       => self::delay_multiplier,
 				'fade_out_duration'      => self::fade_out_duration,
 
+				'use_rest_api'           => intval( WPCOM_Liveblog::use_rest_api && WPCOM_Liveblog::can_use_rest_api() ),
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				'features'               => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
