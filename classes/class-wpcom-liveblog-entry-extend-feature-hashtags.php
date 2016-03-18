@@ -76,11 +76,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	public function get_config( $config ) {
 
 		$endpoint_url = admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms';
-		$use_rest_api = 0;
 
 		if ( WPCOM_Liveblog::use_rest_api() ) {
 			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags');
-			$use_rest_api = 1;
 		}
 
 		// Add our config to the front end autocomplete
@@ -93,7 +91,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			'url'         => $endpoint_url,
 			'template'    => '${slug}',
 			'replacement' => '#${slug}',
-			'use_rest_api' => $use_rest_api,
 		) );
 
 		return $config;
