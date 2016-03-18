@@ -197,6 +197,19 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test getting a preview of an entry
+	 */
+	function test_preview_entry() {
+		
+		// Get entry preview
+		$preview = WPCOM_Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
+
+		$this->assertInternalType( 'array', $preview );
+		$this->assertNotEmpty( $preview['html'] );
+
+	}
+
+	/**
 	 * Integration test
 	 * It makes a real HTTP request to the new and old endpoints and compares the results
 	 *
@@ -300,10 +313,14 @@ class Test_REST_API extends WP_UnitTestCase {
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
 		$entries = $this->insert_entries( $number_of_entries, $args );
 
-		WPCOM_Liveblog::$is_rest_api_call = true;
-		WPCOM_Liveblog::$post_id          = 1;
+		$this->set_liveblog_vars();
 
 		return $entries;
+	}
+
+	private function set_liveblog_vars() {
+		WPCOM_Liveblog::$is_rest_api_call = true;
+		WPCOM_Liveblog::$post_id          = 1;
 	}
 
 	private function insert_entries( $number_of_entries = 1, $args = array() ) {
