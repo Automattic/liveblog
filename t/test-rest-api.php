@@ -222,7 +222,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$end_time          = '1455910058';
 
 		$endpoint1 = $base_endpoint1 . '/' . $start_time . '/' . $end_time . '/';
-		$endpoint2 = $base_endpoint2 . '/' . $start_time . '/' . $end_time . '/';
+		$endpoint2 = $base_endpoint2 . '/entries/' . $start_time . '/' . $end_time . '/';
 
 		// Call the first endpoint
 		$ch1 = curl_init();
