@@ -197,32 +197,23 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * These are integration tests.
-	 * They make real HTTP requests to the new and old endpoints and compare the results
+	 * Integration test
+	 * It makes a real HTTP request to the new and old endpoints and compares the results
+	 *
+	 * Check the endpoints for getting entries between two timestamps
+	 * Runs as an unauthenticated user
+	 *
 	 */
-	function test_compare_new_old_endpoint_output() {
+	function test_compare_new_old_endpoints_get_entries() {
 
-		// Setup some config variables. These will need to be changed for different environments
-		$host              = 'wp.local';
-		$post_id           = '5';
-		$old_partial_query = '/2016/02/13/';
-
-		// Base endpoints used for all calls
-		$base_endpoint1 = 'http://' . $host . $old_partial_query . $post_id . '/liveblog';
-		$base_endpoint2 = 'http://' . $host . '/wp-json/liveblog/v1/' . $post_id;
-
-
-		/***********************************************************************
-		 * Check the endpoints for getting entries between two timestamps
-		 * Runs as an unauthenticated user
-		 ***********************************************************************/
+		$endpoint_config = $this->get_endpoint_config();
 
 		// Set to a range that will return some entries
 		$start_time        = '1455903120';
 		$end_time          = '1455910058';
 
-		$endpoint1 = $base_endpoint1 . '/' . $start_time . '/' . $end_time . '/';
-		$endpoint2 = $base_endpoint2 . '/entries/' . $start_time . '/' . $end_time . '/';
+		$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/' . $start_time . '/' . $end_time . '/';
+		$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/entries/' . $start_time . '/' . $end_time . '/';
 
 		// Call the first endpoint
 		$ch1 = curl_init();
@@ -242,18 +233,26 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Cross your fingers and toes
 		$this->assertJsonStringEqualsJsonString( $response1, $response2 );
+		
+	}
 
+	/**
+	 * Integration test
+	 * It makes a real HTTP request to the new and old endpoints and compares the results
+	 *
+	 * Check to make sure an unauthenticated user cannot insert new entries
+	 */
+	function test_compare_new_old_endpoints_unauthenticated_user_cannot_insert() {
+		//TODO: Look into using 
 
-		/***********************************************************************
-		 * Check to make sure an unauthenticated user cannot insert new entries
-		 ***********************************************************************/
+		$endpoint_config = $this->get_endpoint_config();
 
-		$endpoint1 = $base_endpoint1 . '/crud';
-		$endpoint2 = $base_endpoint2 . '/crud';
+		$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/crud';
+		$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/crud';
 
 		$post_data_insert = array(
 			'crud_action' => 'insert',
-			'post_id' => $post_id,
+			'post_id' => $endpoint_config['post_id'],
 			'entry_id' => '',
 			'content' => 'Crazy test entry3!',
 		);
@@ -323,6 +322,23 @@ class Test_REST_API extends WP_UnitTestCase {
 	private function build_entry_args( $args = array() ) {
 		$defaults = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', );
 		return array_merge( $defaults, $args );
+	}
+
+	/**
+	 * Get settings used for HTTP request integration tests
+	 */
+	private function get_endpoint_config() {
+		$host = 'wp.local';
+
+		$endpoint_config = array(
+			'post_id'           => '5',
+		);
+
+		// Base endpoint URLs used for HTTP requests
+		$endpoint_config['base_endpoint_url1'] = 'http://' . $host . '/2016/02/13/' . $endpoint_config['post_id'] . '/liveblog';
+		$endpoint_config['base_endpoint_url2'] = 'http://' . $host . '/wp-json/liveblog/v1/' . $endpoint_config['post_id'];
+
+		return $endpoint_config;
 	}
 
 }
