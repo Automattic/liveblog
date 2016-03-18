@@ -200,12 +200,61 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Test getting a preview of an entry
 	 */
 	function test_preview_entry() {
-		
+
 		// Get entry preview
 		$preview = WPCOM_Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
 
 		$this->assertInternalType( 'array', $preview );
 		$this->assertNotEmpty( $preview['html'] );
+
+	}
+
+	/**
+	 * Test getting list of authors from a string
+	 */
+	function test_get_authors() {
+
+		// Get a list of authors
+		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
+
+		$authors_not_empty = $liveblog_authors->get_authors( 'adm' ); // Should return admin
+		$authors_is_empty  = $liveblog_authors->get_authors( 'fakeauthor' ); // Non-existent user
+
+		$this->assertInternalType( 'array', $authors_not_empty );
+		$this->assertInternalType( 'array', $authors_is_empty );
+		$this->assertNotEmpty( $authors_not_empty );
+		$this->assertEmpty( $authors_is_empty );
+
+	}
+
+	/**
+	 * Test getting list of hashtags from a string
+	 */
+	function test_get_hashtags() {
+
+		// Get a list of hashtags
+		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
+		// $liveblog_hashtags->add_hashtag_taxonomy();
+
+		// Create a temporary hashtag
+		$this->factory->term->create( array( 'name' => 'coolhashtag', 'taxonomy' => 'hashtags', 'slug' => 'coolhashtag' ) );
+
+		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag
+		$hashtags_is_empty  = $liveblog_hashtags->get_hashtag_terms( 'fakehashtag' ); // Non-existent hashtag
+
+		$this->assertInternalType( 'array', $hashtags_not_empty );
+		$this->assertInternalType( 'array', $hashtags_is_empty );
+		$this->assertNotEmpty( $hashtags_not_empty );
+		$this->assertEmpty( $hashtags_is_empty );
+
+	}
+
+	/**
+	 * Test updating a Liveblog enabled post state
+	 */
+	function test_update_post_state() {
+
+		$this->assertTrue( false );
 
 	}
 
