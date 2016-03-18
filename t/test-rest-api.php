@@ -234,7 +234,6 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Get a list of hashtags
 		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
-		// $liveblog_hashtags->add_hashtag_taxonomy();
 
 		// Create a temporary hashtag
 		$this->factory->term->create( array( 'name' => 'coolhashtag', 'taxonomy' => 'hashtags', 'slug' => 'coolhashtag' ) );
@@ -250,11 +249,28 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test updating a Liveblog enabled post state
+	 * Test updating the state of a post for Liveblog
 	 */
 	function test_update_post_state() {
 
-		$this->assertTrue( false );
+		// Create a test post
+		$post  = $this->factory->post->create_and_get();
+		$state = 'enable';
+
+		// Additional request variables used in the liveblog_admin_settings_update action
+		$request_vars = array(
+			'state'                        => $state,
+			'liveblog-key-template-name'   => 'list',
+			'liveblog-key-template-format' => 'full',
+			'liveblog-key-limit'           => '5',
+		);
+
+		// Save post state and return the metabox markup
+		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
+
+		// TODO: Possibly test for something more specific
+		$this->assertInternalType( 'string', $meta_box );
+		$this->assertNotEmpty( $meta_box );
 
 	}
 
