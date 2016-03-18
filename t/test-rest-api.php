@@ -293,21 +293,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/' . $start_time . '/' . $end_time . '/';
 		$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/entries/' . $start_time . '/' . $end_time . '/';
 
-		// Call the first endpoint
-		$ch1 = curl_init();
-		$ch1 = self::set_common_curl_options( $ch1 );
-		curl_setopt( $ch1, CURLOPT_URL, $endpoint1 );
-
-		$response1 = curl_exec( $ch1 );
-		curl_close( $ch1 );
-
-		// Call the second endpoint
-		$ch2 = curl_init();
-		$ch2 = self::set_common_curl_options( $ch2 );
-		curl_setopt( $ch2, CURLOPT_URL, $endpoint2 );
-
-		$response2 = curl_exec( $ch2 );
-		curl_close( $ch2 );
+		$response1 = wp_remote_retrieve_body( wp_remote_get( $endpoint1 ) );
+		$response2 = wp_remote_retrieve_body( wp_remote_get( $endpoint2 ) );
 
 		// Cross your fingers and toes
 		$this->assertJsonStringEqualsJsonString( $response1, $response2 );
@@ -321,7 +308,6 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Check to make sure an unauthenticated user cannot insert new entries
 	 */
 	function test_compare_new_old_endpoints_unauthenticated_user_cannot_insert() {
-		//TODO: Look into using 
 
 		$endpoint_config = $this->get_endpoint_config();
 
@@ -329,31 +315,17 @@ class Test_REST_API extends WP_UnitTestCase {
 		$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/crud';
 
 		$post_data_insert = array(
-			'crud_action' => 'insert',
-			'post_id' => $endpoint_config['post_id'],
-			'entry_id' => '',
-			'content' => 'Crazy test entry3!',
+			'method' => 'POST',
+			'body'   => array(
+				'crud_action' => 'insert',
+				'post_id'     => $endpoint_config['post_id'],
+				'entry_id'    => '',
+				'content'     => 'Crazy test entry!',
+			)
 		);
 
-		$ch1 = curl_init();
-		$ch1 = self::set_common_curl_options( $ch1 );
-		curl_setopt( $ch1, CURLOPT_URL, $endpoint1 );
-		curl_setopt( $ch1, CURLOPT_POST, 1 );
-		curl_setopt( $ch1, CURLOPT_POSTFIELDS, $post_data_insert );
-
-		curl_exec( $ch1 );
-		$response1_http_code = curl_getinfo( $ch1, CURLINFO_HTTP_CODE );
-		curl_close( $ch1 );
-
-		$ch2 = curl_init();
-		$ch2 = self::set_common_curl_options( $ch2 );
-		curl_setopt( $ch2, CURLOPT_URL, $endpoint2 );
-		curl_setopt( $ch2, CURLOPT_POST, 1 );
-		curl_setopt( $ch2, CURLOPT_POSTFIELDS, $post_data_insert );
-
-		curl_exec( $ch2 );
-		$response2_http_code = curl_getinfo( $ch2, CURLINFO_HTTP_CODE );
-		curl_close( $ch2 );
+		$response1_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint1, $post_data_insert ) );
+		$response2_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint2, $post_data_insert ) );
 
 		// HTTP response codes should be 403 Forbidden
 		$this->assertEquals( 403, $response1_http_code );
