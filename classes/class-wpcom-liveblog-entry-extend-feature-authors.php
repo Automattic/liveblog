@@ -76,7 +76,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		$endpoint_url = admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors';
 		$use_rest_api = 0;
 
-		if ( WPCOM_Liveblog::use_rest_api && WPCOM_Liveblog::can_use_rest_api() ) {
+		if ( WPCOM_Liveblog::use_rest_api() ) {
 			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors');
 			$use_rest_api = 1;
 		}

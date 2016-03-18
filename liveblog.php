@@ -86,7 +86,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
 
-		if (self::can_use_rest_api()) {
+		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
 		}
 	}
@@ -128,7 +128,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
-		if (self::can_use_rest_api()) {
+		if ( self::use_rest_api() ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
 		}
 
@@ -733,7 +733,7 @@ final class WPCOM_Liveblog {
 			$endpoint_url = '';
 			$use_rest_api = 0;
 
-			if ( self::use_rest_api && self::can_use_rest_api() ) {
+			if ( self::use_rest_api() ) {
 				$endpoint_url = trailingslashit( trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . $post->ID ) . 'post_state' );
 				$use_rest_api = 1;
 			}
@@ -817,7 +817,7 @@ final class WPCOM_Liveblog {
 				'delay_multiplier'       => self::delay_multiplier,
 				'fade_out_duration'      => self::fade_out_duration,
 
-				'use_rest_api'           => intval( self::use_rest_api && self::can_use_rest_api() ),
+				'use_rest_api'           => intval( self::use_rest_api() ),
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				'features'               => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
@@ -896,7 +896,7 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		if (self::use_rest_api && self::can_use_rest_api()) {
+		if ( self::use_rest_api() ) {
 			$url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . self::$post_id );
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
@@ -1342,6 +1342,13 @@ final class WPCOM_Liveblog {
 	public static function can_use_rest_api() {
 		global $wp_version;
 		return version_compare( $wp_version, self::min_wp_rest_api_version, '>=' );
+	}
+
+	/**
+	 * Checks if use_rest_api is on and the WordPress version supports it
+	 */
+	public static function use_rest_api() {
+		return ( self::use_rest_api && self::can_use_rest_api() );
 	}
 
 	/**
