@@ -437,7 +437,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		// Get entry preview
+		// Save post state
 		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		// Possibly do not cache the response
