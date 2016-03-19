@@ -37,7 +37,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		if ( get_option( 'permalink_structure' ) ) {
 			// Pretty permalinks enabled 
-			$base = '/wp-json/' . self::$api_namespace . '/';
+			$base = '/' . rest_get_url_prefix() . '/' . self::$api_namespace . '/';
 		} else {
 			// Pretty permalinks not enabled
 			$base = '/?rest_route=/' . self::$api_namespace . '/';
