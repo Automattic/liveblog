@@ -2,9 +2,6 @@
 
 class Test_REST_API extends WP_UnitTestCase {
 
-	const HTTP_AUTH_USER = '';
-	const HTTP_AUTH_PASS = '';
-
 	/**
 	 * Test for the expected array structure when getting entries
 	 */
@@ -331,20 +328,6 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->assertEquals( 403, $response1_http_code );
 		$this->assertEquals( 403, $response2_http_code );
 		
-	}
-
-	private static function set_common_curl_options( $_ch ) {
-		curl_setopt( $_ch, CURLOPT_HEADER, 0 );
-		curl_setopt( $_ch, CURLOPT_HTTPHEADER, array('Accept:application/json' ) );
-		curl_setopt( $_ch, CURLOPT_RETURNTRANSFER, 1 );
-
-		// Use HTTP auth
-		if ( ! empty( self::HTTP_AUTH_USER ) && ! empty( self::HTTP_AUTH_PASS ) ) {
-			curl_setopt( $_ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
-			curl_setopt( $_ch, CURLOPT_USERPWD, self::HTTP_AUTH_USER . ':' . self::HTTP_AUTH_PASS );
-		}
-
-		return $_ch;
 	}
 
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
