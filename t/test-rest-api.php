@@ -279,24 +279,24 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Runs as an unauthenticated user
 	 *
 	 */
-	function test_compare_new_old_endpoints_get_entries() {
+	// function test_compare_new_old_endpoints_get_entries() {
 
-		$endpoint_config = $this->get_endpoint_config();
+	// 	$endpoint_config = $this->get_endpoint_config();
 
-		// Set to a range that will return some entries
-		$start_time        = '1455903120';
-		$end_time          = '1455910058';
+	// 	// Set to a range that will return some entries
+	// 	$start_time        = '1455903120';
+	// 	$end_time          = '1455910058';
 
-		$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/' . $start_time . '/' . $end_time . '/';
-		$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/entries/' . $start_time . '/' . $end_time . '/';
+	// 	$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/' . $start_time . '/' . $end_time . '/';
+	// 	$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/entries/' . $start_time . '/' . $end_time . '/';
 
-		$response1 = wp_remote_retrieve_body( wp_remote_get( $endpoint1 ) );
-		$response2 = wp_remote_retrieve_body( wp_remote_get( $endpoint2 ) );
+	// 	$response1 = wp_remote_retrieve_body( wp_remote_get( $endpoint1 ) );
+	// 	$response2 = wp_remote_retrieve_body( wp_remote_get( $endpoint2 ) );
 
-		// Cross your fingers and toes
-		$this->assertJsonStringEqualsJsonString( $response1, $response2 );
+	// 	// Cross your fingers and toes
+	// 	$this->assertJsonStringEqualsJsonString( $response1, $response2 );
 		
-	}
+	// }
 
 	/**
 	 * Integration test
@@ -304,31 +304,31 @@ class Test_REST_API extends WP_UnitTestCase {
 	 *
 	 * Check to make sure an unauthenticated user cannot insert new entries
 	 */
-	function test_compare_new_old_endpoints_unauthenticated_user_cannot_insert() {
+	// function test_compare_new_old_endpoints_unauthenticated_user_cannot_insert() {
 
-		$endpoint_config = $this->get_endpoint_config();
+	// 	$endpoint_config = $this->get_endpoint_config();
 
-		$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/crud';
-		$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/crud';
+	// 	$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/crud';
+	// 	$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/crud';
 
-		$post_data_insert = array(
-			'method' => 'POST',
-			'body'   => array(
-				'crud_action' => 'insert',
-				'post_id'     => $endpoint_config['post_id'],
-				'entry_id'    => '',
-				'content'     => 'Crazy test entry!',
-			)
-		);
+	// 	$post_data_insert = array(
+	// 		'method' => 'POST',
+	// 		'body'   => array(
+	// 			'crud_action' => 'insert',
+	// 			'post_id'     => $endpoint_config['post_id'],
+	// 			'entry_id'    => '',
+	// 			'content'     => 'Crazy test entry!',
+	// 		)
+	// 	);
 
-		$response1_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint1, $post_data_insert ) );
-		$response2_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint2, $post_data_insert ) );
+	// 	$response1_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint1, $post_data_insert ) );
+	// 	$response2_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint2, $post_data_insert ) );
 
-		// HTTP response codes should be 403 Forbidden
-		$this->assertEquals( 403, $response1_http_code );
-		$this->assertEquals( 403, $response2_http_code );
+	// 	// HTTP response codes should be 403 Forbidden
+	// 	$this->assertEquals( 403, $response1_http_code );
+	// 	$this->assertEquals( 403, $response2_http_code );
 		
-	}
+	// }
 
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
 		$entries = $this->insert_entries( $number_of_entries, $args );
