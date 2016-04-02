@@ -2,6 +2,27 @@
 
 class Test_REST_API extends WP_UnitTestCase {
 
+	const ENDPOINT_BASE = '/liveblog/v1';
+
+	protected $server;
+
+	public function setUp() {
+		parent::setUp();
+
+		/** @var WP_REST_Server $wp_rest_server */
+		global $wp_rest_server;
+		$this->server = $wp_rest_server = new WP_Test_Spy_REST_Server;
+		do_action( 'rest_api_init' );
+	}
+
+	public function tearDown() {
+		parent::tearDown();
+
+		/** @var WP_REST_Server $wp_rest_server */
+		global $wp_rest_server;
+		$wp_rest_server = null;
+	}
+
 	/**
 	 * Test for the expected array structure when getting entries
 	 */
@@ -269,6 +290,31 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->assertInternalType( 'string', $meta_box );
 		$this->assertNotEmpty( $meta_box );
 
+	}
+
+	/**
+	 * Integration test
+	 * Test accessing the get entries endpoint
+	 */
+	function test_endpoint_get_entries() {
+		// Insert 1 entry
+		$this->insert_entries();
+
+		// A time window with entries
+		$start_time = strtotime( '-1 hour' );
+		$end_time   = strtotime( '+1 hour' );
+
+		// Try to access the endpoint
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time . '/');
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		$entries = $response->get_data();
+
+		// The array should contain 1 entry
+		$this->assertCount( 1, $entries['entries'] );
 	}
 
 	/**
