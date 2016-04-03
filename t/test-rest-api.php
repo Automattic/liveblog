@@ -305,7 +305,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$end_time   = strtotime( '+1 hour' );
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time . '/');
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time . '/' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -314,6 +314,41 @@ class Test_REST_API extends WP_UnitTestCase {
 		$entries = $response->get_data();
 
 		// The array should contain 1 entry
+		$this->assertCount( 1, $entries['entries'] );
+	}
+
+	/**
+	 * Integration test
+	 * Test accessing the crud endpoint with an insert action
+	 */
+	function test_endpoint_crud_action() {
+
+		// Create an author and set as the current user
+		$author_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		wp_set_current_user( $author_id );
+
+		// Create a post
+		$this->factory->post->create();
+
+		// The POST data to insert
+		$post_vars  = $this->build_entry_args( array(
+			'crud_action' => 'insert',
+		));
+
+		// Try to access the endpoint and insert an entry
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud/' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $post_vars );
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		$entries = $response->get_data();
+
+		// The array should contain the newly inserted entry
 		$this->assertCount( 1, $entries['entries'] );
 	}
 
