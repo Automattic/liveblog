@@ -305,7 +305,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$end_time   = strtotime( '+1 hour' );
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time . '/' );
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -338,7 +338,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		));
 
 		// Try to access the endpoint and insert an entry
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud/' );
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
@@ -365,7 +365,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$min_timestamp = 0;
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/lazyload/' . $max_timestamp . '/' . $min_timestamp . '/' );
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/lazyload/' . $max_timestamp . '/' . $min_timestamp );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -376,6 +376,27 @@ class Test_REST_API extends WP_UnitTestCase {
 		// The array should contain 1 entry
 		$this->assertCount( 1, $entries['entries'] );
 
+	}
+
+	/**
+	 * Integration test
+	 * Test accessing the get single entry endpoint
+	 */
+	function test_endpoint_get_single_entry() {
+		// Insert 1 entry
+		$new_entries = $this->insert_entries();
+
+		// Try to access the endpoint
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id());
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		$entries = $response->get_data();
+
+		// The array should contain 1 entry
+		$this->assertCount( 1, $entries['entries'] );
 	}
 
 	/**
