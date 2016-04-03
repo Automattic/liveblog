@@ -452,6 +452,35 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * Integration test
+	 * Test accessing the get hashtags endpoint
+	 */
+	function test_endpoint_get_hashtags() {
+
+		// Create 2 hashtags
+		$this->factory->term->create( array(
+			'name'     => 'coolhashtag',
+			'taxonomy' => 'hashtags',
+			'slug'     => 'coolhashtag',
+		));
+		$this->factory->term->create( array(
+			'name'     => 'coolhashtag2',
+			'taxonomy' => 'hashtags',
+			'slug'     => 'coolhashtag2',
+		));
+		
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		// The array should contain 2 authors
+		$this->assertCount( 2, $response->get_data() );
+
+	}
+
+	/**
+	 * Integration test
 	 * It makes a real HTTP request to the new and old endpoints and compares the results
 	 *
 	 * Check the endpoints for getting entries between two timestamps
