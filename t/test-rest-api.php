@@ -509,65 +509,6 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->assertNotEmpty( $response->get_data() );
 	}
 
-	/**
-	 * Integration test
-	 * It makes a real HTTP request to the new and old endpoints and compares the results
-	 *
-	 * Check the endpoints for getting entries between two timestamps
-	 * Runs as an unauthenticated user
-	 *
-	 */
-	// function test_compare_new_old_endpoints_get_entries() {
-
-	// 	$endpoint_config = $this->get_endpoint_config();
-
-	// 	// Set to a range that will return some entries
-	// 	$start_time        = '1455903120';
-	// 	$end_time          = '1455910058';
-
-	// 	$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/' . $start_time . '/' . $end_time . '/';
-	// 	$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/entries/' . $start_time . '/' . $end_time . '/';
-
-	// 	$response1 = wp_remote_retrieve_body( wp_remote_get( $endpoint1 ) );
-	// 	$response2 = wp_remote_retrieve_body( wp_remote_get( $endpoint2 ) );
-
-	// 	// Cross your fingers and toes
-	// 	$this->assertJsonStringEqualsJsonString( $response1, $response2 );
-		
-	// }
-
-	/**
-	 * Integration test
-	 * It makes a real HTTP request to the new and old endpoints and compares the results
-	 *
-	 * Check to make sure an unauthenticated user cannot insert new entries
-	 */
-	// function test_compare_new_old_endpoints_unauthenticated_user_cannot_insert() {
-
-	// 	$endpoint_config = $this->get_endpoint_config();
-
-	// 	$endpoint1 = $endpoint_config['base_endpoint_url1'] . '/crud';
-	// 	$endpoint2 = $endpoint_config['base_endpoint_url2'] . '/crud';
-
-	// 	$post_data_insert = array(
-	// 		'method' => 'POST',
-	// 		'body'   => array(
-	// 			'crud_action' => 'insert',
-	// 			'post_id'     => $endpoint_config['post_id'],
-	// 			'entry_id'    => '',
-	// 			'content'     => 'Crazy test entry!',
-	// 		)
-	// 	);
-
-	// 	$response1_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint1, $post_data_insert ) );
-	// 	$response2_http_code = wp_remote_retrieve_response_code( wp_remote_post( $endpoint2, $post_data_insert ) );
-
-	// 	// HTTP response codes should be 403 Forbidden
-	// 	$this->assertEquals( 403, $response1_http_code );
-	// 	$this->assertEquals( 403, $response2_http_code );
-		
-	// }
-
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
 		$entries = $this->insert_entries( $number_of_entries, $args );
 
@@ -597,23 +538,6 @@ class Test_REST_API extends WP_UnitTestCase {
 	private function build_entry_args( $args = array() ) {
 		$defaults = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', );
 		return array_merge( $defaults, $args );
-	}
-
-	/**
-	 * Get settings used for HTTP request integration tests
-	 */
-	private function get_endpoint_config() {
-		$host = 'wp.local';
-
-		$endpoint_config = array(
-			'post_id'           => '5',
-		);
-
-		// Base endpoint URLs used for HTTP requests
-		$endpoint_config['base_endpoint_url1'] = 'http://' . $host . '/2016/02/13/' . $endpoint_config['post_id'] . '/liveblog';
-		$endpoint_config['base_endpoint_url2'] = 'http://' . $host . '/wp-json/liveblog/v1/' . $endpoint_config['post_id'];
-
-		return $endpoint_config;
 	}
 
 	/**
