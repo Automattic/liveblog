@@ -424,6 +424,34 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * Integration test
+	 * Test accessing the get authors endpoint
+	 */
+	function test_endpoint_get_authors() {
+
+		// Create 2 authors
+		$this->factory->user->create( array(
+			'role' => 'author',
+			'display_name' => 'Josh Smith'
+		) );
+
+		$this->factory->user->create( array(
+			'role' => 'author',
+			'display_name' => 'John Doe'
+		) );
+
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		// The array should contain 2 authors
+		$this->assertCount( 2, $response->get_data() );
+
+	}
+
+	/**
+	 * Integration test
 	 * It makes a real HTTP request to the new and old endpoints and compares the results
 	 *
 	 * Check the endpoints for getting entries between two timestamps
