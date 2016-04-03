@@ -387,7 +387,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$new_entries = $this->insert_entries();
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id());
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id() );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -397,6 +397,29 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// The array should contain 1 entry
 		$this->assertCount( 1, $entries['entries'] );
+	}
+
+	/**
+	 * Integration test
+	 * Test accessing the entry preview endpoint
+	 */
+	function test_endpoint_entry_preview() {
+
+		// The POST data to preview
+		$post_vars = array( 'entry_content' => 'Test Liveblog entry with /key' );
+
+		// Try to access the endpoint
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/preview');
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $post_vars );
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		// The result should be an array with an "html" key
+		$this->assertArrayHasKey( 'html', $response->get_data() );
+		
 	}
 
 	/**
