@@ -354,6 +354,32 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * Integration test
+	 * Test accessing the lazyload endpoint
+	 */
+	function test_endpoint_lazyload() {
+		// Insert 1 entry
+		$this->insert_entries();
+
+		// A time window with entries
+		$max_timestamp = strtotime( '+1 day' );
+		$min_timestamp = 0;
+
+		// Try to access the endpoint
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/lazyload/' . $max_timestamp . '/' . $min_timestamp . '/' );
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		$entries = $response->get_data();
+
+		// The array should contain 1 entry
+		$this->assertCount( 1, $entries['entries'] );
+
+	}
+
+	/**
+	 * Integration test
 	 * It makes a real HTTP request to the new and old endpoints and compares the results
 	 *
 	 * Check the endpoints for getting entries between two timestamps
