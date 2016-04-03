@@ -734,7 +734,7 @@ final class WPCOM_Liveblog {
 			$use_rest_api = 0;
 
 			if ( self::use_rest_api() ) {
-				$endpoint_url = trailingslashit( trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . $post->ID ) . 'post_state' );
+				$endpoint_url = WPCOM_Liveblog_Rest_Api::build_endpoint_base() . $post->ID . '/' . 'post_state';
 				$use_rest_api = 1;
 			}
 
@@ -897,7 +897,7 @@ final class WPCOM_Liveblog {
 	 */
 	private static function get_entries_endpoint_url() {
 		if ( self::use_rest_api() ) {
-			$url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . self::$post_id );
+			$url = WPCOM_Liveblog_Rest_Api::build_endpoint_base() . self::$post_id . '/';
 		} else {
 			$post_permalink = get_permalink( self::$post_id );
 			if ( false !== strpos( $post_permalink, '?p=' ) ) {
