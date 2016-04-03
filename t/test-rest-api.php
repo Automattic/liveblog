@@ -324,10 +324,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	function test_endpoint_crud_action() {
 
 		// Create an author and set as the current user
-		$author_id = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
-		wp_set_current_user( $author_id );
+		$this->set_author_user();
 
 		// Create a post
 		$this->factory->post->create();
@@ -481,6 +478,39 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * Integration test
+	 * Test accessing the update post state endpoint
+	 */
+	function test_endpoint_update_post_state() {
+
+		// Create an author and set as the current user
+		$this->set_author_user();
+
+		// Create a post
+		$post = $this->factory->post->create_and_get();
+
+		// The POST data
+		$post_vars = array(
+			'state'           => 'enable',
+			'template_name'   => 'list',
+			'template_format' => 'full',
+			'limit'           => '5',
+		);
+
+		// Try to access the endpoint
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state');
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $post_vars );
+		$response = $this->server->dispatch( $request );
+
+		// Assert successful response
+		$this->assertEquals( 200, $response->get_status() );
+
+		// The result should be an non-empty string
+		$this->assertNotEmpty( $response->get_data() );
+	}
+
+	/**
+	 * Integration test
 	 * It makes a real HTTP request to the new and old endpoints and compares the results
 	 *
 	 * Check the endpoints for getting entries between two timestamps
@@ -584,6 +614,17 @@ class Test_REST_API extends WP_UnitTestCase {
 		$endpoint_config['base_endpoint_url2'] = 'http://' . $host . '/wp-json/liveblog/v1/' . $endpoint_config['post_id'];
 
 		return $endpoint_config;
+	}
+
+	/**
+	 * Create and author and set it as the current user
+	 */
+	private function set_author_user() {
+		$author_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( $author_id );
 	}
 
 }
