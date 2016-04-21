@@ -543,22 +543,17 @@ class Test_REST_API extends WP_UnitTestCase {
 	 */
 	function test_endpoint_crud_insert_forbidden() {
 
-		// Create a post
-		$post = $this->factory->post->create_and_get();
-
-		// Make the post a liveblog
-		$state        = 'enable';
-		$request_vars = array( 'state' => $state, );
-		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
+		// Create a liveblog post
+		$post_id = $this->create_liveblog_post();
 
 		// The POST data to insert
 		$post_vars  = $this->build_entry_args( array(
 			'crud_action' => 'insert',
-			'post_id'     => $post->ID,
+			'post_id'     => $post_id,
 		));
 
 		// Try to access the endpoint and insert an entry
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/crud' );
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
@@ -581,6 +576,28 @@ class Test_REST_API extends WP_UnitTestCase {
 		// Assert not found response
 		$this->assertEquals( 404, $response->get_status() );
 
+	}
+
+	/**
+	 * Integration test
+	 * Test accessing the entry preview endpoint without the required post data
+	 */
+	function test_endpoint_entry_preview_bad_request() {
+
+		// The "entry_content" POST data is required for the preview endpoint.
+		// Lets leave it out and expect a 400 bad request response
+
+		// Create a liveblog post
+		$post_id = $this->create_liveblog_post();
+
+		// Try to access the endpoint
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/preview');
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$response = $this->server->dispatch( $request );
+
+		// Assert bad request response
+		$this->assertEquals( 400, $response->get_status() );
+		
 	}
 
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
@@ -623,6 +640,23 @@ class Test_REST_API extends WP_UnitTestCase {
 		) );
 
 		wp_set_current_user( $author_id );
+	}
+
+	/**
+	 * Create a new post and make it a liveblog
+	 *
+	 * @return int The ID of the new liveblog post
+	 */
+	private function create_liveblog_post() {
+		// Create a new post
+		$post_id      = $this->factory->post->create();
+
+		// Make the new post a liveblog
+		$state        = 'enable';
+		$request_vars = array( 'state' => $state, );
+		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
+
+		return $post_id;
 	}
 
 }
