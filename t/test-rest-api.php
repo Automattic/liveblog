@@ -540,6 +540,21 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * Integration test
+	 * Test for a proper 404 not found status code when requesting a bad endpoint URL
+	 */
+	function test_endpoint_not_found() {
+
+		// Try to access the endpoint
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/bad/url' );
+		$response = $this->server->dispatch( $request );
+
+		// Assert not found response
+		$this->assertEquals( 404, $response->get_status() );
+
+	}
+
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
 		$entries = $this->insert_entries( $number_of_entries, $args );
 
