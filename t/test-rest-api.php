@@ -511,6 +511,34 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * Integration test
+	 * Test accessing the update post state endpoint when not logged in as an author. Should be forbidden.
+	 */
+	function test_endpoint_update_post_state_forbidden() {
+
+		// Create a post
+		$post = $this->factory->post->create_and_get();
+
+		// The POST data
+		$post_vars = array(
+			'state'           => 'enable',
+			'template_name'   => 'list',
+			'template_format' => 'full',
+			'limit'           => '5',
+		);
+
+		// Try to access the endpoint to set the post as a liveblog
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state');
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $post_vars );
+		$response = $this->server->dispatch( $request );
+
+		// Assert forbidden response
+		$this->assertEquals( 403, $response->get_status() );
+
+	}
+
+	/**
+	 * Integration test
 	 * Test inserting an entry when not logged in as an author. Should be forbidden.
 	 */
 	function test_endpoint_crud_insert_forbidden() {
