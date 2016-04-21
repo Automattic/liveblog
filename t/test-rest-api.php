@@ -509,6 +509,37 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->assertNotEmpty( $response->get_data() );
 	}
 
+	/**
+	 * Integration test
+	 * Test inserting an entry when not logged in as an author. Should be forbidden.
+	 */
+	function test_endpoint_crud_insert_forbidden() {
+
+		// Create a post
+		$post = $this->factory->post->create_and_get();
+
+		// Make the post a liveblog
+		$state        = 'enable';
+		$request_vars = array( 'state' => $state, );
+		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
+
+		// The POST data to insert
+		$post_vars  = $this->build_entry_args( array(
+			'crud_action' => 'insert',
+			'post_id'     => $post->ID,
+		));
+
+		// Try to access the endpoint and insert an entry
+		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/crud' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $post_vars );
+		$response = $this->server->dispatch( $request );
+
+		// Assert forbidden response
+		$this->assertEquals( 403, $response->get_status() );
+
+	}
+
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
 		$entries = $this->insert_entries( $number_of_entries, $args );
 
