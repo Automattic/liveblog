@@ -372,24 +372,25 @@ final class WPCOM_Liveblog {
 	/**
 	 * One of: 'enable', 'archive', false.
 	 */
-	public static function get_liveblog_state( $post_id = null ) {
-		if ( ! is_single() && ! is_admin() ) {
-			return false;
-		}
-		if ( empty( $post_id ) ) {
-			global $post;
-			if ( ! $post ){
-				return false;
-			}
-			$post_id = $post->ID;
-		}
-		$state = get_post_meta( $post_id, self::key, true );
-		// backwards compatibility with older values
-		if ( 1 == $state ) {
-			$state = 'enable';
-		}
-		return $state;
-	}
+	 public static function get_liveblog_state( $post_id = null ) {
+ 		if ( ! is_single() && ! is_admin() ) {
+ 			return false;
+ 		}
+ 		if ( empty( $post_id ) ) {
+ 			$this_post = get_post();
+
+ 			if ( null !== $this_post ) {
+ 				$post_id = $this_post->ID;
+ 			}
+ 		}
+ 		$state = get_post_meta( $post_id, self::key, true );
+ 		//echo 'State: ' . print_r( $state, true );
+ 		// backwards compatibility with older values
+ 		if ( 1 == $state ) {
+ 			$state = 'enable';
+ 		}
+ 		return $state;
+ 	}
 
 	/** Private _is_ Methods **************************************************/
 
