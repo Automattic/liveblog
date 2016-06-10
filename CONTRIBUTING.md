@@ -16,7 +16,6 @@ Perhaps someone has [already contributed something](https://github.com/Automatti
 
 1. [Fork](https://github.com/Automattic/liveblog/fork) the repo
 1. Clone your fork
-1. Switch to the `develop` branch
 1. Create a feature branch, with clear naming (e.g. `feature/doge-everywhere`)
-1. When you're done, submit a pull request to merge your feature branch into develop
+1. When you're done, submit a pull request to merge your feature branch into master
 1. Sit back and await review/feedback (note: could take a long time - we're [busy people](https://automattic.com/work-with-us)!)
