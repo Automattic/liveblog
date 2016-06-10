@@ -18,9 +18,15 @@
 
 	<?php endif; ?>
 
-	<div id="liveblog-fixed-nag">
+	<div id="liveblog-fixed-nag" class="liveblog-fixed-bar">
 		<a href="#">
 		</a>
 	</div>
+
+	<?php if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) : ?>
+		<div id="liveblog-socketio-error-container" class="liveblog-fixed-bar">
+			<p id="liveblog-socketio-error"></p>
+		</div>
+	<?php endif; ?>
 
 </div>
