@@ -294,6 +294,84 @@ public static function filter( $class_prefix ) {
 }
 ```
 
+### WebSocket support
+
+By default this plugin uses AJAX polling to update the list of Liveblog entries. This means that there is a delay of a few seconds between the moment a entry is created and the moment it is displayed to the users. For a close to real-time experience, it is possible to configure Liveblog to use WebSockets instead of AJAX polling. To achieve this, Liveblog uses [Socket.io](http://socket.io), [Redis](http://redis.io) and [socket.io-php-emitter](https://github.com/rase-/socket.io-php-emitter) (responsible for sending messages from PHP to the Socket.io server via Redis).
+
+It is important to note that, since for now the Socket.io server has no way to tell if a client is an authenticated WordPress user or not and what are its capabilities, WebSockets will be used only for public Liveblog posts.
+
+Follow the instructions below to enable WebSocket support.
+
+#### Requirements
+
+Here is a list of what needs to be installed on the server to enable WebSocket support:
+
+* [Node.JS](https://nodejs.org/) - to run the Socket.io server.
+* [Redis](http://redis.io) - responsible for sending messages from WordPress to the Socket.io server.
+* [Composer](https://getcomposer.org/) - to install [socket.io-php-emitter](https://github.com/rase-/socket.io-php-emitter) and [Predis](https://github.com/nrk/predis) (Redis client).
+* PHP >= 5.3
+
+#### Install dependencies
+
+Connected via SSH on the server, it is necessary to run the following commands from the Liveblog plugin directory to install WebSocket support dependencies:
+
+```
+composer install     # to install socket.io-php-emitter and Predis (a PHP client for Redis)
+cd nodeapp
+npm install     # to install socket.io and the adapter socket.io-redis
+```
+
+#### Configuration
+
+Add the following constants to wp-config.php to configure Liveblog plugin to use WebSockets:
+
+* ```LIVEBLOG_USE_SOCKETIO```: set this constant to true to enabled WebSocket support. Default: false.
+* ```LIVEBLOG_SOCKETIO_URL```: URL used by the Socket.io client to connect to the Socket.io server. Default: YOUR_SITE_DOMAIN:3000.
+* ```LIVEBLOG_REDIS_HOST```: Redis server host. Default: localhost.
+* ```LIVEBLOG_REDIS_PORT```: Redis server port. Default: 6379.
+
+#### Running the Socket.io server
+
+To start the Socket.io server go to the plugin directory and run:
+
+```
+node nodeapp/app.js
+```
+
+This will start a Socket.io server on port 3000 listening to a Redis server running on localhost:6379. It is possible to use the parameters bellow to change the app default values:
+
+```
+--socketio-port [port]
+--redis-host [host]
+--redis-port [port]
+```
+
+For more information on the accepted parameters run:
+
+```
+node nodeapp/app.js --help
+```
+
+#### Making sure everything is working
+
+To test that everything is working, after following the steps above, open a Liveblog post in two different browser windows and check that whenever a user changes the list of entries in one window, the list in the other window is refreshed in "real-time". It is also possible to use the browser developer tools to verify that there are no AJAX requests being sent every few seconds to check for changes in the list of entries. Instead the browser is receiving changes using a single WebSocket connection whenever they occur.
+
+#### Important note about private Liveblog posts
+
+When using Liveblog with WebSocket, the plugin will create a unique key for each Liveblog post (based on the post ID and its status). This key is shared with the users with permission to see the corresponding post when the page is loaded. The key is then send by the user's browser to the Socket.io server when a connection is established. Whenever there is a new Liveblog entry (or a Liveblog entry is updated or deleted), the Socket.io server will send a message only to the clients that provided the right key. This system is enough to prevent someone without permission to see the post from receiving Liveblog entries emitted by the Socket.io server but it has an important limitation. Once a user with permission receives the post key, if he saves it somewhere, he will be able to receive messages from the Socket.io server for that particular post even if for some reason he loses access to the post (for example if the user is removed from WordPress).
+
+If you are using private Liveblog posts to share sensitive data and it is important that, once a user loses access to the post, he is not able to receive messages emitted by the Socket.io server anymore, consider using the 'liveblog_socketio_post_key' filter to implement your own criteria to generate the post key. For example, you could generate a random post key for each post that is saved as a post meta and that can be manually invalidated by an editor whenever necessary.
+
+#### Tips for debugging
+
+If for some reason the plugin is not able to use WebSockets to refresh the list of entries, below is a list of tips that might help you debug where is the problem:
+
+* Use your browser developer tools network tab to check if a WebSocket connection was established or check the browser console for errors when trying to establish it.
+* Check if the Node.js app that starts the Socket.io server is running. The app won't start or will stop running if unable to connect to the Redis server.
+* The plugin will fallback to AJAX polling if unable to connect to the Redis server.
+* It is possible to see all the messages received by the Redis server using the command ```redis-cli MONITOR```
+* To see Socket.io server debug messages start the Node.js app with the command ```DEBUG=socket.io* node nodeapp/app.js```
+
 ## Screenshots
 
 ![The entry form is the simplest possible](https://raw.github.com/Automattic/liveblog/master/screenshot-1.png)

@@ -81,6 +81,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Key_Events_Widget::load();
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
+		WPCOM_Liveblog_Socketio_Loader::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -120,6 +121,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
@@ -225,6 +227,20 @@ final class WPCOM_Liveblog {
 			flush_rewrite_rules();
 			update_option( 'liveblog_rewrites_version', self::rewrites_version );
 		}
+	}
+
+	/**
+	 * Returns the ID of the Liveblog post.
+	 *
+	 * @throws Exception when called before post ID is set
+	 * @return int Liveblog post ID
+	 */
+	public static function get_post_id() {
+		if ( is_null( self::$post_id ) ) {
+			throw new Exception( __( 'No Liveblog post ID is set yet', 'liveblog' ) );
+		}
+
+		return self::$post_id;
 	}
 
 	/**
@@ -470,13 +486,20 @@ final class WPCOM_Liveblog {
 			self::send_server_error( $entry->get_error_message() );
 		}
 
-		// Do not send latest_timestamp. If we send it the client won't get
-		// older entries. Since we send only the new one, we don't know if there
-		// weren't any entries in between.
-		self::json_return( array(
-			'entries'           => array( $entry->for_json() ),
-			'latest_timestamp'  => null
-		) );
+		if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) {
+			WPCOM_Liveblog_Socketio::emit(
+				'liveblog entry',
+				$entry->for_json()
+			);
+		} else {
+			// Do not send latest_timestamp. If we send it the client won't get
+			// older entries. Since we send only the new one, we don't know if there
+			// weren't any entries in between.
+			self::json_return( array(
+				'entries'          => array( $entry->for_json() ),
+				'latest_timestamp' => null
+			) );
+		}
 	}
 
 	/**
@@ -687,6 +710,8 @@ final class WPCOM_Liveblog {
 				'permalink'              => get_permalink(),
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
+				'is_liveblog_editable'   => self::is_liveblog_editable(),
+				'socketio_enabled'       => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
