@@ -305,8 +305,10 @@ window.liveblog = window.liveblog || {};
 		var $entry = liveblog.get_entry_by_id( new_entry.id );
 		if ('new' === new_entry.type && !$entry.length) {
 			liveblog.add_entry( new_entry, duration );
+			twttr.widgets.load( document.getElementById( 'liveblog-entry-' + new_entry.id ) );
 		} else if ('update' === new_entry.type && $entry.length) {
 			liveblog.update_entry( $entry, new_entry );
+			twttr.widgets.load( document.getElementById( 'liveblog-entry-' + new_entry.id ) );
 		} else if ('delete' === new_entry.type && $entry.length) {
 			liveblog.delete_entry( $entry );
 		}
