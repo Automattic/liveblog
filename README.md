@@ -15,7 +15,7 @@ Quick and simple blogging for following fast-paced events.
 
 ## Description
 
-[wpvideo tWpw6nCt]
+https://videopress.com/v/tWpw6nCt
 
 Your readers want your updates as quickly as possible, and we think we provide the easiest and the most flexible publishing environment to make that happen. Sometimes though, that’s just not enough.
 
