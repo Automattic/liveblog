@@ -2,7 +2,7 @@
 	<header class="liveblog-meta">
 		<span class="liveblog-author-avatar"><?php echo wp_kses_post( $avatar_img ); ?></span>
 		<span class="liveblog-author-name"><?php echo wp_kses_post( $author_link ); ?></span>
-		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo absint( $entry_id ); ?>"><span class="date"><?php echo esc_html( $entry_date ); ?></span><span class="time"><?php echo esc_html( $entry_time ); ?></span></a></span>
+		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo absint( $entry_id ); ?>" class="liveblog-time-update"><span class="date"><?php echo esc_html( $entry_date ); ?></span><span class="time"><?php echo esc_html( $entry_time ); ?></span></a></span>
 	</header>
 	<div class="liveblog-entry-text" data-original-content="<?php echo esc_attr( $original_content ); ?>">
 		<?php echo wp_kses( $content, $allowed_tags_for_entry ); ?>
