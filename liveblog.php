@@ -882,7 +882,10 @@ final class WPCOM_Liveblog {
 		ob_start();
 		extract( $template_variables );
 		$theme_template = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
-		if ( file_exists( $theme_template ) ) {
+		$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
+		if ( file_exists( $child_theme_template ) ) {
+			include( $child_theme_template );
+		} else if ( file_exists( $theme_template ) ) {
 			include( $theme_template );
 		} else if( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
 			include( self::$custom_template_path . '/' . $template_name );
