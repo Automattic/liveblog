@@ -5,7 +5,7 @@
 		<span class="liveblog-meta-time"><a href="#liveblog-entry-<?php echo absint( $entry_id ); ?>" class="liveblog-time-update"><span class="date"><?php echo esc_html( $entry_date ); ?></span><span class="time"><?php echo esc_html( $entry_time ); ?></span></a></span>
 	</header>
 	<div class="liveblog-entry-text" data-original-content="<?php echo esc_attr( $original_content ); ?>">
-		<?php echo wp_kses( $content, $allowed_tags_for_entry ); ?>
+		<?php echo $content; ?>
 	</div>
 <?php if ( $is_liveblog_editable ): ?>
 	<ul class="liveblog-entry-actions">
