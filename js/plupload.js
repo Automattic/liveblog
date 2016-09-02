@@ -3,8 +3,9 @@ jQuery(document).ready(function($) {
 
 		/* Selectors */
 		// @todo selctors need to be class-based and the upload.dropzone needs to be used to select the current message and container
-		browser: '#liveblog-messages',
-		dropzone: '#liveblog-container',
+		browser: liveblog_plupload.browser ? liveblog_plupload.browser : undefined,
+		dropzone: liveblog_plupload.dropzone ? liveblog_plupload.dropzone : undefined,
+		container: liveblog_plupload.container ? liveblog_plupload.container : undefined,
 
 		/* Callbacks */
 		success  : function( upload ) {
