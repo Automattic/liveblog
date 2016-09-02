@@ -131,6 +131,8 @@
 				if ( entry.html ) {
 					$button.before( $( entry.html ) );
 				}
+
+				twttr.widgets.load( document.getElementById( 'liveblog-entry-' + entry.id ) );
 			} );
 
 			// Convert the timestamps of the newly inserted entries into human time diffed timestamps.

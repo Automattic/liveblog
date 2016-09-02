@@ -712,6 +712,12 @@ final class WPCOM_Liveblog {
 			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' ), '1.3' );
 		}
 
+		if ( wp_script_is( 'jetpack-twitter-timeline', 'registered' ) ) {
+			wp_enqueue_script( 'jetpack-twitter-timeline' );
+		} else {
+			wp_enqueue_script( 'liveblog-twitter-timeline', plugins_url( 'js/twitter-timeline.js', __FILE__ ), false, '1.5, true' );
+		}
+
 		wp_localize_script( self::key, 'liveblog_settings',
 			apply_filters( 'liveblog_settings', array(
 				'permalink'              => get_permalink(),
