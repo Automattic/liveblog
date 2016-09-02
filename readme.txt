@@ -2,8 +2,8 @@
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
 Requires at least: 3.5
-Tested up to: 4.4
-Stable tag: 1.5
+Tested up to: 4.6
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,15 @@ If you'd like to check out the code and contribute, [join us on github](https://
 8. Typical liveblog view
 
 == Changelog ==
+
+= 1.5.1 =
+
+* Fix for duplicate entries with lazyloading (props potatomaster)
+* Fix for formatting tweets with lazyloading (props potatomaster)
+* Restore relative date in entries (props davidbinda)
+* Allow template overrides from child themes (props davidbinda)
+* Fix issue with plupload container (props davidbinda)
+* Fix for broken oEmbeds in Liveblog entries (props philipjohn)
 
 = 1.5 =
 
