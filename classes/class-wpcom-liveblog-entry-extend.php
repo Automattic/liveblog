@@ -30,6 +30,7 @@ class WPCOM_Liveblog_Entry_Extend {
 	    add_action( 'wp_enqueue_scripts',           array( __CLASS__, 'enqueue_scripts' ) );
 	    add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
 	    add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
+		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
 
 	    // Allow the features to be seperated in multiple ways: via spaces,
 	    // pipes or commas. This line explodes via spaces and pipes then
@@ -130,5 +131,19 @@ class WPCOM_Liveblog_Entry_Extend {
 
         return $entry;
     }
+
+	/**
+	 * Replaces div wrapping oembedable links with p for core to pick those up
+	 *
+	 * The div wrapping links which would otherwise would be on their own line
+	 * is coming from Webkit browser's contenteditable
+	 *
+	 * $param array Liveblog entry
+	 * @return array
+	*/
+	public static function fix_links_wrapped_in_div( $entry ) {
+		$entry['content'] = preg_replace( '|(<div(?: [^>]*)?>\s*)(https?://[^\s<>"]+)(\s*<\/div>)|i', '<p>${2}</p>', $entry['content'] );
+		return $entry;
+	}
 
 }
