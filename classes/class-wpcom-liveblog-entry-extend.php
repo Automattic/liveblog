@@ -31,6 +31,8 @@ class WPCOM_Liveblog_Entry_Extend {
 	    add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
 	    add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
 		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
+		add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
+		add_filter( 'liveblog_before_preview_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
 
 	    // Allow the features to be seperated in multiple ways: via spaces,
 	    // pipes or commas. This line explodes via spaces and pipes then
