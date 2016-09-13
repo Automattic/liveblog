@@ -37,11 +37,6 @@ class WPCOM_Liveblog_Lazyloader {
 			 */
 			self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', true );
 
-			// Disable lazy loading for robots
-			if ( self::$enabled && self::is_robot() ) {
-				self::$enabled = false;
-			}
-
 			// Disable lazy loading on archived liveblogs
 			if ( 'enable' != WPCOM_Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
@@ -49,23 +44,6 @@ class WPCOM_Liveblog_Lazyloader {
 		}
 
 		return self::$enabled;
-	}
-
-	/**
-	 * Checks if the current user is a robot.
-	 *
-	 * @return bool
-	 */
-	private static function is_robot() {
-
-		// Variant determiner for caches.
-		if ( function_exists( 'vary_cache_on_function' ) ) {
-			vary_cache_on_function(
-				'return isset( $_SERVER[\'HTTP_USER_AGENT\'] ) && preg_match( \'/bot|crawl|slurp|spider/i\', $_SERVER[\'HTTP_USER_AGENT\'] );'
-			);
-		}
-
-		return isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	/**

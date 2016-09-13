@@ -10,6 +10,11 @@
 		initialize: function() {
 			lazyloader.entrySets = [];
 
+			if ( navigator.userAgent.match(/bot|crawl|slurp|spider/i) ) {
+				$( '.liveblog-load-more' ).hide();
+				return; //no lazy loading for robots
+			}
+
 			lazyloader.setBusy();
 			lazyloader.fetchEntries();
 
