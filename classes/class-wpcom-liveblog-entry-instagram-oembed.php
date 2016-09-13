@@ -22,8 +22,8 @@ class WPCOM_Liveblog_Entry_Instagram_oEmbed {
 	 */
 	public static function register_filters( $return ) {
 		
-		add_filter( 'embed_oembed_html', array( __CLASS__, 'filter_oembed_html' ), 10, 4 );
-		//Deregister the filter as soon as it is no longer needed
+		add_filter( 'oembed_fetch_url', array( __CLASS__, 'add_omitscript_arg' ), 10, 3 );
+		add_filter( 'embed_oembed_html', array( __CLASS__, 'add_custom_script' ), 10, 4 );
 		add_filter( 'comment_text', array( __CLASS__, 'unregister_filters' ), 0, 1 );
 		return $return;
 	}
@@ -32,50 +32,32 @@ class WPCOM_Liveblog_Entry_Instagram_oEmbed {
 	 * Deregister the filter we added
 	 */
 	public static function unregister_filters( $return ) {
-		remove_filter( 'embed_oembed_html', array( __CLASS__, 'filter_oembed_html' ) );
+		remove_filter( 'oembed_fetch_url', array( __CLASS__, 'add_omitscript_arg' ), 10 );
+		remove_filter( 'embed_oembed_html', array( __CLASS__, 'add_custom_script' ), 10 );
 		return $return;
 	}
 
-	/**
-	 * Filter the oEmbed HTML only if instagram is the provider
-	 */
-	public static function filter_oembed_html( $html, $url, $attr, $post_ID ) {
-
-		$oembed = _wp_oembed_get_object();
-		$provider = $oembed->get_provider( $url );
-		if ( false !== strpos( 'instagr.am' ) || false !== strpos( 'instagram.com' ) ) {
-			$html = self::instagram_handler( $html, $url, $attr, $post_ID );
+	public static function add_omitscript_arg( $provider, $url, $args ) {
+		if ( true === self::is_instagram_provider( $url ) )  {
+			$provider = add_query_arg( 'omitscript', rawurlencode( true ), $provider );
 		}
-
-		return $html;
-
+		return $provider;
 	}
 
-	/**
-	 * The custom modifications themselves
-	 *
-	 * This method is removing the default script and attaches it's own
-	 */
-	public static function instagram_handler( $html, $url, $attr, $post_ID ) {
-		$instagram_script_uri = '//platform.instagram.com/en_US/embeds.js';
-		$dom = new DOMDocument();
-		$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-		$script = $dom->getElementsByTagName( 'script' );
-
-		$new_script = $dom->createElement( 'script', '(function( $ ){ if ( undefined === window.instgrm ) { $.getScript( '.wp_json_encode( $instagram_script_uri ).' ); } $(".instagram-media a").each( function(){ if ( -1 === $(this).attr("href").indexOf("instagr") ) { $(this).replaceWith( $(this).text() ) } } ); window.instgrm.Embeds.process(); })(jQuery);' );
-		$new_script->setAttribute( 'type', 'text/javascript' );
-
-		if ( false === empty( $script ) ) {
-			foreach( $script as $item ) {
-				if ( $instagram_script_uri === $item->getAttribute('src') ) {
-					$parent = $item->parentNode;
-					$item->parentNode->removeChild($item);
-					$parent->appendChild( $new_script );
-					break;
-				}
-			}
+	public static function add_custom_script( $html, $url, $attr, $post_ID ) {
+		if ( true === self::is_instagram_provider( $url ) )	 {
+			$instagram_script_uri = '//platform.instagram.com/en_US/embeds.js';
+			$script = '<script type="text/javascript">';
+			$script .= '(function( $ ){ if ( undefined === window.instgrm ) { $.getScript( '.wp_json_encode( $instagram_script_uri ).' ); } $(".instagram-media a").each( function(){ if ( -1 === $(this).attr("href").indexOf("instagr") ) { $(this).replaceWith( $(this).text() ) } } ); window.instgrm.Embeds.process(); })(jQuery);';
+			$script .= '</script>';
+			$html .= $script;
 		}
-		$html = $dom->saveHTML();
 		return $html;
+	}
+
+	private static function is_instagram_provider( $url ) {
+		$wp_oembed = _wp_oembed_get_object();
+		$provider = $wp_oembed->get_provider( $url );
+		return ( 'https://api.instagram.com/oembed' === $provider );
 	}
 }
