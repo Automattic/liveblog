@@ -46,14 +46,14 @@ class WPCOM_Liveblog_Entry_Query {
 		//
 		// We don't want to remove the parameter entirely for backwards compatibility
 		// since this is a public method, but we need instead to handle it as part
-		// of remove_replaced_entries after we retrieve the entire result set.
+		// of remove_replaced_deleted_entries after we retrieve the entire result set.
 		$number = 0;
 		if ( isset( $args['number'] ) ) {
 			$number = intval( $args['number'] );
 			unset( $args['number'] );
 		}
 
-		return self::remove_replaced_entries( $this->get( $args ), $number );
+		return self::remove_replaced_deleted_entries( $this->get( $args ), $number );
 	}
 
 	public function count( $args = array() ) {
@@ -102,7 +102,7 @@ class WPCOM_Liveblog_Entry_Query {
 			}
 		}
 
-		return self::remove_replaced_entries( $entries_between );
+		return self::remove_replaced_deleted_entries( $entries_between );
 	}
 
 	public function has_any() {
@@ -128,7 +128,7 @@ class WPCOM_Liveblog_Entry_Query {
 		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
 	}
 
-	public static function remove_replaced_entries( $entries = array(), $number = 0 ) {
+	public static function remove_replaced_deleted_entries( $entries = array(), $number = 0 ) {
 		if ( empty( $entries ) ) {
 			return $entries;
 		}
@@ -136,9 +136,17 @@ class WPCOM_Liveblog_Entry_Query {
 		$entries_by_id = self::assoc_array_by_id( $entries );
 
 		foreach ( (array) $entries_by_id as $id => $entry ) {
+
+			// Removed replaced entries
 			if ( ! empty( $entry->replaces ) && isset( $entries_by_id[ $entry->replaces ] ) ) {
 				unset( $entries_by_id[ $id ] );
 			}
+
+			// Remove deleted entries
+			if ( 'delete' === $entry->get_type() ) {
+				unset( $entries_by_id[ $id ] );
+			}
+
 		}
 
 		// If a number of entries is set and we have more than that amount of entries,
