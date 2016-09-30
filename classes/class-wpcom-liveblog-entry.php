@@ -23,7 +23,7 @@ class WPCOM_Liveblog_Entry {
 		if ( $this->replaces && $this->get_content() ) {
 			$this->type = 'update';
 		}
-		if ( $this->replaces && !$this->get_content() ) {
+		if ( 'liveblog_trashed' === $comment->comment_approved ) {
 			$this->type = 'delete';
 		}
 	}
@@ -201,7 +201,7 @@ class WPCOM_Liveblog_Entry {
 		do_action( 'liveblog_update_entry', $new_comment->comment_ID, $args['post_id'] );
 		wp_update_comment( array(
 			'comment_ID'      => $original_entry_id,
-			'comment_approved' => 'trash',
+			'comment_approved' => 'liveblog_trashed',
 		) );
 
 		// Grab the WPCOM_Liveblog_Entry for the new comment and return for display.
