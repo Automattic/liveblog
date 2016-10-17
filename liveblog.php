@@ -310,6 +310,13 @@ final class WPCOM_Liveblog {
 			}
 		}
 
+		/**
+		 * Fires just before the Liveblog's ajax request is handled by one of the methods
+		 *
+		 * @param string $response_method The name of the method used for handling the request.
+		 */
+		do_action( 'liveblog_ajax_request', $response_method );
+
 		self::$response_method();
 
 	}
