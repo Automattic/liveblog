@@ -569,8 +569,6 @@ final class WPCOM_Liveblog {
 
 		do_action( 'liveblog_entry_request', $result_for_json );
 
-		self::$do_not_cache_response = true;
-
 		self::json_return( $result_for_json );
 	}
 
@@ -612,8 +610,6 @@ final class WPCOM_Liveblog {
 		);
 
 		do_action( 'liveblog_entry_request', $result_for_json );
-
-		self::$do_not_cache_response = true;
 
 		self::json_return( $result_for_json );
 	}
