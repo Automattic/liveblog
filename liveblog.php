@@ -49,12 +49,12 @@ final class WPCOM_Liveblog {
 	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
 	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
 	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
+	const response_cache_max_age  = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
 
 	/** Variables *************************************************************/
 
 	private static $post_id               = null;
 	private static $entry_query           = null;
-	private static $do_not_cache_response = false;
 	private static $custom_template_path  = null;
 
 	/** Load Methods **********************************************************/
@@ -325,6 +325,7 @@ final class WPCOM_Liveblog {
 	 * Look for any new Liveblog entries, and return them via JSON
 	 */
 	public static function ajax_entries_between() {
+		$response_args = array();
 
 		// Set some defaults
 		$latest_timestamp  = 0;
@@ -339,8 +340,9 @@ final class WPCOM_Liveblog {
 		}
 
 		// Do not cache if it's too soon
-		if ( $end_timestamp > time() )
-			self::$do_not_cache_response = true;
+		if ( $end_timestamp > time() ) {
+			$response_args['cache'] = false;
+		}
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
@@ -350,7 +352,7 @@ final class WPCOM_Liveblog {
 			self::json_return( array(
 				'entries'           => array(),
 				'latest_timestamp'  => null
-			) );
+			), $response_args );
 		}
 
 		/**
@@ -370,7 +372,7 @@ final class WPCOM_Liveblog {
 
 		do_action( 'liveblog_entry_request', $result_for_json );
 
-		self::json_return( $result_for_json );
+		self::json_return( $result_for_json, $response_args );
 	}
 
 	/**
@@ -507,7 +509,7 @@ final class WPCOM_Liveblog {
 			self::json_return( array(
 				'entries'          => array( $entry->for_json() ),
 				'latest_timestamp' => null
-			) );
+			), array( 'cache' => false ) );
 		}
 	}
 
@@ -623,7 +625,10 @@ final class WPCOM_Liveblog {
 
 		do_action( 'liveblog_preview_entry', $entry_content );
 
-		self::json_return( array( 'html' => $entry_content ) );
+		self::json_return(
+			array( 'html' => $entry_content ),
+			array( 'cache' => false )
+		);
 	}
 
 	public static function ajax_unknown() {
@@ -699,7 +704,7 @@ final class WPCOM_Liveblog {
 				wp_enqueue_script( 'editor' );
 			}
 			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
-			
+
 			wp_register_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
 			wp_localize_script( 'liveblog-plupload', 'liveblog_plupload', apply_filters( 'liveblog_plupload_localize', array(
 				'browser' => '#liveblog-messages',
@@ -1154,13 +1159,23 @@ final class WPCOM_Liveblog {
 	 *
 	 * @param array $data
 	 */
-	private static function json_return( $data ) {
+	private static function json_return( $data, $args = array() ) {
+		$args = wp_parse_args( $args, array(
+			// Set false for nocache; set int for Cache-control+max-age
+			'cache' => self::response_cache_max_age,
+		) );
+		$args = apply_filters( 'liveblog_json_return_args', $args, $data );
+
 		$json_data = json_encode( $data );
 
-		header( 'Content-Type: application/json' );
-		if ( self::$do_not_cache_response )
+		// Send cache headers, where appropriate
+		if ( false === $args['cache'] ) {
 			nocache_headers();
+		} elseif ( is_numeric( $args['cache'] ) ) {
+			header( sprintf( 'Cache-Control: max-age=%d', $args['cache'] ) );
+		}
 
+		header( 'Content-Type: application/json' );
 		echo $json_data;
 		exit();
 	}
