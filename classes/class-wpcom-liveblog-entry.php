@@ -23,7 +23,7 @@ class WPCOM_Liveblog_Entry {
 		if ( $this->replaces && $this->get_content() ) {
 			$this->type = 'update';
 		}
-		if ( 'liveblog_trashed' === $comment->comment_approved ) {
+		if ( '' === $this->get_content() ) {
 			$this->type = 'delete';
 		}
 	}
@@ -99,19 +99,31 @@ class WPCOM_Liveblog_Entry {
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
 		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
+
+		// If comment was updated we use the original comment date as the
+		// created timestamp and the new comment date as updated timestamp.
+		$original_comment_id = get_comment_meta( $entry_id, self::replaces_meta_key, true );
+		$original_comment_timestamp = false;
+
+		if ( $original_comment_id ) {
+			$original_comment_timestamp = get_comment_date( 'G', $original_comment_id );
+		}
+
 		$entry = array(
-			'entry_id'              => $entry_id,
-			'post_id'               => $post_id,
-			'css_classes'           => $css_classes ,
-			'content'               => self::render_content( $comment_text, $this->comment ),
-			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
-			'avatar_size'           => $avatar_size,
-			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
-			'author_link'           => get_comment_author_link( $entry_id ),
-			'entry_date'            => get_comment_date( get_option('date_format'), $entry_id ),
-			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
-			'timestamp'             => $this->get_timestamp(),
-			'is_liveblog_editable'  => WPCOM_Liveblog::is_liveblog_editable(),
+			'entry_id'               => $entry_id,
+			'original_id'            => $original_comment_id ? $original_comment_id : $entry_id,
+			'post_id'                => $post_id,
+			'css_classes'            => $css_classes,
+			'content'                => self::render_content( $comment_text, $this->comment ),
+			'original_content'       => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
+			'avatar_size'            => $avatar_size,
+			'avatar_img'             => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'author_link'            => get_comment_author_link( $entry_id ),
+			'entry_date'             => get_comment_date( get_option('date_format'), $entry_id ),
+			'entry_time'             => get_comment_date( get_option('time_format'), $entry_id ),
+			'timestamp'              => $original_comment_timestamp ? $original_comment_timestamp : $this->get_timestamp(),
+			'updated_timestamp'      => $original_comment_timestamp ? $this->get_timestamp() : '',
+			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
 		);
 
@@ -187,6 +199,9 @@ class WPCOM_Liveblog_Entry {
 		$original_entry_id = $args['entry_id'];
 		unset( $args['entry_id'] );
 
+		// If the original entry was already replacing another one store its entry ID instead
+		$replaced_entry_id = get_comment_meta( $original_entry_id, self::replaces_meta_key, true );
+
 		// Create a new entry, with the new content.
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$new_comment = self::insert_comment( $args );
@@ -195,12 +210,16 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		// Mark the new entry as replacing the old one.
-		add_comment_meta( $new_comment->comment_ID, self::replaces_meta_key, $original_entry_id );
+		add_comment_meta(
+			$new_comment->comment_ID,
+			self::replaces_meta_key,
+			$replaced_entry_id ? $replaced_entry_id : $original_entry_id
+		);
 
 		// Mark the original entry comment as trash.
 		do_action( 'liveblog_update_entry', $new_comment->comment_ID, $args['post_id'] );
 		wp_update_comment( array(
-			'comment_ID'      => $original_entry_id,
+			'comment_ID'       => $original_entry_id,
 			'comment_approved' => 'liveblog_trashed',
 		) );
 
