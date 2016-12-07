@@ -5,6 +5,12 @@
  */
 define( 'LIVEBLOG_USE_SOCKETIO', false );
 
+function wpcom_vip_liveblog_bump_stats_extras( $stat, $extra ) {
+	if ( function_exists( 'bump_stats_extras' ) ) {
+		bump_stats_extras( $stat, $extra );
+	}
+}
+
 // Use an AJAX URL, which is easier to match in server configs
 // Using an endpoint can be ambiguous
 add_action( 'after_liveblog_init', function() {
@@ -42,41 +48,45 @@ add_action( 'wp_enqueue_scripts', function() {
 
 // Stats tracking for liveblog
 add_action( 'liveblog_enable_post', function( $post_id ) {
-	bump_stats_extras( 'liveblog', 'enable' );
-	bump_stats_extras( 'liveblog-enable-by-theme', str_replace( '/', '-', get_stylesheet() ) );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog', 'enable' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog-enable-by-theme', str_replace( '/', '-', get_stylesheet() ) );
 
-	send_vip_team_irc_alert( '[VIP Liveblog] Enabled on post '. get_permalink( $post_id ) . ' by ' . get_current_user_id() );
+	if ( function_exists( 'send_vip_team_irc_alert' ) ) {
+		send_vip_team_irc_alert( '[VIP Liveblog] Enabled on post '. get_permalink( $post_id ) . ' by ' . get_current_user_id() );
+	}
 } );
 
 add_action( 'liveblog_disable_post', function( $post_id ) {
-	bump_stats_extras( 'liveblog', 'disable' );
-	bump_stats_extras( 'liveblog-disable-by-theme', str_replace( '/', '-', get_stylesheet() ) );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog', 'disable' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog-disable-by-theme', str_replace( '/', '-', get_stylesheet() ) );
 
-	send_vip_team_irc_alert( '[VIP Liveblog] Disabled on post '. get_permalink( $post_id ) . ' by ' . get_current_user_id() );
+	if ( function_exists( 'send_vip_team_irc_alert' ) ) {
+		send_vip_team_irc_alert( '[VIP Liveblog] Disabled on post '. get_permalink( $post_id ) . ' by ' . get_current_user_id() );
+	}
 } );
 
 add_action( 'liveblog_entry_request_empty', function() {
-	bump_stats_extras( 'liveblog_entry_request', 'miss' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_request', 'miss' );
 } );
 
 add_action( 'liveblog_entry_request', function() {
-	bump_stats_extras( 'liveblog_entry_request', 'hit' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_request', 'hit' );
 } );
 
 add_action( 'liveblog_preview_entry', function() {
-	bump_stats_extras( 'liveblog_entry_action', 'preview' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'preview' );
 } );
 
 add_action( 'liveblog_insert_entry', function( $comment_id ) {
-	bump_stats_extras( 'liveblog_entry_action', 'insert' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'insert' );
 } );
 
 add_action( 'liveblog_update_entry', function( $new_comment_id, $replaces_comment_id ) {
-	bump_stats_extras( 'liveblog_entry_action', 'update' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'update' );
 }, 10, 2 );
 
 add_action( 'liveblog_delete_entry', function( $comment_id ) {
-	bump_stats_extras( 'liveblog_entry_action', 'delete' );
+	wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'delete' );
 } );
 
 /**
