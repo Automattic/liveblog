@@ -172,9 +172,12 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function update( $args ) {
-		if ( !$args['entry_id'] ) {
-			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		if ( ! $args['entry_id'] ) {
+			return new WP_Error( 'entry-update', __( 'Missing entry ID', 'liveblog' ) );
 		}
+
+		// Store the original entry.
+		$original_entry = $args;
 
 		// always use the original author for the update entry, otherwise until refresh
 		// users will see the user who editd the entry as  the author
@@ -183,18 +186,40 @@ class WPCOM_Liveblog_Entry {
 			return $args['user'];
 		}
 
+		// Remove the entry ID so that we don't update the original entry.
+		unset( $args['entry_id'] );
+
+		// We need to preserve the time form the original entry, otherwise the
+		// new replacement entry will go to the top of the liveblog.
+		$original_comment = get_comment( $original_entry['entry_id'] );
+		if ( is_null( $original_comment ) ) {
+			return new WP_Error( 'entry_update', esc_html__( "Couldn't grab original comment", 'liveblog' ) );
+		}
+
+		// Copy the original date to the new args.
+		$args['comment_date'] = $original_comment->comment_date;
+		$args['comment_date_gmt'] = $original_comment->comment_date_gmt;
+
+		// Create a new entry, with the new content.
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
-		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
-		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+
+		// Mark the new entry as replacing the old one.
+		add_comment_meta( $new_comment->comment_ID, self::replaces_meta_key, $original_entry['entry_id'] );
+
+		// Mark the original entry comment as trash, and delete.
+		do_action( 'liveblog_update_entry', $new_comment->comment_ID, $args['post_id'] );
 		wp_update_comment( array(
-			'comment_ID'      => $args['entry_id'],
-			'comment_content' => wp_filter_post_kses( $args['content'] ),
+			'comment_ID'      => $original_entry['entry_id'],
+			'comment_approved' => 'liveblog_trashed',
 		) );
-		$entry = self::from_comment( $comment );
+		self::delete( $original_entry );
+
+		// Grab the WPCOM_Liveblog_Entry for the new comment and return for display.
+		$entry = self::from_comment( $new_comment );
 		return $entry;
 	}
 
@@ -233,17 +258,28 @@ class WPCOM_Liveblog_Entry {
 		if ( is_wp_error( $valid_args ) ) {
 			return $valid_args;
 		}
-		$new_comment_id = wp_insert_comment( array(
+
+		// Establish the new comment data.
+		$new_comment_args = array(
 			'comment_post_ID'      => $args['post_id'],
 			'comment_content'      => wp_filter_post_kses( $args['content'] ),
 			'comment_approved'     => 'liveblog',
 			'comment_type'         => 'liveblog',
 			'user_id'              => $args['user']->ID,
-
 			'comment_author'       => $args['user']->display_name,
 			'comment_author_email' => $args['user']->user_email,
 			'comment_author_url'   => $args['user']->user_url,
-		) );
+		);
+
+		// Check if we're forcing the time.
+		if ( isset( $args['comment_date'] ) && isset( $args['comment_date_gmt'] ) ) {
+			$new_comment_args['comment_date'] = $args['comment_date'];
+			$new_comment_args['comment_date_gmt'] = $args['comment_date_gmt'];
+		}
+
+		// Insert the new comment.
+		$new_comment_id = wp_insert_comment( $new_comment_args );
+
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
 		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) ) {
 			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
