@@ -342,7 +342,7 @@
 			return this.$entry_text.data('original-content');
 		},
 		get_id_for_ajax_request: function() {
-			return this.$entry.attr('id').replace('liveblog-entry-', '');
+			return this.$entry.data('entry-id');
 		},
 		render: function() {
 			this.render_template();
@@ -410,7 +410,7 @@
 
 	liveblog.publisher.delete_click = function( e ) {
 		e.preventDefault();
-		var id = $( e.target ).closest( '.liveblog-entry' ).attr( 'id' ).replace( 'liveblog-entry-', '' );
+		var id = $( e.target ).closest( '.liveblog-entry' ).data( 'entry-id' );
 		if ( !id ) {
 			return;
 		}

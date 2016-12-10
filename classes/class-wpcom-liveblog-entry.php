@@ -8,10 +8,33 @@ class WPCOM_Liveblog_Entry {
 	const default_avatar_size = 30;
 
 	/**
-	 * @var string In case the current entry is an edit (replaces) of
+	 * In case the current entry is an edit (replaces) of
 	 * another entry, we store the other entry's ID in this meta key.
+	 *
+	 * @var string
 	 */
 	const replaces_meta_key   = 'liveblog_replaces';
+
+	/**
+	 * Meta key to store the very first entry that was edited.
+	 *
+	 * @var string
+	 */
+	const original_meta_key   = 'liveblog_original_entry';
+
+	/**
+	 * Meta key to stores the replacement entry 'created at' timestamp.
+	 *
+	 * @var string
+	 */
+	const updated_meta_key    = 'liveblog_updated_timestamp';
+
+	/**
+	 * Meta key to keep track of deleted entries.
+	 *
+	 * @var string
+	 */
+	const deleted_meta_key    = '_liveblog_deleted_entries';
 
 	private $comment;
 	private $type = 'new';
@@ -19,11 +42,13 @@ class WPCOM_Liveblog_Entry {
 
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
-		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
+
+		$this->replaces = get_comment_meta( $comment->comment_ID, self::original_meta_key, true );
+
 		if ( $this->replaces && $this->get_content() ) {
 			$this->type = 'update';
 		}
-		if ( $this->replaces && !$this->get_content() ) {
+		if ( 'liveblog_trashed' === $comment->comment_approved ) {
 			$this->type = 'delete';
 		}
 	}
@@ -94,24 +119,29 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function get_fields_for_render() {
-		$entry_id     = $this->comment->comment_ID;
-		$post_id      = $this->comment->comment_post_ID;
-		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
-		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
+		$entry_id          = $this->comment->comment_ID;
+		$post_id           = $this->comment->comment_post_ID;
+		$avatar_size       = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$comment_text      = get_comment_text( $entry_id );
+		$css_classes       = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
+		$original_entry    = get_comment_meta( $entry_id, self::original_meta_key, true );
+		$updated_timestamp = get_comment_meta( $entry_id, self::updated_meta_key, true );
+
 		$entry = array(
-			'entry_id'              => $entry_id,
-			'post_id'               => $post_id,
-			'css_classes'           => $css_classes ,
-			'content'               => self::render_content( $comment_text, $this->comment ),
-			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
-			'avatar_size'           => $avatar_size,
-			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
-			'author_link'           => get_comment_author_link( $entry_id ),
-			'entry_date'            => get_comment_date( get_option('date_format'), $entry_id ),
-			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
-			'timestamp'             => $this->get_timestamp(),
-			'is_liveblog_editable'  => WPCOM_Liveblog::is_liveblog_editable(),
+			'entry_id'               => $entry_id,
+			'original_entry'         => $original_entry ? $original_entry : $entry_id,
+			'post_id'                => $post_id,
+			'css_classes'            => $css_classes,
+			'content'                => self::render_content( $comment_text, $this->comment ),
+			'original_content'       => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
+			'avatar_size'            => $avatar_size,
+			'avatar_img'             => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'author_link'            => get_comment_author_link( $entry_id ),
+			'entry_date'             => get_comment_date( get_option('date_format'), $entry_id ),
+			'entry_time'             => get_comment_date( get_option('time_format'), $entry_id ),
+			'timestamp'              => $this->get_timestamp(),
+			'updated_timestamp'      => $updated_timestamp,
+			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
 		);
 
@@ -121,11 +151,10 @@ class WPCOM_Liveblog_Entry {
 	public function render( $template = 'liveblog-single-entry.php' ) {
 
 		$output = apply_filters( 'liveblog_pre_entry_output', '', $this );
-		if ( ! empty( $output ) )
-			return $output;
 
-		if ( empty( $this->comment->comment_content ) )
+		if ( ! empty( $output ) ) {
 			return $output;
+		}
 
 		$entry = $this->get_fields_for_render();
 
@@ -202,21 +231,27 @@ class WPCOM_Liveblog_Entry {
 
 		// Create a new entry, with the new content.
         $args = apply_filters( 'liveblog_before_update_entry', $args );
-		$comment = self::insert_comment( $args );
-		if ( is_wp_error( $comment ) ) {
-			return $comment;
+		$new_comment = self::insert_comment( $args );
+		if ( is_wp_error( $new_comment ) ) {
+			return $new_comment;
 		}
 
 		// Mark the new entry as replacing the old one.
 		add_comment_meta( $new_comment->comment_ID, self::replaces_meta_key, $original_entry['entry_id'] );
 
+		// Store the updated timestamp on new entry.
+		add_comment_meta( $new_comment->comment_ID, self::updated_meta_key, current_time( 'timestamp' ) );
+
+		// Keep track of the original updated entry.
+		self::persist_original_entry( $new_comment->comment_ID, $original_entry['entry_id'] );
+
 		// Mark the original entry comment as trash, and delete.
 		do_action( 'liveblog_update_entry', $new_comment->comment_ID, $args['post_id'] );
 		wp_update_comment( array(
-			'comment_ID'      => $original_entry['entry_id'],
+			'comment_ID'       => $original_entry['entry_id'],
 			'comment_approved' => 'liveblog_trashed',
 		) );
-		self::delete( $original_entry );
+		self::delete( $original_entry, false );
 
 		// Grab the WPCOM_Liveblog_Entry for the new comment and return for display.
 		$entry = self::from_comment( $new_comment );
@@ -229,21 +264,32 @@ class WPCOM_Liveblog_Entry {
 	 * Marks an entry as deleted so it doesn't show in the stream.
 	 *
 	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object)
+	 * @param bool $store_entry_id Wether the entry should be kept track of in the post meta
 	 */
-	public static function delete( $args ) {
-		if ( !$args['entry_id'] ) {
+	public static function delete( $args, $store_entry_id = true ) {
+		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+
+		$deleted_comment = get_comment( $args['entry_id'] );
+
+		$entry = self::from_comment( $deleted_comment );
+		$entry->type = 'delete';
+
+		// Keep track of deleted entries in the parent post meta.
+		if ( $store_entry_id ) {
+			$entry_id = self::get_original_entry_id( $args['entry_id'] );
+			add_post_meta( $args['post_id'], self::deleted_meta_key, $entry_id );
 		}
 
 		do_action( 'liveblog_delete_entry', $args['entry_id'], $args['post_id'] );
 		wp_delete_comment( $args['entry_id'] );
 
-		$entry = self::from_comment( $args['entry_id'] );
 		return $entry;
 	}
 
 	public static function delete_key( $args ) {
-		if ( !$args['entry_id'] ) {
+		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 		if ( ! WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['entry_id'] ) ) {
@@ -311,6 +357,32 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
+	}
+
+	/**
+	 * Get original entry id if present.
+	 *
+	 * @param  int $entry_id
+	 * @return int
+	 */
+	private static function get_original_entry_id( $entry_id )
+	{
+		$original_entry_id = get_comment_meta( $entry_id, self::original_meta_key, true );
+
+		return $original_entry_id ? $original_entry_id : $entry_id;
+	}
+
+	/**
+	 * Keep track of the original entry that it's being updated.
+	 *
+	 * @param  int $entry_id
+	 * @param  int $replaced_entry_id
+	 */
+	private static function persist_original_entry( $entry_id, $replaced_entry_id ) {
+		// If the original entry was already replacing another one store its entry ID instead.
+		$original_entry_id = self::get_original_entry_id( $replaced_entry_id );
+
+		add_comment_meta( $entry_id, self::original_meta_key, $original_entry_id );
 	}
 }
 

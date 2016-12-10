@@ -141,6 +141,8 @@ final class WPCOM_Liveblog {
 		// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
 		add_action( 'init',                          array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 		add_action( 'wp_enqueue_scripts',            array( __CLASS__, 'enqueue_scripts'   ) );
+		add_action( 'amp_post_template_data',        array( __CLASS__, 'add_amp_livelist_script' ) );
+		add_action( 'amp_post_template_css',         array( __CLASS__, 'add_amp_styles' ) );
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 		add_action( 'pre_get_posts',                 array( __CLASS__, 'add_custom_post_type_support' ) );
@@ -771,6 +773,17 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Add live list script to AMP requests
+	 *
+	 * @param array $data
+	 * @return array $data
+	 */
+	public static function add_amp_livelist_script( $data ) {
+		$data['amp_component_scripts']['amp-live-list'] = 'https://cdn.ampproject.org/v0/amp-live-list-0.1.js';
+		return $data;
+	}
+
+	/**
 	 * Sets up some default Plupload settings so we can upload meda theme-side
 	 *
 	 * @global type $wp_scripts
@@ -861,8 +874,13 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_editor_output() {
-		if ( !self::is_liveblog_editable() )
+		if ( !self::is_liveblog_editable() ) {
 			return;
+		}
+
+		if ( self::is_amp() ) {
+			return;
+		}
 
 		return self::get_template_part( 'liveblog-form.php' );
 	}
@@ -884,8 +902,19 @@ final class WPCOM_Liveblog {
 		$entries = (array) self::$entry_query->get_all( $args );
 		$show_archived_message = 'archive' == $state && self::current_user_can_edit_liveblog();
 
+		$amp_items_per_page = apply_filters( 'liveblog_amp_items_per_page' , 5 );
+		$amp_poll_interval = apply_filters( 'liveblog_amp_poll_interval', 15000 );
+
+		$template_name = 'liveblog-loop.php';
+
+		if ( self::is_amp() ) {
+			$template_name = 'liveblog-loop-amp.php';
+		}
+
+		$deleted_entries = (array) self::$entry_query->get_deleted_entries();
+
 		// Get the template part
-		return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
+		return self::get_template_part( $template_name, compact( 'entries', 'deleted_entries', 'show_archived_message', 'amp_items_per_page', 'amp_poll_interval' ) );
 	}
 
 	/**
@@ -1088,6 +1117,59 @@ final class WPCOM_Liveblog {
 		}
 	}
 
+	/**
+	 * Check if it's an AMP request
+	 *
+	 * @return boolean
+	 */
+	public static function is_amp() {
+		return function_exists( 'is_amp_endpoint' ) && is_amp_endpoint();
+	}
+
+	/**
+	 * Add AMP specific CSS styles
+	 *
+	 * @param AMP_Post_Template $amp_template
+	 */
+	public static function add_amp_styles( $amp_template ) {
+		$border_color = $amp_template->get_customizer_setting( 'border_color' );
+		$link_color = $amp_template->get_customizer_setting( 'link_color' );
+		?>
+		.liveblog-load-more {
+			border-style: solid;
+			border-color: <?php echo sanitize_hex_color( $border_color ); ?>;
+			border-width: 1px 1px 2px;
+			border-radius: 4px;
+			background-color: transparent;
+			color: <?php echo sanitize_hex_color( $link_color ); ?>;
+			cursor: pointer;
+			display: block;
+			font-size: 14px;
+			font-weight: 600;
+			line-height: 18px;
+			margin: 0 auto 2em;
+			max-width: 200px;
+			padding: 11px 16px;
+			text-decoration: none;
+			width: 50%;
+		}
+		.liveblog-entry {
+			margin: 1.5em 0;
+		}
+		.liveblog-meta {
+			margin-bottom: 1em;
+		}
+		.liveblog-author-avatar amp-img {
+			display: inline-block;
+			vertical-align: middle;
+			border: 1px solid <?php echo sanitize_hex_color( $link_color ); ?>;
+			border-radius: 50%;
+			position: relative;
+			margin-right: 6px;
+		}
+		<?php
+	}
+
 	/** Error Methods *********************************************************/
 
 	/**
@@ -1101,7 +1183,7 @@ final class WPCOM_Liveblog {
 	}
 
 	public static function is_liveblog_editable() {
-		return self::current_user_can_edit_liveblog() && 'enable' == self::get_liveblog_state();
+		return self::current_user_can_edit_liveblog() && 'enable' == self::get_liveblog_state() && ! self::is_amp();
 	}
 
 	/**
