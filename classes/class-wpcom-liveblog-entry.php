@@ -172,6 +172,12 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
+		// The force_balance_tags filter breaks the format AMP
+		// expects for oEmbed elements so we need to remove it.
+		if ( WPCOM_Liveblog::is_amp() ) {
+			remove_filter( 'comment_text', 'force_balance_tags', 25 );
+		}
+
 		return apply_filters( 'comment_text', $content, $comment );
 	}
 
