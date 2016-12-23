@@ -152,6 +152,14 @@
 				},
 				'removeFormat': function () {
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
+				},
+				'lineBreak': function() {
+					var isFirefox = typeof InstallTrigger !== 'undefined';
+					if ( isFirefox ) {
+						return;
+					}
+
+					return e.keyCode === 13;
 				}
 			};
 			found_command = false;
@@ -208,7 +216,10 @@
 					command = 'unlink';
 				}
 			}
-
+			if (command === 'lineBreak') {
+				command = 'insertHTML';
+				value   = "<br><br>";
+			}
 			document.execCommand( command, false, value );
 		},
 
