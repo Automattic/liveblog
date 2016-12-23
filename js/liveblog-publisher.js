@@ -4,6 +4,10 @@
 		return;
 	}
 
+	var isFirefox = typeof InstallTrigger !== 'undefined';
+	var isIE = /*@cc_on!@*/false || !!document.documentMode;
+	var isEdge = !isIE && !!window.StyleMedia;
+
 	liveblog.InsertEntryView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'liveblog-form',
@@ -154,8 +158,7 @@
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
 				},
 				'lineBreak': function() {
-					var isFirefox = typeof InstallTrigger !== 'undefined';
-					if ( isFirefox ) {
+					if ( isFirefox || isEdge  || isIE ) {
 						return;
 					}
 
