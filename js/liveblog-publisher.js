@@ -161,6 +161,13 @@
 				},
 				'lineBreak': function() {
 					if ( isChrome || isSafari ) {
+						return e.shiftKey && e.keyCode === 13;
+					}
+
+					return;
+				},
+				'paragraphBreak': function() {
+					if ( isChrome || isSafari ) {
 						return e.keyCode === 13;
 					}
 
@@ -224,6 +231,10 @@
 			if (command === 'lineBreak') {
 				command = 'insertHTML';
 				value   = "<br><br>";
+			}
+			if (command === 'paragraphBreak') {
+				command = 'insertHTML';
+				value   = "<br><br><br>";
 			}
 			document.execCommand( command, false, value );
 		},
