@@ -4,9 +4,11 @@
 		return;
 	}
 
-	var isFirefox = typeof InstallTrigger !== 'undefined';
-	var isIE = /*@cc_on!@*/false || !!document.documentMode;
-	var isEdge = !isIE && !!window.StyleMedia;
+	var isFirefox = typeof InstallTrigger !== 'undefined',
+		isIE      = /*@cc_on!@*/false || !!document.documentMode,
+		isEdge    = !isIE && !!window.StyleMedia,
+		isChrome  = !!window.chrome && !!window.chrome.webstore,
+		isSafari  = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0 || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
 
 	liveblog.InsertEntryView = Backbone.View.extend({
 		tagName: 'div',
@@ -158,11 +160,11 @@
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
 				},
 				'lineBreak': function() {
-					if ( isFirefox || isEdge || isIE ) {
-						return;
+					if ( isChrome || isSafari ) {
+						return e.keyCode === 13;
 					}
 
-					return e.keyCode === 13;
+					return;
 				}
 			};
 			found_command = false;
