@@ -158,7 +158,7 @@
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
 				},
 				'lineBreak': function() {
-					if ( isFirefox || isEdge  || isIE ) {
+					if ( isFirefox || isEdge || isIE ) {
 						return;
 					}
 
