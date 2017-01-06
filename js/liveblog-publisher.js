@@ -160,18 +160,10 @@
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
 				},
 				'lineBreak': function() {
-					if ( isChrome || isSafari ) {
-						return e.shiftKey && e.keyCode === 13;
-					}
-
-					return;
+					return e.shiftKey && e.keyCode === 13;
 				},
 				'paragraphBreak': function() {
-					if ( isChrome || isSafari ) {
-						return e.keyCode === 13;
-					}
-
-					return;
+					return e.keyCode === 13;
 				}
 			};
 			found_command = false;
@@ -229,12 +221,23 @@
 				}
 			}
 			if (command === 'lineBreak') {
-				command = 'insertHTML';
-				value   = "<br><br>";
+				if ( isChrome || isSafari ) {
+					command = 'insertHTML';
+					value   = "<br><br>";
+				} else {
+					command = 'insertText';
+					value   = "\n";
+				}
 			}
 			if (command === 'paragraphBreak') {
-				command = 'insertHTML';
-				value   = "<br><br><br>";
+				if ( isChrome || isSafari ) {
+					command = 'insertHTML';
+					value   = '<br><br><br>';
+				} else {
+					document.execCommand( 'insertText', false, "\n" );
+					command = 'insertHTML';
+					value   = '<br>';
+				}
 			}
 			document.execCommand( command, false, value );
 		},
