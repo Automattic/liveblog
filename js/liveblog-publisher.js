@@ -4,6 +4,12 @@
 		return;
 	}
 
+	var isFirefox = typeof InstallTrigger !== 'undefined',
+		isIE      = /*@cc_on!@*/false || !!document.documentMode,
+		isEdge    = !isIE && !!window.StyleMedia,
+		isChrome  = !!window.chrome && !!window.chrome.webstore,
+		isSafari  = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0 || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
+
 	liveblog.InsertEntryView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'liveblog-form',
@@ -152,6 +158,12 @@
 				},
 				'removeFormat': function () {
 					return cmd_ctrl_key && e.keyCode === 220  /* backslash */;
+				},
+				'lineBreak': function() {
+					return e.shiftKey && e.keyCode === 13;
+				},
+				'paragraphBreak': function() {
+					return e.keyCode === 13;
 				}
 			};
 			found_command = false;
@@ -208,7 +220,25 @@
 					command = 'unlink';
 				}
 			}
-
+			if (command === 'lineBreak') {
+				if ( isChrome || isSafari ) {
+					command = 'insertHTML';
+					value   = "<br><br>";
+				} else {
+					command = 'insertText';
+					value   = "\n";
+				}
+			}
+			if (command === 'paragraphBreak') {
+				if ( isChrome || isSafari ) {
+					command = 'insertHTML';
+					value   = '<br><br><br>';
+				} else {
+					document.execCommand( 'insertText', false, "\n" );
+					command = 'insertHTML';
+					value   = '<br>';
+				}
+			}
 			document.execCommand( command, false, value );
 		},
 
