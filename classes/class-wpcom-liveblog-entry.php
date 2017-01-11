@@ -23,7 +23,7 @@ class WPCOM_Liveblog_Entry {
 		if ( $this->replaces && $this->get_content() ) {
 			$this->type = 'update';
 		}
-		if ( 'liveblog_trashed' === $comment->comment_approved ) {
+		if ( $this->replaces && !$this->get_content() ) {
 			$this->type = 'delete';
 		}
 	}
@@ -183,29 +183,18 @@ class WPCOM_Liveblog_Entry {
 			return $args['user'];
 		}
 
-		// Remove the entry ID so that we don't update the original entry.
-		$original_entry_id = $args['entry_id'];
-		unset( $args['entry_id'] );
-
-		// Create a new entry, with the new content.
         $args = apply_filters( 'liveblog_before_update_entry', $args );
-		$new_comment = self::insert_comment( $args );
-		if ( is_wp_error( $new_comment ) ) {
-			return $new_comment;
+		$comment = self::insert_comment( $args );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
 		}
-
-		// Mark the new entry as replacing the old one.
-		add_comment_meta( $new_comment->comment_ID, self::replaces_meta_key, $original_entry_id );
-
-		// Mark the original entry comment as trash.
-		do_action( 'liveblog_update_entry', $new_comment->comment_ID, $args['post_id'] );
+		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
+		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_update_comment( array(
-			'comment_ID'      => $original_entry_id,
-			'comment_approved' => 'liveblog_trashed',
+			'comment_ID'      => $args['entry_id'],
+			'comment_content' => wp_filter_post_kses( $args['content'] ),
 		) );
-
-		// Grab the WPCOM_Liveblog_Entry for the new comment and return for display.
-		$entry = self::from_comment( $new_comment );
+		$entry = self::from_comment( $comment );
 		return $entry;
 	}
 
