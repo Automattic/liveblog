@@ -36,12 +36,6 @@ add_action( 'after_liveblog_init', function() {
 // comes in
 add_action( 'wp_enqueue_scripts', function() {
 	global $BlackbirdPie;
-
-	// Fail gracefully if BlackbirdPie isn't available.
-	if ( ! isset( $BlackbirdPie ) || ! is_a( $BlackbirdPie, 'BlackbirdPie' ) ) {
-		return;
-	}
-
 	$BlackbirdPie->load_scripts();
 	$BlackbirdPie->load_infinite_scroll_script();
 } );
