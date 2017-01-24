@@ -173,7 +173,7 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function update( $args ) {
 		if ( !$args['entry_id'] ) {
-			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+			return new WP_Error( 'entry-update', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
 		// always use the original author for the update entry, otherwise until refresh
