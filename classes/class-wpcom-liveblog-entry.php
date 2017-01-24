@@ -217,7 +217,6 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
-		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
 	}
