@@ -31,7 +31,7 @@ jQuery(document).ready(function($) {
 			$textarea.val( entry_text );
 			$textarea.trigger('input');
 			$( '#liveblog-messages' ).html( filename + ' Finished' );
-			$( '#liveblog-actions' ).removeClass( 'uploading' );
+			$( '.liveblog-actions' ).removeClass( 'uploading' );
 
 			if ($contenteditable.is(':visible')) {
 				$contenteditable.focus();
@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
 		},
 
 		added    : function() {
-			$( '#liveblog-actions' ).addClass( 'uploading' );
+			$( '.liveblog-actions' ).addClass( 'uploading' );
 		},
 
 		progress : function( upload, file ) {
