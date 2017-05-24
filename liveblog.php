@@ -22,13 +22,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
  *
  * This class is a big container for a bunch of static methods, similar to a
  * factory but without object inheritance or instantiation.
- *
- * Things yet to be implemented:
- *
- * -- Change "Read More" to "View Liveblog"
- * -- Manual refresh button
- * -- Allow marking of liveblog as ended
- * -- Allow comment modifications; need to store modified date as comment_meta
  */
 final class WPCOM_Liveblog {
 
