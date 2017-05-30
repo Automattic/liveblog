@@ -99,6 +99,14 @@
 			} );
 		},
 
+		fetchAllEntries: function(){
+			var url = liveblog_settings.endpoint_url + 'lazyload/';
+
+			$.get( url, {}, function( response ) {
+			   console.log(response);
+			} );
+		},
+
 		/**
 		 * Returns the button with the given entry set index.
 		 * @param {number} index - The index of an entry set.
@@ -126,6 +134,12 @@
 			if ( ! $button.length ) {
 				return;
 			}
+
+			console.log( lazyloader.fetchAllEntries());
+			/*
+			$.get( liveblogLazyloaderSettings.ajax_url, {fetchentries:'true'},function( res ){
+				console.log(res);
+			});*/
 
 			$.each( lazyloader.entrySets[ setIndex ], function( i, entry ) {
 				if ( entry.html ) {
