@@ -98,15 +98,25 @@
 				lazyloader.setUnbusy();
 			} );
 		},
+		/**
+		 * Fetch all trashed entries.
+		 *
+		 * @returns {Array}
+		 */
+		fetchAllEntries: function() {
 
-		fetchAllEntries: function(){
-			var url = liveblog_settings.endpoint_url + 'lazyload/';
+			var all_entries_id = [];
 
-			$.get( url, {}, function( response ) {
-			   console.log(response);
+			$.ajax( {
+				url: liveblog_settings.endpoint_url + 'getentries/all',
+				async: false,
+				cache: false
+			} ).done( function ( res ) {
+				all_entries_id = _( res ).toArray();
 			} );
-		},
 
+			return all_entries_id;
+		},
 		/**
 		 * Returns the button with the given entry set index.
 		 * @param {number} index - The index of an entry set.
@@ -135,17 +145,19 @@
 				return;
 			}
 
-			console.log( lazyloader.fetchAllEntries());
-			/*
-			$.get( liveblogLazyloaderSettings.ajax_url, {fetchentries:'true'},function( res ){
-				console.log(res);
-			});*/
+			// Fetch all trashed entry.
+			var entries_ids = lazyloader.fetchAllEntries();
 
 			$.each( lazyloader.entrySets[ setIndex ], function( i, entry ) {
+
+				// Skip, if entry is not exists in the database.
+				if ( jQuery.inArray( entry.id, entries_ids )  !== -1 ) {
+					return true;
+				}
+
 				if ( entry.html ) {
 					$button.before( $( entry.html ) );
 				}
-
 				twttr.widgets.load( document.getElementById( 'liveblog-entry-' + entry.id ) );
 			} );
 
@@ -153,7 +165,8 @@
 			liveblog.entriesContainer.updateTimes();
 
 			lazyloader.fetchEntries( setIndex );
-		},
+
+        },
 
 		/**
 		 * Fetches the entry for the according Key Event, if necessary, and renders it.

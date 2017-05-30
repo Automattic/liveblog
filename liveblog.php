@@ -292,6 +292,7 @@ final class WPCOM_Liveblog {
 			'entry' => 'ajax_single_entry',
 			'lazyload' => 'ajax_lazyload_entries',
 			'preview' => 'ajax_preview_entry',
+			'getentries' => 'ajax_get_enteriess',
 		);
 
 		$response_method = 'ajax_unknown';
@@ -313,7 +314,6 @@ final class WPCOM_Liveblog {
 		self::$response_method();
 
 	}
-
 	/**
 	 * Look for any new Liveblog entries, and return them via JSON
 	 */
@@ -607,6 +607,31 @@ final class WPCOM_Liveblog {
 		do_action( 'liveblog_entry_request', $result_for_json );
 
 		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Ajax callback func to get all trashed enteries.
+	 */
+	public static function ajax_get_enteriess(){
+
+		if ( ! isset( $_GET['p'] ) ){
+			return false;
+		}
+
+		$args = array(
+			'status'    => 'trash',
+			'post_id'   => absint( $_GET['p'] ),
+		);
+
+		// Get all trashed entries.
+		$comments = get_comments($args);
+
+		$entries_id = array();
+
+		foreach ( $comments as $comment ) {
+			$entries_id[] = $comment->comment_ID;
+		}
+		self::json_return( $entries_id );
 	}
 
 	public static function ajax_preview_entry() {
