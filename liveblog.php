@@ -206,10 +206,11 @@ final class WPCOM_Liveblog {
 	 */
 	public static function init() {
 		/**
-		 * Add liveblog support to the 'post' post type. This is done here so
+		 * Add liveblog support to the 'post' and 'page' post type. This is done here so
 		 * we can possibly introduce this to other post types later.
 		 */
 		add_post_type_support( 'post', self::key );
+		add_post_type_support( 'page', self::key );
 		do_action( 'after_liveblog_init' );
 	}
 
@@ -388,14 +389,14 @@ final class WPCOM_Liveblog {
 	 * @return bool
 	 */
 	public static function is_viewing_liveblog_post() {
-		return (bool) ( is_single() && self::is_liveblog_post() );
+		return (bool) ( is_single() && self::is_liveblog_post() || is_page() && self::is_liveblog_post() );
 	}
 
 	/**
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
-		if ( ! is_single() && ! is_admin() ) {
+		if ( ! is_single() && ! is_admin() && ! is_page() ) {
 			return false;
 		}
 		if ( empty( $post_id ) ) {
@@ -819,7 +820,7 @@ final class WPCOM_Liveblog {
 	 */
 	private static function get_entries_endpoint_url() {
 		$post_permalink = get_permalink( self::$post_id );
-		if ( false !== strpos( $post_permalink, '?p=' ) )
+		if ( false !== strpos( $post_permalink, '?p=' )  || false !== strpos( $post_permalink, '?page_id=' ) )
 			$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
 		else
 			$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
