@@ -190,11 +190,19 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+
+		$replace_comment_id = get_comment_meta( $comment->comment_ID, 'liveblog_replaces', true );
+		$first_comment_id   = get_comment_meta( $replace_comment_id, 'first_entry_comment_id', true );
+
+		if ( $args['entry_id'] !== $first_comment_id ) {
+			update_comment_meta( $comment->comment_ID, 'first_entry_comment_id', $first_comment_id );
+		}
 		wp_update_comment( array(
-			'comment_ID'      => $args['entry_id'],
+			'comment_ID'      => $first_comment_id,
 			'comment_content' => wp_filter_post_kses( $args['content'] ),
 		) );
 		$entry = self::from_comment( $comment );
+
 		return $entry;
 	}
 
@@ -256,6 +264,9 @@ class WPCOM_Liveblog_Entry {
 		$comment = get_comment( $new_comment_id );
 		if ( !$comment ) {
 			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
+		}
+		if ( empty( $args['entry_id'] ) ) {
+			add_comment_meta( $new_comment_id, 'first_entry_comment_id', $new_comment_id );
 		}
 		return $comment;
 	}
