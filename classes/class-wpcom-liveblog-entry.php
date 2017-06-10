@@ -94,7 +94,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function get_fields_for_render() {
-		$entry_id     = $this->replaces ? $this->replaces : $this->comment->comment_ID;
+		$entry_id     = $this->comment->comment_ID;
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
@@ -218,26 +218,6 @@ class WPCOM_Liveblog_Entry {
 		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_delete_comment( $args['entry_id'] );
-
-		// grab entries that need to be marked as trash
-		global $wpdb;
-
-		$entries_query = new WPCOM_Liveblog_Entry_Query( $args['post_id'], WPCOM_Liveblog::key );
-		$entries_todo = $entries_query->get_all_edits( array( 
-			'post_id' 	 => $args['post_id'],
-			'meta_value' => $args['entry_id']
-			) );
-
-		// mark them as trash in db
-		foreach( $entries_todo as $entry_todo ) {
-			$entry_todo_id = $entry_todo->get_id();
-			$wpdb->update(
-				$wpdb->comments,
-				array( 'comment_approved' => 'trash' ),
-				array( 'comment_id' => $entry_todo_id )
-				);
-		}
-
 		$entry = self::from_comment( $comment );
 		return $entry;
 	}

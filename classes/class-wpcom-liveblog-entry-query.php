@@ -35,25 +35,6 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Query the database for all edited liveblog entries associated with $post_id
-	 *
-	 * @param array $args the same args for the core `get_comments()`.
-	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
-	 */
-	public function get_all_edits( $args = array() ) {
-		$defaults = array(
-			'orderby' 	=> 'comment_date_gmt',
-			'order'   	=> 'ASC',
-			'meta_key'  => 'liveblog_replaces',
-			'status'	=> 'liveblog'
-		);
-
-		$args     = wp_parse_args( $args, $defaults );
-		$comments = get_comments( $args );
-
-		return self::entries_from_comments( $comments );
-	}
-	/**
 	 * Get all of the liveblog entries
 	 *
 	 * @param array $args the same args for the core `get_comments()`
