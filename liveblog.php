@@ -577,15 +577,15 @@ final class WPCOM_Liveblog {
 
 		// Get all Liveblog entries that are to be lazyloaded.
 		$entries = self::$entry_query->get_for_lazyloading(
-			isset( $fragments[1] ) ? (int) $fragments[1] : 0,
-			isset( $fragments[2] ) ? (int) $fragments[2] : 0
+			isset( $fragments[2] ) ? (int) $fragments[2] : 0,
+			isset( $fragments[3] ) ? (int) $fragments[3] : 0
 		);
 		if ( ! $entries ) {
 			do_action( 'liveblog_entry_request_empty' );
 
 			self::json_return( array(
 				'entries' => array(),
-				'index'   => (int) filter_input( INPUT_GET, 'index' ),
+				'index'   => (int) ( isset( $fragments[0] ) ? $fragments[0] : 0 ),
 			) );
 		}
 
