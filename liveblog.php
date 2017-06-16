@@ -585,7 +585,7 @@ final class WPCOM_Liveblog {
 
 			self::json_return( array(
 				'entries' => array(),
-				'index'   => (int) ( isset( $fragments[0] ) ? $fragments[0] : 0 ),
+				'index'   => (int) ( isset( $fragments[1] ) ? $fragments[1] : 0 ),
 			) );
 		}
 
