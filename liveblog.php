@@ -49,6 +49,7 @@ final class WPCOM_Liveblog {
 	private static $post_id               = null;
 	private static $entry_query           = null;
 	private static $custom_template_path  = null;
+	private static $auto_archive_days     = null;
 
 	/** Load Methods **********************************************************/
 
@@ -69,6 +70,9 @@ final class WPCOM_Liveblog {
 		self::add_admin_actions();
 		self::add_admin_filters();
 		self::register_embed_handlers();
+
+		// Globally set auto-archive option
+		self::$auto_archive_days = get_option( 'liveblog_auto_archive', 7);
 
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Key_Events_Widget::load();
@@ -172,6 +176,8 @@ final class WPCOM_Liveblog {
 		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
 		add_action( 'restrict_manage_posts', array( __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ) );
 		add_action( 'pre_get_posts',         array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
+		add_action( 'admin_menu',            array( __CLASS__, 'add_settings_page_to_menu' ) );
+		add_action( 'admin_init',            array( __CLASS__, 'options_page_init' ) );
 	}
 
 	/**
@@ -410,7 +416,23 @@ final class WPCOM_Liveblog {
 		if ( 1 == $state ) {
 			$state = 'enable';
 		}
+		if ( 'enable' == $state && self::$auto_archive_days ) {
+			$time_diff = 60 * 60 * 24 * $auto_archive_days;
+			if ( ( get_post_time( 'U', true, $post_id ) + $time_diff ) < current_time( 'U' ) ) {
+				self::archive_post( $post_id );
+				$state = 'archive';
+			}
+		}
 		return $state;
+	}
+
+	/**
+	 * Convenience function to archive the current post
+	 * 
+	 * @param int $post_id
+	 */
+	public static function archive_post( $post_id ) {
+		update_post_meta( $post_id, 'liveblog', 'archive' );
 	}
 
 	/** Private _is_ Methods **************************************************/
@@ -956,6 +978,67 @@ final class WPCOM_Liveblog {
 		$extra_fields = array();
 		$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
 		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
+	}
+
+	/**
+	 * Register valid options on the liveblog admin settings page
+	 */
+	public static function options_page_init() {
+		register_setting(
+			'liveblog_options',
+			'liveblog_auto_archive',
+			'absint'
+		);
+		add_settings_section(
+			'auto_archive',
+			'Auto Archive',
+			array( __CLASS__, 'display_auto_archive_setting_instructions' ),
+			'liveblog-settings'
+		);
+		add_settings_field(
+			'auto_archive',
+			'Auto Archive',
+			array( __CLASS__, 'display_auto_archive_field' ),
+			'liveblog-settings',
+			'auto_archive'
+		);
+	}
+
+	/**
+	 * Add settings page to the admin menu
+	 */
+	public static function add_settings_page_to_menu() {
+		add_options_page(
+			'Liveblog Settings',
+			'Liveblog Settings',
+			'edit_plugins',
+			'liveblog-settings',
+			array( __CLASS__, 'show_settings' )
+		);
+	}
+	
+	/**
+	 * Display / process the administrative settings page
+	 */
+	public static function show_settings() {
+		include( dirname( __FILE__ ) . '/templates/settings-page.php' );
+	}
+	
+	/**
+	 * Display field description for auto archive option
+	 */
+	public static function display_auto_archive_setting_instructions() {
+		echo __( 'Posts should be automatically archived after this many days.  Enter 0 to disable automatic archiving.' );
+	}
+
+        /**
+	 * Output the auto archive option field
+	 */
+	public static function display_auto_archive_field() {
+		printf(
+			'<input type="text" id="auto_archive" name="liveblog_auto_archive" value="%s">',
+			self::$auto_archive_days
+		);
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
