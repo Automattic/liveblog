@@ -27,7 +27,7 @@ final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
 
-	const version          = '1.4';
+	const version          = '1.5.2';
 	const rewrites_version = 1;
 	const min_wp_version   = '3.5';
 	const key              = 'liveblog';
