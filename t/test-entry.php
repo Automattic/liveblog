@@ -111,7 +111,7 @@ class Test_Entry extends WP_UnitTestCase {
 			'[liveblog_key_events arg="30"]Test Input Inbetween Tags[/liveblog_key_events]',
 		);
 
-		// Loop through each format and create a new comment to check if it gets stripped.
+		// Loop through each format and create a new comment to check if it gets stripped before hitting the DB.
 		foreach ( $formats as $shortcode ) {
 
 			// Create a new entry.
