@@ -417,7 +417,7 @@ final class WPCOM_Liveblog {
 			$state = 'enable';
 		}
 		if ( 'enable' == $state && self::$auto_archive_days ) {
-			$time_diff = 60 * 60 * 24 * $auto_archive_days;
+			$time_diff = 60 * 60 * 24 * self::$auto_archive_days;
 			if ( ( get_post_time( 'U', true, $post_id ) + $time_diff ) < current_time( 'U' ) ) {
 				self::archive_post( $post_id );
 				$state = 'archive';
