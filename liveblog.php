@@ -155,6 +155,10 @@ final class WPCOM_Liveblog {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
 		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );
+
+		// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post. Called from the WPCOM_Liveblog_Entry Class.
+		add_filter( 'liveblog_before_insert_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
+		add_filter( 'liveblog_before_update_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
 	}
 
 	/**

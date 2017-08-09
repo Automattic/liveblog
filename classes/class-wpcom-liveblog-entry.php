@@ -17,6 +17,17 @@ class WPCOM_Liveblog_Entry {
 	private $type = 'new';
 	private static $allowed_tags_for_entry;
 
+	/**
+	 * Define the Lookup array for any shortcodes that should be stripped and replaced
+	 * upon new entry being posted or existing entry being updated.
+	 *
+	 * @var array|mixed|void
+	 * @author Olly Warren, Big Bite Creative
+	 */
+	public static $restricted_shortcodes = array(
+		'liveblog_key_events' => 'We Are Blogging Live! Check Out The Key Events in The Sidebar',
+	);
+
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
 		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
@@ -280,6 +291,33 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
+	}
+
+	/**
+	 * Handles stripping out any Restricted Shortcodes and replacing them with the
+	 * preconfigured string entry.
+	 *
+	 * @param array $args The new Live blog Entry.
+	 * @return mixed
+	 * @author Olly Warren, Big Bite Creative
+	 */
+	public static function handle_restricted_shortcodes( $args ) {
+
+		// Runs the restricted shortcode array through the filter to modify it where applicable before being applied.
+		self::$restricted_shortcodes = apply_filters( 'liveblog_entry_restrict_shortcodes', self::$restricted_shortcodes );
+
+		// Foreach lookup key, does it exist in the content.
+		foreach ( self::$restricted_shortcodes as $key => $value ) {
+
+			// Regex Pattern will match all shortcode formats.
+			$pattern = "/\[{$key}(.*?)?\](?:(.+?)?\[\/{$key}(.*?)?\])?/";
+
+			// if there's a match we replace it with the configured replacement.
+			$args['content'] = preg_replace( $pattern, $value, $args['content'] );
+		}
+
+		// Return the Original entry arguments with any modifications.
+		return $args;
 	}
 }
 

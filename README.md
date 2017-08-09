@@ -294,6 +294,45 @@ public static function filter( $class_prefix ) {
 }
 ```
 
+### Shortcode Filtering
+Developers have to ability to exclude shortcodes from being used within the content of a live entry. By default the in built key events widget short code is excluded, but others can be added easily enough from within the themes ``` functions.php ```.
+
+``` php
+    // Added to Functions.php
+    
+    function liveblog_entry_add_restricted_shortcodes() {
+    
+    	add_filter( 'liveblog_entry_restrict_shortcodes', 'add_shortcode_restriction', 10, 1 );
+    
+    	function add_shortcode_restriction( $restricted_shortcodes ) {
+    
+    		$restricted_shortcodes['my-shortcode'] = 'This Text Will Be Inserted Instead Of The Shortcode!';
+    		$restricted_shortcodes['my-other-shortcode'] = '<h1>Here is a Markup Shortcode Replacement</h1>';
+    
+    		return $restricted_shortcodes;
+    	}
+    }
+    
+    add_action( 'init', 'liveblog_entry_add_restricted_shortcodes' );
+
+```
+
+The functionality takes a associative array of key value pairs where the key is the shortcode to be looked up and the value is the replacement string.
+
+So, given the example above an editor adding any of the shortcode formats:
+
+``` [my-shortcode]``` / ``` [my-shortcode][/my-shortcode]``` / ``` [my-shortcode arg="20"][/my-shortcode]``` 
+
+would see ``` This Text Will Be Inserted Instead Of The Shortcode! ``` outputted on live entry.
+
+By default the inbuilt ``` [liveblog_key_events] ``` shortcode is replaced with ```We Are Blogging Live! Check Out The Key Events in The Sidebar```.
+
+To override this behaviour simple redefine the array key value:
+
+``` php
+$restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output for the shortcode! <a href="/">Click Here to Find Out More!</a>';
+```
+
 ### WebSocket support
 
 By default this plugin uses AJAX polling to update the list of Liveblog entries. This means that there is a delay of a few seconds between the moment a entry is created and the moment it is displayed to the users. For a close to real-time experience, it is possible to configure Liveblog to use WebSockets instead of AJAX polling. To achieve this, Liveblog uses [Socket.io](http://socket.io), [Redis](http://redis.io) and [socket.io-php-emitter](https://github.com/rase-/socket.io-php-emitter) (responsible for sending messages from PHP to the Socket.io server via Redis).
