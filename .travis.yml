@@ -1,8 +1,6 @@
-# This sudo thingy here will make sure that PHP 5.2 tests actually run on Travis
-sudo: false
-
+sudo: required
+dist: trusty
 language: php
-
 matrix:
 
     include:
