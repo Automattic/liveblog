@@ -782,7 +782,7 @@ final class WPCOM_Liveblog {
 			'runtimes'            => 'html5,silverlight,flash,html4',
 			'file_data_name'      => 'async-upload',
 			'multiple_queues'     => true,
-			'max_file_size'       => self::max_upload_size() . 'b',
+			'max_file_size'       => wp_max_upload_size() . 'b',
 			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
 			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
 			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
@@ -1215,57 +1215,6 @@ final class WPCOM_Liveblog {
 		return $protected;
 	}
 
-	/** Plupload Helpers ******************************************************/
-
-	/**
-	 * Convert hours to bytes
-	 *
-	 * @param unknown_type $size
-	 * @return unknown
-	 */
-	private static function convert_hr_to_bytes( $size ) {
-		$size  = strtolower( $size );
-		$bytes = (int) $size;
-
-		if ( strpos( $size, 'k' ) !== false )
-			$bytes = intval( $size ) * 1024;
-		elseif ( strpos( $size, 'm' ) !== false )
-			$bytes = intval( $size ) * 1024 * 1024;
-		elseif ( strpos( $size, 'g' ) !== false )
-			$bytes = intval( $size ) * 1024 * 1024 * 1024;
-
-		return $bytes;
-	}
-
-	/**
-	 * Convert bytes to hour
-	 *
-	 * @param string $bytes
-	 * @return string
-	 */
-	private static function convert_bytes_to_hr( $bytes ) {
-		$units = array( 0 => 'B', 1 => 'kB', 2 => 'MB', 3 => 'GB' );
-		$log   = log( $bytes, 1024 );
-		$power = (int) $log;
-		$size  = pow( 1024, $log - $power );
-
-		return $size . $units[$power];
-	}
-
-	/**
-	 * Get the maximum upload file size
-	 *
-	 * @see wp_max_upload_size()
-	 * @return string
-	 */
-	private static function max_upload_size() {
-		$u_bytes = self::convert_hr_to_bytes( ini_get( 'upload_max_filesize' ) );
-		$p_bytes = self::convert_hr_to_bytes( ini_get( 'post_max_size'       ) );
-		$bytes   = apply_filters( 'upload_size_limit', min( $u_bytes, $p_bytes ), $u_bytes, $p_bytes );
-
-		return $bytes;
-	}
-
 	private static function is_wp_too_old() {
 		global $wp_version;
 		// if WordPress is loaded in a function the version variables aren't globalized
@@ -1277,5 +1226,18 @@ final class WPCOM_Liveblog {
 	}
 }
 WPCOM_Liveblog::load();
+
+/** Plupload Helpers ******************************************************/
+if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {
+	require_once( ABSPATH . 'wp-includes/load.php');
+}
+
+if ( ! function_exists( 'size_format' ) ) {
+	require_once( ABSPATH . 'wp-includes/functions.php');
+}
+
+if ( ! function_exists( 'wp_max_upload_size' ) ) {
+	require_once( ABSPATH . 'wp-includes/media.php');
+}
 
 endif;
