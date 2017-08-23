@@ -94,7 +94,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function get_fields_for_render() {
-		$entry_id     = $this->comment->comment_ID;
+		$entry_id     = $this->replaces ? $this->replaces : $this->comment->comment_ID;
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
