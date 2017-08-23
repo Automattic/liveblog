@@ -1,12 +1,9 @@
 # This sudo thingy here will make sure that PHP 5.2 tests actually run on Travis
 sudo: false
-
 language: php
-
 matrix:
 
     include:
-        # Current $required_php_version for WordPress: 5.2.4
         # aliased to 5.2.17
         - php: '5.2'
           env: WP_VERSION=latest

@@ -88,6 +88,50 @@ class Test_Entry extends WP_UnitTestCase {
 		$this->assertEmpty( $live_blog_entry->get_content() );
 	}
 
+	/**
+	 * test_shortcode_type1_excluded_from_entry
+	 *
+	 * Test to ensure that all [shortcode] formats are stripped.
+	 * Uses the default exclusion [liveblog_key_events] which should
+	 * be replaced with "We Are Blogging Live! Check Out The Key Events in The Sidebar"
+	 * if successful.
+	 *
+	 * @author  Olly Warren, Big Bite Creative
+	 * @package WPCOM_Liveblog
+	 */
+	function test_shortcode_excluded_from_entry() {
+
+		// Insert a new entries with a shortcode body content to test each type of shortcode format.
+		$formats = array(
+			'[liveblog_key_events]',
+			'[liveblog_key_events][/liveblog_key_events]',
+			'[liveblog_key_events arg="30"]',
+			'[liveblog_key_events arg="30"][/liveblog_key_events]',
+			'[liveblog_key_events]Test Input Inbetween Tags[/liveblog_key_events]',
+			'[liveblog_key_events arg="30"]Test Input Inbetween Tags[/liveblog_key_events]',
+		);
+
+		// Loop through each format and create a new comment to check if it gets stripped before hitting the DB.
+		foreach ( $formats as $shortcode ) {
+
+			// Create a new entry.
+			$entry = $this->insert_entry( array(
+				'content' => $shortcode,
+			) );
+
+			// Lets setup a Reflection class so we can access the private object properties and check our comment body.
+			$comment = new ReflectionProperty( $entry, 'comment' );
+			$comment->setAccessible( true );
+			$comment_content = $comment->getValue( $entry );
+
+			// Define a check varibale and see if the returned object content has been set as the default string replacement.
+			$check = 'We Are Blogging Live! Check Out The Key Events in The Sidebar' === $comment_content->comment_content;
+
+			//Assert we have a match. If we do then the shortcode was successfully stripped.
+			$this->assertTrue( $check );
+		}
+	}
+
 	static function set_liveblog_hook_fired() {
 		$GLOBALS['liveblog_hook_fired'] = true;
 	}
@@ -108,4 +152,6 @@ class Test_Entry extends WP_UnitTestCase {
 		add_comment_meta( $comment->comment_ID, WPCOM_Liveblog_Entry::replaces_meta_key, $replaces );
 		return $comment;
 	}
+
+
 }
