@@ -65,7 +65,7 @@
 				$nextEntry = $button.next( '.liveblog-entry' ),
 				maxTimestamp = 0,
 				minTimestamp = 0,
-				url = liveblog_settings.endpoint_url + 'lazyload/';
+				url = liveblog_settings.endpoint_url + 'lazyload/' + setIndex + '/';
 
 			if ( $previousEntry.length ) {
 				maxTimestamp = parseInt( $previousEntry.data( 'timestamp' ) ) || 0;
@@ -79,10 +79,7 @@
 				url = url + maxTimestamp + '/' + minTimestamp + '/';
 			}
 
-			var data = {
-				index: setIndex
-			};
-			$.get( url, data, function( response ) {
+			$.get( url, function( response ) {
 				var index = response.index;
 
 				var $button = lazyloader.getButton( index );
