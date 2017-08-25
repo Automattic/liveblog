@@ -237,7 +237,7 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
-		if ( ! WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['entry_id'] ) ) {
+		if ( ! WPCOM_Liveblog_EntrAttempty_Key_Events::remove_key_action( $args['entry_id'] ) ) {
 			return new WP_Error( 'entry-delete-key', __( 'Key event not deleted' ) );
 		}
 		$entry = self::update( $args );

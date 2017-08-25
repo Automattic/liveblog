@@ -492,6 +492,7 @@ final class WPCOM_Liveblog {
 		return array_map( 'intval', $timestamps );
 	}
 
+	//HANDLES THE CRUD ACTIONS FOR THE COMMENTS
 	public static function ajax_crud_entry() {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
@@ -1068,6 +1069,7 @@ final class WPCOM_Liveblog {
 	}
 
 	private static function set_liveblog_state( $post_id, $state ) {
+
 		if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
 			update_post_meta( $post_id, self::key, $state );
 			do_action( "liveblog_{$state}_post", $post_id );
