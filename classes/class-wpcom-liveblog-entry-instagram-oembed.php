@@ -21,14 +21,14 @@ class WPCOM_Liveblog_Entry_Instagram_oEmbed {
 	 * Register the filters just in time - when we are about to return HTML in endpoint
 	 */
 	public static function register_filters( $return ) {
-		
+
 		add_filter( 'oembed_fetch_url', array( __CLASS__, 'add_omitscript_arg' ), 10, 3 );
 		add_filter( 'embed_oembed_html', array( __CLASS__, 'add_custom_script' ), 10, 4 );
 		add_filter( 'comment_text', array( __CLASS__, 'unregister_filters' ), 0, 1 );
 		return $return;
 	}
 
-	/** 
+	/**
 	 * Deregister the filter we added
 	 */
 	public static function unregister_filters( $return ) {
@@ -56,8 +56,16 @@ class WPCOM_Liveblog_Entry_Instagram_oEmbed {
 	}
 
 	private static function is_instagram_provider( $url ) {
-		$wp_oembed = _wp_oembed_get_object();
-		$provider = $wp_oembed->get_provider( $url );
-		return ( 'https://api.instagram.com/oembed' === $provider );
+
+		$provider = false;
+
+		if ( class_exists( 'WP_oEmbed' ) ) {
+			$wp_oembed = new WP_oEmbed();
+			$provider = $wp_oembed->get_provider( $url );
+			$provider = ( 'https://api.instagram.com/oembed' === $provider );
+		}
+
+		return $provider;
+
 	}
 }

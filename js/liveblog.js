@@ -294,7 +294,7 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_entry_by_id = function( id ) {
-		return $('.liveblog-entry-class-' + id );
+		return $( '#liveblog-entry-' + id );
 	};
 
 	liveblog.display_entry = function( new_entry, duration ) {
