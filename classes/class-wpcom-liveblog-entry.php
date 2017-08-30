@@ -22,10 +22,9 @@ class WPCOM_Liveblog_Entry {
 	 * upon new entry being posted or existing entry being updated.
 	 *
 	 * @var array|mixed|void
-	 * @author Olly Warren, Big Bite Creative
 	 */
 	public static $restricted_shortcodes = array(
-		'liveblog_key_events' => 'We Are Blogging Live! Check Out The Key Events in The Sidebar',
+		'liveblog_key_events' => 'Check Out The Key Events <a href="#key-events-widget">Here</a>',
 	);
 
 	public function __construct( $comment ) {
@@ -299,7 +298,6 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * @param array $args The new Live blog Entry.
 	 * @return mixed
-	 * @author Olly Warren, Big Bite Creative
 	 */
 	public static function handle_restricted_shortcodes( $args ) {
 

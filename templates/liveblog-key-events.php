@@ -1,4 +1,7 @@
 <div class="liveblog-key-events">
+
+    <a name="key-events-widget"></a>
+
 	<?php if( 'false' != $title ): ?>
 	<h2><?php echo esc_html( $title ) ?></h2>
 	<?php endif; ?>

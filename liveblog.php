@@ -72,7 +72,7 @@ final class WPCOM_Liveblog {
 		self::register_embed_handlers();
 
 		// Globally set auto-archive option
-		self::$auto_archive_days = get_option( 'liveblog_auto_archive', 7);
+		self::$auto_archive_days = get_option( 'liveblog_auto_archive', 7 );
 
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Key_Events_Widget::load();
