@@ -23,6 +23,87 @@ class Test_REST_API extends WP_UnitTestCase {
 		$wp_rest_server = null;
 	}
 
+
+	/**
+	 * test_does_the_non_pretty_endpoint_build_correctly
+	 * @author  Olly Warren, Big Bite Creative
+	 * @package WPCOM_Liveblog_Rest_Api
+	 * @version 1.0
+	 *
+	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 */
+	function test_does_the_non_pretty_endpoint_build_correctly() {
+
+		//If the endpoint is empty
+		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
+		$api_namespace = 'liveblog/v1';
+
+		//Non Pretty Permalink Structure
+		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+
+		//Assert we have a return
+		$this->assertNotNull($base);
+
+		//Now assert the return matches the expected return.
+		$expected = '/?rest_route=/' . $api_namespace . '/';
+
+		$this->assertSame($expected, $base);
+
+	}
+
+	/**
+	 * test_does_the_pretty_endpoint_build_correctly
+	 * @author  Olly Warren, Big Bite Creative
+	 * @package WPCOM_Liveblog_Rest_Api
+	 * @version 1.0
+	 *
+	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 */
+	function test_does_the_pretty_endpoint_build_correctly() {
+
+		//Empty the base so we can generate one,
+		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
+
+		//Lets define the known API namespace.
+		$api_namespace = 'liveblog/v1';
+
+		//Lets set a pretty URL Permalink Structure
+		update_option('permalink_structure', '/%year%/%monthnum%/%day%/%postname%/');
+
+		//Now lest fire the method again and see what we get as the method should now detect the new permalink structure and return the pretty endpoint.
+		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+
+		//Lets make sure something is returned
+		$this->assertNotNull($base);
+
+		//Now assert the return matches the expected return.
+		$expected = '/' . rest_get_url_prefix() . '/' . $api_namespace . '/';
+
+		$this->assertSame($expected, $base);
+
+	}
+
+	/**
+	 * test_to_check_if_existing_endpoint_base_returned
+	 * @author  Olly Warren, Big Bite Creative
+	 * @package WPCOM_Liveblog_Rest_Api
+	 * @version 1.0
+	 *
+	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 */
+	function test_to_check_if_existing_endpoint_base_returned() {
+
+		//Lets fire the load method.
+		WPCOM_Liveblog_Rest_Api::load();
+
+		//Lets grab the endpoint base that should have been set in the load method.
+		$base = WPCOM_Liveblog_Rest_Api::$endpoint_base;
+
+		//Lets make sure something is returned
+		$this->assertNotNull($base);
+
+	}
+
 	/**
 	 * Test for the expected array structure when getting entries
 	 */
