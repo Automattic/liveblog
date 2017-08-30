@@ -50,6 +50,7 @@ final class WPCOM_Liveblog {
 	private static $entry_query           = null;
 	private static $custom_template_path  = null;
 	private static $auto_archive_days     = null;
+	private static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
 
 	/** Load Methods **********************************************************/
 
@@ -420,13 +421,25 @@ final class WPCOM_Liveblog {
 		if ( 1 == $state ) {
 			$state = 'enable';
 		}
-		if ( 'enable' == $state && self::$auto_archive_days ) {
-			$time_diff = 60 * 60 * 24 * self::$auto_archive_days;
-			if ( ( get_post_time( 'U', true, $post_id ) + $time_diff ) < current_time( 'U' ) ) {
-				self::archive_post( $post_id );
-				$state = 'archive';
+
+		//If Auto Archive is enabled,
+		if ( '0' !== self::$auto_archive_days ) {
+
+			//Lets grab todays day, convert it to a timestamp and look for any set auto archive date.
+			$today = date('Y-m-d H:i:s' );
+			$today_timestamp = strtotime($today);
+			$expiry = get_post_meta( $post_id, self::$auto_archive_expiry_key);
+
+			//if we have an expiry date lets compare them and if the
+			// expiry is less than today i.e. its in the past lets archive the liveblog.
+			if( $expiry ) {
+				if( (int)$expiry[0] < $today_timestamp ) {
+					self::archive_post( $post_id );
+					$state = get_post_meta( $post_id, self::key, true );
+				}
 			}
 		}
+
 		return $state;
 	}
 
@@ -1068,13 +1081,52 @@ final class WPCOM_Liveblog {
 		exit;
 	}
 
-	private static function set_liveblog_state( $post_id, $state ) {
+	/**
+	 * set_liveblog_state
+	 *
+	 * Sets the status of the Liveblog.
+	 * Integrates with the Auto Archive feature to check
+	 * archive date and update where required. Means a liveblog
+	 * can be auto archived and re-enabled extending the auto archive
+	 * forward by the pre-determined amount of days from the re-enable
+	 * date.
+	 *
+	 * @param $post_id
+	 * @param $new_state
+	 *
+	 * @return bool
+	 */
+	private static function set_liveblog_state( $post_id, $new_state ) {
 
-		if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
-			update_post_meta( $post_id, self::key, $state );
-			do_action( "liveblog_{$state}_post", $post_id );
-		} elseif ( 'disable' == $state ) {
+		//if the auto_archive feature is not disabled
+		if('0' !== self::$auto_archive_days) {
+
+			//Get the Current State
+			$current_state = get_post_meta( $post_id, self::key );
+
+			$today            = date( 'Y-m-d H:i:s' );
+			$autoarchive_date = strtotime( $today . ' + ' . self::$auto_archive_days . ' days' );
+
+			//if the old state is archive and the new state is active or there is no current state and the new state is enable
+			if( $current_state[0] === 'archive' && $new_state === 'enable' || !$current_state && $new_state === 'enable' ) {
+
+				//then we have re-enabled the Liveblog or created a new one so update the post meta expiry date
+				update_post_meta( $post_id, self::$auto_archive_expiry_key, $autoarchive_date );
+
+			}
+		}
+
+		//Lets update the post_meta state as per usual.
+		if ( in_array( $new_state, array( 'enable', 'archive' ) ) ) {
+			update_post_meta( $post_id, self::key, $new_state );
+			do_action( "liveblog_{$new_state}_post", $post_id );
+
+		} elseif ( 'disable' == $new_state ) {
 			delete_post_meta( $post_id, self::key );
+
+			//Lets remove the autoarchive meta data too.
+			delete_post_meta( $post_id, self::$auto_archive_expiry_key );
+
 			do_action( 'liveblog_disable_post', $post_id );
 		} else {
 			return false;
