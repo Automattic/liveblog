@@ -333,6 +333,16 @@ To override this behaviour simple redefine the array key value:
 $restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output for the shortcode! <a href="/">Click Here to Find Out More!</a>';
 ```
 
+### Auto Archiving of Live Blog Posts
+Under WordPress ``` Settings -> Liveblog Settings``` it is now possible to define the number of days at which a liveblog will auto archive.
+This feature was added at the request f the community and solves the issues where Editors will forget to archive old Live Blog's leaving them live indefinitely.
+
+Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the current date + the number of days configured.
+
+Once the expiry date is met the live blog post will be auto archived. It is however possible to re-enable an auto archived Live Blog Post,
+simply click the enable button in the post Liveblog meta box and the expiry will be extended by 7 days from the current date and the post will be
+re-enabled. The auto archiving feature will then re-archive the post at the new expiry date.
+
 ### WebSocket support
 
 By default this plugin uses AJAX polling to update the list of Liveblog entries. This means that there is a delay of a few seconds between the moment a entry is created and the moment it is displayed to the users. For a close to real-time experience, it is possible to configure Liveblog to use WebSockets instead of AJAX polling. To achieve this, Liveblog uses [Socket.io](http://socket.io), [Redis](http://redis.io) and [socket.io-php-emitter](https://github.com/rase-/socket.io-php-emitter) (responsible for sending messages from PHP to the Socket.io server via Redis).
