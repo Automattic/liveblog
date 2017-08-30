@@ -24,7 +24,7 @@ class WPCOM_Liveblog_Entry {
 	 * @var array|mixed|void
 	 */
 	public static $restricted_shortcodes = array(
-		'liveblog_key_events' => 'Check Out The Key Events <a href="#key-events-widget">Here</a>',
+		'liveblog_key_events' => 'Check Out Our Key Events in the <a href="&#035;key-events-widget">Sidebar</a>',
 	);
 
 	public function __construct( $comment ) {
