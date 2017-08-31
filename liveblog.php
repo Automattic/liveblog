@@ -26,34 +26,35 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
-	const version          = '1.5.2';
-	const rewrites_version = 1;
-	const min_wp_version   = '3.5';
-	const key              = 'liveblog';
-	const url_endpoint     = 'liveblog';
-	const edit_cap         = 'publish_posts';
-	//const nonce_key        = 'liveblog_nonce';
-	const nonce_key               = '_wpnonce'; // Using these strings since they're hard coded in the rest api. It'll still work fine for < 4.4
-	const nonce_action            = 'wp_rest';
+	const version          			= '1.5.2';
+	const rewrites_version 			= 1;
+	const min_wp_version   			= '3.5';
+	const min_wp_rest_api_version 	= '4.4';
+	const key              			= 'liveblog';
+	const url_endpoint     			= 'liveblog';
+	const edit_cap         			= 'publish_posts';
+	const nonce_key               	= '_wpnonce'; // Using these strings since they're hard coded in the rest api. It'll still work fine for < 4.4
+	const nonce_action            	= 'wp_rest';
 
-	const refresh_interval        = 10;   // how often should we refresh
-	const debug_refresh_interval  = 2;   // how often we refresh in development mode
-	const max_consecutive_retries = 100; // max number of failed tries before polling is disabled
-	const human_time_diff_update_interval = 60; // how often we change the entry human timestamps: "a minute ago"
-	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
-	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
-	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
-	const response_cache_max_age  = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
-	const use_rest_api            = true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
+	const refresh_interval        			= 10;   // how often should we refresh
+	const debug_refresh_interval  			= 2;   // how often we refresh in development mode
+	const max_consecutive_retries 			= 100; // max number of failed tries before polling is disabled
+	const human_time_diff_update_interval 	= 60; // how often we change the entry human timestamps: "a minute ago"
+	const delay_threshold         			= 5;  // how many failed tries after which we should increase the refresh interval
+	const delay_multiplier        			= 2; // by how much should we inscrease the refresh interval
+	const fade_out_duration       			= 5; // how much time should take fading out the background of new entries
+	const response_cache_max_age  			= DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
+	const use_rest_api            			= true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
-	public static $post_id               = null;
-	private static $entry_query           = null;
-	private static $custom_template_path  = null;
-	private static $auto_archive_days     = null;
+	public static $post_id               	= null;
+	private static $entry_query           	= null;
+	private static $do_not_cache_response	= false;
+	private static $custom_template_path  	= null;
+	private static $auto_archive_days     	= null;
 	private static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
-	public static $is_rest_api_call       = false; // TODO: See about using get_query_var( 'rest_route' ) instead. It's set in rest-api.php
+	public static $is_rest_api_call       	= false; // TODO: See about using get_query_var( 'rest_route' ) instead. It's set in rest-api.php
 
 
 	/** Load Methods **********************************************************/
@@ -1494,17 +1495,15 @@ final class WPCOM_Liveblog {
 
 		$json_data = json_encode( $data );
 
-		// // Send cache headers, where appropriate
-		// if ( false === $args['cache'] ) {
-		// 	nocache_headers();
-		// } elseif ( is_numeric( $args['cache'] ) ) {
-		// 	header( sprintf( 'Cache-Control: max-age=%d', $args['cache'] ) );
-		// }
+		// Send cache headers, where appropriate
+		if ( false === $args['cache'] ) {©
+			nocache_headers();
+		} elseif ( is_numeric( $args['cache'] ) ) {
+			header( sprintf( 'Cache-Control: max-age=%d', $args['cache'] ) );
+		}
 
 		header( 'Content-Type: application/json' );
 		self::prevent_caching_if_needed();
-
-		//header( 'Content-Type: application/json' );
 		echo $json_data;
 		exit();
 	}
