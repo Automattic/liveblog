@@ -23,6 +23,40 @@ class Test_REST_API extends WP_UnitTestCase {
 		$wp_rest_server = null;
 	}
 
+	/**
+	 * test_does_the_non_pretty_endpoint_build_correctly
+	 * @package WPCOM_Liveblog_Rest_Api
+	 * @version 1.0
+	 *
+	 * @covers \WPCOM_Liveblog_Rest_Api::load()
+	 */
+	function test_does_the_class_load_correctly() {
+
+		WPCOM_Liveblog_Rest_Api::load();
+		$base = WPCOM_Liveblog_Rest_Api::$endpoint_base;
+
+		$this->assertNotNull( $base );
+		$this->assertTrue( is_string( $base ) );
+
+		$hook_name = 'rest_api_init';
+		global $wp_filter;
+
+		$collection = $wp_filter[$hook_name];
+
+		$test_array = array();
+
+		foreach( $collection as $key => $value ) {
+			$test_array = array_merge($test_array, $value);
+		}
+
+		$this->assertArrayHasKey('WPCOM_Liveblog_Rest_Api::register_routes', $test_array);
+
+		//Lets test the existing endpoint base. Should return the same one as above.
+		$existing_endpoint_base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		$this->assertSame($base, $existing_endpoint_base);
+
+	}
+
 
 	/**
 	 * test_does_the_non_pretty_endpoint_build_correctly

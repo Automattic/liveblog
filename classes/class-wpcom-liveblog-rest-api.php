@@ -29,20 +29,23 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function build_endpoint_base() {
 
 		if ( ! empty( self::$endpoint_base ) ) {
+
+			// @codeCoverageIgnoreStart
 			return self::$endpoint_base;
+			// @codeCoverageIgnoreEnd
 		}
 
 		self::$api_version   = '1';
 		self::$api_namespace = 'liveblog/v' . self::$api_version;
 
 		if ( get_option( 'permalink_structure' ) ) {
-			// Pretty permalinks enabled 
+			// Pretty permalinks enabled
 			$base = '/' . rest_get_url_prefix() . '/' . self::$api_namespace . '/';
 		} else {
 			// Pretty permalinks not enabled
 			$base = '/?rest_route=/' . self::$api_namespace . '/';
 		}
-		
+
 		return $base;
 
 	}
@@ -175,7 +178,7 @@ class WPCOM_Liveblog_Rest_Api {
 		/*
 		 * Get a list of authors matching a search term.
 		 * Used to autocomplete @ mentions
-		 * 
+		 *
 		 * /authors/<term>
 		 *
 		 * TODO: The regex pattern will allow no slash between 'authors' and the search term.
@@ -197,7 +200,7 @@ class WPCOM_Liveblog_Rest_Api {
 		/*
 		 * Get a list of hashtags matching a search term.
 		 * Used to autocomplete previously used #hashtags
-		 * 
+		 *
 		 * /hashtags/<term>
 		 *
 		 * TODO: The regex pattern will allow no slash between 'hashtags' and the search term.
@@ -404,7 +407,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function get_hashtag_terms( WP_REST_Request $request ) {
 
-		// Get required parameters from the request		
+		// Get required parameters from the request
 		$term = $request->get_param( 'term' );
 
 		// Get a list of authors
@@ -423,7 +426,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function update_post_state( WP_REST_Request $request ) {
 
-		// Get required parameters from the request		
+		// Get required parameters from the request
 		$post_id         = $request->get_param( 'post_id' );
 		$state           = $request->get_param( 'state' );
 
