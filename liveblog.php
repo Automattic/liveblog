@@ -445,7 +445,7 @@ final class WPCOM_Liveblog {
 
 	/**
 	 * Convenience function to archive the current post
-	 * 
+	 *
 	 * @param int $post_id
 	 */
 	public static function archive_post( $post_id ) {
@@ -1034,14 +1034,14 @@ final class WPCOM_Liveblog {
 			array( __CLASS__, 'show_settings' )
 		);
 	}
-	
+
 	/**
 	 * Display / process the administrative settings page
 	 */
 	public static function show_settings() {
 		include( dirname( __FILE__ ) . '/templates/settings-page.php' );
 	}
-	
+
 	/**
 	 * Display field description for auto archive option
 	 */
@@ -1108,7 +1108,7 @@ final class WPCOM_Liveblog {
 			$autoarchive_date = strtotime( $today . ' + ' . self::$auto_archive_days . ' days' );
 
 			//if the old state is archive and the new state is active or there is no current state and the new state is enable
-			if( $current_state[0] === 'archive' && $new_state === 'enable' || !$current_state && $new_state === 'enable' ) {
+			if( count( $current_state ) === 0 && $new_state === 'enable' || $current_state[0] === 'archive' && $new_state === 'enable' ) {
 
 				//then we have re-enabled the Liveblog or created a new one so update the post meta expiry date
 				update_post_meta( $post_id, self::$auto_archive_expiry_key, $autoarchive_date );
