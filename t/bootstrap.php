@@ -21,3 +21,4 @@ tests_add_filter( 'muplugins_loaded', '_set_global_wp_query' );
 
 require $_tests_dir . '/includes/bootstrap.php';
 
+require_once dirname( __FILE__ ) . '/class-wp-test-spy-rest-server.php';

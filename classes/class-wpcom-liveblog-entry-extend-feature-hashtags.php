@@ -75,6 +75,12 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function get_config( $config ) {
 
+		$endpoint_url = admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms';
+
+		if ( WPCOM_Liveblog::use_rest_api() ) {
+			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags');
+		}
+
 		// Add our config to the front end autocomplete
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
@@ -82,7 +88,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 			'type'        => 'ajax',
 			'cache'       => 1000 * 60,
 			'regex'       => '#([\w\d\-]*)$',
-			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms',
+			'url'         => $endpoint_url,
 			'template'    => '${slug}',
 			'replacement' => '#${slug}',
 		) );
@@ -181,6 +187,24 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function ajax_terms() {
+		
+		// Get a list of hashtags matching the 'autocomplete' request variable
+		$terms = $this->get_hashtag_terms( isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '' );
+
+		header( "Content-Type: application/json" );
+		echo json_encode( $terms );
+
+		exit;
+	}
+
+	/**
+	 * Get a list of hashtags matching the search term
+	 *
+	 * @param string $term The term to search for
+	 *
+	 * @return array Array of matching hastags
+	 */
+	public function get_hashtag_terms( $term ) {
 
 		// The args used in the get_terms query.
 		$args = array(
@@ -190,8 +214,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 
 		// If there is no search term then search
 		// for nothing to get everything.
-		$term = isset($_GET['autocomplete']) ? $_GET['autocomplete'] : '';
-
 		// If there is a search term, then add it
 		// to the get_terms query args.
 		if ( strlen( trim( $term ) ) > 0 ) {
@@ -207,10 +229,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// Remove the filter just to clean up.
 		remove_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 
-		header( "Content-Type: application/json" );
-		echo json_encode( $terms );
+		return $terms;
 
-		exit;
 	}
 
 	/**
