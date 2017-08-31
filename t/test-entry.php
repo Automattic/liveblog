@@ -89,7 +89,7 @@ class Test_Entry extends WP_UnitTestCase {
 	}
 
 	/**
-	 * test_shortcode_type1_excluded_from_entry
+	 * test_shortcode_excluded_from_entry
 	 *
 	 * Test to ensure that all [shortcode] formats are stripped.
 	 * Uses the default exclusion [liveblog_key_events] which should

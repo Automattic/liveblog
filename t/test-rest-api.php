@@ -26,7 +26,6 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * test_does_the_non_pretty_endpoint_build_correctly
-	 * @author  Olly Warren, Big Bite Creative
 	 * @package WPCOM_Liveblog_Rest_Api
 	 * @version 1.0
 	 *
@@ -53,7 +52,6 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * test_does_the_pretty_endpoint_build_correctly
-	 * @author  Olly Warren, Big Bite Creative
 	 * @package WPCOM_Liveblog_Rest_Api
 	 * @version 1.0
 	 *
@@ -80,27 +78,6 @@ class Test_REST_API extends WP_UnitTestCase {
 		$expected = '/' . rest_get_url_prefix() . '/' . $api_namespace . '/';
 
 		$this->assertSame($expected, $base);
-
-	}
-
-	/**
-	 * test_to_check_if_existing_endpoint_base_returned
-	 * @author  Olly Warren, Big Bite Creative
-	 * @package WPCOM_Liveblog_Rest_Api
-	 * @version 1.0
-	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
-	 */
-	function test_to_check_if_existing_endpoint_base_returned() {
-
-		//Lets fire the load method.
-		WPCOM_Liveblog_Rest_Api::load();
-
-		//Lets grab the endpoint base that should have been set in the load method.
-		$base = WPCOM_Liveblog_Rest_Api::$endpoint_base;
-
-		//Lets make sure something is returned
-		$this->assertNotNull($base);
 
 	}
 
@@ -263,7 +240,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$this->assertInternalType( 'array', $new_entry );
 		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $new_entry[0] );
-		
+
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete it
@@ -497,7 +474,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// The result should be an array with an "html" key
 		$this->assertArrayHasKey( 'html', $response->get_data() );
-		
+
 	}
 
 	/**
@@ -545,7 +522,7 @@ class Test_REST_API extends WP_UnitTestCase {
 			'taxonomy' => 'hashtags',
 			'slug'     => 'coolhashtag2',
 		));
-		
+
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
 		$response = $this->server->dispatch( $request );
 
@@ -678,7 +655,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Assert bad request response
 		$this->assertEquals( 400, $response->get_status() );
-		
+
 	}
 
 	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
@@ -703,7 +680,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		for( $i = 0; $i < $number_of_entries; $i++ ) {
 			$entries[] = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		}
-		
+
 		return $entries;
 	}
 

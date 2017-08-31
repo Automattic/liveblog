@@ -32,6 +32,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function load() {
 
