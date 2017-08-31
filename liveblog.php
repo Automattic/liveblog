@@ -1496,7 +1496,7 @@ final class WPCOM_Liveblog {
 		$json_data = json_encode( $data );
 
 		// Send cache headers, where appropriate
-		if ( false === $args['cache'] ) {©
+		if ( false === $args['cache'] ) {
 			nocache_headers();
 		} elseif ( is_numeric( $args['cache'] ) ) {
 			header( sprintf( 'Cache-Control: max-age=%d', $args['cache'] ) );
