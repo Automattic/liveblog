@@ -1236,9 +1236,10 @@ final class WPCOM_Liveblog {
 
 			//Instantiate a entry query object
 			$query = new WPCOM_Liveblog_Entry_Query( $post_id, self::key );
+			$latest_timestamp = ( null !== $query->get_latest_timestamp() ) ? $query->get_latest_timestamp() : strtotime( date( 'Y-m-d H:i:s' ) );
 
 			//set autoarchive date based on latest timestamp
-			$autoarchive_date 	= strtotime(' + ' . self::$auto_archive_days . ' days', $query->get_latest_timestamp() );
+			$autoarchive_date 	= strtotime(' + ' . self::$auto_archive_days . ' days', $latest_timestamp );
 
 			//if the old state is archive and the new state is active or there is no current state and the new state is enable
 			if( count( $current_state ) === 0 && $new_state === 'enable' || $current_state[0] === 'archive' && $new_state === 'enable' ) {
