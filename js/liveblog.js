@@ -198,10 +198,12 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_recent_entries = function() {
-		var url  = liveblog_settings.endpoint_url,
-			from = liveblog.latest_entry_timestamp + 1,
-			local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp,
-			to         = liveblog.latest_response_server_timestamp + local_diff;
+		var url 			 = liveblog_settings.endpoint_url,
+		    refresh_interval = liveblog_settings.refresh_interval,
+		    from 			 = liveblog.latest_entry_timestamp + 1,
+		    local_diff		 = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp,
+		    to 				 = liveblog.latest_response_server_timestamp + local_diff;
+		    to 				 = Math.floor( ( liveblog.latest_response_server_timestamp + local_diff ) / refresh_interval ) * refresh_interval;
 
 		if ( 1 == liveblog_settings.use_rest_api ) {
 			// Use REST API entries endpoint
