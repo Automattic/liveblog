@@ -968,7 +968,7 @@ final class WPCOM_Liveblog {
 			'runtimes'            => 'html5,silverlight,flash,html4',
 			'file_data_name'      => 'async-upload',
 			'multiple_queues'     => true,
-			'max_file_size'       => self::max_upload_size() . 'b',
+			'max_file_size'       => wp_max_upload_size() . 'b',
 			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
 			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
 			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
@@ -1624,5 +1624,18 @@ final class WPCOM_Liveblog {
 
 }
 WPCOM_Liveblog::load();
+
+/** Plupload Helpers ******************************************************/
+if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {
+	require_once( ABSPATH . 'wp-includes/load.php');
+}
+
+if ( ! function_exists( 'size_format' ) ) {
+	require_once( ABSPATH . 'wp-includes/functions.php');
+}
+
+if ( ! function_exists( 'wp_max_upload_size' ) ) {
+	require_once( ABSPATH . 'wp-includes/media.php');
+}
 
 endif;
