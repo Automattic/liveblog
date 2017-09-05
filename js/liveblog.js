@@ -140,8 +140,19 @@ window.liveblog = window.liveblog || {};
 			liveblog.start_human_time_diff_timer();
 		}
 
+		document.addEventListener( 'visibilitychange', liveblog.checkFocus );
+		window.addEventListener( 'focus', liveblog.checkFocus );
+		window.addEventListener( 'blur', liveblog.checkFocus );
+
 		liveblog.$events.trigger( 'after-init' );
 	};
+
+	// If user comes back to window get recent entries
+	liveblog.checkFocus = function() {
+	    if ( document.hasFocus() ) {
+	    	liveblog.get_recent_entries();
+	    }
+	}
 
 	liveblog.init_moment_js = function() {
 		momentLang.relativeTime = _.extend(moment().lang().relativeTime, momentLang.relativeTime);
@@ -227,6 +238,11 @@ window.liveblog = window.liveblog || {};
 		liveblog.latest_response_server_timestamp = liveblog.server_timestamp_from_xhr( xhr );
 		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
 		liveblog_settings.refresh_interval        = response.refresh_interval;
+
+		// If the window is no longer in focus increase refresh interval
+		if ( !document.hasFocus() ) {
+			liveblog_settings.refresh_interval    = liveblog_settings.focus_refresh_interval;
+		}
 
 		if ( response.entries.length ) {
 			liveblog.maybe_display_entries( response.entries );

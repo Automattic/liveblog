@@ -38,6 +38,7 @@ final class WPCOM_Liveblog {
 
 	const refresh_interval        			= 10;   // how often should we refresh
 	const debug_refresh_interval  			= 2;   // how often we refresh in development mode
+	const focus_refresh_interval  			= 10;   // how often we refresh in when window not in focus
 	const max_consecutive_retries 			= 100; // max number of failed tries before polling is disabled
 	const human_time_diff_update_interval 	= 60; // how often we change the entry human timestamps: "a minute ago"
 	const delay_threshold         			= 5;  // how many failed tries after which we should increase the refresh interval
@@ -922,6 +923,7 @@ final class WPCOM_Liveblog {
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
 				'refresh_interval'       => self::get_refresh_interval(),
+				'focus_refresh_interval' => self::focus_refresh_interval,
 				'max_consecutive_retries'=> self::max_consecutive_retries,
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
