@@ -78,9 +78,6 @@ final class WPCOM_Liveblog {
 		self::add_admin_filters();
 		self::register_embed_handlers();
 
-		// Globally set auto-archive option
-		self::$auto_archive_days = get_option( 'liveblog_auto_archive', 7 );
-
 		WPCOM_Liveblog_Entry_Key_Events::load();
 		WPCOM_Liveblog_Entry_Key_Events_Widget::load();
 		WPCOM_Liveblog_Entry_Extend::load();
@@ -178,6 +175,9 @@ final class WPCOM_Liveblog {
 		// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post. Called from the WPCOM_Liveblog_Entry Class.
 		add_filter( 'liveblog_before_insert_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
 		add_filter( 'liveblog_before_update_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
+
+		//We need to check the Liveblog autoarchive date on each time a new entry is added or updated to ensure we extend the date  out correctly to the next archive point based on the configured offset.
+		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'update_autoarchive_expiry' ), 10, 1 );
 	}
 
 	/**
@@ -195,8 +195,6 @@ final class WPCOM_Liveblog {
 		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
 		add_action( 'restrict_manage_posts', array( __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ) );
 		add_action( 'pre_get_posts',         array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
-		add_action( 'admin_menu',            array( __CLASS__, 'add_settings_page_to_menu' ) );
-		add_action( 'admin_init',            array( __CLASS__, 'options_page_init' ) );
 	}
 
 	/**
@@ -235,6 +233,13 @@ final class WPCOM_Liveblog {
 		 * we can possibly introduce this to other post types later.
 		 */
 		add_post_type_support( 'post', self::key );
+
+		/**
+		 * Apply a Filter to Setup our Auto Archive Days.
+		 * NULL is classed as disabled.
+		 */
+		self::$auto_archive_days = apply_filters( 'liveblog_auto_archive_days', self::$auto_archive_days);
+
 		do_action( 'after_liveblog_init' );
 	}
 
@@ -472,7 +477,7 @@ final class WPCOM_Liveblog {
 		}
 
 		//If Auto Archive is enabled,
-		if ( '0' !== self::$auto_archive_days ) {
+		if ( null !== self::$auto_archive_days ) {
 
 			//Lets grab todays day, convert it to a timestamp and look for any set auto archive date.
 			$today = date('Y-m-d H:i:s' );
@@ -483,22 +488,13 @@ final class WPCOM_Liveblog {
 			// expiry is less than today i.e. its in the past lets archive the liveblog.
 			if( $expiry ) {
 				if( (int)$expiry[0] < $today_timestamp ) {
-					self::archive_post( $post_id );
+					self::set_liveblog_state( $post_id, 'archive' );
 					$state = get_post_meta( $post_id, self::key, true );
 				}
 			}
 		}
 
 		return $state;
-	}
-
-	/**
-	 * Convenience function to archive the current post
-	 *
-	 * @param int $post_id
-	 */
-	public static function archive_post( $post_id ) {
-		update_post_meta( $post_id, 'liveblog', 'archive' );
 	}
 
 	/** Private _is_ Methods **************************************************/
@@ -1169,67 +1165,6 @@ final class WPCOM_Liveblog {
 		return self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
 	}
 
-	/**
-	 * Register valid options on the liveblog admin settings page
-	 */
-	public static function options_page_init() {
-		register_setting(
-			'liveblog_options',
-			'liveblog_auto_archive',
-			'absint'
-		);
-		add_settings_section(
-			'auto_archive',
-			'Auto Archive',
-			array( __CLASS__, 'display_auto_archive_setting_instructions' ),
-			'liveblog-settings'
-		);
-		add_settings_field(
-			'auto_archive',
-			'Auto Archive',
-			array( __CLASS__, 'display_auto_archive_field' ),
-			'liveblog-settings',
-			'auto_archive'
-		);
-	}
-
-	/**
-	 * Add settings page to the admin menu
-	 */
-	public static function add_settings_page_to_menu() {
-		add_options_page(
-			'Liveblog Settings',
-			'Liveblog Settings',
-			'edit_plugins',
-			'liveblog-settings',
-			array( __CLASS__, 'show_settings' )
-		);
-	}
-
-	/**
-	 * Display / process the administrative settings page
-	 */
-	public static function show_settings() {
-		include( dirname( __FILE__ ) . '/templates/settings-page.php' );
-	}
-
-	/**
-	 * Display field description for auto archive option
-	 */
-	public static function display_auto_archive_setting_instructions() {
-		echo __( 'Posts should be automatically archived after this many days.  Enter 0 to disable automatic archiving.' );
-	}
-
-        /**
-	 * Output the auto archive option field
-	 */
-	public static function display_auto_archive_field() {
-		printf(
-			'<input type="text" id="auto_archive" name="liveblog_auto_archive" value="%s">',
-			self::$auto_archive_days
-		);
-	}
-
 	public static function admin_ajax_set_liveblog_state_for_post() {
 		$post_id = isset( $_REQUEST['post_id'] )? $_REQUEST['post_id'] : 0;
 		$new_state = isset( $_REQUEST['state'] )? $_REQUEST['state'] : '';
@@ -1295,12 +1230,15 @@ final class WPCOM_Liveblog {
 	private static function set_liveblog_state( $post_id, $new_state ) {
 
 		//if the auto_archive feature is not disabled
-		if('0' !== self::$auto_archive_days) {
-
+		if( null !== self::$auto_archive_days ) {
 			//Get the Current State
-			$current_state = get_post_meta( $post_id, self::key );
-			$today            = date( 'Y-m-d H:i:s' );
-			$autoarchive_date = strtotime( $today . ' + ' . self::$auto_archive_days . ' days' );
+			$current_state 		= get_post_meta( $post_id, self::key );
+
+			//Instantiate a entry query object
+			$query = new WPCOM_Liveblog_Entry_Query( $post_id, self::key );
+
+			//set autoarchive date based on latest timestamp
+			$autoarchive_date 	= strtotime(' + ' . self::$auto_archive_days . ' days', $query->get_latest_timestamp() );
 
 			//if the old state is archive and the new state is active or there is no current state and the new state is enable
 			if( count( $current_state ) === 0 && $new_state === 'enable' || $current_state[0] === 'archive' && $new_state === 'enable' ) {
@@ -1326,6 +1264,29 @@ final class WPCOM_Liveblog {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Hooks in and updates the autoarchive date if not disabled.
+	 * Means that any update moving forward pushes the auto archive date
+	 * in turn.
+	 *
+	 * @param  array $args Passed in arguments
+	 * @return array $args Post Filtered Arguments.
+	 */
+	public static function update_autoarchive_expiry( $args ) {
+		if( null !== self::$auto_archive_days ) {
+			//Instantiate a entry query object
+			$query = new WPCOM_Liveblog_Entry_Query( $args['post_id'], self::key );
+
+			//set autoarchive date based on latest timestamp
+			$autoarchive_date 	= strtotime(' + ' . self::$auto_archive_days . ' days', $query->get_latest_timestamp() );
+
+			//Update the Post Meta the extend the AutoArchive Date.
+			update_post_meta( $args['post_id'], self::$auto_archive_expiry_key, $autoarchive_date );
+		}
+
+		return $args;
 	}
 
 	/**

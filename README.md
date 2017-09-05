@@ -120,8 +120,8 @@ An example of a template file is:
 **Format:** This is how each entries content is filtered, there are three inbuilt formats:
 
 * Full - which shows content without filtering
-* First Sentence - which will return everything until it hits either `.?!`  
-* First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.  
+* First Sentence - which will return everything until it hits either `.?!`
+* First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.
 
 Formats add an extra level of control to how the key events section looks. If using the `timeline` template with `first sentence` and the following is entered into the new entry box:
 ```
@@ -299,20 +299,20 @@ Developers have to ability to exclude shortcodes from being used within the cont
 
 ``` php
     // Added to Functions.php
-    
+
     function liveblog_entry_add_restricted_shortcodes() {
-    
+
     	add_filter( 'liveblog_entry_restrict_shortcodes', 'add_shortcode_restriction', 10, 1 );
-    
+
     	function add_shortcode_restriction( $restricted_shortcodes ) {
-    
+
     		$restricted_shortcodes['my-shortcode'] = 'This Text Will Be Inserted Instead Of The Shortcode!';
     		$restricted_shortcodes['my-other-shortcode'] = '<h1>Here is a Markup Shortcode Replacement</h1>';
-    
+
     		return $restricted_shortcodes;
     	}
     }
-    
+
     add_action( 'init', 'liveblog_entry_add_restricted_shortcodes' );
 
 ```
@@ -321,7 +321,7 @@ The functionality takes a associative array of key value pairs where the key is 
 
 So, given the example above an editor adding any of the shortcode formats:
 
-``` [my-shortcode]``` / ``` [my-shortcode][/my-shortcode]``` / ``` [my-shortcode arg="20"][/my-shortcode]``` 
+``` [my-shortcode]``` / ``` [my-shortcode][/my-shortcode]``` / ``` [my-shortcode arg="20"][/my-shortcode]```
 
 would see ``` This Text Will Be Inserted Instead Of The Shortcode! ``` outputted on live entry.
 
@@ -334,14 +334,21 @@ $restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output f
 ```
 
 ### Auto Archiving of Live Blog Posts
-Under WordPress ``` Settings -> Liveblog Settings``` it is now possible to define the number of days at which a liveblog will auto archive.
 This feature was added at the request f the community and solves the issues where Editors will forget to archive old Live Blog's leaving them live indefinitely.
 
-Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the current date + the number of days configured.
+Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the date of the latest liveblog entry + the number of days configured.
 
 Once the expiry date is met the live blog post will be auto archived. It is however possible to re-enable an auto archived Live Blog Post,
-simply click the enable button in the post Liveblog meta box and the expiry will be extended by 7 days from the current date and the post will be
-re-enabled. The auto archiving feature will then re-archive the post at the new expiry date.
+simply click the enable button in the post Liveblog meta box and the expiry will be extended by the number of days configured from the latest liveblog entry date. The auto archiving feature will then re-archive the post at the new expiry date.
+
+In order to configure the number of days to autoarchive after, a filter has been implemented. By default the value is NULL and as such disables the feature. To enable it simply apply a value to the filter e.g:
+
+```
+add_filter( 'liveblog_auto_archive_days', function( $auto_archive_days ) {
+  $auto_archive_days = 50;
+  return $auto_archive_days;
+}, 10, 1 );
+```
 
 ### WebSocket support
 
