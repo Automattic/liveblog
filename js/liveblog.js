@@ -237,7 +237,12 @@ window.liveblog = window.liveblog || {};
 
 		liveblog.latest_response_server_timestamp = liveblog.server_timestamp_from_xhr( xhr );
 		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
-		liveblog_settings.refresh_interval        = response.refresh_interval;
+
+		// If refresh interval supplied by call then update
+		if ( response.refresh_interval ) {
+			liveblog_settings.refresh_interval    = response.refresh_interval;
+		}
+		
 
 		// If the window is no longer in focus increase refresh interval
 		if ( !document.hasFocus() ) {
