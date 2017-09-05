@@ -187,12 +187,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function ajax_terms() {
-		
+
+		//Sanitize the input safely.
+		if( isset( $_GET['autocomplete'] ) ) {
+			$search_term = sanitize_text_field( $_GET['autocomplete'] );
+		} else {
+			$search_term = '';
+		}
+
 		// Get a list of hashtags matching the 'autocomplete' request variable
-		$terms = $this->get_hashtag_terms( isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '' );
+		$terms = $this->get_hashtag_terms($search_term);
 
 		header( "Content-Type: application/json" );
-		echo json_encode( $terms );
+		echo wp_json_encode( $terms );
 
 		exit;
 	}

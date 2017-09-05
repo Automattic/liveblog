@@ -24,7 +24,7 @@ class WPCOM_Liveblog_Entry {
 	 * @var array|mixed|void
 	 */
 	public static $restricted_shortcodes = array(
-		'liveblog_key_events' => 'Check Out Our Key Events in the <a href="&#035;key-events-widget">Sidebar</a>',
+		'liveblog_key_events' => '',
 	);
 
 	public function __construct( $comment ) {
@@ -305,13 +305,15 @@ class WPCOM_Liveblog_Entry {
 		self::$restricted_shortcodes = apply_filters( 'liveblog_entry_restrict_shortcodes', self::$restricted_shortcodes );
 
 		// Foreach lookup key, does it exist in the content.
-		foreach ( self::$restricted_shortcodes as $key => $value ) {
+		if( is_array( self::$restricted_shortcodes ) ) {
+			foreach ( self::$restricted_shortcodes as $key => $value ) {
 
-			// Regex Pattern will match all shortcode formats.
-			$pattern = "/\[{$key}(.*?)?\](?:(.+?)?\[\/{$key}(.*?)?\])?/";
+				// Regex Pattern will match all shortcode formats.
+				$pattern = get_shortcode_regex();
 
-			// if there's a match we replace it with the configured replacement.
-			$args['content'] = preg_replace( $pattern, $value, $args['content'] );
+				// if there's a match we replace it with the configured replacement.
+				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
+			}
 		}
 
 		// Return the Original entry arguments with any modifications.

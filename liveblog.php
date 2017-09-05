@@ -381,7 +381,6 @@ final class WPCOM_Liveblog {
 
 		// Do not cache if it's too soon
 		if ( $end_timestamp > time() ) {
-			//$response_args['cache'] = false; --> Potentially Depricated
 			self::$do_not_cache_response = true;
 		}
 
@@ -391,15 +390,6 @@ final class WPCOM_Liveblog {
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
-
-		// if ( empty( $entries ) ) {
-		// 	do_action( 'liveblog_entry_request_empty' );
-
-		// 	self::json_return( array(
-		// 		'entries'           => array(),
-		// 		'latest_timestamp'  => null
-		// 	), $response_args );
-		// }
 
 		if ( ! empty( $entries ) ) {
 			/**
@@ -426,7 +416,6 @@ final class WPCOM_Liveblog {
 		}
 
 		return $result;
-		// self::json_return( $result_for_json, $response_args );
 	}
 
 	/**
@@ -588,8 +577,6 @@ final class WPCOM_Liveblog {
 				'latest_timestamp' => null
 			), array( 'cache' => false ) );
 		}
-
-		// self::json_return( $entry );
 	}
 
 	/**
@@ -690,8 +677,6 @@ final class WPCOM_Liveblog {
 			$result_for_json['nextTimestamp']     = $next_timestamp;
 			$result_for_json['previousTimestamp'] = $previous_timestamp;
 
-			//self::json_return( $result_for_json );
-
 			do_action( 'liveblog_entry_request', $result_for_json );
 			self::$do_not_cache_response = true;
 		} else {
@@ -786,11 +771,6 @@ final class WPCOM_Liveblog {
 		$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
 
 		do_action( 'liveblog_preview_entry', $entry_content );
-
-		// self::json_return(
-		// 	array( 'html' => $entry_content ),
-		// 	array( 'cache' => false )
-		// );
 
 		return array( 'html' => $entry_content );
 	}

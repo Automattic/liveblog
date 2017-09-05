@@ -334,7 +334,7 @@ $restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output f
 ```
 
 ### Auto Archiving of Live Blog Posts
-This feature was added at the request f the community and solves the issues where Editors will forget to archive old Live Blog's leaving them live indefinitely.
+This feature was added at the request of the community and solves the issues where Editors will forget to archive old Live Blog's leaving them live indefinitely.
 
 Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the date of the latest liveblog entry + the number of days configured.
 
