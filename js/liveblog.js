@@ -226,6 +226,7 @@ window.liveblog = window.liveblog || {};
 
 		liveblog.latest_response_server_timestamp = liveblog.server_timestamp_from_xhr( xhr );
 		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
+		liveblog_settings.refresh_interval        = response.refresh_interval;
 
 		if ( response.entries.length ) {
 			liveblog.maybe_display_entries( response.entries );

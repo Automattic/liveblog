@@ -410,6 +410,7 @@ final class WPCOM_Liveblog {
 		$result = array(
 			'entries'           => $entries_for_json,
 			'latest_timestamp'  => $latest_timestamp,
+			'refresh_interval'  => self::get_refresh_interval(),
 		);
 
 		if ( ! empty( $entries_for_json ) ) {
@@ -920,7 +921,7 @@ final class WPCOM_Liveblog {
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
-				'refresh_interval'       => WP_DEBUG? self::debug_refresh_interval : self::refresh_interval,
+				'refresh_interval'       => self::get_refresh_interval(),
 				'max_consecutive_retries'=> self::max_consecutive_retries,
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
@@ -1644,6 +1645,18 @@ final class WPCOM_Liveblog {
 			return false;
 		}
 		return version_compare( $wp_version, self::min_wp_version, '<' );
+	}
+
+	/**
+	 * Returns refresh interval after filters have been run
+	 *
+	 * @return int
+	 */
+	public static function get_refresh_interval() {
+		$refresh_interval = WP_DEBUG ? self::debug_refresh_interval : self::refresh_interval;
+		$refresh_interval = apply_filters( 'liveblog_refresh_interval', $refresh_interval  						      );
+		$refresh_interval = apply_filters( 'liveblog_post_' . self::$post_id . '_refresh_interval', $refresh_interval );
+		return $refresh_interval;
 	}
 
 }

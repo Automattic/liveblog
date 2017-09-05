@@ -17,9 +17,8 @@ add_action( 'after_liveblog_init', function() {
 	add_filter( 'liveblog_endpoint_url', function( $url, $post_id ) { return home_url( '__liveblog_' . $post_id . '/' ); }, 10, 2 );
 	add_rewrite_rule( '^__liveblog_([0-9]+)/(.*)/?', 'index.php?p=$matches[1]&liveblog=$matches[2]', 'top' );
 
-	add_filter( 'liveblog_settings', function( $settings ) {
-		$settings['refresh_interval'] = 3; // more frequent updates; we can handle it.
-		return $settings;
+	add_filter( 'liveblog_refresh_interval', function( $refresh_interval ) {
+		return 3; // more frequent updates; we can handle it.
 	} );
 	// If a site's permalink structure does not end with a trailing slash the url created by liveblog will redirect.
 	if ( false !== strpos( $_SERVER['REQUEST_URI'],'__liveblog_' ) ){
