@@ -125,7 +125,7 @@ class Test_Entry extends WP_UnitTestCase {
 			$comment_content = $comment->getValue( $entry );
 
 			// Define a check varibale and see if the returned object content has been set as the default string replacement.
-			$check = 'Check Out Our Key Events in the <a href="&#035;key-events-widget">Sidebar</a>' === $comment_content->comment_content;
+			$check = '' === $comment_content->comment_content;
 
 			//Assert we have a match. If we do then the shortcode was successfully stripped.
 			$this->assertTrue( $check );
