@@ -16,6 +16,7 @@ class WPCOM_Liveblog_Entry {
 	private $comment;
 	private $type = 'new';
 	private static $allowed_tags_for_entry;
+	private static $auto_archive_days;
 
 	/**
 	 * Define the Lookup array for any shortcodes that should be stripped and replaced
@@ -36,6 +37,13 @@ class WPCOM_Liveblog_Entry {
 		if ( $this->replaces && !$this->get_content() ) {
 			$this->type = 'delete';
 		}
+
+		/**
+		 * Apply a Filter to Setup our Auto Archive Days.
+		 * NULL is classed as disabled.
+		 */
+		self::$auto_archive_days = apply_filters( 'liveblog_auto_archive_days', self::$auto_archive_days);
+
 	}
 
 	public static function generate_allowed_tags_for_entry() {
