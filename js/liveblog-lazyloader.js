@@ -77,6 +77,8 @@
 
 			if ( maxTimestamp || minTimestamp ) {
 				url = url + maxTimestamp + '/' + minTimestamp + '/';
+			} else {
+				url = url + moment().unix() + '/' + 0 + '/';
 			}
 
 			var data = {
