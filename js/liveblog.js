@@ -144,14 +144,19 @@ window.liveblog = window.liveblog || {};
 		window.addEventListener( 'focus', liveblog.checkFocus );
 		window.addEventListener( 'blur', liveblog.checkFocus );
 
+		liveblog.last_focus_call = 0;
+
 		liveblog.$events.trigger( 'after-init' );
 	};
 
-	// If user comes back to window get recent entries
+	// If user comes back to window get recent entries only if
+	// it has been more than the refresh interval 
 	liveblog.checkFocus = function() {
-	    if ( document.hasFocus() ) {
+		var diff = moment().unix() - liveblog.last_focus_call;
+	    if ( document.hasFocus() && diff > liveblog_settings.refresh_interval ) {
+	    	liveblog.last_focus_call = moment().unix();
 	    	liveblog.get_recent_entries();
-	    }
+	 	}
 	}
 
 	liveblog.init_moment_js = function() {
