@@ -35,7 +35,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 									) );
 
 		//How many live blogs do we have?
-		$total_liveblogs = count($posts->posts);
+		$total_liveblogs = count( $posts->posts );
 		$current_liveblog = 0;
 
 		//Feedback to the user
@@ -47,9 +47,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$current_liveblog ++;
 
 			//Tell the user what we are doing, but lets colour this one se we can see its a new Liveblog in the console output.
-			// Note: Assigned to a varibale to be echo'd out, calling WP_CLI::colorize directly didnt output.
-			$intro = WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n");
-			echo $intro . PHP_EOL;
+			WP_CLI::line ( WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n" ) );
 
 		    //Define the post ID
 			$post_id = $post->ID;
@@ -73,26 +71,38 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 			// replace incorrect meta_value with correct one
 			if( count( $edit_entries ) > 0 ){
+
+				// SHow the User how many Edited Entries we've found.
+				WP_CLI::line( 'Found ' . count($edit_entries) . ' edited entries..' );
+
 				foreach( $edit_entries as $edit_entry ) {
 					$entry_id = $edit_entry->get_id();
 
 					// look for replaces property in $correct_ids
 					if ( in_array( $edit_entry->replaces, $correct_ids ) ) {
 
+						//The edited entry is accurate so we dont need to do anything.
+						WP_CLI::line( 'No action required.. skipping Entry ' . $entry_id );
 						continue;
 
-					} elseif( false == $is_dryrun ) {
-						// If this isnt a dry run we can run the database Update.
+					} else {
+
 						for ( $i = 0; $i <= count( $correct_ids ) - 1; $i++ ) {
 
 							// replace with correct meta_value
 							if ( $correct_ids[$i] < $entry_id ) {
 
-								$wpdb->update(
-									$wpdb->commentmeta,
-									array( 'meta_value' => $correct_ids[$i] ),
-									array( 'comment_id' => $entry_id )
-									);
+								//The edited entry needs updating to reflect the correct ID's
+								WP_CLI::line( 'Correcting Entry ' . $entry_id . '...' );
+
+								// If this isnt a dry run we can run the database Update.
+								if( false == $is_dryrun ){
+									$wpdb->update(
+										$wpdb->commentmeta,
+										array( 'meta_value' => $correct_ids[$i] ),
+										array( 'comment_id' => $entry_id )
+										);
+								}
 							}
 						}
 					}
@@ -122,18 +132,26 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					ORDER BY meta_value ASC", $post_id )
 				);
 
-			// check to make sure entry content being replaced matches available and that this is not a dry run
-			if ( count( $entries_replace ) === count( $correct_contents) && false === $is_dryrun ) {
+			// check to make sure entry content being replaced matches available
+			if ( count( $entries_replace ) === count( $correct_contents) ) {
+
 				// counter
 				$replaced = 0;
+
+				//THe edited entry is accurate so we dont need to do anything.
+				WP_CLI::line( 'Total of ' . count( $entries_replace ) . ' need action..' );
+
 				foreach( $entries_replace as $entry_replace ) {
+
 					$content = $correct_contents[ $replaced ]->comment_content;
 
-					$wpdb->update(
-					 	$wpdb->comments,
-					 	array( 'comment_content' => $content ),
-					 	array( 'comment_id' => $entry_replace->meta_value )
-					 	);
+					if( false === $is_dryrun ) {
+						$wpdb->update(
+						 	$wpdb->comments,
+						 	array( 'comment_content' => $content ),
+						 	array( 'comment_id' => $entry_replace->meta_value )
+						 	);
+					}
 
 					//Lets update the user with what we are doing.
 					WP_CLI::line( 'Replaced Content in ' . $replaced . ' Entry(ies) so far..' );
@@ -144,7 +162,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 			//If we have a dry run flag lets just output what we would be looking to do on a live run.
 			if( true == $is_dryrun ) {
-				WP_CLI::line( 'Found ' . count($edit_entries) . ' Edited Entries on Post ID ' . $post_id . ' with ' . count( $entries_replace ) . ' Original Entries that need replacing with the correct contents.' );
+				WP_CLI::line( 'Found ' . count($edit_entries) . ' Edited Entries on Post ID ' . $post_id);
 			}
 		}
 
