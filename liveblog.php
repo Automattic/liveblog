@@ -53,9 +53,10 @@ final class WPCOM_Liveblog {
 	private static $entry_query           	= null;
 	private static $do_not_cache_response	= false;
 	private static $custom_template_path  	= null;
-	private static $auto_archive_days     	= null;
-	private static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
-	public static $is_rest_api_call       	= false; // TODO: See about using get_query_var( 'rest_route' ) instead. It's set in rest-api.php
+
+	public static $is_rest_api_call       	= false;
+	public static $auto_archive_days     	= null;
+	public static $auto_archive_expiry_key  = 'liveblog_autoarchive_expiry_date';
 
 
 	/** Load Methods **********************************************************/
@@ -88,6 +89,9 @@ final class WPCOM_Liveblog {
 		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
 		}
+
+		//Activate the WP CRON Hooks.
+		WPCOM_Liveblog_Cron::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -143,6 +147,8 @@ final class WPCOM_Liveblog {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
 		}
+
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php' );
 	}
 
 	/**
@@ -463,24 +469,6 @@ final class WPCOM_Liveblog {
 		// backwards compatibility with older values
 		if ( 1 == $state ) {
 			$state = 'enable';
-		}
-
-		//If Auto Archive is enabled,
-		if ( null !== self::$auto_archive_days ) {
-
-			//Lets grab todays day, convert it to a timestamp and look for any set auto archive date.
-			$today = date('Y-m-d H:i:s' );
-			$today_timestamp = strtotime($today);
-			$expiry = get_post_meta( $post_id, self::$auto_archive_expiry_key);
-
-			//if we have an expiry date lets compare them and if the
-			// expiry is less than today i.e. its in the past lets archive the liveblog.
-			if( $expiry ) {
-				if( (int)$expiry[0] < $today_timestamp ) {
-					self::set_liveblog_state( $post_id, 'archive' );
-					$state = get_post_meta( $post_id, self::key, true );
-				}
-			}
 		}
 
 		return $state;
@@ -1207,10 +1195,10 @@ final class WPCOM_Liveblog {
 	 *
 	 * @return bool
 	 */
-	private static function set_liveblog_state( $post_id, $new_state ) {
+	public static function set_liveblog_state( $post_id, $new_state ) {
 
 		//if the auto_archive feature is not disabled
-		if( null !== self::$auto_archive_days ) {
+		if ( null !== self::$auto_archive_days ) {
 			//Get the Current State
 			$current_state 		= get_post_meta( $post_id, self::key );
 
