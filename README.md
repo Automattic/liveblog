@@ -4,8 +4,8 @@
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby), [philipjohn](http://profiles.wordpress.org/philipjohn)
 * Tags: liveblog
 * Requires at least: 3.5
-* Tested up to: 4.4
-* Stable tag: 1.5
+* Tested up to: 4.8.2
+* Stable tag: 1.6
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -438,6 +438,21 @@ If for some reason the plugin is not able to use WebSockets to refresh the list 
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
 
 ## Changelog
+
+### 1.6
+
+* REST API support
+* Performance improvements to lazy loading
+* Auto-archiving of Liveblogs
+* Removed copied core functions
+* Improved test coverage
+* Bugfix for edited comments appearing on archived Liveblogs
+* Bugfix for multiple edits issue
+* Bugfix for deleted key events appearing after edits
+* Bugfix for shortcodes within key events
+* Bugfix to allow editing entries more than once
+
+Thanks to Mo Jangda, Jason Agnew, Max Katz, Olly Warren, Rebecca Hum, Travis W
 
 ### 1.5
 

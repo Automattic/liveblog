@@ -2,8 +2,8 @@
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
 Requires at least: 3.5
-Tested up to: 4.8
-Stable tag: 1.5.2
+Tested up to: 4.8.2
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,23 @@ If you'd like to check out the code and contribute, [join us on github](https://
 8. Typical liveblog view
 
 == Changelog ==
+
+= 1.6 =
+
+* REST API support
+* Performance improvements to lazy loading
+* Auto-archiving of Liveblogs
+* Removed copied core functions
+* Improved test coverage
+* Bugfix for edited comments appearing on archived Liveblogs
+* Bugfix for multiple edits issue
+* Bugfix for deleted key events appearing after edits
+* Bugfix for shortcodes within key events
+* Bugfix to allow editing entries more than once
+
+props batmoo jagnew maxk42 ollywarren1 rebasaurus travisw
+
+Special thanks to Big Bite Creative for making this release happen!
 
 = 1.5.1 =
 
