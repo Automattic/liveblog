@@ -26,29 +26,38 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
+	const version          			= '1.5.2';
+	const rewrites_version 			= 1;
+	const min_wp_version   			= '3.5';
+	const min_wp_rest_api_version 	= '4.4';
+	const key              			= 'liveblog';
+	const url_endpoint     			= 'liveblog';
+	const edit_cap         			= 'publish_posts';
+	const nonce_key               	= '_wpnonce'; // Using these strings since they're hard coded in the rest api. It'll still work fine for < 4.4
+	const nonce_action            	= 'wp_rest';
 
-	const version          = '1.5.2';
-	const rewrites_version = 1;
-	const min_wp_version   = '3.5';
-	const key              = 'liveblog';
-	const url_endpoint     = 'liveblog';
-	const edit_cap         = 'publish_posts';
-	const nonce_key        = 'liveblog_nonce';
-
-	const refresh_interval        = 10;   // how often should we refresh
-	const debug_refresh_interval  = 2;   // how often we refresh in development mode
-	const max_consecutive_retries = 100; // max number of failed tries before polling is disabled
-	const human_time_diff_update_interval = 60; // how often we change the entry human timestamps: "a minute ago"
-	const delay_threshold         = 5;  // how many failed tries after which we should increase the refresh interval
-	const delay_multiplier        = 2; // by how much should we inscrease the refresh interval
-	const fade_out_duration       = 5; // how much time should take fading out the background of new entries
-	const response_cache_max_age  = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
+	const refresh_interval        			= 10;   // how often should we refresh
+	const debug_refresh_interval  			= 2;   // how often we refresh in development mode
+	const focus_refresh_interval  			= 30;   // how often we refresh in when window not in focus
+	const max_consecutive_retries 			= 100; // max number of failed tries before polling is disabled
+	const human_time_diff_update_interval 	= 60; // how often we change the entry human timestamps: "a minute ago"
+	const delay_threshold         			= 5;  // how many failed tries after which we should increase the refresh interval
+	const delay_multiplier        			= 2; // by how much should we inscrease the refresh interval
+	const fade_out_duration       			= 5; // how much time should take fading out the background of new entries
+	const response_cache_max_age  			= DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
+	const use_rest_api            			= true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
 
 	/** Variables *************************************************************/
 
-	private static $post_id               = null;
-	private static $entry_query           = null;
-	private static $custom_template_path  = null;
+	public static $post_id               	= null;
+	private static $entry_query           	= null;
+	private static $do_not_cache_response	= false;
+	private static $custom_template_path  	= null;
+
+	public static $is_rest_api_call       	= false;
+	public static $auto_archive_days     	= null;
+	public static $auto_archive_expiry_key  = 'liveblog_autoarchive_expiry_date';
+
 
 	/** Load Methods **********************************************************/
 
@@ -76,6 +85,13 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Lazyloader::load();
 		WPCOM_Liveblog_Socketio_Loader::load();
 		WPCOM_Liveblog_Entry_Instagram_oEmbed::load();
+
+		if ( self::use_rest_api() ) {
+			WPCOM_Liveblog_Rest_Api::load();
+		}
+
+		//Activate the WP CRON Hooks.
+		WPCOM_Liveblog_Cron::load();
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -118,6 +134,10 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-instagram-oembed.php' );
 
+		if ( self::use_rest_api() ) {
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
+		}
+
 		// Manually include ms.php theme-side in multisite environments because
 		// we need its filesize and available space functions.
 		if ( ! is_admin() && is_multisite() ) {
@@ -127,6 +147,8 @@ final class WPCOM_Liveblog {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
 		}
+
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php' );
 	}
 
 	/**
@@ -155,6 +177,13 @@ final class WPCOM_Liveblog {
 		add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
 		add_filter( 'comment_class',     array( __CLASS__, 'add_comment_class' ), 10, 3 );
 		add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key'	 ), 10, 2 );
+
+		// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post. Called from the WPCOM_Liveblog_Entry Class.
+		add_filter( 'liveblog_before_insert_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
+		add_filter( 'liveblog_before_update_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
+
+		//We need to check the Liveblog autoarchive date on each time a new entry is added or updated to ensure we extend the date  out correctly to the next archive point based on the configured offset.
+		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'update_autoarchive_expiry' ), 10, 1 );
 	}
 
 	/**
@@ -210,6 +239,13 @@ final class WPCOM_Liveblog {
 		 * we can possibly introduce this to other post types later.
 		 */
 		add_post_type_support( 'post', self::key );
+
+		/**
+		 * Apply a Filter to Setup our Auto Archive Days.
+		 * NULL is classed as disabled.
+		 */
+		self::$auto_archive_days = apply_filters( 'liveblog_auto_archive_days', self::$auto_archive_days);
+
 		do_action( 'after_liveblog_init' );
 	}
 
@@ -316,13 +352,10 @@ final class WPCOM_Liveblog {
 
 	/**
 	 * Look for any new Liveblog entries, and return them via JSON
+	 * Legacy endpoint for pre 4.4 installs
 	 */
 	public static function ajax_entries_between() {
 		$response_args = array();
-
-		// Set some defaults
-		$latest_timestamp  = 0;
-		$entries_for_json  = array();
 
 		// Look for entry boundaries
 		list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
@@ -332,40 +365,63 @@ final class WPCOM_Liveblog {
 			self::send_user_error( __( 'A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/', 'liveblog' ) );
 		}
 
+		// Get liveblog entries within the start and end boundaries
+		$result_for_json = self::get_entries_by_time( $start_timestamp, $end_timestamp );
+
+		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Get Liveblog entries between a start and end time for a post
+	 *
+	 * @param int $start_timestamp  The start time boundary
+	 * @param int $end_timestamp  	The end time boundary
+	 *
+	 * @return An array of Liveblog entries, possibly empty.
+	 */
+	public static function get_entries_by_time( $start_timestamp, $end_timestamp ) {
+
+		// Set some defaults
+		$latest_timestamp  = null;
+		$entries_for_json  = array();
+
 		// Do not cache if it's too soon
 		if ( $end_timestamp > time() ) {
-			$response_args['cache'] = false;
+			self::$do_not_cache_response = true;
+		}
+
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 		}
 
 		// Get liveblog entries within the start and end boundaries
 		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
-		if ( empty( $entries ) ) {
-			do_action( 'liveblog_entry_request_empty' );
 
-			self::json_return( array(
-				'entries'           => array(),
-				'latest_timestamp'  => null
-			), $response_args );
+		if ( ! empty( $entries ) ) {
+			/**
+			 * Loop through each liveblog entry, set the most recent timestamp, and
+			 * put the JSON data for each entry into a neat little array.
+			 */
+			foreach( $entries as $entry ) {
+				$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
+				$entries_for_json[] = $entry->for_json();
+			}
 		}
 
-		/**
-		 * Loop through each liveblog entry, set the most recent timestamp, and
-		 * put the JSON data for each entry into a neat little array.
-		 */
-		foreach( $entries as $entry ) {
-			$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
-			$entries_for_json[] = $entry->for_json();
-		}
-
-		// Setup our data to return via JSON
-		$result_for_json = array(
+		// Create the result array
+		$result = array(
 			'entries'           => $entries_for_json,
 			'latest_timestamp'  => $latest_timestamp,
+			'refresh_interval'  => self::get_refresh_interval(),
 		);
 
-		do_action( 'liveblog_entry_request', $result_for_json );
+		if ( ! empty( $entries_for_json ) ) {
+			do_action( 'liveblog_entry_request', $result );
+		} else {
+			do_action( 'liveblog_entry_request_empty' );
+		}
 
-		self::json_return( $result_for_json, $response_args );
+		return $result;
 	}
 
 	/**
@@ -395,21 +451,26 @@ final class WPCOM_Liveblog {
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
-		if ( ! is_single() && ! is_admin() ) {
+		if ( ! is_single() && ! is_admin() && ! self::$is_rest_api_call) {
 			return false;
 		}
 		if ( empty( $post_id ) ) {
-			global $post;
-			if ( ! $post ){
-				return false;
+			if ( ! empty( self::$post_id ) ) {
+				$post_id = self::$post_id;
+			} else {
+				global $post;
+				if ( ! $post ){
+					return false;
+				}
+				$post_id = $post->ID;
 			}
-			$post_id = $post->ID;
 		}
 		$state = get_post_meta( $post_id, self::key, true );
 		// backwards compatibility with older values
 		if ( 1 == $state ) {
 			$state = 'enable';
 		}
+
 		return $state;
 	}
 
@@ -466,6 +527,7 @@ final class WPCOM_Liveblog {
 		return array_map( 'intval', $timestamps );
 	}
 
+	//HANDLES THE CRUD ACTIONS FOR THE COMMENTS
 	public static function ajax_crud_entry() {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
@@ -474,7 +536,7 @@ final class WPCOM_Liveblog {
 
 		$crud_action = isset( $_POST['crud_action'] ) ? $_POST['crud_action'] : 0;
 
-		if ( !in_array( $crud_action, array( 'insert', 'update', 'delete', 'delete_key' ) ) ) {
+		if ( ! self::is_valid_crud_action( $crud_action ) ) {
 			self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 		}
 
@@ -482,13 +544,12 @@ final class WPCOM_Liveblog {
 		$args['content'] = isset( $_POST['content'] ) ? $_POST['content'] : '';
 		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 
-		$args['user'] = wp_get_current_user();
-
-		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+		$entry = self::do_crud_entry($crud_action, $args);
 
 		if ( is_wp_error( $entry ) ) {
 			self::send_server_error( $entry->get_error_message() );
 		}
+
 
 		if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) {
 			WPCOM_Liveblog_Socketio::emit(
@@ -507,6 +568,31 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Perform a specific CRUD action on an entry for a post
+	 *
+	 * @param string $crud_action Allowed actions are insert|update|delete|delete_key
+	 * @param array $args An array of data to be passed to the crud method
+	 *
+	 * @return mixed The result of the crud method
+	 */
+	public static function do_crud_entry( $crud_action, $args ) {
+
+		$args['user'] = wp_get_current_user();
+		$entry = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
+		if ( ! is_wp_error( $entry ) ) {
+			// Do not send latest_timestamp. If we send it the client won't get
+			// older entries. Since we send only the new one, we don't know if there
+			// weren't any entries in between.
+			$entry = array(
+				'entries'           => array( $entry->for_json() ),
+				'latest_timestamp'  => null
+			);
+		}
+
+		return $entry;
+	}
+
+	/**
 	 * Fetches the Liveblog entry with the ID given in the $_GET superglobal, and returns it via JSON.
 	 */
 	public static function ajax_single_entry() {
@@ -516,11 +602,31 @@ final class WPCOM_Liveblog {
 
 		$entry_id = isset( $fragments[1] ) ? $fragments[1] : '';
 
+		$result_for_json = self::get_single_entry( $entry_id );
+
+		self::json_return( $result_for_json );
+	}
+
+	/**
+	 * Get a single Liveblog entry for a post by entry ID
+	 *
+	 * @param int $entry_id The ID of the entry
+	 *
+	 * @return array An array of entry data
+	 */
+	public static function get_single_entry( $entry_id ) {
+
 		$entries = array();
 		$previous_timestamp = 0;
 		$next_timestamp = 0;
 
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
+		}
+
+		// Why not just get the single entry rather than all?
 		$all_entries = array_values( self::$entry_query->get_all() );
+
 		foreach ( $all_entries as $key => $entry ) {
 			if ( $entry_id !== $entry->get_id() ) {
 				continue;
@@ -541,30 +647,32 @@ final class WPCOM_Liveblog {
 			break;
 		}
 
-		if ( ! $entries ) {
-			do_action( 'liveblog_entry_request_empty' );
-
-			self::json_return( array( 'entries' => array() ) );
-		}
-
 		$entries_for_json = array();
 
-		// Set up an array containing the JSON data for all Liveblog entries.
+		// Set up an array containing the JSON data for Liveblog entry.
 		foreach ( $entries as $entry ) {
 			$entries_for_json[] = $entry->for_json();
 		}
 
 		// Set up the data to be returned via JSON.
 		$result_for_json = array(
-			'entries'           => $entries_for_json,
-			'index'             => (int) filter_input( INPUT_GET, 'index' ),
-			'nextTimestamp'     => $next_timestamp,
-			'previousTimestamp' => $previous_timestamp,
+			'entries' => $entries_for_json,
 		);
 
-		do_action( 'liveblog_entry_request', $result_for_json );
+		if ( ! empty( $entries_for_json ) ) {
+			// Entries found
+			$result_for_json['index']             = (int) filter_input( INPUT_GET, 'index' );
+			$result_for_json['nextTimestamp']     = $next_timestamp;
+			$result_for_json['previousTimestamp'] = $previous_timestamp;
 
-		self::json_return( $result_for_json );
+			do_action( 'liveblog_entry_request', $result_for_json );
+			self::$do_not_cache_response = true;
+		} else {
+			// No entries
+			do_action( 'liveblog_entry_request_empty' );
+		}
+
+		return $result_for_json;
 	}
 
 	/**
@@ -576,41 +684,75 @@ final class WPCOM_Liveblog {
 		$fragments = explode( '/', get_query_var( self::url_endpoint ) );
 
 		// Get all Liveblog entries that are to be lazyloaded.
-		$entries = self::$entry_query->get_for_lazyloading(
+		$result_for_json = self::get_lazyload_entries(
 			isset( $fragments[1] ) ? (int) $fragments[1] : 0,
 			isset( $fragments[2] ) ? (int) $fragments[2] : 0
 		);
-		if ( ! $entries ) {
-			do_action( 'liveblog_entry_request_empty' );
-
-			self::json_return( array(
-				'entries' => array(),
-				'index'   => (int) filter_input( INPUT_GET, 'index' ),
-			) );
-		}
-
-		$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
-
-		$entries_for_json = array();
-
-		// Set up an array containing the JSON data for all Liveblog entries.
-		foreach ( $entries as $entry ) {
-			$entries_for_json[] = $entry->for_json();
-		}
-
-		// Set up the data to be returned via JSON.
-		$result_for_json = array(
-			'entries' => $entries_for_json,
-			'index'   => (int) filter_input( INPUT_GET, 'index' ),
-		);
-
-		do_action( 'liveblog_entry_request', $result_for_json );
 
 		self::json_return( $result_for_json );
 	}
 
+	/**
+	 * Get all Liveblog entries that are to be lazyloaded.
+	 *
+	 * @param int $max_timestamp Maximum timestamp for the Liveblog entries.
+	 * @param int $min_timestamp Minimum timestamp for the Liveblog entries.
+	 *
+	 * @return array An array of json encoded results
+	 */
+	public static function get_lazyload_entries( $max_timestamp, $min_timestamp ) {
+
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
+		}
+
+		// Get all Liveblog entries that are to be lazyloaded.
+		$entries = self::$entry_query->get_for_lazyloading( $max_timestamp, $min_timestamp );
+
+		$entries_for_json = array();
+
+		if ( ! empty( $entries ) ) {
+			$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+
+			// Populate an array containing the JSON data for all Liveblog entries.
+			foreach ( $entries as $entry ) {
+				$entries_for_json[] = $entry->for_json();
+			}
+		}
+
+		$result = array(
+			'entries' => $entries_for_json,
+			'index'   => (int) filter_input( INPUT_GET, 'index' ),
+		);
+
+		if ( ! empty( $entries_for_json ) ) {
+			do_action( 'liveblog_entry_request', $result );
+			self::$do_not_cache_response = true;
+		} else {
+			do_action( 'liveblog_entry_request_empty' );
+		}
+
+		//self::json_return( $result_for_json );
+
+		return $result;
+	}
+
 	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
+		$entry_content = self::format_preview_entry( $entry_content );
+
+		self::json_return( $entry_content );
+	}
+
+	/**
+	 * Format the passed in content and give it back in an array
+	 *
+	 * @param string $entry_content The entry content to be previewed
+	 *
+	 * @return array The entry content wrapped in HTML elements
+	 */
+	public static function format_preview_entry( $entry_content ) {
+
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
 		$entry_content = $entry_content['content'];
@@ -618,10 +760,7 @@ final class WPCOM_Liveblog {
 
 		do_action( 'liveblog_preview_entry', $entry_content );
 
-		self::json_return(
-			array( 'html' => $entry_content ),
-			array( 'cache' => false )
-		);
+		return array( 'html' => $entry_content );
 	}
 
 	public static function ajax_unknown() {
@@ -646,15 +785,28 @@ final class WPCOM_Liveblog {
 	}
 
 	public static function admin_enqueue_scripts( $hook_suffix ) {
+		global $post;
+
 		// Enqueue admin scripts only if adding or editing a supported post type.
 		if ( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) && post_type_supports( get_post_type(), self::key ) ) {
+
+			$endpoint_url = '';
+			$use_rest_api = 0;
+
+			if ( self::use_rest_api() ) {
+				$endpoint_url = WPCOM_Liveblog_Rest_Api::build_endpoint_base() . $post->ID . '/' . 'post_state';
+				$use_rest_api = 1;
+			}
+
 			wp_enqueue_style( self::key, plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
 			wp_enqueue_script( 'liveblog-admin', plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
 			wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
 				'nonce_key'                    => self::nonce_key,
-				'nonce'                        => wp_create_nonce( self::nonce_key ),
+				'nonce'                        => wp_create_nonce( self::nonce_action ),
 				'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
+				'use_rest_api'                 => $use_rest_api,
+				'endpoint_url'                 => $endpoint_url,
 			) );
 		}
 	}
@@ -731,15 +883,17 @@ final class WPCOM_Liveblog {
 
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
-				'nonce'                  => wp_create_nonce( self::nonce_key ),
+				'nonce'                  => wp_create_nonce( self::nonce_action ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 
-				'refresh_interval'       => WP_DEBUG? self::debug_refresh_interval : self::refresh_interval,
+				'refresh_interval'       => self::get_refresh_interval(),
+				'focus_refresh_interval' => self::focus_refresh_interval,
 				'max_consecutive_retries'=> self::max_consecutive_retries,
 				'delay_threshold'        => self::delay_threshold,
 				'delay_multiplier'       => self::delay_multiplier,
 				'fade_out_duration'      => self::fade_out_duration,
 
+				'use_rest_api'           => intval( self::use_rest_api() ),
 				'endpoint_url'           => self::get_entries_endpoint_url(),
 
 				'features'               => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
@@ -818,13 +972,19 @@ final class WPCOM_Liveblog {
 	 * @return string
 	 */
 	private static function get_entries_endpoint_url() {
-		$post_permalink = get_permalink( self::$post_id );
-		if ( false !== strpos( $post_permalink, '?p=' ) )
-			$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
-		else
-			$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
-		$url = apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
-		return $url;
+		if ( self::use_rest_api() ) {
+			$url = WPCOM_Liveblog_Rest_Api::build_endpoint_base() . self::$post_id . '/';
+		} else {
+			$post_permalink = get_permalink( self::$post_id );
+			if ( false !== strpos( $post_permalink, '?p=' ) ) {
+				$url = add_query_arg( self::url_endpoint, '', $post_permalink ) . '='; // returns something like ?p=1&liveblog=
+			} else {
+				$url = trailingslashit( trailingslashit( $post_permalink ) . self::url_endpoint ); // returns something like /2012/01/01/post/liveblog/
+			}
+		}
+
+		return apply_filters( 'liveblog_endpoint_url', $url, self::$post_id );
+
 	}
 
 	/** Display Methods *******************************************************/
@@ -938,6 +1098,20 @@ final class WPCOM_Liveblog {
 	 * @param WP_Post $post
 	 */
 	public static function display_meta_box( $post ) {
+
+		// Get and display the metabox content
+		echo self::get_meta_box( $post );
+
+	}
+
+	/**
+	 * Get the metabox for outputting
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return string The metabox markup
+	 */
+	public static function get_meta_box( $post ) {
 		$current_state = self::get_liveblog_state( $post->ID );
 		$buttons = array(
 			'enable' => array( 'value' => 'enable', 'text' => __( 'Enable', 'liveblog' ),
@@ -955,7 +1129,8 @@ final class WPCOM_Liveblog {
 		$update_text  = __( 'Settings have been successfully updated.', 'liveblog' );
 		$extra_fields = array();
 		$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
-		echo self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
+
+		return self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
 	}
 
 	public static function admin_ajax_set_liveblog_state_for_post() {
@@ -965,31 +1140,122 @@ final class WPCOM_Liveblog {
 		self::ajax_current_user_can_edit_liveblog();
 		self::ajax_check_nonce();
 
-		if ( !$REQUEST = get_post( $post_id ) ) {
+		$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST );
+
+		if ( ! $meta_box ) {
+
+			if ( wp_is_post_revision( $post_id ) ) {
+				self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
+			}
+
 			self::send_user_error( __( "Non-existing post ID: $post_id" , 'liveblog') );
+
 		}
 
-		if ( wp_is_post_revision( $post_id ) ) {
-			self::send_user_error( __( "The post is a revision: $post_id" , 'liveblog') );
-		}
+		self::json_return($meta_box);
 
-		do_action( 'liveblog_admin_settings_update', $_REQUEST, $post_id );
-
-		self::set_liveblog_state( $post_id, $_REQUEST['state'] );
-		self::display_meta_box( $REQUEST );
-		exit;
 	}
 
-	private static function set_liveblog_state( $post_id, $state ) {
-		if ( in_array( $state, array( 'enable', 'archive' ) ) ) {
-			update_post_meta( $post_id, self::key, $state );
-			do_action( "liveblog_{$state}_post", $post_id );
-		} elseif ( 'disable' == $state ) {
+	/**
+	 * Update the Liveblog state and return the metabox to be displayed
+	 *
+	 * @param int $post_id Post ID
+	 * @param string $new_state The new state to give the Liveblog post. One of enable|archive|disable
+	 *
+	 * @return string The metabox markup
+	 */
+	public static function admin_set_liveblog_state_for_post( $post_id, $new_state, $request_vars ) {
+
+		$post = get_post( $post_id );
+
+		if ( empty( $post ) || wp_is_post_revision( $post_id ) ) {
+			return false;
+		}
+
+		do_action( 'liveblog_admin_settings_update', $request_vars, $post_id );
+
+		self::set_liveblog_state( $post_id, $new_state );
+
+		return self::get_meta_box( $post );
+
+	}
+
+	/**
+	 * set_liveblog_state
+	 *
+	 * Sets the status of the Liveblog.
+	 * Integrates with the Auto Archive feature to check
+	 * archive date and update where required. Means a liveblog
+	 * can be auto archived and re-enabled extending the auto archive
+	 * forward by the pre-determined amount of days from the re-enable
+	 * date.
+	 *
+	 * @param $post_id
+	 * @param $new_state
+	 *
+	 * @return bool
+	 */
+	public static function set_liveblog_state( $post_id, $new_state ) {
+
+		//if the auto_archive feature is not disabled
+		if ( null !== self::$auto_archive_days ) {
+			//Get the Current State
+			$current_state 		= get_post_meta( $post_id, self::key );
+
+			//Instantiate a entry query object
+			$query = new WPCOM_Liveblog_Entry_Query( $post_id, self::key );
+			$latest_timestamp = ( null !== $query->get_latest_timestamp() ) ? $query->get_latest_timestamp() : strtotime( date( 'Y-m-d H:i:s' ) );
+
+			//set autoarchive date based on latest timestamp
+			$autoarchive_date 	= strtotime(' + ' . self::$auto_archive_days . ' days', $latest_timestamp );
+
+			//if the old state is archive and the new state is active or there is no current state and the new state is enable
+			if( count( $current_state ) === 0 && $new_state === 'enable' || $current_state[0] === 'archive' && $new_state === 'enable' ) {
+
+				//Then the live blog is being setup for the first time or is being reactivated.
+				update_post_meta( $post_id, self::$auto_archive_expiry_key, $autoarchive_date );
+
+			}
+		}
+
+		//Lets update the post_meta state as per usual.
+		if ( in_array( $new_state, array( 'enable', 'archive' ) ) ) {
+			update_post_meta( $post_id, self::key, $new_state );
+			do_action( "liveblog_{$new_state}_post", $post_id );
+
+		} elseif ( 'disable' == $new_state ) {
 			delete_post_meta( $post_id, self::key );
+
+			//Lets remove the autoarchive meta data too.
+			delete_post_meta( $post_id, self::$auto_archive_expiry_key );
+
 			do_action( 'liveblog_disable_post', $post_id );
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Hooks in and updates the autoarchive date if not disabled.
+	 * Means that any update moving forward pushes the auto archive date
+	 * in turn.
+	 *
+	 * @param  array $args Passed in arguments
+	 * @return array $args Post Filtered Arguments.
+	 */
+	public static function update_autoarchive_expiry( $args ) {
+		if( null !== self::$auto_archive_days ) {
+			//Instantiate a entry query object
+			$query = new WPCOM_Liveblog_Entry_Query( $args['post_id'], self::key );
+
+			//set autoarchive date based on latest timestamp
+			$autoarchive_date 	= strtotime(' + ' . self::$auto_archive_days . ' days', $query->get_latest_timestamp() );
+
+			//Update the Post Meta the extend the AutoArchive Date.
+			update_post_meta( $args['post_id'], self::$auto_archive_expiry_key, $autoarchive_date );
+		}
+
+		return $args;
 	}
 
 	/**
@@ -1120,7 +1386,7 @@ final class WPCOM_Liveblog {
 	 *
 	 * @param string $action
 	 */
-	public static function ajax_check_nonce( $action = self::nonce_key ) {
+	public static function ajax_check_nonce( $action = self::nonce_action ) {
 		if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( $_REQUEST[ self::nonce_key ], $action ) ) {
 			self::send_forbidden_error( __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
 		}
@@ -1169,6 +1435,7 @@ final class WPCOM_Liveblog {
 		}
 
 		header( 'Content-Type: application/json' );
+		self::prevent_caching_if_needed();
 		echo $json_data;
 		exit();
 	}
@@ -1215,6 +1482,93 @@ final class WPCOM_Liveblog {
 		return $protected;
 	}
 
+	/**
+	 * Tells browsers to not cache the response if $do_not_cache_response is true
+	 */
+	public static function prevent_caching_if_needed() {
+		if ( self::$do_not_cache_response ) {
+			nocache_headers();
+		}
+	}
+
+	/**
+	 * Checks to see if the current WordPress version has REST API support
+	 *
+	 * @return bool true if supported, false otherwise
+	 */
+	public static function can_use_rest_api() {
+		global $wp_version;
+		return version_compare( $wp_version, self::min_wp_rest_api_version, '>=' );
+	}
+
+	/**
+	 * Checks if use_rest_api is on and the WordPress version supports it
+	 */
+	public static function use_rest_api() {
+		return ( self::use_rest_api && self::can_use_rest_api() );
+	}
+
+	/**
+	 * Check for allowed crud action
+	 *
+	 * @param String $action The CRUD action to check
+	 * @return bool true if $action is one of insert|update|delete|delete_key. false otherwise
+	 */
+	public static function is_valid_crud_action( $action ) {
+		return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ) );
+	}
+
+	/** Plupload Helpers ******************************************************/
+
+	/**
+	 * Convert hours to bytes
+	 *
+	 * @param unknown_type $size
+	 * @return unknown
+	 */
+	private static function convert_hr_to_bytes( $size ) {
+		$size  = strtolower( $size );
+		$bytes = (int) $size;
+
+		if ( strpos( $size, 'k' ) !== false )
+			$bytes = intval( $size ) * 1024;
+		elseif ( strpos( $size, 'm' ) !== false )
+			$bytes = intval( $size ) * 1024 * 1024;
+		elseif ( strpos( $size, 'g' ) !== false )
+			$bytes = intval( $size ) * 1024 * 1024 * 1024;
+
+		return $bytes;
+	}
+
+	/**
+	 * Convert bytes to hour
+	 *
+	 * @param string $bytes
+	 * @return string
+	 */
+	private static function convert_bytes_to_hr( $bytes ) {
+		$units = array( 0 => 'B', 1 => 'kB', 2 => 'MB', 3 => 'GB' );
+		$log   = log( $bytes, 1024 );
+		$power = (int) $log;
+		$size  = pow( 1024, $log - $power );
+
+		return $size . $units[$power];
+	}
+
+	/**
+	 * Get the maximum upload file size
+	 *
+	 * @see wp_max_upload_size()
+	 * @return string
+	 */
+	private static function max_upload_size() {
+		$u_bytes = self::convert_hr_to_bytes( ini_get( 'upload_max_filesize' ) );
+		$p_bytes = self::convert_hr_to_bytes( ini_get( 'post_max_size'       ) );
+		$bytes   = apply_filters( 'upload_size_limit', min( $u_bytes, $p_bytes ), $u_bytes, $p_bytes );
+
+		return $bytes;
+	}
+
 	private static function is_wp_too_old() {
 		global $wp_version;
 		// if WordPress is loaded in a function the version variables aren't globalized
@@ -1224,6 +1578,19 @@ final class WPCOM_Liveblog {
 		}
 		return version_compare( $wp_version, self::min_wp_version, '<' );
 	}
+
+	/**
+	 * Returns refresh interval after filters have been run
+	 *
+	 * @return int
+	 */
+	public static function get_refresh_interval() {
+		$refresh_interval = WP_DEBUG ? self::debug_refresh_interval : self::refresh_interval;
+		$refresh_interval = apply_filters( 'liveblog_refresh_interval', $refresh_interval  						      );
+		$refresh_interval = apply_filters( 'liveblog_post_' . self::$post_id . '_refresh_interval', $refresh_interval );
+		return $refresh_interval;
+	}
+
 }
 WPCOM_Liveblog::load();
 

@@ -46,6 +46,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
+	 * @codeCoverageIgnore
 	 */
 	public function load() {
 

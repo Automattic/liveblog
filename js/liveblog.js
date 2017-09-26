@@ -140,8 +140,24 @@ window.liveblog = window.liveblog || {};
 			liveblog.start_human_time_diff_timer();
 		}
 
+		document.addEventListener( 'visibilitychange', liveblog.checkFocus );
+		window.addEventListener( 'focus', liveblog.checkFocus );
+		window.addEventListener( 'blur', liveblog.checkFocus );
+
+		liveblog.last_focus_call = 0;
+
 		liveblog.$events.trigger( 'after-init' );
 	};
+
+	// If user comes back to window get recent entries only if
+	// it has been more than the refresh interval 
+	liveblog.checkFocus = function() {
+		var diff = moment().unix() - liveblog.last_focus_call;
+	    if ( document.hasFocus() && diff > liveblog_settings.refresh_interval ) {
+	    	liveblog.last_focus_call = moment().unix();
+	    	liveblog.get_recent_entries();
+	 	}
+	}
 
 	liveblog.init_moment_js = function() {
 		momentLang.relativeTime = _.extend(moment().lang().relativeTime, momentLang.relativeTime);
@@ -198,10 +214,17 @@ window.liveblog = window.liveblog || {};
 	};
 
 	liveblog.get_recent_entries = function() {
-		var url  = liveblog_settings.endpoint_url,
-			from = liveblog.latest_entry_timestamp + 1,
-			local_diff = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp,
-			to         = liveblog.latest_response_server_timestamp + local_diff;
+		var url 			 = liveblog_settings.endpoint_url,
+		    refresh_interval = liveblog_settings.refresh_interval,
+		    from 			 = liveblog.latest_entry_timestamp + 1,
+		    local_diff		 = liveblog.current_timestamp() - liveblog.latest_response_local_timestamp,
+		    to 				 = liveblog.latest_response_server_timestamp + local_diff;
+		    to 				 = Math.floor( ( liveblog.latest_response_server_timestamp + local_diff ) / refresh_interval ) * refresh_interval;
+
+		if ( 1 == liveblog_settings.use_rest_api ) {
+			// Use REST API entries endpoint
+			url += 'entries/';
+		}
 
 		url += from + '/' + to + '/';
 		liveblog.show_spinner();
@@ -219,6 +242,17 @@ window.liveblog = window.liveblog || {};
 
 		liveblog.latest_response_server_timestamp = liveblog.server_timestamp_from_xhr( xhr );
 		liveblog.latest_response_local_timestamp  = liveblog.current_timestamp();
+
+		// If refresh interval supplied by call then update
+		if ( response.refresh_interval ) {
+			liveblog_settings.refresh_interval    = response.refresh_interval;
+		}
+		
+
+		// If the window is no longer in focus increase refresh interval
+		if ( !document.hasFocus() ) {
+			liveblog_settings.refresh_interval    = liveblog_settings.focus_refresh_interval;
+		}
 
 		if ( response.entries.length ) {
 			liveblog.maybe_display_entries( response.entries );
@@ -364,6 +398,11 @@ window.liveblog = window.liveblog || {};
 		}
 
 		method = method || 'GET';
+
+		// Add nonce to all requests if it's not already there
+		if ( ! ( liveblog_settings.nonce_key in data ) ) {
+			data[liveblog_settings.nonce_key] = liveblog_settings.nonce;
+		}
 
 		$.ajax( {
 			url: url,

@@ -32,6 +32,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function load() {
 
@@ -73,13 +75,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function get_config( $config ) {
 
+		$endpoint_url = admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors';
+
+		if ( WPCOM_Liveblog::use_rest_api() ) {
+			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors');
+		}
+
 		// Add our config to the front end autocomplete
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_author_config', array(
 			'type'        => 'ajax',
 			'cache'       => 1000 * 60 * 30,
-			'url'         => admin_url( 'admin-ajax.php' ) .'?action=liveblog_authors',
+			'url'         => $endpoint_url,
 			'search'      => 'key',
 			'regex'       => '@([\w\-]*)$',
 			'replacement' => '@${key}',
@@ -197,6 +205,22 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function ajax_authors() {
 
+		//Sanitize the input safely.
+		if( isset( $_GET['autocomplete'] ) ) {
+			$term = sanitize_text_field( $_GET['autocomplete'] );
+		} else {
+			$term = '';
+		}
+
+		$users = $this->get_authors( $term );
+
+		header( "Content-Type: application/json" );
+		echo wp_json_encode( $users );
+		exit;
+	}
+
+	public function get_authors( $term ) {
+
 		// The args used in the get_users query.
 		$args = array(
 			'who'    => 'authors',
@@ -206,8 +230,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// If there is no search term then search
 		// for nothing to get everything.
-		$term = isset( $_GET['autocomplete'] ) ? $_GET['autocomplete'] : '';
-
 		// If there is a search term, then append
 		// '*' to match chars after the term.
 		if ( strlen( trim( $term ) ) > 0 ) {
@@ -217,10 +239,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// Map the authors into the expected format.
 		$users = array_map( array( $this, 'map_ajax_authors' ),  get_users( $args ) );
 
-		header( "Content-Type: application/json" );
-		echo json_encode( $users );
-
-		exit;
+		return $users;
 	}
 
 	/**
