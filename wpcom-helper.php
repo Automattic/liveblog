@@ -14,6 +14,12 @@ function wpcom_vip_liveblog_bump_stats_extras( $stat, $extra ) {
 // Use an AJAX URL, which is easier to match in server configs
 // Using an endpoint can be ambiguous
 add_action( 'after_liveblog_init', function() {
+
+	// No need to use an Ajax URL if we're using the REST API.
+	if ( WPCOM_Liveblog::use_rest_api() ) {
+		return;
+	}
+
 	add_filter( 'liveblog_endpoint_url', function( $url, $post_id ) { return home_url( '__liveblog_' . $post_id . '/' ); }, 10, 2 );
 	add_rewrite_rule( '^__liveblog_([0-9]+)/(.*)/?', 'index.php?p=$matches[1]&liveblog=$matches[2]', 'top' );
 
