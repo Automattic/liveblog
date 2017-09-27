@@ -104,8 +104,15 @@ add_action( 'liveblog_delete_entry', 'wpcom_invalidate_feed_cache' );
 // Don't show the post box for blogs the current user isn't a member of.
 // Helps protect against any accidents by superadmins.
 add_filter( 'liveblog_current_user_can_edit_liveblog', function( $can_edit ) {
-	if ( $can_edit && ! is_admin() && is_user_logged_in() && ! is_user_member_of_blog() )
+
+	// Retain super admin access for A12s.
+	if ( is_automattician() || ( is_defined( A8C_PROXIED_REQUEST ) && A8C_PROXIED_REQUEST ) ) {
+		return $can_edit;
+	}
+
+	if ( $can_edit && ! is_admin() && is_user_logged_in() && ! is_user_member_of_blog() ) {
 		return false;
+	}
 
 	return $can_edit;
 } );
