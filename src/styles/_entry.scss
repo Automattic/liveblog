@@ -1,0 +1,39 @@
+.wpcom-liveblog-entry {
+	border-top: 1px solid #dfdfdf;
+	padding: 10px;
+}
+
+.wpcom-liveblog-entry-actions button, .wpcom-liveblog-entry-actions button:hover, .wpcom-liveblog-entry-edit-action, .wpcom-liveblog-entry-edit-action:hover {
+	padding: 0px;
+	margin: 0px;
+	background: none;
+	border: none;
+	margin-right: 10px;
+	color: #444;
+	font-weight: bold;
+}
+
+.wpcom-liveblog-entry-actions button:hover, .wpcom-liveblog-entry-edit-action:hover {
+	text-decoration: underline;
+}
+
+.wpcom-liveblog-entry-edit-action {
+	text-align: right;
+	width: 100%;
+	font-size: 14px;
+}
+
+.wpcom-liveblog-entry-edit {
+	padding: 10px;
+	background: #f9f9f9;
+	border: 1px solid #dfdfdf;
+	margin-bottom: 20px;
+	margin-top: 20px;
+	border-radius: 3px;
+}
+
+.wpcom-liveblog-entry-edit .editor-container  {
+	padding: 0px;
+	border: none;
+	margin-bottom: 0px;
+}

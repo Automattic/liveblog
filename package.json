@@ -1,0 +1,66 @@
+{
+  "name": "liveblog",
+  "description": "Liveblogging done right. Using WordPress",
+  "version": "1.0.0",
+  "author": "Automattic",
+  "private": true,
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-jest": "^20.0.3",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-lodash": "^3.2.11",
+    "babel-preset-airbnb": "^2.4.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-runtime": "^6.23.0",
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb-base": "^11.3.0",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jest": "^20.0.3",
+    "exports-loader": "^0.6.4"
+  },
+  "dependencies": {
+    "axios": "^0.16.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "css-loader": "^0.28.7",
+    "draft-js": "^0.10.3",
+    "draft-js-export-html": "^1.2.0",
+    "draft-js-import-html": "^1.2.0",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "jest": "^20.0.4",
+    "lodash-es": "^4.17.4",
+    "node-sass": "^4.5.3",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-devtools-extension": "^2.13.2",
+    "redux-observable": "^0.16.0",
+    "reselect": "^3.0.1",
+    "rxjs": "^5.4.3",
+    "sass-loader": "^6.0.6",
+    "sass-module-importer": "^1.4.0",
+    "sass-mq": "^3.3.2",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.3.0"
+  },
+  "scripts": {
+    "lint-scripts": "./node_modules/.bin/eslint ./src/react/",
+    "lint-styles": "./node_modules/.bin/stylelint \"src/styles/**/*.scss\"",
+    "test": "./node_modules/.bin/jest",
+    "build": "NODE_ENV=production webpack",
+    "watch": "NODE_ENV=development webpack --watch"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js?$": "babel-jest"
+    },
+    "globals": {
+      "__DEV__": true,
+      "__TEST__": true
+    },
+    "verbose": true
+  }
+}

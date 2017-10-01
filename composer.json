@@ -1,0 +1,23 @@
+{
+  "name": "automattic/liveblog",
+  "description": "Liveblogging done right. Using WordPress",
+  "homepage"   : "https://github.com/Automattic/liveblog",
+  "license": "GPL-2.0+",
+  "require": {},
+  "config": {
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "WPCOM\\Liveblog\\": "app/"
+    },
+    "files": [
+      "app/routes.php",
+      "app/frontend.php",
+      "app/dashboard.php",
+      "app/cron.php",
+      "app/cli.php"
+    ]
+  }
+}
