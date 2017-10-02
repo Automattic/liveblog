@@ -3,8 +3,8 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const paths = {
-  entry: `./src/react/index.js`,
-  out: `./assets`,
+  entry: './src/react/index.js',
+  out: './assets',
 };
 
 const webpackConfig = {
@@ -32,30 +32,30 @@ const webpackConfig = {
             options: {
               plugins: ['babel-plugin-lodash'].map(require.resolve),
             },
-          }
-          // {
-          //   loader: 'eslint-loader',
-          //   options: {
-          //     configFile: '.eslintrc',
-          //     emitError: false,
-          //     emitWarning: true,
-          //   },
-          // },
+          },
+          {
+            loader: 'eslint-loader',
+            options: {
+              configFile: '.eslintrc',
+              emitError: false,
+              emitWarning: true,
+            },
+          },
         ],
       },
       {
-            test: /\.scss$/,
-            use: ExtractTextPlugin.extract({
-              fallback: 'style-loader',
-              use: ['css-loader', 'sass-loader']
-            })
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader'],
+        }),
       },
       {
-            test: /\.css$/,
-            use: ExtractTextPlugin.extract({
-              fallback: 'style-loader',
-              use: ['css-loader']
-            })
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader'],
+        }),
       },
     ],
   },

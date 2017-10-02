@@ -1,6 +1,6 @@
 const initialState = {
-	entries: {}
-}
+  entries: {},
+};
 
 export default function user(state = initialState, action) {
   switch (action.type) {

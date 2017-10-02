@@ -10,5 +10,5 @@ ReactDOM.render(
   <Provider store={store}>
     <AppContainer />
   </Provider>,
-  document.getElementById('wpcom-liveblog-container')
+  document.getElementById('wpcom-liveblog-container'),
 );

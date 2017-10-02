@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 // Redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import {Editor, EditorState} from 'draft-js';
+import { Editor, EditorState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 import { stateToHTML } from 'draft-js-export-html';
@@ -17,36 +18,47 @@ import * as userActions from '../actions/userActions';
 class EditorContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = {editorState: EditorState.createEmpty(), update: false };
-    this.onChange = (editorState) => this.setState({editorState});
+    this.state = {
+      editorState: EditorState.createEmpty(),
+      update: false,
+    };
+
+    this.onChange = editorState => this.setState({ editorState });
+
     this.publish = () => {
-      if ( this.state.update ) {
-        this.props.updateEntry({
-          id: this.props.entry.id,
-          content: stateToHTML(this.state.editorState.getCurrentContent()) 
+      const { updateEntry, entry, entryEditClose, createEntry } = this.props;
+      const { update, editorState } = this.state;
+
+      if (update) {
+        updateEntry({
+          id: entry.id,
+          content: stateToHTML(editorState.getCurrentContent()),
         });
-        this.props.entryEditClose( this.props.entry.id );
+        entryEditClose(entry.id);
       } else {
-        this.props.createEntry({
-          content: stateToHTML(this.state.editorState.getCurrentContent()) 
+        createEntry({
+          content: stateToHTML(editorState.getCurrentContent()),
         });
-        this.setState({editorState: EditorState.createEmpty()});
+        this.setState({ editorState: EditorState.createEmpty() });
       }
-      
-    }
+    };
   }
 
   componentDidMount() {
-   if ( this.props.entry ) {
-    this.setState({
-      editorState: EditorState.createWithContent( stateFromHTML(this.props.entry.content) ),
-      update: true,
-    });
-   }
+    const { entry } = this.props;
+
+    if (entry) {
+      this.setState({
+        editorState: EditorState.createWithContent(stateFromHTML(entry.content)),
+        update: true,
+      });
+    }
   }
 
   render() {
-    if ( this.props.config.can_edit === "false" ) {
+    const { config } = this.props;
+
+    if (config.can_edit === 'false') {
       return false;
     }
 
@@ -55,18 +67,24 @@ class EditorContainer extends Component {
         <Editor editorState={this.state.editorState} onChange={this.onChange} />
         <button className="editor-publish-button" onClick={this.publish}>Publish Update</button>
       </div>
-    )
+    );
   }
 }
 
+EditorContainer.propTypes = {
+  config: PropTypes.object,
+  updateEntry: PropTypes.func,
+  entry: PropTypes.object,
+  entryEditClose: PropTypes.func,
+  createEntry: PropTypes.func,
+};
+
 // Map state to props on connected component
 // Ideally pick out pieces of state rather than full object
-const mapStateToProps = (state) => state
+const mapStateToProps = state => state;
 
 // Map dispatch/actions to props on connected component
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-  ...apiActions,
-  ...userActions,
-}, dispatch)
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ ...apiActions, ...userActions }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditorContainer);

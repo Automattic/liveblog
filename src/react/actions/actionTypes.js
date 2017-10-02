@@ -1,8 +1,7 @@
 /**
 * Convert list of strings and map them to constants.
 */
-/* eslint ignore next */
-const createTypes = (...a) => a.reduce((r, i) => (r[i] = i, r), {});
+const createTypes = (...args) => args.reduce((obj, item) => ({ ...obj, [item]: item }), {});
 
 export default createTypes(
   'LOAD_CONFIG',

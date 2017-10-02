@@ -6,7 +6,7 @@ const initialState = {
   lastEntry: false,
   nonce: false,
   timestamp: false,
-}
+};
 
 export default function api(state = initialState, action) {
   switch (action.type) {
@@ -56,10 +56,10 @@ export default function api(state = initialState, action) {
         ...state,
         error: false,
         lastEntry: {
-          'id': action.payload.id,
-          'updated': action.payload.updated,
+          id: action.payload.id,
+          updated: action.payload.updated,
         },
-        nonce: action.payload.nonce
+        nonce: action.payload.nonce,
       };
 
     case 'CREATE_ENTRY_FAILED':
@@ -73,10 +73,10 @@ export default function api(state = initialState, action) {
         ...state,
         error: false,
         lastEntry: {
-          'id': action.payload.id,
-          'updated': action.payload.updated,
+          id: action.payload.id,
+          updated: action.payload.updated,
         },
-        nonce: action.payload.nonce
+        nonce: action.payload.nonce,
       };
 
     case 'DELETE_ENTRY_FAILED':
@@ -90,10 +90,10 @@ export default function api(state = initialState, action) {
         ...state,
         error: false,
         lastEntry: {
-          'id': action.payload.id,
-          'updated': action.payload.updated,
+          id: action.payload.id,
+          updated: action.payload.updated,
         },
-        nonce: action.payload.nonce
+        nonce: action.payload.nonce,
       };
 
     case 'UPDATE_ENTRY_FAILED':

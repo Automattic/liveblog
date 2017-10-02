@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 // Redux
 import { bindActionCreators } from 'redux';
@@ -16,35 +17,46 @@ import '../../styles/app.scss';
 
 class AppContainer extends Component {
   componentDidMount() {
-    this.props.loadConfig( window.wpcomLiveblog );
-    this.props.getEntries( window.wpcomLiveblog.last_entry );
-    this.props.startPolling( window.wpcomLiveblog.timestamp );
+    const { loadConfig, getEntries, startPolling } = this.props;
+
+    loadConfig(window.wpcomLiveblog);
+    getEntries(window.wpcomLiveblog.last_entry);
+    startPolling(window.wpcomLiveblog.timestamp);
+  }
+
+  renderEntries() {
+    const { api } = this.props;
+
+    if (api.entries.length === 0) {
+      return <div>Loading...</div>;
+    }
+
+    return <Entries entries={api.entries} />;
   }
 
   render() {
-    if (this.props.api.entries.length === 0) {
-      return (
-        <div>Loading...</div>
-      )
-    }
-
     return (
       <div>
         <EditorContainer />
-        <Entries entries={this.props.api.entries} />
+        {this.renderEntries()}
       </div>
-    )
+    );
   }
 }
 
+AppContainer.propTypes = {
+  loadConfig: PropTypes.func,
+  getEntries: PropTypes.func,
+  startPolling: PropTypes.func,
+  api: PropTypes.object,
+};
+
 // Map state to props on connected component
-// Ideally pick out pieces of state rather than full object
-const mapStateToProps = (state) => state
+// We only need access to the api state
+const mapStateToProps = state => ({ api: state.api });
 
 // Map dispatch/actions to props on connected component
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-  ...configActions,
-  ...apiActions,
-}, dispatch)
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ ...configActions, ...apiActions }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);

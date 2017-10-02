@@ -9,14 +9,14 @@ function configureStore(initialState) {
 
   const enhancers = composeWithDevTools(
     applyMiddleware(
-      epicMiddleware
-    )
+      epicMiddleware,
+    ),
   );
 
   const store = createStore(
     combineReducers(rootReducer),
     initialState,
-    enhancers
+    enhancers,
   );
 
   /**

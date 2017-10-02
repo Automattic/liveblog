@@ -37,6 +37,12 @@ class Entry_Cache {
 		    return $b['updated'] - $a['updated'];
 		} );
 
+		if ( empty($polling) ) {
+			$polling[] = [
+				'id' 	  => 0,
+				'updated' => 0
+			];
+		}
 		set_transient( $this->polling_key, $polling, $this->expiration );
 
 		return [ $entries, $polling ];

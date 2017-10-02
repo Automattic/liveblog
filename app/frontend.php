@@ -1,9 +1,9 @@
-<?php 
+<?php
 
 add_filter( 'the_content', function( $content ) {
 
 	global $post;
-	
+
 	if ( 'enable' === get_post_meta( $post->ID, 'liveblog', true ) ) {
 		return '<div id="wpcom-liveblog-container"></div>';
 	}
