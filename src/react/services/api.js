@@ -62,10 +62,3 @@ export function deleteEntry(id, config, nonce = false) {
 
   return ajax(settings);
 }
-
-export const entryHasBeenAddedOrChanged = (state) => {
-  const previous = state.api.previousPolling;
-  const current = state.api.polling;
-  return previous.length !== current.length || previous[0].updated < current[0].updated;
-};
-

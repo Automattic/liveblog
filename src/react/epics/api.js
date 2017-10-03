@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+
 import { combineEpics } from 'redux-observable';
 import { of } from 'rxjs/observable/of';
 import { interval } from 'rxjs/observable/interval';
@@ -23,8 +25,11 @@ import {
   createEntry,
   updateEntry,
   deleteEntry,
-  entryHasBeenAddedOrChanged,
 } from '../services/api';
+
+import {
+  entryListChanged,
+} from '../utils/utils';
 
 const getEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES)
@@ -77,7 +82,10 @@ const deleteEntryEpic = (action$, store) =>
 
 const examinePollingEpic = (action$, store) =>
   action$.ofType(types.POLLING_SUCCESS)
-    .filter(() => entryHasBeenAddedOrChanged(store.getState()))
+    .filter(() => entryListChanged(
+      store.getState().api.previousPolling,
+      store.getState().api.polling,
+    ))
     .map(() => getEntriesAction(store.getState().api.polling));
 
 const getEntriesAfterCreateEpic = (action$, store) =>
@@ -92,8 +100,7 @@ const getEntriesAfterDeleteEpic = (action$, store) =>
   action$.ofType(types.DELETE_ENTRY_SUCCESS)
     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
-/* eslint-disable */
-export const epics = combineEpics(
+export default combineEpics(
   getEntriesEpic,
   startPollingEpic,
   createEntryEpic,
@@ -104,5 +111,3 @@ export const epics = combineEpics(
   getEntriesAfterUpdateEpic,
   getEntriesAfterDeleteEpic,
 );
-/* eslint-enable */
-
