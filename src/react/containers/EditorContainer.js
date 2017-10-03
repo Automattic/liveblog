@@ -80,7 +80,6 @@ EditorContainer.propTypes = {
 };
 
 // Map state to props on connected component
-// Ideally pick out pieces of state rather than full object
 const mapStateToProps = state => state;
 
 // Map dispatch/actions to props on connected component

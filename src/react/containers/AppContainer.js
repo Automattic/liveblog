@@ -52,8 +52,9 @@ AppContainer.propTypes = {
 };
 
 // Map state to props on connected component
-// We only need access to the api state
-const mapStateToProps = state => ({ api: state.api });
+const mapStateToProps = state => ({
+  api: state.api,
+});
 
 // Map dispatch/actions to props on connected component
 const mapDispatchToProps = dispatch =>

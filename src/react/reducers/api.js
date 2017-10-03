@@ -32,14 +32,14 @@ export default function api(state = initialState, action) {
     case 'START_POLLING':
       return {
         ...state,
-        timestamp: parseInt(action.payload),
+        timestamp: parseInt(action.payload, 10),
         error: false,
       };
 
     case 'POLLING_SUCCESS':
       return {
         ...state,
-        timestamp: parseInt(state.timestamp) + 3,
+        timestamp: parseInt(state.timestamp, 10) + 3,
         previousPolling: state.polling,
         polling: action.payload,
         error: false,

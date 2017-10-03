@@ -4,6 +4,7 @@ import { interval } from 'rxjs/observable/interval';
 import types from '../actions/actionTypes';
 
 import {
+  getEntries as getEntriesAction,
   getEntriesSuccess,
   getEntriesFailed,
   pollingSuccess,
@@ -22,8 +23,7 @@ import {
   createEntry,
   updateEntry,
   deleteEntry,
-  examinePolling,
-  getEntriesAfterCRUD,
+  entryHasBeenAddedOrChanged,
 } from '../services/api';
 
 const getEntriesEpic = (action$, store) =>
@@ -77,19 +77,20 @@ const deleteEntryEpic = (action$, store) =>
 
 const examinePollingEpic = (action$, store) =>
   action$.ofType(types.POLLING_SUCCESS)
-    .switchMap(() => examinePolling(store));
+    .filter(() => entryHasBeenAddedOrChanged(store.getState()))
+    .map(() => getEntriesAction(store.getState().api.polling));
 
 const getEntriesAfterCreateEpic = (action$, store) =>
   action$.ofType(types.CREATE_ENTRY_SUCCESS)
-    .switchMap(() => getEntriesAfterCRUD(store));
+    .map(() => getEntriesAction(store.getState().api.lastEntry));
 
 const getEntriesAfterUpdateEpic = (action$, store) =>
   action$.ofType(types.UPDATE_ENTRY_SUCCESS)
-    .switchMap(() => getEntriesAfterCRUD(store));
+    .map(() => getEntriesAction(store.getState().api.lastEntry));
 
 const getEntriesAfterDeleteEpic = (action$, store) =>
   action$.ofType(types.DELETE_ENTRY_SUCCESS)
-    .switchMap(() => getEntriesAfterCRUD(store));
+    .map(() => getEntriesAction(store.getState().api.lastEntry));
 
 /* eslint-disable */
 export const epics = combineEpics(
