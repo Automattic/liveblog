@@ -86,7 +86,7 @@ const examinePollingEpic = (action$, store) =>
       store.getState().api.previousPolling,
       store.getState().api.polling,
     ))
-    .map(() => getEntriesAction(store.getState().api.polling));
+    .map(() => getEntriesAction(store.getState().api.polling[0]));
 
 const getEntriesAfterCreateEpic = (action$, store) =>
   action$.ofType(types.CREATE_ENTRY_SUCCESS)
