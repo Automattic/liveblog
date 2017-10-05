@@ -62,7 +62,7 @@ class Entry_Cache {
 	public function get_polling() {
 		$polling = get_transient( $this->polling_key );
 
-		if ( $polling === false ) {
+		if ( $polling === false || count($polling) === 0) {
 			$polling = $this->rebuild()[1];
 		}
 
