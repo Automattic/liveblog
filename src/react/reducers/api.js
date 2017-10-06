@@ -1,4 +1,4 @@
-const initialState = {
+export const initialState = {
   entries: [],
   error: false,
   polling: [],
@@ -8,7 +8,7 @@ const initialState = {
   timestamp: false,
 };
 
-export default function api(state = initialState, action) {
+export const api = (state = initialState, action) => {
   switch (action.type) {
     case 'GET_ENTRIES':
       return {
@@ -105,4 +105,4 @@ export default function api(state = initialState, action) {
     default:
       return state;
   }
-}
+};

@@ -1,8 +1,8 @@
-const initialState = {
+export const initialState = {
   entries: {},
 };
 
-export default function user(state = initialState, action) {
+export const user = (state = initialState, action) => {
   switch (action.type) {
     case 'ENTRY_EDIT_OPEN':
       return {
@@ -19,4 +19,4 @@ export default function user(state = initialState, action) {
     default:
       return state;
   }
-}
+};

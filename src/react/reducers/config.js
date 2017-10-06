@@ -1,6 +1,6 @@
-const initialState = {};
+export const initialState = {};
 
-export default function config(state = initialState, action) {
+export const config = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_CONFIG':
       return {
@@ -11,4 +11,4 @@ export default function config(state = initialState, action) {
     default:
       return state;
   }
-}
+};
