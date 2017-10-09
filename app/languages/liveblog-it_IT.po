@@ -1,0 +1,257 @@
+# Copyright (C) 2013 Liveblog
+# This file is distributed under the same license as the Liveblog package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Liveblog 1.3-alpha\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/liveblog\n"
+"POT-Creation-Date: 2013-01-22 23:20:41+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-02-15 02:40+0100\n"
+"Last-Translator: Filippo Maria Caggiani"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: it\n"
+
+#: classes/class-wpcom-liveblog-entry.php:146
+#: classes/class-wpcom-liveblog-entry.php:180
+msgid "Missing entry ID"
+msgstr "Manca l'ID del messaggio"
+
+#: classes/class-wpcom-liveblog-entry.php:212
+msgid "Error posting entry"
+msgstr "Errore nell'immissione del messaggio"
+
+#: classes/class-wpcom-liveblog-entry.php:216
+#: classes/class-wpcom-liveblog-entry.php:234
+msgid "Error retrieving comment"
+msgstr "Errore nel recupero del commento"
+
+#: classes/class-wpcom-liveblog-entry.php:225
+msgid "Missing entry argument: %s"
+msgstr "Manca l'argomento del messaggio: %s "
+
+#: classes/class-wpcom-liveblog-entry.php:238
+msgid "Error retrieving user"
+msgstr "Errore nel recupero dell'utente"
+
+#: liveblog.php:250
+msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
+msgstr "Mancano la data e l'ora. URL corretto: <permalink>/liveblog/"
+
+#: liveblog.php:389
+msgid "Invalid entry crud_action: %s"
+msgstr "Il crud_action del messaggio è invalido: %s"
+
+#: liveblog.php:424
+msgid "Unknown liveblog action"
+msgstr "Azione liveblog sconosciuta"
+
+#: liveblog.php:448 liveblog.php:520
+msgid "Error {error-code}: {error-message}"
+msgstr "Errore {error-code}: {error-message}"
+
+#: liveblog.php:449 liveblog.php:521
+msgid "Error: {error-message}"
+msgstr "Errore: {error-message}"
+
+#: liveblog.php:469
+msgid "%s ago"
+msgstr "%s fa"
+
+#: liveblog.php:470
+msgid "a few seconds"
+msgstr "alcuni secondi"
+
+#: liveblog.php:471
+msgid "a minute"
+msgstr "un minuto"
+
+#: liveblog.php:472
+msgid "%d minutes"
+msgstr "%d minuti"
+
+#: liveblog.php:473
+msgid "an hour"
+msgstr "un'ora"
+
+#: liveblog.php:474
+msgid "%d hours"
+msgstr "%d ore"
+
+#: liveblog.php:475
+msgid "a day"
+msgstr "un giorno"
+
+#: liveblog.php:476
+msgid "%d days"
+msgstr "%d giorni"
+
+#: liveblog.php:477
+msgid "a month"
+msgstr "un mese"
+
+#: liveblog.php:478
+msgid "%d months"
+msgstr "%d mesi"
+
+#: liveblog.php:479
+msgid "a year"
+msgstr "un anno"
+
+#: liveblog.php:480
+msgid "%d years"
+msgstr "%d anni"
+
+#: liveblog.php:519
+msgid "Do you really want do delete this entry? There is no way back."
+msgstr ""
+"Vuoi veramente cancellare questo messaggio? Non si può tornare indietro."
+
+#: liveblog.php:522
+msgid "Liveblog: {number} new update"
+msgstr "Liveblog: {number} nuovo aggiornamento"
+
+#: liveblog.php:523
+msgid "Liveblog: {number} new updates"
+msgstr "Liveblog: {number} nuovi aggiornamenti"
+
+#: liveblog.php:527
+msgid "Loading preview…"
+msgstr "Caricamento dell'anteprima..."
+
+#: liveblog.php:528
+msgid "New Entry"
+msgstr "Nuovo messaggio"
+
+#: liveblog.php:529
+msgid "Publish Update"
+msgstr "Pubblica l'aggiornamento"
+
+#: liveblog.php:530
+msgid "Edit Entry"
+msgstr "Modifica il messaggio"
+
+#: liveblog.php:531
+msgid "Update"
+msgstr "Aggiornamento"
+
+#: liveblog.php:551
+msgid "Allowed Files"
+msgstr "File consentiti"
+
+#. Plugin Name of the plugin/theme
+#: liveblog.php:665
+msgid "Liveblog"
+msgstr "Liveblog"
+
+#: liveblog.php:681
+msgid "Enable"
+msgstr "Attivare"
+
+#: liveblog.php:682
+msgid ""
+"Enables liveblog on this post. Posting tools are enabled for editors, "
+"visitors get the latest updates."
+msgstr ""
+"Attivare liveblog in questo articolo. Gli strumenti di pubblicazione sono "
+"attivati per chi scrive, i visitatori ricevono gli ultimi aggiornamenti."
+
+#: liveblog.php:682
+msgid ""
+"There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog &rarr;</a>"
+msgstr ""
+"In questo articolo c'è un liveblog <strong>attivo</strong>. <a href=\"%s"
+"\">Visita il liveblog &rarr;</a>"
+
+#: liveblog.php:683
+msgid "Archive"
+msgstr "Archivio"
+
+#: liveblog.php:684
+msgid ""
+"Archives the liveblog on this post. Visitors still see the liveblog entries, "
+"but posting tools are hidden."
+msgstr ""
+"Archivia il liveblog su questo articolo. I visitatori riescono ancora a "
+"vedere i messaggi del liveblog, ma gli strumenti di pubblicazione sono "
+"nascosti."
+
+#: liveblog.php:684
+msgid ""
+"There is an <strong>archived</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog archive &rarr;</a>"
+msgstr ""
+"In questo articolo c'è un liveblog <strong>attivo</strong>. <a href=\"%s"
+"\">Visita l'archivio liveblog &rarr;</a>"
+
+#: liveblog.php:690
+msgid "This is a normal WordPress post, without a liveblog."
+msgstr "Questo è un normale articolo di WordPress, senza un liveblog."
+
+#: liveblog.php:750
+msgid "Cheatin', uh?"
+msgstr "Stiamo imbrogliando, eh?"
+
+#: liveblog.php:761
+msgid "Sorry, we could not authenticate you."
+msgstr "Spiacenti, non possiamo autenticarti."
+
+#: templates/liveblog-form.php:9
+msgid "Preview"
+msgstr "Anteprima"
+
+#: templates/liveblog-form.php:13
+msgid "Remember: keep it short! To insert an image, drag and drop it here."
+msgstr ""
+"Ricorda: mantieniti breve! Per inserire un'immagine, trascina qui la "
+"selezione."
+
+#: templates/liveblog-loop.php:3
+msgid ""
+"<strong>This liveblog is archived.</strong> If you need to publish new "
+"updates or edit or delete the old ones, you need to <a href=\"%s\">enable it "
+"first</a>."
+msgstr ""
+"<strong>Questo liveblog è archiviato.</strong> Se hai la necessità di "
+"pubblicare nuovi aggiornamenti o di modificare o cancellare quelli vecchi, "
+"devi <a href=\"%s\">prima attivarlo</a>."
+
+#: templates/liveblog-single-entry.php:12
+msgid "Edit"
+msgstr "Modifica"
+
+#: templates/liveblog-single-entry.php:12
+msgid "Delete"
+msgstr "Cancella"
+
+#: templates/old-wp-notice.php:3
+msgid ""
+"Your current WordPress is version %1$s, which is too old to run the liveblog "
+"plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s"
+"\">update WordPress</a>, or <a href=\"%4$s\">deactivate the liveblog plugin</"
+"a>."
+msgstr ""
+"Il tuo WordPress attuale è alla versione %1$s, che è troppo vecchia per far "
+"funzionare il plugin liveblog. La versione minima richiesta è la %2$s. <a "
+"href=\"%3$s\">Aggiorna WordPress</a>, o <a href=\"%4$s\">disattiva il plugin "
+"liveblog</a>."
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/extend/plugins/liveblog/"
+msgstr "http://wordpress.org/extend/plugins/liveblog/"
+
+#. Description of the plugin/theme
+msgid "Blogging: at the speed of live."
+msgstr "Blogging: alla velocità della luce."
+
+#. Author of the plugin/theme
+msgid "WordPress.com VIP, Automattic"
+msgstr "WordPress.com VIP, Automattic"
+
+#. Author URI of the plugin/theme
+msgid "http://vip.wordpress.com/"
+msgstr "http://vip.wordpress.com/"
