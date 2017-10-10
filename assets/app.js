@@ -55540,23 +55540,28 @@ var deleteEntryEpic = function deleteEntryEpic(action$, store) {
 //     ))
 //     .map(() => getEntriesAction(store.getState().api.polling[0]));
 
-// const getEntriesAfterCreateEpic = (action$, store) =>
-//   action$.ofType(types.CREATE_ENTRY_SUCCESS)
-//     .map(() => getEntriesAction(store.getState().api.lastEntry));
+var getEntriesAfterCreateEpic = function getEntriesAfterCreateEpic(action$, store) {
+  return action$.ofType(_actionTypes2.default.CREATE_ENTRY_SUCCESS).map(function (_ref5) {
+    var payload = _ref5.payload;
+    return (0, _apiActions.pollingSuccess)(payload);
+  });
+};
 
-// const getEntriesAfterUpdateEpic = (action$, store) =>
-//   action$.ofType(types.UPDATE_ENTRY_SUCCESS)
-//     .map(() => getEntriesAction(store.getState().api.lastEntry));
+var getEntriesAfterUpdateEpic = function getEntriesAfterUpdateEpic(action$, store) {
+  return action$.ofType(_actionTypes2.default.UPDATE_ENTRY_SUCCESS).map(function (_ref6) {
+    var payload = _ref6.payload;
+    return (0, _apiActions.pollingSuccess)(payload);
+  });
+};
 
-// const getEntriesAfterDeleteEpic = (action$, store) =>
-//   action$.ofType(types.DELETE_ENTRY_SUCCESS)
-//     .map(() => getEntriesAction(store.getState().api.lastEntry));
+var getEntriesAfterDeleteEpic = function getEntriesAfterDeleteEpic(action$, store) {
+  return action$.ofType(_actionTypes2.default.DELETE_ENTRY_SUCCESS).map(function (_ref7) {
+    var payload = _ref7.payload;
+    return (0, _apiActions.pollingSuccess)(payload);
+  });
+};
 
-exports.default = (0, _reduxObservable.combineEpics)(getEntriesEpic, startPollingEpic, createEntryEpic, updateEntryEpic, deleteEntryEpic
-// getEntriesAfterCreateEpic,
-// getEntriesAfterUpdateEpic,
-// getEntriesAfterDeleteEpic,
-);
+exports.default = (0, _reduxObservable.combineEpics)(getEntriesEpic, startPollingEpic, createEntryEpic, updateEntryEpic, deleteEntryEpic, getEntriesAfterCreateEpic, getEntriesAfterUpdateEpic, getEntriesAfterDeleteEpic);
 
 /***/ }),
 /* 494 */
