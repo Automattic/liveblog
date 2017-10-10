@@ -46,7 +46,7 @@ const startPollingEpic = (action$, store) =>
       interval(3000)
         .takeUntil(action$.ofType(types.CANCEL_POLLING))
         .exhaustMap(() =>
-          startPolling(store.getState().api.timestamp, store.getState().config)
+          startPolling(store.getState().api.newestEntryTimestamp, store.getState().api.timestamp, store.getState().config)
             .timeout(10000)
             .map(res => pollingSuccess(res.response))
             .catch(error => of(pollingFailed(error))),
@@ -80,25 +80,25 @@ const deleteEntryEpic = (action$, store) =>
         .catch(error => of(deleteEntryFailed(error))),
     );
 
-const examinePollingEpic = (action$, store) =>
-  action$.ofType(types.POLLING_SUCCESS)
-    .filter(() => entryListChanged(
-      store.getState().api.previousPolling,
-      store.getState().api.polling,
-    ))
-    .map(() => getEntriesAction(store.getState().api.polling[0]));
+// const examinePollingEpic = (action$, store) =>
+//   action$.ofType(types.POLLING_SUCCESS)
+//     .filter(() => entryListChanged(
+//       store.getState().api.previousPolling,
+//       store.getState().api.polling,
+//     ))
+//     .map(() => getEntriesAction(store.getState().api.polling[0]));
 
-const getEntriesAfterCreateEpic = (action$, store) =>
-  action$.ofType(types.CREATE_ENTRY_SUCCESS)
-    .map(() => getEntriesAction(store.getState().api.lastEntry));
+// const getEntriesAfterCreateEpic = (action$, store) =>
+//   action$.ofType(types.CREATE_ENTRY_SUCCESS)
+//     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
-const getEntriesAfterUpdateEpic = (action$, store) =>
-  action$.ofType(types.UPDATE_ENTRY_SUCCESS)
-    .map(() => getEntriesAction(store.getState().api.lastEntry));
+// const getEntriesAfterUpdateEpic = (action$, store) =>
+//   action$.ofType(types.UPDATE_ENTRY_SUCCESS)
+//     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
-const getEntriesAfterDeleteEpic = (action$, store) =>
-  action$.ofType(types.DELETE_ENTRY_SUCCESS)
-    .map(() => getEntriesAction(store.getState().api.lastEntry));
+// const getEntriesAfterDeleteEpic = (action$, store) =>
+//   action$.ofType(types.DELETE_ENTRY_SUCCESS)
+//     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
 export default combineEpics(
   getEntriesEpic,
@@ -106,8 +106,7 @@ export default combineEpics(
   createEntryEpic,
   updateEntryEpic,
   deleteEntryEpic,
-  examinePollingEpic,
-  getEntriesAfterCreateEpic,
-  getEntriesAfterUpdateEpic,
-  getEntriesAfterDeleteEpic,
+  // getEntriesAfterCreateEpic,
+  // getEntriesAfterUpdateEpic,
+  // getEntriesAfterDeleteEpic,
 );

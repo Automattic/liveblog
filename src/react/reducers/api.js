@@ -1,9 +1,18 @@
+import {
+  entriesApplyUpdate,
+  getLastOfObject,
+  getFirstOfObject,
+  getOldestTimestamp,
+  getNewestTimestamp,
+} from '../utils/utils';
+
 export const initialState = {
-  entries: [],
+  entries: {},
   error: false,
   polling: [],
   previousPolling: [],
-  lastEntry: false,
+  newestEntryTimestamp: false,
+  oldestEntryTimestamp: false,
   nonce: false,
   timestamp: false,
 };
@@ -20,7 +29,9 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: false,
-        entries: action.payload,
+        entries: entriesApplyUpdate(state.entries, action.payload.entries, true),
+        oldestEntryTimestamp: getOldestTimestamp(state.oldestEntryTimestamp, action.payload.entries),
+        newestEntryTimestamp: getNewestTimestamp(state.newestEntryTimestamp, action.payload.entries),
       };
 
     case 'GET_ENTRIES_FAILED':
@@ -40,8 +51,8 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         timestamp: parseInt(state.timestamp, 10) + 3,
-        previousPolling: state.polling,
-        polling: action.payload,
+        entries: entriesApplyUpdate(state.entries, action.payload.entries, false),
+        newestEntryTimestamp: getNewestTimestamp(state.newestEntryTimestamp, action.payload.entries),
         error: false,
       };
 

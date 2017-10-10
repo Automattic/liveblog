@@ -12,6 +12,7 @@ import * as configActions from '../actions/configActions';
 // Component to connect to store
 import EditorContainer from '../containers/EditorContainer';
 import Entries from '../components/Entries';
+import LoadMoreContainer from '../containers/LoadMoreContainer';
 
 import '../../styles/app.scss';
 
@@ -19,9 +20,9 @@ class AppContainer extends Component {
   componentDidMount() {
     const { loadConfig, getEntries, startPolling } = this.props;
 
-    loadConfig(window.wpcomLiveblog);
-    getEntries(window.wpcomLiveblog.last_entry);
-    startPolling(window.wpcomLiveblog.timestamp);
+    loadConfig(window.liveblog_settings);
+    getEntries(0);
+    startPolling(window.liveblog_settings.timestamp);
   }
 
   renderEntries() {
@@ -39,6 +40,7 @@ class AppContainer extends Component {
       <div>
         <EditorContainer />
         {this.renderEntries()}
+        <LoadMoreContainer />
       </div>
     );
   }

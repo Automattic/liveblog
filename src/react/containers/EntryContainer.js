@@ -23,7 +23,7 @@ class EntryContainer extends Component {
   }
 
   entryActions() {
-    if (this.props.config.can_edit === 'false') {
+    if (this.props.config.is_liveblog_editable !== '1') {
       return false;
     }
 

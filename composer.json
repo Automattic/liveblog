@@ -8,16 +8,5 @@
     "preferred-install": "dist"
   },
   "minimum-stability": "dev",
-  "autoload": {
-    "psr-4": {
-      "WPCOM\\Liveblog\\": "app/"
-    },
-    "files": [
-      "app/routes.php",
-      "app/frontend.php",
-      "app/dashboard.php",
-      "app/cron.php",
-      "app/cli.php"
-    ]
-  }
+  "autoload": {}
 }

@@ -97,7 +97,8 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'   => $this->replaces ? $this->replaces : $this->get_id(),
 			'type' => $this->get_type(),
-			'html' => $this->render(),
+			'content' => $this->get_content(),
+			'timestamp' => $this->get_timestamp(),
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;

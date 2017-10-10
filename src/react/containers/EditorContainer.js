@@ -58,7 +58,7 @@ class EditorContainer extends Component {
   render() {
     const { config } = this.props;
 
-    if (config.can_edit === 'false') {
+    if (config.is_liveblog_editable !== '1') {
       return false;
     }
 

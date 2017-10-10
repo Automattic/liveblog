@@ -1,15 +1,5 @@
 <?php
 
-/**
- * Plugin Name: Liveblog
- * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
- * Description: Blogging: at the speed of live.
- * Version:     1.6
- * Author:      WordPress.com VIP, Automattic
- * Author URI: http://vip.wordpress.com/
- * Text Domain: liveblog
- */
-
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 /**
@@ -821,56 +811,56 @@ final class WPCOM_Liveblog {
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
 
-		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog.css', __FILE__ ) );
-		wp_register_script( 'jquery-throttle',  plugins_url( 'js/jquery.ba-throttle-debounce.min.js', __FILE__ ) );
-		wp_register_script( 'moment',  plugins_url( 'js/moment.min.js', __FILE__ ), array(), '1.7.2' );
-		wp_localize_script( 'moment', 'momentLang', array(
-			'locale' => get_locale(),
-			'relativeTime' => array(
-				'past' => __( '%s ago', 'liveblog' ),
-				's' => __( 'a few seconds', 'liveblog' ),
-				'm' => __( 'a minute', 'liveblog' ),
-				'mm' => __( '%d minutes', 'liveblog' ),
-				'h' => __( 'an hour', 'liveblog' ),
-				'hh' => __( '%d hours', 'liveblog' ),
-				'd' => __( 'a day', 'liveblog' ),
-				'dd' => __( '%d days', 'liveblog' ),
-				'M' => __( 'a month', 'liveblog' ),
-				'MM' => __( '%d months', 'liveblog' ),
-				'y' => __( 'a year', 'liveblog' ),
-				'yy' => __( '%d years', 'liveblog' ),
-			),
-		));
+		wp_enqueue_style( self::key,  plugins_url( 'assets/app.css',  dirname(__FILE__) ) );
+		//wp_register_script( 'jquery-throttle',  plugins_url( 'js/jquery.ba-throttle-debounce.min.js', __FILE__ ) );
+		//wp_register_script( 'moment',  plugins_url( 'js/moment.min.js', __FILE__ ), array(), '1.7.2' );
+		//wp_localize_script( 'moment', 'momentLang', array(
+		//	'locale' => get_locale(),
+		//	'relativeTime' => array(
+		//		'past' => __( '%s ago', 'liveblog' ),
+		//		's' => __( 'a few seconds', 'liveblog' ),
+		//		'm' => __( 'a minute', 'liveblog' ),
+		//		'mm' => __( '%d minutes', 'liveblog' ),
+		//		'h' => __( 'an hour', 'liveblog' ),
+		//		'hh' => __( '%d hours', 'liveblog' ),
+		//		'd' => __( 'a day', 'liveblog' ),
+		//		'dd' => __( '%d days', 'liveblog' ),
+		//		'M' => __( 'a month', 'liveblog' ),
+		//		'MM' => __( '%d months', 'liveblog' ),
+		//		'y' => __( 'a year', 'liveblog' ),
+		//		'yy' => __( '%d years', 'liveblog' ),
+		//	),
+		//));
 
-		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
+		wp_enqueue_script( self::key, plugins_url( '/assets/app.js', dirname(__FILE__) ), array(), self::version, true );
 
 		if ( self::is_liveblog_editable() )  {
 			if ( apply_filters( 'liveblog_rich_text_editing_allowed', true ) ) {
-				wp_enqueue_script( 'editor' );
+				//wp_enqueue_script( 'editor' );
 			}
-			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
+			//wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
 
-			wp_register_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
-			wp_localize_script( 'liveblog-plupload', 'liveblog_plupload', apply_filters( 'liveblog_plupload_localize', array(
-				'browser' => '#liveblog-messages',
-				'dropzone' => '#liveblog-container',
-				'container' => false,
-			) ) );
-			wp_enqueue_script( 'liveblog-plupload' );
+			//wp_register_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
+			//wp_localize_script( 'liveblog-plupload', 'liveblog_plupload', apply_filters( 'liveblog_plupload_localize', array(
+			//	'browser' => '#liveblog-messages',
+			//	'dropzone' => '#liveblog-container',
+			///]	'container' => false,
+			//) ) );
+			//wp_enqueue_script( 'liveblog-plupload' );
 			self::add_default_plupload_settings();
 		}
 
 		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
-			wp_enqueue_script( 'jquery.spin' );
+			//wp_enqueue_script( 'jquery.spin' );
 		} else {
-			wp_enqueue_script( 'spin',        plugins_url( 'js/spin.js',        __FILE__ ), false,                     '1.3' );
-			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' ), '1.3' );
+			//wp_enqueue_script( 'spin',        plugins_url( 'js/spin.js',        __FILE__ ), false,                     '1.3' );
+			//wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' ), '1.3' );
 		}
 
 		if ( wp_script_is( 'jetpack-twitter-timeline', 'registered' ) ) {
-			wp_enqueue_script( 'jetpack-twitter-timeline' );
+			//wp_enqueue_script( 'jetpack-twitter-timeline' );
 		} else {
-			wp_enqueue_script( 'liveblog-twitter-timeline', plugins_url( 'js/twitter-timeline.js', __FILE__ ), false, '1.5, true' );
+			//wp_enqueue_script( 'liveblog-twitter-timeline', plugins_url( 'js/twitter-timeline.js', __FILE__ ), false, '1.5, true' );
 		}
 
 		wp_localize_script( self::key, 'liveblog_settings',
@@ -885,6 +875,7 @@ final class WPCOM_Liveblog {
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
+				'timestamp'				 => time(),
 
 				'refresh_interval'       => self::get_refresh_interval(),
 				'focus_refresh_interval' => self::focus_refresh_interval,
@@ -1004,11 +995,7 @@ final class WPCOM_Liveblog {
 			return $content;
 		}
 
-		$liveblog_output  = '<div id="liveblog-container" class="'. self::$post_id .'">';
-		$liveblog_output .= self::get_editor_output();
-		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
-		$liveblog_output .= self::get_all_entry_output();
-		$liveblog_output .= '</div>';
+		$liveblog_output  = '<div id="wpcom-liveblog-container" class="' . self::$post_id  .'"></div>';
 
 		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
 

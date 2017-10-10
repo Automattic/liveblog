@@ -4,18 +4,18 @@
  */
 import { ajax } from 'rxjs/observable/dom/ajax';
 
-export function getEntries(lastEntry, config) {
+export function getEntries(oldestEntryTimestamp, config) {
   const settings = {
-    url: `${config.api}/post/${config.post_id}/entries/${lastEntry.id}-${lastEntry.updated}`,
+    url: `${config.endpoint_url}lazyload/${oldestEntryTimestamp}/0/`,
     method: 'GET',
   };
 
   return ajax(settings);
 }
 
-export function startPolling(timestamp, config) {
+export function startPolling(newestEntryTimestamp, timestamp, config) {
   const settings = {
-    url: `${config.api}/post/${config.post_id}/polling/${timestamp}`,
+    url: `${config.endpoint_url}entries/${newestEntryTimestamp+1}/${timestamp}/`,
     method: 'GET',
   };
 
@@ -24,9 +24,13 @@ export function startPolling(timestamp, config) {
 
 export function createEntry(entry, config, nonce = false) {
   const settings = {
-    url: `${config.api}/post/${config.post_id}/entry`,
+    url: `${config.endpoint_url}crud/`,
     method: 'POST',
-    body: entry,
+    body: {
+      crud_action: 'insert',
+      post_id: config.post_id,
+      content: entry.content
+    },
     headers: {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
@@ -38,9 +42,14 @@ export function createEntry(entry, config, nonce = false) {
 
 export function updateEntry(entry, config, nonce = false) {
   const settings = {
-    url: `${config.api}/post/${config.post_id}/entry/${entry.id}`,
-    method: 'PATCH',
-    body: entry,
+    url: `${config.endpoint_url}crud/`,
+    method: 'POST',
+    body: {
+      crud_action: 'update',
+      post_id: config.post_id,
+      entry_id: entry.id,
+      content: entry.content
+    },
     headers: {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
@@ -52,8 +61,13 @@ export function updateEntry(entry, config, nonce = false) {
 
 export function deleteEntry(id, config, nonce = false) {
   const settings = {
-    url: `${config.api}/post/${config.post_id}/entry/${id}`,
-    method: 'DELETE',
+    url: `${config.endpoint_url}crud/`,
+    method: 'POST',
+    body: {
+      crud_action: 'delete',
+      post_id: config.post_id,
+      entry_id: id
+    },
     headers: {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',

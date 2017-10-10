@@ -16982,7 +16982,7 @@ var EditorContainer = function (_Component) {
       var config = this.props.config;
 
 
-      if (config.can_edit === 'false') {
+      if (config.is_liveblog_editable !== '1') {
         return false;
       }
 
@@ -41872,15 +41872,19 @@ var config = exports.config = function config() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.api = exports.initialState = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _utils = __webpack_require__(495);
+
 var initialState = exports.initialState = {
-  entries: [],
+  entries: {},
   error: false,
   polling: [],
   previousPolling: [],
-  lastEntry: false,
+  newestEntryTimestamp: false,
+  oldestEntryTimestamp: false,
   nonce: false,
   timestamp: false
 };
@@ -41898,7 +41902,9 @@ var api = exports.api = function api() {
     case 'GET_ENTRIES_SUCCESS':
       return _extends({}, state, {
         error: false,
-        entries: action.payload
+        entries: (0, _utils.entriesApplyUpdate)(state.entries, action.payload.entries, true),
+        oldestEntryTimestamp: (0, _utils.getOldestTimestamp)(state.oldestEntryTimestamp, action.payload.entries),
+        newestEntryTimestamp: (0, _utils.getNewestTimestamp)(state.newestEntryTimestamp, action.payload.entries)
       });
 
     case 'GET_ENTRIES_FAILED':
@@ -41915,8 +41921,8 @@ var api = exports.api = function api() {
     case 'POLLING_SUCCESS':
       return _extends({}, state, {
         timestamp: parseInt(state.timestamp, 10) + 3,
-        previousPolling: state.polling,
-        polling: action.payload,
+        entries: (0, _utils.entriesApplyUpdate)(state.entries, action.payload.entries, false),
+        newestEntryTimestamp: (0, _utils.getNewestTimestamp)(state.newestEntryTimestamp, action.payload.entries),
         error: false
       });
 
@@ -55484,7 +55490,7 @@ var getEntriesEpic = function getEntriesEpic(action$, store) {
 var startPollingEpic = function startPollingEpic(action$, store) {
   return action$.ofType(_actionTypes2.default.START_POLLING).switchMap(function () {
     return (0, _interval.interval)(3000).takeUntil(action$.ofType(_actionTypes2.default.CANCEL_POLLING)).exhaustMap(function () {
-      return (0, _api.startPolling)(store.getState().api.timestamp, store.getState().config).timeout(10000).map(function (res) {
+      return (0, _api.startPolling)(store.getState().api.newestEntryTimestamp, store.getState().api.timestamp, store.getState().config).timeout(10000).map(function (res) {
         return (0, _apiActions.pollingSuccess)(res.response);
       }).catch(function (error) {
         return (0, _of.of)((0, _apiActions.pollingFailed)(error));
@@ -55526,33 +55532,31 @@ var deleteEntryEpic = function deleteEntryEpic(action$, store) {
   });
 };
 
-var examinePollingEpic = function examinePollingEpic(action$, store) {
-  return action$.ofType(_actionTypes2.default.POLLING_SUCCESS).filter(function () {
-    return (0, _utils.entryListChanged)(store.getState().api.previousPolling, store.getState().api.polling);
-  }).map(function () {
-    return (0, _apiActions.getEntries)(store.getState().api.polling[0]);
-  });
-};
+// const examinePollingEpic = (action$, store) =>
+//   action$.ofType(types.POLLING_SUCCESS)
+//     .filter(() => entryListChanged(
+//       store.getState().api.previousPolling,
+//       store.getState().api.polling,
+//     ))
+//     .map(() => getEntriesAction(store.getState().api.polling[0]));
 
-var getEntriesAfterCreateEpic = function getEntriesAfterCreateEpic(action$, store) {
-  return action$.ofType(_actionTypes2.default.CREATE_ENTRY_SUCCESS).map(function () {
-    return (0, _apiActions.getEntries)(store.getState().api.lastEntry);
-  });
-};
+// const getEntriesAfterCreateEpic = (action$, store) =>
+//   action$.ofType(types.CREATE_ENTRY_SUCCESS)
+//     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
-var getEntriesAfterUpdateEpic = function getEntriesAfterUpdateEpic(action$, store) {
-  return action$.ofType(_actionTypes2.default.UPDATE_ENTRY_SUCCESS).map(function () {
-    return (0, _apiActions.getEntries)(store.getState().api.lastEntry);
-  });
-};
+// const getEntriesAfterUpdateEpic = (action$, store) =>
+//   action$.ofType(types.UPDATE_ENTRY_SUCCESS)
+//     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
-var getEntriesAfterDeleteEpic = function getEntriesAfterDeleteEpic(action$, store) {
-  return action$.ofType(_actionTypes2.default.DELETE_ENTRY_SUCCESS).map(function () {
-    return (0, _apiActions.getEntries)(store.getState().api.lastEntry);
-  });
-};
+// const getEntriesAfterDeleteEpic = (action$, store) =>
+//   action$.ofType(types.DELETE_ENTRY_SUCCESS)
+//     .map(() => getEntriesAction(store.getState().api.lastEntry));
 
-exports.default = (0, _reduxObservable.combineEpics)(getEntriesEpic, startPollingEpic, createEntryEpic, updateEntryEpic, deleteEntryEpic, examinePollingEpic, getEntriesAfterCreateEpic, getEntriesAfterUpdateEpic, getEntriesAfterDeleteEpic);
+exports.default = (0, _reduxObservable.combineEpics)(getEntriesEpic, startPollingEpic, createEntryEpic, updateEntryEpic, deleteEntryEpic
+// getEntriesAfterCreateEpic,
+// getEntriesAfterUpdateEpic,
+// getEntriesAfterDeleteEpic,
+);
 
 /***/ }),
 /* 494 */
@@ -55572,9 +55576,9 @@ exports.deleteEntry = deleteEntry;
 
 var _ajax = __webpack_require__(123);
 
-function getEntries(lastEntry, config) {
+function getEntries(oldestEntryTimestamp, config) {
   var settings = {
-    url: config.api + '/post/' + config.post_id + '/entries/' + lastEntry.id + '-' + lastEntry.updated,
+    url: config.endpoint_url + 'lazyload/' + oldestEntryTimestamp + '/0/',
     method: 'GET'
   };
 
@@ -55583,9 +55587,9 @@ function getEntries(lastEntry, config) {
    * RxJS ajax pretty much interchangable with axios.
    * Using RxJS ajax as it's already an observable to use with redux-observable.
    */
-function startPolling(timestamp, config) {
+function startPolling(newestEntryTimestamp, timestamp, config) {
   var settings = {
-    url: config.api + '/post/' + config.post_id + '/polling/' + timestamp,
+    url: config.endpoint_url + 'entries/' + (newestEntryTimestamp + 1) + '/' + timestamp + '/',
     method: 'GET'
   };
 
@@ -55596,9 +55600,13 @@ function createEntry(entry, config) {
   var nonce = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   var settings = {
-    url: config.api + '/post/' + config.post_id + '/entry',
+    url: config.endpoint_url + 'crud/',
     method: 'POST',
-    body: entry,
+    body: {
+      crud_action: 'insert',
+      post_id: config.post_id,
+      content: entry.content
+    },
     headers: {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
@@ -55612,9 +55620,14 @@ function updateEntry(entry, config) {
   var nonce = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   var settings = {
-    url: config.api + '/post/' + config.post_id + '/entry/' + entry.id,
-    method: 'PATCH',
-    body: entry,
+    url: config.endpoint_url + 'crud/',
+    method: 'POST',
+    body: {
+      crud_action: 'update',
+      post_id: config.post_id,
+      entry_id: entry.id,
+      content: entry.content
+    },
     headers: {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
@@ -55628,8 +55641,13 @@ function deleteEntry(id, config) {
   var nonce = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   var settings = {
-    url: config.api + '/post/' + config.post_id + '/entry/' + id,
-    method: 'DELETE',
+    url: config.endpoint_url + 'crud/',
+    method: 'POST',
+    body: {
+      crud_action: 'delete',
+      post_id: config.post_id,
+      entry_id: id
+    },
     headers: {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
@@ -55647,12 +55665,92 @@ function deleteEntry(id, config) {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /* eslint-disable import/prefer-default-export */
 
 var entryListChanged = exports.entryListChanged = function entryListChanged(previous, current) {
-  return previous.length !== current.length || previous[0].updated < current[0].updated;
+	return previous.length !== current.length || previous[0].updated < current[0].updated;
+};
+
+var entryArrayToObject = exports.entryArrayToObject = function entryArrayToObject(array) {
+	var object = {};
+	array.map(function (item) {
+		object[item.id] = _extends({}, api[item.id], item);
+	});
+	return object;
+};
+
+var entriesApplyUpdate = exports.entriesApplyUpdate = function entriesApplyUpdate(entries, updates, loadMore) {
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	try {
+		for (var _iterator = updates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var update = _step.value;
+
+			var id = 'id_' + update.id;
+			if (update.type == 'new') {
+				if (loadMore) {
+					entries[id] = update;
+				} else {
+					entries = _extends(_defineProperty({}, id, update), entries);
+				}
+			} else if (update.type == 'update' && entries.hasOwnProperty(id)) {
+				entries[id] = update;
+			} else if (update.type == 'delete') {
+				delete entries[id];
+			}
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+
+	return entries;
+};
+
+var getLastOfObject = exports.getLastOfObject = function getLastOfObject(object) {
+	return object[Object.keys(object)[Object.keys(object).length - 1]];
+};
+
+var getFirstOfObject = exports.getFirstOfObject = function getFirstOfObject(object) {
+	return object[Object.keys(object)[0]];
+};
+
+var getOldestTimestamp = exports.getOldestTimestamp = function getOldestTimestamp(current, updates) {
+	if (updates.length == 0) {
+		return current;
+	}
+	var updateTimestamp = getLastOfObject(updates).timestamp;
+	if (current === false) {
+		return updateTimestamp;
+	}
+	return Math.min(current, updateTimestamp);
+};
+
+var getNewestTimestamp = exports.getNewestTimestamp = function getNewestTimestamp(current, updates) {
+	if (updates.length == 0) {
+		return current;
+	}
+	var updateTimestamp = getFirstOfObject(updates).timestamp;
+	return Math.max(current, updateTimestamp);
 };
 
 /***/ }),
@@ -55698,6 +55796,10 @@ var _Entries = __webpack_require__(599);
 
 var _Entries2 = _interopRequireDefault(_Entries);
 
+var _LoadMoreContainer = __webpack_require__(602);
+
+var _LoadMoreContainer2 = _interopRequireDefault(_LoadMoreContainer);
+
 __webpack_require__(601);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -55737,9 +55839,9 @@ var AppContainer = function (_Component) {
           startPolling = _props.startPolling;
 
 
-      loadConfig(window.wpcomLiveblog);
-      getEntries(window.wpcomLiveblog.last_entry);
-      startPolling(window.wpcomLiveblog.timestamp);
+      loadConfig(window.liveblog_settings);
+      getEntries(0);
+      startPolling(window.liveblog_settings.timestamp);
     }
   }, {
     key: 'renderEntries',
@@ -55764,7 +55866,8 @@ var AppContainer = function (_Component) {
         'div',
         null,
         _react2.default.createElement(_EditorContainer2.default, null),
-        this.renderEntries()
+        this.renderEntries(),
+        _react2.default.createElement(_LoadMoreContainer2.default, null)
       );
     }
   }]);
@@ -65741,14 +65844,14 @@ var Entries = function Entries(_ref) {
   return _react2.default.createElement(
     'div',
     null,
-    entries.map(function (entry, i) {
-      return _react2.default.createElement(_EntryContainer2.default, { entry: entry, key: i });
+    Object.keys(entries).map(function (key, i) {
+      return _react2.default.createElement(_EntryContainer2.default, { entry: entries[key], key: i });
     })
   );
 };
 
 Entries.propTypes = {
-  entries: _propTypes2.default.array
+  entries: _propTypes2.default.object
 };
 
 exports.default = Entries;
@@ -65837,7 +65940,7 @@ var EntryContainer = function (_Component) {
   _createClass(EntryContainer, [{
     key: 'entryActions',
     value: function entryActions() {
-      if (this.props.config.can_edit === 'false') {
+      if (this.props.config.is_liveblog_editable !== '1') {
         return false;
       }
 
@@ -65913,6 +66016,103 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 602 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(11);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(27);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _redux = __webpack_require__(32);
+
+var _reactRedux = __webpack_require__(46);
+
+var _apiActions = __webpack_require__(59);
+
+var apiActions = _interopRequireWildcard(_apiActions);
+
+var _userActions = __webpack_require__(169);
+
+var userActions = _interopRequireWildcard(_userActions);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// Redux
+
+
+// Actions
+
+
+var LoadMoreContainer = function (_Component) {
+  _inherits(LoadMoreContainer, _Component);
+
+  function LoadMoreContainer(props) {
+    _classCallCheck(this, LoadMoreContainer);
+
+    var _this = _possibleConstructorReturn(this, (LoadMoreContainer.__proto__ || Object.getPrototypeOf(LoadMoreContainer)).call(this, props));
+
+    _this.loadMore = function () {
+      return _this.props.getEntries(_this.props.api.oldestEntryTimestamp);
+    };
+    return _this;
+  }
+
+  _createClass(LoadMoreContainer, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'button',
+          { className: 'wpcom-liveblog-load-more', onClick: this.loadMore },
+          'Load More'
+        )
+      );
+    }
+  }]);
+
+  return LoadMoreContainer;
+}(_react.Component);
+
+LoadMoreContainer.propTypes = {};
+
+// Map state to props on connected component
+var mapStateToProps = function mapStateToProps(state) {
+  return state;
+};
+
+// Map dispatch/actions to props on connected component
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)(_extends({}, apiActions, userActions), dispatch);
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(LoadMoreContainer);
 
 /***/ })
 /******/ ]);

@@ -111,8 +111,8 @@ class WPCOM_Liveblog_Entry_Extend {
     public static function enqueue_scripts() {
         if ( WPCOM_Liveblog::is_liveblog_editable() ) {
 			$path = dirname(__FILE__);
-			wp_enqueue_style(  'textcomplete-css',    plugins_url( '/css/jquery.textcomplete.css',   $path ) );
-			wp_enqueue_script( 'textcomplete-script', plugins_url( '/js/jquery.textcomplete.min.js', $path ), false, true );
+			//wp_enqueue_style(  'textcomplete-css',    plugins_url( '/css/jquery.textcomplete.css',   $path ) );
+			//wp_enqueue_script( 'textcomplete-script', plugins_url( '/js/jquery.textcomplete.min.js', $path ), false, true );
 		}
     }
 

@@ -5,12 +5,12 @@ import EntryContainer from '../containers/EntryContainer';
 
 const Entries = ({ entries }) => (
   <div>
-    {entries.map((entry, i) => <EntryContainer entry={entry} key={i}/>)}
+    {Object.keys(entries).map((key, i) => <EntryContainer entry={entries[key]} key={i}/>)}
   </div>
 );
 
 Entries.propTypes = {
-  entries: PropTypes.array,
+  entries: PropTypes.object,
 };
 
 export default Entries;
