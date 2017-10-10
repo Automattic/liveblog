@@ -1,3 +1,7 @@
+import {
+  getCurrentTimestamp,
+} from '../utils/utils';
+
 export const initialState = {};
 
 export const config = (state = initialState, action) => {
@@ -6,6 +10,7 @@ export const config = (state = initialState, action) => {
       return {
         ...state,
         ...action.payload,
+        timeDifference: getCurrentTimestamp() - action.payload.timestamp,
       };
 
     default:

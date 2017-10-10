@@ -4,6 +4,10 @@
  */
 import { ajax } from 'rxjs/observable/dom/ajax';
 
+import {
+  getCurrentTimestamp,
+} from '../utils/utils';
+
 export function getEntries(oldestEntryTimestamp, config) {
   const settings = {
     url: `${config.endpoint_url}lazyload/${oldestEntryTimestamp}/0/`,
@@ -13,7 +17,8 @@ export function getEntries(oldestEntryTimestamp, config) {
   return ajax(settings);
 }
 
-export function startPolling(newestEntryTimestamp, timestamp, config) {
+export function startPolling(newestEntryTimestamp, config) {
+  let timestamp = getCurrentTimestamp() + config.timeDifference;
   const settings = {
     url: `${config.endpoint_url}entries/${newestEntryTimestamp+1}/${timestamp}/`,
     method: 'GET',

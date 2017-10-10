@@ -22,7 +22,7 @@ class AppContainer extends Component {
 
     loadConfig(window.liveblog_settings);
     getEntries(0);
-    startPolling(window.liveblog_settings.timestamp);
+    startPolling();
   }
 
   renderEntries() {

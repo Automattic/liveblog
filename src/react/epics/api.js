@@ -46,7 +46,7 @@ const startPollingEpic = (action$, store) =>
       interval(3000)
         .takeUntil(action$.ofType(types.CANCEL_POLLING))
         .exhaustMap(() =>
-          startPolling(store.getState().api.newestEntryTimestamp, store.getState().api.timestamp, store.getState().config)
+          startPolling(store.getState().api.newestEntryTimestamp, store.getState().config)
             .timeout(10000)
             .map(res => pollingSuccess(res.response))
             .catch(error => of(pollingFailed(error))),

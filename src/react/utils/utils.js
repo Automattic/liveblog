@@ -61,3 +61,7 @@ export const getNewestTimestamp = (current, updates) => {
 	let updateTimestamp = getFirstOfObject(updates).timestamp;
 	return Math.max(current, updateTimestamp);
 } 
+
+export const getCurrentTimestamp = () => {
+	return Math.floor( Date.now() / 1000);
+}
