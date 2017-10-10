@@ -20,8 +20,6 @@ class AppContainer extends Component {
   componentDidMount() {
     const { loadConfig, getEntries, startPolling } = this.props;
 
-    console.log(window.liveblog_settings.timestamp);
-
     loadConfig(window.liveblog_settings);
     getEntries(0);
     startPolling(window.liveblog_settings.timestamp);
