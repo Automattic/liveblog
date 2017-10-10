@@ -20,9 +20,10 @@ export const startPolling = payload => ({
   payload,
 });
 
-export const pollingSuccess = payload => ({
+export const pollingSuccess = (payload, incrementTimestamp = true) => ({
   type: types.POLLING_SUCCESS,
   payload,
+  incrementTimestamp,
 });
 
 export const pollingFailed = () => ({

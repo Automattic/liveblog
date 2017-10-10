@@ -50,7 +50,7 @@ export const api = (state = initialState, action) => {
     case 'POLLING_SUCCESS':
       return {
         ...state,
-        timestamp: parseInt(state.timestamp, 10) + 3,
+        timestamp: action.incrementTimestamp ? parseInt(state.timestamp, 10) + 3 : parseInt(state.timestamp, 10),
         entries: entriesApplyUpdate(state.entries, action.payload.entries, false),
         newestEntryTimestamp: getNewestTimestamp(state.newestEntryTimestamp, action.payload.entries),
         error: false,

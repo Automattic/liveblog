@@ -90,16 +90,16 @@ const deleteEntryEpic = (action$, store) =>
 
 const getEntriesAfterCreateEpic = (action$, store) =>
   action$.ofType(types.CREATE_ENTRY_SUCCESS)
-    .map(({ payload }) => pollingSuccess(payload));
+    .map(({ payload }) => pollingSuccess(payload, false));
 
 const getEntriesAfterUpdateEpic = (action$, store) =>
   action$.ofType(types.UPDATE_ENTRY_SUCCESS)
-    .map(({ payload }) => pollingSuccess(payload));
+    .map(({ payload }) => pollingSuccess(payload, false));
 
 const getEntriesAfterDeleteEpic = (action$, store) =>
   action$.ofType(types.DELETE_ENTRY_SUCCESS)
-    .map(({ payload }) => pollingSuccess(payload));
-    
+    .map(({ payload }) => pollingSuccess(payload, false));
+
 export default combineEpics(
   getEntriesEpic,
   startPollingEpic,
