@@ -106,7 +106,7 @@ add_action( 'liveblog_delete_entry', 'wpcom_invalidate_feed_cache' );
 add_filter( 'liveblog_current_user_can_edit_liveblog', function( $can_edit ) {
 
 	// Retain super admin access for A12s.
-	if ( is_automattician() || ( defined( A8C_PROXIED_REQUEST ) && A8C_PROXIED_REQUEST ) ) {
+	if ( is_automattician() || ( defined( 'A8C_PROXIED_REQUEST' ) && A8C_PROXIED_REQUEST ) ) {
 		return $can_edit;
 	}
 
