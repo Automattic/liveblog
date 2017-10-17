@@ -749,6 +749,7 @@ final class WPCOM_Liveblog {
 		
 		$entries  = self::$entry_query->get_all_entries_asc();
 		$entries  = self::flatten_entries( $entries );
+		$pages 	  = ceil( count( $entries ) / $per_page );
 	
 		//If no page is passed but entry id is, we search for the correct page.
 		if ( $page === false && $id !== false ) {
@@ -763,7 +764,8 @@ final class WPCOM_Liveblog {
 
 		$result = array(
 			'entries' => $entries,
-			'page'	  => $page,
+			'page'	  => (int) $page,
+			'pages'	  => (int) $pages,
 		);
 
 		if ( ! empty( $entries_for_json ) ) {
