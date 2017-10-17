@@ -385,7 +385,10 @@ final class WPCOM_Liveblog {
 		}
 
 		// Get liveblog entries within the start and end boundaries
-		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
+		$all_entries = self::$entry_query->get_all_entries_asc();
+		$entries 	 = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
+		$pages 		 = false;
+		$per_page 	 = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 		if ( ! empty( $entries ) ) {
 			/**
@@ -396,6 +399,8 @@ final class WPCOM_Liveblog {
 				$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
 				$entries_for_json[] = $entry->for_json();
 			}
+
+			$pages = ceil( count( self::flatten_entries( $all_entries ) ) / $per_page );
 		}
 
 		// Create the result array
@@ -403,6 +408,7 @@ final class WPCOM_Liveblog {
 			'entries'           => $entries_for_json,
 			'latest_timestamp'  => $latest_timestamp,
 			'refresh_interval'  => self::get_refresh_interval(),
+			'pages'				=> $pages,
 		);
 
 		if ( ! empty( $entries_for_json ) ) {
@@ -725,6 +731,102 @@ final class WPCOM_Liveblog {
 		//self::json_return( $result_for_json );
 
 		return $result;
+	}
+
+	/**
+	 * Get all entries for specific page
+	 *
+	 * @param int $page Requested Page.
+	 * @return array An array of json encoded results
+	 */
+	public static function get_entries_paged( $page, $id = false ) {
+
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
+		}
+
+		$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+		
+		$entries  = self::$entry_query->get_all_entries_asc();
+		$entries  = self::flatten_entries( $entries );
+	
+		//If no page is passed but entry id is, we search for the correct page.
+		if ( $page === false && $id !== false ) {
+			$index = array_search( $id, array_keys( $entries ));
+			$index = $index + 1;
+			$page  = ceil( $index / $per_page );
+		}
+
+		$offset	  = $per_page * ( $page - 1 );
+		$entries  = array_slice( $entries, $offset, $per_page );
+		$entries  = self::entries_for_json( $entries );
+
+		$result = array(
+			'entries' => $entries,
+			'page'	  => $page,
+		);
+
+		if ( ! empty( $entries_for_json ) ) {
+			do_action( 'liveblog_entry_request', $result );
+			self::$do_not_cache_response = true;
+		} else {
+			do_action( 'liveblog_entry_request_empty' );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert array of entries to there json response.
+	 * @param type $entries 
+	 * @return array
+	 */
+	public static function entries_for_json( $entries ) {
+		$entries_for_json = array();
+		foreach ( $entries as $entry ) {
+			$entries_for_json[] = $entry->for_json();
+		}
+		return $entries_for_json;
+	}
+
+
+	/**
+	 * Flattens Entries by running updates and deletes to get actual
+	 * list of entries
+	 * 
+	 * @param array $entires 
+	 * @return array
+	 */
+	public static function flatten_entries( $entries ) {
+		if ( empty( $entries ) || !is_array( $entries ) ) {
+			return array();
+		}
+		$flatten = array();
+		foreach ( $entries as $entry ) {
+			$type = $entry->get_type();
+			$id   = $entry->get_id();
+
+			if ( !empty( $entry->replaces ) ) {
+				$id = $entry->replaces;
+			}
+
+			switch ( $type ) {
+			    case "new":
+			        $flatten[$id] = $entry;
+			        break;
+			    case "update":
+			        $flatten[$id] = $entry;
+			        break;
+			    case "delete":
+			        unset( $flatten[$id] );
+			        break;
+			    default:
+			        continue;
+			}
+		}
+
+
+		return array_reverse( $flatten, true );
 	}
 
 	public static function ajax_preview_entry() {

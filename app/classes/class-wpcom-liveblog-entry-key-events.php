@@ -100,6 +100,19 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		return $commands;
 	}
 
+	 /**
+ 	 * Check if entry is key event by checking its meta
+ 	 *
+ 	 * @param $id
+ 	 * @return mixed
+ 	 */
+ 	public static function is_key_event( $id ) {
+ 		if ( self::meta_value === get_comment_meta( $id, self::meta_key, true ) ) {
+ 			return true;
+ 		}
+ 		return false;
+ 	}
+
 	/**
 	 * Called when the /key command is used in an entry,
 	 * it attaches meta to set it as a key entry.
@@ -132,12 +145,19 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// We need the post_id to get it's template.
 		$post_id      = $object->get_post_id();
+		// Get the entry content
+		$content      = $object->get_content();	
 
 		// Use the currently set template.
 		$template     = self::get_current_template( $post_id );
 
-		// Render that template and store it in the output.
-		$entry['key'] = $object->render( $template[0] );
+		// Set if key event
+		$entry['key_event'] = self::is_key_event( $object->get_id() );
+  		  
+		// If key event add content
+		if ( $entry['key_event'] ) {
+			$entry['key_event_content'] = self::get_formatted_content( $content, $post_id );
+		}
 
 		return $entry;
 	}
@@ -360,4 +380,22 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			) );
 		}
 	}
+
+	/**
+	 * Get all key events.
+	 *
+	 * @return array
+	 */
+	public static function all() {
+		$query = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::key );
+		$key_events = $query->get( array(
+			'meta_query' => array(
+		        array(
+		            'key' 		=> self::meta_key,
+		            'value' 	=> self::meta_value,
+		            'compare' 	=> '==='
+		        )
+    	) ) );
+    	return $key_events;
+    }
 }
