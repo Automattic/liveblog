@@ -1,59 +1,55 @@
 import {
-  entriesApplyUpdate,
-  getLastOfObject,
-  getFirstOfObject,
-  getOldestTimestamp,
-  getNewestTimestamp,
+  applyUpdate,
+  pollingApplyUpdate,
+  getNewestEntry,
 } from '../utils/utils';
 
 export const initialState = {
-  entries: {},
+  loading: false,
   error: false,
-  polling: [],
-  previousPolling: [],
-  newestEntryTimestamp: false,
-  oldestEntryTimestamp: false,
+  entries: {},
+  newestEntry: false,
   nonce: false,
-  timestamp: false,
 };
 
 export const api = (state = initialState, action) => {
   switch (action.type) {
+    case 'JUMP_TO_EVENT':
     case 'GET_ENTRIES':
       return {
         ...state,
         error: false,
+        loading: true,
       };
 
     case 'GET_ENTRIES_SUCCESS':
       return {
         ...state,
         error: false,
-        entries: entriesApplyUpdate(state.entries, action.payload.entries, true),
-        oldestEntryTimestamp: getOldestTimestamp(state.oldestEntryTimestamp, action.payload.entries),
-        newestEntryTimestamp: getNewestTimestamp(state.newestEntryTimestamp, action.payload.entries),
+        loading: false,
+        entries: applyUpdate({}, action.payload.entries),
+        newestEntry: getNewestEntry(state.newestEntry, action.payload.entries),
       };
 
     case 'GET_ENTRIES_FAILED':
       return {
         ...state,
+        loading: false,
         error: true,
-      };
-
-    case 'START_POLLING':
-      return {
-        ...state,
-        timestamp: parseInt(action.payload, 10),
-        error: false,
       };
 
     case 'POLLING_SUCCESS':
       return {
         ...state,
-        timestamp: action.incrementTimestamp ? parseInt(state.timestamp, 10) + 3 : parseInt(state.timestamp, 10),
-        entries: entriesApplyUpdate(state.entries, action.payload.entries, false),
-        newestEntryTimestamp: getNewestTimestamp(state.newestEntryTimestamp, action.payload.entries),
         error: false,
+        entries: pollingApplyUpdate(
+          state.entries,
+          action.payload.entries,
+          action.renderNewEntries,
+        ),
+        newestEntry: action.renderNewEntries
+          ? getNewestEntry(state.newestEntry, action.payload.entries)
+          : state.newestEntry,
       };
 
     case 'POLLING_FAILED':
@@ -66,10 +62,6 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: false,
-        lastEntry: {
-          id: action.payload.id,
-          updated: action.payload.updated,
-        },
         nonce: action.payload.nonce,
       };
 
@@ -83,10 +75,6 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: false,
-        lastEntry: {
-          id: action.payload.id,
-          updated: action.payload.updated,
-        },
         nonce: action.payload.nonce,
       };
 
@@ -100,10 +88,6 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: false,
-        lastEntry: {
-          id: action.payload.id,
-          updated: action.payload.updated,
-        },
         nonce: action.payload.nonce,
       };
 
@@ -111,6 +95,39 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: true,
+      };
+
+    case 'MERGE_POLLING_INTO_ENTRIES':
+      return {
+        ...state,
+        entries: {
+          ...action.payload,
+          ...state.entries,
+        },
+      };
+
+    case 'SCROLL_TO_ENTRY':
+      return {
+        ...state,
+        entries: {
+          ...state.entries,
+          [action.payload]: {
+            ...state.entries[action.payload],
+            activateScrolling: true,
+          },
+        },
+      };
+
+    case 'RESET_SCROLL_ON_ENTRY':
+      return {
+        ...state,
+        entries: {
+          ...state.entries,
+          [action.payload]: {
+            ...state.entries[action.payload],
+            activateScrolling: false,
+          },
+        },
       };
 
     default:

@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
@@ -16,10 +17,21 @@ class EntryContainer extends Component {
   constructor(props) {
     super(props);
 
-    this.createMarkup = () => ({ __html: this.props.entry.content });
+    this.createMarkup = () => ({ __html: this.props.entry.content || 'deleted' });
     this.edit = () => this.props.entryEditOpen(this.props.entry.id);
     this.close = () => this.props.entryEditClose(this.props.entry.id);
     this.delete = () => this.props.deleteEntry(this.props.entry.id);
+    this.scrollIntoView = () => {
+      this.node.scrollIntoView({ behavior: 'smooth' });
+      this.props.resetScrollOnEntry(`id_${this.props.entry.id}`);
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    const { activateScrolling } = this.props.entry;
+    if (activateScrolling && activateScrolling !== prevProps.entry.activateScrolling) {
+      this.scrollIntoView();
+    }
   }
 
   entryActions() {
@@ -53,7 +65,11 @@ class EntryContainer extends Component {
     }
 
     return (
-      <div className="wpcom-liveblog-entry">
+      <div
+        id={`id_${this.props.entry.id}`}
+        ref={node => this.node = node}
+        className="wpcom-liveblog-entry"
+      >
         <div
           className="wpcom-liveblog-entry-content"
           dangerouslySetInnerHTML={this.createMarkup()}
@@ -71,6 +87,8 @@ EntryContainer.propTypes = {
   entryEditOpen: PropTypes.func,
   entryEditClose: PropTypes.func,
   deleteEntry: PropTypes.func,
+  activateScrolling: PropTypes.bool,
+  resetScrollOnEntry: PropTypes.func,
 };
 
 // Map state to props on connected component

@@ -1,13 +1,14 @@
 import types from './actionTypes';
 
-export const getEntries = payload => ({
+export const getEntries = page => ({
   type: types.GET_ENTRIES,
-  payload,
+  page,
 });
 
-export const getEntriesSuccess = payload => ({
+export const getEntriesSuccess = (payload, renderNewEntries) => ({
   type: types.GET_ENTRIES_SUCCESS,
   payload,
+  renderNewEntries,
 });
 
 export const getEntriesFailed = () => ({
@@ -20,10 +21,10 @@ export const startPolling = payload => ({
   payload,
 });
 
-export const pollingSuccess = (payload, incrementTimestamp = true) => ({
+export const pollingSuccess = (payload, renderNewEntries) => ({
   type: types.POLLING_SUCCESS,
   payload,
-  incrementTimestamp,
+  renderNewEntries,
 });
 
 export const pollingFailed = () => ({
@@ -78,4 +79,13 @@ export const updateEntrySuccess = payload => ({
 export const updateEntryFailed = () => ({
   type: types.UPDATE_ENTRY_FAILED,
   error: true,
+});
+
+export const mergePolling = () => ({
+  type: types.MERGE_POLLING,
+});
+
+export const mergePollingIntoEntries = payload => ({
+  type: types.MERGE_POLLING_INTO_ENTRIES,
+  payload,
 });

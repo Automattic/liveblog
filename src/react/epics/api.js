@@ -2,15 +2,12 @@
 
 import { combineEpics } from 'redux-observable';
 import { of } from 'rxjs/observable/of';
-import { interval } from 'rxjs/observable/interval';
 import types from '../actions/actionTypes';
 
 import {
-  getEntries as getEntriesAction,
   getEntriesSuccess,
   getEntriesFailed,
   pollingSuccess,
-  pollingFailed,
   createEntrySuccess,
   createEntryFailed,
   updateEntrySuccess,
@@ -21,36 +18,31 @@ import {
 
 import {
   getEntries,
-  startPolling,
   createEntry,
   updateEntry,
   deleteEntry,
 } from '../services/api';
 
 import {
-  entryListChanged,
+  shouldRenderNewEntries,
 } from '../utils/utils';
 
 const getEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES)
-    .switchMap(({ payload }) =>
-      getEntries(payload, store.getState().config)
+    .switchMap(({ page }) =>
+      getEntries(page, store.getState().config, store.getState().api.newestEntry)
         .timeout(10000)
-        .map(res => getEntriesSuccess(res.response))
+        .map(res =>
+          getEntriesSuccess(
+            res.response,
+            shouldRenderNewEntries(
+              store.getState().pagination.page,
+              store.getState().api.entries,
+              store.getState().polling.entries,
+            ),
+          ),
+        )
         .catch(error => of(getEntriesFailed(error))),
-    );
-
-const startPollingEpic = (action$, store) =>
-  action$.ofType(types.START_POLLING)
-    .switchMap(() =>
-      interval(3000)
-        .takeUntil(action$.ofType(types.CANCEL_POLLING))
-        .exhaustMap(() =>
-          startPolling(store.getState().api.newestEntryTimestamp, store.getState().config)
-            .timeout(10000)
-            .map(res => pollingSuccess(res.response))
-            .catch(error => of(pollingFailed(error))),
-        ),
     );
 
 const createEntryEpic = (action$, store) =>
@@ -80,33 +72,14 @@ const deleteEntryEpic = (action$, store) =>
         .catch(error => of(deleteEntryFailed(error))),
     );
 
-// const examinePollingEpic = (action$, store) =>
-//   action$.ofType(types.POLLING_SUCCESS)
-//     .filter(() => entryListChanged(
-//       store.getState().api.previousPolling,
-//       store.getState().api.polling,
-//     ))
-//     .map(() => getEntriesAction(store.getState().api.polling[0]));
-
-const getEntriesAfterCreateEpic = (action$, store) =>
-  action$.ofType(types.CREATE_ENTRY_SUCCESS)
-    .map(({ payload }) => pollingSuccess(payload, false));
-
-const getEntriesAfterUpdateEpic = (action$, store) =>
-  action$.ofType(types.UPDATE_ENTRY_SUCCESS)
-    .map(({ payload }) => pollingSuccess(payload, false));
-
-const getEntriesAfterDeleteEpic = (action$, store) =>
-  action$.ofType(types.DELETE_ENTRY_SUCCESS)
-    .map(({ payload }) => pollingSuccess(payload, false));
+const getEntriesAfterChangeEpic = action$ =>
+  action$.ofType(types.CREATE_ENTRY_SUCCESS, types.UPDATE_ENTRY_SUCCESS, types.DELETE_ENTRY_SUCCESS)
+    .map(({ payload }) => pollingSuccess(payload, true));
 
 export default combineEpics(
   getEntriesEpic,
-  startPollingEpic,
   createEntryEpic,
   updateEntryEpic,
   deleteEntryEpic,
-  getEntriesAfterCreateEpic,
-  getEntriesAfterUpdateEpic,
-  getEntriesAfterDeleteEpic,
+  getEntriesAfterChangeEpic,
 );

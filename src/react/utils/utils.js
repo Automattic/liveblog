@@ -1,67 +1,126 @@
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-param-reassign */
 
-export const entryListChanged = (previous, current) =>
-  previous.length !== current.length || previous[0].updated < current[0].updated;
+/**
+ * Apply updated entries to current entries.
+ * @param {Object} currentEntries
+ * @param {Array} newEntries
+ */
+export const applyUpdate = (currentEntries, newEntries) =>
+  newEntries.reduce((accumulator, entry) => {
+    const id = `id_${entry.id}`;
 
-export const entryArrayToObject = (array) => {
-	let object = {};
-	array.map(item => {
-		object[item.id] = {
-			...api[item.id],
-			...item,
-		};
-	});
-	return object;
-}
+    if (entry.type === 'new') {
+      accumulator = {
+        ...accumulator,
+        [id]: entry,
+      };
+    }
 
-export const entriesApplyUpdate = (entries, updates, loadMore) => {
-	for (let update of updates) {
-		let id = `id_${update.id}`;
-		if ( update.type == 'new' ) {
-			if ( loadMore ) {
-				entries[id] = update;
-			} else {
-				entries = {
-					[id]: update,
-					...entries
-				}
-			}
-		} else if ( update.type == 'update' && entries.hasOwnProperty(id) ) {
-			entries[id] = update;
-		} else if ( update.type == 'delete' ) {
-			delete entries[id];
-		}
-	}
-	return entries;
-}
+    if (entry.type === 'update') {
+      if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
+        accumulator[id] = entry;
+      } else {
+        accumulator = {
+          ...accumulator,
+          [id]: entry,
+        };
+      }
+    }
 
-export const getLastOfObject = (object) => {
-	return object[Object.keys(object)[Object.keys(object).length - 1]];
-}
+    if (entry.type === 'delete') {
+      delete accumulator[id];
+    }
 
-export const getFirstOfObject = (object) => {
-	return object[Object.keys(object)[0]];
-}
+    return accumulator;
+  }, { ...currentEntries });
 
-export const getOldestTimestamp = (current, updates) => {
-	if ( updates.length == 0 ) {
-		return current;
-	}
-	let updateTimestamp = getLastOfObject(updates).timestamp;
-	if ( current === false ) {
-		return updateTimestamp;
-	}
-	return Math.min(current, updateTimestamp);
-} 
+/**
+ * Apply updated events to current events.
+ * @param {Object} currentEntries
+ * @param {Array} newEntries
+ */
+export const eventsApplyUpdate = (currentEntries, newEntries) =>
+  newEntries.reduce((accumulator, entry) => {
+    const id = `id_${entry.id}`;
 
-export const getNewestTimestamp = (current, updates) => {
-	if ( updates.length == 0 ) {
-		return current;
-	}
-	let updateTimestamp = getFirstOfObject(updates).timestamp;
-	return Math.max(current, updateTimestamp);
-} 
+    if (entry.type === 'new' && entry.key_event) {
+      accumulator = {
+        [id]: entry,
+        ...accumulator,
+      };
+    }
 
-export const getCurrentTimestamp = () => {
-	return Math.floor( Date.now() / 1000);
-}
+    if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
+      accumulator[id] = entry;
+    }
+
+    if (!entry.key_event || entry.type === 'delete') {
+      delete accumulator[id];
+    }
+
+    return accumulator;
+  }, { ...currentEntries });
+
+/**
+ * Apply updates from polling to current entries
+ * @param {Object} currentEntries
+ * @param {Array} newEntries
+ * @param {Boolean} renderNewEntries
+ */
+export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries) =>
+  newEntries.reduce((accumulator, entry) => {
+    const id = `id_${entry.id}`;
+
+    if (entry.type === 'new' && renderNewEntries) {
+      accumulator = {
+        [id]: entry,
+        ...accumulator,
+      };
+    }
+
+    if (entry.type === 'update' && Object.prototype.hasOwnProperty.call(accumulator, id)) {
+      accumulator[id] = entry;
+    }
+
+    if (entry.type === 'delete') {
+      delete accumulator[id];
+    }
+
+    return accumulator;
+  }, { ...currentEntries });
+
+/**
+ * Determine whether we should render new entries or prompt the user that a new entry is available.
+ * Will return false if the user is not on page one or if the user is on page 1 but the latest
+ * entry is not on the screen.
+ * @param {Number} page
+ * @param {Object} entries
+ * @param {Object} polling
+ */
+export const shouldRenderNewEntries = (page, entries, polling) => {
+  if (page !== 1) return false;
+  if (Object.keys(polling).length > 0) return false;
+  const element = document.getElementById(Object.keys(entries)[0]);
+  if (!element) return true;
+  return element.getBoundingClientRect().y > 0;
+};
+
+/**
+ * Determine the newest entry from current and updated entries
+ * @param {Object} current
+ * @param {Array} updates
+ */
+export const getNewestEntry = (current, updates) => {
+  if (!current && !updates[0]) return false;
+  if (!current && updates[0]) return updates[0];
+  if (!updates[0]) return current;
+  if (current.timestamp > updates[0].timestamp) return current;
+  return updates[0];
+};
+
+export const getLastOfObject = object =>
+  object[Object.keys(object)[Object.keys(object).length - 1]];
+
+export const getFirstOfObject = object => object[Object.keys(object)[0]];
+
+export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
