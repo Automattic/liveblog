@@ -2,9 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Event = ({ event, click, onDelete }) => (
-  <li >
-    <div onClick={click} dangerouslySetInnerHTML={{ __html: event.content }} />
-    <span onClick={onDelete}>x</span>
+  <li className="liveblog-event">
+    <span
+      className="liveblog-event-content"
+      onClick={click}
+      dangerouslySetInnerHTML={{ __html: event.key_event_content }}
+    />
+    <span className="liveblog-event-delete" onClick={onDelete}>x</span>
   </li>
 );
 

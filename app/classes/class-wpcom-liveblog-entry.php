@@ -94,11 +94,17 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function for_json() {
+		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
+		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$comment_text = get_comment_text( $entry_id );
 		$entry = array(
-			'id'   => $this->replaces ? $this->replaces : $this->get_id(),
+			'id'   => $entry_id,
 			'type' => $this->get_type(),
 			'content' => $this->get_content(),
 			'timestamp' => $this->get_timestamp(),
+			'avatar_img' => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'author_link' => get_comment_author_link( $entry_id ),
+			'entry_time' => get_comment_date( 'U', $entry_id ),
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;

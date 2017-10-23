@@ -1,7 +1,8 @@
 
 .public-DraftEditor-content {
 	border: 1px solid #ddd;
-	min-height: 100px;
+  min-height: 100px;
+  margin-bottom: 10px;
 	background: #fff;
 }
 
@@ -25,5 +26,9 @@
 	margin-top: 20px;
 	border-radius: 6px;
 	color: #fff;
+}
+
+.liveblog-editor {
+  margin-bottom: 10px;
 }
 

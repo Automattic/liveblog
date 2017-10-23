@@ -1,9 +1,10 @@
 .is-loading {
+  min-height: 200px;
 	position: relative;
 }
 
 .is-loading::after {
-	content: 'loading';
+	content: 'loading...';
 	display: flex;
 	justify-content: center;
 	align-items: center;

@@ -1,19 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
-// Redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-
 import { Editor, EditorState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
-
 import { stateToHTML } from 'draft-js-export-html';
 import { stateFromHTML } from 'draft-js-import-html';
-
-// Actions
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
+import Button from '../components/Button';
 
 class EditorContainer extends Component {
   constructor(props) {
@@ -56,16 +51,19 @@ class EditorContainer extends Component {
   }
 
   render() {
-    const { config } = this.props;
+    const { config, isEditing } = this.props;
 
-    if (config.is_liveblog_editable !== '1') {
-      return false;
-    }
+    if (config.is_liveblog_editable !== '1') return false;
 
     return (
       <div className="editor-container">
-        <Editor editorState={this.state.editorState} onChange={this.onChange} />
-        <button className="editor-publish-button" onClick={this.publish}>Publish Update</button>
+        <Editor
+          editorState={this.state.editorState}
+          onChange={this.onChange}
+        />
+        <Button type="primary" modifiers="wide" click={this.publish}>
+          {isEditing ? 'Publish Update' : 'Publish New Entry'}
+        </Button>
       </div>
     );
   }
@@ -77,13 +75,15 @@ EditorContainer.propTypes = {
   entry: PropTypes.object,
   entryEditClose: PropTypes.func,
   createEntry: PropTypes.func,
+  isEditing: PropTypes.bool,
 };
 
-// Map state to props on connected component
 const mapStateToProps = state => state;
 
-// Map dispatch/actions to props on connected component
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ ...apiActions, ...userActions }, dispatch);
+  bindActionCreators({
+    ...apiActions,
+    ...userActions },
+  dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditorContainer);

@@ -8,7 +8,7 @@ const Entries = ({ loading, entries }) => (
     {
       entries.length === 0 && !loading
         ? <div>There are no entries</div>
-        : entries.map((entry, i) => <EntryContainer entry={entry} key={i}/>)
+        : entries.map((entry, i) => <EntryContainer entry={entry} key={i} />)
     }
   </div>
 );

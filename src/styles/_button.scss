@@ -1,0 +1,77 @@
+/**
+ * Base button styles.
+ * 1. Corrects inability to style clickable `input` types in iOS.
+ * 2. Normalize `box-sizing` across all elements that this component could be
+ *    applied to.
+ * 3. Normalize `line-height`. For `input`, it can't be changed from `normal` in Firefox 4+.
+ * 4. Prevent button text from being selectable.
+ * 5. Make sure `input` will wrap text across multiple lines.
+ */
+.liveblog-btn {
+  -webkit-appearance: none; /* 1 */
+  box-sizing: border-box; /* 2 */
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+  font: inherit;
+  line-height: normal; /* 3 */
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  overflow: visible;
+  user-select: none; /* 4 */
+  white-space: normal; /* 5 */
+  transition: background .3s ease-in-out;
+  padding: 12px 16px;
+  margin: 2px;
+
+  &:hover,
+  &:focus {
+    transition: background .3s ease-in-out;
+    text-decoration: none;
+  }
+}
+
+.liveblog-btn--primary {
+  color: #FFF;
+  background: $color-primary;
+
+  &:hover,
+  &:focus {
+    background: darken($color-primary, 5%);
+  }
+}
+
+.liveblog-btn--secondary {
+	background: $color-grey-x-light;
+  color: $color-grey-dark;
+
+  &:hover,
+  &:focus {
+    background: darken($color-grey-x-light, 5%);
+  }
+}
+
+.liveblog-btn--small {
+  font-size: 12px;
+  line-height: 23px;
+  padding: 4px 16px;
+}
+
+.liveblog-btn--wide {
+  width: 100%;
+}
+
+.liveblog-btn--delete {
+  background: transparent;
+  color: $color-warning;
+  border: none;
+
+  &:hover,
+  &:focus {
+    background: transparent;
+    color: darken($color-warning, 10%);
+    text-decoration: underline;
+  }
+}

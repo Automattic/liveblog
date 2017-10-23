@@ -118,6 +118,37 @@ export const getNewestEntry = (current, updates) => {
   return updates[0];
 };
 
+/**
+ * Returns a formated string indicating how long ago a timestamp was.
+ * @param {Number} timestamp
+ */
+export const timeAgo = (timestamp) => {
+  const units = [
+    { name: 'second', limit: 60, in_seconds: 1 },
+    { name: 'minute', limit: 3600, in_seconds: 60 },
+    { name: 'hour', limit: 86400, in_seconds: 3600 },
+    { name: 'day', limit: 604800, in_seconds: 86400 },
+    { name: 'week', limit: 2629743, in_seconds: 604800 },
+    { name: 'month', limit: 31556926, in_seconds: 2629743 },
+    { name: 'year', limit: null, in_seconds: 31556926 },
+  ];
+
+  let diff = (new Date() - new Date(timestamp * 1000)) / 1000;
+  if (diff < 5) return 'now';
+
+  let output;
+
+  for (let i = 0; i < units.length; i += 1) {
+    if (diff < units[i].limit || !units[i].limit) {
+      diff = Math.floor(diff / units[i].in_seconds);
+      output = `${diff} ${units[i].name}${(diff > 1 ? 's' : '')} ago`;
+      break;
+    }
+  }
+
+  return output;
+};
+
 export const getLastOfObject = object =>
   object[Object.keys(object)[Object.keys(object).length - 1]];
 

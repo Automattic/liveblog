@@ -52,12 +52,6 @@ export const api = (state = initialState, action) => {
           : state.newestEntry,
       };
 
-    case 'POLLING_FAILED':
-      return {
-        ...state,
-        error: true,
-      };
-
     case 'CREATE_ENTRY_SUCCESS':
       return {
         ...state,

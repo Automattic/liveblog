@@ -1,39 +1,42 @@
-.wpcom-liveblog-entry {
-	border-top: 1px solid #dfdfdf;
-	padding: 10px;
+.liveblog-entry {
+	border-top: 1px solid $color-grey-mid-light;
+  padding: 10px 0;
 }
 
-.wpcom-liveblog-entry-actions button, .wpcom-liveblog-entry-actions button:hover, .wpcom-liveblog-entry-edit-action, .wpcom-liveblog-entry-edit-action:hover {
-	padding: 0px;
-	margin: 0px;
-	background: none;
-	border: none;
-	margin-right: 10px;
-	color: #444;
-	font-weight: bold;
+.liveblog-entry-content {
+  padding-top: 10px;
 }
 
-.wpcom-liveblog-entry-actions button:hover, .wpcom-liveblog-entry-edit-action:hover {
-	text-decoration: underline;
+.liveblog-meta {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	justify-content: space-between;
 }
 
-.wpcom-liveblog-entry-edit-action {
-	text-align: right;
-	width: 100%;
-	font-size: 14px;
+.liveblog-meta-time {
+	font-size: 10px;
+	line-height: 12px;
+  text-transform: uppercase;
 }
 
-.wpcom-liveblog-entry-edit {
-	padding: 10px;
-	background: #f9f9f9;
-	border: 1px solid #dfdfdf;
-	margin-bottom: 20px;
-	margin-top: 20px;
-	border-radius: 3px;
+.liveblog-author {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
-.wpcom-liveblog-entry-edit .editor-container  {
-	padding: 0px;
-	border: none;
-	margin-bottom: 0px;
+.liveblog-author-name {
+	font-size: 15px;
+  line-height: 18px;
+  margin-left: 5px;
+}
+
+.liveblog-author-avatar img {
+	width: 30px;
+	height: 30px;
+}
+
+.type-key {
+  display: none;
 }

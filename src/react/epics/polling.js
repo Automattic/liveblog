@@ -13,7 +13,7 @@ import {
 } from '../actions/apiActions';
 
 import {
-  polling,
+  polling as pollingApi,
   getEntries,
 } from '../services/api';
 
@@ -31,7 +31,7 @@ const startPollingEpic = (action$, store) =>
       interval(3000)
         .takeUntil(action$.ofType(types.CANCEL_POLLING))
         .exhaustMap(() =>
-          polling(store.getState().polling.newestEntry.timestamp, store.getState().config)
+          pollingApi(store.getState().polling.newestEntry.timestamp, store.getState().config)
             .timeout(10000)
             .map(res =>
               pollingSuccess(
@@ -50,18 +50,20 @@ const startPollingEpic = (action$, store) =>
 const mergePollingEpic = (action$, store) =>
   action$.ofType(types.MERGE_POLLING)
     .switchMap(() => {
-      if (store.getState().pagination.page === 1) {
+      const { pagination, polling, config } = store.getState();
+
+      if (pagination.page === 1) {
         return concat(
-          of(mergePollingIntoEntries(store.getState().polling.entries)),
-          of(scrollToEntry(`id_${store.getState().polling.newestEntry.id}`)),
+          of(mergePollingIntoEntries(polling.entries)),
+          of(scrollToEntry(`id_${polling.newestEntry.id}`)),
         );
       }
 
-      return getEntries(1, store.getState().config, store.getState().polling.newestEntry)
+      return getEntries(1, config, polling.newestEntry)
         .timeout(10000)
         .flatMap(res => concat(
           of(getEntriesSuccess(res.response, true)),
-          of(scrollToEntry(`id_${store.getState().polling.newestEntry.id}`)),
+          of(scrollToEntry(`id_${polling.newestEntry.id}`)),
         ))
         .catch(error => of(getEntriesFailed(error)));
     });

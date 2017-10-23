@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const paths = {
@@ -29,9 +30,6 @@ const webpackConfig = {
         use: [
           {
             loader: 'babel-loader',
-            options: {
-              plugins: ['babel-plugin-lodash'].map(require.resolve),
-            },
           },
           {
             loader: 'eslint-loader',
@@ -47,14 +45,32 @@ const webpackConfig = {
         test: /\.scss$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader'],
+          use: [
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: () => [
+                  autoprefixer({
+                    browsers: [
+                      'last 3 version',
+                      'ie >= 11',
+                    ],
+                  }),
+                ],
+              },
+            },
+            'sass-loader',
+          ],
         }),
       },
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader'],
+          use: [
+            'css-loader',
+          ],
         }),
       },
     ],
@@ -76,9 +92,7 @@ const webpackConfig = {
 
 // Production/Dev Specific Config
 if (process.env.NODE_ENV === 'production') {
-  webpackConfig.plugins.push(
-    new webpack.optimize.UglifyJsPlugin()
-  );
+  webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin());
 } else {
   webpackConfig.devtool = 'sourcemap';
 }

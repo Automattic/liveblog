@@ -11,18 +11,18 @@ import Event from '../components/Event';
 
 class EventsContainer extends Component {
   renderEvents() {
-    const { entries, deleteEvent, jumpToEvent } = this.props;
+    const { events, deleteEvent, jumpToEvent } = this.props;
 
     return (
       <div>
         <h1>Key Events</h1>
         <ul>
-          {Object.keys(entries).map((key, i) =>
+          {Object.keys(events).map((key, i) =>
             <Event
               key={i}
-              event={entries[key]}
-              click={() => jumpToEvent(entries[key].id)}
-              onDelete={() => deleteEvent(entries[key])}
+              event={events[key]}
+              click={() => jumpToEvent(events[key].id)}
+              onDelete={() => deleteEvent(events[key])}
             />,
           )}
         </ul>
@@ -42,16 +42,14 @@ EventsContainer.propTypes = {
   getEvents: PropTypes.func,
   deleteEvent: PropTypes.func,
   jumpToEvent: PropTypes.func,
-  entries: PropTypes.object,
+  events: PropTypes.object,
   container: PropTypes.any,
 };
 
-// Map state to props on connected component
 const mapStateToProps = state => ({
-  entries: state.events.entries,
+  events: state.events.entries,
 });
 
-// Map dispatch/actions to props on connected component
 const mapDispatchToProps = dispatch =>
   bindActionCreators({
     ...eventsActions,
