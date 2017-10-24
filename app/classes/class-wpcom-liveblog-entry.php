@@ -100,7 +100,8 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'   => $entry_id,
 			'type' => $this->get_type(),
-			'content' => $this->get_content(),
+			'render' => $this->get_content(),
+			'content' => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'timestamp' => $this->get_timestamp(),
 			'avatar_img' => get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link' => get_comment_author_link( $entry_id ),

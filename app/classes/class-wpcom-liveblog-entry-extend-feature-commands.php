@@ -58,6 +58,21 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// the current command set.
 		$this->commands     	  = apply_filters( 'liveblog_active_commands', $this->commands );
 
+		// This is the regex used to revert the
+		// generated author html back to the
+		// raw input format (e.g /key).
+		$this->revert_regex = implode( '', array(
+			preg_quote( '<span class="liveblog-command ', '~' ),
+			preg_quote( self::$class_prefix, '~' ),
+			'([^"]+)',
+			preg_quote( '">', '~' ),
+			'([^"]+)',
+			preg_quote( '</span>', '~' ),
+		) );
+
+		// Allow plugins, themes, etc. to change the revert regex.
+		$this->revert_regex = apply_filters( 'liveblog_command_revert_regex', $this->revert_regex );
+
 		// We hook into the comment_class filter to
 		// be able to alter the comment content.
 		add_filter( 'comment_class',          array( $this, 'add_type_class_to_entry' ), 10, 3 );
@@ -177,6 +192,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		}
 
 		return $classes;
+	}
+
+	/**
+	 * Reverts the input.
+	 *
+	 * @param mixed $content
+	 * @return mixed
+	 */
+	public function revert( $content ) {
+		return preg_replace( '~'.$this->revert_regex.'~', '/$1', $content );
 	}
 
 	/**
