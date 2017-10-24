@@ -10,7 +10,7 @@ import {
 
 export function getEntries(page, config, newestEntry) {
   const settings = {
-    url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || 0}-${newestEntry.timestamp || 0}`,
+    url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
   };
 
@@ -85,7 +85,7 @@ export function deleteEntry(id, config, nonce = false) {
 
 export function getEvents(config, newestEntry) {
   const settings = {
-    url: `${config.endpoint_url}get-key-events/${newestEntry.id || 0}-${newestEntry.timestamp || 0}`,
+    url: `${config.endpoint_url}get-key-events/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
   };
 

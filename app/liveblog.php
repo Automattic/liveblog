@@ -746,11 +746,11 @@ final class WPCOM_Liveblog {
 		}
 
 		$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
-		
+
 		$entries  = self::$entry_query->get_all_entries_asc();
 		$entries  = self::flatten_entries( $entries );
 		$pages 	  = ceil( count( $entries ) / $per_page );
-	
+
 		//If no page is passed but entry id is, we search for the correct page.
 		if ( $page === false && $id !== false ) {
 			$index = array_search( $id, array_keys( $entries ));
@@ -780,7 +780,7 @@ final class WPCOM_Liveblog {
 
 	/**
 	 * Convert array of entries to there json response.
-	 * @param type $entries 
+	 * @param type $entries
 	 * @return array
 	 */
 	public static function entries_for_json( $entries ) {
@@ -795,8 +795,8 @@ final class WPCOM_Liveblog {
 	/**
 	 * Flattens Entries by running updates and deletes to get actual
 	 * list of entries
-	 * 
-	 * @param array $entires 
+	 *
+	 * @param array $entires
 	 * @return array
 	 */
 	public static function flatten_entries( $entries ) {
@@ -979,6 +979,7 @@ final class WPCOM_Liveblog {
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
+				'latest_entry_id'	     => self::$entry_query->get_latest()->get_id(),
 				'timestamp'				 => time(),
 
 				'refresh_interval'       => self::get_refresh_interval(),

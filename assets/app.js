@@ -12063,7 +12063,7 @@ var _utils = __webpack_require__(29);
  */
 function getEntries(page, config, newestEntry) {
   var settings = {
-    url: config.endpoint_url + 'get-entries/' + page + '/' + (newestEntry.id || 0) + '-' + (newestEntry.timestamp || 0),
+    url: config.endpoint_url + 'get-entries/' + page + '/' + (newestEntry.id || config.latest_entry_id) + '-' + (newestEntry.timestamp || config.latest_entry_timestamp),
     method: 'GET'
   };
 
@@ -12144,7 +12144,7 @@ function deleteEntry(id, config) {
 
 function getEvents(config, newestEntry) {
   var settings = {
-    url: config.endpoint_url + 'get-key-events/' + (newestEntry.id || 0) + '-' + (newestEntry.timestamp || 0),
+    url: config.endpoint_url + 'get-key-events/' + (newestEntry.id || config.latest_entry_id) + '-' + (newestEntry.timestamp || config.latest_entry_timestamp),
     method: 'GET'
   };
 

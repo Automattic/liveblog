@@ -146,14 +146,14 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// We need the post_id to get it's template.
 		$post_id      = $object->get_post_id();
 		// Get the entry content
-		$content      = $object->get_content();	
+		$content      = $object->get_content();
 
 		// Use the currently set template.
 		$template     = self::get_current_template( $post_id );
 
 		// Set if key event
 		$entry['key_event'] = self::is_key_event( $object->get_id() );
-  		  
+
 		// If key event add content
 		if ( $entry['key_event'] ) {
 			$entry['key_event_content'] = self::get_formatted_content( $content, $post_id );
