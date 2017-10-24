@@ -28,7 +28,10 @@ export const api = (state = initialState, action) => {
         error: false,
         loading: false,
         entries: applyUpdate({}, action.payload.entries),
-        newestEntry: getNewestEntry(state.newestEntry, action.payload.entries),
+        newestEntry: getNewestEntry(
+          state.newestEntry,
+          action.payload.entries[0],
+        ),
       };
 
     case 'GET_ENTRIES_FAILED':
@@ -48,7 +51,7 @@ export const api = (state = initialState, action) => {
           action.renderNewEntries,
         ),
         newestEntry: action.renderNewEntries
-          ? getNewestEntry(state.newestEntry, action.payload.entries)
+          ? getNewestEntry(state.newestEntry, action.payload.entries[0])
           : state.newestEntry,
       };
 

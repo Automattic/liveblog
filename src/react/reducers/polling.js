@@ -23,7 +23,7 @@ export const polling = (state = initialState, action) => {
             state.entries,
             action.payload.entries.filter(entry => entry.type === 'new'),
           ),
-        newestEntry: getNewestEntry(state.newestEntry, action.payload.entries),
+        newestEntry: getNewestEntry(state.newestEntry, action.payload.entries[0]),
       };
 
     case 'POLLING_FAILED':
@@ -35,7 +35,10 @@ export const polling = (state = initialState, action) => {
     case 'GET_ENTRIES_SUCCESS':
       return {
         ...state,
-        newestEntry: getNewestEntry(state.newestEntry, action.payload.entries),
+        newestEntry: getNewestEntry(
+          state.newestEntry,
+          action.payload.entries[0],
+        ),
         entries: action.renderNewEntries
           ? {}
           : state.entries,

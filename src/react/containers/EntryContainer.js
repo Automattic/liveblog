@@ -53,7 +53,7 @@ class EntryContainer extends Component {
     const { entry } = this.props;
 
     return (
-      <article id={`id_${entry.id}`} ref={node => this.node = node} className="liveblog-entry">
+      <article id={`id_${entry.id}`} ref={node => this.node = node} className="liveblog-entry" >
         <header className="liveblog-meta">
           <div className="liveblog-author">
             <div

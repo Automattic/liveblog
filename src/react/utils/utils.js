@@ -110,12 +110,12 @@ export const shouldRenderNewEntries = (page, entries, polling) => {
  * @param {Object} current
  * @param {Array} updates
  */
-export const getNewestEntry = (current, updates) => {
-  if (!current && !updates[0]) return false;
-  if (!current && updates[0]) return updates[0];
-  if (!updates[0]) return current;
-  if (current.timestamp > updates[0].timestamp) return current;
-  return updates[0];
+export const getNewestEntry = (current, update) => {
+  if (!current && !update) return false;
+  if (!current && update) return update;
+  if (!update) return current;
+  if (current.timestamp > update.timestamp) return current;
+  return update;
 };
 
 /**
