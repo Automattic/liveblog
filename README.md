@@ -5,7 +5,7 @@
 * Tags: liveblog
 * Requires at least: 3.5
 * Tested up to: 4.8.2
-* Stable tag: 1.6
+* Stable tag: 1.6.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -438,6 +438,12 @@ If for some reason the plugin is not able to use WebSockets to refresh the list 
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
 
 ## Changelog
+
+### 1.6.1
+
+* Remove support for Flash + Silverlight which are no longer supported in WP 4.9, see https://core.trac.wordpress.org/ticket/41755#no0
+* Bugfix for WPCOM: Don't force an AJAX URL if we're using the REST API.
+* Bugfix WPCOM: Retain SA access for A12s
 
 ### 1.6
 
