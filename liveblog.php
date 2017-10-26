@@ -933,13 +933,10 @@ final class WPCOM_Liveblog {
 		global $wp_scripts;
 
 		$defaults = array(
-			'runtimes'            => 'html5,silverlight,flash,html4',
 			'file_data_name'      => 'async-upload',
 			'multiple_queues'     => true,
 			'max_file_size'       => wp_max_upload_size() . 'b',
 			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
-			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
-			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
 			'filters'             => array( array( 'title' => __( 'Allowed Files', 'liveblog' ), 'extensions' => '*') ),
 			'multipart'           => true,
 			'urlstream_upload'    => true,
