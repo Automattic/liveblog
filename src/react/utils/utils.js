@@ -155,3 +155,9 @@ export const getLastOfObject = object =>
 export const getFirstOfObject = object => object[Object.keys(object)[0]];
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
+
+export const getPollingPages = (current, next) => {
+  if (!next) return current;
+  return Math.max(next, 1);
+};
+

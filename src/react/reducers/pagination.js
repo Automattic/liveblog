@@ -1,3 +1,7 @@
+import {
+  getPollingPages
+} from '../utils/utils';
+
 export const initialState = {
   page: 1,
   pages: 1,
@@ -22,7 +26,7 @@ export const pagination = (state = initialState, action) => {
       return {
         ...state,
         pages: action.renderNewEntries
-          ? Math.max(action.payload.pages, 1) || state.pages
+          ? getPollingPages(state.pages, action.payload.pages)
           : state.pages,
       };
 
