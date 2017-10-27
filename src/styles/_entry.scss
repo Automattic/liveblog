@@ -20,23 +20,27 @@
   text-transform: uppercase;
 }
 
-.liveblog-author {
+.liveblog-meta-author {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
 }
 
-.liveblog-author-name {
+.liveblog-meta-author-name {
 	font-size: 15px;
   line-height: 18px;
   margin-left: 5px;
 }
 
-.liveblog-author-avatar img {
+.liveblog-meta-author-avatar img {
 	width: 30px;
-	height: 30px;
+  height: 30px;
 }
 
 .type-key {
   display: none;
+}
+
+.liveblog-hash {
+  color: $color-primary;
 }

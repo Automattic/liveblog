@@ -24,7 +24,7 @@
   white-space: normal; /* 5 */
   transition: background .3s ease-in-out;
   padding: 12px 16px;
-  margin: 2px;
+  margin: 1px;
 
   &:hover,
   &:focus {
@@ -36,6 +36,7 @@
 .liveblog-btn--primary {
   color: #FFF;
   background: $color-primary;
+  font-size: 16px;
 
   &:hover,
   &:focus {
@@ -57,6 +58,10 @@
   font-size: 12px;
   line-height: 23px;
   padding: 4px 16px;
+}
+
+.liveblog-btn--icon {
+  padding: 8px;
 }
 
 .liveblog-btn--wide {

@@ -979,8 +979,9 @@ final class WPCOM_Liveblog {
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
-				'latest_entry_id'	     => self::$entry_query->get_latest()->get_id(),
+				'latest_entry_id'	     => self::$entry_query->get_latest_id(),
 				'timestamp'				 => time(),
+				'entries_per_page'		 => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 
 				'refresh_interval'       => self::get_refresh_interval(),
 				'focus_refresh_interval' => self::focus_refresh_interval,

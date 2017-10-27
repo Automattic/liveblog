@@ -6,10 +6,11 @@ const addModifiers = modifiers =>
     .split(' ')
     .map(x => `liveblog-btn--${x}`).join(' ');
 
-const Button = ({ children, click, type, modifiers }) => (
+const Button = ({ children, click, type, modifiers, onMouseDown }) => (
   <button
     className={`liveblog-btn ${type && `liveblog-btn--${type}`} ${addModifiers(modifiers)}`}
-    onClick={click}>
+    onClick={click}
+    onMouseDown={onMouseDown}>
     {children}
   </button>
 );
@@ -17,6 +18,7 @@ const Button = ({ children, click, type, modifiers }) => (
 Button.propTypes = {
   children: PropTypes.string,
   click: PropTypes.func,
+  onMouseDown: PropTypes.func,
   type: PropTypes.string,
   modifiers: PropTypes.string,
 };

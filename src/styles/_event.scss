@@ -1,6 +1,6 @@
 .liveblog-event {
   display: flex;
-  flex-wrap: nowrap;
+  align-items: center;
   justify-content: space-between;
   border-top: 1px solid $color-grey-mid-light;
   padding: 5px 0;
@@ -8,6 +8,7 @@
 
 .liveblog-event-content {
   cursor: pointer;
+  margin-top: 5px;
 
   &:hover,
   &:focus {

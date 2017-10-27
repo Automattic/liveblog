@@ -1,14 +1,4 @@
 /**
- * Draft v0.10.3
- *
- * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-.DraftEditor-editorContainer,.DraftEditor-root,.public-DraftEditor-content{height:inherit;text-align:initial}.public-DraftEditor-content[contenteditable=true]{-webkit-user-modify:read-write-plaintext-only}.DraftEditor-root{position:relative}.DraftEditor-editorContainer{background-color:rgba(255,255,255,0);border-left:.1px solid transparent;position:relative;z-index:1}.public-DraftEditor-block{position:relative}.DraftEditor-alignLeft .public-DraftStyleDefault-block{text-align:left}.DraftEditor-alignLeft .public-DraftEditorPlaceholder-root{left:0;text-align:left}.DraftEditor-alignCenter .public-DraftStyleDefault-block{text-align:center}.DraftEditor-alignCenter .public-DraftEditorPlaceholder-root{margin:0 auto;text-align:center;width:100%}.DraftEditor-alignRight .public-DraftStyleDefault-block{text-align:right}.DraftEditor-alignRight .public-DraftEditorPlaceholder-root{right:0;text-align:right}.public-DraftEditorPlaceholder-root{color:#9197a3;position:absolute;z-index:1}.public-DraftEditorPlaceholder-hasFocus{color:#bdc1c9}.DraftEditorPlaceholder-hidden{display:none}.public-DraftStyleDefault-block{position:relative;white-space:pre-wrap}.public-DraftStyleDefault-ltr{direction:ltr;text-align:left}.public-DraftStyleDefault-rtl{direction:rtl;text-align:right}.public-DraftStyleDefault-listLTR{direction:ltr}.public-DraftStyleDefault-listRTL{direction:rtl}.public-DraftStyleDefault-ol,.public-DraftStyleDefault-ul{margin:16px 0;padding:0}.public-DraftStyleDefault-depth0.public-DraftStyleDefault-listLTR{margin-left:1.5em}.public-DraftStyleDefault-depth0.public-DraftStyleDefault-listRTL{margin-right:1.5em}.public-DraftStyleDefault-depth1.public-DraftStyleDefault-listLTR{margin-left:3em}.public-DraftStyleDefault-depth1.public-DraftStyleDefault-listRTL{margin-right:3em}.public-DraftStyleDefault-depth2.public-DraftStyleDefault-listLTR{margin-left:4.5em}.public-DraftStyleDefault-depth2.public-DraftStyleDefault-listRTL{margin-right:4.5em}.public-DraftStyleDefault-depth3.public-DraftStyleDefault-listLTR{margin-left:6em}.public-DraftStyleDefault-depth3.public-DraftStyleDefault-listRTL{margin-right:6em}.public-DraftStyleDefault-depth4.public-DraftStyleDefault-listLTR{margin-left:7.5em}.public-DraftStyleDefault-depth4.public-DraftStyleDefault-listRTL{margin-right:7.5em}.public-DraftStyleDefault-unorderedListItem{list-style-type:square;position:relative}.public-DraftStyleDefault-unorderedListItem.public-DraftStyleDefault-depth0{list-style-type:disc}.public-DraftStyleDefault-unorderedListItem.public-DraftStyleDefault-depth1{list-style-type:circle}.public-DraftStyleDefault-orderedListItem{list-style-type:none;position:relative}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listLTR:before{left:-36px;position:absolute;text-align:right;width:30px}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listRTL:before{position:absolute;right:-36px;text-align:left;width:30px}.public-DraftStyleDefault-orderedListItem:before{content:counter(ol0) ". ";counter-increment:ol0}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth1:before{content:counter(ol1) ". ";counter-increment:ol1}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth2:before{content:counter(ol2) ". ";counter-increment:ol2}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth3:before{content:counter(ol3) ". ";counter-increment:ol3}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth4:before{content:counter(ol4) ". ";counter-increment:ol4}.public-DraftStyleDefault-depth0.public-DraftStyleDefault-reset{counter-reset:ol0}.public-DraftStyleDefault-depth1.public-DraftStyleDefault-reset{counter-reset:ol1}.public-DraftStyleDefault-depth2.public-DraftStyleDefault-reset{counter-reset:ol2}.public-DraftStyleDefault-depth3.public-DraftStyleDefault-reset{counter-reset:ol3}.public-DraftStyleDefault-depth4.public-DraftStyleDefault-reset{counter-reset:ol4}/**
  * Base button styles.
  * 1. Corrects inability to style clickable `input` types in iOS.
  * 2. Normalize `box-sizing` across all elements that this component could be
@@ -45,7 +35,7 @@
   -o-transition: background .3s ease-in-out;
   transition: background .3s ease-in-out;
   padding: 12px 16px;
-  margin: 2px; }
+  margin: 1px; }
   .liveblog-btn:hover, .liveblog-btn:focus {
     -webkit-transition: background .3s ease-in-out;
     -o-transition: background .3s ease-in-out;
@@ -54,7 +44,8 @@
 
 .liveblog-btn--primary {
   color: #FFF;
-  background: #21759B; }
+  background: #21759B;
+  font-size: 16px; }
   .liveblog-btn--primary:hover, .liveblog-btn--primary:focus {
     background: #1d6586; }
 
@@ -69,6 +60,9 @@
   line-height: 23px;
   padding: 4px 16px; }
 
+.liveblog-btn--icon {
+  padding: 8px; }
+
 .liveblog-btn--wide {
   width: 100%; }
 
@@ -82,18 +76,16 @@
     text-decoration: underline; }
 
 .public-DraftEditor-content {
-  border: 1px solid #ddd;
-  min-height: 100px;
+  border: 1px solid #bbb;
+  min-height: 200px;
+  padding: 10px;
   margin-bottom: 10px;
   background: #fff; }
 
 .editor-container {
-  padding: 10px;
-  background: #f9f9f9;
-  border: 1px solid #dfdfdf;
-  margin-bottom: 20px;
-  margin-top: 20px;
-  border-radius: 3px; }
+  background: #eee;
+  padding: 15px;
+  margin-bottom: 10px; }
 
 .editor-publish-button {
   display: block;
@@ -109,6 +101,86 @@
 
 .liveblog-editor {
   margin-bottom: 10px; }
+
+.liveblog-editor-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start; }
+
+.liveblog-editor-modal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 99;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center; }
+
+.liveblog-form {
+  background: #eee;
+  border: 1px solid #bbb;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap; }
+
+.liveblog-input {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  margin: 2px;
+  padding: 2px; }
+
+.liveblog-toolbar {
+  background: #eee;
+  border: 1px solid #bbb;
+  border-bottom: none; }
+
+.liveblog-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: #fff;
+  border: 1px solid #bbb;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: scroll; }
+
+.liveblog-popover-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  padding: 5px;
+  font-size: 14px; }
+
+.liveblog-popover-item--focused {
+  background: #eee; }
+
+.liveblog-popover-item-figure {
+  margin-right: 5px; }
+
+.liveblog-popover-item:not(:last-child) {
+  border: 1px solid #eee; }
 
 .liveblog-entry {
   border-top: 1px solid #ccc;
@@ -135,7 +207,7 @@
   line-height: 12px;
   text-transform: uppercase; }
 
-.liveblog-author {
+.liveblog-meta-author {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -145,24 +217,28 @@
       -ms-flex-align: center;
           align-items: center; }
 
-.liveblog-author-name {
+.liveblog-meta-author-name {
   font-size: 15px;
   line-height: 18px;
   margin-left: 5px; }
 
-.liveblog-author-avatar img {
+.liveblog-meta-author-avatar img {
   width: 30px;
   height: 30px; }
 
 .type-key {
   display: none; }
 
+.liveblog-hash {
+  color: #21759B; }
+
 .liveblog-event {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -170,7 +246,8 @@
   padding: 5px 0; }
 
 .liveblog-event-content {
-  cursor: pointer; }
+  cursor: pointer;
+  margin-top: 5px; }
   .liveblog-event-content:hover, .liveblog-event-content:focus {
     text-decoration: underline; }
 

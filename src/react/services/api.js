@@ -119,3 +119,13 @@ export function deleteEvent(entry, config, nonce = false) {
 
   return ajax(settings);
 }
+
+export function getAuthors(term, config) {
+  const settings = {
+    url: `${config.autocomplete[3].url}${term}`,
+    method: 'GET',
+  };
+
+  return ajax(settings);
+}
+

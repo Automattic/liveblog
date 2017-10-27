@@ -98,6 +98,19 @@ class WPCOM_Liveblog_Entry_Query {
 		return reset( $entries );
 	}
 
+	public function get_latest_id() {
+
+		$latest = $this->get_latest();
+
+		if ( is_null( $latest ) )
+		return null;
+
+		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) )
+			return null;
+
+		return $latest->get_id();
+	}
+
 	public function get_latest_timestamp() {
 
 		$latest = $this->get_latest();

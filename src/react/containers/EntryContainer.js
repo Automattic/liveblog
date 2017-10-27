@@ -55,11 +55,11 @@ class EntryContainer extends Component {
     return (
       <article id={`id_${entry.id}`} ref={node => this.node = node} className="liveblog-entry" >
         <header className="liveblog-meta">
-          <div className="liveblog-author">
+          <div className="liveblog-meta-author">
             <div
-              className="liveblog-authour-avatar"
+              className="liveblog-meta-authour-avatar"
               dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
-            <span className="liveblog-author-name" >{entry.author_link}</span>
+            <span className="liveblog-meta-author-name" >{entry.author_link}</span>
           </div>
           <span className="liveblog-meta-time">{timeAgo(entry.entry_time)}</span>
         </header>
@@ -73,7 +73,7 @@ class EntryContainer extends Component {
             : (
               <div
                 className="liveblog-entry-content"
-                dangerouslySetInnerHTML={{ __html: entry.content }}
+                dangerouslySetInnerHTML={{ __html: entry.render }}
               />
             )
         }

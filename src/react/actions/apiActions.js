@@ -89,3 +89,4 @@ export const mergePollingIntoEntries = payload => ({
   type: types.MERGE_POLLING_INTO_ENTRIES,
   payload,
 });
+

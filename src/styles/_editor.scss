@@ -1,18 +1,16 @@
 
 .public-DraftEditor-content {
-	border: 1px solid #ddd;
-  min-height: 100px;
+	border: 1px solid $color-grey-light;
+  min-height: 200px;
+  padding: 10px;
   margin-bottom: 10px;
 	background: #fff;
 }
 
 .editor-container {
-	padding: 10px;
-	background: #f9f9f9;
-	border: 1px solid #dfdfdf;
-	margin-bottom: 20px;
-	margin-top: 20px;
-	border-radius: 3px;
+  background: $color-grey-x-light;
+  padding: 15px;
+  margin-bottom: 10px;
 }
 
 .editor-publish-button {
@@ -30,5 +28,75 @@
 
 .liveblog-editor {
   margin-bottom: 10px;
+}
+
+.liveblog-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.liveblog-editor-modal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: rgba(255, 255, 255, .8);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.liveblog-form {
+  background: $color-grey-x-light;
+  border: 1px solid $color-grey-light;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.liveblog-input {
+  flex-grow: 1;
+  margin: 2px;
+  padding: 2px;
+}
+
+.liveblog-toolbar {
+  background: $color-grey-x-light;
+  border: 1px solid $color-grey-light;
+  border-bottom: none;
+}
+
+.liveblog-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: #fff;
+  border: 1px solid $color-grey-light;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+.liveblog-popover-item {
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.liveblog-popover-item--focused {
+  background: $color-grey-x-light;
+}
+
+.liveblog-popover-item-figure {
+  margin-right: 5px;
+}
+
+.liveblog-popover-item:not(:last-child) {
+  border: 1px solid $color-grey-x-light;
 }
 

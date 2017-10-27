@@ -1,7 +1,6 @@
 export const initialState = {
   page: 1,
   pages: 1,
-  entriesPerPage: 0,
 };
 
 export const pagination = (state = initialState, action) => {
@@ -15,16 +14,15 @@ export const pagination = (state = initialState, action) => {
     case 'GET_ENTRIES_SUCCESS':
       return {
         ...state,
-        pages: action.payload.pages,
+        pages: Math.max(action.payload.pages, 1),
         page: action.payload.page,
-        entriesPerPage: action.payload.entries.length,
       };
 
     case 'POLLING_SUCCESS':
       return {
         ...state,
         pages: action.renderNewEntries
-          ? action.payload.pages || state.pages
+          ? Math.max(action.payload.pages, 1) || state.pages
           : state.pages,
       };
 
