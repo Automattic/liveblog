@@ -124,11 +124,11 @@ export const getNewestEntry = (current, update) => {
  */
 export const timeAgo = (timestamp) => {
   const units = [
-    { name: 'second', limit: 60, in_seconds: 1 },
-    { name: 'minute', limit: 3600, in_seconds: 60 },
-    { name: 'hour', limit: 86400, in_seconds: 3600 },
-    { name: 'day', limit: 604800, in_seconds: 86400 },
-    { name: 'week', limit: 2629743, in_seconds: 604800 },
+    { name: 's', limit: 60, in_seconds: 1 },
+    { name: 'm', limit: 3600, in_seconds: 60 },
+    { name: 'h', limit: 86400, in_seconds: 3600 },
+    { name: 'd', limit: 604800, in_seconds: 86400 },
+    { name: 'w', limit: 2629743, in_seconds: 604800 },
     { name: 'month', limit: 31556926, in_seconds: 2629743 },
     { name: 'year', limit: null, in_seconds: 31556926 },
   ];
@@ -141,12 +141,17 @@ export const timeAgo = (timestamp) => {
   for (let i = 0; i < units.length; i += 1) {
     if (diff < units[i].limit || !units[i].limit) {
       diff = Math.floor(diff / units[i].in_seconds);
-      output = `${diff} ${units[i].name}${(diff > 1 ? 's' : '')} ago`;
+      output = `${diff}${units[i].name} ago`;
       break;
     }
   }
 
   return output;
+};
+
+export const formattedTime = (timestamp) => {
+  const time = new Date(timestamp * 1000);
+  return `${time.getUTCHours()}:${time.getUTCMinutes()}`;
 };
 
 export const getLastOfObject = object =>

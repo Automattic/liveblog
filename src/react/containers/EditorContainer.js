@@ -62,9 +62,7 @@ class EditorContainer extends Component {
         mentionSuggestionsEntryFocused: 'liveblog-popover-item--focused',
       },
       mentionComponent: ({ mention }) => (
-        <span>
-          @{mention.get('key')}
-        </span>
+        <a href="#">{mention.get('key')}</a>
       ),
     });
 
@@ -86,7 +84,7 @@ class EditorContainer extends Component {
     const editorState = props.entry
       ? EditorState.createWithContent(
         ContentState.createFromBlockArray(
-          convertFromHTML(props.entry.content),
+          convertFromHTML(props.entry.render),
         ),
       )
       : EditorState.createEmpty();
@@ -148,7 +146,7 @@ class EditorContainer extends Component {
     ];
 
     return (
-      <div className="editor-container">
+      <div className={`liveblog-editor-container ${isEditing ? 'liveblog-editor-container--edit' : ''}`}>
         {!isEditing && <h1>Add New Entry</h1>}
         <div style={{ position: 'relative' }}>
           <EditorToolbarContainer

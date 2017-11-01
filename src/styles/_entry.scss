@@ -1,23 +1,42 @@
 .liveblog-entry {
-	border-top: 1px solid $color-grey-mid-light;
-  padding: 10px 0;
+  position: relative;
+  background: $color-grey-x-light;
+  border-top: 2px solid $color-grey-mid-light;
+  border-bottom: 2px solid $color-grey-mid-light;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.liveblog-entry--key {
+  border-top: 2px solid $color-grey-x-dark;
 }
 
 .liveblog-entry-content {
   padding-top: 10px;
+  padding-left: 60px;
 }
 
 .liveblog-meta {
 	display: flex;
 	flex-wrap: nowrap;
-	align-items: flex-start;
-	justify-content: space-between;
+  align-items: flex-start;
+  color: $color-grey-base;
 }
 
 .liveblog-meta-time {
-	font-size: 10px;
-	line-height: 12px;
-  text-transform: uppercase;
+  flex-basis: 60px;
+}
+
+.liveblog-meta-time span {
+  display: block;
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.liveblog-meta-time span:first-child {
+  font-weight: 600;
+  color: $color-grey-dark;
+  margin-bottom: 5px;
 }
 
 .liveblog-meta-author {
@@ -27,14 +46,27 @@
 }
 
 .liveblog-meta-author-name {
-	font-size: 15px;
-  line-height: 18px;
-  margin-left: 5px;
+	font-size: 13px;
+  margin-left: 8px;
+}
+
+.liveblog-meta-authour-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
 }
 
 .liveblog-meta-author-avatar img {
 	width: 30px;
   height: 30px;
+}
+
+.liveblog-entry-toolbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  //background: $color-grey-dark;
 }
 
 .type-key {

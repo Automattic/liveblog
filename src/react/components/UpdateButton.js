@@ -5,12 +5,14 @@ const UpdateButton = ({ polling, click }) => {
   if (!polling.length > 0) return false;
 
   return (
-    <button
-      className="liveblog-btn liveblog-btn--primary liveblog-btn--wide"
-      style={{ position: 'sticky', top: '50px' }}
-      onClick={click}>
-      {polling.length} new {polling.length > 1 ? 'entries' : 'entry'} available
-    </button>
+    <div className="liveblog-update-btn-container">
+      <button
+        className="liveblog-btn liveblog-btn--primary liveblog-btn--rounded"
+        onClick={click}>
+        <span className="dashicons dashicons-update"></span>
+        {polling.length} new {polling.length > 1 ? 'entries' : 'entry'} available
+      </button>
+    </div>
   );
 };
 

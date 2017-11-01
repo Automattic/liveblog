@@ -21,7 +21,7 @@ class PaginationContainer extends Component {
           </button>
           <button
             disabled={page === 1}
-            className="liveblog-btn liveblog-btn--secondary liveblog-btn--small"
+            className="liveblog-btn liveblog-btn--secondary liveblog-btn--small liveblog-btn--dark"
             onClick={() => getEntries(page - 1)}
           >
             Prev
@@ -31,7 +31,7 @@ class PaginationContainer extends Component {
         <div>
           <button
             disabled={page === pages}
-            className="liveblog-btn liveblog-btn--secondary liveblog-btn--small"
+            className="liveblog-btn liveblog-btn--secondary liveblog-btn--small liveblog-btn--dark"
             onClick={() => getEntries(page + 1)}
           >
             Next

@@ -15,8 +15,8 @@ class EventsContainer extends Component {
 
     return (
       <div>
-        <h1>Key Events</h1>
-        <ul>
+        <h2 className="widget-title">Key Events</h2>
+        <ul className="liveblog-events">
           {Object.keys(events).map((key, i) =>
             <Event
               key={i}

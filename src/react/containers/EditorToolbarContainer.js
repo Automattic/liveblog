@@ -119,28 +119,28 @@ class EditorToolbarContainer extends Component {
 
     return (
       <div className="liveblog-toolbar">
-        <Button type="secondary" modifiers="icon" onMouseDown={() => this.toggleBlockType('header-one')}>
+        <Button modifiers="icon" onMouseDown={() => this.toggleBlockType('header-one')}>
           H1
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={() => this.toggleInlineStyle('BOLD')}>
+        <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('BOLD')}>
           <span className="dashicons dashicons-editor-bold"></span>
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={() => this.toggleInlineStyle('ITALIC')}>
+        <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('ITALIC')}>
           <span className="dashicons dashicons-editor-italic"></span>
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={() => this.toggleInlineStyle('UNDERLINE')}>
+        <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('UNDERLINE')}>
           <span className="dashicons dashicons-editor-underline"></span>
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={() => this.toggleInlineStyle('STRIKETHROUGH')}>
+        <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('STRIKETHROUGH')}>
           <span className="dashicons dashicons-editor-strikethrough"></span>
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={() => this.toggleBlockType('blockquote')}>
+        <Button modifiers="icon" onMouseDown={() => this.toggleBlockType('blockquote')}>
           <span className="dashicons dashicons-editor-quote"></span>
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={this.openLinkModal.bind(this)}>
+        <Button modifiers="icon" onMouseDown={this.openLinkModal.bind(this)}>
           <span className="dashicons dashicons-admin-links"></span>
         </Button>
-        <Button type="secondary" modifiers="icon" onMouseDown={this.removeAsLink.bind(this)}>
+        <Button modifiers="icon" onMouseDown={this.removeAsLink.bind(this)}>
           <span className="dashicons dashicons-editor-unlink"></span>
         </Button>
         {

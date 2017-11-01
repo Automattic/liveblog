@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
-import { timeAgo } from '../utils/utils';
+import { timeAgo, formattedTime } from '../utils/utils';
 import Button from '../components/Button';
 import EditorContainer from '../containers/EditorContainer';
 
@@ -38,13 +38,19 @@ class EntryContainer extends Component {
     if (config.is_liveblog_editable !== '1') return false;
 
     return (
-      <div>
+      <div className="liveblog-entry-toolbar">
         {
           this.isEditing()
-            ? <Button type="secondary" modifiers="small" click={this.close}>Close Editor</Button>
-            : <Button type="secondary" modifiers="small" click={this.edit}>Edit</Button>
+            ? <Button modifiers="small icon" click={this.close}>
+              <span className="dashicons dashicons-edit"></span>Close Editor
+            </Button>
+            : <Button modifiers="small icon" click={this.edit}>
+              <span className="dashicons dashicons-edit"></span>Edit
+            </Button>
         }
-        <Button modifiers="small delete" click={this.delete}>Delete</Button>
+        <Button modifiers="small icon" click={this.delete}>
+          <span className="dashicons dashicons-no"></span>Delete
+        </Button>
       </div>
     );
   }
@@ -53,15 +59,18 @@ class EntryContainer extends Component {
     const { entry } = this.props;
 
     return (
-      <article id={`id_${entry.id}`} ref={node => this.node = node} className="liveblog-entry" >
+      <article id={`id_${entry.id}`} ref={node => this.node = node} className={`liveblog-entry ${entry.key_event ? 'liveblog-entry--key' : ''}`} >
         <header className="liveblog-meta">
+          <div className="liveblog-meta-time">
+            <span>{timeAgo(entry.entry_time)}</span>
+            <span>{formattedTime(entry.entry_time)}</span>
+          </div>
           <div className="liveblog-meta-author">
             <div
               className="liveblog-meta-authour-avatar"
               dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
             <span className="liveblog-meta-author-name" >{entry.author_link}</span>
           </div>
-          <span className="liveblog-meta-time">{timeAgo(entry.entry_time)}</span>
         </header>
         {
           this.isEditing()

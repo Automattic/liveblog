@@ -1,5 +1,5 @@
 import {
-  getPollingPages
+  getPollingPages,
 } from '../utils/utils';
 
 export const initialState = {
