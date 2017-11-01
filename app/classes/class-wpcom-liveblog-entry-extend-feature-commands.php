@@ -80,7 +80,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// Hook into the entry saving to
 		// execute the command logic.
 		add_action( 'liveblog_insert_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
-		add_action( 'liveblog_update_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
+		//add_action( 'liveblog_update_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
 	}
 
 	/**
