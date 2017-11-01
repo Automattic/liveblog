@@ -130,8 +130,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 *
 	 * @param $id
 	 */
-	public static function remove_key_action( $id ) {
-		return delete_comment_meta( $id, self::meta_key, self::meta_value );
+	public static function remove_key_action( $content, $id ) {
+		delete_comment_meta( $id, self::meta_key, self::meta_value );
+		return str_replace('/key', '', $content);
 	}
 
 	/**

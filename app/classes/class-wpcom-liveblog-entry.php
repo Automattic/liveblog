@@ -244,9 +244,9 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
-		if ( ! WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['entry_id'] ) ) {
-			return new WP_Error( 'entry-delete-key', __( 'Key event not deleted' ) );
-		}
+
+		$args['content'] = WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
+
 		$entry = self::update( $args );
 		return $entry;
 	}
