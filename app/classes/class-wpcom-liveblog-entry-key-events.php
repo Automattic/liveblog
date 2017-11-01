@@ -152,7 +152,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$template     = self::get_current_template( $post_id );
 
 		// Set if key event
-		$entry['key_event'] = self::is_key_event( $entry['id'] );
+		$entry['key_event'] = self::is_key_event( $object->get_id() );
 
 		// If key event add content
 		if ( $entry['key_event'] ) {
