@@ -71,13 +71,11 @@
   width: 100%; }
 
 .liveblog-btn--delete {
-  background: transparent;
-  color: #bc0b0b;
+  background: #bc0b0b;
+  color: #fff;
   border: none; }
   .liveblog-btn--delete:hover {
-    background: transparent;
-    color: #8c0808;
-    text-decoration: underline; }
+    background: #8c0808; }
 
 .liveblog-btn--dark {
   background: #111;
@@ -106,13 +104,6 @@
 .liveblog-btn--rounded .dashicons-update {
   margin-right: 5px; }
 
-.public-DraftEditor-content {
-  border: 1px solid #bbb;
-  min-height: 200px;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: #fff; }
-
 .liveblog-editor-container {
   background: #f7f7f7;
   border-top: 2px solid #111;
@@ -120,7 +111,14 @@
   padding: 16px;
   margin-bottom: 24px; }
 
-.liveblog-editor-container--edit {
+.liveblog-editor-container .public-DraftEditor-content {
+  border: 1px solid #bbb;
+  min-height: 200px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #fff; }
+
+.liveblog-entry-edit .liveblog-editor-container {
   border: none;
   padding: 0;
   margin-top: 24px;
@@ -203,6 +201,9 @@
   padding: 24px;
   margin-bottom: 24px; }
 
+.liveblog-entry-edit {
+  margin-left: 60px; }
+
 .liveblog-entry--key {
   border-top: 2px solid #111; }
 
@@ -259,10 +260,12 @@
   width: 30px;
   height: 30px; }
 
-.liveblog-entry-toolbar {
-  position: absolute;
-  top: 0;
-  right: 0; }
+.liveblog-entry-tools {
+  margin-left: 60px;
+  margin-top: 10px; }
+
+.liveblog-entry-tools .liveblog-btn:first-child {
+  margin-right: 8px; }
 
 .type-key {
   display: none; }
@@ -331,7 +334,16 @@
   font-weight: 600;
   font-size: 14px; }
 
-.liveblog-event:hover .liveblog-event-content {
+.liveblog-event-delete {
+  color: #bc0b0b;
+  cursor: pointer; }
+
+.liveblog-event-delete:hover {
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1); }
+
+.liveblog-event-content:hover {
   cursor: pointer;
   text-decoration: underline; }
 
@@ -405,5 +417,3 @@
           transform: translate(-50%, -50%);
   -webkit-animation: spin 1s linear infinite;
           animation: spin 1s linear infinite; }
-
-/*# sourceMappingURL=app.css.map*/

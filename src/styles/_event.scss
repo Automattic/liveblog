@@ -60,7 +60,16 @@
   font-size: 14px;
 }
 
-.liveblog-event:hover .liveblog-event-content {
+.liveblog-event-delete {
+  color: $color-warning;
+  cursor: pointer;
+}
+
+.liveblog-event-delete:hover {
+  transform: scale(1.1);
+}
+
+.liveblog-event-content:hover {
   cursor: pointer;
   text-decoration: underline;
 }

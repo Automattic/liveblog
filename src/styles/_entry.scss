@@ -7,6 +7,10 @@
   margin-bottom: 24px;
 }
 
+.liveblog-entry-edit {
+  margin-left: 60px;
+}
+
 .liveblog-entry--key {
   border-top: 2px solid $color-grey-x-dark;
 }
@@ -62,11 +66,13 @@
   height: 30px;
 }
 
-.liveblog-entry-toolbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  //background: $color-grey-dark;
+.liveblog-entry-tools {
+  margin-left: 60px;
+  margin-top: 10px;
+}
+
+.liveblog-entry-tools .liveblog-btn:first-child {
+  margin-right: 8px;
 }
 
 .type-key {

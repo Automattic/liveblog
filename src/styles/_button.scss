@@ -72,14 +72,12 @@
 }
 
 .liveblog-btn--delete {
-  background: transparent;
-  color: $color-warning;
+  background: $color-warning;
+  color: #fff;
   border: none;
 
   &:hover {
-    background: transparent;
-    color: darken($color-warning, 10%);
-    text-decoration: underline;
+    background: darken($color-warning, 10%);
   }
 }
 

@@ -130,8 +130,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 *
 	 * @param $id
 	 */
-	public static function remove_key_action( $id ) {
-		return delete_comment_meta( $id, self::meta_key, self::meta_value );
+	public static function remove_key_action( $content, $id ) {
+		delete_comment_meta( $id, self::meta_key, self::meta_value );
+		return str_replace('/key', '', $content);
 	}
 
 	/**
@@ -152,7 +153,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$template     = self::get_current_template( $post_id );
 
 		// Set if key event
-		$entry['key_event'] = self::is_key_event( $entry['id'] );
+		$entry['key_event'] = self::is_key_event( $object->get_id() );
 
 		// If key event add content
 		if ( $entry['key_event'] ) {

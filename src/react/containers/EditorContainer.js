@@ -84,7 +84,7 @@ class EditorContainer extends Component {
     const editorState = props.entry
       ? EditorState.createWithContent(
         ContentState.createFromBlockArray(
-          convertFromHTML(props.entry.render),
+          convertFromHTML(props.entry.content),
         ),
       )
       : EditorState.createEmpty();
@@ -146,7 +146,7 @@ class EditorContainer extends Component {
     ];
 
     return (
-      <div className={`liveblog-editor-container ${isEditing ? 'liveblog-editor-container--edit' : ''}`}>
+      <div className="liveblog-editor-container">
         {!isEditing && <h1>Add New Entry</h1>}
         <div style={{ position: 'relative' }}>
           <EditorToolbarContainer

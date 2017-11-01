@@ -38,18 +38,18 @@ class EntryContainer extends Component {
     if (config.is_liveblog_editable !== '1') return false;
 
     return (
-      <div className="liveblog-entry-toolbar">
+      <div className="liveblog-entry-tools">
         {
           this.isEditing()
-            ? <Button modifiers="small icon" click={this.close}>
-              <span className="dashicons dashicons-edit"></span>Close Editor
+            ? <Button modifiers="small dark" click={this.close}>
+              Close Editor
             </Button>
-            : <Button modifiers="small icon" click={this.edit}>
-              <span className="dashicons dashicons-edit"></span>Edit
+            : <Button modifiers="small dark" click={this.edit}>
+              Edit
             </Button>
         }
-        <Button modifiers="small icon" click={this.delete}>
-          <span className="dashicons dashicons-no"></span>Delete
+        <Button modifiers="small delete" click={this.delete}>
+          Delete
         </Button>
       </div>
     );
@@ -75,7 +75,7 @@ class EntryContainer extends Component {
         {
           this.isEditing()
             ? (
-              <div className="wpcom-liveblog-entry-edit">
+              <div className="liveblog-entry-edit">
                 <EditorContainer entry={entry} isEditing={true} />
               </div>
             )

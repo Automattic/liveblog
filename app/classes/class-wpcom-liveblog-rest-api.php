@@ -532,7 +532,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$entries = WPCOM_Liveblog::get_entries_paged( $page );
+		$entries = WPCOM_Liveblog::get_entries_paged( $page, $last_known_entry );
 
 		// Possibly do not cache the response
 		WPCOM_Liveblog::prevent_caching_if_needed();
@@ -581,7 +581,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$entries = WPCOM_Liveblog::get_entries_paged( false, $id );
+		$entries = WPCOM_Liveblog::get_entries_paged( false, $last_known_entry, $id );
 
 		// Possibly do not cache the response
 		WPCOM_Liveblog::prevent_caching_if_needed();
