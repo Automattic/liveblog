@@ -756,8 +756,7 @@ final class WPCOM_Liveblog {
 			if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
 				$last_entry_id = $last_known_entry[0];
 				$index 		   = array_search( $last_entry_id ,array_keys( $entries ) );
-
-				$entries = array_slice( $entries, $index, -1, true );
+				$entries 	   = array_slice( $entries, $index, NULL, true );
 			}
 		}
 
