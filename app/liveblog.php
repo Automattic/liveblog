@@ -739,16 +739,28 @@ final class WPCOM_Liveblog {
 	 * @param int $page Requested Page.
 	 * @return array An array of json encoded results
 	 */
-	public static function get_entries_paged( $page, $id = false ) {
+	public static function get_entries_paged( $page, $last_known_entry = false, $id = false ) {
 
 		if ( empty( self::$entry_query ) ) {
 			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 		}
 
+
 		$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 		$entries  = self::$entry_query->get_all_entries_asc();
 		$entries  = self::flatten_entries( $entries );
+		
+		if ( $last_known_entry ) {
+			$last_known_entry = explode('-', $last_known_entry);
+			if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
+				$last_entry_id = $last_known_entry[0];
+				$index 		   = array_search( $last_entry_id ,array_keys( $entries ) );
+
+				$entries = array_slice( $entries, $index, -1, true );
+			}
+		}
+
 		$pages 	  = ceil( count( $entries ) / $per_page );
 
 		//If no page is passed but entry id is, we search for the correct page.
