@@ -69,7 +69,8 @@ class EntryContainer extends Component {
             <div
               className="liveblog-meta-authour-avatar"
               dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
-            <span className="liveblog-meta-author-name" >{entry.author_link}</span>
+            <span className="liveblog-meta-author-name"
+              dangerouslySetInnerHTML={{ __html: entry.author_link }} />
           </div>
         </header>
         {
