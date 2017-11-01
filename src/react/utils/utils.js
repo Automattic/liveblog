@@ -151,7 +151,9 @@ export const timeAgo = (timestamp) => {
 
 export const formattedTime = (timestamp) => {
   const time = new Date(timestamp * 1000);
-  return `${time.getUTCHours()}:${time.getUTCMinutes()}`;
+  const hours = time.getUTCHours() < 10 ? `0${time.getUTCHours()}` : time.getUTCHours();
+  const mins = time.getUTCMinutes() < 10 ? `0${time.getUTCMinutes()}` : time.getUTCMinutes();
+  return `${hours}:${mins}`;
 };
 
 export const getLastOfObject = object =>
