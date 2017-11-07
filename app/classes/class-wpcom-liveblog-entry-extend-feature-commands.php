@@ -95,10 +95,12 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_command_config', array(
-			'type'        => 'static',
-			'regex'       => '/(\w*)$',
-			'data'        => $this->get_commands(),
-			'replacement' => '/${term}',
+			'trigger' => '/',
+			'data' => $this->get_commands(),
+			'displayKey' => false,
+			'replaceText' => '/$',
+			'name' => 'Command',
+			'template' => false,
 		) );
 
 		return $config;

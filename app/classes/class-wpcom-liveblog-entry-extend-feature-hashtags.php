@@ -85,12 +85,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_hashtag_config', array(
-			'type'        => 'ajax',
-			'cache'       => 1000 * 60,
-			'regex'       => '#([\w\d\-]*)$',
-			'url'         => $endpoint_url,
-			'template'    => '${slug}',
-			'replacement' => '#${slug}',
+			'cache' => 1000 * 60,
+			'trigger' => '#',
+			'displayKey' => 'slug',
+			'name' => 'Hashtag',
+			'suggestionTemplate' => '${slug}',
+			'replaceText' => '#$',
+			'url' => $endpoint_url,
 		) );
 
 		return $config;

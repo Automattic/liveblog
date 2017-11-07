@@ -53,8 +53,18 @@
   border-bottom: none;
 }
 
+@keyframes slideDown {
+  0% {
+    transform: scaleY(.8);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
 .liveblog-popover {
   position: absolute;
+  animation: slideDown .2s cubic-bezier(.3,1.2,.2,1);
   top: 100%;
   left: 0;
   right: 0;
@@ -62,8 +72,14 @@
   background: #fff;
   border: 1px solid $color-grey-light;
   border-top: none;
-  max-height: 200px;
-  overflow-y: scroll;
+}
+
+.liveblog-popover-meta {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2.5px 10px;
+  background: $color-grey-dark;
+  color: #fff;
 }
 
 .liveblog-popover-item {

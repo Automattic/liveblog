@@ -129,3 +129,12 @@ export function getAuthors(term, config) {
   return ajax(settings);
 }
 
+export function getHashtags(term, config) {
+  const settings = {
+    url: `${config.autocomplete[2].url}${term}`,
+    method: 'GET',
+  };
+
+  return ajax(settings);
+}
+

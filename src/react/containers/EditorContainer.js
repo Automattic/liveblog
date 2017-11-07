@@ -7,98 +7,35 @@ import { connect } from 'react-redux';
 
 import { EditorState, ContentState, convertFromHTML } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
-import Editor, { composeDecorators } from 'draft-js-plugins-editor';
-import createEmojiPlugin from 'draft-js-emoji-plugin';
-import createMentionPlugin from 'draft-js-mention-plugin';
-import createImagePlugin from 'draft-js-image-plugin';
-import createFocusPlugin from 'draft-js-focus-plugin';
-import createBlockDndPlugin from 'draft-js-drag-n-drop-plugin';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 
-import { getAuthors } from '../services/api';
+import { getAuthors, getHashtags } from '../services/api';
 
-import EditorToolbarContainer, { Link, findLinkEntities } from './EditorToolbarContainer';
 import Button from '../components/Button';
 
-const AuthorComponent = ({ mention, theme, searchValue, ...parentProps }) => (
-  <div {...parentProps}>
-    <div className="liveblog-popover-item">
-      <div
-        className="liveblog-popover-item-figure"
-        dangerouslySetInnerHTML={{ __html: mention.get('avatar') }}
-      />
-
-      <div className="liveblog-popover-item-figure">
-        {mention.get('key')}
-      </div>
-    </div>
-  </div>
-);
+import Editor, { decorators } from '../Editor/Editor';
 
 class EditorContainer extends Component {
   constructor(props) {
     super(props);
 
-    this.emojiPlugin = createEmojiPlugin({
-      useNativeArt: true,
-      positionSuggestions: () => ({}),
-      theme: {
-        emojiSuggestions: 'liveblog-popover',
-        emojiSuggestionsEntry: 'liveblog-popover-item',
-        emojiSuggestionsEntryFocused: 'liveblog-popover-item--focused',
-        emojiSuggestionsEntryIcon: 'liveblog-popover-item-figure',
-        emojiSuggestionsEntryText: 'liveblog-popover-item-body',
-      },
-    });
-
-    this.mentionPlugin = createMentionPlugin({
-      positionSuggestions: () => ({}),
-      entityMutability: 'IMMUTABLE',
-      mentionPrefix: '@',
-      theme: {
-        mentionSuggestions: 'liveblog-popover',
-        mentionSuggestionsEntryFocused: 'liveblog-popover-item--focused',
-      },
-      mentionComponent: ({ mention }) => (
-        <a href="#">{mention.get('key')}</a>
-      ),
-    });
-
-    this.focusPlugin = createFocusPlugin();
-    this.blockDndPlugin = createBlockDndPlugin();
-
-    this.imagePlugin = createImagePlugin({
-      decorator: composeDecorators(
-        this.focusPlugin.decorator,
-        this.blockDndPlugin.decorator,
-      ),
-    });
-
-    this.customDecorators = [{
-      strategy: findLinkEntities,
-      component: Link,
-    }];
-
-    const editorState = props.entry
+    const initialEditorState = props.entry
       ? EditorState.createWithContent(
         ContentState.createFromBlockArray(
           convertFromHTML(props.entry.content),
         ),
+        decorators,
       )
-      : EditorState.createEmpty();
+      : EditorState.createEmpty(decorators);
 
     this.state = {
-      editorState,
-      authors: [],
+      editorState: initialEditorState,
+      suggestions: [],
     };
-  }
 
-  onChange(editorState) {
-    this.setState({
-      editorState,
-    });
+    this.onChange = editorState => this.setState({ editorState });
   }
 
   publish() {
@@ -122,51 +59,80 @@ class EditorContainer extends Component {
     this.setState({ editorState: newEditorState });
   }
 
-  updateAuthors(payload) {
+  getAuthors(text) {
     const { config } = this.props;
-
-    getAuthors(payload, config)
+    getAuthors(text, config)
       .timeout(10000)
       .map(res => res.response)
-      .subscribe(res => this.setState({ authors: res }));
+      .subscribe(res => this.setState({
+        suggestions: res.map(author => author),
+      }));
+  }
+
+  getHashtags(text) {
+    const { config } = this.props;
+    getHashtags(text, config)
+      .timeout(10000)
+      .map(res => res.response)
+      .subscribe(res => this.setState({
+        suggestions: res.map(hashtag => hashtag),
+      }));
+  }
+
+  filterCommandSuggestions(suggestions, filter) {
+    this.setState({
+      suggestions: suggestions.filter(item =>
+        item.substring(0, filter.length) === filter,
+      ),
+    });
+  }
+
+  filterEmojiSuggestions(suggestions, filter) {
+    this.setState({
+      suggestions: suggestions.filter(item =>
+        item.key.toString().substring(0, filter.length) === filter,
+      ),
+    });
+  }
+
+  handleOnSearch(trigger, text) {
+    const { config } = this.props;
+
+    switch (trigger) {
+      case '@':
+        this.getAuthors(text);
+        break;
+      case '#':
+        this.getHashtags(text);
+        break;
+      case '/':
+        this.filterCommandSuggestions(config.autocomplete[0].data, text);
+        break;
+      case ':':
+        this.filterEmojiSuggestions(config.autocomplete[1].data, text);
+        break;
+      default:
+        this.setState({ suggestions: [] });
+        break;
+    }
   }
 
   render() {
-    const { editorState, authors } = this.state;
-    const { isEditing } = this.props;
-    const { EmojiSuggestions } = this.emojiPlugin;
-    const { MentionSuggestions } = this.mentionPlugin;
-
-    const plugins = [
-      this.emojiPlugin,
-      this.mentionPlugin,
-      this.blockDndPlugin,
-      this.focusPlugin,
-      this.imagePlugin,
-    ];
+    const { editorState, suggestions } = this.state;
+    const { isEditing, config } = this.props;
 
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1>Add New Entry</h1>}
-        <div style={{ position: 'relative' }}>
-          <EditorToolbarContainer
-            editorState={editorState}
-            onChange={this.onChange.bind(this)}
-          />
-          <Editor
-            editorState={this.state.editorState}
-            onChange={this.onChange.bind(this)}
-            decorators={this.customDecorators}
-            plugins={plugins}
-            ref={ref => this.editor = ref}
-          />
-          <EmojiSuggestions />
-          <MentionSuggestions
-            onSearchChange={({ value }) => this.updateAuthors(value)}
-            suggestions={authors}
-            entryComponent={AuthorComponent}
-          />
-        </div>
+        <Editor
+          editorState={editorState}
+          onChange={this.onChange}
+          suggestions={suggestions}
+          // Need to work out a better way of handling this.
+          resetSuggestions={() => this.setState({ suggestions: [] })}
+          onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
+          autocompleteConfig={config.autocomplete}
+        />
         <Button type="primary" modifiers="wide" click={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </Button>

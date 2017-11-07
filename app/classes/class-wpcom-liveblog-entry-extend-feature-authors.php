@@ -85,13 +85,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_author_config', array(
-			'type'        => 'ajax',
-			'cache'       => 1000 * 60 * 30,
-			'url'         => $endpoint_url,
-			'search'      => 'key',
-			'regex'       => '@([\w\-]*)$',
-			'replacement' => '@${key}',
-			'template'    => '${avatar} ${name}',
+			'cache' => 1000 * 60 * 30,
+			'url' => $endpoint_url,
+			'displayKey' => 'key',
+			'trigger' => '@',
+			'name' => 'Author',
+			'replaceText' => '@$',
+			'suggestionTemplate' => '${avatar} ${key}',
 		) );
 
 		return $config;
