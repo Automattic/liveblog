@@ -1,23 +1,22 @@
 /* eslint-disable no-return-assign */
-import ReactDOM from 'react-dom';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { scrollElementIfNotInView } from './utils';
+const listStyle = {
+  maxHeight: '250px',
+  overflowY: 'scroll',
+  marginBottom: 0,
+};
+
+const listItemStyle = {
+  height: '50px',
+};
 
 class Suggestions extends Component {
-
   componentDidUpdate(prevProps) {
-    const { autocompleteState, onSearch, suggestions } = this.props;
+    const { autocompleteState, onSearch } = this.props;
 
     if (!autocompleteState) return;
-
-    if (this.list && this[`item${autocompleteState.selectedIndex}`]) {
-      scrollElementIfNotInView(
-        this[`item${autocompleteState.selectedIndex}`],
-        this.list,
-      );
-    }
 
     if (!prevProps.autocompleteState && autocompleteState) {
       onSearch(autocompleteState.trigger, autocompleteState.searchText);
@@ -34,17 +33,19 @@ class Suggestions extends Component {
       turnIntoEntity,
       autocompleteState,
       renderTemplate,
-      suggestions
+      suggestions,
+      setSuggestionIndex,
     } = this.props;
 
     return suggestions
       .map((item, i) =>
         <li
           ref={ref => this[`item${i}`] = ref}
-          style={{ height: '50px' }}
+          style={listItemStyle}
           className={`liveblog-popover-item ${autocompleteState.selectedIndex === i ? 'liveblog-popover-item--focused' : ''}`}
           key={i}
           onMouseDown={() => turnIntoEntity(i)}
+          onMouseEnter={() => setSuggestionIndex(i)}
           dangerouslySetInnerHTML={{ __html: renderTemplate(item) }}
         />,
       );
@@ -63,7 +64,7 @@ class Suggestions extends Component {
         <div className="liveblog-popover-meta">
           {suggestions.length} {name}{suggestions.length > 1 ? 's' : ''} matching {trigger}{searchText}
         </div>
-        <ul ref={ref => this.list = ref} style={{ maxHeight: '250px', overflowY: 'scroll', marginBottom: 0 }}>
+        <ul ref={ref => this.list = ref} style={listStyle}>
           {this.renderSuggestions()}
         </ul>
       </div>
@@ -72,7 +73,12 @@ class Suggestions extends Component {
 }
 
 Suggestions.propTypes = {
-
+  autocompleteState: PropTypes.object,
+  onSearch: PropTypes.func,
+  suggestions: PropTypes.array,
+  turnIntoEntity: PropTypes.func,
+  renderTemplate: PropTypes.func,
+  setSuggestionIndex: PropTypes.func,
 };
 
 export default Suggestions;

@@ -1,9 +1,8 @@
 /* eslint-disable no-param-reassign */
 
 export const getLastIndexOf = (string, characters = []) =>
-  characters.reduce((accumulator, character) => {
-    return Math.max(string.lastIndexOf(character), accumulator);
-  }, -1);
+  characters.reduce((accumulator, character) =>
+    Math.max(string.lastIndexOf(character), accumulator), -1);
 
 const get = (path, obj, fb = `$\{${path}}`) =>
   path.split('.').reduce((res, key) => res[key] || fb, obj);
@@ -20,7 +19,7 @@ export const hasEntityAtSelection = (editorState) => {
   const contentState = editorState.getCurrentContent();
   const block = contentState.getBlockForKey(selection.getStartKey());
   return !!block.getEntityAt(selection.getStartOffset() - 1);
-}
+};
 
 export const getTriggerRange = (triggers) => {
   const selection = window.getSelection();

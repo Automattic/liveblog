@@ -2,10 +2,28 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { EditorState, Editor, CompositeDecorator, Modifier } from 'draft-js';
-import { parseTemplate, getTriggerRange, getInsertRange, hasEntityAtSelection } from './utils';
+import {
+  EditorState,
+  Editor,
+  CompositeDecorator,
+  Modifier,
+} from 'draft-js';
+
+import {
+  parseTemplate,
+  getTriggerRange,
+  getInsertRange,
+  hasEntityAtSelection,
+  scrollElementIfNotInView,
+} from './utils';
+
 import Toolbar, { LinkComponent, findLinkEntities } from './Toolbar';
 import Suggestions from './Suggestions';
+
+export const decorators = new CompositeDecorator([{
+  strategy: findLinkEntities,
+  component: LinkComponent,
+}]);
 
 class EditorWrapper extends Component {
   constructor(props) {
@@ -18,6 +36,7 @@ class EditorWrapper extends Component {
 
   updateEditorState(editorState) {
     const { onChange, resetSuggestions, suggestions } = this.props;
+
     onChange(editorState);
     // Wait until editor has been updated.
     setTimeout(() => {
@@ -51,15 +70,24 @@ class EditorWrapper extends Component {
     e.preventDefault();
 
     const selectedIndex = autocompleteState.selectedIndex;
+    const newIndex = selectedIndex + 1;
 
     this.setState({
       autocompleteState: {
         ...autocompleteState,
         selectedIndex: (selectedIndex >= suggestions.length - 1)
           ? selectedIndex
-          : selectedIndex + 1,
+          : newIndex,
       },
     });
+
+    const selectedSuggestionDomNode = this.suggestions[`item${newIndex}`];
+    if (!selectedSuggestionDomNode) return;
+
+    scrollElementIfNotInView(
+      selectedSuggestionDomNode,
+      this.suggestions.list,
+    );
   }
 
   onUpArrow(e, originalHandler) {
@@ -71,14 +99,24 @@ class EditorWrapper extends Component {
     }
 
     const selectedIndex = autocompleteState.selectedIndex;
+    const newIndex = Math.max(selectedIndex - 1, 0);
 
     e.preventDefault();
+
     this.setState({
       autocompleteState: {
         ...autocompleteState,
-        selectedIndex: Math.max(selectedIndex - 1, 0),
+        selectedIndex: newIndex,
       },
     });
+
+    const selectedSuggestionDomNode = this.suggestions[`item${newIndex}`];
+    if (!selectedSuggestionDomNode) return;
+
+    scrollElementIfNotInView(
+      selectedSuggestionDomNode,
+      this.suggestions.list,
+    );
   }
 
   onEscape(e, originalHandler) {
@@ -159,7 +197,7 @@ class EditorWrapper extends Component {
       },
     );
 
-    // Replace with enitity.
+    // Replace with enitity using template from config.
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
     const replaceText = autocompleteState.displayKey
       ? suggestion[autocompleteState.displayKey]
@@ -242,6 +280,15 @@ class EditorWrapper extends Component {
           suggestions={suggestions}
           renderTemplate={item => this.renderTemplate(item)}
           onSearch={(trigger, text) => onSearch(trigger, text)}
+          setSuggestionIndex={i =>
+            this.setState({
+              autocompleteState: {
+                ...autocompleteState,
+                selectedIndex: i,
+              },
+            })
+          }
+          ref={node => this.suggestions = node}
         />
       </div>
     );
@@ -249,12 +296,12 @@ class EditorWrapper extends Component {
 }
 
 EditorWrapper.propTypes = {
-
+  onChange: PropTypes.func,
+  resetSuggestions: PropTypes.func,
+  suggestions: PropTypes.array,
+  autocompleteConfig: PropTypes.array,
+  editorState: PropTypes.object,
+  onSearch: PropTypes.func,
 };
 
 export default EditorWrapper;
-
-export const decorators = new CompositeDecorator([{
-  strategy: findLinkEntities,
-  component: LinkComponent,
-}]);
