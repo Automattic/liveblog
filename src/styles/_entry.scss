@@ -82,3 +82,12 @@
 .liveblog-hash {
   color: $color-primary;
 }
+
+.liveblog-emoji {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: 0em 0em -.2ex;
+}

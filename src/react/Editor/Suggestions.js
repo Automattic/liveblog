@@ -3,13 +3,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 const listStyle = {
-  maxHeight: '250px',
+  maxHeight: '150px',
   overflowY: 'scroll',
   marginBottom: 0,
 };
 
 const listItemStyle = {
-  height: '50px',
+  height: '30px',
 };
 
 class Suggestions extends Component {
@@ -60,9 +60,9 @@ class Suggestions extends Component {
     if (suggestions.length === 0) return false;
 
     return (
-      <div className="liveblog-popover">
+      <div className="liveblog-popover" style={{ top: autocompleteState.top + 10 }}>
         <div className="liveblog-popover-meta">
-          {suggestions.length} {name}{suggestions.length > 1 ? 's' : ''} matching {trigger}{searchText}
+          {suggestions.length} {name}{suggestions.length > 1 ? 's' : ''} matching {'"'}<b>{trigger}{searchText}</b>{'"'}
         </div>
         <ul ref={ref => this.list = ref} style={listStyle}>
           {this.renderSuggestions()}
@@ -79,6 +79,7 @@ Suggestions.propTypes = {
   turnIntoEntity: PropTypes.func,
   renderTemplate: PropTypes.func,
   setSuggestionIndex: PropTypes.func,
+  getEditorRect: PropTypes.func,
 };
 
 export default Suggestions;

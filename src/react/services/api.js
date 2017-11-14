@@ -138,3 +138,27 @@ export function getHashtags(term, config) {
   return ajax(settings);
 }
 
+export function getPreview(content, config) {
+  const settings = {
+    url: `${config.endpoint_url}preview`,
+    method: 'POST',
+    body: {
+      entry_content: content,
+    },
+  };
+
+  return ajax(settings);
+}
+
+export function uploadImage(formData) {
+  const location = window.location;
+
+  const settings = {
+    url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
+    method: 'POST',
+    body: formData,
+  };
+
+  return ajax(settings);
+}
+

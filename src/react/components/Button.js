@@ -7,12 +7,13 @@ const addModifiers = modifiers =>
     .map(x => `liveblog-btn--${x}`).join(' ');
 
 const Button = ({ children, click, type, modifiers, onMouseDown }) => (
-  <button
-    className={`liveblog-btn ${type && `liveblog-btn--${type}`} ${addModifiers(modifiers)}`}
-    onClick={click}
-    onMouseDown={onMouseDown}>
-    {children}
-  </button>
+  <span onMouseDown={onMouseDown ? e => e.preventDefault() : null}>
+    <button
+      className={`liveblog-btn ${type && `liveblog-btn--${type}`} ${addModifiers(modifiers)}`}
+      onClick={onMouseDown || click}>
+      {children}
+    </button>
+  </span>
 );
 
 Button.propTypes = {

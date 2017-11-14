@@ -750,7 +750,7 @@ final class WPCOM_Liveblog {
 
 		$entries  = self::$entry_query->get_all_entries_asc();
 		$entries  = self::flatten_entries( $entries );
-		
+
 		if ( $last_known_entry ) {
 			$last_known_entry = explode('-', $last_known_entry);
 			if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
@@ -989,6 +989,7 @@ final class WPCOM_Liveblog {
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
+				'image_nonce'            => wp_create_nonce( 'media-form' ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 				'latest_entry_id'	     => self::$entry_query->get_latest_id(),
 				'timestamp'				 => time(),

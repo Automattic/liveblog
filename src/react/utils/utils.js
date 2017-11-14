@@ -129,8 +129,8 @@ export const timeAgo = (timestamp) => {
     { name: 'h', limit: 86400, in_seconds: 3600 },
     { name: 'd', limit: 604800, in_seconds: 86400 },
     { name: 'w', limit: 2629743, in_seconds: 604800 },
-    { name: 'month', limit: 31556926, in_seconds: 2629743 },
-    { name: 'year', limit: null, in_seconds: 31556926 },
+    { name: 'm', limit: 31556926, in_seconds: 2629743 },
+    { name: 'y', limit: null, in_seconds: 31556926 },
   ];
 
   let diff = (new Date() - new Date(timestamp * 1000)) / 1000;

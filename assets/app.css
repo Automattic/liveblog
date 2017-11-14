@@ -1,4 +1,30 @@
 /**
+ * Draft v0.10.3
+ *
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ */
+.DraftEditor-editorContainer,.DraftEditor-root,.public-DraftEditor-content{height:inherit;text-align:initial}.public-DraftEditor-content[contenteditable=true]{-webkit-user-modify:read-write-plaintext-only}.DraftEditor-root{position:relative}.DraftEditor-editorContainer{background-color:rgba(255,255,255,0);border-left:.1px solid transparent;position:relative;z-index:1}.public-DraftEditor-block{position:relative}.DraftEditor-alignLeft .public-DraftStyleDefault-block{text-align:left}.DraftEditor-alignLeft .public-DraftEditorPlaceholder-root{left:0;text-align:left}.DraftEditor-alignCenter .public-DraftStyleDefault-block{text-align:center}.DraftEditor-alignCenter .public-DraftEditorPlaceholder-root{margin:0 auto;text-align:center;width:100%}.DraftEditor-alignRight .public-DraftStyleDefault-block{text-align:right}.DraftEditor-alignRight .public-DraftEditorPlaceholder-root{right:0;text-align:right}.public-DraftEditorPlaceholder-root{color:#9197a3;position:absolute;z-index:1}.public-DraftEditorPlaceholder-hasFocus{color:#bdc1c9}.DraftEditorPlaceholder-hidden{display:none}.public-DraftStyleDefault-block{position:relative;white-space:pre-wrap}.public-DraftStyleDefault-ltr{direction:ltr;text-align:left}.public-DraftStyleDefault-rtl{direction:rtl;text-align:right}.public-DraftStyleDefault-listLTR{direction:ltr}.public-DraftStyleDefault-listRTL{direction:rtl}.public-DraftStyleDefault-ol,.public-DraftStyleDefault-ul{margin:16px 0;padding:0}.public-DraftStyleDefault-depth0.public-DraftStyleDefault-listLTR{margin-left:1.5em}.public-DraftStyleDefault-depth0.public-DraftStyleDefault-listRTL{margin-right:1.5em}.public-DraftStyleDefault-depth1.public-DraftStyleDefault-listLTR{margin-left:3em}.public-DraftStyleDefault-depth1.public-DraftStyleDefault-listRTL{margin-right:3em}.public-DraftStyleDefault-depth2.public-DraftStyleDefault-listLTR{margin-left:4.5em}.public-DraftStyleDefault-depth2.public-DraftStyleDefault-listRTL{margin-right:4.5em}.public-DraftStyleDefault-depth3.public-DraftStyleDefault-listLTR{margin-left:6em}.public-DraftStyleDefault-depth3.public-DraftStyleDefault-listRTL{margin-right:6em}.public-DraftStyleDefault-depth4.public-DraftStyleDefault-listLTR{margin-left:7.5em}.public-DraftStyleDefault-depth4.public-DraftStyleDefault-listRTL{margin-right:7.5em}.public-DraftStyleDefault-unorderedListItem{list-style-type:square;position:relative}.public-DraftStyleDefault-unorderedListItem.public-DraftStyleDefault-depth0{list-style-type:disc}.public-DraftStyleDefault-unorderedListItem.public-DraftStyleDefault-depth1{list-style-type:circle}.public-DraftStyleDefault-orderedListItem{list-style-type:none;position:relative}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listLTR:before{left:-36px;position:absolute;text-align:right;width:30px}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listRTL:before{position:absolute;right:-36px;text-align:left;width:30px}.public-DraftStyleDefault-orderedListItem:before{content:counter(ol0) ". ";counter-increment:ol0}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth1:before{content:counter(ol1) ". ";counter-increment:ol1}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth2:before{content:counter(ol2) ". ";counter-increment:ol2}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth3:before{content:counter(ol3) ". ";counter-increment:ol3}.public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth4:before{content:counter(ol4) ". ";counter-increment:ol4}.public-DraftStyleDefault-depth0.public-DraftStyleDefault-reset{counter-reset:ol0}.public-DraftStyleDefault-depth1.public-DraftStyleDefault-reset{counter-reset:ol1}.public-DraftStyleDefault-depth2.public-DraftStyleDefault-reset{counter-reset:ol2}.public-DraftStyleDefault-depth3.public-DraftStyleDefault-reset{counter-reset:ol3}.public-DraftStyleDefault-depth4.public-DraftStyleDefault-reset{counter-reset:ol4}@-webkit-keyframes scaleUp {
+  0% {
+    -webkit-transform: scaleY(0.8);
+            transform: scaleY(0.8); }
+  100% {
+    -webkit-transform: scaleY(1);
+            transform: scaleY(1); } }
+
+@keyframes scaleUp {
+  0% {
+    -webkit-transform: scaleY(0.8);
+            transform: scaleY(0.8); }
+  100% {
+    -webkit-transform: scaleY(1);
+            transform: scaleY(1); } }
+
+/**
  * Base button styles.
  * 1. Corrects inability to style clickable `input` types in iOS.
  * 2. Normalize `box-sizing` across all elements that this component could be
@@ -104,26 +130,39 @@
 .liveblog-btn--rounded .dashicons-update {
   margin-right: 5px; }
 
+/**
+* Editor Container
+*/
 .liveblog-editor-container {
-  background: #f7f7f7;
+  background: #eee;
   border-top: 2px solid #111;
   border-bottom: 2px solid #eee;
   padding: 16px;
   margin-bottom: 24px; }
 
-.liveblog-editor-container .public-DraftEditor-content {
+.liveblog-editor-container .public-DraftEditor-content,
+.liveblog-preview {
   border: 1px solid #bbb;
   min-height: 200px;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 10px; }
+
+.liveblog-editor-container .public-DraftEditor-content {
   background: #fff; }
+
+.liveblog-preview {
+  background: #f7f7f7; }
 
 .liveblog-entry-edit .liveblog-editor-container {
   border: none;
+  background: transparent;
   padding: 0;
   margin-top: 24px;
   margin-bottom: 0; }
 
+/**
+* Editor Modal
+*/
 .liveblog-editor-modal {
   position: absolute;
   top: 0;
@@ -158,45 +197,35 @@
   margin: 2px;
   padding: 2px; }
 
+/**
+* Editor Toolbar
+*/
 .liveblog-toolbar {
   background: #f7f7f7;
   border: 1px solid #bbb;
   border-bottom: none; }
 
-@-webkit-keyframes slideDown {
-  0% {
-    -webkit-transform: scaleY(0.8);
-            transform: scaleY(0.8); }
-  100% {
-    -webkit-transform: scaleY(1);
-            transform: scaleY(1); } }
-
-@keyframes slideDown {
-  0% {
-    -webkit-transform: scaleY(0.8);
-            transform: scaleY(0.8); }
-  100% {
-    -webkit-transform: scaleY(1);
-            transform: scaleY(1); } }
-
+/**
+* Editor Autocomplete Popup
+*/
 .liveblog-popover {
   position: absolute;
-  -webkit-animation: slideDown 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
-          animation: slideDown 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
+  -webkit-animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
+          animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
   top: 100%;
-  left: 0;
-  right: 0;
+  left: 10px;
+  right: 10px;
   z-index: 99;
   background: #fff;
-  border: 1px solid #bbb;
+  -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
   border-top: none; }
 
 .liveblog-popover-meta {
   font-size: 12px;
-  font-weight: 600;
-  padding: 2.5px 10px;
-  background: #333;
-  color: #fff; }
+  padding: 5px 10px;
+  color: #333;
+  border-bottom: 1px solid #f7f7f7; }
 
 .liveblog-popover-item {
   display: -webkit-box;
@@ -204,8 +233,17 @@
   display: flex;
   -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   padding: 5px;
-  font-size: 14px; }
+  font-size: 14px;
+  color: #333; }
+
+.liveblog-popover-item img {
+  width: 15px;
+  height: 15px;
+  margin-right: 8px; }
 
 .liveblog-popover-item--focused {
   background: #f7f7f7; }
@@ -213,8 +251,143 @@
 .liveblog-popover-item-figure {
   margin-right: 5px; }
 
-.liveblog-popover-item:not(:last-child) {
-  border: 1px solid #f7f7f7; }
+/**
+* Editor Tabs
+*/
+.liveblog-editor-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end; }
+
+.liveblog-editor-tab {
+  position: relative;
+  z-index: 99;
+  font-size: 13px;
+  padding: 6px 12px;
+  background: #eee;
+  color: #333;
+  border: 1px solid #bbb;
+  border-bottom: none;
+  font-weight: normal;
+  border-radius: 0; }
+
+.liveblog-editor-tab:hover,
+.liveblog-editor-tab.is-active {
+  background: #f7f7f7; }
+
+.liveblog-editor-tab.is-active::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  top: 100%;
+  left: 0;
+  background: #f7f7f7; }
+
+.liveblog-editor-tab:not(:last-child) {
+  margin-right: 4px; }
+
+/**
+* Editor Emoji
+*/
+.liveblog-inline-emoji {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  vertical-align: middle;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: -.2ex 0em .2ex;
+  color: rgba(255, 255, 255, 0); }
+
+.liveblog-inline-emoji:focus {
+  border: 1px solid black; }
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  position: relative; }
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #bbb;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out; }
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s; }
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% {
+    -webkit-transform: scale(0); }
+  50% {
+    -webkit-transform: scale(1); } }
+
+@keyframes sk-bounce {
+  0%, 100% {
+    transform: scale(0);
+    -webkit-transform: scale(0); }
+  50% {
+    transform: scale(1);
+    -webkit-transform: scale(1); } }
+
+.liveblog-placeholder {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 30px;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: #f7f7f7; }
+
+.liveblog-placeholder-inner {
+  font-size: 14px;
+  color: #777;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center; }
+
+.liveblog-placeholder-text {
+  margin-top: 20px; }
+
+.liveblog-image-upload-btn {
+  position: absolute;
+  margin-bottom: 5px;
+  bottom: 100%;
+  padding: 3px;
+  background: #f7f7f7;
+  border: 1px solid #bbb; }
+
+.liveblog-image-upload-btn .dashicons {
+  margin-right: 3px; }
 
 .liveblog-entry {
   position: relative;
@@ -295,6 +468,14 @@
 
 .liveblog-hash {
   color: #21759B; }
+
+.liveblog-emoji {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: 0em 0em -.2ex; }
 
 .liveblog-event {
   position: relative;

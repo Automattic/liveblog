@@ -1,47 +1,63 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable react/prop-types */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { EditorState, ContentState, convertFromHTML } from 'draft-js';
+import { EditorState, ContentState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 
-import { getAuthors, getHashtags } from '../services/api';
+import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
 import Button from '../components/Button';
+import PreviewContainer from './PreviewContainer';
 
-import Editor, { decorators } from '../Editor/Editor';
+import Editor, { decorators, convertFromHTML } from '../Editor/index';
 
 class EditorContainer extends Component {
   constructor(props) {
     super(props);
 
-    const initialEditorState = props.entry
-      ? EditorState.createWithContent(
-        ContentState.createFromBlockArray(
-          convertFromHTML(props.entry.content),
-        ),
+    let initialEditorState;
+
+    if (props.entry) {
+      initialEditorState = EditorState.createWithContent(
+        convertFromHTML(props.entry.content),
         decorators,
-      )
-      : EditorState.createEmpty(decorators);
+      );
+    } else {
+      initialEditorState = EditorState.createEmpty(decorators);
+    }
 
     this.state = {
       editorState: initialEditorState,
       suggestions: [],
+      preview: false,
     };
 
     this.onChange = editorState => this.setState({ editorState });
   }
 
+  setPreview(state) {
+    this.setState({
+      preview: state,
+    });
+  }
+
+  getContent() {
+    const { editorState } = this.state;
+    return stateToHTML(editorState.getCurrentContent());
+  }
+
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { editorState } = this.state;
-    const content = stateToHTML(editorState.getCurrentContent());
+    const content = this.getContent();
 
     if (isEditing) {
       updateEntry({ id: entry.id, content });
@@ -117,22 +133,57 @@ class EditorContainer extends Component {
     }
   }
 
+  handleImageUpload(file) {
+    const { config } = this.props;
+
+    const formData = new FormData();
+    formData.append('name', file.name);
+    formData.append('action', 'upload-attachment');
+    formData.append('_wpnonce', config.image_nonce);
+    formData.append('async-upload', file);
+
+    return new Promise((resolve) => {
+      uploadImage(formData)
+        .timeout(10000)
+        .map(res => res.response)
+        .subscribe(res => resolve(res.data.url));
+    });
+  }
+
   render() {
-    const { editorState, suggestions } = this.state;
+    const { editorState, suggestions, preview } = this.state;
     const { isEditing, config } = this.props;
 
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1>Add New Entry</h1>}
-        <Editor
-          editorState={editorState}
-          onChange={this.onChange}
-          suggestions={suggestions}
-          // Need to work out a better way of handling this.
-          resetSuggestions={() => this.setState({ suggestions: [] })}
-          onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
-          autocompleteConfig={config.autocomplete}
-        />
+        <div className="liveblog-editor-tabs">
+          <button
+            className={`liveblog-editor-tab ${!preview ? 'is-active' : ''}`}
+            onClick={this.setPreview.bind(this, false)}>Editor</button>
+          <button
+            className={`liveblog-editor-tab ${preview ? 'is-active' : ''}`}
+            onClick={this.setPreview.bind(this, true)}>
+              Preview
+          </button>
+        </div>
+        {
+          preview
+            ? <PreviewContainer
+              config={config}
+              getEntryContent={() => this.getContent()}
+            />
+            : <Editor
+              editorState={editorState}
+              onChange={this.onChange}
+              suggestions={suggestions}
+              // Need to work out a better way of handling this.
+              resetSuggestions={() => this.setState({ suggestions: [] })}
+              onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
+              autocompleteConfig={config.autocomplete}
+              handleImageUpload={this.handleImageUpload.bind(this)}
+            />
+        }
         <Button type="primary" modifiers="wide" click={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </Button>
