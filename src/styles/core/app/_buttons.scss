@@ -29,64 +29,9 @@
   }
 }
 
-.liveblog-btn--primary {
-  color: #FFF;
-  background: $color-primary;
-  font-size: 16px;
-
-  &:hover {
-    background: darken($color-primary, 10%);
-  }
-}
-
-.liveblog-btn--secondary {
-	background: $color-grey-mid-light;
-  color: $color-grey-dark;
-
-  &:hover {
-    background: darken($color-grey-x-light, 10%);
-  }
-}
-
-.liveblog-btn--small {
-  font-size: 12px;
-  line-height: 23px;
-  padding: 4px 16px;
-}
-
-.liveblog-btn--icon {
-  padding: 6px;
-  margin: 2px;
-  background: transparent;
-  color: $color-grey-dark;
-
-  &:hover {
-    background: $color-grey-light;
-  }
-}
-
-.liveblog-btn--wide {
-  width: 100%;
-}
-
-.liveblog-btn--delete {
-  background: $color-warning;
-  color: #fff;
-  border: none;
-
-  &:hover {
-    background: darken($color-warning, 10%);
-  }
-}
-
-.liveblog-btn--dark {
-  background: $color-grey-x-dark;
-  color: #fff;
-
-  &:hover {
-    background: lighten($color-grey-x-dark, 15%);
-    color: #fff;
-  }
+.liveblog-btn-small {
+  font-size: .8rem;
+  padding: .5rem 1rem;
 }
 
 .liveblog-update-btn-container {
@@ -98,11 +43,24 @@
   top: 50px;
 }
 
-.liveblog-btn--rounded {
+.liveblog-update-btn {
+  color: #fff;
+  background: $color-primary;
+  font-size: 16px;
   border-radius: 50px;
-  font-size: 14px;
 }
 
-.liveblog-btn--rounded .dashicons-update {
-  margin-right: 5px;
+.liveblog-update-btn:hover {
+  background: darken($color-primary, 10%);
 }
+
+.liveblog-btn-delete {
+  background: $color-warning;
+  color: #fff;
+  border: none;
+}
+
+.liveblog-btn-delete:hover {
+  background: darken($color-warning, 10%);
+}
+

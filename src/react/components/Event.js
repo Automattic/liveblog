@@ -7,7 +7,10 @@ const Event = ({ event, click, onDelete, canEdit }) => (
     <div className="liveblog-event-body">
       <div className="liveblog-event-meta" >{timeAgo(event.entry_time)}</div>
       <div>
-        {canEdit && <span className="dashicons dashicons-no-alt liveblog-event-delete" onClick={onDelete}></span>}
+        {
+          canEdit &&
+          <span className="dashicons dashicons-no-alt liveblog-event-delete" onClick={onDelete} />
+        }
         <span
           className="liveblog-event-content"
           onClick={click}

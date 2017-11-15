@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 import { timeAgo, formattedTime } from '../utils/utils';
-import Button from '../components/Button';
 import EditorContainer from '../containers/EditorContainer';
 
 class EntryContainer extends Component {
@@ -41,16 +40,19 @@ class EntryContainer extends Component {
       <div className="liveblog-entry-tools">
         {
           this.isEditing()
-            ? <Button modifiers="small dark" click={this.close}>
+            ? <button className="liveblog-btn liveblog-btn-small" onClick={this.close}>
               Close Editor
-            </Button>
-            : <Button modifiers="small dark" click={this.edit}>
+            </button>
+            : <button className="liveblog-btn liveblog-btn-small" onClick={this.edit}>
               Edit
-            </Button>
+            </button>
         }
-        <Button modifiers="small delete" click={this.delete}>
+        <button
+          className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
+          onClick={this.delete}
+        >
           Delete
-        </Button>
+        </button>
       </div>
     );
   }
@@ -59,7 +61,11 @@ class EntryContainer extends Component {
     const { entry } = this.props;
 
     return (
-      <article id={`id_${entry.id}`} ref={node => this.node = node} className={`liveblog-entry ${entry.key_event ? 'liveblog-entry--key' : ''}`} >
+      <article
+        id={`id_${entry.id}`}
+        ref={node => this.node = node}
+        className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''}`}
+      >
         <header className="liveblog-meta">
           <div className="liveblog-meta-time">
             <span>{timeAgo(entry.entry_time)}</span>

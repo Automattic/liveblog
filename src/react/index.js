@@ -5,6 +5,7 @@ import configureStore from './store';
 import AppContainer from './containers/AppContainer';
 
 import '../styles/core.scss';
+import '../styles/theme.scss';
 
 const store = configureStore();
 

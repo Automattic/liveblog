@@ -7,9 +7,9 @@ const UpdateButton = ({ polling, click }) => {
   return (
     <div className="liveblog-update-btn-container">
       <button
-        className="liveblog-btn liveblog-btn--primary liveblog-btn--rounded"
-        onClick={click}>
-        <span className="dashicons dashicons-update"></span>
+        className="liveblog-btn liveblog-update-btn"
+        onClick={click}
+      >
         {polling.length} new {polling.length > 1 ? 'entries' : 'entry'} available
       </button>
     </div>
