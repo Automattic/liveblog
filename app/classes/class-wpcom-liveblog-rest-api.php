@@ -355,10 +355,12 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get the required parameters from the request
 		$crud_action = $request->get_param( 'crud_action' );
+		$json 	 	 = $request->get_json_params();
+
 		$args = array(
-			'post_id'  => $request->get_param( 'post_id' ),
-			'content'  => $request->get_param( 'content' ),
-			'entry_id' => $request->get_param( 'entry_id' ),
+			'post_id'  => self::get_json_param( 'post_id', $json ),
+			'content'  => self::get_json_param( 'content', $json ),
+			'entry_id' => self::get_json_param( 'entry_id', $json ),
 		);
 
 		self::set_liveblog_vars( $args['post_id'] );
@@ -431,9 +433,10 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function format_preview_entry( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id       = $request->get_param( 'post_id' );
-		$entry_content = $request->get_param( 'entry_content' );
-
+		$post_id 		= $request->get_param( 'post_id' );
+		$json 	 		= $request->get_json_params();
+		$entry_content  = self::get_json_param( 'entry_content', $json );
+		
 		self::set_liveblog_vars( $post_id );
 
 		// Get entry preview
@@ -615,6 +618,19 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function sanitize_numeric( $param, $request, $key ) {
 		return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
+	}
+
+	/**
+	 * Get parameter from JSON
+	 * @param type $param 
+	 * @param type $json 
+	 * @return type
+	 */
+	public static function get_json_param( $param, $json ) {
+		if ( isset( $json[$param] ) ) {
+			return $json[$param];
+		}
+		return false;
 	}
 
 }

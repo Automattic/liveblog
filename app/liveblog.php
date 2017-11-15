@@ -857,7 +857,6 @@ final class WPCOM_Liveblog {
 	 * @return array The entry content wrapped in HTML elements
 	 */
 	public static function format_preview_entry( $entry_content ) {
-
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
 		$entry_content = $entry_content['content'];
