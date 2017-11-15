@@ -7,26 +7,24 @@
  * 4. Prevent button text from being selectable.
  * 5. Make sure `input` will wrap text across multiple lines.
  */
-.liveblog-btn {
+ .liveblog-btn {
   -webkit-appearance: none; /* 1 */
   box-sizing: border-box; /* 2 */
-  margin: 0;
   display: inline-block;
   vertical-align: middle;
-  font: inherit;
   line-height: normal; /* 3 */
   text-align: center;
+  font: inherit;
   text-decoration: none;
   border: none;
   cursor: pointer;
   overflow: visible;
   user-select: none; /* 4 */
   white-space: normal; /* 5 */
-  transition: background .3s ease-in-out;
-  padding: 12px 16px;
+  transition: all .3s ease-in-out;
 
   &:hover {
-    transition: background .3s ease-in-out;
+    transition: all .3s ease-in-out;
     text-decoration: none;
   }
 }

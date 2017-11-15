@@ -1,0 +1,46 @@
+.liveblog-editor-btn {
+  display: inline-block;
+  padding: .5rem;
+  margin: 0;
+  background: transparent;
+  border-radius: 0;
+  color: $color-grey-dark;
+}
+
+.liveblog-editor-btn:hover {
+  background: #fff;
+}
+
+.liveblog-image-upload-btn {
+  position: absolute;
+  bottom: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .2rem;
+  padding: .35rem;
+  font-size: .8rem;
+  font-weight: normal;
+  border: $base-border-size solid $color-grey-light;
+  background-color: $color-grey-x-light;
+  border-radius: $base-border-radius;
+}
+
+.liveblog-image-upload-btn .dashicons {
+  margin-right: .35rem;
+}
+
+.liveblog-image-upload-btn:hover {
+  background-color: #fff;
+  transition: .3s background-color ease-in-out;
+}
+
+.liveblog-publish-btn {
+  background: $color-primary;
+  width: 100%;
+  font-size: .9rem;
+}
+
+.liveblog-publish-btn:hover {
+  background: lighten($color-primary, 5%);
+}

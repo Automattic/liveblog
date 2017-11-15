@@ -55,7 +55,7 @@ class EditorWrapper extends Component {
       // Fix for selection getting 'stuck' in emoji as you have to pass through each character.
       const entity = hasEntityAtSelection(editorState);
       if (entity) {
-        if (entity.getType() === ':') {
+        if ([':'].includes(entity.getType())) {
           onChange(
             skipOverEntity(editorState, entity),
           );

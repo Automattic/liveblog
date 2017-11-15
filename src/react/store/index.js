@@ -19,15 +19,6 @@ function configureStore(initialState) {
     enhancers,
   );
 
-  /**
-   * For hot reloading.
-   */
-  // if (module.hot) {
-  //   module.hot.accept(() => {
-  //     store.replaceReducer(require('../reducers').default);
-  //   });
-  // }
-
   return store;
 }
 

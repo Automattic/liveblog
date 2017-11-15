@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { RichUtils } from 'draft-js';
-import Button from '../components/Button';
 
 import addLink from './modifiers/addLink';
+import Button from './Button';
 
 class Toolbar extends Component {
   constructor(props) {
@@ -108,55 +108,40 @@ class Toolbar extends Component {
     return (
       <div>
         <label
-          className="liveblog-btn liveblog-btn--icon liveblog-btn--secondary liveblog-image-upload-btn liveblog-btn--small"
+          className="liveblog-btn liveblog-image-upload-btn"
           htmlFor={imageInputId}>
           <span className="dashicons dashicons-format-image"></span> Insert Image
         </label>
         <div className="liveblog-toolbar">
-          <Button modifiers="icon" onMouseDown={() => this.toggleBlockType('header-one')}>
-            H1
-          </Button>
-          <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('BOLD')}>
-            <span className="dashicons dashicons-editor-bold"></span>
-          </Button>
-          <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('ITALIC')}>
-            <span className="dashicons dashicons-editor-italic"></span>
-          </Button>
-          <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('UNDERLINE')}>
-            <span className="dashicons dashicons-editor-underline"></span>
-          </Button>
-          <Button modifiers="icon" onMouseDown={() => this.toggleInlineStyle('STRIKETHROUGH')}>
-            <span className="dashicons dashicons-editor-strikethrough"></span>
-          </Button>
-          <Button modifiers="icon" onMouseDown={() => this.toggleBlockType('blockquote')}>
-            <span className="dashicons dashicons-editor-quote"></span>
-          </Button>
-          <Button modifiers="icon" onMouseDown={this.openLinkModal.bind(this)}>
-            <span className="dashicons dashicons-admin-links"></span>
-          </Button>
-          <Button modifiers="icon" onMouseDown={this.removeAsLink.bind(this)}>
-            <span className="dashicons dashicons-editor-unlink"></span>
-          </Button>
-          {
-            showURLInput &&
-            <div className="liveblog-editor-modal">
-              <div>
-                <div className="liveblog-form">
-                  <input
-                    className="liveblog-input"
-                    onChange={this.onURLChange}
-                    value={this.state.url}
-                  />
-                  <Button type="primary" modifiers="icon" onMouseDown={this.turnIntoLink.bind(this)}>
-                    <span className="dashicons dashicons-yes"></span>
-                  </Button>
-                  <Button type="secondary" modifiers="icon delete" onMouseDown={this.closeLinkModal.bind(this)}>
-                    <span className="dashicons dashicons-no"></span>
-                  </Button>
-                </div>
+          <Button onMouseDown={() => this.toggleInlineStyle('BOLD')} icon="editor-bold" />
+          <Button onMouseDown={() => this.toggleInlineStyle('ITALIC')} icon="editor-italic" />
+          <Button onMouseDown={() => this.toggleInlineStyle('UNDERLINE')} icon="editor-underline" />
+          <Button onMouseDown={() => this.toggleBlockType('ordered-list-item')} icon="editor-ol" />
+          <Button onMouseDown={() => this.toggleBlockType('unordered-list-item')} icon="editor-ul" />
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <Button onMouseDown={this.openLinkModal.bind(this)} icon="admin-links" />
+            {
+              showURLInput &&
+              <div className="liveblog-editor-input-container">
+                <input
+                  className="liveblog-input"
+                  onChange={this.onURLChange}
+                  value={this.state.url}
+                />
+                <Button
+                  onMouseDown={this.turnIntoLink.bind(this)}
+                  icon="yes"
+                  classes="liveblog-input-enter"
+                />
+                <Button
+                  onMouseDown={this.closeLinkModal.bind(this)}
+                  icon="no-alt"
+                  classes="liveblog-input-cancel"
+                />
               </div>
-            </div>
-          }
+            }
+          </div>
+          <Button onMouseDown={this.removeAsLink.bind(this)} icon="editor-unlink" />
         </div>
       </div>
     );
@@ -168,6 +153,7 @@ Toolbar.propTypes = {
   editorState: PropTypes.object,
   domEditor: PropTypes.any,
   plugins: PropTypes.array,
+  imageInputId: PropTypes.number,
 };
 
 export default Toolbar;

@@ -42,7 +42,7 @@ class Suggestions extends Component {
         <li
           ref={ref => this[`item${i}`] = ref}
           style={listItemStyle}
-          className={`liveblog-popover-item ${autocompleteState.selectedIndex === i ? 'liveblog-popover-item--focused' : ''}`}
+          className={`liveblog-popover-item ${autocompleteState.selectedIndex === i ? 'is-focused' : ''}`}
           key={i}
           onMouseDown={() => turnIntoEntity(i)}
           onMouseEnter={() => setSuggestionIndex(i)}

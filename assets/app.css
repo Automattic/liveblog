@@ -24,458 +24,19 @@
     -webkit-transform: scaleY(1);
             transform: scaleY(1); } }
 
-/**
- * Base button styles.
- * 1. Corrects inability to style clickable `input` types in iOS.
- * 2. Normalize `box-sizing` across all elements that this component could be
- *    applied to.
- * 3. Normalize `line-height`. For `input`, it can't be changed from `normal` in Firefox 4+.
- * 4. Prevent button text from being selectable.
- * 5. Make sure `input` will wrap text across multiple lines.
- */
-.liveblog-btn {
-  -webkit-appearance: none;
-  /* 1 */
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  /* 2 */
-  margin: 0;
-  display: inline-block;
-  vertical-align: middle;
-  font: inherit;
-  line-height: normal;
-  /* 3 */
-  text-align: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  overflow: visible;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  /* 4 */
-  white-space: normal;
-  /* 5 */
-  -webkit-transition: background .3s ease-in-out;
-  -o-transition: background .3s ease-in-out;
-  transition: background .3s ease-in-out;
-  padding: 12px 16px; }
-  .liveblog-btn:hover {
-    -webkit-transition: background .3s ease-in-out;
-    -o-transition: background .3s ease-in-out;
-    transition: background .3s ease-in-out;
-    text-decoration: none; }
-
-.liveblog-btn--primary {
-  color: #FFF;
-  background: #21759B;
-  font-size: 16px; }
-  .liveblog-btn--primary:hover {
-    background: #185571; }
-
-.liveblog-btn--secondary {
-  background: #eee;
-  color: #333; }
-  .liveblog-btn--secondary:hover {
-    background: #dedede; }
-
-.liveblog-btn--small {
-  font-size: 12px;
-  line-height: 23px;
-  padding: 4px 16px; }
-
-.liveblog-btn--icon {
-  padding: 6px;
-  margin: 2px;
-  background: transparent;
-  color: #333; }
-  .liveblog-btn--icon:hover {
-    background: #bbb; }
-
-.liveblog-btn--wide {
-  width: 100%; }
-
-.liveblog-btn--delete {
-  background: #bc0b0b;
-  color: #fff;
-  border: none; }
-  .liveblog-btn--delete:hover {
-    background: #8c0808; }
-
-.liveblog-btn--dark {
-  background: #111;
-  color: #fff; }
-  .liveblog-btn--dark:hover {
-    background: #373737;
-    color: #fff; }
-
-.liveblog-update-btn-container {
-  width: 100%;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  position: -webkit-sticky;
-  position: sticky;
-  z-index: 5;
-  top: 50px; }
-
-.liveblog-btn--rounded {
-  border-radius: 50px;
-  font-size: 14px; }
-
-.liveblog-btn--rounded .dashicons-update {
-  margin-right: 5px; }
-
-/**
-* Editor Container
-*/
-.liveblog-editor-container {
-  background: #eee;
-  border-top: 2px solid #111;
-  border-bottom: 2px solid #eee;
-  padding: 16px;
-  margin-bottom: 24px; }
-
-.liveblog-editor-container .public-DraftEditor-content,
-.liveblog-preview {
-  border: 1px solid #bbb;
+.liveblog-feed {
   min-height: 200px;
-  padding: 10px;
-  margin-bottom: 10px; }
-
-.liveblog-editor-container .public-DraftEditor-content {
-  background: #fff; }
-
-.liveblog-preview {
-  background: #f7f7f7; }
-
-.liveblog-entry-edit .liveblog-editor-container {
-  border: none;
-  background: transparent;
-  padding: 0;
-  margin-top: 24px;
-  margin-bottom: 0; }
-
-/**
-* Editor Modal
-*/
-.liveblog-editor-modal {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  z-index: 99;
-  background: rgba(255, 255, 255, 0.8);
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center; }
-
-.liveblog-form {
-  background: #f7f7f7;
-  border: 1px solid #bbb;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap; }
-
-.liveblog-input {
-  -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  margin: 2px;
-  padding: 2px; }
-
-/**
-* Editor Toolbar
-*/
-.liveblog-toolbar {
-  background: #f7f7f7;
-  border: 1px solid #bbb;
-  border-bottom: none; }
-
-/**
-* Editor Autocomplete Popup
-*/
-.liveblog-popover {
-  position: absolute;
-  -webkit-animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
-          animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
-  top: 100%;
-  left: 10px;
-  right: 10px;
-  z-index: 99;
-  background: #fff;
-  -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
-          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
-  border-top: none; }
-
-.liveblog-popover-meta {
-  font-size: 12px;
-  padding: 5px 10px;
-  color: #333;
-  border-bottom: 1px solid #f7f7f7; }
-
-.liveblog-popover-item {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  padding: 5px;
-  font-size: 14px;
-  color: #333; }
-
-.liveblog-popover-item img {
-  width: 15px;
-  height: 15px;
-  margin-right: 8px; }
-
-.liveblog-popover-item--focused {
-  background: #f7f7f7; }
-
-.liveblog-popover-item-figure {
-  margin-right: 5px; }
-
-/**
-* Editor Tabs
-*/
-.liveblog-editor-tabs {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: end;
-      -ms-flex-pack: end;
-          justify-content: flex-end; }
-
-.liveblog-editor-tab {
-  position: relative;
-  z-index: 99;
-  font-size: 13px;
-  padding: 6px 12px;
-  background: #eee;
-  color: #333;
-  border: 1px solid #bbb;
-  border-bottom: none;
-  font-weight: normal;
-  border-radius: 0; }
-
-.liveblog-editor-tab:hover,
-.liveblog-editor-tab.is-active {
-  background: #f7f7f7; }
-
-.liveblog-editor-tab.is-active::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  top: 100%;
-  left: 0;
-  background: #f7f7f7; }
-
-.liveblog-editor-tab:not(:last-child) {
-  margin-right: 4px; }
-
-/**
-* Editor Emoji
-*/
-.liveblog-inline-emoji {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  vertical-align: middle;
-  display: inline-block;
-  overflow: hidden;
-  max-width: 1.95ch;
-  max-height: 1em;
-  line-height: inherit;
-  margin: -.2ex 0em .2ex;
-  color: rgba(255, 255, 255, 0); }
-
-.liveblog-inline-emoji:focus {
-  border: 1px solid black; }
-
-.spinner {
-  width: 15px;
-  height: 15px;
   position: relative; }
 
-.double-bounce1, .double-bounce2 {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: #bbb;
-  opacity: 0.6;
+.liveblog-feed.is-loading::after {
+  content: "";
   position: absolute;
+  z-index: 0;
   top: 0;
   left: 0;
-  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-  animation: sk-bounce 2.0s infinite ease-in-out; }
-
-.double-bounce2 {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s; }
-
-@-webkit-keyframes sk-bounce {
-  0%, 100% {
-    -webkit-transform: scale(0); }
-  50% {
-    -webkit-transform: scale(1); } }
-
-@keyframes sk-bounce {
-  0%, 100% {
-    transform: scale(0);
-    -webkit-transform: scale(0); }
-  50% {
-    transform: scale(1);
-    -webkit-transform: scale(1); } }
-
-.liveblog-placeholder {
-  width: 100%;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  padding: 30px;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  background: #f7f7f7; }
-
-.liveblog-placeholder-inner {
-  font-size: 14px;
-  color: #777;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center; }
-
-.liveblog-placeholder-text {
-  margin-top: 20px; }
-
-.liveblog-image-upload-btn {
-  position: absolute;
-  margin-bottom: 5px;
-  bottom: 100%;
-  padding: 3px;
-  background: #f7f7f7;
-  border: 1px solid #bbb; }
-
-.liveblog-image-upload-btn .dashicons {
-  margin-right: 3px; }
-
-.liveblog-entry {
-  position: relative;
-  background: #f7f7f7;
-  border-top: 2px solid #eee;
-  border-bottom: 2px solid #eee;
-  padding: 24px;
-  margin-bottom: 24px; }
-
-.liveblog-entry-edit {
-  margin-left: 60px; }
-
-.liveblog-entry--key {
-  border-top: 2px solid #111; }
-
-.liveblog-entry-content {
-  padding-top: 10px;
-  padding-left: 60px; }
-
-.liveblog-meta {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  color: #666; }
-
-.liveblog-meta-time {
-  -ms-flex-preferred-size: 60px;
-      flex-basis: 60px; }
-
-.liveblog-meta-time span {
-  display: block;
-  font-size: 10px;
-  line-height: 12px; }
-
-.liveblog-meta-time span:first-child {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 5px; }
-
-.liveblog-meta-author {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center; }
-
-.liveblog-meta-author-name {
-  font-size: 13px;
-  margin-left: 8px; }
-
-.liveblog-meta-authour-avatar {
-  border-radius: 50%;
-  overflow: hidden;
-  width: 30px;
-  height: 30px; }
-
-.liveblog-meta-author-avatar img {
-  width: 30px;
-  height: 30px; }
-
-.liveblog-entry-tools {
-  margin-left: 60px;
-  margin-top: 10px; }
-
-.liveblog-entry-tools .liveblog-btn:first-child {
-  margin-right: 8px; }
-
-.type-key {
-  display: none; }
-
-.liveblog-hash {
-  color: #21759B; }
-
-.liveblog-emoji {
-  display: inline-block;
-  overflow: hidden;
-  max-width: 1.95ch;
-  max-height: 1em;
-  line-height: inherit;
-  margin: 0em 0em -.2ex; }
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7); }
 
 .liveblog-event {
   position: relative;
@@ -579,47 +140,505 @@
   font-size: 13px;
   line-height: 12px; }
 
-@-webkit-keyframes spin {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg); }
-  to {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg); } }
+.liveblog-entry {
+  position: relative;
+  background: #f7f7f7;
+  border-top: 2px solid #eee;
+  border-bottom: 2px solid #eee;
+  padding: 24px;
+  margin-bottom: 24px; }
 
-@keyframes spin {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg); }
-  to {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg); } }
+.liveblog-entry-edit {
+  margin-left: 60px; }
 
-.liveblog-feed {
+.liveblog-entry--key {
+  border-top: 2px solid #111; }
+
+.liveblog-entry-content {
+  padding-top: 10px;
+  padding-left: 60px; }
+
+.liveblog-meta {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  color: #666; }
+
+.liveblog-meta-time {
+  -ms-flex-preferred-size: 60px;
+      flex-basis: 60px; }
+
+.liveblog-meta-time span {
+  display: block;
+  font-size: 10px;
+  line-height: 12px; }
+
+.liveblog-meta-time span:first-child {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px; }
+
+.liveblog-meta-author {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center; }
+
+.liveblog-meta-author-name {
+  font-size: 13px;
+  margin-left: 8px; }
+
+.liveblog-meta-authour-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 30px;
+  height: 30px; }
+
+.liveblog-meta-author-avatar img {
+  width: 30px;
+  height: 30px; }
+
+.liveblog-entry-tools {
+  margin-left: 60px;
+  margin-top: 10px; }
+
+.liveblog-entry-tools .liveblog-btn:first-child {
+  margin-right: 8px; }
+
+.type-key {
+  display: none; }
+
+.liveblog-hash {
+  color: #21759B; }
+
+.liveblog-emoji {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: 0em 0em -.2ex; }
+
+/**
+ * Base button styles.
+ * 1. Corrects inability to style clickable `input` types in iOS.
+ * 2. Normalize `box-sizing` across all elements that this component could be
+ *    applied to.
+ * 3. Normalize `line-height`. For `input`, it can't be changed from `normal` in Firefox 4+.
+ * 4. Prevent button text from being selectable.
+ * 5. Make sure `input` will wrap text across multiple lines.
+ */
+.liveblog-btn {
+  -webkit-appearance: none;
+  /* 1 */
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  /* 2 */
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  /* 3 */
+  text-align: center;
+  font: inherit;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  overflow: visible;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  /* 4 */
+  white-space: normal;
+  /* 5 */
+  -webkit-transition: all .3s ease-in-out;
+  -o-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out; }
+  .liveblog-btn:hover {
+    -webkit-transition: all .3s ease-in-out;
+    -o-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+    text-decoration: none; }
+
+.liveblog-btn--primary {
+  color: #FFF;
+  background: #21759B;
+  font-size: 16px; }
+  .liveblog-btn--primary:hover {
+    background: #185571; }
+
+.liveblog-btn--secondary {
+  background: #eee;
+  color: #333; }
+  .liveblog-btn--secondary:hover {
+    background: #dedede; }
+
+.liveblog-btn--small {
+  font-size: 12px;
+  line-height: 23px;
+  padding: 4px 16px; }
+
+.liveblog-btn--icon {
+  padding: 6px;
+  margin: 2px;
+  background: transparent;
+  color: #333; }
+  .liveblog-btn--icon:hover {
+    background: #bbb; }
+
+.liveblog-btn--wide {
+  width: 100%; }
+
+.liveblog-btn--delete {
+  background: #bc0b0b;
+  color: #fff;
+  border: none; }
+  .liveblog-btn--delete:hover {
+    background: #8c0808; }
+
+.liveblog-btn--dark {
+  background: #111;
+  color: #fff; }
+  .liveblog-btn--dark:hover {
+    background: #373737;
+    color: #fff; }
+
+.liveblog-update-btn-container {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  position: -webkit-sticky;
+  position: sticky;
+  z-index: 5;
+  top: 50px; }
+
+.liveblog-btn--rounded {
+  border-radius: 50px;
+  font-size: 14px; }
+
+.liveblog-btn--rounded .dashicons-update {
+  margin-right: 5px; }
+
+.liveblog-editor-btn {
+  display: inline-block;
+  padding: .5rem;
+  margin: 0;
+  background: transparent;
+  border-radius: 0;
+  color: #333; }
+
+.liveblog-editor-btn:hover {
+  background: #fff; }
+
+.liveblog-image-upload-btn {
+  position: absolute;
+  bottom: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin-bottom: .2rem;
+  padding: .35rem;
+  font-size: .8rem;
+  font-weight: normal;
+  border: 1px solid #bbb;
+  background-color: #f7f7f7;
+  border-radius: 3px; }
+
+.liveblog-image-upload-btn .dashicons {
+  margin-right: .35rem; }
+
+.liveblog-image-upload-btn:hover {
+  background-color: #fff;
+  -webkit-transition: .3s background-color ease-in-out;
+  -o-transition: .3s background-color ease-in-out;
+  transition: .3s background-color ease-in-out; }
+
+.liveblog-publish-btn {
+  background: #21759B;
+  width: 100%;
+  font-size: .9rem; }
+
+.liveblog-publish-btn:hover {
+  background: #2585b0; }
+
+.liveblog-editor-container {
+  padding: .8rem;
+  margin-bottom: .8rem;
+  background: #eee;
+  border-top: 2px solid #111; }
+
+.liveblog-editor-container .public-DraftEditor-content,
+.liveblog-preview {
   min-height: 200px;
-  position: relative; }
+  padding: .8rem;
+  margin-bottom: .8rem;
+  border: 1px solid #bbb;
+  border-radius: 0 0 3px 3px; }
 
-.liveblog-feed--loading::after {
+.liveblog-editor-container .public-DraftEditor-content {
+  background: #fff; }
+
+.liveblog-preview {
+  background: #f7f7f7; }
+
+.liveblog-entry-edit .liveblog-editor-container {
+  margin: .8rem 0 0;
+  padding: 0;
+  border: none;
+  background: transparent; }
+
+.liveblog-editor-input-container {
+  position: absolute;
+  z-index: 99;
+  bottom: -102%;
+  left: -50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
+          animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
+  background: #fff;
+  padding: .2rem;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25); }
+
+.liveblog-editor-input-container::after {
   content: "";
   position: absolute;
-  z-index: 0;
+  left: 12%;
+  top: -5px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #fff;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid transparent;
+  -webkit-transform: rotate(-45deg);
+      -ms-transform: rotate(-45deg);
+          transform: rotate(-45deg); }
+
+.liveblog-input {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  height: auto;
+  min-width: 200px;
+  height: 2rem;
+  font-size: .9rem;
+  padding: .3rem;
+  margin: 0;
+  border: 1px solid #eee; }
+
+.liveblog-input-enter,
+.liveblog-input-cancel {
+  padding: 0; }
+
+.liveblog-input-enter {
+  background: #21759B;
+  color: #fff; }
+
+.liveblog-input-enter:hover {
+  background: #2585b0; }
+
+.liveblog-input-cancel {
+  color: #bc0b0b; }
+
+.liveblog-input-cancel:hover {
+  color: #8c0808; }
+
+.liveblog-toolbar {
+  background: #f7f7f7;
+  border: 1px solid #bbb;
+  border-radius: 3px 0 0 0;
+  border-bottom: none; }
+
+.liveblog-popover {
+  position: absolute;
+  top: 100%;
+  left: .8rem;
+  right: .8rem;
+  z-index: 99;
+  background: #fff;
+  -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  border-top: none;
+  -webkit-animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
+          animation: scaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1); }
+
+.liveblog-popover-meta {
+  padding: .4rem;
+  font-size: .8rem;
+  color: #333;
+  border-bottom: 1px solid #f7f7f7; }
+
+.liveblog-popover-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: .4rem;
+  font-size: .8rem;
+  color: #333; }
+
+.liveblog-popover-item img {
+  width: 17.5px;
+  height: 17.5px;
+  margin-right: .4rem; }
+
+.liveblog-popover-item.is-focused {
+  background: #f7f7f7; }
+
+.liveblog-popover-item-figure {
+  margin-right: .4rem; }
+
+.liveblog-editor-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end; }
+
+.liveblog-editor-tab {
+  position: relative;
+  z-index: 99;
+  padding: .4rem .8rem;
+  font-size: .8rem;
+  background: #eee;
+  color: #333;
+  border: 1px solid #bbb;
+  border-radius: 3px 3px 0 0;
+  border-bottom: none;
+  font-weight: normal; }
+
+.liveblog-editor-tab:hover,
+.liveblog-editor-tab.is-active {
+  background: #f7f7f7; }
+
+.liveblog-editor-tab.is-active::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #f7f7f7; }
+
+.liveblog-editor-tab:not(:last-child) {
+  margin-right: .25rem; }
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  position: relative; }
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #bbb;
+  opacity: 0.6;
+  position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.7); }
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out; }
 
-.liveblog-loader {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  right: 0;
-  bottom: 0;
-  -webkit-transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-  -webkit-animation: spin 1s linear infinite;
-          animation: spin 1s linear infinite; }
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s; }
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% {
+    -webkit-transform: scale(0); }
+  50% {
+    -webkit-transform: scale(1); } }
+
+@keyframes sk-bounce {
+  0%, 100% {
+    transform: scale(0);
+    -webkit-transform: scale(0); }
+  50% {
+    transform: scale(1);
+    -webkit-transform: scale(1); } }
+
+.liveblog-placeholder {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 30px;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: #f7f7f7; }
+
+.liveblog-placeholder-inner {
+  font-size: 14px;
+  color: #777;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center; }
+
+.liveblog-placeholder-text {
+  margin-top: 20px; }
+
+.liveblog-inline-emoji {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  vertical-align: middle;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: -.2ex 0em .2ex;
+  color: rgba(255, 255, 255, 0); }
+
+.liveblog-inline-emoji:focus {
+  border: 1px solid black; }
 
 /*# sourceMappingURL=app.css.map*/

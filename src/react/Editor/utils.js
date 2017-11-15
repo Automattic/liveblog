@@ -22,8 +22,8 @@ export const parseTemplate = (template, map, fallback) =>
 /**
  * Returns boolean if selection contains entity
  */
-export const hasEntityAtSelection = (editorState) => {
-  const selection = editorState.getSelection();
+export const hasEntityAtSelection = (editorState, selectionState = false) => {
+  const selection = selectionState || editorState.getSelection();
   if (!selection.getHasFocus()) return false;
   const contentState = editorState.getCurrentContent();
   const block = contentState.getBlockForKey(selection.getStartKey());
@@ -128,25 +128,4 @@ export const getSelectedBlocks = (contentState, anchorKey, focusKey) => {
   }
 
   return selectedBlocks;
-};
-
-/**
- * Returns boolean if the current selection of blocks contains an enity.
- */
-export const hasEntity = (editorState, selection) => {
-  const contentState = editorState.getCurrentContent();
-  const currentSelection = selection || editorState.getSelection();
-  const startKey = currentSelection.getStartKey();
-  const endKey = currentSelection.getEndKey();
-
-  const selectedBlocks = getSelectedBlocks(contentState, startKey, endKey);
-  let entitiesFound = false;
-
-  selectedBlocks.forEach((block) => {
-    if (block.getEntityAt(0)) {
-      entitiesFound = true;
-    }
-  });
-
-  return entitiesFound;
 };

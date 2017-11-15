@@ -1,0 +1,30 @@
+.liveblog-editor-container {
+  padding: .8rem;
+  margin-bottom: .8rem;
+  background: $color-grey-mid-light;
+  border-top: 2px solid $color-grey-x-dark;
+}
+
+.liveblog-editor-container .public-DraftEditor-content,
+.liveblog-preview {
+  min-height: 200px;
+  padding: .8rem;
+  margin-bottom: .8rem;
+  border: 1px solid $color-grey-light;
+  border-radius: 0 0 $base-border-radius $base-border-radius;
+}
+
+.liveblog-editor-container .public-DraftEditor-content {
+  background: #fff;
+}
+
+.liveblog-preview {
+  background: $color-grey-x-light;
+}
+
+.liveblog-entry-edit .liveblog-editor-container {
+  margin: .8rem 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}

@@ -14,7 +14,6 @@ import * as userActions from '../actions/userActions';
 
 import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
-import Button from '../components/Button';
 import PreviewContainer from './PreviewContainer';
 
 import Editor, { decorators, convertFromHTML } from '../Editor/index';
@@ -177,16 +176,16 @@ class EditorContainer extends Component {
               editorState={editorState}
               onChange={this.onChange}
               suggestions={suggestions}
-              // Need to work out a better way of handling this.
+              // @todo work out a better way of handling this.
               resetSuggestions={() => this.setState({ suggestions: [] })}
               onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
               autocompleteConfig={config.autocomplete}
               handleImageUpload={this.handleImageUpload.bind(this)}
             />
         }
-        <Button type="primary" modifiers="wide" click={this.publish.bind(this)}>
+        <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
-        </Button>
+        </button>
       </div>
     );
   }

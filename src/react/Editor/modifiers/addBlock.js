@@ -9,14 +9,14 @@ import {
   genKey,
 } from 'draft-js';
 
-import { hasEntity } from '../utils';
+import { hasEntityAtSelection } from '../utils';
 
 export default function (editorState, selection, type, data, entityType, text = ' ') {
   let contentState = editorState.getCurrentContent();
   const currentSelectionState = selection;
 
   // in case text is selected it is removed and then the block is appended
-  if (!hasEntity(editorState, selection)) {
+  if (!hasEntityAtSelection(editorState, selection)) {
     contentState = Modifier.removeRange(
       contentState,
       currentSelectionState,
