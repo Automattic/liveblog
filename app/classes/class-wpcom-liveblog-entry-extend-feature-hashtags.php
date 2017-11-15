@@ -249,14 +249,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function remove_name_search( $clauses ) {
-
 		// Remove the where clause's section about the name.
 		$clauses['where'] = preg_replace(
 			array(
 				'~\\(\\(.*(?='.preg_quote("(t.slug LIKE '").')~',
 				'~(%\'\\))\\)~',
 			),
-			'$1',
+			'($1',
 			$clauses['where']
 		);
 

@@ -9694,6 +9694,7 @@ function createEntry(entry, config) {
       content: entry.content
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
     }
@@ -9715,6 +9716,7 @@ function updateEntry(entry, config) {
       content: entry.content
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
     }
@@ -9735,6 +9737,7 @@ function deleteEntry(id, config) {
       entry_id: id
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
     }
@@ -9774,6 +9777,7 @@ function deleteEvent(entry, config) {
       content: entry.content
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache'
     }
@@ -9806,6 +9810,9 @@ function getPreview(content, config) {
     method: 'POST',
     body: {
       entry_content: content
+    },
+    headers: {
+      'Content-Type': 'application/json'
     }
   };
 
@@ -26167,9 +26174,9 @@ var _AppContainer = __webpack_require__(513);
 
 var _AppContainer2 = _interopRequireDefault(_AppContainer);
 
-__webpack_require__(650);
+__webpack_require__(649);
 
-__webpack_require__(651);
+__webpack_require__(650);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61954,15 +61961,15 @@ var _Entries = __webpack_require__(643);
 
 var _Entries2 = _interopRequireDefault(_Entries);
 
-var _PaginationContainer = __webpack_require__(646);
+var _PaginationContainer = __webpack_require__(645);
 
 var _PaginationContainer2 = _interopRequireDefault(_PaginationContainer);
 
-var _EventsContainer = __webpack_require__(647);
+var _EventsContainer = __webpack_require__(646);
 
 var _EventsContainer2 = _interopRequireDefault(_EventsContainer);
 
-var _UpdateButton = __webpack_require__(649);
+var _UpdateButton = __webpack_require__(648);
 
 var _UpdateButton2 = _interopRequireDefault(_UpdateButton);
 
@@ -82615,8 +82622,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(EntryContainer);
 
 /***/ }),
-/* 645 */,
-/* 646 */
+/* 645 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82768,7 +82774,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(PaginationContainer);
 
 /***/ }),
-/* 647 */
+/* 646 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82802,7 +82808,7 @@ var _eventsActions = __webpack_require__(89);
 
 var eventsActions = _interopRequireWildcard(_eventsActions);
 
-var _Event = __webpack_require__(648);
+var _Event = __webpack_require__(647);
 
 var _Event2 = _interopRequireDefault(_Event);
 
@@ -82895,7 +82901,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(EventsContainer);
 
 /***/ }),
-/* 648 */
+/* 647 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -82957,7 +82963,7 @@ Event.propTypes = {
 exports.default = Event;
 
 /***/ }),
-/* 649 */
+/* 648 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -83008,13 +83014,13 @@ UpdateButton.propTypes = {
 exports.default = UpdateButton;
 
 /***/ }),
-/* 650 */
+/* 649 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 651 */
+/* 650 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

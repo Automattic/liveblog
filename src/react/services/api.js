@@ -38,6 +38,7 @@ export function createEntry(entry, config, nonce = false) {
       content: entry.content,
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
@@ -57,6 +58,7 @@ export function updateEntry(entry, config, nonce = false) {
       content: entry.content,
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
@@ -75,6 +77,7 @@ export function deleteEntry(id, config, nonce = false) {
       entry_id: id,
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
@@ -112,6 +115,7 @@ export function deleteEvent(entry, config, nonce = false) {
       content: entry.content,
     },
     headers: {
+      'Content-Type': 'application/json',
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
@@ -145,6 +149,9 @@ export function getPreview(content, config) {
     body: {
       entry_content: content,
     },
+    headers: {
+      'Content-Type': 'application/json'
+    }
   };
 
   return ajax(settings);
