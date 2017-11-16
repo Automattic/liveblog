@@ -19,6 +19,8 @@
 }
 
 .liveblog-popover-item {
+  // Important: makes on mouse down a clickable event on ios.
+  cursor: pointer;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;

@@ -167,9 +167,3 @@ export const getPollingPages = (current, next) => {
   if (!next) return current;
   return Math.max(next, 1);
 };
-
-export const getLastIndexOf = (string, characters = []) =>
-  characters.reduce((accumulator, character) => {
-    return Math.max(string.lastIndexOf(character), accumulator);
-  }, -1);
-

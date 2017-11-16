@@ -157,6 +157,12 @@
           align-items: center;
   margin-bottom: 24px; }
 
+.liveblog-pagination > * {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  text-align: center; }
+
 .liveblog-pagination-btn {
   margin: 2.5px;
   font-size: .8rem;
@@ -380,6 +386,7 @@
   border-bottom: 1px solid #f7f7f7; }
 
 .liveblog-popover-item {
+  cursor: pointer;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -414,6 +421,7 @@
 .liveblog-editor-tab {
   position: relative;
   z-index: 99;
+  line-height: 1.5;
   padding: .4rem .8rem;
   font-size: .8rem;
   background: #eee;
@@ -524,12 +532,6 @@
 .liveblog-inline-emoji:focus {
   border: 1px solid black; }
 /**
-* Example theme to work with Wordpress's 2017 Default theme.
-*/
-/**
-* Colours
-*/
-/**
 * Entries
 */
 .liveblog-entry {
@@ -542,6 +544,9 @@
 
 .liveblog-entry-edit {
   margin-left: 60px; }
+  @media (max-width: 58.74em) {
+    .liveblog-entry-edit {
+      margin-left: 0; } }
 
 .liveblog-entry-content {
   padding-top: 10px;
@@ -575,6 +580,9 @@
 
 .liveblog-entry-tools {
   margin-left: 60px; }
+  @media (max-width: 58.74em) {
+    .liveblog-entry-tools {
+      margin-left: 0; } }
 
 .liveblog-hash {
   color: #21759B; }
@@ -642,5 +650,3 @@
 .liveblog-pagination-last {
   background: #eee;
   color: #111; }
-
-/*# sourceMappingURL=app.css.map*/

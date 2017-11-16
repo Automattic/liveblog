@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { convertFromHTML } from 'draft-convert';
 
 export default html =>

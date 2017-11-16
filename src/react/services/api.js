@@ -150,8 +150,8 @@ export function getPreview(content, config) {
       entry_content: content,
     },
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   };
 
   return ajax(settings);

@@ -46,6 +46,7 @@ class Suggestions extends Component {
           key={i}
           onMouseDown={() => turnIntoEntity(i)}
           onMouseEnter={() => setSuggestionIndex(i)}
+          onTouchStart={() => setSuggestionIndex(i)}
           dangerouslySetInnerHTML={{ __html: renderTemplate(item) }}
         />,
       );

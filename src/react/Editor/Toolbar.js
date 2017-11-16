@@ -153,7 +153,7 @@ Toolbar.propTypes = {
   editorState: PropTypes.object,
   domEditor: PropTypes.any,
   plugins: PropTypes.array,
-  imageInputId: PropTypes.number,
+  imageInputId: PropTypes.string,
 };
 
 export default Toolbar;
