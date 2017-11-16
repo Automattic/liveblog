@@ -1,7 +1,7 @@
 .liveblog-editor-input-container {
   position: absolute;
   z-index: 99;
-  bottom: -102%;
+  bottom: -100%;
   left: -50%;
   display: flex;
   flex-wrap: nowrap;
@@ -11,6 +11,10 @@
   padding: .2rem;
   border-radius: $base-border-radius;
   box-shadow: $base-drop-shadow;
+
+  @include mq($until: small) {
+    left: -180px;
+  }
 }
 
 .liveblog-editor-input-container::after {
@@ -24,13 +28,16 @@
   border-bottom: 10px solid transparent;
   border-left: 10px solid transparent;
   transform: rotate(-45deg);
+
+  @include mq($until: small) {
+   left: 74%;
+  }
 }
 
 .liveblog-input {
   flex-grow: 1;
   height: auto;
   min-width: 200px;
-  height: 2rem;
   font-size: .9rem;
   padding: .3rem;
   margin: 0;
@@ -39,7 +46,8 @@
 
 .liveblog-input-enter,
 .liveblog-input-cancel {
-  padding: 0;
+  padding: .3em;
+  font-size: .9rem;
 }
 
 .liveblog-input-enter {
