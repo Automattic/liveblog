@@ -19,7 +19,7 @@
 
 .liveblog-editor-input-container::after {
   content: "";
-  position : absolute;
+  position: absolute;
   left: 12%;
   top: -5px;
   width: 0;
@@ -30,7 +30,7 @@
   transform: rotate(-45deg);
 
   @include mq($until: small) {
-   left: 67%;
+    left: 67%;
   }
 }
 
