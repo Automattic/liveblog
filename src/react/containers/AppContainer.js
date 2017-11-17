@@ -17,11 +17,41 @@ class AppContainer extends Component {
     this.eventsContainer = document.getElementById('liveblog-key-events');
   }
 
+  componentWillMount() {
+    const script = document.createElement('script');
+    script.src = 'https://platform.twitter.com/widgets.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    const script2 = document.createElement('script');
+    script2.src = 'https://platform.instagram.com/en_US/embeds.js';
+    script2.async = true;
+    document.body.appendChild(script2);
+
+    const script3 = document.createElement('script');
+    script3.src = 'https://embed.redditmedia.com/widgets/platform.js';
+    script3.async = true;
+    document.body.appendChild(script3);
+  }
+
+  componentDidUpdate() {
+    if (window.instgrm) {
+      window.instgrm.Embeds.process();
+    }
+
+    if (window.twttr) {
+      document.querySelectorAll('.twitter-tweet').forEach((ele) => {
+        window.twttr.widgets.load(ele);
+      });
+    }
+  }
+
   componentDidMount() {
     const { loadConfig, getEntries, getEvents, startPolling } = this.props;
     loadConfig(window.liveblog_settings);
     getEntries(1);
     startPolling();
+    this.listenForEmbeds();
     if (this.eventsContainer) getEvents();
   }
 

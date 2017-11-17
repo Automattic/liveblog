@@ -168,4 +168,3 @@ export function uploadImage(formData) {
 
   return ajax(settings);
 }
-

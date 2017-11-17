@@ -143,7 +143,7 @@ class EditorContainer extends Component {
 
     return new Promise((resolve) => {
       uploadImage(formData)
-        .timeout(10000)
+        .timeout(60000)
         .map(res => res.response)
         .subscribe(res => resolve(res.data.url));
     });
