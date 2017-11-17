@@ -4,9 +4,14 @@ dist/
 npm-debug.log
 yarn-error.log
 
+.svn
+composer.lock
+vendor/
+
 # Editor directories and files
 .idea
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+
