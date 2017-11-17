@@ -62052,7 +62052,6 @@ var AppContainer = function (_Component) {
       loadConfig(window.liveblog_settings);
       getEntries(1);
       startPolling();
-      this.listenForEmbeds();
       if (this.eventsContainer) getEvents();
     }
   }, {
