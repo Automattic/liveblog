@@ -68,3 +68,4 @@ script:
     - phpunit
 	# Run linting
 	- npm run lint-scripts
+	- npm run lint-styles
