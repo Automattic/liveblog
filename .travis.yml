@@ -1,12 +1,12 @@
 language: php
 
 cache:
-	apt: true
-	yarn: true
-	directories:
-		- $HOME/.composer/cache/files
-		- $HOME/.yarn/node_modules
-	- node_modules
+    apt: true
+    yarn: true
+    directories:
+        - $HOME/.composer/cache/files
+        - $HOME/.yarn/node_modules
+        - node_modules
 
 matrix:
     include:
@@ -48,8 +48,8 @@ before_script:
     - if [[ "$SNIFF" == "1" ]]; then phpenv rehash; fi
     # Set up unit tests
     - bash app/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-	# Install npm modules
-	- yarn
+    # Install npm modules
+    - yarn
 
 script:
     # Search for PHP syntax errors.
@@ -66,6 +66,6 @@ script:
     - if [[ "$SNIFF" == "1" ]]; then $PHPCS_DIR/scripts/phpcs -p -s -v -n . --standard="WordPress-VIP" --extensions=php; fi
     # Run unit tests
     - phpunit
-	# Run linting
-	- npm run lint-scripts
-	- npm run lint-styles
+    # Run linting
+    - npm run lint-scripts
+    - npm run lint-styles
