@@ -453,12 +453,12 @@
 .liveblog-editor-tab:not(:last-child) {
   margin-right: .25rem; }
 
-.spinner {
+.liveblog-loader {
   width: 15px;
   height: 15px;
   position: relative; }
 
-.double-bounce1, .double-bounce2 {
+.liveblog-loader-bounce1, .liveblog-loader-bounce2 {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -470,7 +470,7 @@
   -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
   animation: sk-bounce 2.0s infinite ease-in-out; }
 
-.double-bounce2 {
+.liveblog-loader-bounce2 {
   -webkit-animation-delay: -1.0s;
   animation-delay: -1.0s; }
 
@@ -656,5 +656,3 @@
 .liveblog-pagination-last {
   background: #eee;
   color: #111; }
-
-/*# sourceMappingURL=app.css.map*/
