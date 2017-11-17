@@ -1,7 +1,6 @@
 .liveblog-loader {
   width: 15px;
   height: 15px;
-
   position: relative;
 }
 
@@ -10,13 +9,12 @@
   height: 100%;
   border-radius: 50%;
   background-color: $color-grey-light;
-  opacity: 0.6;
+  opacity: .6;
   position: absolute;
   top: 0;
   left: 0;
-
-  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-  animation: sk-bounce 2.0s infinite ease-in-out;
+  -webkit-animation: sk-bounce 2s infinite ease-in-out;
+  animation: sk-bounce 2s infinite ease-in-out;
 }
 
 .liveblog-loader-bounce2 {
@@ -25,16 +23,17 @@
 }
 
 @-webkit-keyframes sk-bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
+  0%, 100% { -webkit-transform: scale(0); }
+  50% { -webkit-transform: scale(1); }
 }
 
 @keyframes sk-bounce {
   0%, 100% {
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% {
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+    -webkit-transform: scale(1);
   }
 }

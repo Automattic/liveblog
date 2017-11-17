@@ -49,6 +49,8 @@
     "sass-module-importer": "^1.4.0",
     "sass-mq": "^3.3.2",
     "style-loader": "^0.18.2",
+    "stylelint": "^8.2.0",
+    "stylelint-scss": "^2.1.0",
     "webpack": "^3.3.0"
   },
   "scripts": {

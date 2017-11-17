@@ -1,7 +1,14 @@
 language: php
 
-matrix:
+cache:
+    apt: true
+    yarn: true
+    directories:
+        - $HOME/.composer/cache/files
+        - $HOME/.yarn/node_modules
+        - node_modules
 
+matrix:
     include:
         # aliased to a recent 5.6.x version
         - php: '5.6'
@@ -40,7 +47,9 @@ before_script:
     # After CodeSniffer install you should refresh your path.
     - if [[ "$SNIFF" == "1" ]]; then phpenv rehash; fi
     # Set up unit tests
-    - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+    - bash app/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+    # Install npm modules
+    - yarn
 
 script:
     # Search for PHP syntax errors.
@@ -57,3 +66,6 @@ script:
     - if [[ "$SNIFF" == "1" ]]; then $PHPCS_DIR/scripts/phpcs -p -s -v -n . --standard="WordPress-VIP" --extensions=php; fi
     # Run unit tests
     - phpunit
+    # Run linting
+    - npm run lint-scripts
+    - npm run lint-styles
