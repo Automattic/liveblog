@@ -13,7 +13,7 @@
   box-shadow: $base-drop-shadow;
 
   @include mq($until: small) {
-    left: -180px;
+    left: -160px;
   }
 }
 
@@ -30,7 +30,7 @@
   transform: rotate(-45deg);
 
   @include mq($until: small) {
-   left: 74%;
+   left: 67%;
   }
 }
 

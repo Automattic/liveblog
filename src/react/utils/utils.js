@@ -118,11 +118,32 @@ export const getNewestEntry = (current, update) => {
   return update;
 };
 
+export const daysBetween = (timestamp1, timestamp2) => {
+  const day = 1000 * 60 * 60 * 24;
+  const difference = Math.abs(timestamp1 - timestamp2);
+  return Math.round(difference / day);
+};
+
 /**
  * Returns a formated string indicating how long ago a timestamp was.
  * @param {Number} timestamp
  */
 export const timeAgo = (timestamp) => {
+  const date = new Date(timestamp * 1000);
+
+  // If its greater than 30 days ago.
+  if (daysBetween((timestamp * 1000), Date.now()) >= 30) {
+    let day = date.getUTCDate();
+    let month = date.getUTCMonth() + 1;
+    let year = date.getUTCFullYear();
+
+    if (day < 10) day = `0${day}`;
+    if (month < 10) month = `0${month}`;
+    if (year < 10) year = `0${year}`;
+
+    return `${day}/${month}/${year}`;
+  }
+
   const units = [
     { name: 's', limit: 60, in_seconds: 1 },
     { name: 'm', limit: 3600, in_seconds: 60 },

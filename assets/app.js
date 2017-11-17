@@ -7738,11 +7738,32 @@ var getNewestEntry = exports.getNewestEntry = function getNewestEntry(current, u
   return update;
 };
 
+var daysBetween = exports.daysBetween = function daysBetween(timestamp1, timestamp2) {
+  var day = 1000 * 60 * 60 * 24;
+  var difference = Math.abs(timestamp1 - timestamp2);
+  return Math.round(difference / day);
+};
+
 /**
  * Returns a formated string indicating how long ago a timestamp was.
  * @param {Number} timestamp
  */
 var timeAgo = exports.timeAgo = function timeAgo(timestamp) {
+  var date = new Date(timestamp * 1000);
+
+  // If its greater than 30 days ago.
+  if (daysBetween(timestamp * 1000, Date.now()) >= 30) {
+    var day = date.getUTCDate();
+    var month = date.getUTCMonth() + 1;
+    var year = date.getUTCFullYear();
+
+    if (day < 10) day = '0' + day;
+    if (month < 10) month = '0' + month;
+    if (year < 10) year = '0' + year;
+
+    return day + '/' + month + '/' + year;
+  }
+
   var units = [{ name: 's', limit: 60, in_seconds: 1 }, { name: 'm', limit: 3600, in_seconds: 60 }, { name: 'h', limit: 86400, in_seconds: 3600 }, { name: 'd', limit: 604800, in_seconds: 86400 }, { name: 'w', limit: 2629743, in_seconds: 604800 }, { name: 'm', limit: 31556926, in_seconds: 2629743 }, { name: 'y', limit: null, in_seconds: 31556926 }];
 
   var diff = (new Date() - new Date(timestamp * 1000)) / 1000;
