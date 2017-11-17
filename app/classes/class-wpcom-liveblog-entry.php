@@ -100,7 +100,7 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'   => $entry_id,
 			'type' => $this->get_type(),
-			'render' => $this->get_content(),
+			'render' => self::render_content( $this->get_content(), $this->comment ),
 			'content' => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'timestamp' => $this->get_timestamp(),
 			'avatar_img' => get_avatar( $this->comment->comment_author_email, $avatar_size ),
@@ -156,8 +156,10 @@ class WPCOM_Liveblog_Entry {
 		global $wp_embed;
 
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
-			if ( get_option( 'embed_autourls' ) )
-				$content = $wp_embed->autoembed( $content );
+			if ( get_option( 'embed_autourls' ) ) {
+				$wpcom_liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
+				$content = $wpcom_liveblog_entry_embed->autoembed( $content, $comment );
+			}
 			$content = do_shortcode( $content );
 		}
 
