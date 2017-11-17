@@ -157,6 +157,12 @@
           align-items: center;
   margin-bottom: 24px; }
 
+.liveblog-pagination > * {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  text-align: center; }
+
 .liveblog-pagination-btn {
   margin: 2.5px;
   font-size: .8rem;
@@ -292,7 +298,7 @@
 .liveblog-editor-input-container {
   position: absolute;
   z-index: 99;
-  bottom: -102%;
+  bottom: -100%;
   left: -50%;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -309,6 +315,9 @@
   border-radius: 3px;
   -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
           box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25); }
+  @media (max-width: 47.49em) {
+    .liveblog-editor-input-container {
+      left: -160px; } }
 
 .liveblog-editor-input-container::after {
   content: "";
@@ -323,6 +332,9 @@
   -webkit-transform: rotate(-45deg);
       -ms-transform: rotate(-45deg);
           transform: rotate(-45deg); }
+  @media (max-width: 47.49em) {
+    .liveblog-editor-input-container::after {
+      left: 67%; } }
 
 .liveblog-input {
   -webkit-box-flex: 1;
@@ -330,7 +342,6 @@
           flex-grow: 1;
   height: auto;
   min-width: 200px;
-  height: 2rem;
   font-size: .9rem;
   padding: .3rem;
   margin: 0;
@@ -338,7 +349,8 @@
 
 .liveblog-input-enter,
 .liveblog-input-cancel {
-  padding: 0; }
+  padding: .3em;
+  font-size: .9rem; }
 
 .liveblog-input-enter {
   background: #21759B;
@@ -380,6 +392,7 @@
   border-bottom: 1px solid #f7f7f7; }
 
 .liveblog-popover-item {
+  cursor: pointer;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -414,6 +427,7 @@
 .liveblog-editor-tab {
   position: relative;
   z-index: 99;
+  line-height: 1.5;
   padding: .4rem .8rem;
   font-size: .8rem;
   background: #eee;
@@ -524,12 +538,6 @@
 .liveblog-inline-emoji:focus {
   border: 1px solid black; }
 /**
-* Example theme to work with Wordpress's 2017 Default theme.
-*/
-/**
-* Colours
-*/
-/**
 * Entries
 */
 .liveblog-entry {
@@ -542,6 +550,9 @@
 
 .liveblog-entry-edit {
   margin-left: 60px; }
+  @media (max-width: 58.74em) {
+    .liveblog-entry-edit {
+      margin-left: 0; } }
 
 .liveblog-entry-content {
   padding-top: 10px;
@@ -575,6 +586,9 @@
 
 .liveblog-entry-tools {
   margin-left: 60px; }
+  @media (max-width: 58.74em) {
+    .liveblog-entry-tools {
+      margin-left: 0; } }
 
 .liveblog-hash {
   color: #21759B; }

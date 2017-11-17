@@ -5,6 +5,11 @@
   margin-bottom: 24px;
 }
 
+.liveblog-pagination > * {
+  display: flex;
+  text-align: center;
+}
+
 .liveblog-pagination-btn {
   margin: 2.5px;
   font-size: .8rem;

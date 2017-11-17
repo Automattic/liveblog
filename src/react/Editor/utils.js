@@ -105,7 +105,7 @@ export const scrollElementIfNotInView = (childElement, parentElement) => {
 let lastId = 0;
 
 export const uniqueHTMLId = (prefix) => {
-  lastId++;
+  lastId += 1;
   return `${prefix}${lastId}`;
 };
 

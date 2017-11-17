@@ -7738,11 +7738,32 @@ var getNewestEntry = exports.getNewestEntry = function getNewestEntry(current, u
   return update;
 };
 
+var daysBetween = exports.daysBetween = function daysBetween(timestamp1, timestamp2) {
+  var day = 1000 * 60 * 60 * 24;
+  var difference = Math.abs(timestamp1 - timestamp2);
+  return Math.round(difference / day);
+};
+
 /**
  * Returns a formated string indicating how long ago a timestamp was.
  * @param {Number} timestamp
  */
 var timeAgo = exports.timeAgo = function timeAgo(timestamp) {
+  var date = new Date(timestamp * 1000);
+
+  // If its greater than 30 days ago.
+  if (daysBetween(timestamp * 1000, Date.now()) >= 30) {
+    var day = date.getUTCDate();
+    var month = date.getUTCMonth() + 1;
+    var year = date.getUTCFullYear();
+
+    if (day < 10) day = '0' + day;
+    if (month < 10) month = '0' + month;
+    if (year < 10) year = '0' + year;
+
+    return day + '/' + month + '/' + year;
+  }
+
   var units = [{ name: 's', limit: 60, in_seconds: 1 }, { name: 'm', limit: 3600, in_seconds: 60 }, { name: 'h', limit: 86400, in_seconds: 3600 }, { name: 'd', limit: 604800, in_seconds: 86400 }, { name: 'w', limit: 2629743, in_seconds: 604800 }, { name: 'm', limit: 31556926, in_seconds: 2629743 }, { name: 'y', limit: null, in_seconds: 31556926 }];
 
   var diff = (new Date() - new Date(timestamp * 1000)) / 1000;
@@ -7783,13 +7804,6 @@ var getCurrentTimestamp = exports.getCurrentTimestamp = function getCurrentTimes
 var getPollingPages = exports.getPollingPages = function getPollingPages(current, next) {
   if (!next) return current;
   return Math.max(next, 1);
-};
-
-var getLastIndexOf = exports.getLastIndexOf = function getLastIndexOf(string) {
-  var characters = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  return characters.reduce(function (accumulator, character) {
-    return Math.max(string.lastIndexOf(character), accumulator);
-  }, -1);
 };
 
 /***/ }),
@@ -13561,7 +13575,7 @@ var scrollElementIfNotInView = exports.scrollElementIfNotInView = function scrol
 var lastId = 0;
 
 var uniqueHTMLId = exports.uniqueHTMLId = function uniqueHTMLId(prefix) {
-  lastId++;
+  lastId += 1;
   return '' + prefix + lastId;
 };
 
@@ -71984,6 +71998,10 @@ var _react = __webpack_require__(3);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(9);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Image = function Image(_ref) {
@@ -72004,6 +72022,11 @@ var Image = function Image(_ref) {
     onDragStart: startDrag,
     role: 'presentation'
   });
+};
+
+Image.propTypes = {
+  contentState: _propTypes2.default.object,
+  block: _propTypes2.default.object
 };
 
 exports.default = Image;
@@ -72270,7 +72293,7 @@ Toolbar.propTypes = {
   editorState: _propTypes2.default.object,
   domEditor: _propTypes2.default.any,
   plugins: _propTypes2.default.array,
-  imageInputId: _propTypes2.default.number
+  imageInputId: _propTypes2.default.string
 };
 
 exports.default = Toolbar;
@@ -72445,6 +72468,9 @@ var Suggestions = function (_Component) {
           onMouseEnter: function onMouseEnter() {
             return setSuggestionIndex(i);
           },
+          onTouchStart: function onTouchStart() {
+            return setSuggestionIndex(i);
+          },
           dangerouslySetInnerHTML: { __html: renderTemplate(item) }
         });
       });
@@ -72573,7 +72599,7 @@ exports.default = function (html) {
     }
 
   })(html);
-};
+}; /* eslint-disable consistent-return */
 
 /***/ }),
 /* 624 */
@@ -82716,7 +82742,6 @@ var PaginationContainer = function (_Component) {
         _react2.default.createElement(
           'span',
           { className: 'liveblog-pagination-pages' },
-          'Page ',
           page,
           ' of ',
           pages

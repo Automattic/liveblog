@@ -1,7 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const Image = ({ contentState, block }) => {
-
   const { src } = contentState.getEntity(block.getEntityAt(0)).getData();
 
   const startDrag = (event) => {
@@ -17,6 +17,11 @@ const Image = ({ contentState, block }) => {
       role="presentation"
     />
   );
+};
+
+Image.propTypes = {
+  contentState: PropTypes.object,
+  block: PropTypes.object,
 };
 
 export default Image;

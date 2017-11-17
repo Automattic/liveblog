@@ -1,4 +1,4 @@
-import { EditorState, Modifier, SelectionState } from 'draft-js';
+import { Modifier, SelectionState } from 'draft-js';
 
 export default (contentState, blockKey) => {
   const afterKey = contentState.getKeyAfter(blockKey);

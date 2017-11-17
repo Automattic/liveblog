@@ -27,7 +27,7 @@ class PaginationContainer extends Component {
             Prev
           </button>
         </div>
-        <span className="liveblog-pagination-pages">Page {page} of {pages}</span>
+        <span className="liveblog-pagination-pages">{page} of {pages}</span>
         <div>
           <button
             disabled={page === pages}
