@@ -86,6 +86,7 @@ const webpackConfig = {
       __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
       __PROD__: JSON.stringify(process.env.NODE_ENV === 'production'),
       __TEST__: JSON.stringify(process.env.NODE_ENV === 'test'),
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
   ],
 };
