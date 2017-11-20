@@ -126,75 +126,7 @@ add_filter( 'liveblog_current_user_can_edit_liveblog', function( $can_edit ) {
  * Discussion: http://wp.me/poqVs-caP
  *
  * We'll use a custom class for storing the oembed meta in comment meta
- * @see wpcom_liveblog_autoembed
- *
- * As far as the function name and code is concerned. We could simply use `__return_false` directly as the filter's callback,
- * but using custom function wrapping the `__return_false()` call is adding more readability to the code and should prevent
- * confusions and conflicts with custom functionality in themes and other plugins
+ * 
+ * This is now included as a core part of the pluign @WPCOM_Liveblog_Entry_Embed
  */
-function wpcom_liveblog_disable_embeds() {
-	return __return_false();
-}
-add_filter( 'liveblog_entry_enable_embeds', 'wpcom_liveblog_disable_embeds', 1000, 0 );
 
-/**
- * WordPress.com specific comment_text filter for handling the automebeds in liveblog entries
- *
- * Filters the comment_text for liveblog entries only with custom implementation of autoembed
- * which is taking advantage of comment meta (vs. post meta) for storing oembed cache
- *
- * Discussion: http://wp.me/poqVs-caP
- *
- * @param string $comment_text Text of the current comment.
- * @param WP_Comment $comment Optional. WP_Comment object.
- */
-function wpcom_liveblog_autoembed( $comment_text, $comment = null ) {
-	//This filter is meant only for liveblog entries
-	if ( true === is_a( $comment, 'WP_Comment' ) && 'liveblog' === $comment->comment_type ) {
-
-		/**
-		 * remove the filter preventing autoembed in WPCOM_Liveblog_Entry::render_content
-		 * it needs to be removed as we're using the very same filter later in this function
-		 * and we still want plugins and themes to be able to take advantage of the filters
-		 */
-		remove_filter( 'liveblog_entry_enable_embeds', 'wpcom_liveblog_disable_embeds', 1000 );
-
-		//honor the standard filter from WPCOM_Liveblog_Entry::render_content as well as the option
-		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
-			if ( get_option( 'embed_autourls' ) ) {
-
-				/**
-				 * Check for existence of WPCOM_Comments_Embed class which extends the WP_Embed class
-				 * The WPCOM_Comments_Embed class does not store oembeds meta cache in post meta, but
-				 * in comment meta and thus preventing the memcache entry storing all post's meta
-				 * exceeding 1M limit.
-				 * See http://wp.me/poqVs-caP
-				 */
-				if ( true === class_exists( 'WPCOM_Comments_Embed' )
-					 && true === isset( $GLOBALS['wpcom_comments_embed'] )
-					 && is_a( $GLOBALS['wpcom_comments_embed'], 'WPCOM_Comments_Embed' )
-				) {
-					global $wpcom_comments_embed;
-					$comment_text = $wpcom_comments_embed->autoembed( $comment_text, $comment );
-				} else {
-					//defaults to standard WP_Embed class and post meta cache for oembed
-					global $wp_embed;
-					$comment_text = $wp_embed->autoembed( $comment_text );
-				}
-
-			}
-
-			$comment_text = do_shortcode( $comment_text );
-		}
-
-		//re-enable the filter preventing autoembed in WPCOM_Liveblog_Entry::render_content
-		add_filter( 'liveblog_entry_enable_embeds', 'wpcom_liveblog_disable_embeds', 1000, 0 );
-
-	}
-	return $comment_text;
-}
-//need to hook soon in order to filter the comment's link before they are turned to HTML
-add_filter( 'comment_text', 'wpcom_liveblog_autoembed', 2, 2 );
-
-
-$GLOBALS['wpcom_comments_embed'] = new WPCOM_Comments_Embed();
