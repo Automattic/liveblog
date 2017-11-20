@@ -16,9 +16,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
-	const version          			= '1.6';
+	const version          			= '1.7';
 	const rewrites_version 			= 1;
-	const min_wp_version   			= '3.5';
+	const min_wp_version   			= '4.4';
 	const min_wp_rest_api_version 	= '4.4';
 	const key              			= 'liveblog';
 	const url_endpoint     			= 'liveblog';
