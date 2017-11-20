@@ -1,9 +1,9 @@
 === Liveblog ===
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
-Requires at least: 3.5
+Requires at least: 4.4
 Tested up to: 4.8.2
-Stable tag: 1.6
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,13 @@ If you'd like to check out the code and contribute, [join us on github](https://
 8. Typical liveblog view
 
 == Changelog ==
+
+
+= 1.6.1 =
+
+* Remove support for Flash + Silverlight which are no longer supported in WP 4.9, see https://core.trac.wordpress.org/ticket/41755#no0
+* Bugfix for WPCOM: Don't force an AJAX URL if we're using the REST API.
+* Bugfix WPCOM: Retain SA access for A12s
 
 = 1.6 =
 
