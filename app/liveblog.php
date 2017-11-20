@@ -927,8 +927,9 @@ final class WPCOM_Liveblog {
 			return;
 
 		wp_enqueue_style( self::key,  plugins_url( 'assets/app.css',  dirname(__FILE__) ) );
-		wp_enqueue_script( self::key, plugins_url( '/assets/app.js', dirname(__FILE__) ), array(), self::version, true );
-
+		wp_enqueue_style( self::key . '_theme',  plugins_url( 'assets/theme.css',  dirname(__FILE__) ) );
+		wp_enqueue_script( self::key, plugins_url( 'assets/app.js', dirname(__FILE__) ), array(), self::version, true );
+		
 		if ( self::is_liveblog_editable() )  {
 			self::add_default_plupload_settings();
 		}
