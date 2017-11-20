@@ -1,8 +1,7 @@
 .liveblog-event {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: inline-block;
+  width: 100%;
 }
 
 .liveblog-event-meta {

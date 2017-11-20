@@ -5,3 +5,8 @@ export const loadConfig = payload => ({
   type: types.LOAD_CONFIG,
   payload,
 });
+
+export const updateInterval = payload => ({
+  type: types.UPDATE_INTERVAL,
+  payload,
+});

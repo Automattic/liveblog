@@ -13,6 +13,12 @@ export const config = (state = initialState, action) => {
         timeDifference: getCurrentTimestamp() - action.payload.timestamp,
       };
 
+    case 'UPDATE_INTERVAL':
+      return {
+        ...state,
+        refresh_interval: action.payload,
+      };
+
     default:
       return state;
   }
