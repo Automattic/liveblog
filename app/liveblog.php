@@ -74,7 +74,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
 		WPCOM_Liveblog_Socketio_Loader::load();
-//		WPCOM_Liveblog_Entry_Instagram_oEmbed::load();
+		WPCOM_Liveblog_Entry_Embed_SDKs::load();
 
 		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
@@ -123,7 +123,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
-//		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-instagram-oembed.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
 
 		if ( self::use_rest_api() ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
