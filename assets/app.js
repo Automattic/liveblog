@@ -86808,7 +86808,7 @@ var EntryContainer = function (_Component) {
           ref: function ref(node) {
             return _this2.node = node;
           },
-          className: 'liveblog-entry ' + (entry.key_event ? 'is-key-event' : '')
+          className: 'liveblog-entry ' + (entry.key_event ? 'is-key-event' : '') + ' ' + entry.css_classes
         },
         _react2.default.createElement(
           'header',

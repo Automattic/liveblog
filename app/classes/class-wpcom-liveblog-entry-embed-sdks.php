@@ -23,8 +23,9 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 */
 	public static function load() {
 		self::$sdks = apply_filters( 'liveblog_embed_sdks', self::$sdks );
-
-      	add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+		
+	    add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+	    add_filter( 'script_loader_tag',  array( __CLASS__, 'add_async_attribute' ), 10, 2 );
 	}
 
 	/**
@@ -33,8 +34,26 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * @return void
 	 */
 	public static function enqueue() {	
+		if ( !WPCOM_Liveblog::is_viewing_liveblog_post() ) {	
+			return;
+		}
+
 		foreach ( self::$sdks as $name => $url ) {
 			wp_enqueue_script( $name, $url, false );
 		}
+	}
+
+	/**
+	 * Set are scripts to use async 
+	 * 
+	 * @param type $tag 
+	 * @param type $handle 
+	 * @return type
+	 */
+	public static function add_async_attribute( $tag, $handle ) {
+	    if ( !in_array( $handle, array_keys( self::$sdks ) ) ) {
+	        return $tag;
+	    }
+	    return str_replace( ' src', ' async="async" src', $tag );
 	}
 }

@@ -203,7 +203,7 @@
 .liveblog-entry-tools .liveblog-btn:first-child {
   margin-right: .5rem; }
 
-.type-key {
+.liveblog-entry .type-key {
   display: none; }
 
 .liveblog-emoji {

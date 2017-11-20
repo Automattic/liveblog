@@ -64,7 +64,7 @@ class EntryContainer extends Component {
       <article
         id={`id_${entry.id}`}
         ref={node => this.node = node}
-        className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''}`}
+        className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
         <header className="liveblog-meta">
           <div className="liveblog-meta-time">
