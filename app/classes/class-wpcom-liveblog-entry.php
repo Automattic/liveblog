@@ -97,11 +97,13 @@ class WPCOM_Liveblog_Entry {
 		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
+		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
 		$entry = array(
 			'id'   => $entry_id,
 			'type' => $this->get_type(),
 			'render' => self::render_content( $this->get_content(), $this->comment ),
 			'content' => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
+			'css_classes' => $css_classes,
 			'timestamp' => $this->get_timestamp(),
 			'avatar_img' => get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link' => get_comment_author_link( $entry_id ),
