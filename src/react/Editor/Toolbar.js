@@ -106,7 +106,7 @@ class Toolbar extends Component {
     const { showURLInput } = this.state;
 
     return (
-      <div>
+      <div className="liveblog-editor-toolbar-container">
         <label
           className="liveblog-btn liveblog-image-upload-btn"
           htmlFor={imageInputId}>

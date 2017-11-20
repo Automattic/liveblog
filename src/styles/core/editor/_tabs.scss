@@ -35,3 +35,13 @@
 .liveblog-editor-tab:not(:last-child) {
   margin-right: .25rem;
 }
+
+@include mq($until: small) {
+  .liveblog-editor-tab:first-child.is-active {
+    background: #fff;
+  }
+
+  .liveblog-editor-tab:first-child.is-active::after {
+    background: #fff;
+  }
+}

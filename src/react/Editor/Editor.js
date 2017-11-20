@@ -334,7 +334,7 @@ class EditorWrapper extends Component {
     } = this.props;
 
     return (
-      <div style={{ position: 'relative' }}>
+      <div className="liveblog-editor-inner-container">
         <input
           ref={ref => this.imageUpload = ref}
           style={{ display: 'none' }}

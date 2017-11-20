@@ -288,6 +288,23 @@
   border: none;
   background: transparent; }
 
+.liveblog-editor-inner-container {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap; }
+
+.liveblog-editor-inner-container > * {
+  -ms-flex-preferred-size: 100%;
+      flex-basis: 100%; }
+
+@media (max-width: 47.49em) {
+  .liveblog-editor-container .public-DraftEditor-content {
+    margin-bottom: 0;
+    border-radius: 3px 0 0 0; } }
+
 .liveblog-editor-input-container {
   position: absolute;
   z-index: 99;
@@ -363,6 +380,17 @@
   border: 1px solid #bbb;
   border-radius: 3px 0 0 0;
   border-bottom: none; }
+
+@media (max-width: 47.49em) {
+  .liveblog-editor-toolbar-container {
+    -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+            order: 2;
+    margin-bottom: 1rem; }
+  .liveblog-toolbar {
+    border-radius: 0 0 3px 3px;
+    border-top: none;
+    border-bottom: 1px solid #bbb; } }
 
 .liveblog-popover {
   position: absolute;
@@ -445,6 +473,12 @@
 
 .liveblog-editor-tab:not(:last-child) {
   margin-right: .25rem; }
+
+@media (max-width: 47.49em) {
+  .liveblog-editor-tab:first-child.is-active {
+    background: #fff; }
+  .liveblog-editor-tab:first-child.is-active::after {
+    background: #fff; } }
 
 .liveblog-loader {
   width: 15px;
