@@ -204,7 +204,7 @@ export const triggerOembedLoad = () => {
     });
   }
 
-  if (window.FB && document.querySelector('fb-post')) {
+  if (window.FB && document.querySelector('.fb-post')) {
     window.FB.XFBML.parse();
   }
 
