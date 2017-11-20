@@ -4,10 +4,6 @@ import PropTypes from 'prop-types';
 import { getPreview } from '../services/api';
 import Loader from '../components/Loader';
 
-import {
-  triggerOembedLoad,
-} from '../utils/utils';
-
 class PreviewContainer extends Component {
   constructor(props) {
     super(props);
@@ -28,7 +24,7 @@ class PreviewContainer extends Component {
       .subscribe(res => this.setState({
         entryContent: res.html,
         loading: false,
-      }, triggerOembedLoad));
+      }));
   }
 
   render() {
