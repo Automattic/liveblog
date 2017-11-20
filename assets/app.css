@@ -270,6 +270,8 @@
 
 .liveblog-editor-container .public-DraftEditor-content,
 .liveblog-preview {
+  max-width: 100%;
+  word-break: break-all;
   min-height: 200px;
   padding: .8rem;
   margin-bottom: .8rem;
@@ -683,3 +685,5 @@
 .liveblog-pagination-last {
   background: #eee;
   color: #111; }
+
+/*# sourceMappingURL=app.css.map*/
