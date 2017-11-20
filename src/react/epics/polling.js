@@ -28,7 +28,7 @@ import {
 const startPollingEpic = (action$, store) =>
   action$.ofType(types.START_POLLING)
     .switchMap(() =>
-      interval(3000)
+      interval(store.getState().config.refresh_interval * 1000)
         .takeUntil(action$.ofType(types.CANCEL_POLLING))
         .exhaustMap(() =>
           pollingApi(store.getState().polling.newestEntry.timestamp, store.getState().config)

@@ -36,4 +36,5 @@ export default createTypes(
   'JUMP_TO_EVENT',
   'SCROLL_TO_ENTRY',
   'RESET_SCROLL_ON_ENTRY',
+  'UPDATE_INTERVAL',
 );
