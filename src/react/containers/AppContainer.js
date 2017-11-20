@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
@@ -15,35 +16,6 @@ class AppContainer extends Component {
   constructor() {
     super();
     this.eventsContainer = document.getElementById('liveblog-key-events');
-  }
-
-  componentWillMount() {
-    const script = document.createElement('script');
-    script.src = 'https://platform.twitter.com/widgets.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    const script2 = document.createElement('script');
-    script2.src = 'https://platform.instagram.com/en_US/embeds.js';
-    script2.async = true;
-    document.body.appendChild(script2);
-
-    const script3 = document.createElement('script');
-    script3.src = 'https://embed.redditmedia.com/widgets/platform.js';
-    script3.async = true;
-    document.body.appendChild(script3);
-  }
-
-  componentDidUpdate() {
-    if (window.instgrm) {
-      window.instgrm.Embeds.process();
-    }
-
-    if (window.twttr) {
-      document.querySelectorAll('.twitter-tweet').forEach((ele) => {
-        window.twttr.widgets.load(ele);
-      });
-    }
   }
 
   componentDidMount() {

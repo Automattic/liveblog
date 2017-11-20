@@ -203,7 +203,7 @@
 .liveblog-entry-tools .liveblog-btn:first-child {
   margin-right: .5rem; }
 
-.type-key {
+.liveblog-entry .type-key {
   display: none; }
 
 .liveblog-emoji {
@@ -464,8 +464,8 @@
   animation: sk-bounce 2s infinite ease-in-out; }
 
 .liveblog-loader-bounce2 {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s; }
+  -webkit-animation-delay: -1s;
+  animation-delay: -1s; }
 
 @-webkit-keyframes sk-bounce {
   0%, 100% {
