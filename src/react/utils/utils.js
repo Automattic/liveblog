@@ -193,18 +193,18 @@ export const getPollingPages = (current, next) => {
  * Fires of any oembed triggers need and adds an event listener that
  * can used to extend oembed support.
  */
-export const triggerOembedLoad = () => {
-  if (window.instgrm && document.querySelector('.instagram-media')) {
+export const triggerOembedLoad = (element) => {
+  if (window.instgrm && element.querySelector('.instagram-media')) {
     window.instgrm.Embeds.process();
   }
 
-  if (window.twttr && document.querySelector('.twitter-tweet')) {
-    Array.from(document.querySelectorAll('.twitter-tweet')).forEach((ele) => {
+  if (window.twttr && element.querySelector('.twitter-tweet')) {
+    Array.from(element.querySelectorAll('.twitter-tweet')).forEach((ele) => {
       window.twttr.widgets.load(ele);
     });
   }
 
-  if (window.FB && document.querySelector('.fb-post')) {
+  if (window.FB && element.querySelector('.fb-post')) {
     window.FB.XFBML.parse();
   }
 

@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
-import { timeAgo, formattedTime } from '../utils/utils';
+import { timeAgo, formattedTime, triggerOembedLoad } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
 
 class EntryContainer extends Component {
@@ -23,6 +23,10 @@ class EntryContainer extends Component {
       this.node.scrollIntoView({ behavior: 'smooth' });
       this.props.resetScrollOnEntry(`id_${this.props.entry.id}`);
     };
+  }
+
+  componentDidMount() {
+    triggerOembedLoad(this.node);
   }
 
   componentDidUpdate(prevProps) {
