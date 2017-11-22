@@ -622,9 +622,9 @@ class WPCOM_Liveblog_Rest_Api {
 
 	/**
 	 * Get parameter from JSON
-	 * @param type $param 
-	 * @param type $json 
-	 * @return type
+	 * @param string $param 
+	 * @param array  $json 
+	 * @return mixed
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[$param] ) ) {
