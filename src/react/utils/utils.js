@@ -106,6 +106,25 @@ export const shouldRenderNewEntries = (page, entries, polling) => {
 };
 
 /**
+ * Returns the last item in an object.
+ */
+export const getLastOfObject = object =>
+  object[Object.keys(object)[Object.keys(object).length - 1]];
+
+/**
+ * Returns the first item in an object.
+ */
+export const getFirstOfObject = object => object[Object.keys(object)[0]];
+
+/**
+ * Returns the correct pages number on poll.
+ */
+export const getPollingPages = (current, next) => {
+  if (!next) return current;
+  return Math.max(next, 1);
+};
+
+/**
  * Determine the newest entry from current and updated entries
  * @param {Object} current
  * @param {Array} updates
@@ -118,6 +137,11 @@ export const getNewestEntry = (current, update) => {
   return update;
 };
 
+/**
+ * Returns the number of days between two timestamps.
+ * @param {Number} timestamp1
+ * @param {Number} timestamp2
+ */
 export const daysBetween = (timestamp1, timestamp2) => {
   const day = 1000 * 60 * 60 * 24;
   const difference = Math.abs(timestamp1 - timestamp2);
@@ -170,6 +194,10 @@ export const timeAgo = (timestamp) => {
   return output;
 };
 
+/**
+ * Returns a string in hour minute format from a timestamp.
+ * @param {Number} timestamp
+ */
 export const formattedTime = (timestamp) => {
   const time = new Date(timestamp * 1000);
   const hours = time.getUTCHours() < 10 ? `0${time.getUTCHours()}` : time.getUTCHours();
@@ -177,17 +205,10 @@ export const formattedTime = (timestamp) => {
   return `${hours}:${mins}`;
 };
 
-export const getLastOfObject = object =>
-  object[Object.keys(object)[Object.keys(object).length - 1]];
-
-export const getFirstOfObject = object => object[Object.keys(object)[0]];
-
+/**
+ * Returns the current Unix Timestamp
+ */
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
-
-export const getPollingPages = (current, next) => {
-  if (!next) return current;
-  return Math.max(next, 1);
-};
 
 /**
  * Fires of any oembed triggers need and adds an event listener that
