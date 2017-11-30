@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 
-const APP_ADMIN = 'http://10.0.10.27:3000/wp-admin';
-const APP_ADD_NEW = 'http://10.0.10.27:3000/wp-admin/post-new.php';
+const APP_ADMIN = 'http://192.168.0.15:3000/wp-admin';
+const APP_ADD_NEW = 'http://192.168.0.15:3000/wp-admin/post-new.php';
 const USER = 'bb_admin';
 const PASSWORD = 'admin';
 const TIMEOUT = 30000;
@@ -9,17 +9,17 @@ const TIMEOUT = 30000;
 let browser;
 let page;
 
-const renderEntry = async () => {
+const renderEntry = async (content = false) => {
   await page.click('.public-DraftEditor-content');
-  await page.keyboard.type('This is some test content');
+  await page.keyboard.type(content || 'This is some test content');
   await page.click('.liveblog-publish-btn');
 };
 
-const renderEntries = async (amount) => {
+const renderEntries = async (amount, content = false) => {
   let times = amount;
   if (times === 0) return Promise.resolve([]);
   times -= 1;
-  const entries = await renderEntry().then(() => renderEntries(times));
+  const entries = await renderEntry().then(() => renderEntries(times, content));
   return Promise.resolve(entries);
 };
 
@@ -81,8 +81,28 @@ describe('End to End', async () => {
     const feedChildrenCount = await page.evaluate(() =>
       document.querySelector('.liveblog-feed').children.length,
     );
+    const pagination = await page.evaluate(() =>
+      document.querySelector('.liveblog-pagination-pages').innerHTML,
+    );
+    expect(pagination).toEqual('2 of 3');
     expect(feedChildrenCount).toEqual(5);
   }, TIMEOUT);
+
+  it('should add a key event', async () => {
+    await page.click('.liveblog-pagination-prev');
+    await renderEntry('/key This is a test key event');
+    await page.waitForSelector('.liveblog-event');
+    const event = await page.$('.liveblog-event');
+    expect(event).toBeDefined();
+  });
+
+  it('should take you to a key event on click', async () => {
+    await page.click('.liveblog-pagination-last');
+    await page.click('.liveblog-event');
+    await page.waitForSelector('.is-key-event');
+    const event = await page.$('.is-key-event');
+    expect(event).toBeDefined();
+  });
 
   afterAll(async () => {
     await page.close();
