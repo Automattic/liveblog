@@ -51,7 +51,7 @@ export const api = (state = initialState, action) => {
           action.renderNewEntries,
         ),
         newestEntry: action.renderNewEntries
-          ? getNewestEntry(state.newestEntry, action.payload.entries[0])
+          ? getNewestEntry(state.newestEntry, action.payload.entries[0], state.entries)
           : state.newestEntry,
       };
 

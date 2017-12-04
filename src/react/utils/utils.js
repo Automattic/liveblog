@@ -1,5 +1,12 @@
 /* eslint-disable no-param-reassign */
 
+export const getLastOfObject = object =>
+  object[Object.keys(object)[Object.keys(object).length - 1]];
+
+export const getFirstOfObject = object => object[Object.keys(object)[0]];
+
+export const getItemOfObject = (object, key) => object[Object.keys(object)[key]];
+
 /**
  * Apply updated entries to current entries.
  * @param {Object} currentEntries
@@ -110,10 +117,13 @@ export const shouldRenderNewEntries = (page, entries, polling) => {
  * @param {Object} current
  * @param {Array} updates
  */
-export const getNewestEntry = (current, update) => {
+export const getNewestEntry = (current, update, entries = false) => {
   if (!current && !update) return false;
-  if (!current && update) return update;
   if (!update) return current;
+  if (!current && update) return update;
+  if (update.type === 'delete' && update.id === current.id && entries) {
+    return getItemOfObject(entries, 1);
+  }
   if (current.timestamp > update.timestamp) return current;
   return update;
 };
@@ -176,11 +186,6 @@ export const formattedTime = (timestamp) => {
   const mins = time.getUTCMinutes() < 10 ? `0${time.getUTCMinutes()}` : time.getUTCMinutes();
   return `${hours}:${mins}`;
 };
-
-export const getLastOfObject = object =>
-  object[Object.keys(object)[Object.keys(object).length - 1]];
-
-export const getFirstOfObject = object => object[Object.keys(object)[0]];
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
 

@@ -138,6 +138,9 @@
   cursor: pointer;
   text-decoration: underline; }
 
+.liveblog-event .type-key {
+  display: none; }
+
 .liveblog-pagination {
   display: -webkit-box;
   display: -ms-flexbox;
