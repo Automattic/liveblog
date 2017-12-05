@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 
-const APP_ADMIN = 'http://192.168.0.15:3000/wp-admin';
-const APP_ADD_NEW = 'http://192.168.0.15:3000/wp-admin/post-new.php';
+const APP_ADMIN = 'http://10.0.10.27:3002/wp-admin';
+const APP_ADD_NEW = 'http://10.0.10.27:3002/wp-admin/post-new.php';
 const USER = 'bb_admin';
 const PASSWORD = 'admin';
 const TIMEOUT = 30000;
@@ -25,7 +25,7 @@ const renderEntries = async (amount, content = false) => {
 
 describe('End to End', async () => {
   beforeAll(async () => {
-    browser = await puppeteer.launch({ headless: false });
+    browser = await puppeteer.launch({ headless: false, sloMo: 10 });
     page = await browser.newPage();
   }, TIMEOUT);
 
@@ -74,6 +74,19 @@ describe('End to End', async () => {
       document.querySelector('.liveblog-pagination-pages').innerHTML,
     );
     expect(pagination).toEqual('1 of 3');
+  }, TIMEOUT);
+
+  it('should delete multiple entries', async () => {
+    await page.click('.liveblog-btn-delete');
+    await page.click('.liveblog-btn-delete');
+    await page.click('.liveblog-btn-delete');
+    await page.click('.liveblog-btn-delete');
+    await page.click('.liveblog-btn-delete');
+    await page.reload({ waitUntil: ['load', 'networkidle0'] });
+    const feedChildrenCount = await page.evaluate(() =>
+      document.querySelector('.liveblog-feed').children.length,
+    );
+    expect(feedChildrenCount).toEqual(5);
   }, TIMEOUT);
 
   it('should render different pages', async () => {

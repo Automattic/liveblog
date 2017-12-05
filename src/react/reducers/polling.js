@@ -5,9 +5,7 @@ import {
 
 export const initialState = {
   error: false,
-  newestEntry: {
-    timestamp: false,
-  },
+  newestEntry: false,
   entries: {},
 };
 

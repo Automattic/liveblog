@@ -98,6 +98,11 @@ class WPCOM_Liveblog_Entry_Query {
 		return reset( $entries );
 	}
 
+	/**
+	 * Returns latest entry id.
+	 * 
+	 * @return int
+	 */
 	public function get_latest_id() {
 
 		$latest = $this->get_latest();
@@ -124,6 +129,14 @@ class WPCOM_Liveblog_Entry_Query {
 		return $latest->get_timestamp();
 	}
 
+	/**
+	 * Get entries between two timestamps from a list of entries supplied.
+	 *
+	 * @param array $all entries
+	 * @param int   $start_timestamp 
+	 * @param int   $end_timestamp 
+	 * @return array
+	 */
 	public function find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp ) {
 		$entries_between = array();
 
@@ -136,6 +149,13 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $entries_between );
 	}
 
+	/**
+	 * Get entries between two timestamps from all entries.
+	 *
+	 * @param int $start_timestamp 
+	 * @param int $end_timestamp 
+	 * @return array
+	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
 		$all_entries = $this->get_all_entries_asc();
 		return $this->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );

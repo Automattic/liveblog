@@ -138,6 +138,9 @@
   cursor: pointer;
   text-decoration: underline; }
 
+.liveblog-event .type-key {
+  display: none; }
+
 .liveblog-pagination {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -566,3 +569,5 @@
 
 .liveblog-inline-emoji:focus {
   border: 1px solid black; }
+
+/*# sourceMappingURL=app.css.map*/

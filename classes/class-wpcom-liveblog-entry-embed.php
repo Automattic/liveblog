@@ -1,5 +1,10 @@
 <?php 
 
+/**
+ * Class WPCOM_Liveblog_Entry_Embed
+ *
+ * Store oembeds in comment meta instead of post meta.
+ */
 class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 
 	public function __construct() {

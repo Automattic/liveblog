@@ -1,6 +1,22 @@
 /* eslint-disable no-param-reassign */
 
 /**
+ * Returns the last item in an object.
+ */
+export const getLastOfObject = object =>
+  object[Object.keys(object)[Object.keys(object).length - 1]];
+
+/**
+* Returns the first item in an object.
+*/
+export const getFirstOfObject = object => object[Object.keys(object)[0]];
+
+/**
+ * Returns an item in an object by key.
+ */
+export const getItemOfObject = (object, key) => object[Object.keys(object)[key]];
+
+/**
  * Apply updated entries to current entries.
  * @param {Object} currentEntries
  * @param {Array} newEntries
@@ -106,17 +122,6 @@ export const shouldRenderNewEntries = (page, entries, polling) => {
 };
 
 /**
- * Returns the last item in an object.
- */
-export const getLastOfObject = object =>
-  object[Object.keys(object)[Object.keys(object).length - 1]];
-
-/**
- * Returns the first item in an object.
- */
-export const getFirstOfObject = object => object[Object.keys(object)[0]];
-
-/**
  * Returns the correct pages number on poll.
  */
 export const getPollingPages = (current, next) => {
@@ -129,10 +134,13 @@ export const getPollingPages = (current, next) => {
  * @param {Object} current
  * @param {Array} updates
  */
-export const getNewestEntry = (current, update) => {
+export const getNewestEntry = (current, update, entries = false) => {
   if (!current && !update) return false;
-  if (!current && update) return update;
   if (!update) return current;
+  if (!current && update) return update;
+  if (update.type === 'delete' && update.id === current.id && entries) {
+    return getItemOfObject(entries, 1);
+  }
   if (current.timestamp > update.timestamp) return current;
   return update;
 };
