@@ -16,6 +16,7 @@ export const api = (state = initialState, action) => {
   switch (action.type) {
     case 'JUMP_TO_EVENT':
     case 'GET_ENTRIES':
+    case 'GET_ENTRIES_PAGINATED':
       return {
         ...state,
         error: false,

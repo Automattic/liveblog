@@ -7,7 +7,7 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntriesPaginated, entriesPerPage } = this.props;
+    const { page, pages, getEntriesPaginated } = this.props;
 
     return (
       <div className="liveblog-pagination">
@@ -15,14 +15,14 @@ class PaginationContainer extends Component {
           <button
             disabled={page === 1}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
-            onClick={() => getEntriesPaginated(1, 1)}
+            onClick={() => getEntriesPaginated(1, 'first')}
           >
             First
           </button>
           <button
             disabled={page === 1}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
-            onClick={() => getEntriesPaginated((page - 1), (entriesPerPage - 1))}
+            onClick={() => getEntriesPaginated((page - 1), 'last')}
           >
             Prev
           </button>
@@ -32,14 +32,14 @@ class PaginationContainer extends Component {
           <button
             disabled={page === pages}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
-            onClick={() => getEntriesPaginated((page + 1), 1)}
+            onClick={() => getEntriesPaginated((page + 1), 'first')}
           >
             Next
           </button>
           <button
             disabled={page === pages}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
-            onClick={() => getEntriesPaginated(pages, 1)}
+            onClick={() => getEntriesPaginated(pages, 'first')}
           >
             Last
           </button>
@@ -53,13 +53,11 @@ PaginationContainer.propTypes = {
   page: PropTypes.number,
   pages: PropTypes.number,
   getEntriesPaginated: PropTypes.func,
-  entriesPerPage: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   pages: state.pagination.pages,
-  entriesPerPage: state.config.entries_per_page,
 });
 
 const mapDispatchToProps = dispatch =>

@@ -215,3 +215,18 @@ export const triggerOembedLoad = (element) => {
 
   window.dispatchEvent(new CustomEvent('omembedTrigger'));
 };
+
+/**
+ * Get the correct id of which entry to scroll to on pagination
+ */
+export const getScrollToId = (entries, key) => {
+  if (key === 'first') {
+    return `id_${entries[0].id}`;
+  }
+
+  if (key === 'last') {
+    return `id_${entries[entries.length - 1].id}`;
+  }
+
+  return `id_${entries[0].id}`;
+};

@@ -5,10 +5,10 @@ export const getEntries = page => ({
   page,
 });
 
-export const getEntriesPaginated = (page, scrollToKey) => ({
+export const getEntriesPaginated = (page, scrollTo) => ({
   type: types.GET_ENTRIES_PAGINATED,
   page,
-  scrollToKey,
+  scrollTo,
 });
 
 export const getEntriesSuccess = (payload, renderNewEntries) => ({

@@ -27,6 +27,7 @@ import {
 
 import {
   shouldRenderNewEntries,
+  getScrollToId,
 } from '../utils/utils';
 
 import {
@@ -53,7 +54,7 @@ const getEntriesEpic = (action$, store) =>
 
 const getPaginatedEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES_PAGINATED)
-    .switchMap(({ page, scrollToKey }) =>
+    .switchMap(({ page, scrollTo }) =>
       getEntries(page, store.getState().config, store.getState().api.newestEntry)
         .timeout(10000)
         .flatMap(res =>
@@ -66,7 +67,7 @@ const getPaginatedEntriesEpic = (action$, store) =>
                 store.getState().polling.entries,
               ),
             )),
-            of(scrollToEntry(`id_${res.response.entries[scrollToKey].id}`)),
+            of(scrollToEntry(getScrollToId(res.response.entries, scrollTo))),
           ),
         )
         .catch(error => of(getEntriesFailed(error))),
