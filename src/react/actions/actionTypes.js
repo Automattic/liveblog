@@ -6,6 +6,7 @@ const createTypes = (...args) => args.reduce((obj, item) => ({ ...obj, [item]: i
 export default createTypes(
   'LOAD_CONFIG',
   'GET_ENTRIES',
+  'GET_ENTRIES_PAGINATED',
   'GET_ENTRIES_SUCCESS',
   'GET_ENTRIES_FAILED',
   'START_POLLING',

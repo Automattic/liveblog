@@ -7,7 +7,7 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntries } = this.props;
+    const { page, pages, getEntriesPaginated, entriesPerPage } = this.props;
 
     return (
       <div className="liveblog-pagination">
@@ -15,14 +15,14 @@ class PaginationContainer extends Component {
           <button
             disabled={page === 1}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
-            onClick={() => getEntries(1)}
+            onClick={() => getEntriesPaginated(1, 1)}
           >
             First
           </button>
           <button
             disabled={page === 1}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
-            onClick={() => getEntries(page - 1)}
+            onClick={() => getEntriesPaginated((page - 1), (entriesPerPage - 1))}
           >
             Prev
           </button>
@@ -32,14 +32,14 @@ class PaginationContainer extends Component {
           <button
             disabled={page === pages}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
-            onClick={() => getEntries(page + 1)}
+            onClick={() => getEntriesPaginated((page + 1), 1)}
           >
             Next
           </button>
           <button
             disabled={page === pages}
             className="liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
-            onClick={() => getEntries(pages)}
+            onClick={() => getEntriesPaginated(pages, 1)}
           >
             Last
           </button>
@@ -52,12 +52,14 @@ class PaginationContainer extends Component {
 PaginationContainer.propTypes = {
   page: PropTypes.number,
   pages: PropTypes.number,
-  getEntries: PropTypes.func,
+  getEntriesPaginated: PropTypes.func,
+  entriesPerPage: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   pages: state.pagination.pages,
+  entriesPerPage: state.config.entries_per_page,
 });
 
 const mapDispatchToProps = dispatch =>

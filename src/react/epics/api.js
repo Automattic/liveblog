@@ -2,6 +2,8 @@
 
 import { combineEpics } from 'redux-observable';
 import { of } from 'rxjs/observable/of';
+import { concat } from 'rxjs/observable/concat';
+
 import types from '../actions/actionTypes';
 
 import {
@@ -27,6 +29,10 @@ import {
   shouldRenderNewEntries,
 } from '../utils/utils';
 
+import {
+  scrollToEntry,
+} from '../actions/userActions';
+
 const getEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES)
     .switchMap(({ page }) =>
@@ -40,6 +46,27 @@ const getEntriesEpic = (action$, store) =>
               store.getState().api.entries,
               store.getState().polling.entries,
             ),
+          ),
+        )
+        .catch(error => of(getEntriesFailed(error))),
+    );
+
+const getPaginatedEntriesEpic = (action$, store) =>
+  action$.ofType(types.GET_ENTRIES_PAGINATED)
+    .switchMap(({ page, scrollToKey }) =>
+      getEntries(page, store.getState().config, store.getState().api.newestEntry)
+        .timeout(10000)
+        .flatMap(res =>
+          concat(
+            of(getEntriesSuccess(
+              res.response,
+              shouldRenderNewEntries(
+                store.getState().pagination.page,
+                store.getState().api.entries,
+                store.getState().polling.entries,
+              ),
+            )),
+            of(scrollToEntry(`id_${res.response.entries[scrollToKey].id}`)),
           ),
         )
         .catch(error => of(getEntriesFailed(error))),
@@ -78,6 +105,7 @@ const getEntriesAfterChangeEpic = action$ =>
 
 export default combineEpics(
   getEntriesEpic,
+  getPaginatedEntriesEpic,
   createEntryEpic,
   updateEntryEpic,
   deleteEntryEpic,
