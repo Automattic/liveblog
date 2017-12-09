@@ -176,6 +176,9 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function insert( $args ) {
         $args = apply_filters( 'liveblog_before_insert_entry', $args );
+
+        $args['user'] = self::handle_author_select( $args );
+
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
@@ -204,6 +207,8 @@ class WPCOM_Liveblog_Entry {
 		if ( is_wp_error( $args['user'] ) ) {
 			return $args['user'];
 		}
+
+		$args['user'] = self::handle_author_select( $args, true );
 
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
@@ -260,6 +265,7 @@ class WPCOM_Liveblog_Entry {
 		if ( is_wp_error( $valid_args ) ) {
 			return $valid_args;
 		}
+
 		$new_comment_id = wp_insert_comment( array(
 			'comment_post_ID'      => $args['post_id'],
 			'comment_content'      => wp_filter_post_kses( $args['content'] ),
@@ -330,6 +336,37 @@ class WPCOM_Liveblog_Entry {
 
 		// Return the Original entry arguments with any modifications.
 		return $args;
+	}
+
+	/**
+	 * If LIVEBLOG_ALLOW_AUTHOR_SELECT is set to true allow 
+	 * return the user using author_id, if user
+	 * not found then set as current user as a fallback.
+	 * 
+	 * If a entry_id is supplied we should update it as its the 
+	 * original entry which is used for displaying author information.
+	 * 
+	 * @param array $args The new Live blog Entry.
+	 * @param int   $entry_id If set we should update the original entry
+	 * @return mixed
+	 */
+	private static function handle_author_select( $args, $entry_id ) {
+		if ( defined('LIVEBLOG_ALLOW_AUTHOR_SELECT') && LIVEBLOG_ALLOW_AUTHOR_SELECT === true 
+			&& isset( $args['author_id'] ) && $args['author_id'] ) {
+			$user_object = get_userdata( $args['author_id'] );
+			if ( $user_object ) {
+				$args['user'] = $user_object;
+
+				wp_update_comment( array( 
+					'comment_ID' 		   => $entry_id,
+					'user_id'              => $args['user']->ID,
+					'comment_author'       => $args['user']->display_name,
+					'comment_author_email' => $args['user']->user_email,
+					'comment_author_url'   => $args['user']->user_url,
+				) );
+			}
+		}
+		return $args['user'];
 	}
 }
 

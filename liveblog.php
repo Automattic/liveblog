@@ -550,6 +550,7 @@ final class WPCOM_Liveblog {
 		$args['post_id'] = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 		$args['content'] = isset( $_POST['content'] ) ? $_POST['content'] : '';
 		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
+		$args['author_id'] = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false;
 
 		$entry = self::do_crud_entry($crud_action, $args);
 
