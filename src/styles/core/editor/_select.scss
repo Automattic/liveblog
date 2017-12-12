@@ -1,0 +1,40 @@
+.Select {
+  margin-bottom: 1rem;
+}
+
+.Select.is-focused:not(.is-open) > .Select-control {
+  border-color: $color-grey-light;
+  box-shadow: none;
+}
+
+.Select-control:hover {
+  box-shadow: none;
+}
+
+.Select--multi .Select-value {
+  border-color: $color-grey-light;
+  background: $color-grey-x-light;
+  color: $color-grey-dark;
+}
+
+.Select-value-label {
+  color: $color-grey-dark;
+  line-height: 1;
+}
+
+.Select--multi .Select-value-icon {
+  padding: 0;
+  padding-left: 4px;
+  vertical-align: middle;
+  color: $color-warning;
+  border: none;
+  background: transparent;
+  transition: transform .2s ease-in-out;
+}
+
+.Select--multi .Select-value-icon:hover {
+  background: transparent;
+  color: $color-warning;
+  transform: scale(1.2);
+  transition: transform .2s ease-in-out;
+}

@@ -36,6 +36,8 @@ export function createEntry(entry, config, nonce = false) {
       crud_action: 'insert',
       post_id: config.post_id,
       content: entry.content,
+      author_id: entry.author,
+      contributor_ids: entry.contributors,
     },
     headers: {
       'Content-Type': 'application/json',
@@ -56,6 +58,8 @@ export function updateEntry(entry, config, nonce = false) {
       post_id: config.post_id,
       entry_id: entry.id,
       content: entry.content,
+      author_id: entry.author,
+      contributor_ids: entry.contributors,
     },
     headers: {
       'Content-Type': 'application/json',

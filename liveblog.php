@@ -276,6 +276,24 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Get current user
+	 */
+	public static function get_current_user() {
+		if (!self::is_liveblog_editable()) {
+			return false;
+		}
+
+		$user = wp_get_current_user();
+
+		return array(
+			'id' => $user->ID,
+			'key' => strtolower($user->user_nicename),
+			'name' => $user->display_name,
+			'avatar' => get_avatar( $user->ID, 20 ),
+		);
+	}
+
+	/**
 	 * This is where a majority of the magic happens.
 	 *
 	 * Hooked to template_redirect, this method tries to add anything it can to
@@ -940,7 +958,7 @@ final class WPCOM_Liveblog {
 		wp_enqueue_style( self::key,  plugins_url( 'assets/app.css',  __FILE__ ) );
 		wp_enqueue_style( self::key . '_theme',  plugins_url( 'assets/theme.css',  __FILE__ ) );
 		wp_enqueue_script( self::key, plugins_url( 'assets/app.js', __FILE__ ), array(), self::version, true );
-		
+
 		if ( self::is_liveblog_editable() )  {
 			self::add_default_plupload_settings();
 		}
@@ -951,6 +969,7 @@ final class WPCOM_Liveblog {
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
 				'is_liveblog_editable'   => self::is_liveblog_editable(),
+				'current_user'			 =>	self::get_current_user(),
 				'socketio_enabled'       => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 				'key'                    => self::key,
