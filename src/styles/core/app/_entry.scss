@@ -6,21 +6,19 @@
 
 .liveblog-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
+}
+
+.liveblog-meta-author,
+.liveblog-meta-contributors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .liveblog-meta-time span {
   display: block;
-}
-
-.liveblog-meta-author {
-  display: flex;
-  align-items: center;
-}
-
-.liveblog-meta-contributors {
-  display: flex;
-  align-items: center;
 }
 
 .liveblog-meta-author-avatar img {

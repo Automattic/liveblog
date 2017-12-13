@@ -603,28 +603,25 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start; }
 
-.liveblog-meta-time span {
-  display: block; }
-
-.liveblog-meta-author {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center; }
-
+.liveblog-meta-author,
 .liveblog-meta-contributors {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center; }
+
+.liveblog-meta-time span {
+  display: block; }
 
 .liveblog-meta-author-avatar img {
   width: 30px;
@@ -746,7 +743,8 @@
   margin-bottom: 1.2rem; }
 
 .liveblog-editor-subTitle {
-  font-size: 1rem;
+  font-size: .9rem;
+  font-weight: 500;
   margin-bottom: .6rem; }
 
 @media (max-width: 47.49em) {
