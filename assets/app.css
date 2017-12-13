@@ -603,8 +603,6 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start; }
@@ -616,8 +614,14 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center; }
+
+.liveblog-meta-contributors {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center; }
@@ -1018,13 +1022,19 @@
   -webkit-box-shadow: none;
           box-shadow: none; }
 
+.Select-control {
+  border-radius: 3px;
+  border-color: #bbb; }
+
 .Select-control:hover {
   -webkit-box-shadow: none;
-          box-shadow: none; }
+          box-shadow: none;
+  border-radius: 3px;
+  border-color: #bbb; }
 
 .Select--multi .Select-value {
-  border-color: #bbb;
-  background: #f7f7f7;
+  border-color: #d1d1d1;
+  background: #eee;
   color: #333; }
 
 .Select-value-label {
@@ -1033,27 +1043,27 @@
 
 .Select--multi .Select-value-icon {
   padding: 0;
-  padding-left: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
   vertical-align: middle;
-  color: #bc0b0b;
-  border: none;
+  color: #333;
+  border-color: #d1d1d1;
   background: transparent;
-  -webkit-transition: -webkit-transform .2s ease-in-out;
-  transition: -webkit-transform .2s ease-in-out;
-  -o-transition: transform .2s ease-in-out;
-  transition: transform .2s ease-in-out;
-  transition: transform .2s ease-in-out, -webkit-transform .2s ease-in-out; }
+  -webkit-transition: color .2s ease-in-out;
+  -o-transition: color .2s ease-in-out;
+  transition: color .2s ease-in-out; }
 
 .Select--multi .Select-value-icon:hover {
   background: transparent;
   color: #bc0b0b;
-  -webkit-transform: scale(1.2);
-      -ms-transform: scale(1.2);
-          transform: scale(1.2);
-  -webkit-transition: -webkit-transform .2s ease-in-out;
-  transition: -webkit-transform .2s ease-in-out;
-  -o-transition: transform .2s ease-in-out;
-  transition: transform .2s ease-in-out;
-  transition: transform .2s ease-in-out, -webkit-transform .2s ease-in-out; }
+  -webkit-transition: color .2s ease-in-out;
+  -o-transition: color .2s ease-in-out;
+  transition: color .2s ease-in-out; }
+
+.Select-menu-outer {
+  width: calc(100% - 1px); }
+
+.Select-option .is-selected .is-focused {
+  background-color: #f7f7f7; }
 
 /*# sourceMappingURL=app.css.map*/

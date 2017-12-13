@@ -47,6 +47,10 @@
   margin-bottom: 5px;
 }
 
+.liveblog-meta-author {
+  margin-right: 8px;
+}
+
 .liveblog-meta-author-name {
   font-size: 13px;
   margin-left: 8px;

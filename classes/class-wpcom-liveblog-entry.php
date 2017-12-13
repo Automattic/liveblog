@@ -101,7 +101,6 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
-		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		$comment_text = get_comment_text( $entry_id );
 		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
 		$entry = array(
@@ -111,8 +110,6 @@ class WPCOM_Liveblog_Entry {
 			'content' => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,
 			'timestamp' => $this->get_timestamp(),
-			'avatar_img' => get_avatar( $this->comment->comment_author_email, $avatar_size ),
-			'author_link' => get_comment_author_link( $entry_id ),
 			'author' => self::get_user_data_for_json( self::user_object_from_comment_id( $entry_id ) ),
 			'contributors' => self::get_contributors_for_json( $entry_id ),
 			'entry_time' => get_comment_date( 'U', $entry_id ),
@@ -354,7 +351,7 @@ class WPCOM_Liveblog_Entry {
 	 * Returns if author select is enabled
 	 * @return boolean
 	 */
-	private static function is_author_select_enabled() {
+	public static function is_author_select_enabled() {
 		return defined('LIVEBLOG_ALLOW_AUTHOR_SELECT') && LIVEBLOG_ALLOW_AUTHOR_SELECT === true;
 	}
 
@@ -431,11 +428,12 @@ class WPCOM_Liveblog_Entry {
 	 * @param object $user The user object
 	 */
 	private static function get_user_data_for_json( $user ) {
+		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
 		return array(
 			'id' => $user->ID,
 			'key' => strtolower($user->user_nicename),
 			'name' => $user->display_name,
-			'avatar' => get_avatar( $user->ID, 20 ),
+			'avatar' => get_avatar( $user->ID, $avatar_size ),
 		);
 	}
 }

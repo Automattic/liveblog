@@ -7,13 +7,20 @@
   box-shadow: none;
 }
 
+.Select-control {
+  border-radius: $base-border-radius;
+  border-color: $color-grey-light;
+}
+
 .Select-control:hover {
   box-shadow: none;
+  border-radius: $base-border-radius;
+  border-color: $color-grey-light;
 }
 
 .Select--multi .Select-value {
-  border-color: $color-grey-light;
-  background: $color-grey-x-light;
+  border-color: $color-grey-mid;
+  background: $color-grey-mid-light;
   color: $color-grey-dark;
 }
 
@@ -24,17 +31,25 @@
 
 .Select--multi .Select-value-icon {
   padding: 0;
-  padding-left: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
   vertical-align: middle;
-  color: $color-warning;
-  border: none;
+  color: $color-grey-dark;
+  border-color: $color-grey-mid;
   background: transparent;
-  transition: transform .2s ease-in-out;
+  transition: color .2s ease-in-out;
 }
 
 .Select--multi .Select-value-icon:hover {
   background: transparent;
   color: $color-warning;
-  transform: scale(1.2);
-  transition: transform .2s ease-in-out;
+  transition: color .2s ease-in-out;
+}
+
+.Select-menu-outer {
+  width: calc(100% - 1px);
+}
+
+.Select-option .is-selected .is-focused {
+  background-color: $color-grey-x-light;
 }

@@ -970,6 +970,7 @@ final class WPCOM_Liveblog {
 				'state'                  => self::get_liveblog_state(),
 				'is_liveblog_editable'   => self::is_liveblog_editable(),
 				'current_user'			 =>	self::get_current_user(),
+				'author_edit_enabled'	 => WPCOM_Liveblog_Entry::is_author_select_enabled(),
 				'socketio_enabled'       => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 				'key'                    => self::key,

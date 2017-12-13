@@ -17,42 +17,9 @@ import * as userActions from '../actions/userActions';
 import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
 import PreviewContainer from './PreviewContainer';
+import AuthorSelectOption from '../components/AuthorSelectOption';
 
 import Editor, { decorators, convertFromHTML } from '../Editor/index';
-
-class User extends Component {
-  handleMouseDown(event) {
-    const { onSelect, option } = this.props;
-    event.preventDefault();
-    event.stopPropagation();
-    onSelect(option, event);
-  }
-
-  handleMouseEnter(event) {
-    this.props.onFocus(this.props.option, event);
-  }
-
-  handleMouseMove(event) {
-    const { isFocused, onFocus, option } = this.props;
-    if (isFocused) return;
-    onFocus(option, event);
-  }
-
-  render() {
-    const { className, option } = this.props;
-    return (
-      <div
-        className={`${className} liveblog-popover-item`}
-        onMouseDown={this.handleMouseDown.bind(this)}
-        onMouseEnter={this.handleMouseEnter.bind(this)}
-        onMouseMove={this.handleMouseMove.bind(this)}
-      >
-        <div dangerouslySetInnerHTML={{ __html: option.avatar }} />
-        {option.name}
-      </div>
-    );
-  }
-}
 
 class EditorContainer extends Component {
   constructor(props) {
@@ -60,22 +27,25 @@ class EditorContainer extends Component {
 
     let initialEditorState;
     let initialAuthor;
+    let initialContributors;
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
         convertFromHTML(props.entry.content),
         decorators,
       );
-      initialAuthor = false;
+      initialAuthor = props.entry.author;
+      initialContributors = props.entry.contributors;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
       initialAuthor = props.config.current_user;
+      initialContributors = [];
     }
 
     this.state = {
       editorState: initialEditorState,
       suggestions: [],
-      selectedUsers: [],
+      selectedUsers: initialContributors,
       selectedAuthor: initialAuthor,
       preview: false,
     };
@@ -256,30 +226,35 @@ class EditorContainer extends Component {
               handleImageUpload={this.handleImageUpload.bind(this)}
             />
         }
-        <h2 className="liveblog-editor-subTitle">Author:</h2>
-        <Async
-          multi={false}
-          value={selectedAuthor}
-          valueKey="key"
-          labelKey="name"
-          onChange={this.onSelectAuthorChange.bind(this)}
-          optionComponent={User}
-          loadOptions={this.getUsers.bind(this)}
-          clearable={false}
-          cache={false}
-        />
-        <h2 className="liveblog-editor-subTitle">Contributors:</h2>
-        <Async
-          multi={true}
-          value={selectedUsers}
-          valueKey="key"
-          labelKey="name"
-          onChange={this.onSelectUsersChange.bind(this)}
-          optionComponent={User}
-          loadOptions={this.getUsers.bind(this)}
-          clearable={false}
-          cache={false}
-        />
+        {
+          config.author_edit_enabled === '1' &&
+          <div>
+            <h2 className="liveblog-editor-subTitle">Author:</h2>
+            <Async
+              multi={false}
+              value={selectedAuthor}
+              valueKey="key"
+              labelKey="name"
+              onChange={this.onSelectAuthorChange.bind(this)}
+              optionComponent={AuthorSelectOption}
+              loadOptions={this.getUsers.bind(this)}
+              clearable={false}
+              cache={false}
+            />
+            <h2 className="liveblog-editor-subTitle">Contributors:</h2>
+            <Async
+              multi={true}
+              value={selectedUsers}
+              valueKey="key"
+              labelKey="name"
+              onChange={this.onSelectUsersChange.bind(this)}
+              optionComponent={AuthorSelectOption}
+              loadOptions={this.getUsers.bind(this)}
+              clearable={false}
+              cache={false}
+            />
+          </div>
+        }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </button>
