@@ -21,7 +21,7 @@ export function polling(newestEntryTimestamp, config) {
   const timestamp = getCurrentTimestamp() + config.timeDifference;
 
   const settings = {
-    url: `${config.endpoint_url}entries/${newestEntryTimestamp + 1}/${timestamp}/`,
+    url: `${config.endpoint_url}entries/${(newestEntryTimestamp + 1) || 0}/${timestamp}/`,
     method: 'GET',
   };
 
