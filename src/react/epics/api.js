@@ -19,6 +19,10 @@ import {
 } from '../actions/apiActions';
 
 import {
+  jumpToEvent,
+} from '../actions/eventsActions';
+
+import {
   getEntries,
   createEntry,
   updateEntry,
@@ -36,8 +40,13 @@ import {
 
 const getEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES)
-    .switchMap(({ page }) =>
-      getEntries(page, store.getState().config, store.getState().api.newestEntry)
+    .switchMap(({ page, hash }) => {
+      if (hash) {
+        const id = hash.split('#')[1];
+        if (!isNaN(id)) return of(jumpToEvent(id));
+      }
+
+      return getEntries(page, store.getState().config, store.getState().api.newestEntry)
         .timeout(10000)
         .map(res =>
           getEntriesSuccess(
@@ -49,8 +58,8 @@ const getEntriesEpic = (action$, store) =>
             ),
           ),
         )
-        .catch(error => of(getEntriesFailed(error))),
-    );
+        .catch(error => of(getEntriesFailed(error)));
+    });
 
 const getPaginatedEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES_PAGINATED)
