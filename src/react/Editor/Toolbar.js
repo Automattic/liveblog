@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { RichUtils } from 'draft-js';
 
 import addLink from './modifiers/addLink';
+import addCodeBlock from './modifiers/addCodeBlock';
 import Button from './Button';
 
 class Toolbar extends Component {
@@ -101,6 +102,18 @@ class Toolbar extends Component {
     );
   }
 
+  addCodeBlock(e) {
+    e.preventDefault();
+    const { editorState, onChange, toggleReadOnly } = this.props;
+
+    onChange(
+      addCodeBlock(editorState, false, {
+        code: '',
+        toggleReadOnly,
+      }),
+    );
+  }
+
   render() {
     const { imageInputId } = this.props;
     const { showURLInput } = this.state;
@@ -142,6 +155,7 @@ class Toolbar extends Component {
             }
           </div>
           <Button onMouseDown={this.removeAsLink.bind(this)} icon="editor-unlink" />
+          <Button onMouseDown={this.addCodeBlock.bind(this)} icon="editor-code" />
         </div>
       </div>
     );
@@ -154,6 +168,7 @@ Toolbar.propTypes = {
   domEditor: PropTypes.any,
   plugins: PropTypes.array,
   imageInputId: PropTypes.string,
+  toggleReadOnly: PropTypes.func,
 };
 
 export default Toolbar;

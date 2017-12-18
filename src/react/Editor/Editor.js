@@ -6,6 +6,7 @@ import 'draft-js/dist/Draft.css';
 
 import {
   Editor,
+  EditorState,
   RichUtils,
 } from 'draft-js';
 
@@ -13,10 +14,14 @@ import {
   parseTemplate,
   getTriggerRange,
   hasEntityAtSelection,
-  scrollElementIfNotInView,
   getTopPosition,
   uniqueHTMLId,
 } from './utils';
+
+import upArrowBinding from './keyBindings/upArrow';
+import downArrowBinding from './keyBindings/downArrow';
+import returnBinding from './keyBindings/returnBinding';
+import keyBindingFunc from './keyBindings/keyBindingFunc';
 
 import addAutocomplete from './modifiers/addAutocomplete';
 import addImage from './modifiers/addImage';
@@ -48,7 +53,9 @@ class EditorWrapper extends Component {
    */
   updateEditorState(editorState) {
     const { onChange, resetSuggestions, suggestions } = this.props;
-    onChange(editorState);
+    onChange(
+      EditorState.forceSelection(editorState, editorState.getSelection()),
+    );
 
     // Wait until the state has been updated.
     setTimeout(() => {
@@ -81,99 +88,68 @@ class EditorWrapper extends Component {
   }
 
   /**
-   * Down Arrow handler to scroll through suggestion list if it exists
-   */
-  onDownArrow(e) {
+  * Down Arrow Binding
+  * @param {event} event
+  */
+  onDownArrow(event) {
     const { autocompleteState } = this.state;
-    const { suggestions } = this.props;
-
-    if (!autocompleteState) return 'not-handled';
-
-    e.preventDefault();
-    const selectedIndex = autocompleteState.selectedIndex;
-    const newIndex = selectedIndex + 1;
-
-    this.setState({
-      autocompleteState: {
-        ...autocompleteState,
-        selectedIndex: (selectedIndex >= suggestions.length - 1)
-          ? selectedIndex
-          : newIndex,
-      },
-    });
-
-    const selectedSuggestionDomNode = this.suggestions[`item${newIndex}`];
-    if (!selectedSuggestionDomNode) return 'handled';
-
-    scrollElementIfNotInView(
-      selectedSuggestionDomNode,
-      this.suggestions.list,
+    const { editorState, onChange, suggestions } = this.props;
+    return downArrowBinding(
+      editorState,
+      autocompleteState,
+      onChange,
+      this.setState.bind(this),
+      event,
+      this.suggestions,
+      suggestions,
     );
-
-    return 'handled';
   }
 
   /**
-   * Up Arrow handler to scroll through suggestion list if it exists
+   * Up Arrow Binding
+   * @param {event} event
    */
-  onUpArrow(e) {
+  onUpArrow(event) {
     const { autocompleteState } = this.state;
-
-    if (!autocompleteState) return 'not-handled';
-
-    const selectedIndex = autocompleteState.selectedIndex;
-    const newIndex = Math.max(selectedIndex - 1, 0);
-
-    e.preventDefault();
-
-    this.setState({
-      autocompleteState: {
-        ...autocompleteState,
-        selectedIndex: newIndex,
-      },
-    });
-
-    const selectedSuggestionDomNode = this.suggestions[`item${newIndex}`];
-    if (!selectedSuggestionDomNode) return 'handled';
-
-    scrollElementIfNotInView(
-      selectedSuggestionDomNode,
-      this.suggestions.list,
+    const { editorState, onChange } = this.props;
+    return upArrowBinding(
+      editorState,
+      autocompleteState,
+      onChange,
+      this.setState.bind(this),
+      event,
+      this.suggestions,
     );
-
-    return 'handled';
   }
 
   /**
-   * Escape handler to exit suggestion list if it exists
+   * Escape arrow binding
+   * @param {event} event
    */
-  onEscape(e) {
+  onEscape(event) {
     const { autocompleteState } = this.state;
-
     if (!autocompleteState) return 'not-handled';
-
-    e.preventDefault();
+    event.preventDefault();
     this.setState({ autocompleteState: null });
     return 'handled';
   }
 
   /**
-   * Return handler to choose suggestion from list if it exists
+   * Return arrow binding
+   * @param {event} event
    */
-  handleReturn(e) {
+  handleReturn(event) {
     const { autocompleteState } = this.state;
-    const { suggestions } = this.props;
+    const { suggestions, onChange, editorState } = this.props;
 
-    if (
-      !autocompleteState ||
-      !suggestions[autocompleteState.selectedIndex]
-    ) {
-      return 'not-handled';
-    }
-
-    e.preventDefault();
-    this.turnSuggestionIntoEntity();
-    return 'handled';
+    return returnBinding(
+      editorState,
+      autocompleteState,
+      onChange,
+      event,
+      suggestions,
+      this.turnSuggestionIntoEntity.bind(this),
+    );
   }
 
   /**
@@ -303,22 +279,22 @@ class EditorWrapper extends Component {
   }
 
   /**
-   * If its an internal image we handle its repositioning. Everything else we bail on
-   * because how the editor should handle other things will need some thought.
-   */
+  * If a draft block is dropped handle its reposition to the new selection.
+  */
   handleDrop(selection, dataTransfer, location) {
     if (location === 'external') return 'not-handled';
-    const type = dataTransfer.data.getData('type');
-    if (!type || type !== 'image') return 'not-handled';
-
-    const { editorState } = this.props;
-    const blockKey = dataTransfer.data.getData('key');
-
-    this.updateEditorState(
-      moveBlock(editorState, blockKey, selection),
-    );
-
-    return 'handled';
+    const raw = dataTransfer.data.getData('text');
+    const data = raw ? raw.split(':') : [];
+    if (data.length !== 2) return 'not-handled';
+    if (data[0] === 'DRAFT_BLOCK') {
+      const { editorState } = this.props;
+      const blockKey = data[1];
+      this.updateEditorState(
+        moveBlock(editorState, blockKey, selection),
+      );
+      return 'handled';
+    }
+    return 'not-handled';
   }
 
   render() {
@@ -331,6 +307,8 @@ class EditorWrapper extends Component {
       onChange,
       suggestions,
       onSearch,
+      readOnly,
+      toggleReadOnly,
     } = this.props;
 
     return (
@@ -349,12 +327,13 @@ class EditorWrapper extends Component {
           editor={this.editor}
           editorState={editorState}
           onChange={onChange}
+          toggleReadOnly={toggleReadOnly}
         />
         <div style={{ position: 'relative' }} >
           <Editor
             editorState={editorState}
             onChange={this.updateEditorState.bind(this)}
-            blockRendererFn={block => blockRenderer(block, editorState)}
+            blockRendererFn={block => blockRenderer(block, editorState, onChange)}
             ref={node => this.editor = node}
             onDownArrow={this.onDownArrow.bind(this)}
             onUpArrow={this.onUpArrow.bind(this)}
@@ -363,7 +342,9 @@ class EditorWrapper extends Component {
             handleDroppedFiles={this.handleDroppedFiles.bind(this)}
             handleDrop={this.handleDrop.bind(this)}
             handleKeyCommand={this.handleKeyCommand.bind(this)}
+            keyBindingFn={event => keyBindingFunc(event, editorState, onChange)}
             spellCheck={true}
+            readOnly={readOnly}
           />
           <Suggestions
             turnIntoEntity={index => this.turnSuggestionIntoEntity(index)}
@@ -395,6 +376,8 @@ EditorWrapper.propTypes = {
   editorState: PropTypes.object,
   onSearch: PropTypes.func,
   handleImageUpload: PropTypes.func,
+  readOnly: PropTypes.bool,
+  toggleReadOnly: PropTypes.func,
 };
 
 export default EditorWrapper;

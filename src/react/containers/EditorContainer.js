@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { EditorState, ContentState } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
@@ -16,7 +15,7 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
 import PreviewContainer from './PreviewContainer';
 
-import Editor, { decorators, convertFromHTML } from '../Editor/index';
+import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
 class EditorContainer extends Component {
   constructor(props) {
@@ -26,7 +25,9 @@ class EditorContainer extends Component {
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
-        convertFromHTML(props.entry.content),
+        convertFromHTML(props.entry.content, {
+          toggleReadOnly: this.toggleReadOnly.bind(this),
+        }),
         decorators,
       );
     } else {
@@ -37,6 +38,7 @@ class EditorContainer extends Component {
       editorState: initialEditorState,
       suggestions: [],
       preview: false,
+      readOnly: false,
     };
 
     this.onChange = editorState => this.setState({ editorState });
@@ -48,9 +50,15 @@ class EditorContainer extends Component {
     });
   }
 
+  toggleReadOnly() {
+    this.setState({
+      readOnly: !this.state.readOnly,
+    });
+  }
+
   getContent() {
     const { editorState } = this.state;
-    return stateToHTML(editorState.getCurrentContent());
+    return convertToHTML(editorState.getCurrentContent());
   }
 
   publish() {
@@ -71,7 +79,10 @@ class EditorContainer extends Component {
       ContentState.createFromText(''),
     );
 
-    this.setState({ editorState: newEditorState });
+    this.setState({
+      editorState: newEditorState,
+      readOnly: false,
+    });
   }
 
   getAuthors(text) {
@@ -150,7 +161,7 @@ class EditorContainer extends Component {
   }
 
   render() {
-    const { editorState, suggestions, preview } = this.state;
+    const { editorState, suggestions, preview, readOnly } = this.state;
     const { isEditing, config } = this.props;
 
     return (
@@ -176,11 +187,12 @@ class EditorContainer extends Component {
               editorState={editorState}
               onChange={this.onChange}
               suggestions={suggestions}
-              // @todo work out a better way of handling this.
               resetSuggestions={() => this.setState({ suggestions: [] })}
               onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
               autocompleteConfig={config.autocomplete}
               handleImageUpload={this.handleImageUpload.bind(this)}
+              readOnly={readOnly}
+              toggleReadOnly={this.toggleReadOnly.bind(this)}
             />
         }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>

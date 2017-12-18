@@ -129,3 +129,16 @@ export const getSelectedBlocks = (contentState, anchorKey, focusKey) => {
 
   return selectedBlocks;
 };
+
+/**
+ * Check if a focusable block is focused/selected
+ */
+export const focusableBlockIsSelected = (editorState) => {
+  const selection = editorState.getSelection();
+  if (selection.getAnchorKey() !== selection.getFocusKey()) {
+    return false;
+  }
+  const content = editorState.getCurrentContent();
+  const block = content.getBlockForKey(selection.getAnchorKey());
+  return block.getType() === 'atomic';
+};

@@ -15,7 +15,6 @@ export default function (editorState, selection, type, data, entityType, text = 
   let contentState = editorState.getCurrentContent();
   const currentSelectionState = selection;
 
-  // in case text is selected it is removed and then the block is appended
   if (!hasEntityAtSelection(editorState, selection)) {
     contentState = Modifier.removeRange(
       contentState,
@@ -46,7 +45,6 @@ export default function (editorState, selection, type, data, entityType, text = 
     insertionTargetSelection = insertionTargetBlock.getSelectionAfter();
   }
 
-  // @todo not sure why we need it …
   const newContentStateAfterSplit = Modifier.setBlockType(
     insertionTargetBlock,
     insertionTargetSelection,
@@ -70,17 +68,20 @@ export default function (editorState, selection, type, data, entityType, text = 
       key: genKey(),
       type,
       text,
-      characterList: List(Repeat(charData, text.length || 1)), // eslint-disable-line new-cap
-    }),
-
-    // new contentblock so we can continue wrting right away after inserting the block
-    new ContentBlock({
-      key: genKey(),
-      type: 'unstyled',
-      text: '',
-      characterList: List(), // eslint-disable-line new-cap
+      characterList: List(Repeat(charData, text.length || 1)),
     }),
   ];
+
+  if (!isEmptyBlock) {
+    fragmentArray.push(
+      new ContentBlock({
+        key: genKey(),
+        type: 'unstyled',
+        text: '',
+        characterList: List(),
+      }),
+    );
+  }
 
   // create fragment containing the two content blocks
   const fragment = BlockMapBuilder.createFromArray(fragmentArray);

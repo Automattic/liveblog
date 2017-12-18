@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 import { convertFromHTML } from 'draft-convert';
 
-export default html =>
+export default (html, extraData) =>
   convertFromHTML({
     htmlToEntity: (nodeName, node, createEntity) => {
       if (nodeName === 'a') {
@@ -19,10 +19,24 @@ export default html =>
           { src: node.src },
         );
       }
+
+      if (node.classList && node.classList.contains('liveblog-codeblock-identifier')) {
+        return createEntity(
+          'code-block',
+          'IMMUTABLE',
+          {
+            code: node.innerHTML,
+            toggleReadOnly: extraData.toggleReadOnly,
+          },
+        );
+      }
     },
 
-    htmlToBlock: (nodeName) => {
-      if (nodeName === 'img') {
+    htmlToBlock: (nodeName, node) => {
+      if (
+        nodeName === 'img' ||
+        (node.classList && node.classList.contains('liveblog-codeblock-identifier'))
+      ) {
         return 'atomic';
       }
     },
