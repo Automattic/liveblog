@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Class WPCOM_Liveblog_Entry_Embed
@@ -43,9 +43,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	public function shortcode( $attr, $url = '', $comment = null ) {
 		if ( ! empty( $comment ) ) {
 			$comment = get_comment( $comment );
-		}
-
-		if ( empty( $comment ) ) {
+		} else {
 			$comment = get_comment();
 		}
 

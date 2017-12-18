@@ -100,18 +100,20 @@ class WPCOM_Liveblog_Entry_Query {
 
 	/**
 	 * Returns latest entry id.
-	 * 
+	 *
 	 * @return int
 	 */
 	public function get_latest_id() {
 
 		$latest = $this->get_latest();
 
-		if ( is_null( $latest ) )
-		return null;
-
-		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) )
+		if ( is_null( $latest ) ) {
 			return null;
+		}
+
+		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) ) {
+			return null;
+		}
 
 		return $latest->get_id();
 	}
@@ -120,11 +122,13 @@ class WPCOM_Liveblog_Entry_Query {
 
 		$latest = $this->get_latest();
 
-		if ( is_null( $latest ) )
+		if ( is_null( $latest ) ) {
 			return null;
+		}
 
-		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) )
+		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) ) {
 			return null;
+		}
 
 		return $latest->get_timestamp();
 	}
@@ -133,8 +137,8 @@ class WPCOM_Liveblog_Entry_Query {
 	 * Get entries between two timestamps from a list of entries supplied.
 	 *
 	 * @param array $all entries
-	 * @param int   $start_timestamp 
-	 * @param int   $end_timestamp 
+	 * @param int   $start_timestamp
+	 * @param int   $end_timestamp
 	 * @return array
 	 */
 	public function find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp ) {
@@ -152,8 +156,8 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Get entries between two timestamps from all entries.
 	 *
-	 * @param int $start_timestamp 
-	 * @param int $end_timestamp 
+	 * @param int $start_timestamp
+	 * @param int $end_timestamp
 	 * @return array
 	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
