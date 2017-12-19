@@ -211,7 +211,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 */
 	public function delete_oembed_caches( $comment_ID = 0 ) {
 		if ( ! $comment_id ) {
-			$comment_id = get_comment_ID;
+			$comment_id = get_comment_ID();
 		}
 		$comment_metas = get_comment_meta( $comment_ID );
 		if ( empty( $comment_metas ) ) {

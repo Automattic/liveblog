@@ -136,15 +136,15 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Get entries between two timestamps from a list of entries supplied.
 	 *
-	 * @param array $all entries
+	 * @param array $entries
 	 * @param int   $start_timestamp
 	 * @param int   $end_timestamp
 	 * @return array
 	 */
-	public function find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp ) {
+	public function find_between_timestamps( $entries, $start_timestamp, $end_timestamp ) {
 		$entries_between = array();
 
-		foreach ( (array) $all_entries as $entry ) {
+		foreach ( (array) $entries as $entry ) {
 			if ( $entry->get_timestamp() >= $start_timestamp && $entry->get_timestamp() <= $end_timestamp ) {
 				$entries_between[] = $entry;
 			}

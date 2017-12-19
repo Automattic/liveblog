@@ -748,6 +748,8 @@ final class WPCOM_Liveblog {
 	 * Get all entries for specific page
 	 *
 	 * @param int $page Requested Page.
+	 * @param string $last_know_entry id-timestamp of the last rendered entry.
+	 * @param int $id entry id
 	 * @return array An array of json encoded results
 	 */
 	public static function get_entries_paged( $page, $last_known_entry = false, $id = false ) {
@@ -939,7 +941,7 @@ final class WPCOM_Liveblog {
 		wp_enqueue_style( self::key,  plugins_url( 'assets/app.css',  __FILE__ ) );
 		wp_enqueue_style( self::key . '_theme',  plugins_url( 'assets/theme.css',  __FILE__ ) );
 		wp_enqueue_script( self::key, plugins_url( 'assets/app.js', __FILE__ ), array(), self::version, true );
-		
+
 		if ( self::is_liveblog_editable() )  {
 			self::add_default_plupload_settings();
 		}
