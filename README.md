@@ -185,7 +185,7 @@ Selecting which template or format to use for liveblog happens in the admin pane
 #### Managing Hashtags
 Hashtags are manageable in the admin area. Under Posts there will be a menu for Hashtags. Please note that the slug is used, not the name.
 
-#### Emjoi's
+#### Emoji's
 When a `:emoji:` is inserted into an entry it is converted into:
 
 `<img src="//s.w.org/images/core/emoji/72x72/1f44d.png" class="liveblog-emoji emoji-+1">`
