@@ -960,7 +960,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 			'replaceText' 	=> ':$:',
 			'trigger' 		=> ':',
 			'name' 			=> 'Emoji',
-			'cdn' 			=> $this->emoji_cdn,
+			'cdn' 			=> esc_url( $this->emoji_cdn ),
 			'template' 		=> '<img src="'.esc_url( $this->emoji_cdn ).'${image}.png" height="20" width="20" /> ${name}',
 		) );
 
