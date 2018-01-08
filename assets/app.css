@@ -644,6 +644,14 @@
   line-height: inherit;
   margin: 0em 0em -.2ex; }
 
+.liveblog-hash::before {
+  content: "#"; }
+
+.fb-post.fb_iframe_widget,
+.fb-post.fb_iframe_widget > span,
+.fb-post.fb_iframe_widget iframe {
+  max-width: 100%; }
+
 .liveblog-editor-btn {
   display: inline-block;
   padding: .5rem;

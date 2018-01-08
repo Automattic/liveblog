@@ -101,11 +101,11 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
-		$comment_text = get_comment_text( $entry_id );
 		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
 		$entry = array(
 			'id'   => $entry_id,
 			'type' => $this->get_type(),
+			'html' => $this->render(),
 			'render' => self::render_content( $this->get_content(), $this->comment ),
 			'content' => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,

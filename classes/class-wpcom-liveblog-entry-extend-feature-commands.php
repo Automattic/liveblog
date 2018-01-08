@@ -63,7 +63,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// raw input format (e.g /key).
 		$this->revert_regex = implode( '', array(
 			preg_quote( '<span class="liveblog-command ', '~' ),
-			preg_quote( self::$class_prefix, '~' ),
+			preg_quote( $this->class_prefix_local, '~' ),
 			'([^"]+)',
 			preg_quote( '">', '~' ),
 			'([^"]+)',
@@ -80,7 +80,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// Hook into the entry saving to
 		// execute the command logic.
 		add_action( 'liveblog_insert_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
-		//add_action( 'liveblog_update_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
 	}
 
 	/**
@@ -95,12 +94,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_command_config', array(
-			'trigger' => '/',
-			'data' => $this->get_commands(),
-			'displayKey' => false,
-			'replaceText' => '/$',
-			'name' => 'Command',
-			'template' => false,
+			'trigger' 		=> '/',
+			'data' 			=> $this->get_commands(),
+			'displayKey'	=> false,
+			'regex'       	=> '/(\w*)$',
+			'replacement' 	=> '/${term}',
+			'replaceText' 	=> '/$',
+			'name' 			=> 'Command',
+			'template' 		=> false,
 		) );
 
 		return $config;

@@ -146,6 +146,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// We need the post_id to get it's template.
 		$post_id      = $object->get_post_id();
+
 		// Get the entry content
 		$content      = $object->get_content();
 

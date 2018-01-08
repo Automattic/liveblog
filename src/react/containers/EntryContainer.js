@@ -27,7 +27,9 @@ class EntryContainer extends Component {
   }
 
   componentDidMount() {
+    const { activateScrolling } = this.props.entry;
     triggerOembedLoad(this.node);
+    if (activateScrolling) this.scrollIntoView();
   }
 
   componentDidUpdate(prevProps) {
