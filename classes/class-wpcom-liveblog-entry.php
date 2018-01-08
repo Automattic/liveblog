@@ -189,7 +189,10 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 
-		self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
+		}
+
 
 		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
 		$entry = self::from_comment( $comment );
@@ -217,7 +220,10 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
-		self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
+
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
+		}
 
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
