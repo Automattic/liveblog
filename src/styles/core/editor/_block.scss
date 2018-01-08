@@ -3,6 +3,10 @@
   border-radius: $base-border-radius;
 }
 
+.liveblog-draggable-block.is-focused > * {
+  border-radius: $base-border-radius;
+}
+
 .liveblog-draggable-block:hover {
   cursor: move;
 }

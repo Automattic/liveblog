@@ -285,7 +285,8 @@ class EditorWrapper extends Component {
   * If a draft block is dropped handle its reposition to the new selection.
   */
   handleDrop(selection, dataTransfer, location) {
-    if (location === 'external') return 'not-handled';
+    if (location === 'external') return 'handled';
+    let handled = 'not-handled';
     const raw = dataTransfer.data.getData('text');
     const data = raw ? raw.split(':') : [];
     if (data.length !== 2) return 'not-handled';
@@ -295,9 +296,23 @@ class EditorWrapper extends Component {
       this.updateEditorState(
         moveBlock(editorState, blockKey, selection),
       );
-      return 'handled';
+      handled = 'handled';
     }
-    return 'not-handled';
+
+    /**
+     * Fix for an issue where drop breaks onChange. There is an open
+     * pull request which fixes the issue which means we will no longer
+     * need this once this has been merged.
+     * https://github.com/facebook/draft-js/issues/1383
+     */
+    const mouseUpEvent = new MouseEvent('mouseup', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    this.editor.refs.editor.dispatchEvent(mouseUpEvent);
+
+    return handled;
   }
 
   render() {

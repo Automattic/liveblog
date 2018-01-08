@@ -709,10 +709,11 @@
           box-shadow: 0 0 0 2px #b2dbfb;
   border-radius: 3px; }
 
+.liveblog-draggable-block.is-focused > * {
+  border-radius: 3px; }
+
 .liveblog-draggable-block:hover {
   cursor: move; }
 
 .liveblog-draggable-block img {
   display: block; }
-
-/*# sourceMappingURL=app.css.map*/
