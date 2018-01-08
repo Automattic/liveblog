@@ -237,8 +237,8 @@ class EditorWrapper extends Component {
     const { autocompleteConfig } = this.props;
     const { trigger } = this.state.autocompleteState;
     const config = autocompleteConfig.filter(x => x.trigger === trigger)[0];
-    if (!config.suggestionTemplate) return item;
-    return parseTemplate(config.suggestionTemplate, item);
+    if (!config.template) return item;
+    return parseTemplate(config.template, item);
   }
 
   /**

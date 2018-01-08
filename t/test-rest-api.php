@@ -429,7 +429,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		// Try to access the endpoint and insert an entry
 		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud' );
 		$request->add_header( 'content-type', 'application/json' );
-		$request->set_body( json_encode( $post_vars ) );
+		$request->set_body( wp_json_encode( $post_vars ) );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
