@@ -1,12 +1,10 @@
 import Image from './Image';
 import Placeholder from './Placeholder';
 import CodeBlock from './CodeBlock';
-import DragAndFocus from './DragAndFocusHOC';
-import setSelectionToBlock from '../modifiers/setSelectionToBlock';
+import DragAndFocus from './DragAndFocus';
 
-export default (block, editorState, onChange) => {
+export default (block, editorState) => {
   if (block.getType() === 'atomic') {
-    const blockKey = block.getKey();
     const contentState = editorState.getCurrentContent();
     const entity = contentState.getEntity(block.getEntityAt(0));
     const type = entity.getType();
@@ -18,11 +16,6 @@ export default (block, editorState, onChange) => {
         editable: false,
         props: {
           isFocused,
-          setSelectionToBlock: () => {
-            onChange(
-              setSelectionToBlock(editorState, blockKey),
-            );
-          },
         },
       };
     }
@@ -32,11 +25,6 @@ export default (block, editorState, onChange) => {
         editable: false,
         props: {
           isFocused,
-          setSelectionToBlock: () => {
-            onChange(
-              setSelectionToBlock(editorState, blockKey),
-            );
-          },
         },
       };
     }

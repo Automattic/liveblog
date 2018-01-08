@@ -21,7 +21,7 @@ export default contentState =>
           return (
             <div>
               <div
-                className="liveblog-codeblock-identifier"
+                id={`liveblog-codeblock-identifier-${entity.getData().title.replace(/\s+/g, '-')}`}
                 dangerouslySetInnerHTML={{ __html: entity.getData().code }}
               />
             </div>

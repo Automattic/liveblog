@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { RichUtils } from 'draft-js';
 
 import addLink from './modifiers/addLink';
-import addCodeBlock from './modifiers/addCodeBlock';
+import addAtomicBlock from './modifiers/addAtomicBlock';
 import Button from './Button';
 
 class Toolbar extends Component {
@@ -104,13 +104,15 @@ class Toolbar extends Component {
 
   addCodeBlock(e) {
     e.preventDefault();
-    const { editorState, onChange, toggleReadOnly } = this.props;
+    const { editorState, onChange, setReadOnly } = this.props;
 
     onChange(
-      addCodeBlock(editorState, false, {
+      addAtomicBlock(editorState, false, {
         code: '',
-        toggleReadOnly,
-      }),
+        title: 'HTML Block',
+        edit: true,
+        setReadOnly,
+      }, 'code-block'),
     );
   }
 
@@ -168,7 +170,7 @@ Toolbar.propTypes = {
   domEditor: PropTypes.any,
   plugins: PropTypes.array,
   imageInputId: PropTypes.string,
-  toggleReadOnly: PropTypes.func,
+  setReadOnly: PropTypes.func,
 };
 
 export default Toolbar;

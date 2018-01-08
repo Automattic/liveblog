@@ -6,7 +6,6 @@ import 'draft-js/dist/Draft.css';
 
 import {
   Editor,
-  EditorState,
   RichUtils,
 } from 'draft-js';
 
@@ -16,6 +15,7 @@ import {
   hasEntityAtSelection,
   getTopPosition,
   uniqueHTMLId,
+  focusableBlockIsSelected,
 } from './utils';
 
 import upArrowBinding from './keyBindings/upArrow';
@@ -24,9 +24,8 @@ import returnBinding from './keyBindings/returnBinding';
 import keyBindingFunc from './keyBindings/keyBindingFunc';
 
 import addAutocomplete from './modifiers/addAutocomplete';
-import addImage from './modifiers/addImage';
+import addAtomicBlock from './modifiers/addAtomicBlock';
 import moveBlock from './modifiers/moveBlock';
-import addPlaceholder from './modifiers/addPlaceholder';
 import skipOverEntity from './modifiers/skipOverEntity';
 
 import blockRenderer from './blocks/blockRenderer';
@@ -53,8 +52,11 @@ class EditorWrapper extends Component {
    */
   updateEditorState(editorState) {
     const { onChange, resetSuggestions, suggestions } = this.props;
+
+    if (focusableBlockIsSelected(editorState)) return;
+
     onChange(
-      EditorState.forceSelection(editorState, editorState.getSelection()),
+      editorState,
     );
 
     // Wait until the state has been updated.
@@ -228,12 +230,12 @@ class EditorWrapper extends Component {
 
     Array.from(files).forEach((file) => {
       this.updateEditorState(
-        addPlaceholder(editorState),
+        addAtomicBlock(editorState, false, {}, 'placeholder'),
       );
 
       handleImageUpload(file).then((url) => {
         this.updateEditorState(
-          addImage(editorState, false, url),
+          addAtomicBlock(editorState, false, { src: url }, 'image'),
         );
       });
     });
@@ -252,12 +254,12 @@ class EditorWrapper extends Component {
       if (!file.name.match(/.(jpg|jpeg|png|gif)$/i)) return;
 
       this.updateEditorState(
-        addPlaceholder(editorState, selection),
+        addAtomicBlock(editorState, false, {}, 'placeholder'),
       );
 
       handleImageUpload(file).then((url) => {
         this.updateEditorState(
-          addImage(editorState, selection, url),
+          addAtomicBlock(editorState, false, { src: url }, 'image'),
         );
       });
     });
@@ -269,6 +271,7 @@ class EditorWrapper extends Component {
    * by using RichUtils.handleKeyCommand()
    */
   handleKeyCommand(command) {
+    if (command === 'handled') return 'handled';
     const { editorState } = this.props;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
@@ -308,11 +311,14 @@ class EditorWrapper extends Component {
       suggestions,
       onSearch,
       readOnly,
-      toggleReadOnly,
+      setReadOnly,
     } = this.props;
 
     return (
-      <div className="liveblog-editor-inner-container">
+      <div className="liveblog-editor-inner-container" onDrop={(event) => {
+        // Fix for Draft Bug not always correctly handling handleDrop
+        if (!event.target.isContentEditable) event.preventDefault();
+      }}>
         <input
           ref={ref => this.imageUpload = ref}
           style={{ display: 'none' }}
@@ -327,7 +333,7 @@ class EditorWrapper extends Component {
           editor={this.editor}
           editorState={editorState}
           onChange={onChange}
-          toggleReadOnly={toggleReadOnly}
+          setReadOnly={setReadOnly}
         />
         <div style={{ position: 'relative' }} >
           <Editor
@@ -377,7 +383,7 @@ EditorWrapper.propTypes = {
   onSearch: PropTypes.func,
   handleImageUpload: PropTypes.func,
   readOnly: PropTypes.bool,
-  toggleReadOnly: PropTypes.func,
+  setReadOnly: PropTypes.func,
 };
 
 export default EditorWrapper;

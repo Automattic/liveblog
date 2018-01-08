@@ -1,0 +1,12 @@
+.liveblog-draggable-block.is-focused {
+  box-shadow: 0 0 0 2px lighten($color-accent, 30%);
+  border-radius: $base-border-radius;
+}
+
+.liveblog-draggable-block:hover {
+  cursor: move;
+}
+
+.liveblog-draggable-block img {
+  display: block;
+}

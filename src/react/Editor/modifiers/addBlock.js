@@ -30,9 +30,11 @@ export default function (editorState, selection, type, data, entityType, text = 
   let insertionTargetSelection;
   let insertionTargetBlock;
 
-  // In case there are no characters or entity or the selection is at the start it
-  // is safe to insert the block in the current block.
-  // Otherwise a new block is created (the block is always its own block)
+  /**
+  *  In case there are no characters or entity or the selection is at the start it
+  * is safe to insert the block in the current block.
+  * Otherwise a new block is created (the block is always its own block)
+  */
   const isEmptyBlock = block.getLength() === 0 && block.getEntityAt(0) === null;
   const selectedFromStart = currentSelectionState.getStartOffset() === 0;
   if (isEmptyBlock || selectedFromStart) {

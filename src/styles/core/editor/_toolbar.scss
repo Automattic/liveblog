@@ -3,6 +3,7 @@
   border: $base-border-size solid $color-grey-light;
   border-radius: $base-border-radius 0 0 0;
   border-bottom: none;
+  line-height: 0;
 }
 
 @include mq($until: small) {

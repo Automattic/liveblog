@@ -32,15 +32,30 @@
 
 .liveblog-image-upload-btn:hover {
   background-color: #fff;
-  transition: .3s background-color ease-in-out;
+  transition: .25s background-color ease-in-out;
+}
+
+.liveblog-publish-btn,
+.liveblog-save-btn {
+  background: $color-primary;
 }
 
 .liveblog-publish-btn {
-  background: $color-primary;
   width: 100%;
+}
+
+.liveblog-publish-btn:hover,
+.liveblog-save-btn:hover {
+  background: lighten($color-primary, 5%);
+}
+
+.liveblog-save-btn,
+.liveblog-cancel-btn,
+.liveblog-publish-btn {
   font-size: .9rem;
 }
 
-.liveblog-publish-btn:hover {
-  background: lighten($color-primary, 5%);
+.liveblog-cancel-btn {
+  background: $color-grey-light;
+  color: $color-grey-dark;
 }

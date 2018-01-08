@@ -26,7 +26,7 @@ class EditorContainer extends Component {
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
         convertFromHTML(props.entry.content, {
-          toggleReadOnly: this.toggleReadOnly.bind(this),
+          setReadOnly: this.setReadOnly.bind(this),
         }),
         decorators,
       );
@@ -44,15 +44,15 @@ class EditorContainer extends Component {
     this.onChange = editorState => this.setState({ editorState });
   }
 
-  setPreview(state) {
+  setReadOnly(state) {
     this.setState({
-      preview: state,
+      readOnly: state,
     });
   }
 
-  toggleReadOnly() {
+  setPreview(state) {
     this.setState({
-      readOnly: !this.state.readOnly,
+      preview: state,
     });
   }
 
@@ -192,7 +192,7 @@ class EditorContainer extends Component {
               autocompleteConfig={config.autocomplete}
               handleImageUpload={this.handleImageUpload.bind(this)}
               readOnly={readOnly}
-              toggleReadOnly={this.toggleReadOnly.bind(this)}
+              setReadOnly={this.setReadOnly.bind(this)}
             />
         }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>

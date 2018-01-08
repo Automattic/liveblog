@@ -18,10 +18,6 @@ const DragAndFocus = Component => ({ block, blockProps, ...props }) => {
       className={`liveblog-draggable-block ${blockProps.isFocused ? 'is-focused' : ''}`}
       draggable={true}
       onDragStart={startDrag}
-      onMouseDown={blockProps.setSelectionToBlock && !blockProps.isFocused
-        ? blockProps.setSelectionToBlock
-        : null
-      }
     >
       <Component block={block} blockProps={blockProps} {...props} />
     </div>

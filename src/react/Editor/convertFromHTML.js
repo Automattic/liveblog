@@ -20,22 +20,27 @@ export default (html, extraData) =>
         );
       }
 
-      if (node.classList && node.classList.contains('liveblog-codeblock-identifier')) {
+      if (node.id && node.id.includes('liveblog-codeblock-identifier-')) {
         return createEntity(
           'code-block',
           'IMMUTABLE',
           {
             code: node.innerHTML,
-            toggleReadOnly: extraData.toggleReadOnly,
+            title: node.id.replace('liveblog-codeblock-identifier-', '').replace('-', ' '),
+            setReadOnly: extraData.setReadOnly,
           },
         );
       }
     },
 
     htmlToBlock: (nodeName, node) => {
+      if (nodeName === 'p' && node.innerHTML === '') {
+        return false;
+      }
+
       if (
         nodeName === 'img' ||
-        (node.classList && node.classList.contains('liveblog-codeblock-identifier'))
+        (node.id && node.id.includes('liveblog-codeblock-identifier-'))
       ) {
         return 'atomic';
       }

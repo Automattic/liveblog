@@ -16,8 +16,8 @@ export default (editorState, onChange, direction, event) => {
     event.preventDefault();
 
     const offsetKey = DraftOffsetKey.encode(block.getKey(), 0, 0);
-    // Set the native selection to the node so the caret is not in the text
-    const node = document.querySelectorAll(`[data-offset-key="${offsetKey}"]`)[0];
+    // Set the native selection to the node so the selection is not in the text
+    const node = document.querySelector(`[data-offset-key="${offsetKey}"]`);
     const selection = window.getSelection();
     const range = document.createRange();
     range.setStart(node, 0);
