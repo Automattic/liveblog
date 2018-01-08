@@ -282,7 +282,10 @@ class EditorWrapper extends Component {
   }
 
   /**
-  * If a draft block is dropped handle its reposition to the new selection.
+  * If a draft block is dropped handle its reposition to the new selection. Annoyingly this
+  * event never gets fired in IE11 and it silently fails. This issue has been documented
+  * so hopefully will be resolved soon.
+  * https://github.com/facebook/draft-js/issues/1174
   */
   handleDrop(selection, dataTransfer, location) {
     if (location === 'external') return 'handled';

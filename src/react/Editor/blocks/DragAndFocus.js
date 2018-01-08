@@ -6,7 +6,9 @@ import React from 'react';
 const DragAndFocus = Component => ({ block, blockProps, ...props }) => {
   /**
    * Set dataTransfer data on drag. We set the text key because nothing else will
-   * move the cursor which is the behavior we want.
+   * move the cursor which is the behavior we want. It is worth noting that in development
+   * builds of React this doesn't work in IE11. You can read why here -
+   * https://github.com/facebook/react/issues/5700
    */
   const startDrag = (event) => {
     event.dataTransfer.dropEffect = 'move'; // eslint-disable-line no-param-reassign
