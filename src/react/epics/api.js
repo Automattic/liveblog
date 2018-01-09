@@ -41,6 +41,11 @@ import {
 const getEntriesEpic = (action$, store) =>
   action$.ofType(types.GET_ENTRIES)
     .switchMap(({ page, hash }) => {
+      /**
+       * If there is a has in the url, we check that it is a number
+       * and then we jump to the that entry. If the number isn't a valid
+       * id of an entry the jumpToEvent api will return the first page.
+       */
       if (hash) {
         const id = hash.split('#')[1];
         if (!isNaN(id)) return of(jumpToEvent(id));
