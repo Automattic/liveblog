@@ -237,6 +237,9 @@
   overflow-y: scroll; }
 
 .liveblog-modal-inner {
+  position: relative;
+  background: #f7f7f7;
+  padding: 1rem;
   width: 50%;
   -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
           box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
@@ -252,6 +255,12 @@
   @media (max-width: 47.49em) {
     .liveblog-modal-inner {
       width: 95%; } }
+
+.liveblog-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer; }
 
 .liveblog-editor-btn {
   display: inline-block;
@@ -282,7 +291,8 @@
   font-weight: normal;
   border: 1px solid #bbb;
   background-color: #f7f7f7;
-  border-radius: 3px; }
+  border-radius: 3px;
+  color: #333; }
 
 .liveblog-image-upload-btn .dashicons {
   margin-right: .35rem; }
@@ -651,10 +661,6 @@
   font-weight: bold;
   color: #333; }
 
-.liveblog-codeblock-editor {
-  background: #f7f7f7;
-  padding: 1rem; }
-
 .liveblog-codeblock-textarea {
   border-radius: 3px;
   border: 1px solid #bbb;
@@ -717,3 +723,74 @@
 
 .liveblog-draggable-block img {
   display: block; }
+
+.liveblog-media-grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  list-style: none; }
+
+.liveblog-media-grid-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background: #fff;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-preferred-size: 15%;
+      flex-basis: 15%;
+  margin-bottom: .75rem;
+  cursor: pointer; }
+
+.liveblog-media-grid-item > img {
+  display: block;
+  max-width: 100%; }
+
+.liveblog-media-grid-item:hover {
+  -webkit-box-shadow: 0 0 0 2px #b2dbfb;
+          box-shadow: 0 0 0 2px #b2dbfb;
+  border-radius: 3px; }
+
+.liveblog-media-grid-item:hover > img {
+  border-radius: 3px; }
+
+.liveblog-media-loading {
+  min-height: 300px; }
+
+.liveblog-media-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center; }
+
+.liveblog-media-pagination {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  list-style: none; }
+
+.liveblog-media-pagination-number {
+  cursor: pointer;
+  padding: 0 .1rem; }
+
+.liveblog-media-pagination-number.is-active {
+  font-weight: bold; }
+
+/*# sourceMappingURL=app.css.map*/

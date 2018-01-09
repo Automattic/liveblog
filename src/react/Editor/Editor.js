@@ -32,6 +32,7 @@ import blockRenderer from './blocks/blockRenderer';
 
 import Toolbar from './Toolbar';
 import Suggestions from './Suggestions';
+import MediaLibrary from './MediaLibrary';
 
 class EditorWrapper extends Component {
   constructor(props) {
@@ -39,6 +40,7 @@ class EditorWrapper extends Component {
 
     this.state = {
       autocompleteState: null,
+      mediaLibraryOpen: false,
     };
   }
 
@@ -266,6 +268,19 @@ class EditorWrapper extends Component {
   }
 
   /**
+   * Insert image from media library.
+   */
+  insertImage(src) {
+    const { editorState } = this.props;
+    this.updateEditorState(
+      addAtomicBlock(editorState, false, { src }, 'image'),
+    );
+    this.setState({
+      mediaLibraryOpen: false,
+    });
+  }
+
+  /**
    * Draft doesn't handle certain commands by default as it generally expects
    * you to implement your own. However you can enable some default behavior
    * by using RichUtils.handleKeyCommand()
@@ -321,6 +336,7 @@ class EditorWrapper extends Component {
   render() {
     const {
       autocompleteState,
+      mediaLibraryOpen,
     } = this.state;
 
     const {
@@ -330,6 +346,7 @@ class EditorWrapper extends Component {
       onSearch,
       readOnly,
       setReadOnly,
+      handleImageUpload,
     } = this.props;
 
     return (
@@ -352,6 +369,7 @@ class EditorWrapper extends Component {
           editorState={editorState}
           onChange={onChange}
           setReadOnly={setReadOnly}
+          toggleMediaLibrary={() => this.setState({ mediaLibraryOpen: !mediaLibraryOpen })}
         />
         <div style={{ position: 'relative' }} >
           <Editor
@@ -387,6 +405,12 @@ class EditorWrapper extends Component {
             ref={node => this.suggestions = node}
           />
         </div>
+        <MediaLibrary
+          active={mediaLibraryOpen}
+          close={() => this.setState({ mediaLibraryOpen: false })}
+          handleImageUpload={handleImageUpload}
+          insertImage={this.insertImage.bind(this)}
+        />
       </div>
     );
   }

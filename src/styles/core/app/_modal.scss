@@ -13,6 +13,9 @@
 }
 
 .liveblog-modal-inner {
+  position: relative;
+  background: $color-grey-x-light;
+  padding: 1rem;
   width: 50%;
   box-shadow: $base-drop-shadow;
   border-radius: $base-border-radius;
@@ -29,4 +32,11 @@
   @include mq($until: small) {
     width: 95%;
   }
+}
+
+.liveblog-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
 }

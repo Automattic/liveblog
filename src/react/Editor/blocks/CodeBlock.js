@@ -92,7 +92,7 @@ class CodeBlock extends Component {
           </button>
         </span>
 
-        <Modal active={edit} customInnerClass="liveblog-codeblock-editor">
+        <Modal active={edit}>
           <h1 className="liveblog-editor-title">Code Block Editor</h1>
           <div className="liveblog-codeblock-input-container">
             <span>Title:</span>

@@ -29,13 +29,13 @@ class Modal extends Component {
   }
 
   renderModal() {
-    const { active, children, customInnerClass } = this.props;
+    const { active, children } = this.props;
 
     if (!active) return false;
 
     return (
       <div className="liveblog-modal">
-        <div className={`liveblog-modal-inner ${customInnerClass || ''}`}>
+        <div className="liveblog-modal-inner">
           {children}
         </div>
       </div>

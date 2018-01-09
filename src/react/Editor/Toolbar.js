@@ -117,16 +117,14 @@ class Toolbar extends Component {
   }
 
   render() {
-    const { imageInputId } = this.props;
+    const { imageInputId, toggleMediaLibrary } = this.props;
     const { showURLInput } = this.state;
 
     return (
       <div className="liveblog-editor-toolbar-container">
-        <label
-          className="liveblog-btn liveblog-image-upload-btn"
-          htmlFor={imageInputId}>
+        <button onClick={toggleMediaLibrary} className="liveblog-btn liveblog-image-upload-btn">
           <span className="dashicons dashicons-format-image"></span> Insert Image
-        </label>
+        </button>
         <div className="liveblog-toolbar">
           <Button onMouseDown={() => this.toggleInlineStyle('BOLD')} icon="editor-bold" />
           <Button onMouseDown={() => this.toggleInlineStyle('ITALIC')} icon="editor-italic" />
@@ -171,6 +169,7 @@ Toolbar.propTypes = {
   plugins: PropTypes.array,
   imageInputId: PropTypes.string,
   setReadOnly: PropTypes.func,
+  toggleMediaLibrary: PropTypes.func,
 };
 
 export default Toolbar;
