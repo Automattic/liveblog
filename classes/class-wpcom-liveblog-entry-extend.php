@@ -27,7 +27,6 @@ class WPCOM_Liveblog_Entry_Extend {
 	 * it attaches the new command.
 	 */
 	public static function load() {
-	    add_action( 'wp_enqueue_scripts',           array( __CLASS__, 'enqueue_scripts' ) );
 	    add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
 	    add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
 		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
@@ -103,17 +102,6 @@ class WPCOM_Liveblog_Entry_Extend {
      */
     public static function get_autocomplete() {
         return self::$autocomplete;
-    }
-
-    /**
-     * Loads in the scripts and styles for autocomplete
-     */
-    public static function enqueue_scripts() {
-        if ( WPCOM_Liveblog::is_liveblog_editable() ) {
-			$path = dirname(__FILE__);
-			wp_enqueue_style(  'textcomplete-css',    plugins_url( '/css/jquery.textcomplete.css',   $path ) );
-			wp_enqueue_script( 'textcomplete-script', plugins_url( '/js/jquery.textcomplete.min.js', $path ), false, true );
-		}
     }
 
     /**

@@ -250,6 +250,72 @@ class WPCOM_Liveblog_Rest_Api {
 			)
 		);
 
+		/*
+		 * Get entries for a post in paged format
+		 *
+		 * /<post_id>/get-entries/<page>/<last_known_entry>
+		 *
+		 */
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/get-entries/(?P<page>\d+)/(?P<last_known_entry>[^\/]+)',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_entries_paged' ),
+				'args' => array(
+					'post_id' => array(
+						'required' => true,
+					),
+					'page' => array(
+						'required' => true,
+					),
+					'last_known_entry' => array(
+						'required' => true,
+					),
+				),
+			)
+		);
+
+		/*
+		 * Get key events
+		 *
+		 * /<post_id>/get-key-events
+		 *
+		 */
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'get_key_events' ),
+				'args' => array(
+					'last_known_entry' => array(
+						'required' => true,
+					),
+				),
+			)
+		);
+
+		/*
+		 * Returns page and its entries which contains key entry
+		 *
+		 * /<post_id>/jump-to-key-event/<id>/<last_known_entry>
+		 *
+		 */
+		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'jump_to_key_event' ),
+				'args' => array(
+					'post_id' => array(
+						'required' => true,
+					),
+					'id' => array(
+						'required' => true,
+					),
+					'last_known_entry' => array(
+						'required' => true,
+					),
+				),
+			)
+		);
+
 	}
 
 	/**
@@ -289,10 +355,12 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get the required parameters from the request
 		$crud_action = $request->get_param( 'crud_action' );
+		$json 	 	 = $request->get_json_params();
+
 		$args = array(
-			'post_id'  => $request->get_param( 'post_id' ),
-			'content'  => $request->get_param( 'content' ),
-			'entry_id' => $request->get_param( 'entry_id' ),
+			'post_id'  => self::get_json_param( 'post_id', $json ),
+			'content'  => self::get_json_param( 'content', $json ),
+			'entry_id' => self::get_json_param( 'entry_id', $json ),
 		);
 
 		self::set_liveblog_vars( $args['post_id'] );
@@ -365,9 +433,10 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function format_preview_entry( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id       = $request->get_param( 'post_id' );
-		$entry_content = $request->get_param( 'entry_content' );
-
+		$post_id 		= $request->get_param( 'post_id' );
+		$json 	 		= $request->get_json_params();
+		$entry_content  = self::get_json_param( 'entry_content', $json );
+		
 		self::set_liveblog_vars( $post_id );
 
 		// Get entry preview
@@ -451,6 +520,79 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
+	 * Get entries for a post in paged format
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array An array of entries
+	 */
+	public static function get_entries_paged( WP_REST_Request $request ) {
+
+		// Get required parameters from the request
+		$post_id     	  = $request->get_param( 'post_id' );
+		$page 			  = $request->get_param( 'page' );
+		$last_known_entry = $request->get_param( 'last_known_entry' );
+
+		self::set_liveblog_vars( $post_id );
+
+		$entries = WPCOM_Liveblog::get_entries_paged( $page, $last_known_entry );
+
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
+		return $entries;
+	}
+
+
+	/**
+	 * Get key events
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array An array of key events
+	 */
+	public static function get_key_events( WP_REST_Request $request ) {
+
+		// Get required parameters from the request
+		$post_id     	  = $request->get_param( 'post_id' );
+		$last_known_entry = $request->get_param( 'last_known_entry' );
+
+		self::set_liveblog_vars( $post_id );
+
+		$key_events = WPCOM_Liveblog_Entry_Key_Events::all();
+		$key_events = WPCOM_Liveblog::entries_for_json( $key_events  );
+
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
+		return $key_events;
+	}
+
+	/**
+	 * Jump to page for key event
+	 *
+	 * @param WP_REST_Request $request A REST request object
+	 *
+	 * @return array An array of entries
+	 */
+	public static function jump_to_key_event( WP_REST_Request $request ) {
+
+		// Get required parameters from the request
+		$post_id     	  = $request->get_param( 'post_id' );
+		$id 			  = $request->get_param( 'id' );
+		$last_known_entry = $request->get_param( 'last_known_entry' );
+
+		self::set_liveblog_vars( $post_id );
+
+		$entries = WPCOM_Liveblog::get_entries_paged( false, $last_known_entry, $id );
+
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
+		return $entries;
+	}
+
+	/**
 	 * Set a few static variables in the WPCOM_Liveblog class needed for some callbacks to work
 	 *
 	 * @param int $post_id The post ID for the current request
@@ -476,6 +618,19 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function sanitize_numeric( $param, $request, $key ) {
 		return ( ! empty( $param ) && is_numeric( $param ) ? intval( $param ) : 0 );
+	}
+
+	/**
+	 * Get parameter from JSON
+	 * @param string $param 
+	 * @param array  $json 
+	 * @return mixed
+	 */
+	public static function get_json_param( $param, $json ) {
+		if ( isset( $json[$param] ) ) {
+			return $json[$param];
+		}
+		return false;
 	}
 
 }

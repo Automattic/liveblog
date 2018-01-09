@@ -149,8 +149,6 @@ class WPCOM_Liveblog_Lazyloader {
 			return;
 		}
 
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
-
 		add_filter( 'liveblog_display_archive_query_args', array( __CLASS__, 'display_archive_query_args' ), 20 );
 	}
 
@@ -165,29 +163,6 @@ class WPCOM_Liveblog_Lazyloader {
 
 		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array(
 			'plugin' => 'Lazyload Liveblog Entries',
-		) );
-	}
-
-	/**
-	 * Enqueues the lazyloader script file.
-	 *
-	 * @wp-hook wp_enqueue_scripts
-	 *
-	 * @return void
-	 */
-	public static function enqueue_script() {
-
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
-			return;
-		}
-
-		$handle      = 'liveblog-lazyloader';
-		$path        = 'js/liveblog-lazyloader.js';
-		$plugin_path = dirname( __FILE__ );
-		$temp        = plugin_dir_path( $plugin_path ) . $path;
-		wp_enqueue_script( $handle, plugins_url( $path, $plugin_path ), array( 'liveblog' ), filemtime( $temp ), true );
-		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
-			'loadMoreText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
 		) );
 	}
 

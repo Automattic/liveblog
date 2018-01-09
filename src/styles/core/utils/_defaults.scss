@@ -1,0 +1,14 @@
+$base-border-size: 1px;
+$base-border-radius: 3px;
+$base-drop-shadow: 0 2px 6px 0 rgba(0, 0, 0, .25);
+
+$mq-breakpoints: (
+  xx-small: 320px,
+  x-small:  540px,
+  small:    760px,
+  medium:   940px,
+  large:    1024px,
+  x-large:  1280px,
+  xx-large: 1400px
+);
+

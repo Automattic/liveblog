@@ -94,10 +94,20 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function for_json() {
+		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
+		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
 		$entry = array(
-			'id'   => $this->replaces ? $this->replaces : $this->get_id(),
-			'type' => $this->get_type(),
-			'html' => $this->render(),
+			'id'   			=> $entry_id,
+			'type' 			=> $this->get_type(),
+			'html' 			=> $this->render(),
+			'render' 		=> self::render_content( $this->get_content(), $this->comment ),
+			'content' 		=> apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
+			'css_classes' 	=> $css_classes,
+			'timestamp' 	=> $this->get_timestamp(),
+			'avatar_img' 	=> get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'author_link' 	=> get_comment_author_link( $entry_id ),
+			'entry_time' 	=> get_comment_date( 'U', $entry_id ),
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
@@ -148,8 +158,10 @@ class WPCOM_Liveblog_Entry {
 		global $wp_embed;
 
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
-			if ( get_option( 'embed_autourls' ) )
-				$content = $wp_embed->autoembed( $content );
+			if ( get_option( 'embed_autourls' ) ) {
+				$wpcom_liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
+				$content = $wpcom_liveblog_entry_embed->autoembed( $content, $comment );
+			}
 			$content = do_shortcode( $content );
 		}
 
@@ -236,9 +248,9 @@ class WPCOM_Liveblog_Entry {
 		if ( !$args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
-		if ( ! WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['entry_id'] ) ) {
-			return new WP_Error( 'entry-delete-key', __( 'Key event not deleted' ) );
-		}
+
+		$args['content'] = WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
+
 		$entry = self::update( $args );
 		return $entry;
 	}

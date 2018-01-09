@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.6.1
+ * Version:     1.7.0
  * Author:      WordPress.com VIP, Automattic
  * Author URI: http://vip.wordpress.com/
  * Text Domain: liveblog
@@ -26,9 +26,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
-	const version          			= '1.6.1';
+	const version          			= '1.7';
 	const rewrites_version 			= 1;
-	const min_wp_version   			= '3.5';
+	const min_wp_version   			= '4.4';
 	const min_wp_rest_api_version 	= '4.4';
 	const key              			= 'liveblog';
 	const url_endpoint     			= 'liveblog';
@@ -84,7 +84,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Entry_Extend::load();
 		WPCOM_Liveblog_Lazyloader::load();
 		WPCOM_Liveblog_Socketio_Loader::load();
-		WPCOM_Liveblog_Entry_Instagram_oEmbed::load();
+		WPCOM_Liveblog_Entry_Embed_SDKs::load();
 
 		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
@@ -132,7 +132,8 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
-		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-instagram-oembed.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
 
 		if ( self::use_rest_api() ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
@@ -395,7 +396,10 @@ final class WPCOM_Liveblog {
 		}
 
 		// Get liveblog entries within the start and end boundaries
-		$entries = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
+		$all_entries = self::$entry_query->get_all_entries_asc();
+		$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
+		$pages       = false;
+		$per_page    = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 		if ( ! empty( $entries ) ) {
 			/**
@@ -406,6 +410,8 @@ final class WPCOM_Liveblog {
 				$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
 				$entries_for_json[] = $entry->for_json();
 			}
+
+			$pages = ceil( count( self::flatten_entries( $all_entries ) ) / $per_page );
 		}
 
 		// Create the result array
@@ -413,6 +419,7 @@ final class WPCOM_Liveblog {
 			'entries'           => $entries_for_json,
 			'latest_timestamp'  => $latest_timestamp,
 			'refresh_interval'  => self::get_refresh_interval(),
+			'pages'				=> $pages,
 		);
 
 		if ( ! empty( $entries_for_json ) ) {
@@ -737,6 +744,117 @@ final class WPCOM_Liveblog {
 		return $result;
 	}
 
+	/**
+	 * Get all entries for specific page
+	 *
+	 * @param int $page Requested Page.
+	 * @param string $last_know_entry id-timestamp of the last rendered entry.
+	 * @param int $id entry id
+	 * @return array An array of json encoded results
+	 */
+	public static function get_entries_paged( $page, $last_known_entry = false, $id = false ) {
+
+		if ( empty( self::$entry_query ) ) {
+			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
+		}
+
+
+		$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+
+		$entries  = self::$entry_query->get_all_entries_asc();
+		$entries  = self::flatten_entries( $entries );
+
+		if ( $last_known_entry ) {
+			$last_known_entry = explode('-', $last_known_entry);
+			if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
+				$last_entry_id = $last_known_entry[0];
+				$index 		   = array_search( $last_entry_id ,array_keys( $entries ) );
+				$entries 	   = array_slice( $entries, $index, NULL, true );
+			}
+		}
+
+		$pages 	  = ceil( count( $entries ) / $per_page );
+
+		//If no page is passed but entry id is, we search for the correct page.
+		if ( $page === false && $id !== false ) {
+			$index = array_search( $id, array_keys( $entries ));
+			$index = $index + 1;
+			$page  = ceil( $index / $per_page );
+		}
+
+		$offset	  = $per_page * ( $page - 1 );
+		$entries  = array_slice( $entries, $offset, $per_page );
+		$entries  = self::entries_for_json( $entries );
+
+		$result = array(
+			'entries' => $entries,
+			'page'	  => (int) $page,
+			'pages'	  => (int) $pages,
+		);
+
+		if ( ! empty( $entries_for_json ) ) {
+			do_action( 'liveblog_entry_request', $result );
+			self::$do_not_cache_response = true;
+		} else {
+			do_action( 'liveblog_entry_request_empty' );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert array of entries to there json response.
+	 * @param type $entries
+	 * @return array
+	 */
+	public static function entries_for_json( $entries ) {
+		$entries_for_json = array();
+		foreach ( $entries as $entry ) {
+			$entries_for_json[] = $entry->for_json();
+		}
+		return $entries_for_json;
+	}
+
+
+	/**
+	 * Flattens Entries by running updates and deletes to get actual
+	 * list of entries
+	 *
+	 * @param array $entires
+	 * @return array
+	 */
+	public static function flatten_entries( $entries ) {
+		if ( empty( $entries ) || !is_array( $entries ) ) {
+			return array();
+		}
+		$flatten = array();
+		foreach ( $entries as $entry ) {
+			$type = $entry->get_type();
+			$id   = $entry->get_id();
+
+			if ( !empty( $entry->replaces ) ) {
+				$id = $entry->replaces;
+			}
+
+			switch ( $type ) {
+			    case "new":
+			        $flatten[$id] = $entry;
+			        break;
+			    case "update":
+			        $flatten[$id] = $entry;
+			        break;
+			    case "delete":
+			        unset( $flatten[$id] );
+			        break;
+			    default:
+			        continue;
+			}
+		}
+
+
+		return array_reverse( $flatten, true );
+	}
+
 	public static function ajax_preview_entry() {
 		$entry_content = isset( $_REQUEST['entry_content'] ) ? $_REQUEST['entry_content'] : '';
 		$entry_content = self::format_preview_entry( $entry_content );
@@ -752,7 +870,6 @@ final class WPCOM_Liveblog {
 	 * @return array The entry content wrapped in HTML elements
 	 */
 	public static function format_preview_entry( $entry_content ) {
-
 		$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 		$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
 		$entry_content = $entry_content['content'];
@@ -798,8 +915,8 @@ final class WPCOM_Liveblog {
 				$use_rest_api = 1;
 			}
 
-			wp_enqueue_style( self::key, plugins_url( 'css/liveblog-admin.css', __FILE__ ) );
-			wp_enqueue_script( 'liveblog-admin', plugins_url( 'js/liveblog-admin.js', __FILE__ ) );
+			wp_enqueue_style( self::key, plugins_url( 'assets/dashboard/app.css', __FILE__ ) );
+			wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ) );
 			wp_localize_script( 'liveblog-admin', 'liveblog_admin_settings', array(
 				'nonce_key'                    => self::nonce_key,
 				'nonce'                        => wp_create_nonce( self::nonce_action ),
@@ -821,56 +938,12 @@ final class WPCOM_Liveblog {
 		if ( ! self::is_viewing_liveblog_post() )
 			return;
 
-		wp_enqueue_style( self::key,  plugins_url( 'css/liveblog.css', __FILE__ ) );
-		wp_register_script( 'jquery-throttle',  plugins_url( 'js/jquery.ba-throttle-debounce.min.js', __FILE__ ) );
-		wp_register_script( 'moment',  plugins_url( 'js/moment.min.js', __FILE__ ), array(), '1.7.2' );
-		wp_localize_script( 'moment', 'momentLang', array(
-			'locale' => get_locale(),
-			'relativeTime' => array(
-				'past' => __( '%s ago', 'liveblog' ),
-				's' => __( 'a few seconds', 'liveblog' ),
-				'm' => __( 'a minute', 'liveblog' ),
-				'mm' => __( '%d minutes', 'liveblog' ),
-				'h' => __( 'an hour', 'liveblog' ),
-				'hh' => __( '%d hours', 'liveblog' ),
-				'd' => __( 'a day', 'liveblog' ),
-				'dd' => __( '%d days', 'liveblog' ),
-				'M' => __( 'a month', 'liveblog' ),
-				'MM' => __( '%d months', 'liveblog' ),
-				'y' => __( 'a year', 'liveblog' ),
-				'yy' => __( '%d years', 'liveblog' ),
-			),
-		));
-
-		wp_enqueue_script( self::key, plugins_url( 'js/liveblog.js', __FILE__ ), array( 'jquery', 'jquery-color', 'backbone', 'jquery-throttle', 'moment' ), self::version, true );
+		wp_enqueue_style( self::key,  plugins_url( 'assets/app.css',  __FILE__ ) );
+		wp_enqueue_style( self::key . '_theme',  plugins_url( 'assets/theme.css',  __FILE__ ) );
+		wp_enqueue_script( self::key, plugins_url( 'assets/app.js', __FILE__ ), array(), self::version, true );
 
 		if ( self::is_liveblog_editable() )  {
-			if ( apply_filters( 'liveblog_rich_text_editing_allowed', true ) ) {
-				wp_enqueue_script( 'editor' );
-			}
-			wp_enqueue_script( 'liveblog-publisher', plugins_url( 'js/liveblog-publisher.js', __FILE__ ), array( self::key ), self::version, true );
-
-			wp_register_script( 'liveblog-plupload', plugins_url( 'js/plupload.js', __FILE__ ), array( self::key, 'wp-plupload', 'jquery' ) );
-			wp_localize_script( 'liveblog-plupload', 'liveblog_plupload', apply_filters( 'liveblog_plupload_localize', array(
-				'browser' => '#liveblog-messages',
-				'dropzone' => '#liveblog-container',
-				'container' => false,
-			) ) );
-			wp_enqueue_script( 'liveblog-plupload' );
 			self::add_default_plupload_settings();
-		}
-
-		if ( wp_script_is( 'jquery.spin', 'registered' ) ) {
-			wp_enqueue_script( 'jquery.spin' );
-		} else {
-			wp_enqueue_script( 'spin',        plugins_url( 'js/spin.js',        __FILE__ ), false,                     '1.3' );
-			wp_enqueue_script( 'jquery.spin', plugins_url( 'js/jquery.spin.js', __FILE__ ), array( 'jquery', 'spin' ), '1.3' );
-		}
-
-		if ( wp_script_is( 'jetpack-twitter-timeline', 'registered' ) ) {
-			wp_enqueue_script( 'jetpack-twitter-timeline' );
-		} else {
-			wp_enqueue_script( 'liveblog-twitter-timeline', plugins_url( 'js/twitter-timeline.js', __FILE__ ), false, '1.5, true' );
 		}
 
 		wp_localize_script( self::key, 'liveblog_settings',
@@ -884,7 +957,11 @@ final class WPCOM_Liveblog {
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
+				'image_nonce'            => wp_create_nonce( 'media-form' ),
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
+				'latest_entry_id'        => self::$entry_query->get_latest_id(),
+				'timestamp'              => time(),
+				'entries_per_page'       => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 
 				'refresh_interval'       => self::get_refresh_interval(),
 				'focus_refresh_interval' => self::focus_refresh_interval,
@@ -933,10 +1010,13 @@ final class WPCOM_Liveblog {
 		global $wp_scripts;
 
 		$defaults = array(
+			'runtimes'            => 'html5,silverlight,flash,html4',
 			'file_data_name'      => 'async-upload',
 			'multiple_queues'     => true,
 			'max_file_size'       => wp_max_upload_size() . 'b',
 			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
+			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
+			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
 			'filters'             => array( array( 'title' => __( 'Allowed Files', 'liveblog' ), 'extensions' => '*') ),
 			'multipart'           => true,
 			'urlstream_upload'    => true,
@@ -1001,15 +1081,11 @@ final class WPCOM_Liveblog {
 			return $content;
 		}
 
-		$liveblog_output  = '<div id="liveblog-container" class="'. self::$post_id .'">';
-		$liveblog_output .= self::get_editor_output();
-		$liveblog_output .= '<div id="liveblog-update-spinner"></div>';
-		$liveblog_output .= self::get_all_entry_output();
-		$liveblog_output .= '</div>';
+		$liveblog_output  = '<div id="wpcom-liveblog-container" class="' . self::$post_id  .'"></div>';
 
 		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
 
-		return $content . $liveblog_output;
+		return $content . wp_kses_post( $liveblog_output );
 	}
 
 	/**

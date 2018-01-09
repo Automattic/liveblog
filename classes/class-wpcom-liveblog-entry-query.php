@@ -19,7 +19,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $args the same args for the core `get_comments()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
-	private function get( $args = array() ) {
+	public function get( $args = array() ) {
 		$defaults = array(
 			'post_id' => $this->post_id,
 			'orderby' => 'comment_date_gmt',
@@ -98,24 +98,53 @@ class WPCOM_Liveblog_Entry_Query {
 		return reset( $entries );
 	}
 
+	/**
+	 * Returns latest entry id.
+	 *
+	 * @return int
+	 */
+	public function get_latest_id() {
+
+		$latest = $this->get_latest();
+
+		if ( is_null( $latest ) ) {
+			return null;
+		}
+
+		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) ) {
+			return null;
+		}
+
+		return $latest->get_id();
+	}
+
 	public function get_latest_timestamp() {
 
 		$latest = $this->get_latest();
 
-		if ( is_null( $latest ) )
+		if ( is_null( $latest ) ) {
 			return null;
+		}
 
-		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) )
+		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) ) {
 			return null;
+		}
 
 		return $latest->get_timestamp();
 	}
 
-	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
+	/**
+	 * Get entries between two timestamps from a list of entries supplied.
+	 *
+	 * @param array $entries
+	 * @param int   $start_timestamp
+	 * @param int   $end_timestamp
+	 * @return array
+	 */
+	public function find_between_timestamps( $entries, $start_timestamp, $end_timestamp ) {
 		$entries_between = array();
-		$all_entries = $this->get_all_entries_asc();
 
-		foreach ( (array) $all_entries as $entry ) {
+		foreach ( (array) $entries as $entry ) {
 			if ( $entry->get_timestamp() >= $start_timestamp && $entry->get_timestamp() <= $end_timestamp ) {
 				$entries_between[] = $entry;
 			}
@@ -124,11 +153,23 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $entries_between );
 	}
 
+	/**
+	 * Get entries between two timestamps from all entries.
+	 *
+	 * @param int $start_timestamp
+	 * @param int $end_timestamp
+	 * @return array
+	 */
+	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
+		$all_entries = $this->get_all_entries_asc();
+		return $this->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
+	}
+
 	public function has_any() {
 		return (bool)$this->get();
 	}
 
-	private function get_all_entries_asc() {
+	public function get_all_entries_asc() {
 		$cached_entries_asc_key =  $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
 		if ( false !== $cached_entries_asc ) {

@@ -1,9 +1,9 @@
 === Liveblog ===
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
-Requires at least: 3.5
+Requires at least: 4.4
 Tested up to: 4.8.2
-Stable tag: 1.6.1
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

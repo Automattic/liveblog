@@ -85,12 +85,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_hashtag_config', array(
-			'type'        => 'ajax',
-			'cache'       => 1000 * 60,
-			'regex'       => '#([\w\d\-]*)$',
-			'url'         => $endpoint_url,
-			'template'    => '${slug}',
-			'replacement' => '#${slug}',
+			'type'			=> 'ajax',
+			'cache' 		=> 1000 * 60,
+			'regex'       	=> '#([\w\d\-]*)$',
+			'replacement' 	=> '#${slug}',
+			'trigger' 		=> '#',
+			'displayKey' 	=> 'slug',
+			'name' 			=> 'Hashtag',
+			'template' 		=> '${slug}',
+			'replaceText' 	=> '#$',
+			'url' 			=> esc_url( $endpoint_url ),
 		) );
 
 		return $config;
@@ -248,14 +252,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function remove_name_search( $clauses ) {
-
 		// Remove the where clause's section about the name.
 		$clauses['where'] = preg_replace(
 			array(
 				'~\\(\\(.*(?='.preg_quote("(t.slug LIKE '").')~',
 				'~(%\'\\))\\)~',
 			),
-			'$1',
+			'($1',
 			$clauses['where']
 		);
 

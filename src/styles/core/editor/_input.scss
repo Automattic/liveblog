@@ -1,0 +1,68 @@
+.liveblog-editor-input-container {
+  position: absolute;
+  z-index: 99;
+  bottom: -100%;
+  left: -50%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  animation: scaleUp .2s cubic-bezier(.3, 1.2, .2, 1);
+  background: #fff;
+  padding: .2rem;
+  border-radius: $base-border-radius;
+  box-shadow: $base-drop-shadow;
+
+  @include mq($until: small) {
+    left: -160px;
+  }
+}
+
+.liveblog-editor-input-container::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  top: -5px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #fff;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid transparent;
+  transform: rotate(-45deg);
+
+  @include mq($until: small) {
+    left: 67%;
+  }
+}
+
+.liveblog-input {
+  flex-grow: 1;
+  height: auto;
+  min-width: 200px;
+  font-size: .9rem;
+  padding: .3rem;
+  margin: 0;
+  border: $base-border-size solid $color-grey-mid-light;
+}
+
+.liveblog-input-enter,
+.liveblog-input-cancel {
+  padding: .3em;
+  font-size: .9rem;
+}
+
+.liveblog-input-enter {
+  background: $color-primary;
+  color: #fff;
+}
+
+.liveblog-input-enter:hover {
+  background: lighten($color-primary, 5%);
+}
+
+.liveblog-input-cancel {
+  color: $color-warning;
+}
+
+.liveblog-input-cancel:hover {
+  color: darken($color-warning, 10%);
+}
