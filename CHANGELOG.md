@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7
+
+* New: Mobile-friendly React-based frontend UI for a better editing experience across devices. (props jagnew jrmd liam-defty)
+* Various UI bugfixes thanks to the new frontend.
+* Fix for incorrect use of `defined()` (props kevinfodness)
+
 ## 1.6.1
 
 * Remove support for Flash + Silverlight which are no longer supported in WP 4.9, see https://core.trac.wordpress.org/ticket/41755#no0
