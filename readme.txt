@@ -2,7 +2,7 @@
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
 Requires at least: 4.4
-Tested up to: 4.8.2
+Tested up to: 4.9.1
 Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -47,6 +47,11 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 == Changelog ==
 
+= 1.7.0 =
+
+* New: Mobile-friendly React-based frontend UI for a better editing experience across devices. (props jagnew jrmd liam-defty)
+* Various UI bugfixes thanks to the new frontend.
+* Fix for incorrect use of `defined()` (props kevinfodness)
 
 = 1.6.1 =
 
