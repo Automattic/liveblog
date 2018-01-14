@@ -454,7 +454,7 @@ final class WPCOM_Liveblog {
 	 * @return bool
 	 */
 	public static function is_viewing_liveblog_post() {
-		return (bool) ( is_single() && self::is_liveblog_post() );
+		return (bool) ( ( is_single() || is_page() || is_attachment() ) && self::is_liveblog_post() );
 	}
 
 	/**
