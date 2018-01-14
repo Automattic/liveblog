@@ -461,7 +461,7 @@ final class WPCOM_Liveblog {
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
-		if ( ! is_single() && ! is_admin() && ! self::$is_rest_api_call) {
+		if ( !is_singular() && ! is_admin() && ! self::$is_rest_api_call) {
 			return false;
 		}
 		if ( empty( $post_id ) ) {
