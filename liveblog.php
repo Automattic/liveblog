@@ -240,6 +240,9 @@ final class WPCOM_Liveblog {
 		 * we can possibly introduce this to other post types later.
 		 */
 		add_post_type_support( 'post', self::key );
+		add_post_type_support( 'page', self::key );
+		add_post_type_support( 'attachment', self::key );
+		add_post_type_support( 'revision', self::key );		
 
 		/**
 		 * Apply a Filter to Setup our Auto Archive Days.
