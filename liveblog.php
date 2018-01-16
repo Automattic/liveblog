@@ -134,6 +134,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-schema.php' );
 
 		if ( self::use_rest_api() ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
@@ -305,7 +306,13 @@ final class WPCOM_Liveblog {
 			// we need to add the liveblog after the shortcodes are run, because we already
 			// process shortcodes in the comment contents and if we left any (like in the original content)
 			// we wouldn't like them to be processed
+
+			// Add Liveblog schema right before the content
+			add_filter( 'the_content', array( 'WPCOM_Liveblog_Schema', 'add_schema_to_content' ), 20);
+
+			// Add Liveblog content
 			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
+
 		} else {
 			self::handle_ajax_request();
 		}
