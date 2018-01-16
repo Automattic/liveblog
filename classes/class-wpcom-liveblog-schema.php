@@ -28,7 +28,13 @@ class WPCOM_Liveblog_Schema {
 			return $content;
 		}
 
-		$schema = new static( get_the_ID() );
+		try {
+			$post_id = WPCOM_Liveblog::get_post_id();
+		} catch ( Exception $e ) {
+			$post_id = get_the_ID();
+		}
+
+		$schema = new static( $post_id );
 		return $content . $schema->render();
 
 	}
