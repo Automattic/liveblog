@@ -82,7 +82,6 @@ class WPCOM_Liveblog_Schema {
 		$entries = (array) $this->query->get_all_entries_asc();
 
 		if ( ! empty( $entries ) ) {
-			// Execute the entry query with the previously defined args.
 			return array_map( array( $this, 'convert_entry_to_schema_blog_posting' ), $entries );
 		}
 
