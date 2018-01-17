@@ -1,6 +1,6 @@
-import moment from 'moment';
-/* eslint-disable no-param-reassign */
+import moment from './extendedMoment';
 
+/* eslint-disable no-param-reassign */
 export const getLastOfObject = object =>
   object[Object.keys(object)[Object.keys(object).length - 1]];
 
@@ -145,11 +145,13 @@ export const daysAgo = (time, utcOffset) => {
  * @param {Number} timestamp Unix Timestamp in seconds
  * @return {String} utcOffset Utc Offset from server
  */
-export const timeAgo = (timestamp, utcOffset) => {
+export const timeAgo = (timestamp, utcOffset, dateFormat) => {
   const offset = parseInt(utcOffset, 10);
   const offsetTime = moment.unix(timestamp).utcOffset(offset, true);
   // If its greater than 30 days ago.
-  if (daysAgo(offsetTime, offset) >= 30) return offsetTime.format('DD/MM/YYYY');
+  if (daysAgo(offsetTime, offset) >= 30) {
+    return offsetTime.formatUsingDateTime(dateFormat);
+  }
   return offsetTime.fromNow();
 };
 

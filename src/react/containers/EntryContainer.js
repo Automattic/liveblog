@@ -74,7 +74,7 @@ class EntryContainer extends Component {
       >
         <header className="liveblog-meta">
           <div className="liveblog-meta-time">
-            <span>{timeAgo(entry.entry_time, config.utc_offset)}</span>
+            <span>{timeAgo(entry.entry_time, config.utc_offset, config.date_format)}</span>
             <span>{formattedTime(entry.entry_time, config.utc_offset)}</span>
           </div>
           <div className="liveblog-meta-author">
