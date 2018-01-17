@@ -342,7 +342,6 @@ class EditorWrapper extends Component {
           id={this.inputId}
           onChange={this.uploadImages.bind(this)}
           accept="image/jpeg,image/gif,image/png,image/jpg"
-          capture="camera"
         />
         <Toolbar
           imageInputId={this.inputId}
