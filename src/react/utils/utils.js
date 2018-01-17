@@ -160,9 +160,9 @@ export const timeAgo = (timestamp, utcOffset, dateFormat) => {
  * @param {Number} timestamp
  * @return {String} utcOffset Utc Offset from server
  */
-export const formattedTime = (timestamp, utcOffset) => {
+export const formattedTime = (timestamp, utcOffset, timeFormat) => {
   const offset = parseInt(utcOffset, 10);
-  return moment.unix(timestamp).utcOffset(offset, true).local().format('HH:mm');
+  return moment.unix(timestamp).utcOffset(offset, true).local().formatUsingDateTime(timeFormat);
 };
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
