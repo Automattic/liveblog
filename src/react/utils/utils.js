@@ -149,7 +149,7 @@ export const timeAgo = (timestamp, utcOffset) => {
   const offset = parseInt(utcOffset, 10);
   const offsetTime = moment.unix(timestamp).utcOffset(offset, true);
   // If its greater than 30 days ago.
-  if (daysAgo(offsetTime, offset) >= 30) return offsetTime.format('MM/DD/YYYY');
+  if (daysAgo(offsetTime, offset) >= 30) return offsetTime.format('DD/MM/YYYY');
   return offsetTime.fromNow();
 };
 
