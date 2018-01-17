@@ -50,14 +50,14 @@
 
 .liveblog-meta-author-name {
   font-size: 13px;
-  margin-left: 8px;
 }
 
-.liveblog-meta-authour-avatar {
+.liveblog-meta-author-avatar {
   border-radius: 50%;
   overflow: hidden;
   width: 30px;
   height: 30px;
+  margin-right: 8px;
 }
 
 .liveblog-entry-tools {
@@ -81,7 +81,7 @@
 }
 
 .liveblog-event::before,
-.liveblog-event:only-child::before, {
+.liveblog-event:only-child::before {
   content: "";
   position: absolute;
   z-index: 1;

@@ -78,9 +78,11 @@ class EntryContainer extends Component {
             <span>{formattedTime(entry.entry_time)}</span>
           </div>
           <div className="liveblog-meta-author">
-            <div
-              className="liveblog-meta-authour-avatar"
-              dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
+            {entry.avatar_img &&
+                <div
+                  className="liveblog-meta-author-avatar"
+                  dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
+            }
             <span className="liveblog-meta-author-name"
               dangerouslySetInnerHTML={{ __html: entry.author_link }} />
           </div>
