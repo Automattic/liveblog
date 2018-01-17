@@ -64,7 +64,7 @@ class EntryContainer extends Component {
   }
 
   render() {
-    const { entry } = this.props;
+    const { entry, config } = this.props;
 
     return (
       <article
@@ -74,8 +74,8 @@ class EntryContainer extends Component {
       >
         <header className="liveblog-meta">
           <div className="liveblog-meta-time">
-            <span>{timeAgo(entry.entry_time)}</span>
-            <span>{formattedTime(entry.entry_time)}</span>
+            <span>{timeAgo(entry.entry_time, config.utc_offset)}</span>
+            <span>{formattedTime(entry.entry_time, config.utc_offset)}</span>
           </div>
           <div className="liveblog-meta-author">
             {

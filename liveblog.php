@@ -961,6 +961,7 @@ final class WPCOM_Liveblog {
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 				'latest_entry_id'        => self::$entry_query->get_latest_id(),
 				'timestamp'              => time(),
+				'utc_offset'			 => get_option('gmt_offset') * 60, // in minutes
 				'entries_per_page'       => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 
 				'refresh_interval'       => self::get_refresh_interval(),

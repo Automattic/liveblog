@@ -43,6 +43,7 @@
     "draft-js-export-html": "^1.2.0",
     "immutable": "^3.8.2",
     "lodash-es": "^4.17.4",
+    "moment": "^2.20.1",
     "node-sass": "^4.5.3",
     "postcss-loader": "^2.0.8",
     "prop-types": "^15.6.0",
