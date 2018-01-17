@@ -14,7 +14,6 @@ import {
   getTriggerRange,
   hasEntityAtSelection,
   getTopPosition,
-  uniqueHTMLId,
   focusableBlockIsSelected,
 } from './utils';
 
@@ -29,10 +28,8 @@ import moveBlock from './modifiers/moveBlock';
 import skipOverEntity from './modifiers/skipOverEntity';
 
 import blockRenderer from './blocks/blockRenderer';
-
 import Toolbar from './Toolbar';
 import Suggestions from './Suggestions';
-import MediaLibrary from './MediaLibrary';
 
 class EditorWrapper extends Component {
   constructor(props) {
@@ -40,12 +37,7 @@ class EditorWrapper extends Component {
 
     this.state = {
       autocompleteState: null,
-      mediaLibraryOpen: false,
     };
-  }
-
-  componentWillMount() {
-    this.inputId = uniqueHTMLId('imageUpload');
   }
 
   /**
@@ -55,6 +47,9 @@ class EditorWrapper extends Component {
   updateEditorState(editorState) {
     const { onChange, resetSuggestions, suggestions } = this.props;
 
+    // Bail if a block is focused. We handle any necessary actions in our
+    // key binding functions. If we update the editor state when it is selected
+    // it will cause errors as the selection is set to be 'out' of the editor focus.
     if (focusableBlockIsSelected(editorState)) return;
 
     onChange(
@@ -222,61 +217,30 @@ class EditorWrapper extends Component {
   }
 
   /**
-   * Handle Image upload on press.
-   */
-  uploadImages() {
-    const { handleImageUpload, editorState } = this.props;
-    const files = this.imageUpload.files;
-
-    if (files.length === 0) return;
-
-    Array.from(files).forEach((file) => {
-      this.updateEditorState(
-        addAtomicBlock(editorState, false, {}, 'placeholder'),
-      );
-
-      handleImageUpload(file).then((url) => {
-        this.updateEditorState(
-          addAtomicBlock(editorState, false, { src: url }, 'image'),
-        );
-      });
-    });
-
-    // Clear input value so the same file can be upload again if user wants to.
-    this.imageUpload.value = '';
-  }
-
-  /**
    * Handle Image upload on drop. We bail for any other files.
    */
   handleDroppedFiles(selection, files) {
-    const { handleImageUpload, editorState } = this.props;
+    const { handleImageUpload, editorState, setReadOnly } = this.props;
+    if (!files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.name.match(/.(jpg|jpeg|png|gif)$/i)) return;
-
-      this.updateEditorState(
-        addAtomicBlock(editorState, false, {}, 'placeholder'),
-      );
-
-      handleImageUpload(file).then((url) => {
-        this.updateEditorState(
-          addAtomicBlock(editorState, false, { src: url }, 'image'),
-        );
-      });
-    });
-  }
-
-  /**
-   * Insert image from media library.
-   */
-  insertImage(src) {
-    const { editorState } = this.props;
     this.updateEditorState(
-      addAtomicBlock(editorState, false, { src }, 'image'),
+      addAtomicBlock(editorState, false, {}, 'placeholder'),
     );
-    this.setState({
-      mediaLibraryOpen: false,
+
+    handleImageUpload(files[0]).then((src) => {
+      this.updateEditorState(
+        addAtomicBlock(
+          editorState,
+          false,
+          {
+            setReadOnly,
+            image: src,
+            edit: false,
+            handleImageUpload,
+          },
+          'media',
+        ),
+      );
     });
   }
 
@@ -334,10 +298,7 @@ class EditorWrapper extends Component {
   }
 
   render() {
-    const {
-      autocompleteState,
-      mediaLibraryOpen,
-    } = this.state;
+    const { autocompleteState } = this.state;
 
     const {
       editorState,
@@ -347,6 +308,7 @@ class EditorWrapper extends Component {
       readOnly,
       setReadOnly,
       handleImageUpload,
+      imageSizes,
     } = this.props;
 
     return (
@@ -354,22 +316,14 @@ class EditorWrapper extends Component {
         // Fix for Draft Bug not always correctly handling handleDrop
         if (!event.target.isContentEditable) event.preventDefault();
       }}>
-        <input
-          ref={ref => this.imageUpload = ref}
-          style={{ display: 'none' }}
-          type="file"
-          id={this.inputId}
-          onChange={this.uploadImages.bind(this)}
-          accept="image/jpeg,image/gif,image/png,image/jpg"
-          capture="camera"
-        />
         <Toolbar
-          imageInputId={this.inputId}
           editor={this.editor}
           editorState={editorState}
           onChange={onChange}
+          handleImageUpload={handleImageUpload}
           setReadOnly={setReadOnly}
-          toggleMediaLibrary={() => this.setState({ mediaLibraryOpen: !mediaLibraryOpen })}
+          readOnly={readOnly}
+          imageSizes={imageSizes}
         />
         <div style={{ position: 'relative' }} >
           <Editor
@@ -405,12 +359,6 @@ class EditorWrapper extends Component {
             ref={node => this.suggestions = node}
           />
         </div>
-        <MediaLibrary
-          active={mediaLibraryOpen}
-          close={() => this.setState({ mediaLibraryOpen: false })}
-          handleImageUpload={handleImageUpload}
-          insertImage={this.insertImage.bind(this)}
-        />
       </div>
     );
   }
@@ -426,6 +374,7 @@ EditorWrapper.propTypes = {
   handleImageUpload: PropTypes.func,
   readOnly: PropTypes.bool,
   setReadOnly: PropTypes.func,
+  imageSizes: PropTypes.object,
 };
 
 export default EditorWrapper;

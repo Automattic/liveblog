@@ -1,132 +1,111 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Modal from '../../components/Modal';
+import Button from '../Button';
 
 class CodeBlock extends Component {
   constructor(props) {
     super(props);
-
-    const { contentState, block } = props;
-    const { code, title, edit } = contentState.getEntity(block.getEntityAt(0)).getData();
-
-    this.placeholder = 'Enter HTML Code...';
+    const { code, title } = props.getMetadata();
+    this.placeholder = 'Write some HTML...';
 
     this.state = {
-      edit: edit || false,
       title,
       code,
     };
   }
 
-  componentDidMount() {
-    const { setReadOnly } = this.getMetadata();
-    const { edit } = this.state;
-    if (edit) setReadOnly(true);
-  }
-
-  getMetadata() {
-    const { contentState, block } = this.props;
-    return contentState.getEntity(block.getEntityAt(0)).getData();
-  }
-
-  replaceMetadata(data) {
-    const { contentState, block } = this.props;
-    contentState.mergeEntityData(block.getEntityAt(0), data);
-  }
-
-  edit() {
-    const { setReadOnly } = this.getMetadata();
-
-    setReadOnly(true);
-
-    this.setState({
-      edit: true,
-    });
-  }
-
+  /**
+   * Handle save.
+   */
   save() {
     const { code, title } = this.state;
-    const { setReadOnly } = this.getMetadata();
-
-    this.setState({
-      edit: false,
-    });
-
-    this.replaceMetadata({ code, title, edit: false });
-
-    setReadOnly(false);
+    const { replaceMetadata, setEditMode } = this.props;
+    replaceMetadata({ code, title });
+    setEditMode(false);
   }
 
+  /**
+   * Set edit mode to false.
+   */
   cancel() {
-    const { code, title, setReadOnly } = this.getMetadata();
-
-    this.setState({
-      edit: false,
-      code,
-      title,
-    });
-
-    this.replaceMetadata({ edit: false });
-
-    setReadOnly(false);
+    const { setEditMode, getMetadata } = this.props;
+    const { code, title } = getMetadata();
+    this.setState({ code, title });
+    setEditMode(false);
   }
 
+  /**
+   * Handle onChange event to keep textare in sync.
+   * @param {object} event
+   */
   handleChange(event) {
     this.setState({ code: event.target.value });
   }
 
   render() {
-    const { edit, code, title } = this.state;
+    const { code, title } = this.state;
+    const { edit, setEditMode, removeBlock } = this.props;
 
     return (
-      <div className="liveblog-editor-codeblock">
-        <span className="liveblog-codeblock-title-container">
-          Code Block: <span className="liveblog-codeblock-title">{title}</span>
-        </span>
-        <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
-          <button
-            className="liveblog-btn liveblog-btn-small"
-            onClick={this.edit.bind(this)}>
-            Edit
-          </button>
-        </span>
-
-        <Modal active={edit}>
-          <h1 className="liveblog-editor-title">Code Block Editor</h1>
-          <div className="liveblog-codeblock-input-container">
-            <span>Title:</span>
-            <input onChange={event => this.setState({ title: event.target.value })} value={title} />
+      <div className="liveblog-block-inner liveblog-editor-codeblock">
+        <div className="liveblog-block-header">
+          <span className="liveblog-block-title-container">
+            { !edit ? 'HTML Block:' : 'Title:' }
+            {!edit
+              ? <span className="liveblog-block-title">{title}</span>
+              : <input
+                value={title}
+                onChange={event => this.setState({ title: event.target.value })}
+              />
+            }
+          </span>
+          <div className="liveblog-editor-actions">
+            {edit &&
+              <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
+                <button
+                  className="liveblog-editor-btn liveblog-editor-cancel-btn"
+                  onClick={this.cancel.bind(this)}>
+                  Cancel
+                </button>
+              </span>
+            }
+            <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
+              <button
+                className="liveblog-editor-btn liveblog-editor-action-btn"
+                onClick={!edit ? () => setEditMode(true) : this.save.bind(this)}>
+                {edit ? 'Save' : 'Edit'}
+              </button>
+            </span>
+            { !edit &&
+              <Button
+                onMouseDown={() => removeBlock()}
+                icon="no-alt"
+                classes="liveblog-editor-delete"
+              />
+            }
           </div>
-          <textarea
+        </div>
+        {
+          edit && <textarea
+            autoFocus
             placeholder={this.placeholder}
             className="liveblog-codeblock-textarea"
             value={code}
             onChange={this.handleChange.bind(this)}
             spellCheck={false}
           />
-          <div className="liveblog-codeblock-controls">
-            <button
-              className="liveblog-btn liveblog-cancel-btn"
-              onMouseDown={this.cancel.bind(this)}>
-                Cancel
-            </button>
-            <button
-              className="liveblog-btn liveblog-save-btn"
-              onMouseDown={this.save.bind(this)}>
-                Save
-            </button>
-          </div>
-        </Modal>
+        }
       </div>
     );
   }
 }
 
 CodeBlock.propTypes = {
-  contentState: PropTypes.object,
-  block: PropTypes.object,
-  setReadOnly: PropTypes.func,
+  setEditMode: PropTypes.func,
+  getMetadata: PropTypes.func,
+  replaceMetadata: PropTypes.func,
+  edit: PropTypes.bool,
 };
 
 export default CodeBlock;

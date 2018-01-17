@@ -1,16 +1,85 @@
-.liveblog-draggable-block.is-focused {
-  box-shadow: 0 0 0 2px lighten($color-accent, 30%);
-  border-radius: $base-border-radius;
-}
-
-.liveblog-draggable-block.is-focused > * {
-  border-radius: $base-border-radius;
-}
-
-.liveblog-draggable-block:hover {
+.liveblog-block {
+  position: relative;
+  border: $base-border-size solid $color-grey-light;
   cursor: move;
 }
 
-.liveblog-draggable-block img {
+.liveblog-block.is-focused {
+  box-shadow: 0 0 0 2px lighten($color-accent, 20%);
+}
+
+.liveblog-block img {
   display: block;
+}
+
+.liveblog-block.is-editing {
+  cursor: auto;
+  box-shadow: $base-drop-shadow;
+}
+
+.liveblog-editor-container
+.public-DraftEditor-content[contenteditable="false"]
+.liveblog-block {
+  cursor: auto;
+}
+
+.liveblog-editor-container
+.public-DraftEditor-content[contenteditable="false"]
+.liveblog-block:not(.is-editing)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, .9);
+}
+
+.liveblog-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-basis: 100%;
+  padding: .25rem .5rem;
+
+  @include mq($until: large) {
+    text-align: center;
+    flex-wrap: wrap;
+  }
+}
+
+.liveblog-block-header > * {
+  @include mq($until: large) {
+    flex-basis: 100;
+  }
+}
+
+.liveblog-block-title-container {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  font-size: 14px;
+}
+
+.liveblog-block-title-container input {
+  flex-grow: 1;
+  margin: .25rem 0 .25rem .25rem;
+  padding: .25rem;
+  font-size: 14px;
+}
+
+.liveblog-block-title {
+  font-weight: 600;
+  margin-left: .5rem;
+  padding: .5rem 0;
+  color: $color-grey-dark;
+}
+
+.liveblog-block-select-container select {
+  border: none;
+  background: $color-grey-x-light;
+  border-radius: 0;
+  font-size: 13px;
+  padding: .25rem;
+  max-width: 100px;
 }

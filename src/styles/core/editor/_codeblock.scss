@@ -1,42 +1,42 @@
 .liveblog-editor-codeblock {
   display: flex;
   align-items: center;
-  padding: .5rem;
+  flex-wrap: wrap;
   justify-content: space-between;
   background: transparent;
-  border: $base-border-size solid $color-grey-light;
   color: $color-grey-base;
-  border-radius: $base-border-radius;
 }
 
-.liveblog-codeblock-title-container {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 100%;
-  color: $color-grey-light;
+.liveblog-editor-codeblock > * {
+  flex-basis: 100%;
 }
 
-.liveblog-codeblock-title {
-  font-weight: bold;
-  color: $color-grey-dark;
-}
-
+.liveblog-editor-container
 .liveblog-codeblock-textarea {
-  border-radius: $base-border-radius;
-  border: $base-border-size solid $color-grey-light;
+  border: none;
+  border-radius: 0;
+  border: none;
   color: $color-grey-dark;
-  margin-bottom: 1rem;
-  min-height: 350px;
+  min-height: 200px;
   width: 100%;
+  padding: .75rem;
+  font-family: 'Lucida Console', Monaco, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #fff;
+  border: none;
+  color: $color-grey-base;
+  background-color: $color-grey-x-light;
+  resize: none;
 }
 
 .liveblog-codeblock-textarea::placeholder {
   color: $color-grey-light;
+  font-family: 'Lucida Console', Monaco, monospace;
 }
 
 .liveblog-codeblock-textarea:focus {
-  border: $base-border-size solid $color-grey-light;
+  border: none;
 }
 
 .liveblog-codeblock-controls {
@@ -48,19 +48,7 @@
   width: 49.5%;
 }
 
-.liveblog-codeblock-input-container {
-  padding: .4rem;
-  background: #FFF;
-  margin-bottom: .5rem;
-  border-radius: $base-border-radius;
-  border: $base-border-size solid $color-grey-light;
-  color: $color-grey-light;
-  padding-left: .5rem;
-  padding-right: .5rem
-}
-
-.liveblog-codeblock-input-container input {
+.liveblog-editor-codeblock input {
   border: none;
-  color: $color-grey-dark;
-  margin-left: .5rem;
+  background: $color-grey-x-light;
 }

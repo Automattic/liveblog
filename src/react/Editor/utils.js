@@ -100,16 +100,6 @@ export const scrollElementIfNotInView = (childElement, parentElement) => {
 };
 
 /**
- * Provide a unique id for htmlFor
- */
-let lastId = 0;
-
-export const uniqueHTMLId = (prefix) => {
-  lastId += 1;
-  return `${prefix}${lastId}`;
-};
-
-/**
  * Returns an array of all the blocks at a selection given a start and end key.
  */
 export const getSelectedBlocks = (contentState, anchorKey, focusKey) => {

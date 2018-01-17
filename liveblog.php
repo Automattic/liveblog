@@ -46,6 +46,7 @@ final class WPCOM_Liveblog {
 	const fade_out_duration       			= 5; // how much time should take fading out the background of new entries
 	const response_cache_max_age  			= DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
 	const use_rest_api            			= true; // Use the REST API if current version is at least min_wp_rest_api_version. Allows for easy disabling/enabling
+	const default_image_size				= 'full'; // The default image size to use when inserting media frm the media library.
 
 	/** Variables *************************************************************/
 
@@ -882,6 +883,19 @@ final class WPCOM_Liveblog {
 		self::send_user_error( __( 'Unknown liveblog action', 'liveblog' ) );
 	}
 
+	/**
+	 * Get image sizes and default size.
+	 *
+	 * @return array Array of sizes, with default size.
+	 */
+	public static function get_image_sizes() {
+		$default_image_size = apply_filters( 'liveblog_default_image_size', self::default_image_size );
+
+		return array(
+			'sizes' => get_intermediate_image_sizes(),
+			'default' => $default_image_size,
+		);
+	}
 
 	/** Comment Methods *******************************************************/
 
@@ -939,7 +953,7 @@ final class WPCOM_Liveblog {
 		wp_enqueue_style( self::key,  plugins_url( 'assets/app.css',  __FILE__ ) );
 		wp_enqueue_style( self::key . '_theme',  plugins_url( 'assets/theme.css',  __FILE__ ) );
 		wp_enqueue_script( self::key, plugins_url( 'assets/app.js', __FILE__ ), array(), self::version, true );
-		
+
 		if ( self::is_liveblog_editable() )  {
 			self::add_default_plupload_settings();
 		}
@@ -955,7 +969,10 @@ final class WPCOM_Liveblog {
 				'key'                    => self::key,
 				'nonce_key'              => self::nonce_key,
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
+
 				'image_nonce'            => wp_create_nonce( 'media-form' ),
+				'image_sizes'			 => self::get_image_sizes(),
+
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 				'latest_entry_id'	     => self::$entry_query->get_latest_id(),
 				'timestamp'				 => time(),

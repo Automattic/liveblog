@@ -1,9 +1,10 @@
 import Image from './Image';
 import Placeholder from './Placeholder';
 import CodeBlock from './CodeBlock';
-import DragAndFocus from './DragAndFocus';
+import CreateBlock from './CreateBlockHOC';
+import Media from './Media';
 
-export default (block, editorState) => {
+export default (block, editorState, onChange) => {
   if (block.getType() === 'atomic') {
     const contentState = editorState.getCurrentContent();
     const entity = contentState.getEntity(block.getEntityAt(0));
@@ -12,7 +13,7 @@ export default (block, editorState) => {
 
     if (type === 'image') {
       return {
-        component: DragAndFocus(Image),
+        component: CreateBlock(Image, editorState, onChange),
         editable: false,
         props: {
           isFocused,
@@ -21,7 +22,16 @@ export default (block, editorState) => {
     }
     if (type === 'code-block') {
       return {
-        component: DragAndFocus(CodeBlock),
+        component: CreateBlock(CodeBlock, editorState, onChange),
+        editable: false,
+        props: {
+          isFocused,
+        },
+      };
+    }
+    if (type === 'media') {
+      return {
+        component: CreateBlock(Media, editorState, onChange),
         editable: false,
         props: {
           isFocused,

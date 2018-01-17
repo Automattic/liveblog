@@ -27,6 +27,7 @@ class EditorContainer extends Component {
       initialEditorState = EditorState.createWithContent(
         convertFromHTML(props.entry.content, {
           setReadOnly: this.setReadOnly.bind(this),
+          handleImageUpload: this.handleImageUpload.bind(this),
         }),
         decorators,
       );
@@ -193,6 +194,7 @@ class EditorContainer extends Component {
               handleImageUpload={this.handleImageUpload.bind(this)}
               readOnly={readOnly}
               setReadOnly={this.setReadOnly.bind(this)}
+              imageSizes={config.image_sizes}
             />
         }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>

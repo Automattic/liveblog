@@ -9,15 +9,6 @@
   color: $color-grey-base;
 }
 
-.liveblog-event-delete {
-  color: $color-warning;
-  cursor: pointer;
-}
-
-.liveblog-event-delete:hover {
-  transform: scale(1.1);
-}
-
 .liveblog-event-content {
   word-break: break-all;
 }

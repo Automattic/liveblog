@@ -1,8 +1,31 @@
+.liveblog-media-search-container {
+  display: flex;
+  align-items: center;
+  padding: .5rem;
+  border-top: $base-border-size solid $color-grey-light;
+}
+
+.liveblog-media-search-container input {
+  flex-grow: 1;
+  padding-left: .25rem;
+  border: none;
+  font-size: 15px;
+}
+
+.liveblog-media-search-container input::placholder {
+  color: $color-grey-x-light;
+  font-size: 15px;
+}
+
 .liveblog-media-grid {
   display: flex;
   justify-content: space-between;
+  background: $color-grey-x-light;
   flex-wrap: wrap;
   list-style: none;
+  overflow-y: scroll;
+  padding: .5rem 0;
+  max-height: 250px;
 }
 
 .liveblog-media-grid-item {
@@ -10,9 +33,23 @@
   background: #fff;
   justify-content: center;
   align-items: center;
-  flex-basis: 15%;
-  margin-bottom: .75rem;
+  flex-basis: 23%;
+  margin-bottom: 2%;
+  border: $base-border-size solid $color-grey-light;
   cursor: pointer;
+
+  @include mq($until: medium) {
+    flex-basis: 31%;
+  }
+
+  @include mq($until: small) {
+    flex-basis: 48%;
+  }
+}
+
+.liveblog-media-grid-item:not(:last-child) {
+  margin-right: 1%;
+  margin-left: 1%;
 }
 
 .liveblog-media-grid-item > img {
@@ -21,16 +58,11 @@
 }
 
 .liveblog-media-grid-item:hover {
-  box-shadow: 0 0 0 2px lighten($color-accent, 30%);
-  border-radius: $base-border-radius;
-}
-
-.liveblog-media-grid-item:hover > img {
-  border-radius: $base-border-radius;
+  box-shadow: 0 0 0 2px lighten($color-accent, 20%);
 }
 
 .liveblog-media-loading {
-  min-height: 300px;
+  min-height: 250px;
 }
 
 .liveblog-media-controls {
@@ -52,4 +84,17 @@
 
 .liveblog-media-pagination-number.is-active {
   font-weight: bold;
+}
+
+.liveblog-media-current-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $color-grey-x-light;
+  padding: 1rem;
+}
+
+.liveblog-media-current-container img {
+  max-width: 100%;
+  max-height: 100%;
 }

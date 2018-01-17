@@ -14,9 +14,14 @@ export default (html, extraData) =>
 
       if (nodeName === 'img') {
         return createEntity(
-          'image',
+          'media',
           'IMMUTABLE',
-          { src: node.src },
+          {
+            setReadOnly: extraData.setReadOnly,
+            image: node.src,
+            edit: false,
+            handleImageUpload: extraData.handleImageUpload,
+          },
         );
       }
 

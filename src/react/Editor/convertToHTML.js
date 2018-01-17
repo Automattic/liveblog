@@ -27,6 +27,10 @@ export default contentState =>
             </div>
           );
         }
+
+        if (type === 'media') {
+          return <img src={entity.getData().image} />;
+        }
       }
     },
     entityToHTML: () => {},

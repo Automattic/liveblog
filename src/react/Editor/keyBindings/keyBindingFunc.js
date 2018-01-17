@@ -26,7 +26,7 @@ export default (event, editorState, onChange) => {
 
       onChange(
         EditorState.forceSelection(
-          EditorState.push(editorState, contentAfterRemove),
+          EditorState.push(editorState, contentAfterRemove, 'remove-block'),
           contentAfterRemove.getSelectionAfter(),
         ),
       );

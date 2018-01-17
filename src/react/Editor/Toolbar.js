@@ -109,30 +109,79 @@ class Toolbar extends Component {
     onChange(
       addAtomicBlock(editorState, false, {
         code: '',
-        title: 'HTML Block',
+        title: 'HTML',
         edit: true,
         setReadOnly,
       }, 'code-block'),
     );
   }
 
+  addMediaBlock(e) {
+    e.preventDefault();
+    const {
+      editorState,
+      onChange,
+      setReadOnly,
+      handleImageUpload,
+      imageSizes,
+    } = this.props;
+
+    onChange(
+      addAtomicBlock(editorState, false, {
+        setReadOnly,
+        image: '',
+        edit: true,
+        handleImageUpload,
+        imageSizes,
+      }, 'media'),
+    );
+  }
+
   render() {
-    const { imageInputId, toggleMediaLibrary } = this.props;
     const { showURLInput } = this.state;
+    const { readOnly } = this.props;
 
     return (
       <div className="liveblog-editor-toolbar-container">
-        <button onClick={toggleMediaLibrary} className="liveblog-btn liveblog-image-upload-btn">
+        <button
+          disabled={readOnly}
+          onClick={this.addMediaBlock.bind(this)}
+          className="liveblog-editor-btn liveblog-image-upload-btn"
+        >
           <span className="dashicons dashicons-format-image"></span> Insert Image
         </button>
         <div className="liveblog-toolbar">
-          <Button onMouseDown={() => this.toggleInlineStyle('BOLD')} icon="editor-bold" />
-          <Button onMouseDown={() => this.toggleInlineStyle('ITALIC')} icon="editor-italic" />
-          <Button onMouseDown={() => this.toggleInlineStyle('UNDERLINE')} icon="editor-underline" />
-          <Button onMouseDown={() => this.toggleBlockType('ordered-list-item')} icon="editor-ol" />
-          <Button onMouseDown={() => this.toggleBlockType('unordered-list-item')} icon="editor-ul" />
+          <Button
+            onMouseDown={() => this.toggleInlineStyle('BOLD')}
+            icon="editor-bold"
+            readOnly={readOnly}
+          />
+          <Button
+            onMouseDown={() => this.toggleInlineStyle('ITALIC')}
+            icon="editor-italic"
+            readOnly={readOnly}
+          />
+          <Button
+            onMouseDown={() => this.toggleInlineStyle('UNDERLINE')}
+            icon="editor-underline"
+            readOnly={readOnly}
+          />
+          <Button
+            onMouseDown={() => this.toggleBlockType('ordered-list-item')}
+            icon="editor-ol"
+            readOnly={readOnly}
+          />
+          <Button
+            onMouseDown={() => this.toggleBlockType('unordered-list-item')}
+            icon="editor-ul"
+            readOnly={readOnly}
+          />
           <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Button onMouseDown={this.openLinkModal.bind(this)} icon="admin-links" />
+            <Button
+              onMouseDown={this.openLinkModal.bind(this)}
+              icon="admin-links"
+              readOnly={readOnly}
+            />
             {
               showURLInput &&
               <div className="liveblog-editor-input-container">
@@ -154,8 +203,16 @@ class Toolbar extends Component {
               </div>
             }
           </div>
-          <Button onMouseDown={this.removeAsLink.bind(this)} icon="editor-unlink" />
-          <Button onMouseDown={this.addCodeBlock.bind(this)} icon="editor-code" />
+          <Button
+            onMouseDown={this.removeAsLink.bind(this)}
+            icon="editor-unlink"
+            readOnly={readOnly}
+          />
+          <Button
+            onMouseDown={this.addCodeBlock.bind(this)}
+            icon="editor-code"
+            readOnly={readOnly}
+          />
         </div>
       </div>
     );
@@ -165,11 +222,10 @@ class Toolbar extends Component {
 Toolbar.propTypes = {
   onChange: PropTypes.func,
   editorState: PropTypes.object,
-  domEditor: PropTypes.any,
-  plugins: PropTypes.array,
-  imageInputId: PropTypes.string,
   setReadOnly: PropTypes.func,
-  toggleMediaLibrary: PropTypes.func,
+  handleImageUpload: PropTypes.func,
+  readOnly: PropTypes.bool,
+  imageSizes: PropTypes.object,
 };
 
 export default Toolbar;
