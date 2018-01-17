@@ -81,7 +81,7 @@
 }
 
 .liveblog-event::before,
-.liveblog-event:only-child::before, {
+.liveblog-event:only-child::before {
   content: "";
   position: absolute;
   z-index: 1;
