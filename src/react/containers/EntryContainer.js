@@ -80,7 +80,7 @@ class EntryContainer extends Component {
           <div className="liveblog-meta-author">
             {entry.avatar_img &&
                 <div
-                  className="liveblog-meta-authour-avatar"
+                  className="liveblog-meta-author-avatar"
                   dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
             }
             <span className="liveblog-meta-author-name"
