@@ -28,7 +28,7 @@ export default contentState =>
           );
         }
 
-        if (type === 'media' && entity.getData().image) {
+        if (type === 'media') {
           return <img src={entity.getData().image} />;
         }
       }
