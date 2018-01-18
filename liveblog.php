@@ -241,8 +241,7 @@ final class WPCOM_Liveblog {
 		 */
 		add_post_type_support( 'post', self::key );
 		add_post_type_support( 'page', self::key );
-		add_post_type_support( 'attachment', self::key );
-
+		
 		/**
 		 * Apply a Filter to Setup our Auto Archive Days.
 		 * NULL is classed as disabled.
