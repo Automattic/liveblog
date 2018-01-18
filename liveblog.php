@@ -883,20 +883,6 @@ final class WPCOM_Liveblog {
 		self::send_user_error( __( 'Unknown liveblog action', 'liveblog' ) );
 	}
 
-	/**
-	 * Get image sizes and default size.
-	 *
-	 * @return array Array of sizes, with default size.
-	 */
-	public static function get_image_sizes() {
-		$default_image_size = apply_filters( 'liveblog_default_image_size', self::default_image_size );
-
-		return array(
-			'sizes' => get_intermediate_image_sizes(),
-			'default' => $default_image_size,
-		);
-	}
-
 	/** Comment Methods *******************************************************/
 
 	/**
@@ -971,7 +957,7 @@ final class WPCOM_Liveblog {
 				'nonce'                  => wp_create_nonce( self::nonce_action ),
 
 				'image_nonce'            => wp_create_nonce( 'media-form' ),
-				'image_sizes'			 => self::get_image_sizes(),
+				'default_image_size'	 => apply_filters( 'liveblog_default_image_size', self::default_image_size ),
 
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 				'latest_entry_id'	     => self::$entry_query->get_latest_id(),

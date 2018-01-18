@@ -123,7 +123,7 @@ class Toolbar extends Component {
       onChange,
       setReadOnly,
       handleImageUpload,
-      imageSizes,
+      defaultImageSize,
     } = this.props;
 
     onChange(
@@ -132,7 +132,7 @@ class Toolbar extends Component {
         image: '',
         edit: true,
         handleImageUpload,
-        imageSizes,
+        defaultImageSize,
       }, 'media'),
     );
   }
@@ -225,7 +225,7 @@ Toolbar.propTypes = {
   setReadOnly: PropTypes.func,
   handleImageUpload: PropTypes.func,
   readOnly: PropTypes.bool,
-  imageSizes: PropTypes.object,
+  defaultImageSize: PropTypes.string,
 };
 
 export default Toolbar;

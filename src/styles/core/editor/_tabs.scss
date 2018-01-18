@@ -12,7 +12,7 @@
   background: $color-grey-mid-light;
   color: $color-grey-dark;
   border: $base-border-size solid $color-grey-light;
-  border-radius: 0;
+  border-radius: $base-border-radius $base-border-radius 0 0;
   border-bottom: none;
   font-weight: normal;
 }

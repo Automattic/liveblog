@@ -45,7 +45,7 @@
 }
 
 .liveblog-editor-action-btn {
-  background: $color-grey-x-dark;
+  background: $color-primary;
   color: #fff;
   font-size: .8rem;
   padding: .5rem 1rem;
@@ -53,7 +53,18 @@
 }
 
 .liveblog-editor-action-btn:hover {
-  background: lighten($color-grey-x-dark, 5%);
+  background: lighten($color-primary, 5%);
+}
+
+.liveblog-editor-action-btn.has-icon {
+  padding-left: .4rem;
+}
+
+.liveblog-editor-action-btn .dashicons {
+  display: inline-block;
+  font-size: 15px;
+  height: 3px;
+  margin-right: .25rem;
 }
 
 .liveblog-editor-cancel-btn {
@@ -92,7 +103,7 @@
   font-weight: normal;
   border: $base-border-size solid $color-grey-light;
   background-color: $color-grey-x-light;
-  border-radius: 0;
+  border-radius: $base-border-radius;
   color: $color-grey-dark;
 }
 

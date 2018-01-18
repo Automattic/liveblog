@@ -7,7 +7,7 @@ class CodeBlock extends Component {
   constructor(props) {
     super(props);
     const { code, title } = props.getMetadata();
-    this.placeholder = 'Write some HTML...';
+    this.placeholder = 'Insert HTML...';
 
     this.state = {
       title,
@@ -51,9 +51,9 @@ class CodeBlock extends Component {
       <div className="liveblog-block-inner liveblog-editor-codeblock">
         <div className="liveblog-block-header">
           <span className="liveblog-block-title-container">
-            { !edit ? 'HTML Block:' : 'Title:' }
+            <span className="liveblog-block-title">{ !edit ? 'HTML Block:' : 'Title:' }</span>
             {!edit
-              ? <span className="liveblog-block-title">{title}</span>
+              ? <span>{title}</span>
               : <input
                 value={title}
                 onChange={event => this.setState({ title: event.target.value })}
@@ -106,6 +106,7 @@ CodeBlock.propTypes = {
   getMetadata: PropTypes.func,
   replaceMetadata: PropTypes.func,
   edit: PropTypes.bool,
+  removeBlock: PropTypes.func,
 };
 
 export default CodeBlock;

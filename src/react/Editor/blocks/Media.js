@@ -1,4 +1,5 @@
 // @todo This file could be tidied up and split out into seperate components.
+
 /* eslint-disable no-return-assign */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -6,6 +7,7 @@ import { getMedia } from '../../services/api';
 
 import Button from '../Button';
 import Loader from '../../components/Loader';
+import { getImageSize } from '../utils';
 
 /**
  * Find the image thumbanil src
@@ -15,22 +17,6 @@ const getImageThumbnail = (image) => {
   if (!image) return '';
   if (image.media_details.sizes.thumbnail) {
     return image.media_details.sizes.thumbnail.source_url;
-  }
-  return '';
-};
-
-/**
- * Get the most suitable image size.
- * @param {object} image
- * @param {string} selectedSize
- */
-const getImageSize = (image, selectedSize) => {
-  if (!image) return '';
-  if (image.media_details.sizes[selectedSize]) {
-    return image.media_details.sizes[selectedSize].source_url;
-  }
-  if (image.media_details.sizes.full) {
-    return image.media_details.sizes.full.source_url;
   }
   return '';
 };
@@ -48,23 +34,6 @@ class Media extends Component {
     // the block's unique key.
     this.inputId = props.block.getKey();
 
-    const { imageSizes, selectedSize } = props.getMetadata();
-
-    let defaultSize;
-
-    if (!selectedSize) {
-      defaultSize = imageSizes.sizes.includes(imageSizes.default)
-        ? imageSizes.default
-        : 'full';
-    } else {
-      defaultSize = selectedSize;
-    }
-
-    this.imageSizes = [
-      ...imageSizes.sizes,
-      'full',
-    ];
-
     this.defaultState = {
       loading: true,
       images: [],
@@ -73,7 +42,6 @@ class Media extends Component {
       searchInput: '',
       searching: false,
       uploading: false,
-      selectedSize: defaultSize,
     };
 
     this.state = {
@@ -158,8 +126,10 @@ class Media extends Component {
   /**
    * Handle selecting an image from the media library.
    */
-  selectImage(src) {
-    const { setEditMode, replaceMetadata } = this.props;
+  selectImage(image) {
+    const { setEditMode, replaceMetadata, getMetadata } = this.props;
+    const { defaultImageSize } = getMetadata();
+    const src = getImageSize(image.media_details.sizes, defaultImageSize);
     setEditMode(false);
     this.setState({ ...this.defaultState });
     replaceMetadata({ image: src, edit: false });
@@ -204,21 +174,10 @@ class Media extends Component {
   }
 
   /**
-   * Handle Image Size change.
-   * @param {object} event
-   */
-  handleImageSizeChange(event) {
-    const size = event.target.value;
-    const { replaceMetadata } = this.props;
-    replaceMetadata({ selectedSize: size });
-    this.setState({ selectedSize: size });
-  }
-
-  /**
    * Render the media library images.
    */
   renderMediaImages() {
-    const { loading, images, currentPage, totalPages, searching, selectedSize } = this.state;
+    const { loading, images, currentPage, totalPages, searching } = this.state;
 
     if (searching) {
       return (
@@ -235,14 +194,15 @@ class Media extends Component {
       return (
         <div className="liveblog-placeholder liveblog-media-loading">
           <div className="liveblog-placeholder-inner">
-            <div style={{ marginBottom: '.5rem' }} className="liveblog-placeholder-text">
+            <div style={{ marginBottom: '.5rem' }}>
               No Images Found
             </div>
             <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
               <label
                 htmlFor={this.inputId}
-                className="liveblog-editor-btn liveblog-editor-action-btn"
+                className="liveblog-editor-btn liveblog-editor-action-btn has-icon"
               >
+                <span className="dashicons dashicons-upload" />
                 Upload an Image?
               </label>
             </span>
@@ -257,7 +217,7 @@ class Media extends Component {
           images.map(image => (
             <div
               key={image.id}
-              onClick={this.selectImage.bind(this, getImageSize(image, selectedSize))}
+              onClick={() => this.selectImage(image)}
               className="liveblog-media-grid-item"
             >
               <img src={getImageThumbnail(image)} />
@@ -274,7 +234,7 @@ class Media extends Component {
           {
             ((currentPage !== totalPages) && !loading) &&
             <button
-              style={{ width: '100%' }}
+              style={{ width: '100%', padding: '.75rem' }}
               className="liveblog-editor-btn liveblog-editor-action-btn"
               onClick={this.loadMore.bind(this)}
             >
@@ -321,15 +281,16 @@ class Media extends Component {
     return (
       <div className="liveblog-placeholder liveblog-media-loading">
         <div className="liveblog-placeholder-inner">
-          <div style={{ marginBottom: '.5rem' }} className="liveblog-placeholder-text">
+          <div style={{ marginBottom: '.5rem' }}>
             No Image Selected
           </div>
           <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
             <button
-              className="liveblog-editor-btn liveblog-editor-action-btn"
+              className="liveblog-editor-btn liveblog-editor-action-btn has-icon"
               onClick={() => setEditMode(true)}
             >
-              Select an Image
+              <span className="dashicons dashicons-format-image" />
+              Choose an Image?
             </button>
           </span>
         </div>
@@ -338,9 +299,8 @@ class Media extends Component {
   }
 
   render() {
-    const { searchInput, selectedSize } = this.state;
-    const { edit, setEditMode, removeBlock, getMetadata } = this.props;
-    const { image } = getMetadata();
+    const { searchInput } = this.state;
+    const { edit, setEditMode, removeBlock } = this.props;
 
     return (
       <div className="liveblog-block-inner liveblog-media-block">
@@ -359,21 +319,6 @@ class Media extends Component {
               { edit ? 'Add Media' : 'Image Block' }
             </span>
           </span>
-          { edit &&
-            <div className="liveblog-block-select-container">
-              <select
-                className="liveblog-block-select"
-                value={selectedSize}
-                onChange={this.handleImageSizeChange.bind(this)}
-              >
-                {
-                  this.imageSizes.map((size, i) => (
-                    <option key={i} value={size}>{size}</option>
-                  ))
-                }
-              </select>
-            </div>
-          }
           <div className="liveblog-editor-actions">
             <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
               <button
@@ -381,7 +326,7 @@ class Media extends Component {
                 onClick={!edit ? () => setEditMode(true) : this.cancel.bind(this)}
               >
                 {!edit
-                  ? `Select ${image ? 'A Different' : 'An'} Image`
+                  ? 'Change Image'
                   : 'Cancel'
                 }
               </button>
@@ -390,7 +335,8 @@ class Media extends Component {
               <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
                 <label
                   htmlFor={this.inputId}
-                  className="liveblog-editor-btn liveblog-editor-action-btn">
+                  className="liveblog-editor-btn liveblog-editor-action-btn has-icon">
+                  <span className="dashicons dashicons-upload" />
                   Upload
                 </label>
               </span>
@@ -413,8 +359,9 @@ class Media extends Component {
                   onSubmit={this.handleSearch.bind(this)}
                 >
                   <span
-                    style={{ color: '#333' }}
+                    style={{ color: '#333', cursor: 'pointer' }}
                     className="dashicons dashicons-search"
+                    onClick={this.handleSearch.bind(this)}
                   />
                   <input
                     placeholder="Search media items..."
@@ -440,6 +387,7 @@ Media.propTypes = {
   replaceMetadata: PropTypes.func,
   removeBlock: PropTypes.func,
   edit: PropTypes.bool,
+  defaultImageSize: PropTypes.string,
 };
 
 export default Media;

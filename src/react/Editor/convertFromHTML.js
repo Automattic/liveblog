@@ -21,6 +21,7 @@ export default (html, extraData) =>
             image: node.src,
             edit: false,
             handleImageUpload: extraData.handleImageUpload,
+            defaultImageSize: extraData.defaultImageSize,
           },
         );
       }

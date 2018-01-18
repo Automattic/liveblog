@@ -17,6 +17,8 @@ import PreviewContainer from './PreviewContainer';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
+import { getImageSize } from '../Editor/utils';
+
 class EditorContainer extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +30,7 @@ class EditorContainer extends Component {
         convertFromHTML(props.entry.content, {
           setReadOnly: this.setReadOnly.bind(this),
           handleImageUpload: this.handleImageUpload.bind(this),
+          defaultImageSize: props.config.default_image_size,
         }),
         decorators,
       );
@@ -157,7 +160,10 @@ class EditorContainer extends Component {
       uploadImage(formData)
         .timeout(60000)
         .map(res => res.response)
-        .subscribe(res => resolve(res.data.url));
+        .subscribe((res) => {
+          const src = getImageSize(res.data.sizes, config.default_image_size);
+          resolve(src);
+        });
     });
   }
 
@@ -194,7 +200,7 @@ class EditorContainer extends Component {
               handleImageUpload={this.handleImageUpload.bind(this)}
               readOnly={readOnly}
               setReadOnly={this.setReadOnly.bind(this)}
-              imageSizes={config.image_sizes}
+              defaultImageSize={config.default_image_size}
             />
         }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>

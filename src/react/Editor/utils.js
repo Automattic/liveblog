@@ -130,5 +130,22 @@ export const focusableBlockIsSelected = (editorState) => {
   }
   const content = editorState.getCurrentContent();
   const block = content.getBlockForKey(selection.getAnchorKey());
-  return block.getType() === 'atomic';
+  if (block.getType() === 'atomic') return block;
+  return false;
+};
+
+/**
+ * Get the most suitable image size.
+ * @param {object} image
+ * @param {string} selectedSize
+ */
+export const getImageSize = (sizes, defaultSize) => {
+  if (!sizes) return '';
+  if (sizes[defaultSize]) {
+    return sizes[defaultSize].source_url || sizes[defaultSize].url;
+  }
+  if (sizes.full) {
+    return sizes.full.source_url || sizes.full.url;
+  }
+  return '';
 };

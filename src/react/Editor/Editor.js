@@ -26,6 +26,7 @@ import addAutocomplete from './modifiers/addAutocomplete';
 import addAtomicBlock from './modifiers/addAtomicBlock';
 import moveBlock from './modifiers/moveBlock';
 import skipOverEntity from './modifiers/skipOverEntity';
+import addNewLine from './modifiers/addNewLine';
 
 import blockRenderer from './blocks/blockRenderer';
 import Toolbar from './Toolbar';
@@ -38,6 +39,22 @@ class EditorWrapper extends Component {
     this.state = {
       autocompleteState: null,
     };
+  }
+
+  /**
+   * If focus is set to a block on mount, set the selection to
+   * just after it for a better UX. This can happen in an edge case
+   * when there is a block at the top of the content when we are converting
+   * from HTML to the editor.
+   */
+  componentDidMount() {
+    const { onChange, editorState } = this.props;
+
+    if (focusableBlockIsSelected(editorState)) {
+      onChange(
+        addNewLine(editorState),
+      );
+    }
   }
 
   /**
@@ -220,7 +237,7 @@ class EditorWrapper extends Component {
    * Handle Image upload on drop. We bail for any other files.
    */
   handleDroppedFiles(selection, files) {
-    const { handleImageUpload, editorState, setReadOnly } = this.props;
+    const { handleImageUpload, editorState, setReadOnly, defaultImageSize } = this.props;
     if (!files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) return;
 
     this.updateEditorState(
@@ -237,6 +254,7 @@ class EditorWrapper extends Component {
             image: src,
             edit: false,
             handleImageUpload,
+            defaultImageSize,
           },
           'media',
         ),
@@ -308,7 +326,7 @@ class EditorWrapper extends Component {
       readOnly,
       setReadOnly,
       handleImageUpload,
-      imageSizes,
+      defaultImageSize,
     } = this.props;
 
     return (
@@ -323,7 +341,7 @@ class EditorWrapper extends Component {
           handleImageUpload={handleImageUpload}
           setReadOnly={setReadOnly}
           readOnly={readOnly}
-          imageSizes={imageSizes}
+          defaultImageSize={defaultImageSize}
         />
         <div style={{ position: 'relative' }} >
           <Editor
@@ -374,7 +392,7 @@ EditorWrapper.propTypes = {
   handleImageUpload: PropTypes.func,
   readOnly: PropTypes.bool,
   setReadOnly: PropTypes.func,
-  imageSizes: PropTypes.object,
+  defaultImageSize: PropTypes.string,
 };
 
 export default EditorWrapper;

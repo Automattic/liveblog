@@ -40,7 +40,8 @@
   justify-content: space-between;
   align-items: center;
   flex-basis: 100%;
-  padding: .25rem .5rem;
+  padding: .4rem;
+  border-bottom: $base-border-size solid darken($color-grey-x-light , 5%);
 
   @include mq($until: large) {
     text-align: center;
@@ -54,6 +55,10 @@
   }
 }
 
+.liveblog-block-header .liveblog-editor-delete {
+  padding: 0;
+}
+
 .liveblog-block-title-container {
   display: flex;
   align-items: center;
@@ -61,17 +66,9 @@
   font-size: 14px;
 }
 
-.liveblog-block-title-container input {
-  flex-grow: 1;
-  margin: .25rem 0 .25rem .25rem;
-  padding: .25rem;
-  font-size: 14px;
-}
-
 .liveblog-block-title {
   font-weight: 600;
-  margin-left: .5rem;
-  padding: .5rem 0;
+  margin: 0 .25rem 0 .5rem;
   color: $color-grey-dark;
 }
 

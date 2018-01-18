@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   padding: .5rem;
-  border-top: $base-border-size solid $color-grey-light;
+  border-bottom: $base-border-size solid $color-grey-x-light;
 }
 
 .liveblog-media-search-container input {
@@ -12,9 +12,9 @@
   font-size: 15px;
 }
 
-.liveblog-media-search-container input::placholder {
-  color: $color-grey-x-light;
-  font-size: 15px;
+.liveblog-media-search-container input::placeholder {
+  color: $color-grey-light;
+  font-size: 14px;
 }
 
 .liveblog-media-grid {
@@ -24,7 +24,7 @@
   flex-wrap: wrap;
   list-style: none;
   overflow-y: scroll;
-  padding: .5rem 0;
+  padding: .5rem 1%;
   max-height: 250px;
 }
 
@@ -35,8 +35,9 @@
   align-items: center;
   flex-basis: 23%;
   margin-bottom: 2%;
-  border: $base-border-size solid $color-grey-light;
+  background: #fff;
   cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
 
   @include mq($until: medium) {
     flex-basis: 31%;
