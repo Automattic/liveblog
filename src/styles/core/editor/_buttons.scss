@@ -38,6 +38,11 @@
   justify-content: flex-end;
   align-items: center;
   flex-grow: 1;
+
+  @include mq($until: x-small) {
+    justify-content: center;
+    margin-top: .25rem;
+  }
 }
 
 .liveblog-editor-actions > *:not(:first-child) {

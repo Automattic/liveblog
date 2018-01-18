@@ -3,6 +3,11 @@
   margin-bottom: .8rem;
   background: $color-grey-mid-light;
   border-top: 2px solid $color-grey-x-dark;
+
+  @include mq($until: x-small) {
+    padding: .8rem 0 0 0;
+    background: transparent;
+  }
 }
 
 .liveblog-editor-container *:not(.dashicons),

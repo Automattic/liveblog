@@ -64,6 +64,11 @@
   align-items: center;
   flex-grow: 1;
   font-size: 14px;
+
+  @include mq($until: x-small) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 .liveblog-block-title {
