@@ -58,7 +58,7 @@ final class WPCOM_Liveblog {
 	public static $auto_archive_days     	= null;
 	public static $auto_archive_expiry_key  = 'liveblog_autoarchive_expiry_date';
 	
-	public $supported_post_types = array();
+	public static $supported_post_types = array();
 
 
 	/** Load Methods **********************************************************/
@@ -245,9 +245,9 @@ final class WPCOM_Liveblog {
 		/**
 		 * This allows the users to filter their supported post types.
 		 */
-		$this->supported_post_types = apply_filters( 'modify_supported_post_types', $post_types );
+		self::$supported_post_types = apply_filters( 'modify_supported_post_types', $post_types );
 
-		foreach ( $this->supported_post_types as $post_type) {
+		foreach ( self::$supported_post_types as $post_type) {
 			add_post_type_support($post_type, self::key);
 		}
 		
