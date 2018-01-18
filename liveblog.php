@@ -57,6 +57,8 @@ final class WPCOM_Liveblog {
 	public static $is_rest_api_call       	= false;
 	public static $auto_archive_days     	= null;
 	public static $auto_archive_expiry_key  = 'liveblog_autoarchive_expiry_date';
+	
+	public $supported_post_types = array();
 
 
 	/** Load Methods **********************************************************/
@@ -236,11 +238,18 @@ final class WPCOM_Liveblog {
 	 */
 	public static function init() {
 		/**
-		 * Add liveblog support to the 'post' post type. This is done here so
-		 * we can possibly introduce this to other post types later.
+		 * Add liveblog support to the 'post' and 'page' post type.
+		 */		
+		$post_types = array( 'post', 'page' );
+		
+		/**
+		 * This allows the users to filter their supported post types.
 		 */
-		add_post_type_support( 'post', self::key );
-		add_post_type_support( 'page', self::key );
+		$this->supported_post_types = apply_filters( 'modify_supported_post_types', $post_types );
+
+		foreach ( $this->supported_post_types as $post_type) {
+			add_post_type_support($post_type, self::key);
+		}
 		
 		/**
 		 * Apply a Filter to Setup our Auto Archive Days.
