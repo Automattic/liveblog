@@ -232,7 +232,7 @@ class Media extends Component {
           width: '100%',
         }}>
           {
-            ((currentPage !== totalPages) && !loading) &&
+            ((currentPage !== parseInt(totalPages, 10)) && !loading) &&
             <button
               style={{ width: '100%', padding: '.75rem' }}
               className="liveblog-editor-btn liveblog-editor-action-btn"
@@ -365,7 +365,6 @@ class Media extends Component {
                   />
                   <input
                     placeholder="Search media items..."
-                    autoFocus
                     value={searchInput}
                     onChange={event => this.setState({ searchInput: event.target.value })}
                   />
