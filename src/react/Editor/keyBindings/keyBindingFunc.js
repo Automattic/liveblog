@@ -33,6 +33,8 @@ export default (event, editorState, onChange) => {
 
       return 'handled';
     }
+
+    return 'handled';
   }
 
   if (isLeftPress || isBackspacePress) {

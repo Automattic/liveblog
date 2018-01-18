@@ -64,11 +64,6 @@ class EditorWrapper extends Component {
   updateEditorState(editorState) {
     const { onChange, resetSuggestions, suggestions } = this.props;
 
-    // Bail if a block is focused. We handle any necessary actions in our
-    // key binding functions. If we update the editor state when it is selected
-    // it will cause errors as the selection is set to be 'out' of the editor focus.
-    if (focusableBlockIsSelected(editorState)) return;
-
     onChange(
       editorState,
     );
