@@ -907,7 +907,7 @@
           align-items: center;
   -ms-flex-preferred-size: 23%;
       flex-basis: 23%;
-  margin-bottom: 2%;
+  margin-bottom: 5px;
   background: #fff;
   cursor: pointer;
   -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
