@@ -14,7 +14,7 @@
             status: {
                 type: 'string',
                 meta: 'liveblog',
-                source: 'meta',
+                // source: 'meta',
                 default: 0
             },
             showOptions: {
@@ -50,8 +50,6 @@
                 },
             };
 
-            const toggleOptions = () => setAttributes({ showOptions: showOptions === 'show' ? 'hide' : 'show' });
-
             return (
                 <section className={className}>
                     <h2>Liveblog</h2>
@@ -74,7 +72,6 @@
             );
         },
         save({ attributes: { status = 0 } = {} } = {}) {
-          console.log(status);
             return `[liveblog status="${status}" /]`;
         },
     });

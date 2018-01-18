@@ -85,6 +85,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Lazyloader::load();
 		WPCOM_Liveblog_Socketio_Loader::load();
 		WPCOM_Liveblog_Entry_Embed_SDKs::load();
+		WPCOM_Liveblog_TinyMCE::load();
 
 		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
@@ -136,6 +137,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-tinymce.php' );
 		require( dirname( __FILE__ ) . '/gutenberg-liveblog/index.php' );
 
 		if ( self::use_rest_api() ) {
@@ -1680,24 +1682,27 @@ final class WPCOM_Liveblog {
 			&& array_key_exists( 2, $matches )
 			&& in_array( 'liveblog', $matches[2] ) )
 		{
-			$key_where_shortcode_present = false;
 			$match_length = count( $matches[2] );
 			for ( $i = 0; $i < $match_length; $i++ ) {
-				if ($matches[2][ $i ] === 'liveblog') {
-					$key_where_shortcode_present = $i;
+				if ($matches[2][ $i ] !== 'liveblog') {
+					continue;
 				}
+
+				$liveblog_shortcode = $matches[0][ $i ];
 			}
 
-			if ( $key_where_shortcode_present === false ) {
-				return;
-			}
-
-			$attrs = shortcode_parse_atts( $matches[0][ $key_where_shortcode_present ] );
+			$attrs = shortcode_parse_atts( $liveblog_shortcode );
 			$valid_statuses = ['enable', 'archive', '0'];
 
 			if ( isset( $attrs['status'] ) && in_array( $attrs['status'], $valid_statuses ) ) {
-				update_post_meta( $post_id, 'liveblog', $attrs['status'] );
+				update_post_meta( $post_id, self::key, $attrs['status'] );
+				update_post_meta( $post_id, 'liveblog_shortcode', true );
+				return;
 			}
+		}
+
+		if ( get_post_meta( $post_id, 'liveblog_shortcode', true ) ) {
+			update_post_meta( $post_id, self::key, '0' );
 		}
 	}
 
@@ -1744,4 +1749,3 @@ if ( ! function_exists( 'wp_max_upload_size' ) ) {
 }
 
 endif;
-

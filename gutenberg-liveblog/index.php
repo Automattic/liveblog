@@ -2,13 +2,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-function bb_render_liveblog( $attributes = [] ) {
-	if ( ! isset( $attributes['status'] ) ) {
-		$attributes['status'] = 0;
-	}
-	return '[liveblog status="' . $attributes['status'] . '"]';
-}
-
 function bb_register_liveblog_block () {
 	if ( function_exists( 'register_block_type' ) ) {
 		wp_enqueue_script(
@@ -19,7 +12,6 @@ function bb_register_liveblog_block () {
 		);
 
 		register_block_type( 'gutenberg/liveblog', array(
-			'render_callback' => 'bb_render_liveblog',
 			'editor_script' => 'bb-liveblog-script',
 		) );
 
