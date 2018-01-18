@@ -1,0 +1,45 @@
+.postlist {
+    width: 348px;
+    max-width: 100%;
+    padding: 0 24px 24px;
+}
+
+.postlist.postlist--full {
+    margin: 0 auto;
+    padding-top: 24px;
+}
+
+.postlist.postlist--left {
+    float: left;
+    padding-left: 0;
+}
+
+.postlist.postlist--right {
+    float: right;
+    padding-right: 0;
+}
+
+.postlist-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.postlist-article a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.postlist-article + .postlist-article {
+    margin-top: 12px;
+}
+
+.postlist-article h3 {
+    font-size: 18px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.postlist-article span {
+    font-size: 13px;
+    color: #888;
+}

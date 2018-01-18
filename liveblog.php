@@ -92,6 +92,8 @@ final class WPCOM_Liveblog {
 
 		//Activate the WP CRON Hooks.
 		WPCOM_Liveblog_Cron::load();
+
+		add_shortcode( 'liveblog', array( __CLASS__, 'add_liveblog_to_content' ) );
 	}
 
 	public static function add_custom_post_type_support( $query ) {
@@ -134,6 +136,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
+		require( dirname( __FILE__ ) . '/gutenberg-liveblog/index.php' );
 
 		if ( self::use_rest_api() ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
@@ -167,6 +170,7 @@ final class WPCOM_Liveblog {
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 		add_action( 'pre_get_posts',                 array( __CLASS__, 'add_custom_post_type_support' ) );
+		add_action( 'save_post', array( __CLASS__, 'check_for_shortcode' ), 10, 3 );
 	}
 
 	/**
@@ -199,7 +203,7 @@ final class WPCOM_Liveblog {
 		if ( ! is_admin() )
 			return;
 
-		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
+//		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
 		add_action( 'restrict_manage_posts', array( __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ) );
 		add_action( 'pre_get_posts',         array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
 	}
@@ -302,10 +306,7 @@ final class WPCOM_Liveblog {
 		self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::key );
 
 		if ( self::is_initial_page_request() ) {
-			// we need to add the liveblog after the shortcodes are run, because we already
-			// process shortcodes in the comment contents and if we left any (like in the original content)
-			// we wouldn't like them to be processed
-			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
+			add_filter( 'the_content', array( __CLASS__, 'apply_filter_when_no_shortcode' ), 1 );
 		} else {
 			self::handle_ajax_request();
 		}
@@ -1073,19 +1074,17 @@ final class WPCOM_Liveblog {
 	 * @param string $content
 	 * @return string
 	 */
-	 public static function add_liveblog_to_content( $content ) {
+	 public static function add_liveblog_to_content() {
 
 		// We don't want to add the liveblog to other loops
 		// on the same page
 		if ( ! self::is_viewing_liveblog_post() ) {
-			return $content;
+			return '';
 		}
 
 		$liveblog_output  = '<div id="wpcom-liveblog-container" class="' . self::$post_id  .'"></div>';
 
-		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
-
-		return $content . wp_kses_post( $liveblog_output );
+		return wp_kses_post( $liveblog_output );
 	}
 
 	/**
@@ -1549,7 +1548,7 @@ final class WPCOM_Liveblog {
 	 * @return Boolean
 	 */
 	public static function protect_liveblog_meta_key( $protected, $meta_key ) {
-		if ( self::key === $meta_key )
+		if ( self::key === $meta_key && ! self::current_user_can_edit_liveblog() )
 			return true;
 
 		return $protected;
@@ -1664,6 +1663,70 @@ final class WPCOM_Liveblog {
 		return $refresh_interval;
 	}
 
+	/**
+	 * If the post contains a the liveblog shortcode on save
+	 * it automatically updates the meta to the correct value.
+	 *
+	 * @param $post_id
+	 * @param $post
+	 */
+	public static function check_for_shortcode( $post_id, $post ) {
+		if ( wp_is_post_revision( $post_id ) )
+			return;
+
+		$pattern = get_shortcode_regex();
+
+		if (   preg_match_all( '/'. $pattern .'/s', $post->post_content, $matches )
+			&& array_key_exists( 2, $matches )
+			&& in_array( 'liveblog', $matches[2] ) )
+		{
+			$key_where_shortcode_present = false;
+			$match_length = count( $matches[2] );
+			for ( $i = 0; $i < $match_length; $i++ ) {
+				if ($matches[2][ $i ] === 'liveblog') {
+					$key_where_shortcode_present = $i;
+				}
+			}
+
+			if ( $key_where_shortcode_present === false ) {
+				return;
+			}
+
+			$attrs = shortcode_parse_atts( $matches[0][ $key_where_shortcode_present ] );
+			$valid_statuses = ['enable', 'archive', '0'];
+
+			if ( isset( $attrs['status'] ) && in_array( $attrs['status'], $valid_statuses ) ) {
+				update_post_meta( $post_id, 'liveblog', $attrs['status'] );
+			}
+		}
+	}
+
+	/**
+	 * If the shortcode isn't present within the post but the liveblog meta is set
+	 * then it adds liveblog to the end of the post.
+	 *
+	 * @param $content - post content
+	 * @return string - post content with alteration
+	 */
+	public static function apply_filter_when_no_shortcode( $content ) {
+		$pattern = get_shortcode_regex();
+
+		if (   preg_match_all( '/'. $pattern .'/s', $content, $matches )
+			&& array_key_exists( 2, $matches )
+			&& in_array( 'liveblog', $matches[2] ) )
+		{
+			return $content;
+		}
+
+		$post_id = $GLOBALS['post']->ID;
+
+		$liveblogmetavalue = get_post_meta( $post_id, self::key, true );
+
+		if ( in_array( $liveblogmetavalue, [ 'enable', 'archive' ] ) ) {
+			return $content . wp_kses_post( self::add_liveblog_to_content() );
+		}
+	}
+
 }
 WPCOM_Liveblog::load();
 
@@ -1681,3 +1744,4 @@ if ( ! function_exists( 'wp_max_upload_size' ) ) {
 }
 
 endif;
+
