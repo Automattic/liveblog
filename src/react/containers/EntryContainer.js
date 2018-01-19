@@ -65,7 +65,7 @@ class EntryContainer extends Component {
   }
 
   render() {
-    const { entry, config } = this.props;
+    const { entry } = this.props;
 
     return (
       <article
@@ -73,7 +73,7 @@ class EntryContainer extends Component {
         ref={node => this.node = node}
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
-        <EntryMeta entry={entry} authorEditEnabled={config.author_edit_enabled === '1'} />
+        <EntryMeta entry={entry} />
         {
           this.isEditing()
             ? (

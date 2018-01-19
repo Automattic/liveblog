@@ -1020,8 +1020,8 @@
 .liveblog-inline-emoji:focus {
   border: 1px solid black; }
 
-.Select {
-  margin-bottom: 1rem; }
+.Select:not(:last-child) {
+  margin-bottom: .5rem; }
 
 .Select.is-focused:not(.is-open) > .Select-control {
   border-color: #bbb;
@@ -1071,3 +1071,34 @@
 
 .Select-option .is-selected .is-focused {
   background-color: #f7f7f7; }
+
+.liveblog-metabox-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: #fff;
+  padding: .5rem;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  margin-bottom: 1rem; }
+
+.liveblog-metabox-header.is-active {
+  margin-bottom: 0;
+  border-radius: 3px 3px 0 0; }
+
+.liveblog-metabox-content {
+  background: #f7f7f7;
+  border: 1px solid #bbb;
+  border-top: 0;
+  border-radius: 0 0 3px 3px;
+  padding: .5rem;
+  margin-bottom: 1rem; }

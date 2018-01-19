@@ -28,7 +28,7 @@ class AuthorSelectOption extends Component {
         onMouseEnter={this.handleMouseEnter.bind(this)}
         onMouseMove={this.handleMouseMove.bind(this)}
       >
-        <div dangerouslySetInnerHTML={{ __html: option.avatar }} />
+        { option.avatar && <div dangerouslySetInnerHTML={{ __html: option.avatar }} /> }
         {option.name}
       </div>
     );

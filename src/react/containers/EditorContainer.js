@@ -48,6 +48,7 @@ class EditorContainer extends Component {
       selectedUsers: initialContributors,
       selectedAuthor: initialAuthor,
       preview: false,
+      showAuthors: false,
     };
 
     this.onChange = editorState => this.setState({ editorState });
@@ -194,7 +195,14 @@ class EditorContainer extends Component {
   }
 
   render() {
-    const { editorState, suggestions, preview, selectedUsers, selectedAuthor } = this.state;
+    const {
+      editorState,
+      suggestions, preview,
+      selectedUsers,
+      selectedAuthor,
+      showAuthors,
+    } = this.state;
+
     const { isEditing, config } = this.props;
 
     return (
@@ -226,34 +234,42 @@ class EditorContainer extends Component {
               handleImageUpload={this.handleImageUpload.bind(this)}
             />
         }
-        {
-          config.author_edit_enabled === '1' &&
-          <div>
-            <h2 className="liveblog-editor-subTitle">Author:</h2>
-            <Async
-              multi={false}
-              value={selectedAuthor}
-              valueKey="key"
-              labelKey="name"
-              onChange={this.onSelectAuthorChange.bind(this)}
-              optionComponent={AuthorSelectOption}
-              loadOptions={this.getUsers.bind(this)}
-              clearable={false}
-              cache={false}
-            />
-            <h2 className="liveblog-editor-subTitle">Contributors:</h2>
-            <Async
-              multi={true}
-              value={selectedUsers}
-              valueKey="key"
-              labelKey="name"
-              onChange={this.onSelectUsersChange.bind(this)}
-              optionComponent={AuthorSelectOption}
-              loadOptions={this.getUsers.bind(this)}
-              clearable={false}
-              cache={false}
-            />
-          </div>
+        <div
+          onClick={() => this.setState({ showAuthors: !showAuthors })}
+          className={`liveblog-metabox-header ${showAuthors ? 'is-active' : ''}`}
+        >
+          Author Options
+          <span
+            className={`dashicons dashicons-arrow-${showAuthors ? 'up' : 'down'}`}
+          />
+        </div>
+        { showAuthors &&
+        <div className="liveblog-metabox-content">
+          <h2 className="liveblog-editor-subTitle">Author:</h2>
+          <Async
+            multi={false}
+            value={selectedAuthor}
+            valueKey="key"
+            labelKey="name"
+            onChange={this.onSelectAuthorChange.bind(this)}
+            optionComponent={AuthorSelectOption}
+            loadOptions={this.getUsers.bind(this)}
+            clearable={false}
+            cache={false}
+          />
+          <h2 className="liveblog-editor-subTitle">Contributors:</h2>
+          <Async
+            multi={true}
+            value={selectedUsers}
+            valueKey="key"
+            labelKey="name"
+            onChange={this.onSelectUsersChange.bind(this)}
+            optionComponent={AuthorSelectOption}
+            loadOptions={this.getUsers.bind(this)}
+            clearable={false}
+            cache={false}
+          />
+        </div>
         }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}

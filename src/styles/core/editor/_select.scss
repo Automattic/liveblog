@@ -1,5 +1,5 @@
-.Select {
-  margin-bottom: 1rem;
+.Select:not(:last-child) {
+  margin-bottom: .5rem;
 }
 
 .Select.is-focused:not(.is-open) > .Select-control {

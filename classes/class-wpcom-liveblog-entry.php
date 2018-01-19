@@ -11,7 +11,7 @@ class WPCOM_Liveblog_Entry {
 	 * @var string In case the current entry is an edit (replaces) of
 	 * another entry, we store the other entry's ID in this meta key.
 	 */
-	const replaces_meta_key   	= 'liveblog_replaces';
+	const replaces_meta_key = 'liveblog_replaces';
 
 	/**
 	 * @var string If author editing is enabled, we stored contributors
@@ -356,14 +356,6 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Returns if author select is enabled
-	 * @return boolean
-	 */
-	public static function is_author_select_enabled() {
-		return defined('LIVEBLOG_ALLOW_AUTHOR_SELECT') && LIVEBLOG_ALLOW_AUTHOR_SELECT === true;
-	}
-
-	/**
 	 * If author select is enabled return the user using author_id,
 	 * if user not found then set as current user as a fallback.
 	 *
@@ -375,7 +367,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return mixed
 	 */
 	private static function handle_author_select( $args, $entry_id ) {
-		if ( self::is_author_select_enabled() && isset( $args['author_id'] ) && $args['author_id'] ) {
+		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
 			$user_object = get_userdata( $args['author_id'] );
 			if ( $user_object ) {
 				$args['user'] = $user_object;
@@ -403,7 +395,7 @@ class WPCOM_Liveblog_Entry {
 	 * @param array $contributors Array of ids to store as meta.
 	 */
 	private static function add_contributors( $comment_id, $contributors ) {
-		if ( self::is_author_select_enabled() && is_array( $contributors ) ) {
+		if ( is_array( $contributors ) ) {
 			if ( metadata_exists( 'comment', $comment_id, self::contributors_meta_key ) ) {
 				update_comment_meta( $comment_id, self::contributors_meta_key, $contributors );
 				return;

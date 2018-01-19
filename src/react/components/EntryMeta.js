@@ -2,28 +2,32 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { timeAgo, formattedTime } from '../utils/utils';
 
-const EntryMeta = ({ entry, authorEditEnabled }) => (
+const EntryMeta = ({ entry }) => (
   <header className="liveblog-meta">
     <div className="liveblog-meta-time">
       <span>{timeAgo(entry.entry_time)}</span>
       <span>{formattedTime(entry.entry_time)}</span>
     </div>
     <div className="liveblog-meta-author">
-      <div
-        className="liveblog-meta-authour-avatar"
-        dangerouslySetInnerHTML={{ __html: entry.author.avatar }} />
+      { entry.author.avatar &&
+        <div
+          className="liveblog-meta-authour-avatar"
+          dangerouslySetInnerHTML={{ __html: entry.author.avatar }} />
+      }
       <span className="liveblog-meta-author-name"
         dangerouslySetInnerHTML={{ __html: entry.author.name }} />
     </div>
     {
-      authorEditEnabled &&
+      (entry.contributors && entry.contributors.length > 0) &&
       <div className="liveblog-meta-contributors">
         {
           entry.contributors.map(contributor => (
             <div className="liveblog-meta-author" key={contributor.id}>
-              <div
-                className="liveblog-meta-authour-avatar"
-                dangerouslySetInnerHTML={{ __html: contributor.avatar }} />
+              { contributor.avatar &&
+                <div
+                  className="liveblog-meta-authour-avatar"
+                  dangerouslySetInnerHTML={{ __html: contributor.avatar }} />
+              }
               <span className="liveblog-meta-author-name"
                 dangerouslySetInnerHTML={{ __html: contributor.name }} />
             </div>
