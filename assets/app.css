@@ -181,7 +181,11 @@
       flex-wrap: nowrap;
   -webkit-box-align: start;
       -ms-flex-align: start;
-          align-items: flex-start; }
+          align-items: flex-start;
+  text-decoration: none; }
+
+.liveblog-meta-time {
+  display: block; }
 
 .liveblog-meta-time span {
   display: block; }

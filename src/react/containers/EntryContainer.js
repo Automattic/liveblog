@@ -73,10 +73,10 @@ class EntryContainer extends Component {
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
         <header className="liveblog-meta">
-          <div className="liveblog-meta-time">
+          <a className="liveblog-meta-time" href={entry.share_link} target="_blank">
             <span>{timeAgo(entry.entry_time)}</span>
             <span>{formattedTime(entry.entry_time)}</span>
-          </div>
+          </a>
           <div className="liveblog-meta-author">
             <div
               className="liveblog-meta-authour-avatar"
