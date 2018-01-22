@@ -461,14 +461,14 @@ final class WPCOM_Liveblog {
 	 * @return bool
 	 */
 	public static function is_viewing_liveblog_post() {
-		return (bool) ( is_singular() && self::is_liveblog_post() );
+		return (bool) ( is_singular(self::$supported_post_types) && self::is_liveblog_post() );
 	}
 
 	/**
 	 * One of: 'enable', 'archive', false.
 	 */
 	public static function get_liveblog_state( $post_id = null ) {
-		if ( !is_singular() && ! is_admin() && ! self::$is_rest_api_call) {
+		if ( !is_singular(self::$supported_post_types) && ! is_admin() && ! self::$is_rest_api_call) {
 			return false;
 		}
 		if ( empty( $post_id ) ) {
