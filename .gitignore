@@ -7,7 +7,6 @@ yarn-error.log
 .svn
 composer.lock
 vendor/
-/nbproject
 
 # Editor directories and files
 .idea
