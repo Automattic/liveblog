@@ -4,8 +4,16 @@ const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const paths = {
-  entry: './src/react/index.js',
-  out: './assets',
+  app: {
+    name: 'app',
+    entry: './src/react/index.js',
+    out: './assets',
+  },
+  block: {
+    name: 'dashboard/liveblog-block.build',
+    entry: './src/gutenberg/liveblog-block.js',
+    out: './assets/dashboard',
+  },
 };
 
 const webpackConfig = {
@@ -13,11 +21,12 @@ const webpackConfig = {
   context: path.resolve(__dirname, './src'),
 
   entry: {
-    app: path.join(__dirname, paths.entry),
+    [paths.app.name]: path.join(__dirname, paths.app.entry),
+    [paths.block.name]: path.join(__dirname, paths.block.entry),
   },
 
   output: {
-    path: path.join(__dirname, paths.out),
+    path: path.join(__dirname, paths.app.out),
     filename: '[name].js',
   },
 

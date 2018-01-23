@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: jeromeduncan
- * Date: 18/01/2018
- * Time: 15:38
- */
 
-class WPCOM_Liveblog_TinyMCE
-{
+class WPCOM_Liveblog_TinyMCE {
 	public static function load() {
 		add_action( 'init', array( __CLASS__, 'setup_plugin') );
 		add_action ( 'after_wp_tiny_mce', array( __CLASS__, 'extra_vars') );
@@ -27,7 +20,7 @@ class WPCOM_Liveblog_TinyMCE
 	}
 
 	public static function add_buttons( $plugin_array ) {
-		$plugin_array['liveblog_button'] = plugin_dir_url( __DIR__ ) . 'assets/tinymce-liveblog-shortcode-button.js';
+		$plugin_array['liveblog_button'] = plugin_dir_url( __DIR__ ) . 'assets/dashboard/tinymce-liveblog-shortcode-button.js';
 
 		return $plugin_array;
 	}

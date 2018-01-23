@@ -86,6 +86,7 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Socketio_Loader::load();
 		WPCOM_Liveblog_Entry_Embed_SDKs::load();
 		WPCOM_Liveblog_TinyMCE::load();
+		WPCOM_Liveblog_Gutenberg::load();
 
 		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
@@ -138,7 +139,7 @@ final class WPCOM_Liveblog {
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
 		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-tinymce.php' );
-		require( dirname( __FILE__ ) . '/gutenberg-liveblog/index.php' );
+		require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-gutenberg.php' );
 
 		if ( self::use_rest_api() ) {
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
