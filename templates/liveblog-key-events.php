@@ -1,12 +1,12 @@
 <div class="liveblog-key-events">
-	<h2 class="widget-title">
-<?php
-	if ( isset( $title ) && $title ) {
-		echo $title;
-	} else {
-		echo 'Key Events';
-	}
-?>
-	</h2>
+	<?php if ( isset( $title ) && $title ) : ?>
+		<h2 class="widget-title">
+			<?php if ( $title ) {
+				echo $title;
+			} else {
+				echo 'Key Events';
+			} ?>
+		</h2>
+	<?php endif; ?>
 	<div id="liveblog-key-events"></div>
 </div>
