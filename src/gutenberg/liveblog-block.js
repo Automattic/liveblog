@@ -78,7 +78,7 @@
         </section>
       );
     },
-    save({ attributes: { status = 0 } = {} } = {}) {
+    save({ attributes: { status = '0' } = {} } = {}) {
       return `[liveblog status="${status}" /]`;
     },
   });

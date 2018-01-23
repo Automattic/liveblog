@@ -14,20 +14,17 @@ class EventsContainer extends Component {
     const { events, deleteEvent, jumpToEvent, canEdit } = this.props;
 
     return (
-      <div>
-        <h2 className="widget-title">Key Events</h2>
-        <ul className="liveblog-events">
-          {Object.keys(events).map((key, i) =>
-            <Event
-              key={i}
-              event={events[key]}
-              click={() => jumpToEvent(events[key].id)}
-              onDelete={() => deleteEvent(events[key])}
-              canEdit={canEdit}
-            />,
-          )}
-        </ul>
-      </div>
+      <ul className="liveblog-events">
+        {Object.keys(events).map((key, i) =>
+          <Event
+            key={i}
+            event={events[key]}
+            click={() => jumpToEvent(events[key].id)}
+            onDelete={() => deleteEvent(events[key])}
+            canEdit={canEdit}
+          />,
+        )}
+      </ul>
     );
   }
 

@@ -14,6 +14,11 @@ const paths = {
     entry: './src/gutenberg/liveblog-block.js',
     out: './assets/dashboard',
   },
+  keyEventsBlock: {
+    name: 'dashboard/key-events-block.build',
+    entry: './src/gutenberg/key-events-block.js',
+    out: './assets/dashboard',
+  },
 };
 
 const webpackConfig = {
@@ -23,6 +28,7 @@ const webpackConfig = {
   entry: {
     [paths.app.name]: path.join(__dirname, paths.app.entry),
     [paths.block.name]: path.join(__dirname, paths.block.entry),
+    [paths.keyEventsBlock.name]: path.join(__dirname, paths.keyEventsBlock.entry),
   },
 
   output: {
