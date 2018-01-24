@@ -21,7 +21,7 @@ const EntryMeta = ({ entry }) => (
       (entry.contributors && entry.contributors.length > 0) &&
       <div className="liveblog-meta-contributors">
         {
-          entry.contributors.map(contributor => (
+          entry.contributors.filter(x => x.id !== entry.author.id).map(contributor => (
             <div className="liveblog-meta-author" key={contributor.id}>
               { contributor.avatar &&
                 <div
