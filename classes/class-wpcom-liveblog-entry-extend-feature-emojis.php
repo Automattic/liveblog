@@ -952,14 +952,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters( 'liveblog_emoji_config',  array(
-			'type' => 'static',
-			'data' => $emojis,
-			'displayKey' => 'key',
-			'replaceText' => ':$:',
-			'trigger' => ':',
-			'name' => 'Emoji',
-			'cdn' => $this->emoji_cdn,
-			'suggestionTemplate' => '<img src="'.$this->emoji_cdn.'${image}.png" height="20" width="20" /> ${name}',
+			'type' 			=> 'static',
+			'data' 			=> $emojis,
+			'search' 		=> 'key',
+			'replacement' 	=> ':${key}:',
+			'displayKey' 	=> 'key',
+			'replaceText' 	=> ':$:',
+			'trigger' 		=> ':',
+			'name' 			=> 'Emoji',
+			'cdn' 			=> esc_url( $this->emoji_cdn ),
+			'template' 		=> '<img src="'.esc_url( $this->emoji_cdn ).'${image}.png" height="20" width="20" /> ${name}',
 		) );
 
 		return $config;

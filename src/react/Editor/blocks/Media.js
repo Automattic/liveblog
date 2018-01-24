@@ -311,7 +311,6 @@ class Media extends Component {
           id={this.inputId}
           onChange={this.uploadImage.bind(this)}
           accept="image/jpeg,image/gif,image/png,image/jpg"
-          capture="camera"
         />
         <div className="liveblog-block-header">
           <span className="liveblog-block-title-container">

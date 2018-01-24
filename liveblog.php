@@ -398,9 +398,9 @@ final class WPCOM_Liveblog {
 
 		// Get liveblog entries within the start and end boundaries
 		$all_entries = self::$entry_query->get_all_entries_asc();
-		$entries 	 = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
-		$pages 		 = false;
-		$per_page 	 = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+		$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
+		$pages       = false;
+		$per_page    = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 		if ( ! empty( $entries ) ) {
 			/**
@@ -749,6 +749,8 @@ final class WPCOM_Liveblog {
 	 * Get all entries for specific page
 	 *
 	 * @param int $page Requested Page.
+	 * @param string $last_know_entry id-timestamp of the last rendered entry.
+	 * @param int $id entry id
 	 * @return array An array of json encoded results
 	 */
 	public static function get_entries_paged( $page, $last_known_entry = false, $id = false ) {
@@ -960,9 +962,9 @@ final class WPCOM_Liveblog {
 				'default_image_size'	 => apply_filters( 'liveblog_default_image_size', self::default_image_size ),
 
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
-				'latest_entry_id'	     => self::$entry_query->get_latest_id(),
-				'timestamp'				 => time(),
-				'entries_per_page'		 => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
+				'latest_entry_id'        => self::$entry_query->get_latest_id(),
+				'timestamp'              => time(),
+				'entries_per_page'       => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 
 				'refresh_interval'       => self::get_refresh_interval(),
 				'focus_refresh_interval' => self::focus_refresh_interval,
@@ -1086,7 +1088,7 @@ final class WPCOM_Liveblog {
 
 		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
 
-		return $content . $liveblog_output;
+		return $content . wp_kses_post( $liveblog_output );
 	}
 
 	/**
