@@ -78,7 +78,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->assertNotNull($base);
 
 		//Now assert the return matches the expected return.
-		$expected = '/?rest_route=/' . $api_namespace . '/';
+		$expected = home_url('/?rest_route=/' . $api_namespace . '/');
 
 		$this->assertSame($expected, $base);
 
@@ -109,7 +109,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->assertNotNull($base);
 
 		//Now assert the return matches the expected return.
-		$expected = '/' . rest_get_url_prefix() . '/' . $api_namespace . '/';
+		$expected = home_url('/' . rest_get_url_prefix() . '/' . $api_namespace . '/');
 
 		$this->assertSame($expected, $base);
 
@@ -625,7 +625,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 
 		// Assert forbidden response
-		$this->assertEquals( 403, $response->get_status() );
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() == 401 );
 
 	}
 
@@ -651,7 +651,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 
 		// Assert forbidden response
-		$this->assertEquals( 403, $response->get_status() );
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() == 401 );
 
 	}
 
