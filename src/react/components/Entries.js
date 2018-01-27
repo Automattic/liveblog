@@ -7,7 +7,7 @@ const Entries = ({ loading, entries }) => (
   <div className={loading ? 'liveblog-feed is-loading' : 'liveblog-feed'}>
     {
       entries.length === 0 && !loading
-        ? <div>There are no entries</div>
+        ? <div className="liveblog-empty-message">There are no entries on this page.</div>
         : entries.map(entry => <EntryContainer entry={entry} key={entry.id} />)
     }
   </div>

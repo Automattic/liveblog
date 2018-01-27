@@ -51,11 +51,13 @@ const mergePollingEpic = (action$, store) =>
   action$.ofType(types.MERGE_POLLING)
     .switchMap(() => {
       const { pagination, polling, config } = store.getState();
+      const entries = Object.keys(polling.entries).map(key => polling.entries[key]);
+      const pages = Math.max(pagination.pages, polling.pages);
 
       if (pagination.page === 1) {
         return concat(
-          of(mergePollingIntoEntries(polling.entries)),
-          of(scrollToEntry(`id_${polling.newestEntry.id}`)),
+          of(mergePollingIntoEntries(entries, pages)),
+          of(scrollToEntry(`id_${entries[entries.length - 1].id}`)),
         );
       }
 

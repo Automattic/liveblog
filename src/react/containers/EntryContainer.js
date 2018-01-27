@@ -64,7 +64,7 @@ class EntryContainer extends Component {
   }
 
   render() {
-    const { entry } = this.props;
+    const { entry, config } = this.props;
 
     return (
       <article
@@ -74,13 +74,16 @@ class EntryContainer extends Component {
       >
         <header className="liveblog-meta">
           <div className="liveblog-meta-time">
-            <span>{timeAgo(entry.entry_time)}</span>
-            <span>{formattedTime(entry.entry_time)}</span>
+            <span>{timeAgo(entry.entry_time, config.utc_offset, config.date_format)}</span>
+            <span>{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</span>
           </div>
           <div className="liveblog-meta-author">
-            <div
-              className="liveblog-meta-authour-avatar"
-              dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
+            {
+              entry.avatar_img &&
+              <div
+                className="liveblog-meta-author-avatar"
+                dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
+            }
             <span className="liveblog-meta-author-name"
               dangerouslySetInnerHTML={{ __html: entry.author_link }} />
           </div>

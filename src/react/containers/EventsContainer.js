@@ -11,7 +11,7 @@ import Event from '../components/Event';
 
 class EventsContainer extends Component {
   renderEvents() {
-    const { events, deleteEvent, jumpToEvent, canEdit } = this.props;
+    const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat } = this.props;
 
     return (
       <div>
@@ -24,6 +24,8 @@ class EventsContainer extends Component {
               click={() => jumpToEvent(events[key].id)}
               onDelete={() => deleteEvent(events[key])}
               canEdit={canEdit}
+              utcOffset={utcOffset}
+              dateFormat={dateFormat}
             />,
           )}
         </ul>
@@ -46,9 +48,13 @@ EventsContainer.propTypes = {
   events: PropTypes.object,
   container: PropTypes.any,
   canEdit: PropTypes.bool,
+  utcOffset: PropTypes.string,
+  dateFormat: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
+  dateFormat: state.config.date_format,
+  utcOffset: state.config.utc_offset,
   events: state.events.entries,
   canEdit: state.config.is_liveblog_editable === '1',
 });
