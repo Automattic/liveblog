@@ -321,7 +321,7 @@ class WPCOM_Liveblog_Entry {
 			foreach ( self::$restricted_shortcodes as $key => $value ) {
 
 				// Regex Pattern will match all shortcode formats.
-				$pattern = get_shortcode_regex();
+				$pattern = get_shortcode_regex( array( $key ) );
 
 				// if there's a match we replace it with the configured replacement.
 				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
