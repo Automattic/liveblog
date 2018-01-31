@@ -182,7 +182,6 @@ final class WPCOM_Liveblog {
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 		add_action( 'pre_get_posts',                 array( __CLASS__, 'add_custom_post_type_support' ) );
 		add_action( 'save_post',                     array( __CLASS__, 'check_for_shortcode' ), 10, 3 );
-		add_filter( 'content_edit_pre',              array( __CLASS__, 'add_shortcode_if_needed' ), 10, 2 );
 	}
 
 	/**
@@ -212,12 +211,17 @@ final class WPCOM_Liveblog {
 	private static function add_admin_actions() {
 
 		// Bail if not in admin area
-		if ( ! is_admin() )
+		if ( ! is_admin() ) {
 			return;
+		}
 
-//		add_action( 'add_meta_boxes',        array( __CLASS__, 'add_meta_box'  ) );
 		add_action( 'restrict_manage_posts', array( __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ) );
 		add_action( 'pre_get_posts',         array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
+
+		// We run this action because the hook content_edit_pre doesn't run when gutenberg is enabled
+		if ( self::is_gutenberg_enabled() ) {
+			add_action( 'the_post', array( __CLASS__, 'add_shortcode_to_gutenberg_if_needed' ) );
+		}
 	}
 
 	/**
@@ -229,11 +233,16 @@ final class WPCOM_Liveblog {
 	private static function add_admin_filters() {
 
 		// Bail if not in admin area
-		if ( ! is_admin() )
+		if ( ! is_admin() ) {
 			return;
+		}
 
 		add_filter( 'display_post_states', array( __CLASS__, 'add_display_post_state' ), 10, 2 );
 		add_filter( 'query_vars',          array( __CLASS__, 'add_query_var_for_post_filtering' ) );
+
+		if ( ! self::is_gutenberg_enabled() ) {
+			add_filter( 'content_edit_pre',    array( __CLASS__, 'add_shortcode_if_needed' ), 10, 2 );
+		}
 	}
 
 	private static function register_embed_handlers() {
@@ -1679,8 +1688,47 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
-	 * When visiting an old liveblog post with no shortcode. Add the shortcode
+	 * Wrap shortcode in HTML comments with JSON literals for Gutenberg. This means when upgrading to
+	 * Gutenberg instead of showing the shortcode in a paragraph block, it will show the correct
+	 * liveblog block.
+	 *
+	 * @param $post_id
+	 */
+	public static function create_liveblog_shortcode( $post_id ) {
+		$state = self::get_liveblog_state( $post_id );
+		return " <!-- wp:gutenberg/liveblog {\"status\":\"{$state}\"} -->[liveblog status=\"{$state}\" /]<!-- /wp:gutenberg/liveblog -->";
+	}
+
+	/**
+	 * When visiting an old liveblog post with with gutenberg with no shortcode add the shortcode
 	 * to the content.
+	 *
+	 * @param $post_object
+	 */
+	public static function add_shortcode_to_gutenberg_if_needed( $post_object ) {
+		if ( ! get_post_meta( $post_object->ID, 'liveblog', true ) ) {
+			return $post_object;
+		}
+
+		$pattern = get_shortcode_regex();
+
+		if ( preg_match_all( '/'. $pattern .'/s', $post_object->post_content, $matches )
+			&& array_key_exists( 2, $matches )
+			&& in_array( 'liveblog', $matches[2] ) ) {
+			return $post_object;
+		}
+
+		$post_object->post_content = $post_object->post_content . self::create_liveblog_shortcode( $post_object->ID );
+
+		return $post_object;
+	}
+
+	/**
+	 * When visiting an old liveblog post with no shortcode add the shortcode
+	 * to the content.
+	 *
+	 * @param $content
+	 * @param $post_id
 	 */
 	public static function add_shortcode_if_needed( $content, $post_id ) {
 		if ( ! get_post_meta( $post_id, 'liveblog', true ) ) {
@@ -1691,14 +1739,13 @@ final class WPCOM_Liveblog {
 
 		if ( preg_match_all( '/'. $pattern .'/s', $content, $matches )
 			&& array_key_exists( 2, $matches )
-			&& in_array( 'liveblog', $matches[2] ) )
-		{
+			&& in_array( 'liveblog', $matches[2] ) ) {
 			return $content;
 		}
 
-		$state = self::get_liveblog_state( $post_id );
+		update_post_meta( $post_id, self::key, '0' );
 
-		return $content . " [liveblog state={$state} /]";
+		return $content . self::create_liveblog_shortcode( $post_id );
 	}
 
 	/**
@@ -1771,6 +1818,7 @@ final class WPCOM_Liveblog {
 
 }
 WPCOM_Liveblog::load();
+
 
 /** Plupload Helpers ******************************************************/
 if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {

@@ -10,7 +10,7 @@
           return alert('Liveblog can only be present in a post once');
         }
 
-        editor.insertContent('[liveblog status="enable" /]');
+        editor.insertContent('<!-- wp:gutenberg/liveblog {"status":"enable"} -->[liveblog status="enable" /]<!-- /wp:gutenberg/liveblog -->');
       }
     });
   });
