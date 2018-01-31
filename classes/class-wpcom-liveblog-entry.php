@@ -25,6 +25,7 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static $restricted_shortcodes = array(
 		'liveblog_key_events' => '',
+		'liveblog' => '',
 	);
 
 	public function __construct( $comment ) {
