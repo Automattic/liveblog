@@ -1,5 +1,6 @@
-/* eslint-disable no-param-reassign */
+import moment from './extendedMoment';
 
+/* eslint-disable no-param-reassign */
 export const getLastOfObject = object =>
   object[Object.keys(object)[Object.keys(object).length - 1]];
 
@@ -128,63 +129,40 @@ export const getNewestEntry = (current, update, entries = false) => {
   return update;
 };
 
-export const daysBetween = (timestamp1, timestamp2) => {
-  const day = 1000 * 60 * 60 * 24;
-  const difference = Math.abs(timestamp1 - timestamp2);
-  return Math.round(difference / day);
+/**
+ * Get days between two timestamps
+ * @param {Object} time Moment Time
+ * @param {Number} utcOffset Utc Offset from server
+ * @return {Number}
+ */
+export const daysAgo = (time, utcOffset) => {
+  const currentUTCTime = moment().utcOffset(utcOffset, true);
+  return currentUTCTime.diff(time, 'days');
 };
 
 /**
  * Returns a formated string indicating how long ago a timestamp was.
- * @param {Number} timestamp
+ * @param {Number} timestamp Unix Timestamp in seconds
+ * @return {String} utcOffset Utc Offset from server
  */
-export const timeAgo = (timestamp) => {
-  const date = new Date(timestamp * 1000);
-
+export const timeAgo = (timestamp, utcOffset, dateFormat) => {
+  const offset = parseInt(utcOffset, 10);
+  const offsetTime = moment.unix(timestamp).utcOffset(offset, true);
   // If its greater than 30 days ago.
-  if (daysBetween((timestamp * 1000), Date.now()) >= 30) {
-    let day = date.getUTCDate();
-    let month = date.getUTCMonth() + 1;
-    let year = date.getUTCFullYear();
-
-    if (day < 10) day = `0${day}`;
-    if (month < 10) month = `0${month}`;
-    if (year < 10) year = `0${year}`;
-
-    return `${day}/${month}/${year}`;
+  if (daysAgo(offsetTime, offset) >= 30) {
+    return offsetTime.formatUsingDateTime(dateFormat);
   }
-
-  const units = [
-    { name: 's', limit: 60, in_seconds: 1 },
-    { name: 'm', limit: 3600, in_seconds: 60 },
-    { name: 'h', limit: 86400, in_seconds: 3600 },
-    { name: 'd', limit: 604800, in_seconds: 86400 },
-    { name: 'w', limit: 2629743, in_seconds: 604800 },
-    { name: 'm', limit: 31556926, in_seconds: 2629743 },
-    { name: 'y', limit: null, in_seconds: 31556926 },
-  ];
-
-  let diff = (new Date() - new Date(timestamp * 1000)) / 1000;
-  if (diff < 5) return 'now';
-
-  let output;
-
-  for (let i = 0; i < units.length; i += 1) {
-    if (diff < units[i].limit || !units[i].limit) {
-      diff = Math.floor(diff / units[i].in_seconds);
-      output = `${diff}${units[i].name} ago`;
-      break;
-    }
-  }
-
-  return output;
+  return offsetTime.fromNow();
 };
 
-export const formattedTime = (timestamp) => {
-  const time = new Date(timestamp * 1000);
-  const hours = time.getUTCHours() < 10 ? `0${time.getUTCHours()}` : time.getUTCHours();
-  const mins = time.getUTCMinutes() < 10 ? `0${time.getUTCMinutes()}` : time.getUTCMinutes();
-  return `${hours}:${mins}`;
+/**
+ * Returns a formated string from timestamp in HH MM format.
+ * @param {Number} timestamp
+ * @return {String} utcOffset Utc Offset from server
+ */
+export const formattedTime = (timestamp, utcOffset, timeFormat) => {
+  const offset = parseInt(utcOffset, 10);
+  return moment.unix(timestamp).utcOffset(offset, true).local().formatUsingDateTime(timeFormat);
 };
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);

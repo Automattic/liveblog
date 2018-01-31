@@ -46,7 +46,7 @@ class WPCOM_Liveblog_Rest_Api {
 			$base = '/?rest_route=/' . self::$api_namespace . '/';
 		}
 
-		return $base;
+		return home_url( $base );
 
 	}
 

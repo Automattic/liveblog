@@ -238,7 +238,7 @@ class EditorWrapper extends Component {
     const { trigger } = this.state.autocompleteState;
     const config = autocompleteConfig.filter(x => x.trigger === trigger)[0];
     if (!config.template) return item;
-    return parseTemplate(config.template, item);
+    return parseTemplate(config.template, item, '');
   }
 
   /**
@@ -342,7 +342,6 @@ class EditorWrapper extends Component {
           id={this.inputId}
           onChange={this.uploadImages.bind(this)}
           accept="image/jpeg,image/gif,image/png,image/jpg"
-          capture="camera"
         />
         <Toolbar
           imageInputId={this.inputId}
