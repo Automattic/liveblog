@@ -1696,7 +1696,6 @@ final class WPCOM_Liveblog {
 	 */
 	public static function create_liveblog_shortcode( $post_id ) {
 		$state = self::get_liveblog_state( $post_id );
-		update_post_meta( $post_id, 'liveblog_shortcode', true );
 		return " <!-- wp:gutenberg/liveblog {\"status\":\"{$state}\"} -->[liveblog status=\"{$state}\" /]<!-- /wp:gutenberg/liveblog -->";
 	}
 
@@ -1732,7 +1731,7 @@ final class WPCOM_Liveblog {
 	 * @param $post_id
 	 */
 	public static function add_shortcode_if_needed( $content, $post_id ) {
-		if ( ! get_post_meta( $post_id, 'liveblog', true ) ) {
+		if ( ! get_post_meta( $post_id, self::key, true ) ) {
 			return $content;
 		}
 
@@ -1782,10 +1781,12 @@ final class WPCOM_Liveblog {
 				update_post_meta( $post_id, 'liveblog_shortcode', true );
 				return;
 			}
+
+			return;
 		}
 
-		if ( get_post_meta( $post_id, 'liveblog_shortcode', true ) ) {
-			update_post_meta( $post_id, self::key, '0' );
+		if ( get_post_meta( $post_id, self::key, true ) ) {
+			delete_post_meta( $post_id, self::key );
 		}
 	}
 
