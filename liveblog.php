@@ -1696,6 +1696,7 @@ final class WPCOM_Liveblog {
 	 */
 	public static function create_liveblog_shortcode( $post_id ) {
 		$state = self::get_liveblog_state( $post_id );
+		update_post_meta( $post_id, 'liveblog_shortcode', true );
 		return " <!-- wp:gutenberg/liveblog {\"status\":\"{$state}\"} -->[liveblog status=\"{$state}\" /]<!-- /wp:gutenberg/liveblog -->";
 	}
 
@@ -1742,8 +1743,6 @@ final class WPCOM_Liveblog {
 			&& in_array( 'liveblog', $matches[2] ) ) {
 			return $content;
 		}
-
-		update_post_meta( $post_id, self::key, '0' );
 
 		return $content . self::create_liveblog_shortcode( $post_id );
 	}
