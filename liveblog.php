@@ -125,7 +125,7 @@ final class WPCOM_Liveblog {
 	}
 
 	public static function is_gutenberg_enabled() {
-		return function_exists( 'register_block_type' );
+		return function_exists( 'register_block_type' ) && ! $_GET['classic-editor'];
 	}
 
 	/**
@@ -181,7 +181,8 @@ final class WPCOM_Liveblog {
 		add_action( 'admin_enqueue_scripts',         array( __CLASS__, 'admin_enqueue_scripts'   ) );
 		add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 		add_action( 'pre_get_posts',                 array( __CLASS__, 'add_custom_post_type_support' ) );
-		add_action( 'save_post', array( __CLASS__, 'check_for_shortcode' ), 10, 3 );
+		add_action( 'save_post',                     array( __CLASS__, 'check_for_shortcode' ), 10, 3 );
+		add_filter( 'content_edit_pre',              array( __CLASS__, 'add_shortcode_if_needed' ), 10, 2 );
 	}
 
 	/**
@@ -1678,6 +1679,29 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * When visiting an old liveblog post with no shortcode. Add the shortcode
+	 * to the content.
+	 */
+	public static function add_shortcode_if_needed( $content, $post_id ) {
+		if ( ! get_post_meta( $post_id, 'liveblog', true ) ) {
+			return $content;
+		}
+
+		$pattern = get_shortcode_regex();
+
+		if ( preg_match_all( '/'. $pattern .'/s', $content, $matches )
+			&& array_key_exists( 2, $matches )
+			&& in_array( 'liveblog', $matches[2] ) )
+		{
+			return $content;
+		}
+
+		$state = self::get_liveblog_state( $post_id );
+
+		return $content . " [liveblog state={$state} /]";
+	}
+
+	/**
 	 * If the post contains a the liveblog shortcode on save
 	 * it automatically updates the meta to the correct value.
 	 *
@@ -1685,8 +1709,9 @@ final class WPCOM_Liveblog {
 	 * @param $post
 	 */
 	public static function check_for_shortcode( $post_id, $post ) {
-		if ( wp_is_post_revision( $post_id ) )
+		if ( wp_is_post_revision( $post_id ) ) {
 			return;
+		}
 
 		$pattern = get_shortcode_regex();
 

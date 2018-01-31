@@ -262,12 +262,19 @@ class WPCOM_Liveblog_Entry_Key_Events {
      */
 	public static function get_current_format( $post_id ) {
 
-		// Get the format meta from the post.
+		// Get the format meta from the post. (Fallback for older liveblogs)
 		$type = get_post_meta( $post_id, self::meta_key_format, true );
 
 		// If the post has a format set, return that.
 		if ( ! empty( $type ) ) {
 			return self::$available_formats[$type];
+		}
+
+		// Filter for deciding which format to use. If it exists then use it.
+		$format = apply_filters( 'liveblog_key_format', 'first-linebreak' );
+
+		if ( array_key_exists( $format, self::$available_formats ) ) {
+			return self::$available_formats[$format];
 		}
 
 		// If not, return the default 'first-line' format.
