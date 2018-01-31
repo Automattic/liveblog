@@ -85,8 +85,12 @@ final class WPCOM_Liveblog {
 		WPCOM_Liveblog_Lazyloader::load();
 		WPCOM_Liveblog_Socketio_Loader::load();
 		WPCOM_Liveblog_Entry_Embed_SDKs::load();
-		WPCOM_Liveblog_TinyMCE::load();
-		WPCOM_Liveblog_Gutenberg::load();
+
+		if ( self::is_gutenberg_enabled() ) {
+			WPCOM_Liveblog_Gutenberg::load();
+		} else {
+			WPCOM_Liveblog_TinyMCE::load();
+		}
 
 		if ( self::use_rest_api() ) {
 			WPCOM_Liveblog_Rest_Api::load();
@@ -118,6 +122,10 @@ final class WPCOM_Liveblog {
 		global $wp_version;
 		$min_version = self::min_wp_version;
 		echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) );
+	}
+
+	public static function is_gutenberg_enabled() {
+		return function_exists( 'register_block_type' );
 	}
 
 	/**
