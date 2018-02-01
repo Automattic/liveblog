@@ -22,6 +22,12 @@ export const pagination = (state = initialState, action) => {
         page: action.payload.page,
       };
 
+    case 'MERGE_POLLING_INTO_ENTRIES':
+      return {
+        ...state,
+        pages: action.pages,
+      };
+
     case 'POLLING_SUCCESS':
       return {
         ...state,

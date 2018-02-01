@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { timeAgo } from '../utils/utils';
 
-const Event = ({ event, click, onDelete, canEdit }) => (
+const Event = ({ event, click, onDelete, canEdit, utcOffset, dateFormat }) => (
   <li className="liveblog-event">
     <div className="liveblog-event-body">
-      <div className="liveblog-event-meta" >{timeAgo(event.entry_time)}</div>
+      <div className="liveblog-event-meta" >{timeAgo(event.entry_time, utcOffset, dateFormat)}</div>
       <div>
         {
           canEdit &&
@@ -26,6 +26,8 @@ Event.propTypes = {
   click: PropTypes.func,
   onDelete: PropTypes.func,
   canEdit: PropTypes.bool,
+  utcOffset: PropTypes.string,
+  dateFormat: PropTypes.string,
 };
 
 export default Event;
