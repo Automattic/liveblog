@@ -40,13 +40,13 @@ class WPCOM_Liveblog_Rest_Api {
 
 		if ( get_option( 'permalink_structure' ) ) {
 			// Pretty permalinks enabled
-			$base = '/' . rest_get_url_prefix() . '/' . self::$api_namespace . '/';
+			$url = get_rest_url( ) . self::$api_namespace . '/';
 		} else {
 			// Pretty permalinks not enabled
-			$base = '/?rest_route=/' . self::$api_namespace . '/';
+			$url = home_url( '/' ) . '/?rest_route=/' . self::$api_namespace . '/';
 		}
 
-		return home_url( $base );
+		return $url;
 
 	}
 
