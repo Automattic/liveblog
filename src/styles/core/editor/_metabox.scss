@@ -1,0 +1,27 @@
+.liveblog-metabox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: .5rem;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 500;
+  border: $base-border-size solid $color-grey-light;
+  border-radius: $base-border-radius;
+  margin-bottom: 1rem;
+}
+
+.liveblog-metabox-header.is-active {
+  margin-bottom: 0;
+  border-radius: $base-border-radius $base-border-radius 0 0;
+}
+
+.liveblog-metabox-content {
+  background: $color-grey-x-light;
+  border: $base-border-size solid $color-grey-light;
+  border-top: 0;
+  border-radius: 0 0 $base-border-radius $base-border-radius;
+  padding: .5rem;
+  margin-bottom: 1rem;
+}

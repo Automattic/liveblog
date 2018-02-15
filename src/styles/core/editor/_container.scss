@@ -9,7 +9,7 @@
 .liveblog-preview {
   max-width: 100%;
   word-break: break-all;
-  min-height: 200px;
+  min-height: 250px;
   padding: .8rem;
   margin-bottom: .8rem;
   border: 1px solid $color-grey-light;
@@ -39,6 +39,24 @@
 
 .liveblog-editor-inner-container > * {
   flex-basis: 100%;
+}
+
+.liveblog-editor-title,
+.liveblog-editor-subTitle {
+  margin: 0;
+  padding: 0;
+  color: $color-grey-dark;
+}
+
+.liveblog-editor-title {
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.liveblog-editor-subTitle {
+  font-size: .9rem;
+  font-weight: 500;
+  margin-bottom: .6rem;
 }
 
 @include mq($until: small) {

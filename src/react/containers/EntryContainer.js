@@ -5,8 +5,9 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
-import { timeAgo, formattedTime, triggerOembedLoad } from '../utils/utils';
+import { triggerOembedLoad } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
+import EntryMeta from '../components/EntryMeta';
 
 class EntryContainer extends Component {
   constructor(props) {
@@ -64,7 +65,7 @@ class EntryContainer extends Component {
   }
 
   render() {
-    const { entry, config } = this.props;
+    const { entry } = this.props;
 
     return (
       <article
@@ -72,22 +73,7 @@ class EntryContainer extends Component {
         ref={node => this.node = node}
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
-        <header className="liveblog-meta">
-          <div className="liveblog-meta-time">
-            <span>{timeAgo(entry.entry_time, config.utc_offset, config.date_format)}</span>
-            <span>{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</span>
-          </div>
-          <div className="liveblog-meta-author">
-            {
-              entry.avatar_img &&
-              <div
-                className="liveblog-meta-author-avatar"
-                dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
-            }
-            <span className="liveblog-meta-author-name"
-              dangerouslySetInnerHTML={{ __html: entry.author_link }} />
-          </div>
-        </header>
+        <EntryMeta entry={entry} />
         {
           this.isEditing()
             ? (
