@@ -91,8 +91,9 @@ export const mergePolling = () => ({
   type: types.MERGE_POLLING,
 });
 
-export const mergePollingIntoEntries = payload => ({
+export const mergePollingIntoEntries = (payload, pages) => ({
   type: types.MERGE_POLLING_INTO_ENTRIES,
   payload,
+  pages,
 });
 

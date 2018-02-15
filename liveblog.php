@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.7.0
+ * Version:     1.7.1
  * Author:      WordPress.com VIP, Automattic
  * Author URI: http://vip.wordpress.com/
  * Text Domain: liveblog
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 final class WPCOM_Liveblog {
 
 	/** Constants *************************************************************/
-	const version          			= '1.7';
+	const version          			= '1.7.1';
 	const rewrites_version 			= 1;
 	const min_wp_version   			= '4.4';
 	const min_wp_rest_api_version 	= '4.4';
@@ -965,6 +965,9 @@ final class WPCOM_Liveblog {
 				'latest_entry_timestamp' => self::$entry_query->get_latest_timestamp(),
 				'latest_entry_id'        => self::$entry_query->get_latest_id(),
 				'timestamp'              => time(),
+				'utc_offset'			 => get_option('gmt_offset') * 60, // in minutes
+				'date_format'			 => get_option('date_format'),
+				'time_format'			 => get_option('time_format'),
 				'entries_per_page'       => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 
 				'refresh_interval'       => self::get_refresh_interval(),

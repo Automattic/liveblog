@@ -52,7 +52,11 @@ export const api = (state = initialState, action) => {
           action.renderNewEntries,
         ),
         newestEntry: action.renderNewEntries
-          ? getNewestEntry(state.newestEntry, action.payload.entries[0], state.entries)
+          ? getNewestEntry(
+            state.newestEntry,
+            action.payload.entries[action.payload.entries.length - 1],
+            state.entries,
+          )
           : state.newestEntry,
       };
 
@@ -98,10 +102,12 @@ export const api = (state = initialState, action) => {
     case 'MERGE_POLLING_INTO_ENTRIES':
       return {
         ...state,
-        entries: {
-          ...action.payload,
-          ...state.entries,
-        },
+        entries: pollingApplyUpdate(
+          state.entries,
+          action.payload,
+          true,
+        ),
+        newestEntry: action.payload[action.payload.length - 1],
       };
 
     case 'SCROLL_TO_ENTRY':

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.1
+
+* Fix bug with REST endpoints in Multisite (props justnorris)
+* Fix for some failing unit tests due to core changes (props jasonagnew)
+* Fix for bug where shortcodes would be removed completely (props jasonagnew)
+* Fixed some pagination issues in relatively unique circumstances (props liam-defty)
+* Fixed a bug that failed to correctly handle avatars (props liam-defty)
+* Made sure we handle timezones in entries properly (props liam-defty)
+
 ## 1.7
 
 * New: Mobile-friendly React-based frontend UI for a better editing experience across devices. (props jagnew jrmd liam-defty)

@@ -44,6 +44,7 @@
 .liveblog-meta-time span:first-child {
   font-weight: 600;
   color: #333;
+  padding-right: 5px;
   margin-bottom: 5px;
 }
 
@@ -52,7 +53,7 @@
   margin-left: 8px;
 }
 
-.liveblog-meta-authour-avatar {
+.liveblog-meta-author-avatar {
   border-radius: 50%;
   overflow: hidden;
   width: 30px;
