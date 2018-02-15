@@ -9,7 +9,7 @@ export default (block, editorState) => {
     if (type === 'image') {
       return {
         component: Image,
-        editable: false,
+        editable: true,
       };
     }
     if (type === 'placeholder') {
