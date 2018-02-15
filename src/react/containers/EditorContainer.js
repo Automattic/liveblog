@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { EditorState, ContentState } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
