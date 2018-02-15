@@ -23,11 +23,7 @@ class WPCOM_Liveblog_Schema {
 	}
 
 	public static function add_schema_to_content( $content ) {
-
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
-			return $content;
-		}
-
+		
 		try {
 			$post_id = WPCOM_Liveblog::get_post_id();
 		} catch ( Exception $e ) {
