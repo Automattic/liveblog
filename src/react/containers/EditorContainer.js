@@ -5,9 +5,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Async } from 'react-select';
+import 'react-select/dist/react-select.css';
 
 import { EditorState, ContentState } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
@@ -15,6 +16,7 @@ import * as userActions from '../actions/userActions';
 import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
 import PreviewContainer from './PreviewContainer';
+import AuthorSelectOption from '../components/AuthorSelectOption';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
@@ -25,6 +27,8 @@ class EditorContainer extends Component {
     super(props);
 
     let initialEditorState;
+    let initialAuthor;
+    let initialContributors;
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
@@ -35,14 +39,21 @@ class EditorContainer extends Component {
         }),
         decorators,
       );
+      initialAuthor = props.entry.author;
+      initialContributors = props.entry.contributors;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
+      initialAuthor = props.config.current_user;
+      initialContributors = [];
     }
 
     this.state = {
       editorState: initialEditorState,
       suggestions: [],
+      selectedUsers: initialContributors,
+      selectedAuthor: initialAuthor,
       preview: false,
+      showAuthors: false,
       readOnly: false,
     };
 
@@ -68,16 +79,26 @@ class EditorContainer extends Component {
 
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState } = this.state;
+    const { editorState, selectedAuthor, selectedUsers } = this.state;
     const content = this.getContent();
+    const contributors = selectedUsers.map(user => user.id);
 
     if (isEditing) {
-      updateEntry({ id: entry.id, content });
+      updateEntry({
+        id: entry.id,
+        content,
+        author: selectedAuthor.id,
+        contributors,
+      });
       entryEditClose(entry.id);
       return;
     }
 
-    createEntry({ content });
+    createEntry({
+      content,
+      author: selectedAuthor.id,
+      contributors,
+    });
 
     const newEditorState = EditorState.push(
       editorState,
@@ -88,6 +109,29 @@ class EditorContainer extends Component {
       editorState: newEditorState,
       readOnly: false,
     });
+  }
+
+  onSelectUsersChange(value) {
+    this.setState({
+      selectedUsers: value,
+    });
+  }
+
+  onSelectAuthorChange(value) {
+    this.setState({
+      selectedAuthor: value,
+    });
+  }
+
+  getUsers(text, callback) {
+    const { config } = this.props;
+    getAuthors(text, config)
+      .timeout(10000)
+      .map(res => res.response)
+      .subscribe(res => callback(null, {
+        options: res,
+        complete: false,
+      }));
   }
 
   getAuthors(text) {
@@ -169,12 +213,21 @@ class EditorContainer extends Component {
   }
 
   render() {
-    const { editorState, suggestions, preview, readOnly } = this.state;
+    const {
+      editorState,
+      suggestions,
+      preview,
+      selectedUsers,
+      selectedAuthor,
+      showAuthors,
+      readOnly,
+    } = this.state;
+
     const { isEditing, config } = this.props;
 
     return (
       <div className="liveblog-editor-container">
-        {!isEditing && <h1>Add New Entry</h1>}
+        {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
         <div className="liveblog-editor-tabs">
           <button
             className={`liveblog-editor-tab ${!preview ? 'is-active' : ''}`}
@@ -195,7 +248,6 @@ class EditorContainer extends Component {
               editorState={editorState}
               onChange={this.onChange}
               suggestions={suggestions}
-              // @todo work out a better way of handling this.
               resetSuggestions={() => this.setState({ suggestions: [] })}
               onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
               autocompleteConfig={config.autocomplete}
@@ -204,6 +256,43 @@ class EditorContainer extends Component {
               setReadOnly={this.setReadOnly.bind(this)}
               defaultImageSize={config.default_image_size}
             />
+        }
+        <div
+          onClick={() => this.setState({ showAuthors: !showAuthors })}
+          className={`liveblog-metabox-header ${showAuthors ? 'is-active' : ''}`}
+        >
+          Author Options
+          <span
+            className={`dashicons dashicons-arrow-${showAuthors ? 'up' : 'down'}`}
+          />
+        </div>
+        { showAuthors &&
+        <div className="liveblog-metabox-content">
+          <h2 className="liveblog-editor-subTitle">Author:</h2>
+          <Async
+            multi={false}
+            value={selectedAuthor}
+            valueKey="key"
+            labelKey="name"
+            onChange={this.onSelectAuthorChange.bind(this)}
+            optionComponent={AuthorSelectOption}
+            loadOptions={this.getUsers.bind(this)}
+            clearable={false}
+            cache={false}
+          />
+          <h2 className="liveblog-editor-subTitle">Contributors:</h2>
+          <Async
+            multi={true}
+            value={selectedUsers}
+            valueKey="key"
+            labelKey="name"
+            onChange={this.onSelectUsersChange.bind(this)}
+            optionComponent={AuthorSelectOption}
+            loadOptions={this.getUsers.bind(this)}
+            clearable={false}
+            cache={false}
+          />
+        </div>
         }
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}

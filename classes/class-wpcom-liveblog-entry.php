@@ -11,7 +11,13 @@ class WPCOM_Liveblog_Entry {
 	 * @var string In case the current entry is an edit (replaces) of
 	 * another entry, we store the other entry's ID in this meta key.
 	 */
-	const replaces_meta_key   = 'liveblog_replaces';
+	const replaces_meta_key = 'liveblog_replaces';
+
+	/**
+	 * @var string If author editing is enabled, we stored contributors
+	 *  in this meta key.
+	 */
+	const contributors_meta_key	= 'liveblog_contributors';
 
 	private $comment;
 	private $type = 'new';
@@ -95,9 +101,9 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
-		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
-		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
+		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
 		$share_link = get_permalink( $this->get_post_id() ) . '#' . $entry_id;
+
 		$entry = array(
 			'id'   			=> $entry_id,
 			'type' 			=> $this->get_type(),
@@ -106,11 +112,12 @@ class WPCOM_Liveblog_Entry {
 			'content' 		=> apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' 	=> $css_classes,
 			'timestamp' 	=> $this->get_timestamp(),
-			'avatar_img' 	=> get_avatar( $this->comment->comment_author_email, $avatar_size ),
-			'author_link' 	=> get_comment_author_link( $entry_id ),
+			'author' 		=> self::get_user_data_for_json( self::user_object_from_comment_id( $entry_id ) ),
+			'contributors' 	=> self::get_contributors_for_json( $entry_id ),
 			'entry_time' 	=> get_comment_date( 'U', $entry_id ),
-			'share_link'	=> $share_link,
+			'share_link' 	=> $share_link,
 		);
+
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
 	}
@@ -177,11 +184,20 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
-        $args = apply_filters( 'liveblog_before_insert_entry', $args );
+		$args = apply_filters( 'liveblog_before_insert_entry', $args );
+
+		$args['user'] = self::handle_author_select( $args, false );
+
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
+
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
+		}
+
+
 		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
@@ -205,6 +221,12 @@ class WPCOM_Liveblog_Entry {
 		$args['user'] = self::user_object_from_comment_id( $args['entry_id'] );
 		if ( is_wp_error( $args['user'] ) ) {
 			return $args['user'];
+		}
+
+		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
+
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
 		}
 
         $args = apply_filters( 'liveblog_before_update_entry', $args );
@@ -262,6 +284,7 @@ class WPCOM_Liveblog_Entry {
 		if ( is_wp_error( $valid_args ) ) {
 			return $valid_args;
 		}
+
 		$new_comment_id = wp_insert_comment( array(
 			'comment_post_ID'      => $args['post_id'],
 			'comment_content'      => wp_filter_post_kses( $args['content'] ),
@@ -323,7 +346,7 @@ class WPCOM_Liveblog_Entry {
 			foreach ( self::$restricted_shortcodes as $key => $value ) {
 
 				// Regex Pattern will match all shortcode formats.
-				$pattern = get_shortcode_regex();
+				$pattern = get_shortcode_regex( array( $key ) );
 
 				// if there's a match we replace it with the configured replacement.
 				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
@@ -332,6 +355,92 @@ class WPCOM_Liveblog_Entry {
 
 		// Return the Original entry arguments with any modifications.
 		return $args;
+	}
+
+	/**
+	 * If author select is enabled return the user using author_id,
+	 * if user not found then set as current user as a fallback.
+	 *
+	 * If a entry_id is supplied we should update it as its the
+	 * original entry which is used for displaying author information.
+	 *
+	 * @param array $args The new Live blog Entry.
+	 * @param int   $entry_id If set we should update the original entry
+	 * @return mixed
+	 */
+	private static function handle_author_select( $args, $entry_id ) {
+		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
+			$user_object = get_userdata( $args['author_id'] );
+			if ( $user_object ) {
+				$args['user'] = $user_object;
+
+				if ( $entry_id ) {
+					wp_update_comment( array(
+						'comment_ID' 		   => $entry_id,
+						'user_id'              => $args['user']->ID,
+						'comment_author'       => $args['user']->display_name,
+						'comment_author_email' => $args['user']->user_email,
+						'comment_author_url'   => $args['user']->user_url,
+					) );
+				}
+			}
+		}
+
+		return $args['user'];
+	}
+
+	/**
+	 * If author select is enabled then we store the contributors
+	 * as comment meta.
+	 *
+	 * @param int $comment_id The comment id for the meta we should update.
+	 * @param array $contributors Array of ids to store as meta.
+	 */
+	private static function add_contributors( $comment_id, $contributors ) {
+		if ( is_array( $contributors ) ) {
+			if ( metadata_exists( 'comment', $comment_id, self::contributors_meta_key ) ) {
+				update_comment_meta( $comment_id, self::contributors_meta_key, $contributors );
+				return;
+			}
+
+			add_comment_meta( $comment_id, self::contributors_meta_key, $contributors, true );
+		}
+	}
+
+	/**
+	 * Returns a list of contributor user objects.
+	 *
+	 * @param int $comment_id The comment id to retrive the metadata.
+	 */
+	private static function get_contributors_for_json( $comment_id ) {
+		$contributors = get_comment_meta( $comment_id, self::contributors_meta_key, true );
+
+		if ( ! $contributors ) {
+			return array();
+		}
+
+		return array_map(function( $contributor ) {
+			return self::get_user_data_for_json( get_userdata( $contributor ) );
+		}, $contributors );
+	}
+
+	/**
+	 * Returns a formatted array of user data.
+	 *
+	 * @param object $user The user object
+	 */
+	private static function get_user_data_for_json( $user ) {
+		if ( is_wp_error( $user ) ) {
+			return array();
+		}
+
+		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		return array(
+			'id' => $user->ID,
+			'key' => strtolower($user->user_nicename),
+			'name' => $user->display_name,
+			'avatar' => get_avatar( $user->ID, $avatar_size ),
+		);
 	}
 }
 
