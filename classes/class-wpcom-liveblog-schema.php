@@ -114,7 +114,7 @@ class WPCOM_Liveblog_Schema {
 
 		$first_value = array_shift( $entries_asc );
 
-		if ( ! empty( $first_value['datePublished'] ) ) {
+		if ( empty( $first_value['datePublished'] ) ) {
 			return '';
 		}
 
