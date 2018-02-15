@@ -100,16 +100,6 @@ export const scrollElementIfNotInView = (childElement, parentElement) => {
 };
 
 /**
- * Provide a unique id for htmlFor
- */
-let lastId = 0;
-
-export const uniqueHTMLId = (prefix) => {
-  lastId += 1;
-  return `${prefix}${lastId}`;
-};
-
-/**
  * Returns an array of all the blocks at a selection given a start and end key.
  */
 export const getSelectedBlocks = (contentState, anchorKey, focusKey) => {
@@ -128,4 +118,34 @@ export const getSelectedBlocks = (contentState, anchorKey, focusKey) => {
   }
 
   return selectedBlocks;
+};
+
+/**
+ * Check if a focusable block is focused/selected
+ */
+export const focusableBlockIsSelected = (editorState) => {
+  const selection = editorState.getSelection();
+  if (selection.getAnchorKey() !== selection.getFocusKey()) {
+    return false;
+  }
+  const content = editorState.getCurrentContent();
+  const block = content.getBlockForKey(selection.getAnchorKey());
+  if (block.getType() === 'atomic') return block;
+  return false;
+};
+
+/**
+ * Get the most suitable image size.
+ * @param {object} image
+ * @param {string} selectedSize
+ */
+export const getImageSize = (sizes, defaultSize) => {
+  if (!sizes) return '';
+  if (sizes[defaultSize]) {
+    return sizes[defaultSize].source_url || sizes[defaultSize].url;
+  }
+  if (sizes.full) {
+    return sizes.full.source_url || sizes.full.url;
+  }
+  return '';
 };

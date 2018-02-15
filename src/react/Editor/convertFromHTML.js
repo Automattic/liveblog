@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 import { convertFromHTML } from 'draft-convert';
 
-export default html =>
+export default (html, extraData) =>
   convertFromHTML({
     htmlToEntity: (nodeName, node, createEntity) => {
       if (nodeName === 'a') {
@@ -14,15 +14,40 @@ export default html =>
 
       if (nodeName === 'img') {
         return createEntity(
-          'image',
+          'media',
           'IMMUTABLE',
-          { src: node.src },
+          {
+            setReadOnly: extraData.setReadOnly,
+            image: node.src,
+            edit: false,
+            handleImageUpload: extraData.handleImageUpload,
+            defaultImageSize: extraData.defaultImageSize,
+          },
+        );
+      }
+
+      if (node.id && node.id.includes('liveblog-codeblock-identifier-')) {
+        return createEntity(
+          'code-block',
+          'IMMUTABLE',
+          {
+            code: node.innerHTML,
+            title: node.id.replace('liveblog-codeblock-identifier-', '').replace('-', ' '),
+            setReadOnly: extraData.setReadOnly,
+          },
         );
       }
     },
 
-    htmlToBlock: (nodeName) => {
-      if (nodeName === 'img') {
+    htmlToBlock: (nodeName, node) => {
+      if (nodeName === 'p' && node.innerHTML === '') {
+        return false;
+      }
+
+      if (
+        nodeName === 'img' ||
+        (node.id && node.id.includes('liveblog-codeblock-identifier-'))
+      ) {
         return 'atomic';
       }
     },
