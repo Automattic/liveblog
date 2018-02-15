@@ -276,6 +276,24 @@ final class WPCOM_Liveblog {
 	}
 
 	/**
+	 * Get current user
+	 */
+	public static function get_current_user() {
+		if ( ! self::is_liveblog_editable() ) {
+			return false;
+		}
+
+		$user = wp_get_current_user();
+
+		return array(
+			'id' => $user->ID,
+			'key' => strtolower( $user->user_nicename ),
+			'name' => $user->display_name,
+			'avatar' => get_avatar( $user->ID, 20 ),
+		);
+	}
+
+	/**
 	 * This is where a majority of the magic happens.
 	 *
 	 * Hooked to template_redirect, this method tries to add anything it can to
@@ -550,6 +568,8 @@ final class WPCOM_Liveblog {
 		$args['post_id'] = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 		$args['content'] = isset( $_POST['content'] ) ? $_POST['content'] : '';
 		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
+		$args['author_id'] = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false;
+		$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? intval( $_POST['contributor_ids'] ) : false;
 
 		$entry = self::do_crud_entry($crud_action, $args);
 
@@ -952,6 +972,7 @@ final class WPCOM_Liveblog {
 				'post_id'                => get_the_ID(),
 				'state'                  => self::get_liveblog_state(),
 				'is_liveblog_editable'   => self::is_liveblog_editable(),
+				'current_user'			 =>	self::get_current_user(),
 				'socketio_enabled'       => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 				'key'                    => self::key,
