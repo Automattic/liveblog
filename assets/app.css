@@ -608,7 +608,11 @@
       flex-wrap: wrap;
   -webkit-box-align: start;
       -ms-flex-align: start;
-          align-items: flex-start; }
+          align-items: flex-start;
+  text-decoration: none; }
+
+.liveblog-meta-time {
+  display: block; }
 
 .liveblog-meta-author,
 .liveblog-meta-contributors {
