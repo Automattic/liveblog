@@ -307,9 +307,6 @@ final class WPCOM_Liveblog {
 			// process shortcodes in the comment contents and if we left any (like in the original content)
 			// we wouldn't like them to be processed
 
-			// Add Liveblog schema right before the content
-			add_filter( 'the_content', array( 'WPCOM_Liveblog_Schema', 'add_schema_to_content' ), 20);
-
 			// Add Liveblog content
 			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
 
@@ -1087,6 +1084,10 @@ final class WPCOM_Liveblog {
 		if ( ! self::is_viewing_liveblog_post() ) {
 			return $content;
 		}
+
+		 if ( apply_filters( 'liveblog_enable_schema', true ) ) {
+			 $content .= WPCOM_Liveblog_Schema::add_schema_to_content( $content );
+		 }
 
 		$liveblog_output  = '<div id="wpcom-liveblog-container" class="' . self::$post_id  .'"></div>';
 
