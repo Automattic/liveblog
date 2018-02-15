@@ -9,7 +9,6 @@ import { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
 
 import { EditorState, ContentState } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
@@ -19,7 +18,9 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 
-import Editor, { decorators, convertFromHTML } from '../Editor/index';
+import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
+
+import { getImageSize } from '../Editor/utils';
 
 class EditorContainer extends Component {
   constructor(props) {
@@ -31,7 +32,11 @@ class EditorContainer extends Component {
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
-        convertFromHTML(props.entry.content),
+        convertFromHTML(props.entry.content, {
+          setReadOnly: this.setReadOnly.bind(this),
+          handleImageUpload: this.handleImageUpload.bind(this),
+          defaultImageSize: props.config.default_image_size,
+        }),
         decorators,
       );
       initialAuthor = props.entry.author;
@@ -49,9 +54,16 @@ class EditorContainer extends Component {
       selectedAuthor: initialAuthor,
       preview: false,
       showAuthors: false,
+      readOnly: false,
     };
 
     this.onChange = editorState => this.setState({ editorState });
+  }
+
+  setReadOnly(state) {
+    this.setState({
+      readOnly: state,
+    });
   }
 
   setPreview(state) {
@@ -62,7 +74,7 @@ class EditorContainer extends Component {
 
   getContent() {
     const { editorState } = this.state;
-    return stateToHTML(editorState.getCurrentContent());
+    return convertToHTML(editorState.getCurrentContent());
   }
 
   publish() {
@@ -93,7 +105,10 @@ class EditorContainer extends Component {
       ContentState.createFromText(''),
     );
 
-    this.setState({ editorState: newEditorState });
+    this.setState({
+      editorState: newEditorState,
+      readOnly: false,
+    });
   }
 
   onSelectUsersChange(value) {
@@ -190,17 +205,22 @@ class EditorContainer extends Component {
       uploadImage(formData)
         .timeout(60000)
         .map(res => res.response)
-        .subscribe(res => resolve(res.data.url));
+        .subscribe((res) => {
+          const src = getImageSize(res.data.sizes, config.default_image_size);
+          resolve(src);
+        });
     });
   }
 
   render() {
     const {
       editorState,
-      suggestions, preview,
+      suggestions,
+      preview,
       selectedUsers,
       selectedAuthor,
       showAuthors,
+      readOnly,
     } = this.state;
 
     const { isEditing, config } = this.props;
@@ -232,6 +252,9 @@ class EditorContainer extends Component {
               onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
               autocompleteConfig={config.autocomplete}
               handleImageUpload={this.handleImageUpload.bind(this)}
+              readOnly={readOnly}
+              setReadOnly={this.setReadOnly.bind(this)}
+              defaultImageSize={config.default_image_size}
             />
         }
         <div

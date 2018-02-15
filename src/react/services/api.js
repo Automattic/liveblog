@@ -8,6 +8,8 @@ import {
   getCurrentTimestamp,
 } from '../utils/utils';
 
+const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
+
 export function getEntries(page, config, newestEntry) {
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
@@ -168,6 +170,17 @@ export function uploadImage(formData) {
     url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
     method: 'POST',
     body: formData,
+  };
+
+  return ajax(settings);
+}
+
+export function getMedia(params) {
+  const location = window.location;
+
+  const settings = {
+    url: `${location.protocol}//${location.hostname}/wp-json/wp/v2/media${getParams(params)}`,
+    method: 'GET',
   };
 
   return ajax(settings);

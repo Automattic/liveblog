@@ -1,4 +1,4 @@
-import { EditorState, SelectionState } from 'draft-js';
+import { EditorState } from 'draft-js';
 
 import removeBlock from './removeBlock';
 import addBlock from './addBlock';
@@ -20,16 +20,9 @@ export default (editorState, blockKey, selection) => {
 
   const newState = EditorState.push(editorState, contentStateAfterRemove, 'move-block');
 
-  const newSelection = new SelectionState({
-    anchorKey: blockKey,
-    anchorOffset: 0,
-    focusKey: blockKey,
-    focusOffset: 0,
-  });
-
   return EditorState.forceSelection(
     newState,
-    newSelection,
+    contentStateAfterRemove.getSelectionAfter(),
   );
 };
 
