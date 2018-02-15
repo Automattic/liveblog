@@ -14,15 +14,25 @@ class WPCOM_Liveblog_Schema {
 	protected $permalink;
 
 
+	/**
+	 * WPCOM_Liveblog_Schema constructor.
+	 *
+	 * @param $post_id
+	 */
 	public function __construct( $post_id ) {
 		$this->query   = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::key );
 		$this->post_id = $post_id;
 
-		// store permalink because it's used in a loop @ convert_comment_to_schema_entry
+		// store permalink because it's used in a loop @ convert_entry_to_schema_blog_posting
 		$this->permalink = get_permalink( $this->post_id );
 	}
 
 
+	/**
+	 * Generate the full schema HTML
+	 *
+	 * @return string
+	 */
 	public function render() {
 
 		$schema = $this->generate_schema();
@@ -40,7 +50,9 @@ class WPCOM_Liveblog_Schema {
 	}
 
 	/**
-	 * @return mixed|void
+	 * Generate an array of all the schema properties from liveblog updates
+	 *
+	 * @return array|mixed|void
 	 */
 	public function generate_schema() {
 
@@ -62,11 +74,20 @@ class WPCOM_Liveblog_Schema {
 			$schema['coverageEndTime'] = $end_time;
 		}
 
+		/**
+		 * Filter LiveBlogPosting schema - allow schema customization
+		 *
+		 * @param string                $schema  - an array of already generated schema data
+		 * @param int                   $post_id - the post_id shcema is generated for
+		 * @param WPCOM_Liveblog_Schema $this    - current schema class instance for $post_id
+		 */
 		return apply_filters( 'liveblog_schema_liveblogposting', $schema, $this->post_id, $this );
 	}
 
-	/*
-	 * Get all Liveblog entries and convert them to Schema BlogPosting
+	/**
+	 *  Get all Liveblog entries and convert them to Schema BlogPosting
+	 *
+	 * @return array
 	 */
 	public function get_live_blog_updates() {
 		$entries = (array) $this->query->get_all_entries_asc();
