@@ -1581,7 +1581,7 @@ final class WPCOM_Liveblog {
 	 * Checks if use_rest_api is on and the WordPress version supports it
 	 */
 	public static function use_rest_api() {
-		return apply_filters( 'liveblog_use_rest_api', self::use_rest_api && self::can_use_rest_api() );
+		return ( self::use_rest_api && self::can_use_rest_api() );
 	}
 
 	/**
