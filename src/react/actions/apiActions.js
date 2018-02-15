@@ -1,8 +1,9 @@
 import types from './actionTypes';
 
-export const getEntries = page => ({
+export const getEntries = (page, hash = false) => ({
   type: types.GET_ENTRIES,
   page,
+  hash,
 });
 
 export const getEntriesPaginated = (page, scrollTo) => ({

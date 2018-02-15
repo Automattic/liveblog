@@ -31,9 +31,16 @@
   color: #666;
 }
 
-.liveblog-meta-time {
+.entry-content .liveblog-meta-time {
   -ms-flex-preferred-size: 60px;
   flex-basis: 60px;
+}
+
+.entry-content .liveblog-meta-time,
+.entry-content .liveblog-meta-time:hover,
+.entry-content .liveblog-meta-time:focus {
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
 .liveblog-meta-time span {

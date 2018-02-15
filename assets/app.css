@@ -1,5 +1,5 @@
 /**
- * Draft v0.10.5
+ * Draft v0.10.3
  *
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -181,7 +181,11 @@
       flex-wrap: nowrap;
   -webkit-box-align: start;
       -ms-flex-align: start;
-          align-items: flex-start; }
+          align-items: flex-start;
+  text-decoration: none; }
+
+.liveblog-meta-time {
+  display: block; }
 
 .liveblog-meta-time span {
   display: block; }
