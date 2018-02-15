@@ -112,7 +112,7 @@ class WPCOM_Liveblog_Schema {
 			return '';
 		}
 
-		return $start_time = $entries_asc[0]['datePublished'];
+		return $entries_asc[0]['datePublished'];
 	}
 
 	/**
