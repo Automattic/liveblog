@@ -26,7 +26,7 @@
 .liveblog-editor-container
 .public-DraftEditor-content[contenteditable="false"]
 .liveblog-block:not(.is-editing)::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -41,7 +41,7 @@
   align-items: center;
   flex-basis: 100%;
   padding: .4rem;
-  border-bottom: $base-border-size solid darken($color-grey-x-light , 5%);
+  border-bottom: $base-border-size solid darken($color-grey-x-light, 5%);
 
   @include mq($until: large) {
     text-align: center;
