@@ -13,19 +13,22 @@ import {
   parseTemplate,
   getTriggerRange,
   hasEntityAtSelection,
-  scrollElementIfNotInView,
   getTopPosition,
-  uniqueHTMLId,
+  focusableBlockIsSelected,
 } from './utils';
 
+import upArrowBinding from './keyBindings/upArrow';
+import downArrowBinding from './keyBindings/downArrow';
+import returnBinding from './keyBindings/returnBinding';
+import keyBindingFunc from './keyBindings/keyBindingFunc';
+
 import addAutocomplete from './modifiers/addAutocomplete';
-import addImage from './modifiers/addImage';
+import addAtomicBlock from './modifiers/addAtomicBlock';
 import moveBlock from './modifiers/moveBlock';
-import addPlaceholder from './modifiers/addPlaceholder';
 import skipOverEntity from './modifiers/skipOverEntity';
+import addNewLine from './modifiers/addNewLine';
 
 import blockRenderer from './blocks/blockRenderer';
-
 import Toolbar from './Toolbar';
 import Suggestions from './Suggestions';
 
@@ -38,8 +41,20 @@ class EditorWrapper extends Component {
     };
   }
 
-  componentWillMount() {
-    this.inputId = uniqueHTMLId('imageUpload');
+  /**
+   * If focus is set to a block on mount, set the selection to
+   * just after it for a better UX. This can happen in an edge case
+   * when there is a block at the top of the content when we are converting
+   * from HTML to the editor.
+   */
+  componentDidMount() {
+    const { onChange, editorState } = this.props;
+
+    if (focusableBlockIsSelected(editorState)) {
+      onChange(
+        addNewLine(editorState),
+      );
+    }
   }
 
   /**
@@ -48,7 +63,10 @@ class EditorWrapper extends Component {
    */
   updateEditorState(editorState) {
     const { onChange, resetSuggestions, suggestions } = this.props;
-    onChange(editorState);
+
+    onChange(
+      editorState,
+    );
 
     // Wait until the state has been updated.
     setTimeout(() => {
@@ -81,99 +99,68 @@ class EditorWrapper extends Component {
   }
 
   /**
-   * Down Arrow handler to scroll through suggestion list if it exists
-   */
-  onDownArrow(e) {
+  * Down Arrow Binding
+  * @param {event} event
+  */
+  onDownArrow(event) {
     const { autocompleteState } = this.state;
-    const { suggestions } = this.props;
-
-    if (!autocompleteState) return 'not-handled';
-
-    e.preventDefault();
-    const selectedIndex = autocompleteState.selectedIndex;
-    const newIndex = selectedIndex + 1;
-
-    this.setState({
-      autocompleteState: {
-        ...autocompleteState,
-        selectedIndex: (selectedIndex >= suggestions.length - 1)
-          ? selectedIndex
-          : newIndex,
-      },
-    });
-
-    const selectedSuggestionDomNode = this.suggestions[`item${newIndex}`];
-    if (!selectedSuggestionDomNode) return 'handled';
-
-    scrollElementIfNotInView(
-      selectedSuggestionDomNode,
-      this.suggestions.list,
+    const { editorState, onChange, suggestions } = this.props;
+    return downArrowBinding(
+      editorState,
+      autocompleteState,
+      onChange,
+      this.setState.bind(this),
+      event,
+      this.suggestions,
+      suggestions,
     );
-
-    return 'handled';
   }
 
   /**
-   * Up Arrow handler to scroll through suggestion list if it exists
+   * Up Arrow Binding
+   * @param {event} event
    */
-  onUpArrow(e) {
+  onUpArrow(event) {
     const { autocompleteState } = this.state;
-
-    if (!autocompleteState) return 'not-handled';
-
-    const selectedIndex = autocompleteState.selectedIndex;
-    const newIndex = Math.max(selectedIndex - 1, 0);
-
-    e.preventDefault();
-
-    this.setState({
-      autocompleteState: {
-        ...autocompleteState,
-        selectedIndex: newIndex,
-      },
-    });
-
-    const selectedSuggestionDomNode = this.suggestions[`item${newIndex}`];
-    if (!selectedSuggestionDomNode) return 'handled';
-
-    scrollElementIfNotInView(
-      selectedSuggestionDomNode,
-      this.suggestions.list,
+    const { editorState, onChange } = this.props;
+    return upArrowBinding(
+      editorState,
+      autocompleteState,
+      onChange,
+      this.setState.bind(this),
+      event,
+      this.suggestions,
     );
-
-    return 'handled';
   }
 
   /**
-   * Escape handler to exit suggestion list if it exists
+   * Escape arrow binding
+   * @param {event} event
    */
-  onEscape(e) {
+  onEscape(event) {
     const { autocompleteState } = this.state;
-
     if (!autocompleteState) return 'not-handled';
-
-    e.preventDefault();
+    event.preventDefault();
     this.setState({ autocompleteState: null });
     return 'handled';
   }
 
   /**
-   * Return handler to choose suggestion from list if it exists
+   * Return arrow binding
+   * @param {event} event
    */
-  handleReturn(e) {
+  handleReturn(event) {
     const { autocompleteState } = this.state;
-    const { suggestions } = this.props;
+    const { suggestions, onChange, editorState } = this.props;
 
-    if (
-      !autocompleteState ||
-      !suggestions[autocompleteState.selectedIndex]
-    ) {
-      return 'not-handled';
-    }
-
-    e.preventDefault();
-    this.turnSuggestionIntoEntity();
-    return 'handled';
+    return returnBinding(
+      editorState,
+      autocompleteState,
+      onChange,
+      event,
+      suggestions,
+      this.turnSuggestionIntoEntity.bind(this),
+    );
   }
 
   /**
@@ -242,48 +229,31 @@ class EditorWrapper extends Component {
   }
 
   /**
-   * Handle Image upload on press.
-   */
-  uploadImages() {
-    const { handleImageUpload, editorState } = this.props;
-    const files = this.imageUpload.files;
-
-    if (files.length === 0) return;
-
-    Array.from(files).forEach((file) => {
-      this.updateEditorState(
-        addPlaceholder(editorState),
-      );
-
-      handleImageUpload(file).then((url) => {
-        this.updateEditorState(
-          addImage(editorState, false, url),
-        );
-      });
-    });
-
-    // Clear input value so the same file can be upload again if user wants to.
-    this.imageUpload.value = '';
-  }
-
-  /**
    * Handle Image upload on drop. We bail for any other files.
    */
   handleDroppedFiles(selection, files) {
-    const { handleImageUpload, editorState } = this.props;
+    const { handleImageUpload, editorState, setReadOnly, defaultImageSize } = this.props;
+    if (!files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.name.match(/.(jpg|jpeg|png|gif)$/i)) return;
+    this.updateEditorState(
+      addAtomicBlock(editorState, false, {}, 'placeholder'),
+    );
 
+    handleImageUpload(files[0]).then((src) => {
       this.updateEditorState(
-        addPlaceholder(editorState, selection),
+        addAtomicBlock(
+          editorState,
+          false,
+          {
+            setReadOnly,
+            image: src,
+            edit: false,
+            handleImageUpload,
+            defaultImageSize,
+          },
+          'media',
+        ),
       );
-
-      handleImageUpload(file).then((url) => {
-        this.updateEditorState(
-          addImage(editorState, selection, url),
-        );
-      });
     });
   }
 
@@ -293,6 +263,7 @@ class EditorWrapper extends Component {
    * by using RichUtils.handleKeyCommand()
    */
   handleKeyCommand(command) {
+    if (command === 'handled') return 'handled';
     const { editorState } = this.props;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
@@ -303,57 +274,75 @@ class EditorWrapper extends Component {
   }
 
   /**
-   * If its an internal image we handle its repositioning. Everything else we bail on
-   * because how the editor should handle other things will need some thought.
-   */
+  * If a draft block is dropped handle its reposition to the new selection. Annoyingly this
+  * event never gets fired in IE11 and it silently fails. This issue has been documented
+  * so hopefully will be resolved soon.
+  * https://github.com/facebook/draft-js/issues/1174
+  */
   handleDrop(selection, dataTransfer, location) {
-    if (location === 'external') return 'not-handled';
-    const type = dataTransfer.data.getData('type');
-    if (!type || type !== 'image') return 'not-handled';
+    if (location === 'external') return 'handled';
+    let handled = 'not-handled';
+    const raw = dataTransfer.data.getData('text');
+    const data = raw ? raw.split(':') : [];
+    if (data.length !== 2) return 'not-handled';
+    if (data[0] === 'DRAFT_BLOCK') {
+      const { editorState } = this.props;
+      const blockKey = data[1];
+      this.updateEditorState(
+        moveBlock(editorState, blockKey, selection),
+      );
+      handled = 'handled';
+    }
 
-    const { editorState } = this.props;
-    const blockKey = dataTransfer.data.getData('key');
+    /**
+     * Fix for an issue where drop breaks onChange. There is an open
+     * pull request which fixes the issue which means we will no longer
+     * need this once this has been merged.
+     * https://github.com/facebook/draft-js/issues/1383
+     */
+    const mouseUpEvent = new MouseEvent('mouseup', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    this.editor.refs.editor.dispatchEvent(mouseUpEvent);
 
-    this.updateEditorState(
-      moveBlock(editorState, blockKey, selection),
-    );
-
-    return 'handled';
+    return handled;
   }
 
   render() {
-    const {
-      autocompleteState,
-    } = this.state;
+    const { autocompleteState } = this.state;
 
     const {
       editorState,
       onChange,
       suggestions,
       onSearch,
+      readOnly,
+      setReadOnly,
+      handleImageUpload,
+      defaultImageSize,
     } = this.props;
 
     return (
-      <div className="liveblog-editor-inner-container">
-        <input
-          ref={ref => this.imageUpload = ref}
-          style={{ display: 'none' }}
-          type="file"
-          id={this.inputId}
-          onChange={this.uploadImages.bind(this)}
-          accept="image/jpeg,image/gif,image/png,image/jpg"
-        />
+      <div className="liveblog-editor-inner-container" onDrop={(event) => {
+        // Fix for Draft Bug not always correctly handling handleDrop
+        if (!event.target.isContentEditable) event.preventDefault();
+      }}>
         <Toolbar
-          imageInputId={this.inputId}
           editor={this.editor}
           editorState={editorState}
           onChange={onChange}
+          handleImageUpload={handleImageUpload}
+          setReadOnly={setReadOnly}
+          readOnly={readOnly}
+          defaultImageSize={defaultImageSize}
         />
         <div style={{ position: 'relative' }} >
           <Editor
             editorState={editorState}
             onChange={this.updateEditorState.bind(this)}
-            blockRendererFn={block => blockRenderer(block, editorState)}
+            blockRendererFn={block => blockRenderer(block, editorState, onChange)}
             ref={node => this.editor = node}
             onDownArrow={this.onDownArrow.bind(this)}
             onUpArrow={this.onUpArrow.bind(this)}
@@ -362,7 +351,9 @@ class EditorWrapper extends Component {
             handleDroppedFiles={this.handleDroppedFiles.bind(this)}
             handleDrop={this.handleDrop.bind(this)}
             handleKeyCommand={this.handleKeyCommand.bind(this)}
+            keyBindingFn={event => keyBindingFunc(event, editorState, onChange)}
             spellCheck={true}
+            readOnly={readOnly}
           />
           <Suggestions
             turnIntoEntity={index => this.turnSuggestionIntoEntity(index)}
@@ -394,6 +385,9 @@ EditorWrapper.propTypes = {
   editorState: PropTypes.object,
   onSearch: PropTypes.func,
   handleImageUpload: PropTypes.func,
+  readOnly: PropTypes.bool,
+  setReadOnly: PropTypes.func,
+  defaultImageSize: PropTypes.string,
 };
 
 export default EditorWrapper;
