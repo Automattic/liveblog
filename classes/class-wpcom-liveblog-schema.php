@@ -108,11 +108,18 @@ class WPCOM_Liveblog_Schema {
 	 * @return string
 	 */
 	public function get_start_time( $entries_asc ) {
-		if ( ! isset( $entries_asc[0] ) || ! isset( $entries_asc[0]['datePublished'] ) ) {
+
+		if ( ! is_array( $entries_asc ) || empty( $entries_asc ) ) {
 			return '';
 		}
 
-		return $entries_asc[0]['datePublished'];
+		$first_value = array_shift( $entries_asc );
+
+		if ( ! empty( $first_value['datePublished'] ) ) {
+			return '';
+		}
+
+		return $first_value['datePublished'];
 	}
 
 	/**
