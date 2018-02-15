@@ -1086,7 +1086,8 @@ final class WPCOM_Liveblog {
 		}
 
 		 if ( apply_filters( 'liveblog_enable_schema', true ) ) {
-			 $content .= WPCOM_Liveblog_Schema::add_schema_to_content( $content );
+			 $schema  = new WPCOM_Liveblog_Schema( self::$post_id );
+			 $content .= $schema->render();
 		 }
 
 		$liveblog_output  = '<div id="wpcom-liveblog-container" class="' . self::$post_id  .'"></div>';

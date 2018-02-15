@@ -21,20 +21,7 @@ class WPCOM_Liveblog_Schema {
 		// store permalink because it's used in a loop @ convert_comment_to_schema_entry
 		$this->permalink = get_permalink( $this->post_id );
 	}
-
-	public static function add_schema_to_content( $content ) {
-
-		try {
-			$post_id = WPCOM_Liveblog::get_post_id();
-		} catch ( Exception $e ) {
-			$post_id = get_the_ID();
-		}
-
-		$schema = new static( $post_id );
-
-		return $content . $schema->render();
-
-	}
+	
 
 	public function render() {
 
