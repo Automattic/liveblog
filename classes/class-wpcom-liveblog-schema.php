@@ -59,8 +59,7 @@ class WPCOM_Liveblog_Schema {
 		$updates    = (array) $this->get_live_blog_updates();
 		$start_time = $this->get_start_time( $updates );
 		$end_time   = $this->get_end_time( $updates );
-
-
+		
 		$schema = array(
 			"@context"          => "http://schema.org",
 			"@type"             => "LiveBlogPosting",
@@ -135,7 +134,7 @@ class WPCOM_Liveblog_Schema {
 			return '';
 		}
 
-		$latest_update = $entries_asc[ count( $entries_asc ) - 1 ];
+		$latest_update = array_pop($entries_asc);
 		if ( ! isset( $latest_update['datePublished'] ) ) {
 			return '';
 		}
