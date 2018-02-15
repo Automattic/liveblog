@@ -8,6 +8,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  text-decoration: none;
+}
+
+.liveblog-meta-time {
+  display: block;
 }
 
 .liveblog-meta-author,
