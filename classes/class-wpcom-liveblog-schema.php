@@ -21,7 +21,7 @@ class WPCOM_Liveblog_Schema {
 		// store permalink because it's used in a loop @ convert_comment_to_schema_entry
 		$this->permalink = get_permalink( $this->post_id );
 	}
-	
+
 
 	public function render() {
 
@@ -62,7 +62,7 @@ class WPCOM_Liveblog_Schema {
 			$schema['coverageEndTime'] = $end_time;
 		}
 
-		return apply_filters( 'liveblog_schema_liveblogposting', $schema );
+		return apply_filters( 'liveblog_schema_liveblogposting', $schema, $this->post_id, $this );
 	}
 
 	/*
