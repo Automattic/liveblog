@@ -89,6 +89,8 @@ class WPCOM_Liveblog_Schema {
 	 * @return array
 	 */
 	public function get_live_blog_updates() {
+
+		// `get_all_entries_asc` may return null, cast to array:
 		$entries = (array) $this->query->get_all_entries_asc();
 
 		if ( empty( $entries ) ) {
@@ -130,6 +132,8 @@ class WPCOM_Liveblog_Schema {
 	 */
 	public function get_end_time( $entries_asc ) {
 
+		// Make sure entries exist, and
+		// Only show end time if the Liveblog has ended ( is archived )
 		if ( ! is_array( $entries_asc ) || empty( $entries_asc ) || 'archive' !== WPCOM_Liveblog::get_liveblog_state() ) {
 			return '';
 		}
@@ -159,6 +163,7 @@ class WPCOM_Liveblog_Schema {
 			// ID Format can be found in the DOM ".liveblog-feed > .liveblog-entry#id_**":
 			"url"           => $this->permalink . '#id_' . $entry->get_id(),
 			"datePublished" => $dateTime->setTimeStamp( $entry->get_timestamp() )->format( DateTime::ISO8601 ),
+			// articleBody doesn't support HTML - remove any HTML from the content
 			"articleBody"   => wp_strip_all_tags( $entry->get_content() ),
 			"author"        => array(
 				"name" => $entry->get_author_name()
