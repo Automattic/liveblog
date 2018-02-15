@@ -23,7 +23,7 @@ class WPCOM_Liveblog_Schema {
 	}
 
 	public static function add_schema_to_content( $content ) {
-		
+
 		try {
 			$post_id = WPCOM_Liveblog::get_post_id();
 		} catch ( Exception $e ) {
@@ -31,6 +31,7 @@ class WPCOM_Liveblog_Schema {
 		}
 
 		$schema = new static( $post_id );
+
 		return $content . $schema->render();
 
 	}
@@ -39,16 +40,16 @@ class WPCOM_Liveblog_Schema {
 
 		$schema = $this->generate_schema();
 
-		if ( is_array( $schema ) ) {
-			$output = '';
-			$output .= '<script type="application/ld+json">';
-			$output .= wp_json_encode( $schema );
-			$output .= '</script>';
-
-			return $output;
+		if ( ! is_array( $schema ) ) {
+			return '';
 		}
 
-		return '';
+		$output = '';
+		$output .= '<script type="application/ld+json">';
+		$output .= wp_json_encode( $schema );
+		$output .= '</script>';
+
+		return $output;
 	}
 
 	/**
@@ -83,11 +84,11 @@ class WPCOM_Liveblog_Schema {
 	public function get_live_blog_updates() {
 		$entries = (array) $this->query->get_all_entries_asc();
 
-		if ( ! empty( $entries ) ) {
-			return array_map( array( $this, 'convert_entry_to_schema_blog_posting' ), $entries );
+		if ( empty( $entries ) ) {
+			return array();
 		}
 
-		return array();
+		return array_map( array( $this, 'convert_entry_to_schema_blog_posting' ), $entries );
 	}
 
 
@@ -115,14 +116,16 @@ class WPCOM_Liveblog_Schema {
 	 */
 	public function get_end_time( $entries_asc ) {
 
-		if ( 'archive' === WPCOM_Liveblog::get_liveblog_state() && is_array( $entries_asc ) ) {
-			$latest_update = $entries_asc[ count( $entries_asc ) - 1 ];
-			if ( isset( $latest_update['datePublished'] ) ) {
-				return $latest_update['datePublished'];
-			}
+		if ( ! is_array( $entries_asc ) || empty( $entries_asc ) || 'archive' !== WPCOM_Liveblog::get_liveblog_state() ) {
+			return '';
 		}
 
-		return '';
+		$latest_update = $entries_asc[ count( $entries_asc ) - 1 ];
+		if ( ! isset( $latest_update['datePublished'] ) ) {
+			return '';
+		}
+
+		return $latest_update['datePublished'];
 	}
 
 	/**
