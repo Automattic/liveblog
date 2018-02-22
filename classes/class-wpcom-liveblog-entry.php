@@ -5,13 +5,13 @@
  */
 class WPCOM_Liveblog_Entry {
 
-	const default_avatar_size = 30;
+	const DEFAULT_AVATAR_SIZE = 30;
 
 	/**
 	 * @var string In case the current entry is an edit (replaces) of
 	 * another entry, we store the other entry's ID in this meta key.
 	 */
-	const replaces_meta_key = 'liveblog_replaces';
+	const REPLACES_META_KEY = 'liveblog_replaces';
 
 	private $comment;
 	private $type = 'new';
@@ -29,7 +29,7 @@ class WPCOM_Liveblog_Entry {
 
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
-		$this->replaces = get_comment_meta( $comment->comment_ID, self::replaces_meta_key, true );
+		$this->replaces = get_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, true );
 		if ( $this->replaces && $this->get_content() ) {
 			$this->type = 'update';
 		}
@@ -97,7 +97,7 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
-		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
 		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
 		$entry       = array(
 			'id'          => $entry_id,
@@ -118,7 +118,7 @@ class WPCOM_Liveblog_Entry {
 	public function get_fields_for_render() {
 		$entry_id     = $this->replaces ? $this->replaces : $this->comment->comment_ID;
 		$post_id      = $this->comment->comment_post_ID;
-		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::default_avatar_size );
+		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
 		$comment_text = get_comment_text( $entry_id );
 		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
 		$entry        = array(
@@ -215,7 +215,7 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
-		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 		wp_update_comment(
 			array(
 				'comment_ID'      => $args['entry_id'],
@@ -244,7 +244,7 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
-		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
+		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;

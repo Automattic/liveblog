@@ -13,11 +13,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Set the meta_key and meta_value
 	 */
-	const meta_key          = 'liveblog_key_entry';
-	const meta_value        = 'true';
-	const meta_key_template = '_liveblog_key_entry_template';
-	const meta_key_format   = '_liveblog_key_entry_format';
-	const meta_key_limit    = '_liveblog_key_entry_limit';
+	const META_KEY          = 'liveblog_key_entry';
+	const META_VALUE        = 'true';
+	const META_KEY_TEMPLATE = '_liveblog_key_entry_template';
+	const META_KEY_FORMAT   = '_liveblog_key_entry_format';
+	const META_KEY_LIMIT    = '_liveblog_key_entry_limit';
 
 	/**
 	 * Template to render entries
@@ -107,7 +107,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @return mixed
 	 */
 	public static function is_key_event( $id ) {
-		if ( self::meta_value === get_comment_meta( $id, self::meta_key, true ) ) {
+		if ( self::META_VALUE === get_comment_meta( $id, self::META_KEY, true ) ) {
 			return true;
 		}
 		return false;
@@ -122,7 +122,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @param $post_id
 	 */
 	public static function add_key_action( $content, $id, $post_id ) {
-		add_comment_meta( $id, self::meta_key, self::meta_value );
+		add_comment_meta( $id, self::META_KEY, self::META_VALUE );
 	}
 
 	/**
@@ -131,7 +131,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @param $id
 	 */
 	public static function remove_key_action( $content, $id ) {
-		delete_comment_meta( $id, self::meta_key, self::meta_value );
+		delete_comment_meta( $id, self::META_KEY, self::META_VALUE );
 		return str_replace( '/key', '', $content );
 	}
 
@@ -187,7 +187,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			}
 
 			// Store this template on the post.
-			update_post_meta( $post_id, self::meta_key_template, $template );
+			update_post_meta( $post_id, self::META_KEY_TEMPLATE, $template );
 
 			// The default format.
 			$format = 'first-linebreak';
@@ -198,12 +198,12 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			}
 
 			// Store this format on the post.
-			update_post_meta( $post_id, self::meta_key_format, $format );
+			update_post_meta( $post_id, self::META_KEY_FORMAT, $format );
 
 			// If isn't a valid number turns it into 0, which returns all key events
 			$limit = absint( $response['liveblog-key-limit'] );
 			if ( isset( $limit ) ) {
-				update_post_meta( $post_id, self::meta_key_limit, $limit );
+				update_post_meta( $post_id, self::META_KEY_LIMIT, $limit );
 			}
 		}
 	}
@@ -220,9 +220,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Add the custom template fields to the editor.
 		$extra_fields[] = WPCOM_Liveblog::get_template_part(
 			'liveblog-key-admin.php', array(
-				'current_key_template' => get_post_meta( $post_id, self::meta_key_template, true ),
-				'current_key_format'   => get_post_meta( $post_id, self::meta_key_format, true ),
-				'current_key_limit'    => get_post_meta( $post_id, self::meta_key_limit, true ),
+				'current_key_template' => get_post_meta( $post_id, self::META_KEY_TEMPLATE, true ),
+				'current_key_format'   => get_post_meta( $post_id, self::META_KEY_FORMAT, true ),
+				'current_key_limit'    => get_post_meta( $post_id, self::META_KEY_LIMIT, true ),
 				'key_name'             => __( 'Template:', 'liveblog' ),
 				'key_format_name'      => __( 'Format:', 'liveblog' ),
 				'key_description'      => __( 'Set template for key events shortcode, select a format and restrict most recent shown.', 'liveblog' ),
@@ -245,7 +245,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function get_current_template( $post_id ) {
 
 		// Get the template meta from the post.
-		$type = get_post_meta( $post_id, self::meta_key_template, true );
+		$type = get_post_meta( $post_id, self::META_KEY_TEMPLATE, true );
 
 		// If the post has a template set, return that.
 		if ( ! empty( $type ) ) {
@@ -265,7 +265,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function get_current_format( $post_id ) {
 
 		// Get the format meta from the post.
-		$type = get_post_meta( $post_id, self::meta_key_format, true );
+		$type = get_post_meta( $post_id, self::META_KEY_FORMAT, true );
 
 		// If the post has a format set, return that.
 		if ( ! empty( $type ) ) {
@@ -355,17 +355,17 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// The args to pass into the entry query.
 		$args = array(
-			'meta_key'   => self::meta_key,
-			'meta_value' => self::meta_value,
+			'meta_key'   => self::META_KEY,
+			'meta_value' => self::META_VALUE,
 		);
 
-		$limit = get_post_meta( $post->ID, self::meta_key_limit, true );
+		$limit = get_post_meta( $post->ID, self::META_KEY_LIMIT, true );
 		if ( isset( $limit ) ) {
 			$args['number'] = $limit;
 		}
 
 		// Build the entry query.
-		$entry_query = new WPCOM_Liveblog_Entry_Query( $post->ID, WPCOM_Liveblog::key );
+		$entry_query = new WPCOM_Liveblog_Entry_Query( $post->ID, WPCOM_Liveblog::KEY );
 
 		// Execute the entry query with the previously defined args.
 		$entries = (array) $entry_query->get_all( $args );
@@ -395,13 +395,13 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @return array
 	 */
 	public static function all() {
-		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::key );
+		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::KEY );
 		$key_events = $query->get(
 			array(
 				'meta_query' => array(
 					array(
-						'key'     => self::meta_key,
-						'value'   => self::meta_value,
+						'key'     => self::META_KEY,
+						'value'   => self::META_VALUE,
 						'compare' => '===',
 					),
 				),

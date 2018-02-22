@@ -14,6 +14,6 @@ class Test_Liveblog extends WP_UnitTestCase {
 	}
 
 	public function test_protected_liveblog_meta_should_return_true() {
-		$this->assertEquals( true, is_protected_meta( WPCOM_Liveblog::key ) );
+		$this->assertEquals( true, is_protected_meta( WPCOM_Liveblog::KEY ) );
 	}
 }
