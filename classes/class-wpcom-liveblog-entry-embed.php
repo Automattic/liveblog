@@ -220,7 +220,8 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		if ( ! is_array( $comment_metas ) ) {
 			return;
 		}
-		if ( ! $comment_meta_keys = array_keys( $comment_metas ) ) {
+		$comment_meta_keys = array_keys( $comment_metas )
+		if ( ! $comment_meta_keys ) {
 			return;
 		}
 
