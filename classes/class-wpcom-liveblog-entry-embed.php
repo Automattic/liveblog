@@ -20,7 +20,6 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 * being created on the fly on frontend
 	 */
 	public function maybe_run_ajax_cache() {
-		return;
 	}
 
 	/**
@@ -242,7 +241,6 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 * @param int $comment_id Comment ID to do the caching for.
 	 */
 	public function cache_oembed( $comment_id ) {
-		return;
 	}
 
 	/**
