@@ -29,7 +29,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 */
 	public function __construct() {
 		$widget_ops = array(
-			'class_name' => 'liveblog-key-events-widget',
+			'class_name'  => 'liveblog-key-events-widget',
 			'description' => __( 'A list of key events displayed when the user is viewing a Liveblog post.', 'liveblog' ),
 		);
 
@@ -95,7 +95,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return array Updated safe values to be saved.
 	 */
 	public function update( $new_instance, $old_instance ) {
-		$instance = array();
+		$instance          = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
 
 		return $instance;
