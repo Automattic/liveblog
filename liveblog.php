@@ -25,7 +25,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
  */
 	final class WPCOM_Liveblog {
 
-	/** Constants *************************************************************/
+		/** Constants *************************************************************/
 		const VERSION                 = '1.7.1';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
@@ -47,7 +47,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		const RESPONSE_CACHE_MAX_AGE          = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
 		const USE_REST_API                    = true; // Use the REST API if current version is at least MIN_WP_REST_API_VERSION. Allows for easy disabling/enabling
 
-	/** Variables *************************************************************/
+		/** Variables *************************************************************/
 
 		public static $post_id                = null;
 		private static $entry_query           = null;
@@ -59,9 +59,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
 
 
-	/** Load Methods **********************************************************/
+		/** Load Methods **********************************************************/
 
-	/**
+		/**
 	 * @uses add_action() to hook methods into WordPress actions
 	 * @uses add_filter() to hook methods into WordPress filters
 	 */
@@ -117,7 +117,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			echo wp_kses_post( self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ) );
 		}
 
-	/**
+		/**
 	 * Include the necessary files
 	 */
 		private static function includes() {
@@ -153,7 +153,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php';
 		}
 
-	/**
+		/**
 	 * Hook actions in that run on every page-load
 	 *
 	 * @uses add_action()
@@ -170,7 +170,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
 		}
 
-	/**
+		/**
 	 * Hook filters in that run on every page-load
 	 *
 	 * @uses add_filter()
@@ -188,7 +188,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'update_autoarchive_expiry' ), 10, 1 );
 		}
 
-	/**
+		/**
 	 * Hook actions in that run on every admin page-load
 	 *
 	 * @uses add_action()
@@ -206,7 +206,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'pre_get_posts', array( __CLASS__, 'handle_query_vars_for_post_filtering' ) );
 		}
 
-	/**
+		/**
 	 * Hook filters in that run on every admin page-load
 	 *
 	 * @uses add_filter()
@@ -228,9 +228,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			wp_embed_register_handler( 'liveblog_image', '/\.(png|jpe?g|gif)(\?.*)?$/', array( 'WPCOM_Liveblog', 'image_embed_handler' ), 99 );
 		}
 
-	/** Public Methods ********************************************************/
+		/** Public Methods ********************************************************/
 
-	/**
+		/**
 	 * Liveblog initialization functions.
 	 *
 	 * This is where Liveblog sets up any additional things it needs to run
@@ -238,13 +238,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	 * taxonomies, we modify endpoints and add post type support for Liveblog.
 	 */
 		public static function init() {
-		/**
+			/**
 		 * Add liveblog support to the 'post' post type. This is done here so
 		 * we can possibly introduce this to other post types later.
 		 */
 			add_post_type_support( 'post', self::KEY );
 
-		/**
+			/**
 		 * Apply a Filter to Setup our Auto Archive Days.
 		 * NULL is classed as disabled.
 		 */
@@ -264,7 +264,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/**
+		/**
 	 * Returns the ID of the Liveblog post.
 	 *
 	 * @throws Exception when called before post ID is set
@@ -278,7 +278,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return self::$post_id;
 		}
 
-	/**
+		/**
 	 * This is where a majority of the magic happens.
 	 *
 	 * Hooked to template_redirect, this method tries to add anything it can to
@@ -344,7 +344,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 			}
 
-		/**
+			/**
 		 * Fires just before the Liveblog's ajax request is handled by one of the methods
 		 *
 		 * @param string $response_method The name of the method used for handling the request.
@@ -355,7 +355,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		}
 
-	/**
+		/**
 	 * Look for any new Liveblog entries, and return them via JSON
 	 * Legacy endpoint for pre 4.4 installs
 	 */
@@ -376,7 +376,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::json_return( $result_for_json );
 		}
 
-	/**
+		/**
 	 * Get Liveblog entries between a start and end time for a post
 	 *
 	 * @param int $start_timestamp  The start time boundary
@@ -406,7 +406,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$per_page    = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 			if ( ! empty( $entries ) ) {
-			/**
+				/**
 			 * Loop through each liveblog entry, set the most recent timestamp, and
 			 * put the JSON data for each entry into a neat little array.
 			 */
@@ -435,7 +435,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $result;
 		}
 
-	/**
+		/**
 	 * Is a given post_id a liveblog enabled post?
 	 *
 	 * @global WP_Post $post
@@ -447,7 +447,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return (bool) $state;
 		}
 
-	/**
+		/**
 	 * Are we viewing a liveblog post?
 	 *
 	 * @uses is_single()
@@ -458,7 +458,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return (bool) ( is_single() && self::is_liveblog_post() );
 		}
 
-	/**
+		/**
 	 * One of: 'enable', 'archive', false.
 	 */
 		public static function get_liveblog_state( $post_id = null ) {
@@ -485,9 +485,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $state;
 		}
 
-	/** Private _is_ Methods **************************************************/
+		/** Private _is_ Methods **************************************************/
 
-	/**
+		/**
 	 * Is this the initial page request?
 	 *
 	 * Note that we do not use get_query_var() - it returns '' for all requests,
@@ -502,7 +502,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return (bool) ! isset( $wp_query->query_vars[ self::KEY ] );
 		}
 
-	/**
+		/**
 	 * Is this an ajax request for the entries?
 	 *
 	 * @uses get_query_var() to check for the URL_ENDPOINT
@@ -512,7 +512,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return (bool) get_query_var( self::URL_ENDPOINT );
 		}
 
-	/**
+		/**
 	 * Get timestamps from the current WP_Query
 	 *
 	 * Ensures that two timestamps exist, and returns a properly formatted empty
@@ -582,7 +582,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/**
+		/**
 	 * Perform a specific CRUD action on an entry for a post
 	 *
 	 * @param string $crud_action Allowed actions are insert|update|delete|delete_key
@@ -607,7 +607,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $entry;
 		}
 
-	/**
+		/**
 	 * Fetches the Liveblog entry with the ID given in the $_GET superglobal, and returns it via JSON.
 	 */
 		public static function ajax_single_entry() {
@@ -622,7 +622,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::json_return( $result_for_json );
 		}
 
-	/**
+		/**
 	 * Get a single Liveblog entry for a post by entry ID
 	 *
 	 * @param int $entry_id The ID of the entry
@@ -690,7 +690,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $result_for_json;
 		}
 
-	/**
+		/**
 	 * Fetches all Liveblog entries that are to be lazyloaded, and returns them via JSON.
 	 */
 		public static function ajax_lazyload_entries() {
@@ -707,7 +707,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::json_return( $result_for_json );
 		}
 
-	/**
+		/**
 	 * Get all Liveblog entries that are to be lazyloaded.
 	 *
 	 * @param int $max_timestamp Maximum timestamp for the Liveblog entries.
@@ -752,7 +752,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $result;
 		}
 
-	/**
+		/**
 	 * Get all entries for specific page
 	 *
 	 * @param int $page Requested Page.
@@ -809,7 +809,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $result;
 		}
 
-	/**
+		/**
 	 * Convert array of entries to there json response.
 	 * @param type $entries
 	 * @return array
@@ -823,7 +823,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 
-	/**
+		/**
 	 * Flattens Entries by running updates and deletes to get actual
 	 * list of entries
 	 *
@@ -868,7 +868,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::json_return( $entry_content );
 		}
 
-	/**
+		/**
 	 * Format the passed in content and give it back in an array
 	 *
 	 * @param string $entry_content The entry content to be previewed
@@ -891,9 +891,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 
-	/** Comment Methods *******************************************************/
+		/** Comment Methods *******************************************************/
 
-	/**
+		/**
 	 * Add a liveblog class to each comment, so they can be styled
 	 *
 	 * @param array $classes
@@ -936,7 +936,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/**
+		/**
 	 * Enqueue the necessary CSS and JS that liveblog needs to function.
 	 *
 	 * @return If not a liveblog post
@@ -1018,7 +1018,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			);
 		}
 
-	/**
+		/**
 	 * Sets up some default Plupload settings so we can upload meda theme-side
 	 *
 	 * @global type $wp_scripts
@@ -1066,7 +1066,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$wp_scripts->add_data( 'wp-plupload', 'data', $script );
 		}
 
-	/**
+		/**
 	 * Get the URL of a specific liveblog entry.
 	 *
 	 * @return string
@@ -1087,9 +1087,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		}
 
-	/** Display Methods *******************************************************/
+		/** Display Methods *******************************************************/
 
-	/**
+		/**
 	 * Filter the_content and add the liveblog theme-side UI above the normal
 	 * content area.
 	 *
@@ -1111,7 +1111,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $content . wp_kses_post( $liveblog_output );
 		}
 
-	/**
+		/**
 	 * Return the posting area for the end-user to liveblog from
 	 *
 	 * @return string
@@ -1124,7 +1124,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return self::get_template_part( 'liveblog-form.php' );
 		}
 
-	/**
+		/**
 	 * Get all the liveblog entries for this post
 	 */
 		private static function get_all_entry_output() {
@@ -1145,7 +1145,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
 		}
 
-	/**
+		/**
 	 * Get the template part in an output buffer and return it
 	 *
 	 * @param string $template_name
@@ -1168,9 +1168,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return ob_get_clean();
 		}
 
-	/** Admin Methods *********************************************************/
+		/** Admin Methods *********************************************************/
 
-	/**
+		/**
 	 * Register the metabox with the supporting post-type
 	 *
 	 * @param string $post_type
@@ -1190,7 +1190,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return apply_filters( 'embed_liveblog_image', $embed, $matches, $attr, $url, $rawattr );
 		}
 
-	/**
+		/**
 	 * Output the metabox
 	 *
 	 * @param WP_Post $post
@@ -1202,7 +1202,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		}
 
-	/**
+		/**
 	 * Get the metabox for outputting
 	 *
 	 * @param WP_Post $post
@@ -1270,7 +1270,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		}
 
-	/**
+		/**
 	 * Update the Liveblog state and return the metabox to be displayed
 	 *
 	 * @param int $post_id Post ID
@@ -1294,7 +1294,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		}
 
-	/**
+		/**
 	 * set_liveblog_state
 	 *
 	 * Sets the status of the Liveblog.
@@ -1349,7 +1349,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/**
+		/**
 	 * Hooks in and updates the autoarchive date if not disabled.
 	 * Means that any update moving forward pushes the auto archive date
 	 * in turn.
@@ -1372,7 +1372,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $args;
 		}
 
-	/**
+		/**
 	 * Indicate in the post list that a post is a liveblog
 	 *
 	 * @param array $post_states
@@ -1395,7 +1395,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $post_states;
 		}
 
-	/**
+		/**
 	 * Register the query_var for filtering posts by liveblog state
 	 *
 	 * @param array $query_vars
@@ -1407,7 +1407,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $query_vars;
 		}
 
-	/**
+		/**
 	 * Render the liveblog state select to filter posts in the post table
 	 *
 	 * @action restrict_manage_posts
@@ -1428,7 +1428,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			echo self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) ); // @codingStandardsIgnoreLine
 		}
 
-	/**
+		/**
 	 * Translate the liveblog_state query_var into a meta_query
 	 *
 	 * @param WP_Query $query
@@ -1465,9 +1465,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/** Error Methods *********************************************************/
+		/** Error Methods *********************************************************/
 
-	/**
+		/**
 	 * Can the current user edit liveblog data (non-ajax)
 	 *
 	 * @return bool
@@ -1481,7 +1481,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return self::current_user_can_edit_liveblog() && 'enable' === self::get_liveblog_state();
 		}
 
-	/**
+		/**
 	 * Can the current user edit liveblog data (ajax)
 	 *
 	 * Sends an error if not
@@ -1492,7 +1492,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/**
+		/**
 	 * Check for valid intention, and send an error if there is none
 	 *
 	 * @param string $action
@@ -1503,9 +1503,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/** Feedback **************************************************************/
+		/** Feedback **************************************************************/
 
-	/**
+		/**
 	 * Send an error message
 	 * @param type $message
 	 */
@@ -1524,7 +1524,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			exit();
 		}
 
-	/**
+		/**
 	 * Encode some data and echo it (possibly without cached headers)
 	 *
 	 * @param array $data
@@ -1551,7 +1551,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			exit();
 		}
 
-	/**
+		/**
 	 * Modify the header and description in the global array
 	 *
 	 * @global array $wp_header_to_desc
@@ -1570,7 +1570,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$wp_header_to_desc[ $status ] = $official_message;
 		}
 
-	/**
+		/**
 	 * Removes newlines from headers
 	 *
 	 * The only forbidden value in a header is a newline. PHP has a safe
@@ -1580,7 +1580,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return str_replace( array( "\n", "\r", chr( 0 ) ), '', $text );
 		}
 
-	/**
+		/**
 	 * Hide meta key from being edited from users
 	 * @param  Boolean $protected
 	 * @param  String $meta_key
@@ -1594,7 +1594,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $protected;
 		}
 
-	/**
+		/**
 	 * Tells browsers to not cache the response if $do_not_cache_response is true
 	 */
 		public static function prevent_caching_if_needed() {
@@ -1603,7 +1603,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 		}
 
-	/**
+		/**
 	 * Checks to see if the current WordPress version has REST API support
 	 *
 	 * @return bool true if supported, false otherwise
@@ -1613,14 +1613,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return version_compare( $wp_version, self::MIN_WP_REST_API_VERSION, '>=' );
 		}
 
-	/**
+		/**
 	 * Checks if use_rest_api is on and the WordPress version supports it
 	 */
 		public static function use_rest_api() {
 			return ( self::USE_REST_API && self::can_use_rest_api() );
 		}
 
-	/**
+		/**
 	 * Check for allowed crud action
 	 *
 	 * @param String $action The CRUD action to check
@@ -1630,9 +1630,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ), true );
 		}
 
-	/** Plupload Helpers ******************************************************/
+		/** Plupload Helpers ******************************************************/
 
-	/**
+		/**
 	 * Convert hours to bytes
 	 *
 	 * @param unknown_type $size
@@ -1653,7 +1653,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $bytes;
 		}
 
-	/**
+		/**
 	 * Convert bytes to hour
 	 *
 	 * @param string $bytes
@@ -1673,7 +1673,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $size . $units[ $power ];
 		}
 
-	/**
+		/**
 	 * Get the maximum upload file size
 	 *
 	 * @see wp_max_upload_size()
@@ -1697,7 +1697,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return version_compare( $wp_version, self::MIN_WP_VERSION, '<' );
 		}
 
-	/**
+		/**
 	 * Returns refresh interval after filters have been run
 	 *
 	 * @return int
