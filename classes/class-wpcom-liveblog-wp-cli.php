@@ -6,7 +6,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 	public function readme_for_github() {
 		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
-		$readme      = file_get_contents( $readme_path );
+		$readme      = file_get_contents( $readme_path ); // @codingStandardsIgnoreLine
 		$readme      = $this->listify_meta( $readme );
 		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
 		$readme      = $this->add_screenshot_links( $readme );
