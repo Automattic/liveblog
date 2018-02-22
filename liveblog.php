@@ -784,7 +784,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
 				$index = array_search( $id, array_keys( $entries ), true );
-				$index = $index + 1;
+				$index = $index++;
 				$page  = ceil( $index / $per_page );
 			}
 
@@ -916,7 +916,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$use_rest_api = 0;
 
 				if ( self::use_rest_api() ) {
-					$endpoint_url = WPCOM_Liveblog_Rest_Api::build_endpoint_base() . $post->ID . '/' . 'post_state';
+					$endpoint_url = WPCOM_Liveblog_Rest_Api::build_endpoint_base() . $post->ID . '/post_state';
 					$use_rest_api = 1;
 				}
 
@@ -1050,7 +1050,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => wp_is_mobile(),
+					'mobile'    => jetpack_is_mobile(),
 					'supported' => _device_can_upload(),
 				),
 			);
