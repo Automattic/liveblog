@@ -7,7 +7,7 @@ class Test_Extend_Feature_Commands extends WP_UnitTestCase {
 	 * @return bool
 	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Commands::get_commands()
 	 */
-	function test_get_commands_returns_array() {
+	public function test_get_commands_returns_array() {
 		$class = new WPCOM_Liveblog_Entry_Extend_Feature_Commands();
 		$array = is_array( $class->get_commands() );
 		$this->assertTrue( $array );
@@ -18,7 +18,7 @@ class Test_Extend_Feature_Commands extends WP_UnitTestCase {
 	 * @return mixed
 	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Commands::get_config()
 	 */
-	function test_get_config_filter_executes() {
+	public function test_get_config_filter_executes() {
 		add_filter( 'liveblog_command_config', array( $this, 'example_test_filter' ), 1, 10 );
 		$class  = new WPCOM_Liveblog_Entry_Extend_Feature_Commands();
 		$config = array();
@@ -34,7 +34,7 @@ class Test_Extend_Feature_Commands extends WP_UnitTestCase {
 	 * @param  mixed $example
 	 * @return mixed
 	 */
-	function example_test_filter( $example ) {
+	public function example_test_filter( $example ) {
 		if ( is_array( $example ) ) {
 			$example['testCase'] = true;
 		} elseif ( is_string( $example ) ) {
