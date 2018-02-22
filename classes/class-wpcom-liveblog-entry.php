@@ -294,6 +294,7 @@ class WPCOM_Liveblog_Entry {
 		$required_keys = array( 'post_id', 'user' );
 		foreach ( $required_keys as $key ) {
 			if ( ! isset( $args[ $key ] ) || ! $args[ $key ] ) {
+				// translators: 1: argument
 				return new WP_Error( 'entry-invalid-args', sprintf( __( 'Missing entry argument: %s', 'liveblog' ), $key ) );
 			}
 		}
