@@ -106,7 +106,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		if ( $comment_id ) {
 
 			// Check for a cached result (stored in the comment meta)
-			$key_suffix    = md5( $url . serialize( $attr ) );
+			$key_suffix    = md5( $url . wp_json_encode( $attr ) );
 			$cachekey      = '_oembed_' . $key_suffix;
 			$cachekey_time = '_oembed_time_' . $key_suffix;
 
