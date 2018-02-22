@@ -161,7 +161,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$type = apply_filters( 'liveblog_command_type', $match[2] );
 
 		// If it's not a command that's been registered then skip it.
-		if ( ! in_array( $type, $this->commands ) ) {
+		if ( ! in_array( $type, $this->commands, true ) ) {
 			return $match[0];
 		}
 
@@ -190,7 +190,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$comment = get_comment( $comment_id );
 
 		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::key === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $comment->comment_content, $types );

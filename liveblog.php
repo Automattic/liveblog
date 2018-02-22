@@ -258,7 +258,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function flush_rewrite_rules() {
-			if ( get_option( 'liveblog_rewrites_version' ) != self::rewrites_version ) {
+			if ( get_option( 'liveblog_rewrites_version' ) !== self::rewrites_version ) {
 				flush_rewrite_rules();
 				update_option( 'liveblog_rewrites_version', self::rewrites_version );
 			}
@@ -478,7 +478,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 			$state = get_post_meta( $post_id, self::key, true );
 			// backwards compatibility with older values
-			if ( 1 == $state ) {
+			if ( 1 === $state ) {
 				$state = 'enable';
 			}
 
@@ -774,7 +774,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$last_known_entry = explode( '-', $last_known_entry );
 				if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
 					$last_entry_id = $last_known_entry[0];
-					$index         = array_search( $last_entry_id, array_keys( $entries ) );
+					$index         = array_search( $last_entry_id, array_keys( $entries ), true );
 					$entries       = array_slice( $entries, $index, null, true );
 				}
 			}
@@ -783,7 +783,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( $page === false && $id !== false ) {
-				$index = array_search( $id, array_keys( $entries ) );
+				$index = array_search( $id, array_keys( $entries ), true );
 				$index = $index + 1;
 				$page  = ceil( $index / $per_page );
 			}
@@ -899,7 +899,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	 * @return string
 	 */
 		public static function add_comment_class( $classes, $class, $comment_id ) {
-			if ( self::key == get_comment_type( $comment_id ) ) {
+			if ( self::key === get_comment_type( $comment_id ) ) {
 				$classes[] = 'liveblog-entry';
 				$classes[] = 'liveblog-entry-class-' . $comment_id;
 			}
@@ -910,7 +910,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			global $post;
 
 			// Enqueue admin scripts only if adding or editing a supported post type.
-			if ( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) && post_type_supports( get_post_type(), self::key ) ) {
+			if ( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ), true ) && post_type_supports( get_post_type(), self::key ) ) {
 
 				$endpoint_url = '';
 				$use_rest_api = 0;
@@ -1132,13 +1132,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$args  = array();
 			$state = self::get_liveblog_state();
 
-			if ( 'archive' == $state ) {
+			if ( 'archive' === $state ) {
 				$args['order'] = 'ASC';
 			}
 
 			$args                  = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
 			$entries               = (array) self::$entry_query->get_all( $args );
-			$show_archived_message = 'archive' == $state && self::current_user_can_edit_liveblog();
+			$show_archived_message = 'archive' === $state && self::current_user_can_edit_liveblog();
 
 			// Get the template part
 			return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
@@ -1328,11 +1328,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			//Lets update the post_meta state as per usual.
-			if ( in_array( $new_state, array( 'enable', 'archive' ) ) ) {
+			if ( in_array( $new_state, array( 'enable', 'archive' ), true ) ) {
 				update_post_meta( $post_id, self::key, $new_state );
 				do_action( "liveblog_{$new_state}_post", $post_id );
 
-			} elseif ( 'disable' == $new_state ) {
+			} elseif ( 'disable' === $new_state ) {
 				delete_post_meta( $post_id, self::key );
 
 				//Lets remove the autoarchive meta data too.
@@ -1443,7 +1443,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'key'     => self::key,
 					'compare' => 'NOT EXISTS',
 				);
-			} elseif ( in_array( $state, array( 'enable', 'archive' ) ) ) {
+			} elseif ( in_array( $state, array( 'enable', 'archive' ), true ) ) {
 				$new_meta_query_clause = array(
 					'key'   => self::key,
 					'value' => $state,
@@ -1473,7 +1473,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function is_liveblog_editable() {
-			return self::current_user_can_edit_liveblog() && 'enable' == self::get_liveblog_state();
+			return self::current_user_can_edit_liveblog() && 'enable' === self::get_liveblog_state();
 		}
 
 		/**
@@ -1624,7 +1624,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	 * @return bool true if $action is one of insert|update|delete|delete_key. false otherwise
 	 */
 		public static function is_valid_crud_action( $action ) {
-			return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ) );
+			return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ), true );
 		}
 
 		/** Plupload Helpers ******************************************************/

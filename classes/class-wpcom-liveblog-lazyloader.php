@@ -43,7 +43,7 @@ class WPCOM_Liveblog_Lazyloader {
 			}
 
 			// Disable lazy loading on archived liveblogs
-			if ( 'enable' != WPCOM_Liveblog::get_liveblog_state() ) {
+			if ( 'enable' !== WPCOM_Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
 			}
 		}

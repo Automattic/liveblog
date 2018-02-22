@@ -644,7 +644,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 
 		// Assert forbidden response
-		$this->assertTrue( $response->get_status() === 403 || $response->get_status() == 401 );
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
 
 	}
 
@@ -672,7 +672,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 
 		// Assert forbidden response
-		$this->assertTrue( $response->get_status() === 403 || $response->get_status() == 401 );
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
 
 	}
 

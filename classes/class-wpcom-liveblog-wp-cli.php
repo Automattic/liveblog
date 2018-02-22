@@ -82,7 +82,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					$entry_id = $edit_entry->get_id();
 
 					// look for replaces property in $correct_ids
-					if ( in_array( $edit_entry->replaces, $correct_ids ) ) {
+					if ( in_array( $edit_entry->replaces, $correct_ids, true ) ) {
 
 						//The edited entry is accurate so we dont need to do anything.
 						WP_CLI::line( 'No action required.. skipping Entry ' . $entry_id );
@@ -99,7 +99,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 								WP_CLI::line( 'Correcting Entry ' . $entry_id . '...' );
 
 								// If this isnt a dry run we can run the database Update.
-								if ( false == $is_dryrun ) {
+								if ( false === $is_dryrun ) {
 									$wpdb->update(
 										$wpdb->commentmeta,
 										array( 'meta_value' => $correct_ids[ $i ] ),
@@ -165,12 +165,12 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			}
 
 			//If we have a dry run flag lets just output what we would be looking to do on a live run.
-			if ( true == $is_dryrun ) {
+			if ( true === $is_dryrun ) {
 				WP_CLI::line( 'Found ' . count( $edit_entries ) . ' Edited Entries on Post ID ' . $post_id );
 			}
 		}
 
-		if ( true == $is_dryrun ) {
+		if ( true === $is_dryrun ) {
 			WP_CLI::success( 'Dry Run Completed. Please check the results and when ready re-run the command without the --dryrun flag.' );
 		} else {
 			WP_CLI::success( 'Fixed all entries on all liveblog posts!' );

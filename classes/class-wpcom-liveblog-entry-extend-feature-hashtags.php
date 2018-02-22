@@ -177,7 +177,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$comment = get_comment( $comment_id );
 
 		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::key === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix ) . '(\w\-?)+/', $comment->comment_content, $terms );

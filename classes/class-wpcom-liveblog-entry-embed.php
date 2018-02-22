@@ -226,7 +226,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		}
 
 		foreach ( $comment_meta_keys as $comment_meta_key ) {
-			if ( '_oembed_' == substr( $comment_meta_key, 0, 8 ) ) {
+			if ( '_oembed_' === substr( $comment_meta_key, 0, 8 ) ) {
 				delete_comment_meta( $comment_ID, $comment_meta_key );
 			}
 		}

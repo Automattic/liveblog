@@ -176,7 +176,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Only save / update the template option if the response
 		// state is `liveblog-key-template-save` and the
 		// `liveblog-key-template-name` is not empty.
-		if ( 'liveblog-key-template-save' == $response['state'] && ! empty( $response['liveblog-key-template-name'] ) ) {
+		if ( 'liveblog-key-template-save' === $response['state'] && ! empty( $response['liveblog-key-template-name'] ) ) {
 
 			// The default template.
 			$template = 'timeline';
@@ -408,7 +408,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			)
 		);
 
-		if ( $key_events == null ) {
+		if ( $key_events === null ) {
 			return array();
 		}
 		return $key_events;
