@@ -70,8 +70,8 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		$handlers = $this->handlers;
 		//check for handlers registered for wp_embed class using all the helper functions
 		if ( true === isset( $GLOBALS['wp_embed'] )
-			 && is_a( $GLOBALS['wp_embed'], 'WP_Embed' )
-			 && is_array( $GLOBALS['wp_embed']->handlers )
+			&& is_a( $GLOBALS['wp_embed'], 'WP_Embed' )
+			&& is_array( $GLOBALS['wp_embed']->handlers )
 		) {
 			//marge those in a single array
 			$handlers = array_replace_recursive( $GLOBALS['wp_embed']->handlers, $this->handlers );
@@ -220,7 +220,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		if ( ! is_array( $comment_metas ) ) {
 			return;
 		}
-		$comment_meta_keys = array_keys( $comment_metas )
+		$comment_meta_keys = array_keys( $comment_metas );
 		if ( ! $comment_meta_keys ) {
 			return;
 		}

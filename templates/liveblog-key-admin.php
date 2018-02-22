@@ -7,7 +7,11 @@
 		<?php
 		if ( $template === $current_key_template ) :
 ?>
- selected="selected" <?php endif; ?> value="<?php echo esc_attr( $template ); ?>"><?php echo esc_html( ucwords( str_replace( '-', ' ', $template ) ) ); ?></option>
+selected="selected" <?php endif; ?> value="<?php echo esc_attr( $template ); ?>">
+									<?php
+									echo esc_html( ucwords( str_replace( '-', ' ', $template ) ) );
+?>
+</option>
 		<?php endforeach; ?>
 	</select>
 	<label for="liveblog-key-template-format"><?php echo esc_html( $key_format_name ); ?> </label>
@@ -17,7 +21,11 @@
 			<?php
 			if ( $format === $current_key_format ) :
 ?>
- selected="selected" <?php endif; ?> value="<?php echo esc_attr( $format ); ?>"><?php echo esc_html( ucwords( str_replace( '-', ' ', $format ) ) ); ?></option>
+selected="selected" <?php endif; ?> value="<?php echo esc_attr( $format ); ?>">
+									<?php
+									echo esc_html( ucwords( str_replace( '-', ' ', $format ) ) );
+?>
+</option>
 		<?php endforeach; ?>
 	</select>
 	<label for="liveblog-key-limit"><?php echo esc_html( $key_limit ); ?></label>
