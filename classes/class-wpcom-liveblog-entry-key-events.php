@@ -408,7 +408,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			)
 		);
 
-		if ( $key_events === null ) {
+		if ( null === $key_events ) {
 			return array();
 		}
 		return $key_events;

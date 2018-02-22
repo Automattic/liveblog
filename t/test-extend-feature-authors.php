@@ -15,7 +15,7 @@ class Test_Extend_Feature_Authors extends WP_UnitTestCase {
 
 		$this->assertTrue( is_array( $test ) );
 		$this->assertArrayHasKey( 'testCase', $test[0] );
-		$this->assertTrue( $test[0]['testCase'] === true );
+		$this->assertTrue( true === $test[0]['testCase'] );
 	}
 
 	/**
