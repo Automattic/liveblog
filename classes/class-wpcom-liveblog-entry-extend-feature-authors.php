@@ -214,8 +214,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function ajax_authors() {
 
 		//Sanitize the input safely.
-		if ( isset( $_GET['autocomplete'] ) ) {
-			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) );
+		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
+			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
 		} else {
 			$term = '';
 		}

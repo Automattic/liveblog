@@ -547,15 +547,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$args = array();
 
-			$crud_action = isset( $_POST['crud_action'] ) ? wp_unslash( $_POST['crud_action'] ) : 0;
+			$crud_action = isset( $_POST['crud_action'] ) ? wp_unslash( $_POST['crud_action'] ) : 0; // input var ok
 
 			if ( ! self::is_valid_crud_action( $crud_action ) ) {
 				self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 			}
 
-			$args['post_id']  = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-			$args['content']  = isset( $_POST['content'] ) ? wp_unslash( $_POST['content'] ) : '';
-			$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
+			$args['post_id']  = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // input var ok
+			$args['content']  = isset( $_POST['content'] ) ? wp_unslash( $_POST['content'] ) : ''; // input var ok
+			$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // input var ok
 
 			$entry = self::do_crud_entry( $crud_action, $args );
 
@@ -861,7 +861,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function ajax_preview_entry() {
-			$entry_content = isset( $_REQUEST['entry_content'] ) ? wp_unslash( $_REQUEST['entry_content'] ) : '';
+			$entry_content = isset( $_REQUEST['entry_content'] ) ? wp_unslash( $_REQUEST['entry_content'] ) : ''; // input var ok
 			$entry_content = self::format_preview_entry( $entry_content );
 
 			self::json_return( $entry_content );
@@ -1243,13 +1243,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function admin_ajax_set_liveblog_state_for_post() {
-			$post_id   = isset( $_REQUEST['post_id'] ) ? wp_unslash( $_REQUEST['post_id'] ) : 0;
-			$new_state = isset( $_REQUEST['state'] ) ? wp_unslash( $_REQUEST['state'] ) : '';
+			$post_id   = isset( $_REQUEST['post_id'] ) ? wp_unslash( $_REQUEST['post_id'] ) : 0; // input var ok
+			$new_state = isset( $_REQUEST['state'] ) ? wp_unslash( $_REQUEST['state'] ) : ''; // input var ok
 
 			self::ajax_current_user_can_edit_liveblog();
 			self::ajax_check_nonce();
 
-			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST );
+			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); // input var ok
 
 			if ( ! $meta_box ) {
 
@@ -1493,7 +1493,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	 * @param string $action
 	 */
 		public static function ajax_check_nonce( $action = self::nonce_action ) {
-			if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( wp_unslash( $_REQUEST[ self::nonce_key ] ), $action ) ) {
+			if ( ! isset( $_REQUEST[ self::nonce_key ] ) || ! wp_verify_nonce( wp_unslash( $_REQUEST[ self::nonce_key ] ), $action ) ) { // input var ok
 				self::send_forbidden_error( __( 'Sorry, we could not authenticate you.', 'liveblog' ) );
 			}
 		}
