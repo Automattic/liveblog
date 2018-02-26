@@ -29,7 +29,7 @@
 ?>
 <p class="error"></p>
 <p class="success"><?php echo esc_html( $update_text ); ?></p>
-<h2><?php echo esc_html( $active_text ); ?></h2>
+<h2><?php echo wp_kses_post( $active_text ); ?></h2>
 <ul>
 <?php
 foreach ( $buttons as $button ) :
