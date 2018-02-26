@@ -42,7 +42,7 @@ foreach ( $buttons as $button ) :
 	<button class="button <?php echo $button['primary'] ? 'button-primary' : ''; ?>" <?php echo $button['disabled'] ? 'disabled="disabled"' : ''; ?> value="<?php echo esc_attr( $button['value'] ); ?>">
 		<?php echo esc_html( $button['text'] ); ?>
 	</button>
-	<?php echo esc_html( $button['description'] ); ?>
+	<?php echo wp_kses_post( $button['description'] ); ?>
 </li>
 <?php endforeach; ?>
 </ul>
