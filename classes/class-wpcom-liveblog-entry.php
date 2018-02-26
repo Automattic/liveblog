@@ -420,7 +420,8 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		return array_map(function( $contributor ) {
-			return self::get_user_data_for_json( get_userdata( $contributor ) );
+			$author_data = apply_filters( 'liveblog_author_data', get_userdata( $contributor ), $contributor );
+			return self::get_user_data_for_json( $author_data );
 		}, $contributors );
 	}
 
