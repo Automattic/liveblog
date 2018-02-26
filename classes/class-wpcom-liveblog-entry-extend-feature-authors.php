@@ -118,7 +118,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// Map the authors and store them on the object
 		// for use in another function, we need
 		// them to be lowercased.
-		$authors = apply_filters( 'liveblog_author_list', get_users( $args ) );
+		$authors       = apply_filters( 'liveblog_author_list', get_users( $args ) );
 		$this->authors = array_map( array( $this, 'map_authors' ), $authors );
 
 		// Map over every match and apply it via the
