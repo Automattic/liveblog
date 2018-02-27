@@ -135,7 +135,7 @@ class WPCOM_Liveblog_Entry {
 			'content'               => self::render_content( $comment_text, $this->comment ),
 			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
 			'avatar_size'           => $avatar_size,
-			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'avatar_img'            => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'           => get_comment_author_link( $entry_id ),
 			'entry_date'            => get_comment_date( get_option('date_format'), $entry_id ),
 			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
@@ -420,7 +420,8 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		return array_map(function( $contributor ) {
-			return self::get_user_data_for_json( get_userdata( $contributor ) );
+			$author_data = apply_filters( 'liveblog_author_data', get_userdata( $contributor ), $contributor );
+			return self::get_user_data_for_json( $author_data );
 		}, $contributors );
 	}
 
@@ -439,7 +440,7 @@ class WPCOM_Liveblog_Entry {
 			'id' => $user->ID,
 			'key' => strtolower($user->user_nicename),
 			'name' => $user->display_name,
-			'avatar' => get_avatar( $user->ID, $avatar_size ),
+			'avatar' => WPCOM_Liveblog::get_avatar( $user->ID, $avatar_size ),
 		);
 	}
 }
