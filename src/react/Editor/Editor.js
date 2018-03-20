@@ -182,7 +182,7 @@ class EditorWrapper extends Component {
     return {
       ...range,
       trigger,
-      top: getTopPosition(range, this.editor.refs.editorContainer),
+      top: getTopPosition(range, this.editor.editorContainer),
       displayKey: config.displayKey,
       replaceText: config.replaceText,
       name: config.name,

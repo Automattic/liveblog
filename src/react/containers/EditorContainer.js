@@ -27,8 +27,7 @@ class EditorContainer extends Component {
     super(props);
 
     let initialEditorState;
-    let initialAuthor;
-    let initialContributors;
+    let initialAuthors;
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
@@ -39,21 +38,17 @@ class EditorContainer extends Component {
         }),
         decorators,
       );
-      initialAuthor = props.entry.author;
-      initialContributors = props.entry.contributors;
+      initialAuthors = props.entry.authors;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
-      initialAuthor = props.config.current_user;
-      initialContributors = [];
+      initialAuthors = [props.config.current_user];
     }
 
     this.state = {
       editorState: initialEditorState,
       suggestions: [],
-      selectedUsers: initialContributors,
-      selectedAuthor: initialAuthor,
+      authors: initialAuthors,
       preview: false,
-      showAuthors: false,
       readOnly: false,
     };
 
@@ -79,15 +74,17 @@ class EditorContainer extends Component {
 
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState, selectedAuthor, selectedUsers } = this.state;
+    const { editorState, authors } = this.state;
     const content = this.getContent();
-    const contributors = selectedUsers.map(user => user.id);
+    const authorIds = authors.map(author => author.id);
+    const author = authorIds.length > 0 ? authorIds[0] : false;
+    const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
 
     if (isEditing) {
       updateEntry({
         id: entry.id,
         content,
-        author: selectedAuthor.id,
+        author,
         contributors,
       });
       entryEditClose(entry.id);
@@ -96,7 +93,7 @@ class EditorContainer extends Component {
 
     createEntry({
       content,
-      author: selectedAuthor.id,
+      author,
       contributors,
     });
 
@@ -111,15 +108,9 @@ class EditorContainer extends Component {
     });
   }
 
-  onSelectUsersChange(value) {
-    this.setState({
-      selectedUsers: value,
-    });
-  }
-
   onSelectAuthorChange(value) {
     this.setState({
-      selectedAuthor: value,
+      authors: value,
     });
   }
 
@@ -217,9 +208,7 @@ class EditorContainer extends Component {
       editorState,
       suggestions,
       preview,
-      selectedUsers,
-      selectedAuthor,
-      showAuthors,
+      authors,
       readOnly,
     } = this.state;
 
@@ -257,43 +246,18 @@ class EditorContainer extends Component {
               defaultImageSize={config.default_image_size}
             />
         }
-        <div
-          onClick={() => this.setState({ showAuthors: !showAuthors })}
-          className={`liveblog-metabox-header ${showAuthors ? 'is-active' : ''}`}
-        >
-          Author Options
-          <span
-            className={`dashicons dashicons-arrow-${showAuthors ? 'up' : 'down'}`}
-          />
-        </div>
-        { showAuthors &&
-        <div className="liveblog-metabox-content">
-          <h2 className="liveblog-editor-subTitle">Author:</h2>
-          <Async
-            multi={false}
-            value={selectedAuthor}
-            valueKey="key"
-            labelKey="name"
-            onChange={this.onSelectAuthorChange.bind(this)}
-            optionComponent={AuthorSelectOption}
-            loadOptions={this.getUsers.bind(this)}
-            clearable={false}
-            cache={false}
-          />
-          <h2 className="liveblog-editor-subTitle">Contributors:</h2>
-          <Async
-            multi={true}
-            value={selectedUsers}
-            valueKey="key"
-            labelKey="name"
-            onChange={this.onSelectUsersChange.bind(this)}
-            optionComponent={AuthorSelectOption}
-            loadOptions={this.getUsers.bind(this)}
-            clearable={false}
-            cache={false}
-          />
-        </div>
-        }
+        <h2 className="liveblog-editor-subTitle">Authors:</h2>
+        <Async
+          multi={true}
+          value={authors}
+          valueKey="key"
+          labelKey="name"
+          onChange={this.onSelectAuthorChange.bind(this)}
+          optionComponent={AuthorSelectOption}
+          loadOptions={this.getUsers.bind(this)}
+          clearable={false}
+          cache={false}
+        />
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </button>

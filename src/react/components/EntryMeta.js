@@ -8,28 +8,19 @@ const EntryMeta = ({ entry, config }) => (
       <span>{timeAgo(entry.entry_time, config.utc_offset, config.date_format)}</span>
       <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format)}</span>
     </a>
-    <div className="liveblog-meta-author">
-      { entry.author.avatar &&
-        <div
-          className="liveblog-meta-author-avatar"
-          dangerouslySetInnerHTML={{ __html: entry.author.avatar }} />
-      }
-      <span className="liveblog-meta-author-name"
-        dangerouslySetInnerHTML={{ __html: entry.author.name }} />
-    </div>
     {
-      (entry.contributors && entry.contributors.length > 0) &&
-      <div className="liveblog-meta-contributors">
+      (entry.authors && entry.authors.length > 0) &&
+      <div className="liveblog-meta-authors">
         {
-          entry.contributors.filter(x => x.id !== entry.author.id).map(contributor => (
-            <div className="liveblog-meta-author" key={contributor.id}>
-              { contributor.avatar &&
+          entry.authors.map(author => (
+            <div className="liveblog-meta-author" key={author.id}>
+              { author.avatar &&
                 <div
                   className="liveblog-meta-author-avatar"
-                  dangerouslySetInnerHTML={{ __html: contributor.avatar }} />
+                  dangerouslySetInnerHTML={{ __html: author.avatar }} />
               }
               <span className="liveblog-meta-author-name"
-                dangerouslySetInnerHTML={{ __html: contributor.name }} />
+                dangerouslySetInnerHTML={{ __html: author.name }} />
             </div>
           ))
         }
