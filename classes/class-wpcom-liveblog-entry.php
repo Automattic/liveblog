@@ -139,7 +139,7 @@ class WPCOM_Liveblog_Entry {
 			'content'               => self::render_content( $comment_text, $this->comment ),
 			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
 			'avatar_size'           => $avatar_size,
-			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'avatar_img'            => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'           => get_comment_author_link( $entry_id ),
 			'entry_date'            => get_comment_date( get_option('date_format'), $entry_id ),
 			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
@@ -198,10 +198,6 @@ class WPCOM_Liveblog_Entry {
 
 		$args['user'] = self::handle_author_select( $args, $comment->comment_ID );
 
-		if ( isset( $args['contributor_ids'] ) ) {
-			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
-		}
-
 		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
@@ -228,10 +224,6 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
-
-		if ( isset( $args['contributor_ids'] ) ) {
-			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
-		}
 
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
@@ -326,7 +318,7 @@ class WPCOM_Liveblog_Entry {
 		if ( !$original_comment ) {
 			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
 		}
-		$user_object = get_userdata( $original_comment->user_id );
+		$user_object = self::get_userdata_with_filter( $original_comment->user_id );
 		if ( !$user_object ) {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
@@ -376,7 +368,7 @@ class WPCOM_Liveblog_Entry {
 	 */
 	private static function handle_author_select( $args, $entry_id ) {
 		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
-			$user_object = get_userdata( $args['author_id'] );
+			$user_object = self::get_userdata_with_filter( $args['author_id'] );
 			if ( $user_object ) {
 				$args['user'] = $user_object;
 
@@ -394,6 +386,10 @@ class WPCOM_Liveblog_Entry {
 			update_comment_meta( $entry_id, self::hide_authors_key, true );
 		}
 
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $entry_id, $args['contributor_ids'] );
+		}
+
 		return $args['user'];
 	}
 
@@ -404,6 +400,10 @@ class WPCOM_Liveblog_Entry {
 	 * @param array $contributors Array of ids to store as meta.
 	 */
 	private static function add_contributors( $comment_id, $contributors ) {
+		if ( ! $contributors ) {
+			delete_comment_meta( $comment_id, self::contributors_meta_key );
+		}
+
 		if ( is_array( $contributors ) ) {
 			if ( metadata_exists( 'comment', $comment_id, self::contributors_meta_key ) ) {
 				update_comment_meta( $comment_id, self::contributors_meta_key, $contributors );
@@ -427,8 +427,13 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		return array_map( function( $contributor ) {
-			return self::get_user_data_for_json( get_userdata( $contributor ) );
+			$user_object = self::get_userdata_with_filter( $contributor );
+			return self::get_user_data_for_json( $user_object );
 		}, $contributors );
+	}
+
+	public static function get_userdata_with_filter( $author_id ) {
+		return apply_filters( 'liveblog_userdata', get_userdata( $author_id ), $author_id );
 	}
 
 	/**
@@ -446,7 +451,7 @@ class WPCOM_Liveblog_Entry {
 			'id' => $user->ID,
 			'key' => strtolower($user->user_nicename),
 			'name' => $user->display_name,
-			'avatar' => get_avatar( $user->ID, $avatar_size ),
+			'avatar' => WPCOM_Liveblog::get_avatar( $user->ID, $avatar_size ),
 		);
 	}
 

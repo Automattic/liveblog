@@ -6,7 +6,7 @@
 
 .liveblog-meta {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
   text-decoration: none;
 }
@@ -15,8 +15,8 @@
   display: block;
 }
 
-.liveblog-meta-author,
-.liveblog-meta-contributors {
+.liveblog-meta-authors,
+.liveblog-meta-author {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
