@@ -1,5 +1,5 @@
-<div id="liveblog-key-events">
-	<?php if( 'false' != $title ): ?>
-        <h2 class="widget-title"><?php echo esc_html( $title ) ?></h2>
-	<?php endif; ?>
-</div>
+<?php if( 'false' != $title ): ?>
+    <div id="liveblog-key-events" data-title="<?php echo esc_attr( $title ) ?>"></div>
+<?php else: ?>
+    <div id="liveblog-key-events"></div>
+<?php endif;

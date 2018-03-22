@@ -10,11 +10,28 @@ import * as eventsActions from '../actions/eventsActions';
 import Event from '../components/Event';
 
 class EventsContainer extends Component {
+  constructor() {
+    super();
+    this.state = { customTitle: "" };
+  }
+
+  componentDidMount() {
+    this.setState({
+        customTitle: ReactDOM.findDOMNode(this).parentNode.getAttribute("data-title")
+    });
+  }
+
   renderEvents() {
     const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat } = this.props;
 
+    let containerTitle = "";
+    if ("undefined" !== this.state.customTitle) {
+      containerTitle = this.state.customTitle;
+    }
+
     return (
       <div>
+        { (containerTitle !== "") ? <h2 className="widget-title">{containerTitle}</h2> : null }
         <ul className="liveblog-events">
           {Object.keys(events).map((key, i) =>
             <Event
