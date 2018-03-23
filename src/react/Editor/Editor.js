@@ -305,8 +305,7 @@ class EditorWrapper extends Component {
       bubbles: true,
       cancelable: true,
     });
-    this.editor.refs.editor.dispatchEvent(mouseUpEvent);
-
+    this.editor.editor.dispatchEvent(mouseUpEvent);
     return handled;
   }
 

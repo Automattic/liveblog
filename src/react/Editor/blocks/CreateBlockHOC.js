@@ -26,6 +26,10 @@ const CreateBlock = (Block, editorState, onChange) => class extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.setEditMode(false);
+  }
+
   /**
    * Set edit mode to new state.
    * @param {bool} state
@@ -48,10 +52,24 @@ const CreateBlock = (Block, editorState, onChange) => class extends Component {
   /**
    * Replace metadata daved to block.
    * @param {object} data
+   * @param {boolean} update whether to trigger a re-render. Should be used cautiously as can
+   * cause race conditions. We generally only need to re-render when we want to keep the raw html
+   * input in sync.
    */
-  replaceMetadata(data) {
+  replaceMetadata(data, update = false) {
     const { contentState, block } = this.props;
-    contentState.mergeEntityData(block.getEntityAt(0), data);
+    const newContentState = contentState.mergeEntityData(block.getEntityAt(0), data);
+    if (update) {
+      const newEditorState = EditorState.push(
+        editorState,
+        newContentState,
+        'replace-metadata',
+      );
+
+      onChange(
+        EditorState.forceSelection(newEditorState, newEditorState.getSelection()),
+      );
+    }
   }
 
   /**

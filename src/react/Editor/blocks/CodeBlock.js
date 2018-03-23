@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '../Button';
+import HTMLInput from '../../components/HTMLInput';
 
 class CodeBlock extends Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class CodeBlock extends Component {
   save() {
     const { code, title } = this.state;
     const { replaceMetadata, setEditMode } = this.props;
-    replaceMetadata({ code, title });
+    replaceMetadata({ code, title }, true);
     setEditMode(false);
   }
 
@@ -39,8 +40,8 @@ class CodeBlock extends Component {
    * Handle onChange event to keep textare in sync.
    * @param {object} event
    */
-  handleChange(event) {
-    this.setState({ code: event.target.value });
+  handleChange(value) {
+    this.setState({ code: value });
   }
 
   render() {
@@ -87,13 +88,13 @@ class CodeBlock extends Component {
           </div>
         </div>
         {
-          edit && <textarea
-            autoFocus
-            placeholder={this.placeholder}
-            className="liveblog-codeblock-textarea"
+          edit &&
+          <HTMLInput
+            container={false}
             value={code}
             onChange={this.handleChange.bind(this)}
-            spellCheck={false}
+            height="175px"
+            width="100%"
           />
         }
       </div>

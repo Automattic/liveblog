@@ -7,6 +7,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
+import { html } from 'js-beautify';
 
 import { EditorState, ContentState } from 'draft-js';
 
@@ -17,6 +18,7 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
+import HTMLInput from '../components/HTMLInput';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
@@ -48,11 +50,15 @@ class EditorContainer extends Component {
       editorState: initialEditorState,
       suggestions: [],
       authors: initialAuthors,
-      preview: false,
+      mode: 'editor',
       readOnly: false,
+      rawText: props.entry ? props.entry.content : '',
     };
 
-    this.onChange = editorState => this.setState({ editorState });
+    this.onChange = editorState => this.setState({
+      editorState,
+      rawText: html(convertToHTML(editorState.getCurrentContent())),
+    });
   }
 
   setReadOnly(state) {
@@ -61,15 +67,23 @@ class EditorContainer extends Component {
     });
   }
 
-  setPreview(state) {
-    this.setState({
-      preview: state,
-    });
-  }
-
   getContent() {
     const { editorState } = this.state;
     return convertToHTML(editorState.getCurrentContent());
+  }
+
+  syncRawTextToEditorState() {
+    this.setState({
+      editorState:
+        EditorState.createWithContent(
+          convertFromHTML(this.state.rawText, {
+            setReadOnly: this.setReadOnly.bind(this),
+            handleImageUpload: this.handleImageUpload.bind(this),
+            defaultImageSize: this.props.config.default_image_size,
+          }),
+          decorators,
+        ),
+    });
   }
 
   publish() {
@@ -207,7 +221,7 @@ class EditorContainer extends Component {
     const {
       editorState,
       suggestions,
-      preview,
+      mode,
       authors,
       readOnly,
     } = this.state;
@@ -219,32 +233,58 @@ class EditorContainer extends Component {
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
         <div className="liveblog-editor-tabs">
           <button
-            className={`liveblog-editor-tab ${!preview ? 'is-active' : ''}`}
-            onClick={this.setPreview.bind(this, false)}>Editor</button>
+            className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
+            onClick={() => this.setState({ mode: 'editor' })}
+          >
+            Editor
+          </button>
           <button
-            className={`liveblog-editor-tab ${preview ? 'is-active' : ''}`}
-            onClick={this.setPreview.bind(this, true)}>
+            className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
+            onClick={() => this.setState({ mode: 'raw' })}
+          >
+              Text
+          </button>
+          <button
+            className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
+            onClick={() => this.setState({ mode: 'preview' })}
+          >
               Preview
           </button>
         </div>
         {
-          preview
-            ? <PreviewContainer
-              config={config}
-              getEntryContent={() => this.getContent()}
-            />
-            : <Editor
-              editorState={editorState}
-              onChange={this.onChange}
-              suggestions={suggestions}
-              resetSuggestions={() => this.setState({ suggestions: [] })}
-              onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
-              autocompleteConfig={config.autocomplete}
-              handleImageUpload={this.handleImageUpload.bind(this)}
-              readOnly={readOnly}
-              setReadOnly={this.setReadOnly.bind(this)}
-              defaultImageSize={config.default_image_size}
-            />
+          mode === 'preview' &&
+          <PreviewContainer
+            config={config}
+            getEntryContent={() => this.getContent()}
+          />
+        }
+        {
+          mode === 'editor' &&
+          <Editor
+            editorState={editorState}
+            onChange={this.onChange}
+            suggestions={suggestions}
+            resetSuggestions={() => this.setState({ suggestions: [] })}
+            onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
+            autocompleteConfig={config.autocomplete}
+            handleImageUpload={this.handleImageUpload.bind(this)}
+            readOnly={readOnly}
+            setReadOnly={this.setReadOnly.bind(this)}
+            defaultImageSize={config.default_image_size}
+          />
+        }
+        {
+          mode === 'raw' &&
+          <HTMLInput
+            value={this.state.rawText}
+            onChange={(text) => {
+              this.setState({ rawText: text }, () => {
+                this.syncRawTextToEditorState();
+              });
+            }}
+            height="245px"
+            width="100%"
+          />
         }
         <h2 className="liveblog-editor-subTitle">Authors:</h2>
         <Async
