@@ -11,6 +11,9 @@ export const CODE_BLOCK_TAGS = [
   'table',
   'form',
   'div',
+  'section',
+  'iframe',
+  'details',
 ];
 
 /**
@@ -83,6 +86,8 @@ export const IGNORED_TAGS = [
   'input',
   'datalist',
   'fieldset',
+  'frameset',
+  'frame',
   'label',
   'textarea',
   'label',
@@ -93,7 +98,6 @@ export const IGNORED_TAGS = [
   'output',
   'progress',
   'select',
-  'details',
   'diaglog',
   'menu',
   'menuitem',

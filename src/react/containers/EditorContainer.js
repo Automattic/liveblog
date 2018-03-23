@@ -116,10 +116,8 @@ class EditorContainer extends Component {
       ContentState.createFromText(''),
     );
 
-    this.setState({
-      editorState: newEditorState,
-      readOnly: false,
-    });
+    this.onChange(newEditorState);
+    this.setState({ readOnly: false });
   }
 
   onSelectAuthorChange(value) {
@@ -282,7 +280,7 @@ class EditorContainer extends Component {
                 this.syncRawTextToEditorState();
               });
             }}
-            height="245px"
+            height="275px"
             width="100%"
           />
         }
