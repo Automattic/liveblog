@@ -10,28 +10,12 @@ import * as eventsActions from '../actions/eventsActions';
 import Event from '../components/Event';
 
 class EventsContainer extends Component {
-  constructor() {
-    super();
-    this.state = { customTitle: '' };
-  }
-
-  componentDidMount() {
-    this.setState({
-      customTitle: this.props.container.getAttribute('data-title'),
-    });
-  }
-
   renderEvents() {
-    const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat } = this.props;
-
-    let containerTitle = '';
-    if (this.state.customTitle !== 'undefined') {
-      containerTitle = this.state.customTitle;
-    }
+    const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat, title } = this.props;
 
     return (
       <div>
-        { (containerTitle !== '') ? <h2 className="widget-title">{containerTitle}</h2> : null }
+        { (title !== '') ? <h2 className="widget-title">{title}</h2> : null }
         <ul className="liveblog-events">
           {Object.keys(events).map((key, i) =>
             <Event
@@ -66,6 +50,7 @@ EventsContainer.propTypes = {
   canEdit: PropTypes.bool,
   utcOffset: PropTypes.string,
   dateFormat: PropTypes.string,
+  title: PropTypes.string,
 };
 
 const mapStateToProps = state => ({

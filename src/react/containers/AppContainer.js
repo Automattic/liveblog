@@ -37,7 +37,7 @@ class AppContainer extends Component {
         <PaginationContainer />
         <Entries loading={loading} entries={entries} />
         <PaginationContainer />
-        {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
+        {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
       </div>
     );
   }
