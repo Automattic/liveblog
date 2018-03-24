@@ -56,7 +56,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		// Allow plugins, themes, etc. to change
 		// the current command set.
-		$this->commands     	  = apply_filters( 'liveblog_active_commands', $this->commands );
+		add_action( 'after_setup_theme', array( $this, 'custom_commands' ), 10 );
 
 		// This is the regex used to revert the
 		// generated author html back to the
@@ -82,6 +82,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		add_action( 'liveblog_insert_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
 	}
 
+	/**
+	 * Returns the custom commands and allows for customizing the command set
+	 *
+	 */
+	public function custom_commands() {
+		$this->commands = apply_filters( 'liveblog_active_commands', $this->commands );
+	}
 	/**
 	 * Gets the autocomplete config.
 	 *
