@@ -147,8 +147,9 @@ class WPCOM_Liveblog_Entry {
 		if ( empty( $this->comment->comment_content ) )
 			return $output;
 
-		$entry = $this->get_fields_for_render();
-		if ( ! wp_get_comment_status( $entry['entry_id'] ) ) {
+		$entry   = $this->get_fields_for_render();
+		$comment = get_comment( $entry['entry_id'] );
+		if ( $comment && 'liveblog' !== $comment->comment_approved ) {
 			return $output;
 		}
 
