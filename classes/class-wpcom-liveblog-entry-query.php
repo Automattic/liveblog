@@ -194,9 +194,17 @@ class WPCOM_Liveblog_Entry_Query {
 		}
 
 		$entries_by_id = self::assoc_array_by_id( $entries );
-
+		
+		/**
+		 * Filter Entries.
+		 *
+		 * Reason to add this filter, Lode More button not working as expected because of DELETE entries.
+		 *
+		 */
+		$entries_by_id = apply_filters( 'WPCOM_liveblog_remove_replaced_entries', $entries_by_id );
+		
 		foreach ( (array) $entries_by_id as $id => $entry ) {
-			if ( ! empty( $entry->replaces ) && isset( $entries_by_id[ $entry->replaces ] ) ) {
+			if ( ( 'delete' === $entry->get_type() ) || ( 'update' === $entry->get_type() && ! empty( $entry->replaces ) ) ) {
 				unset( $entries_by_id[ $id ] );
 			}
 		}
