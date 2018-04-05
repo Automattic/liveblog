@@ -305,7 +305,19 @@ final class WPCOM_Liveblog {
 			// we need to add the liveblog after the shortcodes are run, because we already
 			// process shortcodes in the comment contents and if we left any (like in the original content)
 			// we wouldn't like them to be processed
-			add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
+			// also 'add_liveblog_to_content' only once using loop_start and loop_end actions.
+			add_action( 'loop_start', function( WP_Query $query ) {
+				if ( $query->is_main_query() ) {
+					add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
+				}
+			} );
+
+			// remove the filter when main loop ends
+			add_action( 'loop_end', function( WP_Query $query ) {
+				if ( has_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) ) ) {
+					remove_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ) );
+				}
+			} );
 		} else {
 			self::handle_ajax_request();
 		}
