@@ -55,6 +55,7 @@ class EditorContainer extends Component {
       preview: false,
       showAuthors: false,
       readOnly: false,
+      isKeyEvent: true,
     };
 
     this.onChange = editorState => this.setState({ editorState });
@@ -72,6 +73,10 @@ class EditorContainer extends Component {
     });
   }
 
+  onToggleKeyEvent() {
+    this.setState({ isKeyEvent: !this.state.isKeyEvent });
+  }
+
   getContent() {
     const { editorState } = this.state;
     return convertToHTML(editorState.getCurrentContent());
@@ -79,7 +84,7 @@ class EditorContainer extends Component {
 
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState, selectedAuthor, selectedUsers } = this.state;
+    const { editorState, selectedAuthor, selectedUsers, isKeyEvent } = this.state;
     const content = this.getContent();
     const contributors = selectedUsers.map(user => user.id);
 
@@ -89,6 +94,7 @@ class EditorContainer extends Component {
         content,
         author: selectedAuthor.id,
         contributors,
+        isKeyEvent,
       });
       entryEditClose(entry.id);
       return;
@@ -98,6 +104,7 @@ class EditorContainer extends Component {
       content,
       author: selectedAuthor.id,
       contributors,
+      isKeyEvent,
     });
 
     const newEditorState = EditorState.push(
@@ -221,6 +228,7 @@ class EditorContainer extends Component {
       selectedAuthor,
       showAuthors,
       readOnly,
+      isKeyEvent,
     } = this.state;
 
     const { isEditing, config } = this.props;
@@ -251,6 +259,8 @@ class EditorContainer extends Component {
               resetSuggestions={() => this.setState({ suggestions: [] })}
               onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
               autocompleteConfig={config.autocomplete}
+              onToggleKeyEvent={this.onToggleKeyEvent.bind(this)}
+              isKeyEvent={isKeyEvent}
               handleImageUpload={this.handleImageUpload.bind(this)}
               readOnly={readOnly}
               setReadOnly={this.setReadOnly.bind(this)}
@@ -308,6 +318,7 @@ EditorContainer.propTypes = {
   entry: PropTypes.object,
   entryEditClose: PropTypes.func,
   createEntry: PropTypes.func,
+  onToggleKeyEvent: PropTypes.func,
   isEditing: PropTypes.bool,
   authors: PropTypes.array,
   getAuthors: PropTypes.func,

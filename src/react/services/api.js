@@ -37,6 +37,7 @@ export function createEntry(entry, config, nonce = false) {
     body: {
       crud_action: 'insert',
       post_id: config.post_id,
+      is_key_event: entry.isKeyEvent,
       content: entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
@@ -62,6 +63,7 @@ export function updateEntry(entry, config, nonce = false) {
       content: entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
+      is_key_event: entry.isKeyEvent,
     },
     headers: {
       'Content-Type': 'application/json',

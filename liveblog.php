@@ -571,7 +571,8 @@ final class WPCOM_Liveblog {
 		$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 		$args['author_id'] = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false;
 		$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? intval( $_POST['contributor_ids'] ) : false;
-
+		$args['is_key_event'] = isset( $_POST['is_key_event'] ) ? bool( $_POST['is_key_event'] ) : false;
+		
 		$entry = self::do_crud_entry($crud_action, $args);
 
 		if ( is_wp_error( $entry ) ) {

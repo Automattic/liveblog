@@ -322,6 +322,8 @@ class EditorWrapper extends Component {
       setReadOnly,
       handleImageUpload,
       defaultImageSize,
+      isKeyEvent,
+      onToggleKeyEvent,
     } = this.props;
 
     return (
@@ -333,6 +335,8 @@ class EditorWrapper extends Component {
           editor={this.editor}
           editorState={editorState}
           onChange={onChange}
+          onToggleKeyEvent={onToggleKeyEvent}
+          isKeyEvent={isKeyEvent}
           handleImageUpload={handleImageUpload}
           setReadOnly={setReadOnly}
           readOnly={readOnly}
@@ -387,6 +391,8 @@ EditorWrapper.propTypes = {
   handleImageUpload: PropTypes.func,
   readOnly: PropTypes.bool,
   setReadOnly: PropTypes.func,
+  onToggleKeyEvent: PropTypes.func,
+  isKeyEvent: PropTypes.bool,
   defaultImageSize: PropTypes.string,
 };
 
