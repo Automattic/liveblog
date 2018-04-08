@@ -40,18 +40,20 @@ class WPCOM_Liveblog_Cron {
 		//If Auto Archive is enabled,
 		if ( null !== WPCOM_Liveblog::$auto_archive_days ) {
 
-			$posts = new WP_Query( array(
-				'order'      => 'ASC',
-				'orderby'    => 'ID',
-				'meta_key'   => 'liveblog',
-			) );
+			$posts = new WP_Query(
+				array(
+					'order'    => 'ASC',
+					'orderby'  => 'ID',
+					'meta_key' => 'liveblog',
+				)
+			);
 
 			foreach ( $posts->posts as $post ) {
 
 				$post_id = $post->ID;
 
 				//Lets grab todays day, convert it to a timestamp and look for any set auto archive date.
-				$today = strtotime( date( 'Y-m-d H:i:s' ) );
+				$today  = strtotime( date( 'Y-m-d H:i:s' ) );
 				$expiry = get_post_meta( $post_id, WPCOM_Liveblog::$auto_archive_expiry_key, true );
 
 				//if we have an expiry date lets compare them and if the

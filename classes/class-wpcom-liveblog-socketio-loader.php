@@ -27,10 +27,10 @@ class WPCOM_Liveblog_Socketio_Loader {
 		if ( self::is_socketio_constant_enabled() ) {
 			if ( self::is_php_too_old_for_socketio() ) {
 				self::add_old_php_for_socketio_error();
-			} else if ( ! self::socketio_emitter_exists() ) {
+			} elseif ( ! self::socketio_emitter_exists() ) {
 				self::add_socketio_emitter_required_error();
 			} else {
-				require( dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php' );
+				require dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php';
 				WPCOM_Liveblog_Socketio::load();
 			}
 		}
@@ -63,7 +63,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	private static function socketio_emitter_exists() {
 		return file_exists( dirname( __FILE__ ) . '/../vendor/autoload.php' )
-		       && file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
+			   && file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
 	}
 
 	/**
@@ -140,9 +140,9 @@ class WPCOM_Liveblog_Socketio_Loader {
 		}
 
 		return WPCOM_Liveblog::is_viewing_liveblog_post()
-		       && self::is_socketio_constant_enabled()
-		       && ! self::is_php_too_old_for_socketio()
-		       && self::socketio_emitter_exists()
-		       && $redis_client_connected;
+			   && self::is_socketio_constant_enabled()
+			   && ! self::is_php_too_old_for_socketio()
+			   && self::socketio_emitter_exists()
+			   && $redis_client_connected;
 	}
 }

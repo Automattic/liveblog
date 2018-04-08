@@ -42,7 +42,7 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function load() {
 		// load socket.io-php-emitter
-		require( dirname( __FILE__ ) . '/../vendor/autoload.php' );
+		require dirname( __FILE__ ) . '/../vendor/autoload.php';
 
 		self::load_settings();
 
@@ -50,8 +50,8 @@ class WPCOM_Liveblog_Socketio {
 
 		self::$redis_client = new Predis\Client(
 			array(
-				'host'   => self::$redis_host,
-				'port'   => self::$redis_port,
+				'host' => self::$redis_host,
+				'port' => self::$redis_port,
 			)
 		);
 
@@ -96,7 +96,7 @@ class WPCOM_Liveblog_Socketio {
 			self::$url = LIVEBLOG_SOCKETIO_URL;
 		} else {
 			$parsed_url = parse_url( site_url() );
-			self::$url = $parsed_url['scheme'] . '://' . $parsed_url['host'] . ':3000';
+			self::$url  = $parsed_url['scheme'] . '://' . $parsed_url['host'] . ':3000';
 		}
 
 		self::$redis_host = defined( 'LIVEBLOG_REDIS_HOST' ) ? LIVEBLOG_REDIS_HOST : 'localhost';
@@ -125,8 +125,10 @@ class WPCOM_Liveblog_Socketio {
 			true
 		);
 
-		wp_localize_script( $handle, 'liveblog_socketio_settings',
-			apply_filters( 'liveblog_socketio_settings',
+		wp_localize_script(
+			$handle, 'liveblog_socketio_settings',
+			apply_filters(
+				'liveblog_socketio_settings',
 				array(
 					'url'               => self::$url,
 					'post_key'          => self::get_post_key(),
@@ -171,8 +173,8 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function is_connected() {
 		return self::$redis_client->isConnected()
-		       && is_object( self::$emitter )
-		       && 'SocketIO\Emitter' === get_class( self::$emitter );
+			   && is_object( self::$emitter )
+			   && 'SocketIO\Emitter' === get_class( self::$emitter );
 	}
 
 	/**
