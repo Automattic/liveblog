@@ -243,7 +243,7 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 
-		if ( true === $args['is_key_event'] ) {
+		if ( !empty( $args['is_key_event'] ) && true === $args['is_key_event'] ) {
 			do_action( 'liveblog_command_key_after', $args['content'], $comment->comment_ID, $args['post_id'] );
 		}
 
