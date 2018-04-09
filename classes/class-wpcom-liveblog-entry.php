@@ -197,7 +197,7 @@ class WPCOM_Liveblog_Entry {
 			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
 		}
 
-		if ( true === $args['is_key_event'] ) {
+		if ( !empty( $args['is_key_event'] ) && true === $args['is_key_event'] ) {
 			do_action( 'liveblog_command_key_after', $args['content'], $comment->comment_ID, $args['post_id'] );
 		}
 
