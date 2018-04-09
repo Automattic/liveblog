@@ -29,6 +29,8 @@ class EditorContainer extends Component {
     let initialEditorState;
     let initialAuthor;
     let initialContributors;
+    let keyEvent;
+    let entryId;
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
@@ -41,10 +43,14 @@ class EditorContainer extends Component {
       );
       initialAuthor = props.entry.author;
       initialContributors = props.entry.contributors;
+      keyEvent = props.entry.key_event;
+      entryId = props.entry.id;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
       initialAuthor = props.config.current_user;
       initialContributors = [];
+      keyEvent = false;
+      entryId = '';
     }
 
     this.state = {
@@ -55,7 +61,8 @@ class EditorContainer extends Component {
       preview: false,
       showAuthors: false,
       readOnly: false,
-      isKeyEvent: true,
+      isKeyEvent: keyEvent,
+      entryId,
     };
 
     this.onChange = editorState => this.setState({ editorState });
@@ -115,6 +122,7 @@ class EditorContainer extends Component {
     this.setState({
       editorState: newEditorState,
       readOnly: false,
+      isKeyEvent: false,
     });
   }
 
@@ -229,6 +237,7 @@ class EditorContainer extends Component {
       showAuthors,
       readOnly,
       isKeyEvent,
+      entryId,
     } = this.state;
 
     const { isEditing, config } = this.props;
@@ -259,14 +268,25 @@ class EditorContainer extends Component {
               resetSuggestions={() => this.setState({ suggestions: [] })}
               onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
               autocompleteConfig={config.autocomplete}
-              onToggleKeyEvent={this.onToggleKeyEvent.bind(this)}
-              isKeyEvent={isKeyEvent}
               handleImageUpload={this.handleImageUpload.bind(this)}
               readOnly={readOnly}
               setReadOnly={this.setReadOnly.bind(this)}
               defaultImageSize={config.default_image_size}
             />
         }
+        <div className="liveblog-metabox-key-events-checkbox">
+          <label
+            htmlFor={`key-event-checkbox-${entryId}`}
+          >
+            <input
+              type="checkbox"
+              id={`key-event-checkbox-${entryId}`}
+              onChange={this.onToggleKeyEvent.bind(this)}
+              checked={isKeyEvent}
+            />
+            Key Event
+          </label>
+        </div>
         <div
           onClick={() => this.setState({ showAuthors: !showAuthors })}
           className={`liveblog-metabox-header ${showAuthors ? 'is-active' : ''}`}

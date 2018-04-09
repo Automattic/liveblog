@@ -197,7 +197,7 @@ class WPCOM_Liveblog_Entry {
 			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
 		}
 
-		if ( isset( $args['is_key_event'] ) && true === $args['is_key_event'] ) {
+		if ( true === $args['is_key_event'] ) {
 			do_action( 'liveblog_command_key_after', $args['content'], $comment->comment_ID, $args['post_id'] );
 		}
 
@@ -232,11 +232,21 @@ class WPCOM_Liveblog_Entry {
 			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
 		}
 
+		// Remove any existing key event meta information before creating the new comment.
+		// Not deleting the key event meta information means that the all() function will pick up the old live blog
+		// as being a key event, even if it changed to no longer being a key event
+		WPCOM_Liveblog_Entry_Key_Events::remove_key_action($args['content'], $args['entry_id']);
+
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
+
+		if ( true === $args['is_key_event'] ) {
+			do_action( 'liveblog_command_key_after', $args['content'], $comment->comment_ID, $args['post_id'] );
+		}
+
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::replaces_meta_key, $args['entry_id'] );
 		wp_update_comment( array(

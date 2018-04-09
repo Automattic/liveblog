@@ -139,7 +139,7 @@ class Toolbar extends Component {
 
   render() {
     const { showURLInput } = this.state;
-    const { readOnly, onToggleKeyEvent, isKeyEvent } = this.props;
+    const { readOnly } = this.props;
 
     return (
       <div className="liveblog-editor-toolbar-container">
@@ -150,17 +150,6 @@ class Toolbar extends Component {
         >
           <span className="dashicons dashicons-format-image"></span> Insert Image
         </button>
-        <label
-          htmlFor="key-event-checkbox"
-        >
-          <input
-            type="checkbox"
-            id="key-event-checkbox"
-            onChange={onToggleKeyEvent}
-            checked={isKeyEvent}
-          />
-          Key Event
-        </label>
         <div className="liveblog-toolbar">
           <Button
             onMouseDown={() => this.toggleInlineStyle('BOLD')}
@@ -236,8 +225,6 @@ Toolbar.propTypes = {
   setReadOnly: PropTypes.func,
   handleImageUpload: PropTypes.func,
   readOnly: PropTypes.bool,
-  isKeyEvent: PropTypes.bool,
-  onToggleKeyEvent: PropTypes.func,
   defaultImageSize: PropTypes.string,
 };
 

@@ -44152,6 +44152,8 @@ var EditorContainer = function (_Component) {
     var initialEditorState = void 0;
     var initialAuthor = void 0;
     var initialContributors = void 0;
+    var keyEvent = void 0;
+    var entryId = void 0;
 
     if (props.entry) {
       initialEditorState = _draftJs.EditorState.createWithContent((0, _index.convertFromHTML)(props.entry.content, {
@@ -44161,10 +44163,14 @@ var EditorContainer = function (_Component) {
       }), _index.decorators);
       initialAuthor = props.entry.author;
       initialContributors = props.entry.contributors;
+      keyEvent = props.entry.key_event;
+      entryId = props.entry.id;
     } else {
       initialEditorState = _draftJs.EditorState.createEmpty(_index.decorators);
       initialAuthor = props.config.current_user;
       initialContributors = [];
+      keyEvent = false;
+      entryId = '';
     }
 
     _this.state = {
@@ -44175,7 +44181,8 @@ var EditorContainer = function (_Component) {
       preview: false,
       showAuthors: false,
       readOnly: false,
-      isKeyEvent: true
+      isKeyEvent: keyEvent,
+      entryId: entryId
     };
 
     _this.onChange = function (editorState) {
@@ -44253,7 +44260,8 @@ var EditorContainer = function (_Component) {
 
       this.setState({
         editorState: newEditorState,
-        readOnly: false
+        readOnly: false,
+        isKeyEvent: false
       });
     }
   }, {
@@ -44394,7 +44402,8 @@ var EditorContainer = function (_Component) {
           selectedAuthor = _state2.selectedAuthor,
           showAuthors = _state2.showAuthors,
           readOnly = _state2.readOnly,
-          isKeyEvent = _state2.isKeyEvent;
+          isKeyEvent = _state2.isKeyEvent,
+          entryId = _state2.entryId;
       var _props2 = this.props,
           isEditing = _props2.isEditing,
           config = _props2.config;
@@ -44442,13 +44451,28 @@ var EditorContainer = function (_Component) {
             return _this4.handleOnSearch(trigger, text);
           },
           autocompleteConfig: config.autocomplete,
-          onToggleKeyEvent: this.onToggleKeyEvent.bind(this),
-          isKeyEvent: isKeyEvent,
           handleImageUpload: this.handleImageUpload.bind(this),
           readOnly: readOnly,
           setReadOnly: this.setReadOnly.bind(this),
           defaultImageSize: config.default_image_size
         }),
+        _react2.default.createElement(
+          'div',
+          { className: 'liveblog-metabox-key-events-checkbox' },
+          _react2.default.createElement(
+            'label',
+            {
+              htmlFor: 'key-event-checkbox-' + entryId
+            },
+            _react2.default.createElement('input', {
+              type: 'checkbox',
+              id: 'key-event-checkbox-' + entryId,
+              onChange: this.onToggleKeyEvent.bind(this),
+              checked: isKeyEvent
+            }),
+            'Key Event'
+          )
+        ),
         _react2.default.createElement(
           'div',
           {
@@ -100218,9 +100242,7 @@ var EditorWrapper = function (_Component) {
           readOnly = _props9.readOnly,
           setReadOnly = _props9.setReadOnly,
           handleImageUpload = _props9.handleImageUpload,
-          defaultImageSize = _props9.defaultImageSize,
-          isKeyEvent = _props9.isKeyEvent,
-          onToggleKeyEvent = _props9.onToggleKeyEvent;
+          defaultImageSize = _props9.defaultImageSize;
 
 
       return _react2.default.createElement(
@@ -100233,8 +100255,6 @@ var EditorWrapper = function (_Component) {
           editor: this.editor,
           editorState: editorState,
           onChange: onChange,
-          onToggleKeyEvent: onToggleKeyEvent,
-          isKeyEvent: isKeyEvent,
           handleImageUpload: handleImageUpload,
           setReadOnly: setReadOnly,
           readOnly: readOnly,
@@ -100306,8 +100326,6 @@ EditorWrapper.propTypes = {
   handleImageUpload: _propTypes2.default.func,
   readOnly: _propTypes2.default.bool,
   setReadOnly: _propTypes2.default.func,
-  onToggleKeyEvent: _propTypes2.default.func,
-  isKeyEvent: _propTypes2.default.bool,
   defaultImageSize: _propTypes2.default.string
 };
 
@@ -102024,10 +102042,7 @@ var Toolbar = function (_Component) {
       var _this2 = this;
 
       var showURLInput = this.state.showURLInput;
-      var _props5 = this.props,
-          readOnly = _props5.readOnly,
-          onToggleKeyEvent = _props5.onToggleKeyEvent,
-          isKeyEvent = _props5.isKeyEvent;
+      var readOnly = this.props.readOnly;
 
 
       return _react2.default.createElement(
@@ -102042,19 +102057,6 @@ var Toolbar = function (_Component) {
           },
           _react2.default.createElement('span', { className: 'dashicons dashicons-format-image' }),
           ' Insert Image'
-        ),
-        _react2.default.createElement(
-          'label',
-          {
-            htmlFor: 'key-event-checkbox'
-          },
-          _react2.default.createElement('input', {
-            type: 'checkbox',
-            id: 'key-event-checkbox',
-            onChange: onToggleKeyEvent,
-            checked: isKeyEvent
-          }),
-          'Key Event'
         ),
         _react2.default.createElement(
           'div',
@@ -102146,8 +102148,6 @@ Toolbar.propTypes = {
   setReadOnly: _propTypes2.default.func,
   handleImageUpload: _propTypes2.default.func,
   readOnly: _propTypes2.default.bool,
-  isKeyEvent: _propTypes2.default.bool,
-  onToggleKeyEvent: _propTypes2.default.func,
   defaultImageSize: _propTypes2.default.string
 };
 
