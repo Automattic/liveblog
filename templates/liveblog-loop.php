@@ -1,6 +1,6 @@
-<?php if ( $show_archived_message ): ?>
+<?php if ( $show_archived_message ) : ?>
 <div class="liveblog-archived-message">
-	<?php printf( __( '<strong>This liveblog is archived.</strong> If you need to publish new updates or edit or delete the old ones, you need to <a href="%s">enable it first</a>.' , 'liveblog'), get_edit_post_link() . '#liveblog' ); ?>
+	<?php printf( __( '<strong>This liveblog is archived.</strong> If you need to publish new updates or edit or delete the old ones, you need to <a href="%s">enable it first</a>.', 'liveblog' ), get_edit_post_link() . '#liveblog' ); ?>
 </div>
 <?php endif; ?>
 
