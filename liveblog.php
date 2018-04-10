@@ -971,7 +971,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'latest_entry_timestamp'       => self::$entry_query->get_latest_timestamp(),
 						'latest_entry_id'              => self::$entry_query->get_latest_id(),
 						'timestamp'                    => time(),
-						'utc_offset'                   => get_option( 'gmt_offset' ) * 60, // in minutes
+						'utc_offset'                   => get_option( 'gmt_offset' ) * 120, // in minutes
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => get_option( 'time_format' ),
 						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
