@@ -198,7 +198,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 
 		//Sanitize the input safely.
 		if ( isset( $_GET['autocomplete'] ) ) {
-			$search_term = sanitize_text_field( $_GET['autocomplete'] );
+			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) );
 		} else {
 			$search_term = '';
 		}

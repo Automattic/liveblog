@@ -216,7 +216,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		//Sanitize the input safely.
 		if ( isset( $_GET['autocomplete'] ) ) {
-			$term = sanitize_text_field( $_GET['autocomplete'] );
+			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) );
 		} else {
 			$term = '';
 		}
