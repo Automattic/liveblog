@@ -90,7 +90,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 					} else {
 
-						for ( $i = 0; $i <= count( $correct_ids ) - 1; $i++ ) {
+						$correct_id_count = count( $correct_ids );
+						for ( $i = 0; $i <= $correct_id_count - 1; $i++ ) {
 
 							// replace with correct meta_value
 							if ( $correct_ids[ $i ] < $entry_id ) {

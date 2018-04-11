@@ -80,7 +80,8 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		foreach ( $handlers as $priority => $handlers ) {
 			foreach ( $handlers as $id => $handler ) {
 				if ( preg_match( $handler['regex'], $url, $matches ) && is_callable( $handler['callback'] ) ) {
-					if ( false !== $return = call_user_func( $handler['callback'], $matches, $attr, $url, $rawattr ) ) {
+					$return = call_user_func( $handler['callback'], $matches, $attr, $url, $rawattr );
+					if ( false !== $return ) {
 						/**
 						 * Filter the returned embed handler.
 						 *
