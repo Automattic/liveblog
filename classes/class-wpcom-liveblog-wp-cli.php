@@ -11,7 +11,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
 		$readme      = $this->add_screenshot_links( $readme );
 		$readme      = $this->markdownify_headings( $readme );
-		echo $readme;
+		echo $readme; // @codingStandardsIgnoreLine
 	}
 
 	/**

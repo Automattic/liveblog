@@ -63,7 +63,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	private static function socketio_emitter_exists() {
 		return file_exists( dirname( __FILE__ ) . '/../vendor/autoload.php' )
-			   && file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
+			&& file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
 	}
 
 	/**
@@ -73,9 +73,11 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	public static function show_error_message( $message ) {
 		if ( current_user_can( 'manage_options' ) ) {
-			echo WPCOM_Liveblog::get_template_part(
-				'liveblog-socketio-error.php',
-				array( 'message' => $message )
+			echo wp_kses_post(
+				WPCOM_Liveblog::get_template_part(
+					'liveblog-socketio-error.php',
+					array( 'message' => $message )
+				)
 			);
 		}
 	}

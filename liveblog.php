@@ -114,7 +114,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function show_old_wp_notice() {
 			global $wp_version;
 			$min_version = self::MIN_WP_VERSION;
-			echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) );
+			echo wp_kses_post( self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ) );
 		}
 
 		/**
@@ -1199,7 +1199,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function display_meta_box( $post ) {
 
 			// Get and display the metabox content
-			echo self::get_meta_box( $post );
+			echo self::get_meta_box( $post ); // @codingStandardsIgnoreLine
 
 		}
 
@@ -1422,7 +1422,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'archive' => __( 'Archived liveblogs', 'liveblog' ),
 				'none'    => __( 'No liveblogs', 'liveblog' ),
 			);
-			echo self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) );
+			echo self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) ); // @codingStandardsIgnoreLine
 		}
 
 		/**
@@ -1535,8 +1535,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			);
 			$args = apply_filters( 'liveblog_json_return_args', $args, $data );
 
-			$json_data = wp_json_encode( $data );
-
 			// Send cache headers, where appropriate
 			if ( false === $args['cache'] ) {
 				nocache_headers();
@@ -1546,7 +1544,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			header( 'Content-Type: application/json' );
 			self::prevent_caching_if_needed();
-			echo $json_data;
+			echo wp_json_encode( $data );
 			exit();
 		}
 
