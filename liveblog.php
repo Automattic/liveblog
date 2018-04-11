@@ -1057,7 +1057,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				),
 			);
 
-			$script = 'var _wpPluploadSettings = ' . json_encode( $settings ) . ';';
+			$script = 'var _wpPluploadSettings = ' . wp_json_encode( $settings ) . ';';
 			$data   = $wp_scripts->get_data( 'wp-plupload', 'data' );
 
 			if ( ! empty( $data ) ) {
@@ -1535,7 +1535,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			);
 			$args = apply_filters( 'liveblog_json_return_args', $args, $data );
 
-			$json_data = json_encode( $data );
+			$json_data = wp_json_encode( $data );
 
 			// Send cache headers, where appropriate
 			if ( false === $args['cache'] ) {
