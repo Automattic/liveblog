@@ -15,7 +15,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	/**
 	 * Minimum PHP version required to run socket.io-php-emitter.
 	 */
-	const socketio_min_php_version = '5.3.0';
+	const SOCKETIO_MIN_PHP_VERSION = '5.3.0';
 
 	/**
 	 * Load Socket.io main class if constant is true and
@@ -44,7 +44,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 * @return bool
 	 */
 	private static function is_php_too_old_for_socketio() {
-		return version_compare( PHP_VERSION, self::socketio_min_php_version, '<' );
+		return version_compare( PHP_VERSION, self::SOCKETIO_MIN_PHP_VERSION, '<' );
 	}
 
 	/**
@@ -118,7 +118,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 		$message = sprintf(
 			__( 'Your current PHP is version %1$s, which is too old to run the Liveblog plugin with WebSocket support enabled. The minimum required version is %2$s. Please, either update PHP or disable WebSocket support by removing or setting to false the constant LIVEBLOG_USE_SOCKETIO in wp-config.php.', 'liveblog' ),
 			PHP_VERSION,
-			self::socketio_min_php_version
+			self::SOCKETIO_MIN_PHP_VERSION
 		);
 
 		self::show_error_message( $message );

@@ -120,8 +120,8 @@ class WPCOM_Liveblog_Socketio {
 		wp_enqueue_script(
 			$handle,
 			plugins_url( 'js/liveblog-socket.io.js', dirname( __FILE__ ) ),
-			array( 'jquery', 'socket.io', WPCOM_Liveblog::key ),
-			WPCOM_Liveblog::version,
+			array( 'jquery', 'socket.io', WPCOM_Liveblog::KEY ),
+			WPCOM_Liveblog::VERSION,
 			true
 		);
 
