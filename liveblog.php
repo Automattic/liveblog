@@ -550,6 +550,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$crud_action = isset( $_POST['crud_action'] ) ? sanitize_text_field( wp_unslash( $_POST['crud_action'] ) ) : 0; // input var ok
 
 			if ( ! self::is_valid_crud_action( $crud_action ) ) {
+				// translators: 1: crud action
 				self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 			}
 
@@ -1217,6 +1218,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'value'       => 'enable',
 					'text'        => __( 'Enable', 'liveblog' ),
 					'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.', 'liveblog' ),
+					// translators: 1: post url
 					'active-text' => sprintf( __( 'There is an <strong>enabled</strong> liveblog on this post. <a href="%s">Visit the liveblog &rarr;</a>', 'liveblog' ), get_permalink( $post ) ),
 					'primary'     => true,
 					'disabled'    => false,
@@ -1225,6 +1227,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'value'       => 'archive',
 					'text'        => __( 'Archive', 'liveblog' ),
 					'description' => __( 'Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden.', 'liveblog' ),
+					// translators: 1: archive url
 					'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ),
 					'primary'     => false,
 					'disabled'    => false,
@@ -1256,10 +1259,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( ! $meta_box ) {
 
 				if ( wp_is_post_revision( $post_id ) ) {
-					self::send_user_error( __( "The post is a revision: $post_id", 'liveblog' ) );
+					// translators: post id
+					self::send_user_error( sprintf( __( 'The post is a revision: %s', 'liveblog' ), $post_id ) );
 				}
 
-				self::send_user_error( __( "Non-existing post ID: $post_id", 'liveblog' ) );
+				// translators: post id
+				self::send_user_error( sprintf( __( 'Non-existing post ID: %s', 'liveblog' ), $post_id ) );
 
 			}
 
