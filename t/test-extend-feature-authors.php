@@ -7,7 +7,7 @@ class Test_Extend_Feature_Authors extends WP_UnitTestCase {
 	 * @return mixed
 	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Authors::get_config()
 	 */
-	function test_get_config_filter_executes() {
+	public function test_get_config_filter_executes() {
 		add_filter( 'liveblog_author_config', array( $this, 'example_test_filter' ), 1, 10 );
 		$class  = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
 		$config = array();
@@ -23,7 +23,7 @@ class Test_Extend_Feature_Authors extends WP_UnitTestCase {
 	 * @param  mixed $example
 	 * @return mixed
 	 */
-	function example_test_filter( $example ) {
+	public function example_test_filter( $example ) {
 		if ( is_array( $example ) ) {
 			$example['testCase'] = true;
 		} elseif ( is_string( $example ) ) {

@@ -228,7 +228,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		);
 	}
 
-	static function help() {
+	public static function help() {
 		WP_CLI::line(
 			<<<HELP
 usage: wp liveblog readme_for_github
