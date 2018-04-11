@@ -782,7 +782,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$pages = ceil( count( $entries ) / $per_page );
 
 			//If no page is passed but entry id is, we search for the correct page.
-			if ( $page === false && $id !== false ) {
+			if ( false === $page && false !== $id ) {
 				$index = array_search( $id, array_keys( $entries ), true );
 				$index = $index + 1;
 				$page  = ceil( $index / $per_page );
@@ -1321,7 +1321,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$autoarchive_date = strtotime( ' + ' . self::$auto_archive_days . ' days', $latest_timestamp );
 
 				//if the old state is archive and the new state is active or there is no current state and the new state is enable
-				if ( count( $current_state ) === 0 && $new_state === 'enable' || $current_state[0] === 'archive' && $new_state === 'enable' ) {
+				if ( 0 === count( $current_state ) && 'enable' === $new_state || 'archive' === $current_state[0] && 'enable' === $new_state ) {
 
 					//Then the live blog is being setup for the first time or is being reactivated.
 					update_post_meta( $post_id, self::$auto_archive_expiry_key, $autoarchive_date );
