@@ -65,7 +65,7 @@ class WPCOM_Liveblog_Lazyloader {
 			);
 		}
 
-		return isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
+		return isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ); // input var ok
 	}
 
 	/**

@@ -197,8 +197,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	public function ajax_terms() {
 
 		//Sanitize the input safely.
-		if ( isset( $_GET['autocomplete'] ) ) {
-			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) );
+		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
+			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
 		} else {
 			$search_term = '';
 		}
