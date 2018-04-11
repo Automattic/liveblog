@@ -100,7 +100,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		return $commands;
 	}
 
-	 /**
+	/**
 	 * Check if entry is key event by checking its meta
 	 *
 	 * @param $id

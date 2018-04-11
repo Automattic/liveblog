@@ -173,8 +173,8 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function is_connected() {
 		return self::$redis_client->isConnected()
-			   && is_object( self::$emitter )
-			   && 'SocketIO\Emitter' === get_class( self::$emitter );
+				&& is_object( self::$emitter )
+				&& 'SocketIO\Emitter' === get_class( self::$emitter );
 	}
 
 	/**
