@@ -62,18 +62,19 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/entries/<start_time>/<end_time>
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entries/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/entries/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_entries' ),
-				'args' => array(
-					'post_id' => array(
+				'args'     => array(
+					'post_id'    => array(
 						'required' => true,
 					),
 					'start_time' => array(
 						'required' => true,
 					),
-					'end_time' => array(
+					'end_time'   => array(
 						'required' => true,
 					),
 				),
@@ -87,28 +88,29 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/crud
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/crud([/]*)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/crud([/]*)',
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback' => array( __CLASS__, 'crud_entry' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'crud_entry' ),
 				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
-				'args' => array(
+				'args'                => array(
 					'crud_action' => array(
-						'required' => true,
+						'required'          => true,
 						'validate_callback' => array( __CLASS__, 'validate_crud_action' ),
 					),
-					'post_id' => array(
-						'required' => false,
+					'post_id'     => array(
+						'required'          => false,
 						'sanitize_callback' => array( __CLASS__, 'sanitize_numeric' ),
 					),
-					'content' => array(
+					'content'     => array(
 						'required' => false,
 					),
-					'entry_id' => array(
-						'required' => false,
+					'entry_id'    => array(
+						'required'          => false,
 						'sanitize_callback' => array( __CLASS__, 'sanitize_numeric' ),
 					),
-				)
+				),
 			)
 		);
 
@@ -118,12 +120,13 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/lazyload/<max_time>/<min_time>
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_lazyload_entries' ),
-				'args' => array(
-					'post_id' => array(
+				'args'     => array(
+					'post_id'  => array(
 						'required' => true,
 					),
 					'max_time' => array(
@@ -142,12 +145,13 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/entry/<entry_id>
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)([/]*)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)([/]*)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_single_entry' ),
-				'args' => array(
-					'post_id' => array(
+				'args'     => array(
+					'post_id'  => array(
 						'required' => true,
 					),
 					'entry_id' => array(
@@ -163,15 +167,16 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/preview
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/preview([/]*)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/preview([/]*)',
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
+				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'format_preview_entry' ),
-				'args' => array(
+				'args'     => array(
 					'entry_content' => array(
 						'required' => true,
 					),
-				)
+				),
 			)
 		);
 
@@ -185,15 +190,16 @@ class WPCOM_Liveblog_Rest_Api {
 		 *       Look into requiring the slash
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/authors([/]*)(?P<term>.*)',
+		register_rest_route(
+			self::$api_namespace, '/authors([/]*)(?P<term>.*)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_authors' ),
-				'args' => array(
+				'args'     => array(
 					'term' => array(
 						'required' => false,
 					),
-				)
+				),
 			)
 		);
 
@@ -207,15 +213,16 @@ class WPCOM_Liveblog_Rest_Api {
 		 *       Look into requiring the slash
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
+		register_rest_route(
+			self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_hashtag_terms' ),
-				'args' => array(
+				'args'     => array(
 					'term' => array(
 						'required' => false,
 					),
-				)
+				),
 			)
 		);
 
@@ -225,25 +232,26 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/post_state
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/post_state([/]*)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/post_state([/]*)',
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback' => array( __CLASS__, 'update_post_state' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'update_post_state' ),
 				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
-				'args' => array(
-					'post_id' => array(
+				'args'                => array(
+					'post_id'         => array(
 						'required' => true,
 					),
-					'state' => array(
+					'state'           => array(
 						'required' => true,
 					),
-					'template_name' => array(
+					'template_name'   => array(
 						'required' => true,
 					),
 					'template_format' => array(
 						'required' => true,
 					),
-					'limit' => array(
+					'limit'           => array(
 						'required' => true,
 					),
 				),
@@ -256,15 +264,16 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/get-entries/<page>/<last_known_entry>
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/get-entries/(?P<page>\d+)/(?P<last_known_entry>[^\/]+)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/get-entries/(?P<page>\d+)/(?P<last_known_entry>[^\/]+)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_entries_paged' ),
-				'args' => array(
-					'post_id' => array(
+				'args'     => array(
+					'post_id'          => array(
 						'required' => true,
 					),
-					'page' => array(
+					'page'             => array(
 						'required' => true,
 					),
 					'last_known_entry' => array(
@@ -280,11 +289,12 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/get-key-events
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_key_events' ),
-				'args' => array(
+				'args'     => array(
 					'last_known_entry' => array(
 						'required' => true,
 					),
@@ -298,15 +308,16 @@ class WPCOM_Liveblog_Rest_Api {
 		 * /<post_id>/jump-to-key-event/<id>/<last_known_entry>
 		 *
 		 */
-		register_rest_route( self::$api_namespace, '/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
 			array(
-				'methods' => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'jump_to_key_event' ),
-				'args' => array(
-					'post_id' => array(
+				'args'     => array(
+					'post_id'          => array(
 						'required' => true,
 					),
-					'id' => array(
+					'id'               => array(
 						'required' => true,
 					),
 					'last_known_entry' => array(
@@ -355,14 +366,12 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get the required parameters from the request
 		$crud_action = $request->get_param( 'crud_action' );
-		$json 	 	 = $request->get_json_params();
+		$json        = $request->get_json_params();
 
 		$args = array(
-			'post_id'   => self::get_json_param( 'post_id', $json ),
-			'content'   => self::get_json_param( 'content', $json ),
-			'entry_id'  => self::get_json_param( 'entry_id', $json ),
-			'author_id' => self::get_json_param( 'author_id', $json ),
-			'contributor_ids' => self::get_json_param( 'contributor_ids', $json ),
+			'post_id'  => self::get_json_param( 'post_id', $json ),
+			'content'  => self::get_json_param( 'content', $json ),
+			'entry_id' => self::get_json_param( 'entry_id', $json ),
 		);
 
 		self::set_liveblog_vars( $args['post_id'] );
@@ -435,9 +444,9 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function format_preview_entry( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id 		= $request->get_param( 'post_id' );
-		$json 	 		= $request->get_json_params();
-		$entry_content  = self::get_json_param( 'entry_content', $json );
+		$post_id       = $request->get_param( 'post_id' );
+		$json          = $request->get_json_params();
+		$entry_content = self::get_json_param( 'entry_content', $json );
 
 		self::set_liveblog_vars( $post_id );
 
@@ -464,7 +473,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get a list of authors
 		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
-		$authors = $liveblog_authors->get_authors( $term );
+		$authors          = $liveblog_authors->get_authors( $term );
 
 		return $authors;
 	}
@@ -483,7 +492,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get a list of authors
 		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
-		$hashtags = $liveblog_hashtags->get_hashtag_terms( $term );
+		$hashtags          = $liveblog_hashtags->get_hashtag_terms( $term );
 
 		return $hashtags;
 	}
@@ -498,8 +507,8 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function update_post_state( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id         = $request->get_param( 'post_id' );
-		$state           = $request->get_param( 'state' );
+		$post_id = $request->get_param( 'post_id' );
+		$state   = $request->get_param( 'state' );
 
 		// Additional request variables used in the liveblog_admin_settings_update action
 		$request_vars = array(
@@ -531,8 +540,8 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_entries_paged( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id     	  = $request->get_param( 'post_id' );
-		$page 			  = $request->get_param( 'page' );
+		$post_id          = $request->get_param( 'post_id' );
+		$page             = $request->get_param( 'page' );
 		$last_known_entry = $request->get_param( 'last_known_entry' );
 
 		self::set_liveblog_vars( $post_id );
@@ -556,13 +565,13 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_key_events( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id     	  = $request->get_param( 'post_id' );
+		$post_id          = $request->get_param( 'post_id' );
 		$last_known_entry = $request->get_param( 'last_known_entry' );
 
 		self::set_liveblog_vars( $post_id );
 
 		$key_events = WPCOM_Liveblog_Entry_Key_Events::all();
-		$key_events = WPCOM_Liveblog::entries_for_json( $key_events  );
+		$key_events = WPCOM_Liveblog::entries_for_json( $key_events );
 
 		// Possibly do not cache the response
 		WPCOM_Liveblog::prevent_caching_if_needed();
@@ -580,8 +589,8 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function jump_to_key_event( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id     	  = $request->get_param( 'post_id' );
-		$id 			  = $request->get_param( 'id' );
+		$post_id          = $request->get_param( 'post_id' );
+		$id               = $request->get_param( 'id' );
 		$last_known_entry = $request->get_param( 'last_known_entry' );
 
 		self::set_liveblog_vars( $post_id );
@@ -629,8 +638,8 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return mixed
 	 */
 	public static function get_json_param( $param, $json ) {
-		if ( isset( $json[$param] ) ) {
-			return $json[$param];
+		if ( isset( $json[ $param ] ) ) {
+			return $json[ $param ];
 		}
 		return false;
 	}

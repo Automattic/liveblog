@@ -28,11 +28,11 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	 */
 	protected $prefixes = array();
 
-    /**
-     * Called by WPCOM_Liveblog_Entry_Extend::load()
-     *
-     * @return void
-     */
+	/**
+	 * Called by WPCOM_Liveblog_Entry_Extend::load()
+	 *
+	 * @return void
+	 */
 	public function load() {
 		//
 	}
@@ -81,13 +81,13 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	 * @param array $config
 	 * @return array
 	 */
-	public abstract function get_config( $config );
+	abstract public function get_config( $config );
 
 	/**
 	 * Filters the input.
 	 *
-     * @param mixed $entry
-     * @return mixed
+	 * @param mixed $entry
+	 * @return mixed
 	 */
 	public function filter( $entry ) {
 		return $entry;
@@ -96,8 +96,8 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Reverts the input.
 	 *
-     * @param mixed $entry
-     * @return mixed
+	 * @param mixed $entry
+	 * @return mixed
 	 */
 	public function revert( $entry ) {
 		return $entry;

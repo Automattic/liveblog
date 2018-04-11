@@ -2,8 +2,8 @@
 
 /**
  * Helper class from the WP-API test suite.
- * 
- * @link	https://github.com/WP-API/WP-API/tree/develop/tests
+ *
+ * @link    https://github.com/WP-API/WP-API/tree/develop/tests
  */
 
 class WP_Test_Spy_REST_Server extends WP_REST_Server {

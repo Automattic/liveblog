@@ -43,7 +43,7 @@ class WPCOM_Liveblog_Lazyloader {
 			}
 
 			// Disable lazy loading on archived liveblogs
-			if ( 'enable' != WPCOM_Liveblog::get_liveblog_state() ) {
+			if ( 'enable' !== WPCOM_Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
 			}
 		}
@@ -161,9 +161,11 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function admin_notices() {
 
-		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array(
-			'plugin' => 'Lazyload Liveblog Entries',
-		) );
+		echo WPCOM_Liveblog::get_template_part(
+			'lazyload-notice.php', array(
+				'plugin' => 'Lazyload Liveblog Entries',
+			)
+		);
 	}
 
 	/**

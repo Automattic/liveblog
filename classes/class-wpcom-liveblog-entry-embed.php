@@ -59,7 +59,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		}
 
 		$rawattr = $attr;
-		$attr = wp_parse_args( $attr, wp_embed_defaults( $url ) );
+		$attr    = wp_parse_args( $attr, wp_embed_defaults( $url ) );
 
 		$this->last_attr = $attr;
 
@@ -81,7 +81,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		foreach ( $handlers as $priority => $handlers ) {
 			foreach ( $handlers as $id => $handler ) {
 				if ( preg_match( $handler['regex'], $url, $matches ) && is_callable( $handler['callback'] ) ) {
-					if ( false !== $return = call_user_func( $handler['callback'], $matches, $attr, $url, $rawattr ) )
+					if ( false !== $return = call_user_func( $handler['callback'], $matches, $attr, $url, $rawattr ) ) {
 						/**
 						 * Filter the returned embed handler.
 						 *
@@ -92,6 +92,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 						 * @param array  $attr   An array of shortcode attributes.
 						 */
 						return apply_filters( 'embed_handler_html', $return, $url, $attr );
+					}
 				}
 			}
 		}
@@ -105,8 +106,8 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		if ( $comment_ID ) {
 
 			// Check for a cached result (stored in the comment meta)
-			$key_suffix = md5( $url . serialize( $attr ) );
-			$cachekey = '_oembed_' . $key_suffix;
+			$key_suffix    = md5( $url . serialize( $attr ) );
+			$cachekey      = '_oembed_' . $key_suffix;
 			$cachekey_time = '_oembed_time_' . $key_suffix;
 
 			/**
@@ -119,7 +120,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 			 */
 			$ttl = apply_filters( 'oembed_ttl', DAY_IN_SECONDS, $url, $attr, $comment_ID );
 
-			$cache = get_comment_meta( $comment_ID, $cachekey, true );
+			$cache      = get_comment_meta( $comment_ID, $cachekey, true );
 			$cache_time = get_comment_meta( $comment_ID, $cachekey_time, true );
 
 			/**
@@ -131,8 +132,8 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 			if ( true === empty( $cache_time ) && true === empty( $cache ) ) {
 				$comment = get_comment( $comment_ID );
 				if ( true === is_a( $comment, 'WP_Comment' ) ) {
-					$post_id = $comment->comment_post_ID;
-					$cache = get_post_meta( $post_id, $cachekey, true );
+					$post_id    = $comment->comment_post_ID;
+					$cache      = get_post_meta( $post_id, $cachekey, true );
 					$cache_time = get_post_meta( $post_id, $cachekey_time, true );
 				}
 			}
@@ -225,8 +226,9 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		}
 
 		foreach ( $comment_meta_keys as $comment_meta_key ) {
-			if ( '_oembed_' == substr( $comment_meta_key, 0, 8 ) )
+			if ( '_oembed_' === substr( $comment_meta_key, 0, 8 ) ) {
 				delete_comment_meta( $comment_ID, $comment_meta_key );
+			}
 		}
 	}
 
@@ -250,9 +252,9 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 * @return string The embed HTML on success, otherwise the original URL.
 	 */
 	public function autoembed_callback( $match ) {
-		$oldval = $this->linkifunknown;
+		$oldval              = $this->linkifunknown;
 		$this->linkifunknown = false;
-		$return = $this->shortcode( array(), $match[2] );
+		$return              = $this->shortcode( array(), $match[2] );
 		$this->linkifunknown = $oldval;
 
 		return $match[1] . $return . $match[3];
