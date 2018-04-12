@@ -234,7 +234,7 @@ class EditorContainer extends Component {
             className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
             onClick={() => this.setState({ mode: 'editor' })}
           >
-            Editor
+            Visual
           </button>
           <button
             className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
