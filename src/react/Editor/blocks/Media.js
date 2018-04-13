@@ -132,7 +132,7 @@ class Media extends Component {
     const src = getImageSize(image.media_details.sizes, defaultImageSize);
     setEditMode(false);
     this.setState({ ...this.defaultState });
-    replaceMetadata({ image: src, edit: false });
+    replaceMetadata({ image: src, edit: false }, true);
   }
 
   /**

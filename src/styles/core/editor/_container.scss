@@ -31,12 +31,9 @@
   border: 1px solid $color-grey-light;
 }
 
-.liveblog-editor-container .public-DraftEditor-content {
-  background: #fff;
-}
-
+.liveblog-editor-container .public-DraftEditor-content,
 .liveblog-preview {
-  background: $color-grey-x-light;
+  background: #fff;
 }
 
 .liveblog-entry-edit .liveblog-editor-container {

@@ -1,8 +1,10 @@
-/**
+/* *
 * Entries
 */
 
 .liveblog-entry {
+  display: flex;
+  padding: 1rem;
   background: #f7f7f7;
   border-top: 2px solid #eee;
   border-bottom: 2px solid #eee;
@@ -12,28 +14,22 @@
   border-top: 2px solid #111;
 }
 
-.liveblog-entry-edit {
-  margin-left: 60px;
-}
-
-@media (max-width: 58.74em) {
-  .liveblog-entry-edit {
-    margin-left: 0;
-  }
-}
-
-.liveblog-entry-content {
-  padding-top: 10px;
-  padding-left: 60px;
-}
-
 .liveblog-meta {
   color: #666;
 }
 
-.entry-content .liveblog-meta-time {
-  -ms-flex-preferred-size: 60px;
-  flex-basis: 60px;
+.liveblog-entry-aside {
+  flex-basis: 70px;
+  min-width: 70px;
+  margin-right: 10px;
+}
+
+.liveblog-entry-main {
+  flex-grow: 1;
+}
+
+.liveblog-entry-content * {
+  word-break: break-all;
 }
 
 .entry-content .liveblog-meta-time,
@@ -54,6 +50,10 @@
   margin-bottom: 5px;
 }
 
+.liveblog-meta-authors {
+  margin-bottom: .5rem;
+}
+
 .liveblog-meta-author {
   margin-right: 8px;
 }
@@ -68,16 +68,6 @@
   overflow: hidden;
   width: 30px;
   height: 30px;
-}
-
-.liveblog-entry-tools {
-  margin-left: 60px;
-}
-
-@media (max-width: 58.74em) {
-  .liveblog-entry-tools {
-    margin-left: 0;
-  }
 }
 
 .liveblog-hash {

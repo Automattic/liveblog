@@ -149,3 +149,14 @@ export const getImageSize = (sizes, defaultSize) => {
   }
   return '';
 };
+
+/**
+ * Map a NamedNodeMap to an object and map the class attribute to className
+ * for React.
+ * @param {namedNodeMap} attributes
+ */
+export const namedNodeMapToObject = namedNodeMap =>
+  Array.from(namedNodeMap).reduce((object, item) => ({
+    ...object,
+    [item.name === 'class' ? 'className' : item.name]: item.value,
+  }), {});

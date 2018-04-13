@@ -588,25 +588,21 @@
 
 .liveblog-entry {
   position: relative;
-  padding: 1rem;
   margin-bottom: 1rem; }
 
 .liveblog-meta {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
   text-decoration: none; }
 
-.liveblog-meta-time {
-  display: block; }
-
-.liveblog-meta-author,
-.liveblog-meta-contributors {
+.liveblog-meta-authors,
+.liveblog-meta-author {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -777,6 +773,12 @@
 .liveblog-image-upload-btn .dashicons {
   margin-right: .35rem; }
 
+@media (max-width: 47.49em) {
+  .liveblog-image-upload-btn-text {
+    display: none; }
+  .liveblog-image-upload-btn .dashicons {
+    margin-right: 0; } }
+
 .liveblog-image-upload-btn:hover {
   background-color: #fff;
   -webkit-transition: .25s background-color ease-in-out;
@@ -831,11 +833,9 @@
   margin-bottom: .8rem;
   border: 1px solid #bbb; }
 
-.liveblog-editor-container .public-DraftEditor-content {
-  background: #fff; }
-
+.liveblog-editor-container .public-DraftEditor-content,
 .liveblog-preview {
-  background: #f7f7f7; }
+  background: #fff; }
 
 .liveblog-entry-edit .liveblog-editor-container {
   margin: .8rem 0 0;
@@ -1028,7 +1028,7 @@
 
 .liveblog-editor-tab:hover,
 .liveblog-editor-tab.is-active {
-  background: #f7f7f7; }
+  background: #fff; }
 
 .liveblog-editor-tab.is-active::after {
   content: "";
@@ -1037,6 +1037,12 @@
   left: 0;
   width: 100%;
   height: 2px;
+  background: #fff; }
+
+.liveblog-editor-tab:first-child.is-active {
+  background: #f7f7f7; }
+
+.liveblog-editor-tab:first-child.is-active::after {
   background: #f7f7f7; }
 
 .liveblog-editor-tab:not(:last-child) {
@@ -1134,7 +1140,7 @@
   border: 1px solid black; }
 
 .Select:not(:last-child) {
-  margin-bottom: .5rem; }
+  margin-bottom: 1rem; }
 
 .Select.is-focused:not(.is-open) > .Select-control {
   border-color: #bbb;
@@ -1513,3 +1519,15 @@
 .liveblog-media-current-container img {
   max-width: 100%;
   max-height: 100%; }
+
+.liveblog-html-editor-container {
+  border: 1px solid #bbb;
+  margin-bottom: 1rem; }
+
+.liveblog-html-editor {
+  padding: .5rem;
+  background: #fff; }
+
+.ace_scroll-left {
+  -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25) !important;
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25) !important; }

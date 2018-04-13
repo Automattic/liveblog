@@ -19,6 +19,11 @@ class WPCOM_Liveblog_Entry {
 	 */
 	const contributors_meta_key	= 'liveblog_contributors';
 
+	/**
+	 * @var string Whether or not an entry should show an author
+	 */
+	const hide_authors_key = 'liveblog_hide_authors';
+
 	private $comment;
 	private $type = 'new';
 	private static $allowed_tags_for_entry;
@@ -112,8 +117,7 @@ class WPCOM_Liveblog_Entry {
 			'content' 		=> apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' 	=> $css_classes,
 			'timestamp' 	=> $this->get_timestamp(),
-			'author' 		=> self::get_user_data_for_json( self::user_object_from_comment_id( $entry_id ) ),
-			'contributors' 	=> self::get_contributors_for_json( $entry_id ),
+			'authors'       => self::get_authors( $entry_id ),
 			'entry_time' 	=> get_comment_date( 'U', $entry_id ),
 			'share_link' 	=> $share_link,
 		);
@@ -135,7 +139,7 @@ class WPCOM_Liveblog_Entry {
 			'content'               => self::render_content( $comment_text, $this->comment ),
 			'original_content'      => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
 			'avatar_size'           => $avatar_size,
-			'avatar_img'            => get_avatar( $this->comment->comment_author_email, $avatar_size ),
+			'avatar_img'            => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'           => get_comment_author_link( $entry_id ),
 			'entry_date'            => get_comment_date( get_option('date_format'), $entry_id ),
 			'entry_time'            => get_comment_date( get_option('time_format'), $entry_id ),
@@ -186,17 +190,13 @@ class WPCOM_Liveblog_Entry {
 	public static function insert( $args ) {
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
-		$args['user'] = self::handle_author_select( $args, false );
-
 		$comment = self::insert_comment( $args );
+
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
 
-		if ( isset( $args['contributor_ids'] ) ) {
-			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
-		}
-
+		$args['user'] = self::handle_author_select( $args, $comment->comment_ID );
 
 		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
 		$entry = self::from_comment( $comment );
@@ -224,10 +224,6 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
-
-		if ( isset( $args['contributor_ids'] ) ) {
-			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
-		}
 
         $args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
@@ -322,7 +318,7 @@ class WPCOM_Liveblog_Entry {
 		if ( !$original_comment ) {
 			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
 		}
-		$user_object = get_userdata( $original_comment->user_id );
+		$user_object = self::get_userdata_with_filter( $original_comment->user_id );
 		if ( !$user_object ) {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
@@ -358,11 +354,13 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * If author select is enabled return the user using author_id,
-	 * if user not found then set as current user as a fallback.
+	 * Return the user using author_id, if user not found then set as current
+	 * user as a fallback, we store a meta to show that authors are hidden as
+	 * a comment must have an author.
 	 *
 	 * If a entry_id is supplied we should update it as its the
 	 * original entry which is used for displaying author information.
+	 *
 	 *
 	 * @param array $args The new Live blog Entry.
 	 * @param int   $entry_id If set we should update the original entry
@@ -370,33 +368,42 @@ class WPCOM_Liveblog_Entry {
 	 */
 	private static function handle_author_select( $args, $entry_id ) {
 		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
-			$user_object = get_userdata( $args['author_id'] );
+			$user_object = self::get_userdata_with_filter( $args['author_id'] );
 			if ( $user_object ) {
 				$args['user'] = $user_object;
 
-				if ( $entry_id ) {
-					wp_update_comment( array(
-						'comment_ID' 		   => $entry_id,
-						'user_id'              => $args['user']->ID,
-						'comment_author'       => $args['user']->display_name,
-						'comment_author_email' => $args['user']->user_email,
-						'comment_author_url'   => $args['user']->user_url,
-					) );
-				}
+				wp_update_comment( array(
+					'comment_ID' 		   => $entry_id,
+					'user_id'              => $args['user']->ID,
+					'comment_author'       => $args['user']->display_name,
+					'comment_author_email' => $args['user']->user_email,
+					'comment_author_url'   => $args['user']->user_url,
+				) );
+
+				update_comment_meta( $entry_id, self::hide_authors_key, false );
 			}
+		} else {
+			update_comment_meta( $entry_id, self::hide_authors_key, true );
+		}
+
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $entry_id, $args['contributor_ids'] );
 		}
 
 		return $args['user'];
 	}
 
 	/**
-	 * If author select is enabled then we store the contributors
-	 * as comment meta.
+	 * Store the contributors as comment meta.
 	 *
 	 * @param int $comment_id The comment id for the meta we should update.
 	 * @param array $contributors Array of ids to store as meta.
 	 */
 	private static function add_contributors( $comment_id, $contributors ) {
+		if ( ! $contributors ) {
+			delete_comment_meta( $comment_id, self::contributors_meta_key );
+		}
+
 		if ( is_array( $contributors ) ) {
 			if ( metadata_exists( 'comment', $comment_id, self::contributors_meta_key ) ) {
 				update_comment_meta( $comment_id, self::contributors_meta_key, $contributors );
@@ -419,9 +426,14 @@ class WPCOM_Liveblog_Entry {
 			return array();
 		}
 
-		return array_map(function( $contributor ) {
-			return self::get_user_data_for_json( get_userdata( $contributor ) );
+		return array_map( function( $contributor ) {
+			$user_object = self::get_userdata_with_filter( $contributor );
+			return self::get_user_data_for_json( $user_object );
 		}, $contributors );
+	}
+
+	public static function get_userdata_with_filter( $author_id ) {
+		return apply_filters( 'liveblog_userdata', get_userdata( $author_id ), $author_id );
 	}
 
 	/**
@@ -439,8 +451,26 @@ class WPCOM_Liveblog_Entry {
 			'id' => $user->ID,
 			'key' => strtolower($user->user_nicename),
 			'name' => $user->display_name,
-			'avatar' => get_avatar( $user->ID, $avatar_size ),
+			'avatar' => WPCOM_Liveblog::get_avatar( $user->ID, $avatar_size ),
 		);
+	}
+
+	/**
+	 * Return an array of authors, based on the original comment author and its contributors.
+	 *
+	 * @param number $comment_id The id of the comment.
+	 */
+	public static function get_authors( $comment_id ) {
+		$hide_authors = get_comment_meta( $comment_id, self::hide_authors_key, true );
+
+		if ( $hide_authors ) {
+			return array();
+		}
+
+		$author = [ self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) ];
+		$contributors = self::get_contributors_for_json( $comment_id );
+
+		return array_merge( $author, $contributors );
 	}
 }
 
