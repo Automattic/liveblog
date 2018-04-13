@@ -42,7 +42,7 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function load() {
 		// load socket.io-php-emitter
-		require( dirname( __FILE__ ) . '/../vendor/autoload.php' );
+		require dirname( __FILE__ ) . '/../vendor/autoload.php';
 
 		self::load_settings();
 
@@ -50,8 +50,8 @@ class WPCOM_Liveblog_Socketio {
 
 		self::$redis_client = new Predis\Client(
 			array(
-				'host'   => self::$redis_host,
-				'port'   => self::$redis_port,
+				'host' => self::$redis_host,
+				'port' => self::$redis_port,
 			)
 		);
 
@@ -95,8 +95,8 @@ class WPCOM_Liveblog_Socketio {
 		if ( defined( 'LIVEBLOG_SOCKETIO_URL' ) ) {
 			self::$url = LIVEBLOG_SOCKETIO_URL;
 		} else {
-			$parsed_url = parse_url( site_url() );
-			self::$url = $parsed_url['scheme'] . '://' . $parsed_url['host'] . ':3000';
+			$parsed_url = wp_parse_url( site_url() );
+			self::$url  = $parsed_url['scheme'] . '://' . $parsed_url['host'] . ':3000';
 		}
 
 		self::$redis_host = defined( 'LIVEBLOG_REDIS_HOST' ) ? LIVEBLOG_REDIS_HOST : 'localhost';
@@ -120,13 +120,15 @@ class WPCOM_Liveblog_Socketio {
 		wp_enqueue_script(
 			$handle,
 			plugins_url( 'js/liveblog-socket.io.js', dirname( __FILE__ ) ),
-			array( 'jquery', 'socket.io', WPCOM_Liveblog::key ),
-			WPCOM_Liveblog::version,
+			array( 'jquery', 'socket.io', WPCOM_Liveblog::KEY ),
+			WPCOM_Liveblog::VERSION,
 			true
 		);
 
-		wp_localize_script( $handle, 'liveblog_socketio_settings',
-			apply_filters( 'liveblog_socketio_settings',
+		wp_localize_script(
+			$handle, 'liveblog_socketio_settings',
+			apply_filters(
+				'liveblog_socketio_settings',
 				array(
 					'url'               => self::$url,
 					'post_key'          => self::get_post_key(),
@@ -171,8 +173,8 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function is_connected() {
 		return self::$redis_client->isConnected()
-		       && is_object( self::$emitter )
-		       && 'SocketIO\Emitter' === get_class( self::$emitter );
+				&& is_object( self::$emitter )
+				&& 'SocketIO\Emitter' === get_class( self::$emitter );
 	}
 
 	/**
@@ -187,7 +189,7 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function emit( $name, $data ) {
 		if ( self::is_connected() ) {
-			self::$emitter->to( self::get_post_key() )->json->emit( $name, json_encode( $data ) );
+			self::$emitter->to( self::get_post_key() )->json->emit( $name, wp_json_encode( $data ) );
 		}
 
 		exit;

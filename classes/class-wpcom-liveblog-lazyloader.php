@@ -43,7 +43,7 @@ class WPCOM_Liveblog_Lazyloader {
 			}
 
 			// Disable lazy loading on archived liveblogs
-			if ( 'enable' != WPCOM_Liveblog::get_liveblog_state() ) {
+			if ( 'enable' !== WPCOM_Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
 			}
 		}
@@ -65,7 +65,7 @@ class WPCOM_Liveblog_Lazyloader {
 			);
 		}
 
-		return isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] );
+		return isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) ); // input var ok
 	}
 
 	/**
@@ -161,9 +161,13 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function admin_notices() {
 
-		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array(
-			'plugin' => 'Lazyload Liveblog Entries',
-		) );
+		echo wp_kses_post(
+			WPCOM_Liveblog::get_template_part(
+				'lazyload-notice.php', array(
+					'plugin' => 'Lazyload Liveblog Entries',
+				)
+			)
+		);
 	}
 
 	/**

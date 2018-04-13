@@ -14,7 +14,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
 		'twitter'   => 'https://platform.twitter.com/widgets.js',
 		'instagram' => 'https://platform.instagram.com/en_US/embeds.js',
-		'reddit' 	=> 'https://embed.redditmedia.com/widgets/platform.js'
+		'reddit'    => 'https://embed.redditmedia.com/widgets/platform.js',
 	);
 
 	/**
@@ -24,8 +24,8 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	public static function load() {
 		self::$sdks = apply_filters( 'liveblog_embed_sdks', self::$sdks );
 
-	    add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
-	    add_filter( 'script_loader_tag',  array( __CLASS__, 'add_async_attribute' ), 10, 2 );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+		add_filter( 'script_loader_tag', array( __CLASS__, 'add_async_attribute' ), 10, 2 );
 	}
 
 	/**
@@ -51,9 +51,9 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * @return type
 	 */
 	public static function add_async_attribute( $tag, $handle ) {
-	    if ( ! in_array( $handle, array_keys( self::$sdks ) ) ) {
-	        return $tag;
-	    }
-	    return str_replace( ' src', ' async="async" src', $tag );
+		if ( ! in_array( $handle, array_keys( self::$sdks ), true ) ) {
+			return $tag;
+		}
+		return str_replace( ' src', ' async="async" src', $tag );
 	}
 }

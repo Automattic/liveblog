@@ -11,7 +11,8 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;
-		$this->server = $wp_rest_server = new WP_Test_Spy_REST_Server;
+		$wp_rest_server = new WP_Test_Spy_REST_Server();
+		$this->server   = $wp_rest_server;
 		do_action( 'rest_api_init' );
 	}
 
@@ -30,7 +31,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 *
 	 * @covers \WPCOM_Liveblog_Rest_Api::load()
 	 */
-	function test_does_the_class_load_correctly() {
+	public function test_does_the_class_load_correctly() {
 
 		WPCOM_Liveblog_Rest_Api::load();
 		$base = WPCOM_Liveblog_Rest_Api::$endpoint_base;
@@ -41,19 +42,19 @@ class Test_REST_API extends WP_UnitTestCase {
 		$hook_name = 'rest_api_init';
 		global $wp_filter;
 
-		$collection = $wp_filter[$hook_name];
+		$collection = $wp_filter[ $hook_name ];
 
 		$test_array = array();
 
-		foreach( $collection as $key => $value ) {
-			$test_array = array_merge($test_array, $value);
+		foreach ( $collection as $key => $value ) {
+			$test_array = array_merge( $test_array, $value );
 		}
 
-		$this->assertArrayHasKey('WPCOM_Liveblog_Rest_Api::register_routes', $test_array);
+		$this->assertArrayHasKey( 'WPCOM_Liveblog_Rest_Api::register_routes', $test_array );
 
 		//Lets test the existing endpoint base. Should return the same one as above.
 		$existing_endpoint_base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
-		$this->assertSame($base, $existing_endpoint_base);
+		$this->assertSame( $base, $existing_endpoint_base );
 
 	}
 
@@ -65,22 +66,22 @@ class Test_REST_API extends WP_UnitTestCase {
 	 *
 	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
 	 */
-	function test_does_the_non_pretty_endpoint_build_correctly() {
+	public function test_does_the_non_pretty_endpoint_build_correctly() {
 
 		//If the endpoint is empty
 		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
-		$api_namespace = 'liveblog/v1';
+		$api_namespace                          = 'liveblog/v1';
 
 		//Non Pretty Permalink Structure
 		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
 
 		//Assert we have a return
-		$this->assertNotNull($base);
+		$this->assertNotNull( $base );
 
 		//Now assert the return matches the expected return.
-		$expected = home_url('/?rest_route=/' . $api_namespace . '/');
+		$expected = home_url( '/?rest_route=/' . $api_namespace . '/' );
 
-		$this->assertSame($expected, $base);
+		$this->assertSame( $expected, $base );
 
 	}
 
@@ -91,7 +92,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 *
 	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
 	 */
-	function test_does_the_pretty_endpoint_build_correctly() {
+	public function test_does_the_pretty_endpoint_build_correctly() {
 
 		//Empty the base so we can generate one,
 		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
@@ -100,78 +101,78 @@ class Test_REST_API extends WP_UnitTestCase {
 		$api_namespace = 'liveblog/v1';
 
 		//Lets set a pretty URL Permalink Structure
-		update_option('permalink_structure', '/%year%/%monthnum%/%day%/%postname%/');
+		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 
 		//Now lest fire the method again and see what we get as the method should now detect the new permalink structure and return the pretty endpoint.
 		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
 
 		//Lets make sure something is returned
-		$this->assertNotNull($base);
+		$this->assertNotNull( $base );
 
 		//Now assert the return matches the expected return.
-		$expected = home_url('/' . rest_get_url_prefix() . '/' . $api_namespace . '/');
+		$expected = home_url( '/' . rest_get_url_prefix() . '/' . $api_namespace . '/' );
 
-		$this->assertSame($expected, $base);
+		$this->assertSame( $expected, $base );
 
 	}
 
 	/**
 	 * Test for the expected array structure when getting entries
 	 */
-	function test_get_entries_by_time_not_empty_response_structure() {
+	public function test_get_entries_by_time_not_empty_response_structure() {
 
 		$this->setup_entry_test_state();
 
-		$start_time = strtotime('-1 hour');
-		$end_time   = strtotime('+1 hour');
+		$start_time = strtotime( '-1 hour' );
+		$end_time   = strtotime( '+1 hour' );
 
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
 
-		$this->assertArrayHasKey('entries', $entries);
-		$this->assertArrayHasKey('latest_timestamp', $entries);
+		$this->assertArrayHasKey( 'entries', $entries );
+		$this->assertArrayHasKey( 'latest_timestamp', $entries );
 
 	}
 
 	/**
 	 * Test for a non-empty response when getting entries
 	 */
-	function test_get_entries_by_time_not_empty() {
+	public function test_get_entries_by_time_not_empty() {
 
 		$this->setup_entry_test_state();
 
 		// A time window with entries
-		$start_time = strtotime('-1 hour');
-		$end_time   = strtotime('+1 hour');
+		$start_time = strtotime( '-1 hour' );
+		$end_time   = strtotime( '+1 hour' );
 
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
 
-		$this->assertNotEmpty($entries['entries']);
-		$this->assertNotNull($entries['latest_timestamp']);
+		$this->assertNotEmpty( $entries['entries'] );
+		$this->assertNotNull( $entries['latest_timestamp'] );
 
 	}
 
 	/**
 	 * Test for an empty response when getting entries
 	 */
-	function test_get_entries_by_time_is_empty() {
+	public function test_get_entries_by_time_is_empty() {
 
 		$this->setup_entry_test_state();
 
 		// A time window without entries
-		$start_time = strtotime('-2 hour');
-		$end_time   = strtotime('-1 hour');
+		$start_time = strtotime( '-2 hour' );
+		$end_time   = strtotime( '-1 hour' );
 
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
 
-		$this->assertEmpty($entries['entries']);
-		$this->assertNull($entries['latest_timestamp']);
+		$this->assertEmpty( $entries['entries'] );
+		$this->assertNull( $entries['latest_timestamp'] );
 
 	}
 
 	/**
 	 * Test for valid return values when getting a single entry
 	 */
-	function test_get_single_entry_not_empty() {
+	public function test_get_single_entry_not_empty() {
 
 		$new_entry = $this->setup_entry_test_state();
 
@@ -187,7 +188,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test for valid return values when getting a single entry that doesn't exist
 	 */
-	function test_get_single_entry_is_empty() {
+	public function test_get_single_entry_is_empty() {
 
 		$this->setup_entry_test_state();
 
@@ -200,7 +201,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test for a non-empty response when getting entries for lazyloading
 	 */
-	function test_get_lazyload_entries_by_time_not_empty() {
+	public function test_get_lazyload_entries_by_time_not_empty() {
 
 		// Create multiple entries
 		$this->setup_entry_test_state( 3 );
@@ -219,7 +220,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test for an empty response when getting entries for lazyloading
 	 */
-	function test_get_lazyload_entries_by_time_is_empty() {
+	public function test_get_lazyload_entries_by_time_is_empty() {
 
 		$this->setup_entry_test_state();
 
@@ -237,10 +238,10 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test the insert CRUD action
 	 */
-	function test_crud_action_insert() {
+	public function test_crud_action_insert() {
 
 		$user  = $this->factory->user->create_and_get();
-		$args  = array( 'user' => $user, );
+		$args  = array( 'user' => $user );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
 
 		$this->assertInternalType( 'array', $entry );
@@ -252,10 +253,13 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test the update CRUD action
 	 */
-	function test_crud_action_update() {
+	public function test_crud_action_update() {
 
 		$new_entry = $this->setup_entry_test_state();
-		$args      = array( 'entry_id' => $new_entry[0]->get_id(), 'content' => 'Updated Test Liveblog entry', );
+		$args      = array(
+			'entry_id' => $new_entry[0]->get_id(),
+			'content'  => 'Updated Test Liveblog entry',
+		);
 		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
 
 		$this->assertInternalType( 'array', $entry );
@@ -267,7 +271,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test the delete CRUD action
 	 */
-	function test_crud_action_delete() {
+	public function test_crud_action_delete() {
 
 		// First create an entry
 		$new_entry = $this->setup_entry_test_state();
@@ -278,38 +282,38 @@ class Test_REST_API extends WP_UnitTestCase {
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete it
-		$args  = array( 'entry_id' => $new_entry_id, );
+		$args  = array( 'entry_id' => $new_entry_id );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
 
 		// Check that it was sent to the trash
 		$deleted_entry = get_comment( $new_entry_id );
 
-		$this->assertEquals( 'trash', $deleted_entry->comment_approved);
+		$this->assertEquals( 'trash', $deleted_entry->comment_approved );
 
 	}
 
 	/**
 	 * Test the delete_key CRUD action
 	 */
-	function test_crud_action_delete_key() {
+	public function test_crud_action_delete_key() {
 
 		// First create an entry with a key
-		$new_entry = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
+		$new_entry    = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete the key
-		$args      = array( 'entry_id' => $new_entry_id, );
-		$entry     = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
+		$args  = array( 'entry_id' => $new_entry_id );
+		$entry = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
 
 		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error
-		$this->assertNotInstanceOf( 'WP_Error' , $entry);
+		$this->assertNotInstanceOf( 'WP_Error', $entry );
 
 	}
 
 	/**
 	 * Test getting a preview of an entry
 	 */
-	function test_preview_entry() {
+	public function test_preview_entry() {
 
 		// Get entry preview
 		$preview = WPCOM_Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
@@ -322,7 +326,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test getting list of authors from a string
 	 */
-	function test_get_authors() {
+	public function test_get_authors() {
 
 		// Get a list of authors
 		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
@@ -340,13 +344,19 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test getting list of hashtags from a string
 	 */
-	function test_get_hashtags() {
+	public function test_get_hashtags() {
 
 		// Get a list of hashtags
 		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
 
 		// Create a temporary hashtag
-		$this->factory->term->create( array( 'name' => 'coolhashtag', 'taxonomy' => 'hashtags', 'slug' => 'coolhashtag' ) );
+		$this->factory->term->create(
+			array(
+				'name'     => 'coolhashtag',
+				'taxonomy' => 'hashtags',
+				'slug'     => 'coolhashtag',
+			)
+		);
 
 		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag
 		$hashtags_is_empty  = $liveblog_hashtags->get_hashtag_terms( 'fakehashtag' ); // Non-existent hashtag
@@ -361,7 +371,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	/**
 	 * Test updating the state of a post for Liveblog
 	 */
-	function test_update_post_state() {
+	public function test_update_post_state() {
 
 		// Create a test post
 		$post  = $this->factory->post->create_and_get();
@@ -388,7 +398,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the get entries endpoint
 	 */
-	function test_endpoint_get_entries() {
+	public function test_endpoint_get_entries() {
 		// Insert 1 entry
 		$this->insert_entries();
 
@@ -397,7 +407,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$end_time   = strtotime( '+1 hour' );
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -413,7 +423,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the crud endpoint with an insert action
 	 */
-	function test_endpoint_crud_action() {
+	public function test_endpoint_crud_action() {
 
 		// Create an author and set as the current user
 		$this->set_author_user();
@@ -422,12 +432,14 @@ class Test_REST_API extends WP_UnitTestCase {
 		$this->factory->post->create();
 
 		// The POST data to insert
-		$post_vars  = $this->build_entry_args( array(
-			'crud_action' => 'insert',
-		));
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+			)
+		);
 
 		// Try to access the endpoint and insert an entry
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud' );
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud' );
 		$request->add_header( 'content-type', 'application/json' );
 		$request->set_body( wp_json_encode( $post_vars ) );
 		$response = $this->server->dispatch( $request );
@@ -445,7 +457,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the lazyload endpoint
 	 */
-	function test_endpoint_lazyload() {
+	public function test_endpoint_lazyload() {
 		// Insert 1 entry
 		$this->insert_entries();
 
@@ -454,7 +466,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$min_timestamp = 0;
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/lazyload/' . $max_timestamp . '/' . $min_timestamp );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/lazyload/' . $max_timestamp . '/' . $min_timestamp );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -471,12 +483,12 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the get single entry endpoint
 	 */
-	function test_endpoint_get_single_entry() {
+	public function test_endpoint_get_single_entry() {
 		// Insert 1 entry
 		$new_entries = $this->insert_entries();
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id() );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id() );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
@@ -492,13 +504,13 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the entry preview endpoint
 	 */
-	function test_endpoint_entry_preview() {
+	public function test_endpoint_entry_preview() {
 
 		// The POST data to preview
 		$post_vars = array( 'entry_content' => 'Test Liveblog entry with /key' );
 
 		// Try to access the endpoint
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/preview');
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/preview' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
@@ -515,18 +527,22 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the get authors endpoint
 	 */
-	function test_endpoint_get_authors() {
+	public function test_endpoint_get_authors() {
 
 		// Create 2 authors
-		$this->factory->user->create( array(
-			'role' => 'author',
-			'display_name' => 'Josh Smith'
-		) );
+		$this->factory->user->create(
+			array(
+				'role'         => 'author',
+				'display_name' => 'Josh Smith',
+			)
+		);
 
-		$this->factory->user->create( array(
-			'role' => 'author',
-			'display_name' => 'John Doe'
-		) );
+		$this->factory->user->create(
+			array(
+				'role'         => 'author',
+				'display_name' => 'John Doe',
+			)
+		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
 		$response = $this->server->dispatch( $request );
@@ -543,19 +559,23 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the get hashtags endpoint
 	 */
-	function test_endpoint_get_hashtags() {
+	public function test_endpoint_get_hashtags() {
 
 		// Create 2 hashtags
-		$this->factory->term->create( array(
-			'name'     => 'coolhashtag',
-			'taxonomy' => 'hashtags',
-			'slug'     => 'coolhashtag',
-		));
-		$this->factory->term->create( array(
-			'name'     => 'coolhashtag2',
-			'taxonomy' => 'hashtags',
-			'slug'     => 'coolhashtag2',
-		));
+		$this->factory->term->create(
+			array(
+				'name'     => 'coolhashtag',
+				'taxonomy' => 'hashtags',
+				'slug'     => 'coolhashtag',
+			)
+		);
+		$this->factory->term->create(
+			array(
+				'name'     => 'coolhashtag2',
+				'taxonomy' => 'hashtags',
+				'slug'     => 'coolhashtag2',
+			)
+		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
 		$response = $this->server->dispatch( $request );
@@ -572,7 +592,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the update post state endpoint
 	 */
-	function test_endpoint_update_post_state() {
+	public function test_endpoint_update_post_state() {
 
 		// Create an author and set as the current user
 		$this->set_author_user();
@@ -589,7 +609,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		);
 
 		// Try to access the endpoint
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state');
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
@@ -605,7 +625,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the update post state endpoint when not logged in as an author. Should be forbidden.
 	 */
-	function test_endpoint_update_post_state_forbidden() {
+	public function test_endpoint_update_post_state_forbidden() {
 
 		// Create a post
 		$post = $this->factory->post->create_and_get();
@@ -619,13 +639,13 @@ class Test_REST_API extends WP_UnitTestCase {
 		);
 
 		// Try to access the endpoint to set the post as a liveblog
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state');
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
 
 		// Assert forbidden response
-		$this->assertTrue( $response->get_status() === 403 || $response->get_status() == 401 );
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
 
 	}
 
@@ -633,25 +653,27 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test inserting an entry when not logged in as an author. Should be forbidden.
 	 */
-	function test_endpoint_crud_insert_forbidden() {
+	public function test_endpoint_crud_insert_forbidden() {
 
 		// Create a liveblog post
 		$post_id = $this->create_liveblog_post();
 
 		// The POST data to insert
-		$post_vars  = $this->build_entry_args( array(
-			'crud_action' => 'insert',
-			'post_id'     => $post_id,
-		));
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+				'post_id'     => $post_id,
+			)
+		);
 
 		// Try to access the endpoint and insert an entry
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
 
 		// Assert forbidden response
-		$this->assertTrue( $response->get_status() === 403 || $response->get_status() == 401 );
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
 
 	}
 
@@ -659,10 +681,10 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test for a proper 404 not found status code when requesting a bad endpoint URL
 	 */
-	function test_endpoint_not_found() {
+	public function test_endpoint_not_found() {
 
 		// Try to access the endpoint
-		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/bad/url' );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/bad/url' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert not found response
@@ -674,7 +696,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Integration test
 	 * Test accessing the entry preview endpoint without the required post data
 	 */
-	function test_endpoint_entry_preview_bad_request() {
+	public function test_endpoint_entry_preview_bad_request() {
 
 		// The "entry_content" POST data is required for the preview endpoint.
 		// Lets leave it out and expect a 400 bad request response
@@ -683,7 +705,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$post_id = $this->create_liveblog_post();
 
 		// Try to access the endpoint
-		$request  = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/preview');
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/preview' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$response = $this->server->dispatch( $request );
 
@@ -708,10 +730,10 @@ class Test_REST_API extends WP_UnitTestCase {
 	private function insert_entries( $number_of_entries = 1, $args = array() ) {
 		$entries = array();
 
-		$user = $this->factory->user->create_and_get();
+		$user         = $this->factory->user->create_and_get();
 		$args['user'] = $user;
 
-		for( $i = 0; $i < $number_of_entries; $i++ ) {
+		for ( $i = 0; $i < $number_of_entries; $i++ ) {
 			$entries[] = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		}
 
@@ -719,7 +741,10 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	private function build_entry_args( $args = array() ) {
-		$defaults = array( 'post_id' => 1, 'content' => 'Test Liveblog entry', );
+		$defaults = array(
+			'post_id' => 1,
+			'content' => 'Test Liveblog entry',
+		);
 		return array_merge( $defaults, $args );
 	}
 
@@ -727,9 +752,11 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Create and author and set it as the current user
 	 */
 	private function set_author_user() {
-		$author_id = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
+		$author_id = $this->factory->user->create(
+			array(
+				'role' => 'author',
+			)
+		);
 
 		wp_set_current_user( $author_id );
 	}
@@ -741,11 +768,11 @@ class Test_REST_API extends WP_UnitTestCase {
 	 */
 	private function create_liveblog_post() {
 		// Create a new post
-		$post_id      = $this->factory->post->create();
+		$post_id = $this->factory->post->create();
 
 		// Make the new post a liveblog
 		$state        = 'enable';
-		$request_vars = array( 'state' => $state, );
+		$request_vars = array( 'state' => $state );
 		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		return $post_id;

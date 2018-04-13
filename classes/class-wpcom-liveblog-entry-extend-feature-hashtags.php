@@ -42,29 +42,31 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// This is the regex used to revert the
 		// generated hashtag html back to the
 		// raw input format (e.g #hashtag).
-		$this->revert_regex = implode( '', array(
-			preg_quote( '<span class="liveblog-hash ', '~' ),
-			preg_quote( $this->class_prefix, '~' ),
-			'([^"]+)',
-			preg_quote( '">', '~' ),
-			'([^"]+)',
-			preg_quote( '</span>', '~' ),
-		) );
+		$this->revert_regex = implode(
+			'', array(
+				preg_quote( '<span class="liveblog-hash ', '~' ),
+				preg_quote( $this->class_prefix, '~' ),
+				'([^"]+)',
+				preg_quote( '">', '~' ),
+				'([^"]+)',
+				preg_quote( '</span>', '~' ),
+			)
+		);
 
 		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_hashtag_revert_regex', $this->revert_regex );
 
 		// We hook into the comment_class filter to
 		// be able to alter the comment content.
-		add_filter( 'comment_class',          array( $this, 'add_term_class_to_entry' ), 10, 3 );
+		add_filter( 'comment_class', array( $this, 'add_term_class_to_entry' ), 10, 3 );
 
 		// Hook into the WordPress init method to
 		// make sure the taxonomy is created.
-		add_action( 'init',                   array( $this, 'add_hashtag_taxonomy') );
+		add_action( 'init', array( $this, 'add_hashtag_taxonomy' ) );
 
 		// Add an ajax endpoint to find the hashtags
 		// which is to be used on the front end.
-		add_action( 'wp_ajax_liveblog_terms', array( $this, 'ajax_terms') );
+		add_action( 'wp_ajax_liveblog_terms', array( $this, 'ajax_terms' ) );
 	}
 
 	/**
@@ -75,27 +77,29 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function get_config( $config ) {
 
-		$endpoint_url = admin_url( 'admin-ajax.php' ) .'?action=liveblog_terms';
+		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_terms';
 
 		if ( WPCOM_Liveblog::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags');
+			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags' );
 		}
 
 		// Add our config to the front end autocomplete
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
-		$config[] = apply_filters( 'liveblog_hashtag_config', array(
-			'type'			=> 'ajax',
-			'cache' 		=> 1000 * 60,
-			'regex'       	=> '#([\w\d\-]*)$',
-			'replacement' 	=> '#${slug}',
-			'trigger' 		=> '#',
-			'displayKey' 	=> 'slug',
-			'name' 			=> 'Hashtag',
-			'template' 		=> '${slug}',
-			'replaceText' 	=> '#$',
-			'url' 			=> esc_url( $endpoint_url ),
-		) );
+		$config[] = apply_filters(
+			'liveblog_hashtag_config', array(
+				'type'        => 'ajax',
+				'cache'       => 1000 * 60,
+				'regex'       => '#([\w\d\-]*)$',
+				'replacement' => '#${slug}',
+				'trigger'     => '#',
+				'displayKey'  => 'slug',
+				'name'        => 'Hashtag',
+				'template'    => '${slug}',
+				'replaceText' => '#$',
+				'url'         => esc_url( $endpoint_url ),
+			)
+		);
 
 		return $config;
 	}
@@ -145,7 +149,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// span with the hashtag as content.
 		return str_replace(
 			$match[1],
-			'<span class="liveblog-hash '.$this->class_prefix.$hashtag.'">'.$hashtag.'</span>',
+			'<span class="liveblog-hash ' . $this->class_prefix . $hashtag . '">' . $hashtag . '</span>',
 			$match[0]
 		);
 	}
@@ -157,7 +161,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function revert( $content ) {
-		return preg_replace( '~'.$this->revert_regex.'~', '#$1', $content );
+		return preg_replace( '~' . $this->revert_regex . '~', '#$1', $content );
 	}
 
 	/**
@@ -173,10 +177,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$comment = get_comment( $comment_id );
 
 		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)'.preg_quote( $this->class_prefix ).'(\w\-?)+/', $comment->comment_content, $terms );
+			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix ) . '(\w\-?)+/', $comment->comment_content, $terms );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $terms[0] );
@@ -193,16 +197,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	public function ajax_terms() {
 
 		//Sanitize the input safely.
-		if( isset( $_GET['autocomplete'] ) ) {
-			$search_term = sanitize_text_field( $_GET['autocomplete'] );
+		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
+			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
 		} else {
 			$search_term = '';
 		}
 
 		// Get a list of hashtags matching the 'autocomplete' request variable
-		$terms = $this->get_hashtag_terms($search_term);
+		$terms = $this->get_hashtag_terms( $search_term );
 
-		header( "Content-Type: application/json" );
+		header( 'Content-Type: application/json' );
 		echo wp_json_encode( $terms );
 
 		exit;
@@ -220,7 +224,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// The args used in the get_terms query.
 		$args = array(
 			'hide_empty' => false,
-			'number' 	 => 10,
+			'number'     => 10,
 		);
 
 		// If there is no search term then search
@@ -255,7 +259,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// Remove the where clause's section about the name.
 		$clauses['where'] = preg_replace(
 			array(
-				'~\\(\\(.*(?='.preg_quote("(t.slug LIKE '").')~',
+				'~\\(\\(.*(?=' . preg_quote( "(t.slug LIKE '" ) . ')~',
 				'~(%\'\\))\\)~',
 			),
 			'($1',
@@ -290,7 +294,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// The args to pass to the register_taxonomy function.
 		$args = array(
 			'show_ui' => true,
-			'labels'  => $labels
+			'labels'  => $labels,
 		);
 
 		// Register the taxonomy.

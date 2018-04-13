@@ -52,34 +52,36 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		// Allow plugins, themes, etc. to change
 		// the generated command class.
-		$this->class_prefix_local = apply_filters( 'liveblog_command_class',   self::$class_prefix );
+		$this->class_prefix_local = apply_filters( 'liveblog_command_class', self::$class_prefix );
 
 		// Allow plugins, themes, etc. to change
 		// the current command set.
-		$this->commands     	  = apply_filters( 'liveblog_active_commands', $this->commands );
+		$this->commands = apply_filters( 'liveblog_active_commands', $this->commands );
 
 		// This is the regex used to revert the
 		// generated author html back to the
 		// raw input format (e.g /key).
-		$this->revert_regex = implode( '', array(
-			preg_quote( '<span class="liveblog-command ', '~' ),
-			preg_quote( $this->class_prefix_local, '~' ),
-			'([^"]+)',
-			preg_quote( '">', '~' ),
-			'([^"]+)',
-			preg_quote( '</span>', '~' ),
-		) );
+		$this->revert_regex = implode(
+			'', array(
+				preg_quote( '<span class="liveblog-command ', '~' ),
+				preg_quote( $this->class_prefix_local, '~' ),
+				'([^"]+)',
+				preg_quote( '">', '~' ),
+				'([^"]+)',
+				preg_quote( '</span>', '~' ),
+			)
+		);
 
 		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_command_revert_regex', $this->revert_regex );
 
 		// We hook into the comment_class filter to
 		// be able to alter the comment content.
-		add_filter( 'comment_class',          array( $this, 'add_type_class_to_entry' ), 10, 3 );
+		add_filter( 'comment_class', array( $this, 'add_type_class_to_entry' ), 10, 3 );
 
 		// Hook into the entry saving to
 		// execute the command logic.
-		add_action( 'liveblog_insert_entry',  array( $this, 'do_action_per_type' ), 10, 2 );
+		add_action( 'liveblog_insert_entry', array( $this, 'do_action_per_type' ), 10, 2 );
 	}
 
 	/**
@@ -93,16 +95,18 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// Add our config to the front end autocomplete
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
-		$config[] = apply_filters( 'liveblog_command_config', array(
-			'trigger' 		=> '/',
-			'data' 			=> $this->get_commands(),
-			'displayKey'	=> false,
-			'regex'       	=> '/(\w*)$',
-			'replacement' 	=> '/${term}',
-			'replaceText' 	=> '/$',
-			'name' 			=> 'Command',
-			'template' 		=> false,
-		) );
+		$config[] = apply_filters(
+			'liveblog_command_config', array(
+				'trigger'     => '/',
+				'data'        => $this->get_commands(),
+				'displayKey'  => false,
+				'regex'       => '/(\w*)$',
+				'replacement' => '/${term}',
+				'replaceText' => '/$',
+				'name'        => 'Command',
+				'template'    => false,
+			)
+		);
 
 		return $config;
 	}
@@ -130,14 +134,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		// Map over every match and apply it via the
 		// preg_replace_callback method.
-        $entry['content'] = preg_replace_callback(
-        	$this->get_regex(),
-        	array( $this, 'preg_replace_callback' ),
-        	$entry['content']
-        );
+		$entry['content'] = preg_replace_callback(
+			$this->get_regex(),
+			array( $this, 'preg_replace_callback' ),
+			$entry['content']
+		);
 
-        // For all the filters found,
-        // apply them to the content.
+		// For all the filters found,
+		// apply them to the content.
 		foreach ( $this->filters as $filter ) {
 			$entry['content'] = apply_filters( $filter, $entry['content'] );
 		}
@@ -157,8 +161,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$type = apply_filters( 'liveblog_command_type', $match[2] );
 
 		// If it's not a command that's been registered then skip it.
-		if ( ! in_array( $type, $this->commands ) ) {
-		    return $match[0];
+		if ( ! in_array( $type, $this->commands, true ) ) {
+			return $match[0];
 		}
 
 		// Append the filter to the filters array.
@@ -168,7 +172,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// to show the command was matched.
 		return str_replace(
 			$match[1],
-			'<span class="liveblog-command '.$this->class_prefix_local.$type.'">'.$type.'</span>',
+			'<span class="liveblog-command ' . $this->class_prefix_local . $type . '">' . $type . '</span>',
 			$match[0]
 		);
 	}
@@ -186,10 +190,10 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$comment = get_comment( $comment_id );
 
 		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)'.$this->class_prefix_local.'\w+/', $comment->comment_content, $types );
+			preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $comment->comment_content, $types );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $types[0] );
@@ -205,7 +209,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return mixed
 	 */
 	public function revert( $content ) {
-		return preg_replace( '~'.$this->revert_regex.'~', '/$1', $content );
+		return preg_replace( '~' . $this->revert_regex . '~', '/$1', $content );
 	}
 
 	/**
@@ -220,14 +224,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$content = get_comment_text( $id );
 
 		// Match all of the command types.
-		preg_match_all( '/(?<!\w)'.$this->class_prefix_local.'\w+/', $content, $types );
+		preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $content, $types );
 
 		foreach ( $types[0] as $type ) {
 			$type = ltrim( $type, $this->class_prefix_local );
 
 			// Run the command_after action on the
 			// content for the current type.
-			do_action( "liveblog_command_${type}_after" , $content, $id, $post_id );
+			do_action( "liveblog_command_${type}_after", $content, $id, $post_id );
 		}
 	}
 

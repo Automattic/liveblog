@@ -29,7 +29,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 */
 	public function __construct() {
 		$widget_ops = array(
-			'class_name' => 'liveblog-key-events-widget',
+			'class_name'  => 'liveblog-key-events-widget',
 			'description' => __( 'A list of key events displayed when the user is viewing a Liveblog post.', 'liveblog' ),
 		);
 
@@ -56,14 +56,14 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 			return;
 		}
 
-		echo $args['before_widget'];
+		echo wp_kses_post( $args['before_widget'] );
 
 		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+			echo wp_kses_post( $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'] );
 		}
 
-		echo $shortcode_output;
-		echo $args['after_widget'];
+		echo wp_kses_post( $shortcode_output );
+		echo wp_kses_post( $args['after_widget'] );
 	}
 
 	/**
@@ -77,8 +77,8 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : '';
 		?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php esc_html_e( 'Title:', 'liveblog' ); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'liveblog' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p class="description">
 			<?php esc_html_e( 'Note: the number of key events displayed in the widget is defined in the Liveblog configuration inside each post.', 'liveblog' ); ?>
@@ -95,7 +95,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return array Updated safe values to be saved.
 	 */
 	public function update( $new_instance, $old_instance ) {
-		$instance = array();
+		$instance          = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
 
 		return $instance;

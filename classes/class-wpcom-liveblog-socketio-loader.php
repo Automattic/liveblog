@@ -15,7 +15,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	/**
 	 * Minimum PHP version required to run socket.io-php-emitter.
 	 */
-	const socketio_min_php_version = '5.3.0';
+	const SOCKETIO_MIN_PHP_VERSION = '5.3.0';
 
 	/**
 	 * Load Socket.io main class if constant is true and
@@ -27,10 +27,10 @@ class WPCOM_Liveblog_Socketio_Loader {
 		if ( self::is_socketio_constant_enabled() ) {
 			if ( self::is_php_too_old_for_socketio() ) {
 				self::add_old_php_for_socketio_error();
-			} else if ( ! self::socketio_emitter_exists() ) {
+			} elseif ( ! self::socketio_emitter_exists() ) {
 				self::add_socketio_emitter_required_error();
 			} else {
-				require( dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php' );
+				require dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php';
 				WPCOM_Liveblog_Socketio::load();
 			}
 		}
@@ -44,7 +44,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 * @return bool
 	 */
 	private static function is_php_too_old_for_socketio() {
-		return version_compare( PHP_VERSION, self::socketio_min_php_version, '<' );
+		return version_compare( PHP_VERSION, self::SOCKETIO_MIN_PHP_VERSION, '<' );
 	}
 
 	/**
@@ -63,7 +63,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	private static function socketio_emitter_exists() {
 		return file_exists( dirname( __FILE__ ) . '/../vendor/autoload.php' )
-		       && file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
+			&& file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
 	}
 
 	/**
@@ -73,9 +73,11 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	public static function show_error_message( $message ) {
 		if ( current_user_can( 'manage_options' ) ) {
-			echo WPCOM_Liveblog::get_template_part(
-				'liveblog-socketio-error.php',
-				array( 'message' => $message )
+			echo wp_kses_post(
+				WPCOM_Liveblog::get_template_part(
+					'liveblog-socketio-error.php',
+					array( 'message' => $message )
+				)
 			);
 		}
 	}
@@ -116,9 +118,10 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	public static function show_old_php_for_socketio_error() {
 		$message = sprintf(
+			// translators: 1: current PHP version, 2: minimum required PHP version
 			__( 'Your current PHP is version %1$s, which is too old to run the Liveblog plugin with WebSocket support enabled. The minimum required version is %2$s. Please, either update PHP or disable WebSocket support by removing or setting to false the constant LIVEBLOG_USE_SOCKETIO in wp-config.php.', 'liveblog' ),
 			PHP_VERSION,
-			self::socketio_min_php_version
+			self::SOCKETIO_MIN_PHP_VERSION
 		);
 
 		self::show_error_message( $message );
@@ -140,9 +143,9 @@ class WPCOM_Liveblog_Socketio_Loader {
 		}
 
 		return WPCOM_Liveblog::is_viewing_liveblog_post()
-		       && self::is_socketio_constant_enabled()
-		       && ! self::is_php_too_old_for_socketio()
-		       && self::socketio_emitter_exists()
-		       && $redis_client_connected;
+				&& self::is_socketio_constant_enabled()
+				&& ! self::is_php_too_old_for_socketio()
+				&& self::socketio_emitter_exists()
+				&& $redis_client_connected;
 	}
 }
