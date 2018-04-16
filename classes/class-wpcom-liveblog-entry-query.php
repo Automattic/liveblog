@@ -81,8 +81,13 @@ class WPCOM_Liveblog_Entry_Query {
 
 	public function get_by_id( $id ) {
 		$comment = get_comment( $id );
-		// When running tests, WP_Comment's commend_ID and comment_post_ID return strings and post_id returns an integer. For this to pass, coerce comment_post_ID to an integer before using a strict comparison.
-		if ( intval( $comment->comment_post_ID ) !== $this->post_id || $comment->comment_type !== $this->key || $comment->comment_approved !== $this->key ) {
+		/*
+		 * When running tests, WP_Comment's comment_ID and comment_post_ID return strings. However, post_id
+		 * returns a string (test_update_should_update_original_entry) or
+		 * an integer (test_get_by_id_should_return_the_entry). For this to pass, coerce comment_post_ID to
+		 * an integer before using a strict comparison.
+		 */
+		if ( intval( $comment->comment_post_ID ) !== intval( $this->post_id ) || $comment->comment_type !== $this->key || $comment->comment_approved !== $this->key ) {
 			return null;
 		}
 		$entries = self::entries_from_comments( array( $comment ) );
