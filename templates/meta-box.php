@@ -29,7 +29,7 @@
 ?>
 <p class="error"></p>
 <p class="success"><?php echo esc_html( $update_text ); ?></p>
-<h2><?php echo esc_html( $active_text ); ?></h2>
+<h2><?php echo wp_kses_post( $active_text ); ?></h2>
 <ul>
 <?php
 foreach ( $buttons as $button ) :
@@ -42,7 +42,7 @@ foreach ( $buttons as $button ) :
 	<button class="button <?php echo $button['primary'] ? 'button-primary' : ''; ?>" <?php echo $button['disabled'] ? 'disabled="disabled"' : ''; ?> value="<?php echo esc_attr( $button['value'] ); ?>">
 		<?php echo esc_html( $button['text'] ); ?>
 	</button>
-	<?php echo esc_html( $button['description'] ); ?>
+	<?php echo wp_kses_post( $button['description'] ); ?>
 </li>
 <?php endforeach; ?>
 </ul>
