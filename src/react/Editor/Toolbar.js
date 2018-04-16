@@ -148,7 +148,8 @@ class Toolbar extends Component {
           onClick={this.addMediaBlock.bind(this)}
           className="liveblog-editor-btn liveblog-image-upload-btn"
         >
-          <span className="dashicons dashicons-format-image"></span> Insert Image
+          <span className="dashicons dashicons-format-image"></span>
+          <span className="liveblog-image-upload-btn-text">Insert Image</span>
         </button>
         <div className="liveblog-toolbar">
           <Button

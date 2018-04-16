@@ -115,6 +115,16 @@
   margin-right: .35rem;
 }
 
+@include mq($until: small) {
+  .liveblog-image-upload-btn-text {
+    display: none;
+  }
+
+  .liveblog-image-upload-btn .dashicons {
+    margin-right: 0;
+  }
+}
+
 .liveblog-image-upload-btn:hover {
   background-color: #fff;
   transition: .25s background-color ease-in-out;
