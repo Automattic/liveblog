@@ -111,9 +111,9 @@ class WPCOM_Liveblog_Entry_Extend {
      * @return mixed
      */
     public static function strip_input( $entry ) {
-    	// Replace all escaped spaces with normal spaces to
+    	// Replace all escaped enitities to
     	// allow matching to work as we expect it to.
-        $entry['content'] = str_replace( '&nbsp;', ' ', $entry['content'] );
+		$entry['content'] = html_entity_decode( $entry['content'], ENT_QUOTES );
 
         // Strip at all the atwho classes that may have been
         // generated from the front end autocompletion.

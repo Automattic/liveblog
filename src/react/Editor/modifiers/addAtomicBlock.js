@@ -4,19 +4,30 @@ import {
 } from 'draft-js';
 
 import moveBlock from './moveBlock';
+import addNewLine from './addNewLine';
 
-export default (editorState, selection = false, url) => {
-  const contentState = editorState.getCurrentContent();
+import {
+  focusableBlockIsSelected,
+} from '../utils';
+
+export default (editorState, selection = false, data = {}, name) => {
+  let newEditorState = editorState;
+
+  if (focusableBlockIsSelected(editorState)) {
+    newEditorState = addNewLine(editorState);
+  }
+
+  const contentState = newEditorState.getCurrentContent();
   const contentStateWithEntity = contentState.createEntity(
-    'image',
+    name,
     'IMMUTABLE',
-    { src: url },
+    data,
   );
 
   const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 
-  const newEditorState = AtomicBlockUtils.insertAtomicBlock(
-    editorState,
+  newEditorState = AtomicBlockUtils.insertAtomicBlock(
+    newEditorState,
     entityKey,
     ' ',
   );

@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
-import { timeAgo, formattedTime, triggerOembedLoad } from '../utils/utils';
+import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
 
 class EntryContainer extends Component {
@@ -43,7 +43,7 @@ class EntryContainer extends Component {
     if (config.is_liveblog_editable !== '1') return false;
 
     return (
-      <div className="liveblog-entry-tools">
+      <footer className="liveblog-entry-tools">
         {
           this.isEditing()
             ? <button className="liveblog-btn liveblog-btn-small" onClick={this.close}>
@@ -59,7 +59,7 @@ class EntryContainer extends Component {
         >
           Delete
         </button>
-      </div>
+      </footer>
     );
   }
 
@@ -72,37 +72,47 @@ class EntryContainer extends Component {
         ref={node => this.node = node}
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
-        <header className="liveblog-meta">
-          <div className="liveblog-meta-time">
+        <aside className="liveblog-entry-aside">
+          <a className="liveblog-meta-time" href={entry.share_link} target="_blank">
             <span>{timeAgo(entry.entry_time, config.utc_offset, config.date_format)}</span>
-            <span>{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</span>
-          </div>
-          <div className="liveblog-meta-author">
-            {
-              entry.avatar_img &&
-              <div
-                className="liveblog-meta-author-avatar"
-                dangerouslySetInnerHTML={{ __html: entry.avatar_img }} />
-            }
-            <span className="liveblog-meta-author-name"
-              dangerouslySetInnerHTML={{ __html: entry.author_link }} />
-          </div>
-        </header>
-        {
-          this.isEditing()
-            ? (
-              <div className="liveblog-entry-edit">
-                <EditorContainer entry={entry} isEditing={true} />
-              </div>
-            )
-            : (
-              <div
-                className="liveblog-entry-content"
-                dangerouslySetInnerHTML={{ __html: entry.render }}
-              />
-            )
-        }
-        {this.entryActions()}
+            <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format)}</span>
+          </a>
+        </aside>
+        <div className="liveblog-entry-main">
+          {
+            (entry.authors && entry.authors.length > 0) &&
+            <header className="liveblog-meta-authors">
+              {
+                entry.authors.map(author => (
+                  <div className="liveblog-meta-author" key={author.id}>
+                    { author.avatar &&
+                      <div
+                        className="liveblog-meta-author-avatar"
+                        dangerouslySetInnerHTML={{ __html: author.avatar }} />
+                    }
+                    <span className="liveblog-meta-author-name"
+                      dangerouslySetInnerHTML={{ __html: author.name }} />
+                  </div>
+                ))
+              }
+            </header>
+          }
+          {
+            this.isEditing()
+              ? (
+                <div className="liveblog-entry-edit">
+                  <EditorContainer entry={entry} isEditing={true} />
+                </div>
+              )
+              : (
+                <div
+                  className="liveblog-entry-content"
+                  dangerouslySetInnerHTML={{ __html: entry.render }}
+                />
+              )
+          }
+          {this.entryActions()}
+        </div>
       </article>
     );
   }

@@ -21,7 +21,7 @@ class AppContainer extends Component {
   componentDidMount() {
     const { loadConfig, getEntries, getEvents, startPolling } = this.props;
     loadConfig(window.liveblog_settings);
-    getEntries(1);
+    getEntries(1, window.location.hash);
     startPolling();
     if (this.eventsContainer) getEvents();
   }

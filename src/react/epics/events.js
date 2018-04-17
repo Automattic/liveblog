@@ -49,12 +49,15 @@ const jumpToEventEpic = (action$, store) =>
     .switchMap(({ payload }) =>
       jumpToEvent(payload, store.getState().config, store.getState().api.newestEntry)
         .timeout(10000)
-        .flatMap(res =>
-          concat(
+        .flatMap((res) => {
+          if (!res.response.entries.some(x => x.id === payload)) {
+            return of(getEntriesSuccess(res.response));
+          }
+          return concat(
             of(getEntriesSuccess(res.response)),
             of(scrollToEntry(`id_${payload}`)),
-          ),
-        )
+          );
+        })
         .catch(error => of(getEntriesFailed(error))),
     );
 
