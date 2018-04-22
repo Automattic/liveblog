@@ -19,7 +19,7 @@
 
 .liveblog-editor-tab:hover,
 .liveblog-editor-tab.is-active {
-  background: $color-grey-x-light;
+  background: #fff;
 }
 
 .liveblog-editor-tab.is-active::after {
@@ -29,6 +29,14 @@
   left: 0;
   width: 100%;
   height: 2px;
+  background: #fff;
+}
+
+.liveblog-editor-tab:first-child.is-active {
+  background: $color-grey-x-light;
+}
+
+.liveblog-editor-tab:first-child.is-active::after {
   background: $color-grey-x-light;
 }
 
