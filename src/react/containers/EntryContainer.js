@@ -57,15 +57,15 @@ class EntryContainer extends Component {
       <footer className="liveblog-entry-tools">
         {
           this.isEditing()
-            ? <button className="liveblog-btn liveblog-btn-small" onClick={this.close}>
+            ? <button className="button button-large liveblog-btn liveblog-btn-small" onClick={this.close}>
               Close Editor
             </button>
-            : <button className="liveblog-btn liveblog-btn-small" onClick={this.edit}>
+            : <button className="button button-large liveblog-btn liveblog-btn-small" onClick={this.edit}>
               Edit
             </button>
         }
         <button
-          className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
+          className="button button-large button-link-delete liveblog-btn liveblog-btn-small liveblog-btn-delete"
           onClick={this.delete}
         >
           Delete

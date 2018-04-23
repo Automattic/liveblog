@@ -298,7 +298,7 @@ class EditorContainer extends Component {
           clearable={false}
           cache={false}
         />
-        <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
+        <button className="button button-primary button-large liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </button>
       </div>
