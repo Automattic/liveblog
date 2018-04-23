@@ -1,0 +1,54 @@
+.liveblog-editor-codeblock {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background: transparent;
+  color: $color-grey-base;
+}
+
+.liveblog-editor-codeblock > * {
+  flex-basis: 100%;
+}
+
+.liveblog-editor-container
+.liveblog-codeblock-textarea {
+  border-radius: 0;
+  border: none;
+  min-height: 200px;
+  width: 100%;
+  padding: .75rem;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #fff;
+  color: $color-grey-base;
+  background-color: $color-grey-x-light;
+  resize: none;
+}
+
+.liveblog-codeblock-textarea::placeholder {
+  color: $color-grey-light;
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+.liveblog-codeblock-textarea:focus {
+  border: none;
+}
+
+.liveblog-codeblock-controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.liveblog-codeblock-controls .liveblog-btn {
+  width: 49.5%;
+}
+
+.liveblog-editor-codeblock input {
+  border: none;
+  background: $color-grey-x-light;
+  margin-left: .5rem;
+  font-size: 14px;
+  padding: .25rem;
+}

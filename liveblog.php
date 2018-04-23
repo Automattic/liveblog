@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.7.1
+ * Version:     1.8.0
  * Author:      WordPress.com VIP, Automattic
  * Author URI: http://vip.wordpress.com/
  * Text Domain: liveblog
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.7.1';
+		const VERSION                 = '1.8.0';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -46,6 +46,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		const FADE_OUT_DURATION               = 5; // how much time should take fading out the background of new entries
 		const RESPONSE_CACHE_MAX_AGE          = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
 		const USE_REST_API                    = true; // Use the REST API if current version is at least MIN_WP_REST_API_VERSION. Allows for easy disabling/enabling
+		const DEFAULT_IMAGE_SIZE              = 'full'; // The default image size to use when inserting media frm the media library.
 
 		/** Variables *************************************************************/
 
@@ -114,43 +115,43 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function show_old_wp_notice() {
 			global $wp_version;
 			$min_version = self::MIN_WP_VERSION;
-			echo wp_kses_post( self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ) );
+			echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ); // phpcs:ignore
 		}
 
 		/**
 	 * Include the necessary files
 	 */
 		private static function includes() {
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events-widget.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events-widget.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
 
 			if ( self::use_rest_api() ) {
-				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php';
+				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
 			}
 
 			// Manually include ms.php theme-side in multisite environments because
 			// we need its filesize and available space functions.
 			if ( ! is_admin() && is_multisite() ) {
-				require_once ABSPATH . 'wp-admin/includes/ms.php';
+				require_once( ABSPATH . 'wp-admin/includes/ms.php' );
 			}
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
-				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php';
+				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
 			}
 
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php';
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php' );
 		}
 
 		/**
@@ -276,6 +277,35 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			return self::$post_id;
+		}
+
+		/**
+	 * Returns the avatar for a user
+	 *
+	 * @param $user_id author ID
+	 * @param $size size, in pixels (or named size)
+	 * @return HTML for avatar
+	 */
+		public static function get_avatar( $user_id, $size ) {
+			return apply_filters( 'liveblog_author_avatar', get_avatar( $user_id, $size ), $user_id, $size );
+		}
+
+		/**
+	 * Get current user
+	 */
+		public static function get_current_user() {
+			if ( ! self::is_liveblog_editable() ) {
+				return false;
+			}
+
+			$user = wp_get_current_user();
+
+			return array(
+				'id'     => $user->ID,
+				'key'    => strtolower( $user->user_nicename ),
+				'name'   => $user->display_name,
+				'avatar' => self::get_avatar( $user->ID, 20 ),
+			);
 		}
 
 		/**
@@ -554,9 +584,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 			}
 
-			$args['post_id']  = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // input var ok
-			$args['content']  = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // input var ok
-			$args['entry_id'] = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // input var ok
+			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // input var ok
+			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // input var ok
+			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // input var ok
+			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // input var ok
+			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? intval( $_POST['contributor_ids'] ) : false; // input var ok
 
 			$entry = self::do_crud_entry( $crud_action, $args );
 
@@ -747,8 +779,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				do_action( 'liveblog_entry_request_empty' );
 			}
 
-			//self::json_return( $result_for_json );
-
 			return $result;
 		}
 
@@ -785,7 +815,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
 				$index = array_search( $id, array_keys( $entries ), true );
-				$index = $index++;
+				$index = $index + 1;
 				$page  = ceil( $index / $per_page );
 			}
 
@@ -968,7 +998,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'key'                          => self::KEY,
 						'nonce_key'                    => self::NONCE_KEY,
 						'nonce'                        => wp_create_nonce( self::NONCE_ACTION ),
+
 						'image_nonce'                  => wp_create_nonce( 'media-form' ),
+						'default_image_size'           => apply_filters( 'liveblog_default_image_size', self::DEFAULT_IMAGE_SIZE ),
+
 						'latest_entry_timestamp'       => self::$entry_query->get_latest_timestamp(),
 						'latest_entry_id'              => self::$entry_query->get_latest_id(),
 						'timestamp'                    => time(),
@@ -1157,13 +1190,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$theme_template       = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			if ( file_exists( $child_theme_template ) ) {
-				include $child_theme_template;
+				include( $child_theme_template );
 			} elseif ( file_exists( $theme_template ) ) {
-				include $theme_template;
+				include( $theme_template );
 			} elseif ( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
-				include self::$custom_template_path . '/' . $template_name;
+				include( self::$custom_template_path . '/' . $template_name );
 			} else {
-				include dirname( __FILE__ ) . '/templates/' . $template_name;
+				include( dirname( __FILE__ ) . '/templates/' . $template_name );
 			}
 			return ob_get_clean();
 		}
@@ -1252,16 +1285,16 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::ajax_current_user_can_edit_liveblog();
 			self::ajax_check_nonce();
 
-			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); // input var ok
+			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); //input var ok
 
 			if ( ! $meta_box ) {
 
 				if ( wp_is_post_revision( $post_id ) ) {
-					// translators: post id
+					// translators: 1: post ID
 					self::send_user_error( sprintf( __( 'The post is a revision: %s', 'liveblog' ), $post_id ) );
 				}
 
-				// translators: post id
+				// translators: 1: post ID
 				self::send_user_error( sprintf( __( 'Non-existing post ID: %s', 'liveblog' ), $post_id ) );
 
 			}
@@ -1311,7 +1344,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	 */
 		public static function set_liveblog_state( $post_id, $new_state ) {
 
-			//if the auto_archive feature is not disabled
+			// if the auto_archive feature is not disabled
 			if ( null !== self::$auto_archive_days ) {
 				//Get the Current State
 				$current_state = get_post_meta( $post_id, self::KEY );
@@ -1323,10 +1356,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				//set autoarchive date based on latest timestamp
 				$autoarchive_date = strtotime( ' + ' . self::$auto_archive_days . ' days', $latest_timestamp );
 
-				//if the old state is archive and the new state is active or there is no current state and the new state is enable
+				// if the old state is archive and the new state is active or there is no current state and the new state is enable
 				if ( 0 === count( $current_state ) && 'enable' === $new_state || 'archive' === $current_state[0] && 'enable' === $new_state ) {
 
-					//Then the live blog is being setup for the first time or is being reactivated.
+					// Then the live blog is being setup for the first time or is being reactivated.
 					update_post_meta( $post_id, self::$auto_archive_expiry_key, $autoarchive_date );
 
 				}
@@ -1630,6 +1663,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ), true );
 		}
 
+
 		/** Plupload Helpers ******************************************************/
 
 		/**
@@ -1714,15 +1748,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 	/** Plupload Helpers ******************************************************/
 	if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {
-		require_once ABSPATH . 'wp-includes/load.php';
+		require_once( ABSPATH . 'wp-includes/load.php' );
 	}
 
 	if ( ! function_exists( 'size_format' ) ) {
-		require_once ABSPATH . 'wp-includes/functions.php';
+		require_once( ABSPATH . 'wp-includes/functions.php' );
 	}
 
 	if ( ! function_exists( 'wp_max_upload_size' ) ) {
-		require_once ABSPATH . 'wp-includes/media.php';
+		require_once( ABSPATH . 'wp-includes/media.php' );
 	}
 
 endif;

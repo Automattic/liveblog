@@ -369,9 +369,11 @@ class WPCOM_Liveblog_Rest_Api {
 		$json        = $request->get_json_params();
 
 		$args = array(
-			'post_id'  => self::get_json_param( 'post_id', $json ),
-			'content'  => self::get_json_param( 'content', $json ),
-			'entry_id' => self::get_json_param( 'entry_id', $json ),
+			'post_id'         => self::get_json_param( 'post_id', $json ),
+			'content'         => self::get_json_param( 'content', $json ),
+			'entry_id'        => self::get_json_param( 'entry_id', $json ),
+			'author_id'       => self::get_json_param( 'author_id', $json ),
+			'contributor_ids' => self::get_json_param( 'contributor_ids', $json ),
 		);
 
 		self::set_liveblog_vars( $args['post_id'] );

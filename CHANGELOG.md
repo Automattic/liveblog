@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.8
+
+* New: Allow multiple authors for each Liveblog entry
+* New: Entries no longer have to have an author
+* New: Share entries with entry-specific permalinks
+* New: Media library integration in the entry editor
+* New: Edit entry HTML within the editor
+* Fixed: Bug with some installs using the correct REST API base URL
+* Fixed: Various coding standards issues
+
+props [jasonagnew](https://github.com/), [liam-defty](https://github.com/liam-defty), [paulschreiber](https://github.com/paulschreiber), [philipjohn](https://github.com/philipjohn), [sboisvert](https://github.com/sboisvert)
+
 ## 1.7.1
 
 * Fix bug with REST endpoints in Multisite (props justnorris)

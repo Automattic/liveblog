@@ -8,6 +8,8 @@ import {
   getCurrentTimestamp,
 } from '../utils/utils';
 
+const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
+
 export function getEntries(page, config, newestEntry) {
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
@@ -36,6 +38,8 @@ export function createEntry(entry, config, nonce = false) {
       crud_action: 'insert',
       post_id: config.post_id,
       content: entry.content,
+      author_id: entry.author,
+      contributor_ids: entry.contributors,
     },
     headers: {
       'Content-Type': 'application/json',
@@ -56,6 +60,8 @@ export function updateEntry(entry, config, nonce = false) {
       post_id: config.post_id,
       entry_id: entry.id,
       content: entry.content,
+      author_id: entry.author,
+      contributor_ids: entry.contributors,
     },
     headers: {
       'Content-Type': 'application/json',
@@ -164,6 +170,17 @@ export function uploadImage(formData) {
     url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
     method: 'POST',
     body: formData,
+  };
+
+  return ajax(settings);
+}
+
+export function getMedia(params) {
+  const location = window.location;
+
+  const settings = {
+    url: `${location.protocol}//${location.hostname}/wp-json/wp/v2/media${getParams(params)}`,
+    method: 'GET',
   };
 
   return ajax(settings);

@@ -1,28 +1,30 @@
 .liveblog-entry {
   position: relative;
-  padding: 1rem;
   margin-bottom: 1rem;
 }
 
 .liveblog-meta {
-  display: flex;
+  display: inline-flex;
   flex-wrap: nowrap;
   align-items: flex-start;
+  text-decoration: none;
+}
+
+.liveblog-meta-authors,
+.liveblog-meta-author {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .liveblog-meta-time span {
   display: block;
 }
 
-.liveblog-meta-author {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
 .liveblog-meta-author-avatar img {
   width: 30px;
   height: 30px;
+  border-radius: 50%;
 }
 
 .liveblog-entry-tools {

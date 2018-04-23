@@ -9,7 +9,7 @@ const Event = ({ event, click, onDelete, canEdit, utcOffset, dateFormat }) => (
       <div>
         {
           canEdit &&
-          <span className="dashicons dashicons-no-alt liveblog-event-delete" onClick={onDelete} />
+          <span className="dashicons dashicons-no-alt liveblog-editor-delete" onClick={onDelete} />
         }
         <span
           className="liveblog-event-content"
