@@ -58,6 +58,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $is_rest_api_call        = false;
 		public static $auto_archive_days       = null;
 		public static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
+		public static $latest_timestamp        = false;
 
 
 		/** Load Methods **********************************************************/
@@ -987,6 +988,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::add_default_plupload_settings();
 			}
 
+			self::$latest_timestamp = self::$entry_query->get_latest_timestamp();
+
 			wp_localize_script(
 				self::KEY, 'liveblog_settings',
 				apply_filters(
@@ -1004,7 +1007,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'image_nonce'                  => wp_create_nonce( 'media-form' ),
 						'default_image_size'           => apply_filters( 'liveblog_default_image_size', self::DEFAULT_IMAGE_SIZE ),
 
-						'latest_entry_timestamp'       => self::$entry_query->get_latest_timestamp(),
+						'latest_entry_timestamp'       => self::$latest_timestamp,
 						'latest_entry_id'              => self::$entry_query->get_latest_id(),
 						'timestamp'                    => time(),
 						'utc_offset'                   => get_option( 'gmt_offset' ) * 60, // in minutes
