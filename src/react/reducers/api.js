@@ -134,6 +134,15 @@ export const api = (state = initialState, action) => {
         },
       };
 
+    case 'LOAD_CONFIG':
+      return {
+        ...state,
+        newestEntry: {
+          id: action.payload.latest_entry_id,
+          timestamp: parseInt(action.payload.latest_entry_timestamp, 10),
+        },
+      };
+
     default:
       return state;
   }

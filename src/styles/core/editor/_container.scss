@@ -3,25 +3,37 @@
   margin-bottom: .8rem;
   background: $color-grey-mid-light;
   border-top: 2px solid $color-grey-x-dark;
+
+  @include mq($until: x-small) {
+    padding: .8rem 0 0 0;
+    background: transparent;
+  }
+}
+
+.liveblog-editor-container *:not(.dashicons),
+.liveblog-editor-container *:placeholder,
+.liveblog-modal * {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.liveblog-editor-container
+.public-DraftEditor-content[contenteditable="false"] {
+  color: #eee;
 }
 
 .liveblog-editor-container .public-DraftEditor-content,
 .liveblog-preview {
   max-width: 100%;
   word-break: break-all;
-  min-height: 200px;
+  min-height: 250px;
   padding: .8rem;
   margin-bottom: .8rem;
   border: 1px solid $color-grey-light;
-  border-radius: 0 0 $base-border-radius $base-border-radius;
 }
 
-.liveblog-editor-container .public-DraftEditor-content {
-  background: #fff;
-}
-
+.liveblog-editor-container .public-DraftEditor-content,
 .liveblog-preview {
-  background: $color-grey-x-light;
+  background: #fff;
 }
 
 .liveblog-entry-edit .liveblog-editor-container {
@@ -41,9 +53,26 @@
   flex-basis: 100%;
 }
 
+.liveblog-editor-title,
+.liveblog-editor-subTitle {
+  margin: 0;
+  padding: 0;
+  color: $color-grey-dark;
+}
+
+.liveblog-editor-title {
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.liveblog-editor-subTitle {
+  font-size: .9rem;
+  font-weight: 500;
+  margin-bottom: .6rem;
+}
+
 @include mq($until: small) {
   .liveblog-editor-container .public-DraftEditor-content {
     margin-bottom: 0;
-    border-radius: $base-border-radius 0 0 0;
   }
 }

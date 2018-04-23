@@ -1,0 +1,100 @@
+.liveblog-media-search-container {
+  display: flex;
+  align-items: center;
+  padding: .5rem;
+  border-bottom: $base-border-size solid $color-grey-x-light;
+}
+
+.liveblog-media-search-container input {
+  flex-grow: 1;
+  padding-left: .25rem;
+  border: none;
+  font-size: 15px;
+}
+
+.liveblog-media-search-container input::placeholder {
+  color: $color-grey-light;
+  font-size: 14px;
+}
+
+.liveblog-media-grid {
+  display: flex;
+  justify-content: space-between;
+  background: $color-grey-x-light;
+  flex-wrap: wrap;
+  list-style: none;
+  overflow-y: scroll;
+  padding: .5rem 1%;
+  max-height: 250px;
+}
+
+.liveblog-media-grid-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-basis: 23%;
+  margin-bottom: 5px;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
+
+  @include mq($until: medium) {
+    flex-basis: 31%;
+  }
+
+  @include mq($until: small) {
+    flex-basis: 48%;
+  }
+}
+
+.liveblog-media-grid-item:not(:last-child) {
+  margin-right: 1%;
+  margin-left: 1%;
+}
+
+.liveblog-media-grid-item > img {
+  display: block;
+  max-width: 100%;
+}
+
+.liveblog-media-grid-item:hover {
+  box-shadow: 0 0 0 2px lighten($color-accent, 20%);
+}
+
+.liveblog-media-loading {
+  min-height: 250px;
+}
+
+.liveblog-media-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.liveblog-media-pagination {
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+
+.liveblog-media-pagination-number {
+  cursor: pointer;
+  padding: 0 .1rem;
+}
+
+.liveblog-media-pagination-number.is-active {
+  font-weight: bold;
+}
+
+.liveblog-media-current-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $color-grey-x-light;
+  padding: 1rem;
+}
+
+.liveblog-media-current-container img {
+  max-width: 100%;
+  max-height: 100%;
+}
