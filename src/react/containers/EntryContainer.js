@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
-import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
+import { triggerOembedLoad, formattedTime } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
 
 class EntryContainer extends Component {
@@ -63,6 +63,17 @@ class EntryContainer extends Component {
     );
   }
 
+  entryShare() {
+    const { entry } = this.props;
+
+    return (
+      <div className="liveblog-share" id={`liveblog-update-${entry.id}-share`} data-update-id={entry.id}>
+        <button className="share-social share-facebook"></button>
+        <button className="share-social share-twitter"></button>
+      </div>
+    );
+  }
+
   render() {
     const { entry, config } = this.props;
 
@@ -72,31 +83,36 @@ class EntryContainer extends Component {
         ref={node => this.node = node}
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
-        <aside className="liveblog-entry-aside">
-          <a className="liveblog-meta-time" href={entry.share_link} target="_blank">
-            <span>{timeAgo(entry.entry_time, config.utc_offset, config.date_format)}</span>
-            <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format)}</span>
-          </a>
-        </aside>
         <div className="liveblog-entry-main">
           {
             (entry.authors && entry.authors.length > 0) &&
-            <header className="liveblog-meta-authors">
+            <div className="liveblog-meta-avatars">
               {
                 entry.authors.map(author => (
-                  <div className="liveblog-meta-author" key={author.id}>
-                    { author.avatar &&
-                      <div
-                        className="liveblog-meta-author-avatar"
-                        dangerouslySetInnerHTML={{ __html: author.avatar }} />
-                    }
-                    <span className="liveblog-meta-author-name"
-                      dangerouslySetInnerHTML={{ __html: author.name }} />
-                  </div>
+                  <a
+                    key={author.id}
+                    className="liveblog-meta-avatar"
+                    href={`/contributors/${author.name.toLowerCase().replace(' ', '-')}/`}
+                    dangerouslySetInnerHTML={{ __html: author.avatar }} />
                 ))
               }
-            </header>
+            </div>
           }
+          <header className="liveblog-meta">
+            {
+              (entry.authors && entry.authors.length > 0) &&
+              <div className="liveblog-meta-authors">
+                {
+                  entry.authors.map(author => (
+                    <span className="liveblog-meta-author" key={author.id}><a href={`/contributors/${author.name.toLowerCase().replace(' ', '-')}/`}>{author.name}</a></span>
+                  ))
+                }
+              </div>
+            }
+            <a className="liveblog-meta-time" href={entry.share_link}>
+              <abbr title={formattedTime(entry.entry_time, config.utc_offset, 'c')} className="liveblog-timestamp">{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</abbr>
+            </a>
+          </header>
           {
             this.isEditing()
               ? (
@@ -112,6 +128,7 @@ class EntryContainer extends Component {
               )
           }
           {this.entryActions()}
+          {this.entryShare()}
         </div>
       </article>
     );
