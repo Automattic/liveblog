@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.8.10';
+		const VERSION                 = '1.8.0';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
