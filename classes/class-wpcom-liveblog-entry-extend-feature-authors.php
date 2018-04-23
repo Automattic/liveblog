@@ -263,7 +263,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'id'     => $author->ID,
 			'key'    => strtolower( $author->user_nicename ),
 			'name'   => $author->display_name,
-			'avatar' => get_avatar( $author->ID, 20 ),
+			'avatar' => WPCOM_Liveblog::get_avatar( $author->ID, 20 ),
 		);
 	}
 
