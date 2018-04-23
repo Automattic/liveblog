@@ -49,7 +49,7 @@ class EntryContainer extends Component {
 
   entryActions() {
     const { config } = this.props;
-    if ( ! config.is_admin && ( config.is_liveblog_editable !== '1' || config.backend_liveblogging === '1' ) ) {
+    if (!config.is_admin && (config.is_liveblog_editable !== '1' || config.backend_liveblogging === '1')) {
       return false;
     }
 
@@ -57,10 +57,16 @@ class EntryContainer extends Component {
       <footer className="liveblog-entry-tools">
         {
           this.isEditing()
-            ? <button className="button button-large liveblog-btn liveblog-btn-small" onClick={this.close}>
-              Close Editor
+            ? <button
+              className="button button-large liveblog-btn liveblog-btn-small"
+              onClick={this.close}
+              >
+            Close Editor
             </button>
-            : <button className="button button-large liveblog-btn liveblog-btn-small" onClick={this.edit}>
+            : <button
+              className="button button-large liveblog-btn liveblog-btn-smallx"
+              onClick={this.edit}
+              >
               Edit
             </button>
         }
