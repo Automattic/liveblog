@@ -94,25 +94,25 @@ class WPCOM_Liveblog_Entry_Extend {
 	}
 
 	/**
-	 * Returns the settings for autocomplete that are used by
-	 * the frontend javascript for autocomplete matching.
-	 *
-	 * @return array
-	 */
+	* Returns the settings for autocomplete that are used by
+	* the frontend javascript for autocomplete matching.
+	*
+	* @return array
+	*/
 	public static function get_autocomplete() {
 		return self::$autocomplete;
 	}
 
 	/**
-	 * Strips out unneeded spans
-	 *
-	 * @param $entry
-	 * @return mixed
-	 */
+	* Strips out unneeded spans
+	*
+	* @param $entry
+	* @return mixed
+	*/
 	public static function strip_input( $entry ) {
-		// Replace all escaped spaces with normal spaces to
+		// Replace all escaped enitities to
 		// allow matching to work as we expect it to.
-		$entry['content'] = str_replace( '&nbsp;', ' ', $entry['content'] );
+		$entry['content'] = html_entity_decode( $entry['content'], ENT_QUOTES );
 
 		// Strip at all the atwho classes that may have been
 		// generated from the front end autocompletion.

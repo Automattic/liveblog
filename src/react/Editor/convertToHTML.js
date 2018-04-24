@@ -32,38 +32,6 @@ export default contentState =>
           return <img src={entity.getData().image} />;
         }
       }
-      if (block.type === 'unordered-list-item') {
-        return {
-          start: '<li>',
-          end: '</li>',
-          nestStart: '<ul>',
-          nestEnd: '</ul>',
-        };
-      }
-      if (block.type === 'ordered-list-item') {
-        return {
-          start: '<li>',
-          end: '</li>',
-          nestStart: '<ol>',
-          nestEnd: '</ol>',
-        };
-      }
-      if (block.type === 'unstyled') {
-        return <p />;
-      }
-      return <span />;
     },
-    entityToHTML: (entity, originalText) => {
-      if (entity.type === 'LINK') {
-        return <a href={entity.data.url}>{originalText}</a>;
-      }
-      if (entity.type === 'TEXT') {
-        return React.createElement(
-          entity.data.nodeName,
-          entity.data.attributes,
-          originalText,
-        );
-      }
-      return originalText;
-    },
+    entityToHTML: () => {},
   })(contentState);

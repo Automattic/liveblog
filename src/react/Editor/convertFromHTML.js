@@ -1,7 +1,5 @@
 /* eslint-disable consistent-return */
 import { convertFromHTML } from 'draft-convert';
-import { CODE_BLOCK_TAGS, IGNORED_TAGS, TEXT_TAGS } from './HTMLtags';
-import { namedNodeMapToObject } from './utils';
 
 export default (html, extraData) =>
   convertFromHTML({
@@ -11,17 +9,6 @@ export default (html, extraData) =>
           'LINK',
           'MUTABLE',
           { url: node.href },
-        );
-      }
-
-      if (TEXT_TAGS.includes(nodeName)) {
-        return createEntity(
-          'TEXT',
-          'MUTABLE',
-          {
-            nodeName,
-            attributes: namedNodeMapToObject(node.attributes),
-          },
         );
       }
 
@@ -39,20 +26,13 @@ export default (html, extraData) =>
         );
       }
 
-      const isHTMLBlock = node.id && node.id.includes('liveblog-codeblock-identifier-');
-
-      if (
-        isHTMLBlock ||
-        CODE_BLOCK_TAGS.includes(nodeName)
-      ) {
+      if (node.id && node.id.includes('liveblog-codeblock-identifier-')) {
         return createEntity(
           'code-block',
           'IMMUTABLE',
           {
-            code: isHTMLBlock ? node.innerHTML : node.outerHTML,
-            title: isHTMLBlock
-              ? node.id.replace('liveblog-codeblock-identifier-', '').replace('-', ' ')
-              : nodeName,
+            code: node.innerHTML,
+            title: node.id.replace('liveblog-codeblock-identifier-', '').replace('-', ' '),
             setReadOnly: extraData.setReadOnly,
           },
         );
@@ -64,14 +44,9 @@ export default (html, extraData) =>
         return false;
       }
 
-      if (IGNORED_TAGS.includes(nodeName)) {
-        return false;
-      }
-
       if (
         nodeName === 'img' ||
-        (node.id && node.id.includes('liveblog-codeblock-identifier-')) ||
-        CODE_BLOCK_TAGS.includes(nodeName)
+        (node.id && node.id.includes('liveblog-codeblock-identifier-'))
       ) {
         return 'atomic';
       }

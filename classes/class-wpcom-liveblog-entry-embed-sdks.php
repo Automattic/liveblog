@@ -51,7 +51,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * @return type
 	 */
 	public static function add_async_attribute( $tag, $handle ) {
-		if ( ! in_array( $handle, array_keys( self::$sdks ) ) ) {
+		if ( ! in_array( $handle, array_keys( self::$sdks ), true ) ) {
 			return $tag;
 		}
 		return str_replace( ' src', ' async="async" src', $tag );

@@ -182,7 +182,7 @@ class EditorWrapper extends Component {
     return {
       ...range,
       trigger,
-      top: getTopPosition(range, this.editor.editorContainer),
+      top: getTopPosition(range, this.editor.refs.editorContainer),
       displayKey: config.displayKey,
       replaceText: config.replaceText,
       name: config.name,
@@ -305,7 +305,8 @@ class EditorWrapper extends Component {
       bubbles: true,
       cancelable: true,
     });
-    this.editor.editor.dispatchEvent(mouseUpEvent);
+    this.editor.refs.editor.dispatchEvent(mouseUpEvent);
+
     return handled;
   }
 

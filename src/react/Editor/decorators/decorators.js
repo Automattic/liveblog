@@ -1,6 +1,5 @@
 import Link, { findLinkEntities } from './Link';
 import Emoji, { findEmojiEntities } from './Emoji';
-import Text, { findTextEntities } from './Text';
 
 export default [
   {
@@ -10,9 +9,5 @@ export default [
   {
     strategy: findEmojiEntities,
     component: Emoji,
-  },
-  {
-    strategy: findTextEntities,
-    component: Text,
   },
 ];

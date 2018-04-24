@@ -1,6 +1,6 @@
 /* global ajaxurl, liveblog_admin_settings, jQuery */
 jQuery( function( $ ) {
-	var $meta_box = $( '#liveblog' ),
+	var $meta_box = $( '#liveblog.postbox' ),
 		post_id = $( '#post_ID' ).val(),
 		show_error = function( status, code ) {
 			var template = code? liveblog_admin_settings.error_message_template : liveblog_admin_settings.short_error_message_template,
@@ -25,7 +25,7 @@ jQuery( function( $ ) {
 			url       += '&' + $('input, textarea, select', $meta_box).serialize();
 			var method = 'GET';
 		}
-		
+
 		$.ajax( url, {
 			dataType: 'json',
 			data: data,
@@ -36,10 +36,18 @@ jQuery( function( $ ) {
 
 				if ( status === 'success') {
 					$( 'p.success', $meta_box ).show(0).delay( 1000 ).hide(0);
+						setTimeout( function() {
+							var $save = $( '#minor-publishing-actions #save-post' );
+							if ( 0 !== $save.length ) {
+								$save.click();
+							} else {
+								$( '#publishing-action #publish' ).click();
+							}
+						}, 1000 );
 					return;
 				}
 			},
-			error:  function( xhr, status, error ) {
+			error:	function( xhr, status, error ) {
 				if (xhr.status && xhr.status > 200) {
 					show_error( xhr.statusText, xhr.status );
 				} else {

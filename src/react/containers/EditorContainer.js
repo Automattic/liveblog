@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
-import { html } from 'js-beautify';
 
 import { EditorState, ContentState } from 'draft-js';
 
@@ -18,7 +17,6 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
-import HTMLInput from '../components/HTMLInput';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
@@ -29,7 +27,8 @@ class EditorContainer extends Component {
     super(props);
 
     let initialEditorState;
-    let initialAuthors;
+    let initialAuthor;
+    let initialContributors;
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
@@ -40,25 +39,25 @@ class EditorContainer extends Component {
         }),
         decorators,
       );
-      initialAuthors = props.entry.authors;
+      initialAuthor = props.entry.author;
+      initialContributors = props.entry.contributors;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
-      initialAuthors = [props.config.current_user];
+      initialAuthor = props.config.current_user;
+      initialContributors = [];
     }
 
     this.state = {
       editorState: initialEditorState,
       suggestions: [],
-      authors: initialAuthors,
-      mode: 'editor',
+      selectedUsers: initialContributors,
+      selectedAuthor: initialAuthor,
+      preview: false,
+      showAuthors: false,
       readOnly: false,
-      rawText: props.entry ? props.entry.content : '',
     };
 
-    this.onChange = editorState => this.setState({
-      editorState,
-      rawText: html(convertToHTML(editorState.getCurrentContent())),
-    });
+    this.onChange = editorState => this.setState({ editorState });
   }
 
   setReadOnly(state) {
@@ -67,38 +66,31 @@ class EditorContainer extends Component {
     });
   }
 
+  setPreview(state, e) {
+    e.preventDefault();
+    this.setState({
+      preview: state,
+    });
+  }
+
   getContent() {
     const { editorState } = this.state;
     return convertToHTML(editorState.getCurrentContent());
   }
 
-  syncRawTextToEditorState() {
-    this.setState({
-      editorState:
-        EditorState.createWithContent(
-          convertFromHTML(this.state.rawText, {
-            setReadOnly: this.setReadOnly.bind(this),
-            handleImageUpload: this.handleImageUpload.bind(this),
-            defaultImageSize: this.props.config.default_image_size,
-          }),
-          decorators,
-        ),
-    });
-  }
+  publish(e) {
+    e.preventDefault();
 
-  publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState, authors } = this.state;
+    const { editorState, selectedAuthor, selectedUsers } = this.state;
     const content = this.getContent();
-    const authorIds = authors.map(author => author.id);
-    const author = authorIds.length > 0 ? authorIds[0] : false;
-    const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
+    const contributors = selectedUsers.map(user => user.id);
 
     if (isEditing) {
       updateEntry({
         id: entry.id,
         content,
-        author,
+        author: selectedAuthor.id,
         contributors,
       });
       entryEditClose(entry.id);
@@ -107,7 +99,7 @@ class EditorContainer extends Component {
 
     createEntry({
       content,
-      author,
+      author: selectedAuthor.id,
       contributors,
     });
 
@@ -116,13 +108,21 @@ class EditorContainer extends Component {
       ContentState.createFromText(''),
     );
 
-    this.onChange(newEditorState);
-    this.setState({ readOnly: false });
+    this.setState({
+      editorState: newEditorState,
+      readOnly: false,
+    });
+  }
+
+  onSelectUsersChange(value) {
+    this.setState({
+      selectedUsers: value,
+    });
   }
 
   onSelectAuthorChange(value) {
     this.setState({
-      authors: value,
+      selectedAuthor: value,
     });
   }
 
@@ -219,8 +219,10 @@ class EditorContainer extends Component {
     const {
       editorState,
       suggestions,
-      mode,
-      authors,
+      preview,
+      selectedUsers,
+      selectedAuthor,
+      showAuthors,
       readOnly,
     } = this.state;
 
@@ -231,72 +233,74 @@ class EditorContainer extends Component {
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
         <div className="liveblog-editor-tabs">
           <button
-            className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'editor' })}
-          >
-            Visual
-          </button>
+            className={`liveblog-editor-tab ${!preview ? 'is-active' : ''}`}
+            onClick={this.setPreview.bind(this, false)}>Editor</button>
           <button
-            className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'raw' })}
-          >
-              Text
-          </button>
-          <button
-            className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'preview' })}
-          >
+            className={`liveblog-editor-tab ${preview ? 'is-active' : ''}`}
+            onClick={this.setPreview.bind(this, true)}>
               Preview
           </button>
         </div>
         {
-          mode === 'preview' &&
-          <PreviewContainer
-            config={config}
-            getEntryContent={() => this.getContent()}
-          />
+          preview
+            ? <PreviewContainer
+              config={config}
+              getEntryContent={() => this.getContent()}
+            />
+            : <Editor
+              editorState={editorState}
+              onChange={this.onChange}
+              suggestions={suggestions}
+              resetSuggestions={() => this.setState({ suggestions: [] })}
+              onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
+              autocompleteConfig={config.autocomplete}
+              handleImageUpload={this.handleImageUpload.bind(this)}
+              readOnly={readOnly}
+              setReadOnly={this.setReadOnly.bind(this)}
+              defaultImageSize={config.default_image_size}
+            />
         }
-        {
-          mode === 'editor' &&
-          <Editor
-            editorState={editorState}
-            onChange={this.onChange}
-            suggestions={suggestions}
-            resetSuggestions={() => this.setState({ suggestions: [] })}
-            onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
-            autocompleteConfig={config.autocomplete}
-            handleImageUpload={this.handleImageUpload.bind(this)}
-            readOnly={readOnly}
-            setReadOnly={this.setReadOnly.bind(this)}
-            defaultImageSize={config.default_image_size}
+        <div
+          onClick={() => this.setState({ showAuthors: !showAuthors })}
+          className={`liveblog-metabox-header ${showAuthors ? 'is-active' : ''}`}
+        >
+          Author Options
+          <span
+            className={`dashicons dashicons-arrow-${showAuthors ? 'up' : 'down'}`}
           />
-        }
-        {
-          mode === 'raw' &&
-          <HTMLInput
-            value={this.state.rawText}
-            onChange={(text) => {
-              this.setState({ rawText: text }, () => {
-                this.syncRawTextToEditorState();
-              });
-            }}
-            height="275px"
-            width="100%"
+        </div>
+        { showAuthors &&
+        <div className="liveblog-metabox-content">
+          <h2 className="liveblog-editor-subTitle">Author:</h2>
+          <Async
+            multi={false}
+            value={selectedAuthor}
+            valueKey="key"
+            labelKey="name"
+            onChange={this.onSelectAuthorChange.bind(this)}
+            optionComponent={AuthorSelectOption}
+            loadOptions={this.getUsers.bind(this)}
+            clearable={false}
+            cache={false}
           />
+          <h2 className="liveblog-editor-subTitle">Contributors:</h2>
+          <Async
+            multi={true}
+            value={selectedUsers}
+            valueKey="key"
+            labelKey="name"
+            onChange={this.onSelectUsersChange.bind(this)}
+            optionComponent={AuthorSelectOption}
+            loadOptions={this.getUsers.bind(this)}
+            clearable={false}
+            cache={false}
+          />
+        </div>
         }
-        <h2 className="liveblog-editor-subTitle">Authors:</h2>
-        <Async
-          multi={true}
-          value={authors}
-          valueKey="key"
-          labelKey="name"
-          onChange={this.onSelectAuthorChange.bind(this)}
-          optionComponent={AuthorSelectOption}
-          loadOptions={this.getUsers.bind(this)}
-          clearable={false}
-          cache={false}
-        />
-        <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
+        <button
+          className="button button-primary button-large liveblog-btn liveblog-publish-btn"
+          onClick={this.publish.bind(this)}
+        >
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </button>
       </div>

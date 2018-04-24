@@ -1,21 +1,52 @@
 div#liveblog span.disabled {
-	color: #bbb;
+  color: #bbb;
 }
 div#liveblog button {
-	margin-right: 4px;
+  margin-right: 4px;
 }
 div#liveblog p.error {
-	display: none;
-	background-color: #ffebe8;
-	border: 1px solid #c00;
-	padding: 4px;
-	border-radius: 3px;
+  display: none;
+  background-color: #ffebe8;
+  border: 1px solid #c00;
+  padding: 4px;
+  border-radius: 3px;
 }
 
 div#liveblog p.success {
-	display: none;
-	background-color: #93DB70;
-	border: 1px solid #4CBB17;
-	padding: 4px;
-	border-radius: 3px;
+  display: none;
+  background-color: #93DB70;
+  border: 1px solid #4CBB17;
+  padding: 4px;
+  border-radius: 3px;
+}
+
+div#edit-slug-box {
+  font-size: 13px;
+}
+
+div#edit-slug-box a {
+  color: #0073aa;
+  text-decoration: underline;
+}
+
+div#edit-slug-box a:hover {
+  color: #00a0d2;
+
+}
+body.wp-admin .liveblog-editor-container {
+  border-top: none;
+  margin-bottom: 2px;
+}
+
+body.wp-admin .liveblog-editor-title,
+body.wp-admin .liveblog-share {
+  display: none;
+}
+
+body.wp-admin.post-type-fte_liveblog #postdivrich {
+  display: none;
+}
+
+body.wp-admin .liveblog-pagination button {
+  margin: 4px;
 }

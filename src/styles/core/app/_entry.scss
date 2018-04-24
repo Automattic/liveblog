@@ -1,17 +1,22 @@
 .liveblog-entry {
   position: relative;
+  padding: 1rem;
   margin-bottom: 1rem;
 }
 
 .liveblog-meta {
-  display: inline-flex;
-  flex-wrap: nowrap;
+  display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   text-decoration: none;
 }
 
-.liveblog-meta-authors,
-.liveblog-meta-author {
+.liveblog-meta-time {
+  display: block;
+}
+
+.liveblog-meta-author,
+.liveblog-meta-contributors {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

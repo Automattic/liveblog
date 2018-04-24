@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '../Button';
-import HTMLInput from '../../components/HTMLInput';
 
 class CodeBlock extends Component {
   constructor(props) {
@@ -19,17 +18,19 @@ class CodeBlock extends Component {
   /**
    * Handle save.
    */
-  save() {
+  save(e) {
+    e.preventDefault();
     const { code, title } = this.state;
     const { replaceMetadata, setEditMode } = this.props;
-    replaceMetadata({ code, title }, true);
+    replaceMetadata({ code, title });
     setEditMode(false);
   }
 
   /**
    * Set edit mode to false.
    */
-  cancel() {
+  cancel(e) {
+    e.preventDefault();
     const { setEditMode, getMetadata } = this.props;
     const { code, title } = getMetadata();
     this.setState({ code, title });
@@ -40,8 +41,8 @@ class CodeBlock extends Component {
    * Handle onChange event to keep textare in sync.
    * @param {object} event
    */
-  handleChange(value) {
-    this.setState({ code: value });
+  handleChange(event) {
+    this.setState({ code: event.target.value });
   }
 
   render() {
@@ -74,7 +75,11 @@ class CodeBlock extends Component {
             <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
               <button
                 className="liveblog-editor-btn liveblog-editor-action-btn"
-                onClick={!edit ? () => setEditMode(true) : this.save.bind(this)}>
+                onClick={!edit ? (e) => {
+                  e.preventDefault();
+                  setEditMode(true);
+                } : this.save.bind(this)}
+              >
                 {edit ? 'Save' : 'Edit'}
               </button>
             </span>
@@ -88,13 +93,13 @@ class CodeBlock extends Component {
           </div>
         </div>
         {
-          edit &&
-          <HTMLInput
-            container={false}
+          edit && <textarea
+            autoFocus
+            placeholder={this.placeholder}
+            className="liveblog-codeblock-textarea"
             value={code}
             onChange={this.handleChange.bind(this)}
-            height="175px"
-            width="100%"
+            spellCheck={false}
           />
         }
       </div>
