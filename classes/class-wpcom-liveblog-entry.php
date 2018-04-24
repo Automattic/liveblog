@@ -56,7 +56,7 @@ class WPCOM_Liveblog_Entry {
 		self::$allowed_tags_for_entry = wp_kses_allowed_html( 'post' );
 		/**
 		 * Expand with additional tags that we want to allow.
-		*/
+		 */
 		$additional_tags = array();
 		$additional_tags['iframe'] = array(
 			'src'             => array(),
@@ -229,19 +229,16 @@ class WPCOM_Liveblog_Entry {
 
 		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
 
-		// Remove any existing key event meta information before creating the new comment.
-		// Not deleting the key event meta information means that the all() function will pick up the old live blog
-		// as being a key event, even if it changed to no longer being a key event
-		WPCOM_Liveblog_Entry_Key_Events::remove_key_action($args['content'], $args['entry_id']);
-
-        $args = apply_filters( 'liveblog_before_update_entry', $args );
+		$args = apply_filters( 'liveblog_before_update_entry', $args );
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
 
 		if ( !empty( $args['is_key_event'] ) && true === $args['is_key_event'] ) {
-			do_action( 'liveblog_command_key_after', $args['content'], $comment->comment_ID, $args['post_id'] );
+			do_action( 'liveblog_command_key_after', $args['content'], $args['entry_id'], $args['post_id'] );
+		} elseif ( isset( $args['is_key_event'] ) && false === $args['is_key_event'] ) {
+			WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
 		}
 
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
