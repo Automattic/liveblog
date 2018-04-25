@@ -965,7 +965,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 						'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 						'use_rest_api'                 => $use_rest_api,
-						'endpoint_url'                 => $endpoint_url,
+						'endpoint_url'                 => apply_filters( 'liveblog_endpoint_url', $endpoint_url, get_the_ID() ),
 					)
 				);
 			}
