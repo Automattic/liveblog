@@ -58,6 +58,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $is_rest_api_call        = false;
 		public static $auto_archive_days       = null;
 		public static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
+		public static $latest_timestamp        = null;
 
 
 		/** Load Methods **********************************************************/
@@ -166,6 +167,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
 			add_action( 'init', array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
@@ -954,7 +956,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$use_rest_api = 1;
 				}
 
-				wp_enqueue_style( self::KEY, plugins_url( 'assets/dashboard/app.css', __FILE__ ) );
+				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard/app.css', __FILE__ ) );
 				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ) );
 				wp_localize_script(
 					'liveblog-admin', 'liveblog_admin_settings', array(
@@ -963,7 +965,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 						'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 						'use_rest_api'                 => $use_rest_api,
-						'endpoint_url'                 => $endpoint_url,
+						'endpoint_url'                 => apply_filters( 'liveblog_endpoint_url', $endpoint_url, get_the_ID() ),
 					)
 				);
 			}
@@ -976,7 +978,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function enqueue_scripts() {
 
-			if ( ! self::is_viewing_liveblog_post() ) {
+			$back_end_blogging = apply_filters( 'liveblog_back_end_liveblogging', false );
+
+			if ( ! self::is_viewing_liveblog_post() && ( ! $back_end_blogging && ! is_admin() ) ) {
 				return;
 			}
 
@@ -1008,7 +1012,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'image_nonce'                  => wp_create_nonce( 'media-form' ),
 						'default_image_size'           => apply_filters( 'liveblog_default_image_size', self::DEFAULT_IMAGE_SIZE ),
 
-						'latest_entry_timestamp'       => self::$entry_query->get_latest_timestamp(),
+						'latest_entry_timestamp'       => $entry_query->get_latest_timestamp(),
 						'latest_entry_id'              => $entry_query->get_latest_id(),
 						'timestamp'                    => time(),
 						'utc_offset'                   => get_option( 'gmt_offset' ) * 120, // in minutes
@@ -1170,7 +1174,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			?>
-			<br /><br /><h2>Liveblog Editor</h2><div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div><br /><br /><h2>Parent Post Editor</h2>
+			<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div><br /><br /><h1>Parent Post Content</h1>
 			<?php
 		}
 
