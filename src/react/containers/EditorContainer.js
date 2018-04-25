@@ -234,19 +234,19 @@ class EditorContainer extends Component {
         <div className="liveblog-editor-tabs">
           <button
             className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'editor' })}
+            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'editor' }); } }
           >
             Visual
           </button>
           <button
             className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'raw' })}
+            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'raw' }); } }
           >
               Text
           </button>
           <button
             className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'preview' })}
+            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'preview' }); } }
           >
               Preview
           </button>
