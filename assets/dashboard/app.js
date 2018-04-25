@@ -1,6 +1,6 @@
 /* global ajaxurl, liveblog_admin_settings, jQuery */
 jQuery( function( $ ) {
-	var $meta_box = $( '#liveblog' ),
+	var $meta_box = $( '#liveblog.postbox' ),
 		post_id = $( '#post_ID' ).val(),
 		show_error = function( status, code ) {
 			var template = code? liveblog_admin_settings.error_message_template : liveblog_admin_settings.short_error_message_template,
