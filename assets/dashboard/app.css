@@ -24,12 +24,26 @@ div#edit-slug-box {
   font-size: 13px;
 }
 
+div#edit-slug-box a {
+  color: #0073aa;
+  text-decoration: underline;
+}
+
+div#edit-slug-box a:hover {
+  color: #00a0d2;
+
+}
 body.wp-admin .liveblog-editor-container {
   border-top: none;
   margin-bottom: 2px;
 }
 
+body.wp-admin .liveblog-editor-title,
 body.wp-admin .liveblog-share {
+  display: none;
+}
+
+body.wp-admin.post-type-fte_liveblog #postdivrich {
   display: none;
 }
 
