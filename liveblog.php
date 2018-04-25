@@ -1174,7 +1174,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			?>
-			<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div><br /><br /><h1>Parent Post Content</h1>
+			<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div><br /><br />
 			<?php
 		}
 
