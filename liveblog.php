@@ -171,7 +171,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
-			add_action( 'edit_form_after_title', array( __CLASS__, 'add_liveblog_to_editor' ) );
+			add_action( 'edit_form_after_editor', array( __CLASS__, 'add_liveblog_after_editor' ) );
 		}
 
 		/**
@@ -957,7 +957,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 
 				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard/app.css', __FILE__ ) );
-				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ) );
+				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ), array(), true );
 				wp_localize_script(
 					'liveblog-admin', 'liveblog_admin_settings', array(
 						'nonce_key'                    => self::NONCE_KEY,
@@ -1161,7 +1161,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @param string $content
 		 * @return string
 		 */
-		public static function add_liveblog_to_editor() {
+		public static function add_liveblog_after_editor() {
 			global $post;
 
 			if ( ! $post ) {
@@ -1174,6 +1174,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			?>
+			<div class="liveblog-admin-publish-section">
+				<button class="button button-primary button-large liveblog-btn liveblog-admin-publish-btn"><?php echo esc_html__( 'Publish New Entry', 'liveblog' ); ?></button>
+			</div><br />
 			<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div><br /><br />
 			<?php
 		}
