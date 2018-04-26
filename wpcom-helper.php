@@ -34,7 +34,7 @@ add_action(
 			}
 		);
 		// If a site's permalink structure does not end with a trailing slash the url created by liveblog will redirect.
-		if ( false !== strpos( $_SERVER['REQUEST_URI'], '__liveblog_' ) ) {
+		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) { // input var ok
 			add_action(
 				'wp',
 				function() {
@@ -50,15 +50,13 @@ add_action(
 // comes in
 add_action(
 	'wp_enqueue_scripts', function() {
-		global $BlackbirdPie;
-
 		// Fail gracefully if BlackbirdPie isn't available.
-		if ( ! isset( $BlackbirdPie ) || ! is_a( $BlackbirdPie, 'BlackbirdPie' ) ) {
+		if ( ! isset( $GLOBALS['BlackbirdPie'] ) || ! is_a( $GLOBALS['BlackbirdPie'], 'BlackbirdPie' ) ) {
 			return;
 		}
 
-		$BlackbirdPie->load_scripts();
-		$BlackbirdPie->load_infinite_scroll_script();
+		$GLOBALS['BlackbirdPie']->load_scripts();
+		$GLOBALS['BlackbirdPie']->load_infinite_scroll_script();
 	}
 );
 

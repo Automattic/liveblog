@@ -6,7 +6,7 @@
 			<ul>
 				<li class="active entry"><a href="#">{{entry_tab_label}}</a></li>
 				<li>&bull;</li>
-				<li class="preview"><a href="#"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
+				<li class="preview"><a href="#"><?php esc_html_e( 'Preview', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
 			<div class="liveblog-edit-entry">
@@ -34,8 +34,8 @@
 				<div class="liveblog-submit-wrapper">
 					<span class="liveblog-submit-spinner"></span>
 					<input type="button" class="liveblog-form-entry-submit button" value="{{submit_label}}" />
-					<a href="#" class="cancel"><?php _e( 'Cancel', 'liveblog' ); ?></a>
-					<a href="#" class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></a>
+					<a href="#" class="cancel"><?php esc_html_e( 'Cancel', 'liveblog' ); ?></a>
+					<a href="#" class="liveblog-entry-delete"><?php esc_html_e( 'Delete', 'liveblog' ); ?></a>
 				</div>
 			</div>
 			<div class="liveblog-preview">

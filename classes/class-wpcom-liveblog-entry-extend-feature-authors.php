@@ -159,7 +159,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// If the match isn't actually an author then we can
 		// safely say that this doesn't need to be matched.
-		if ( ! in_array( $author, $this->authors ) ) {
+		if ( ! in_array( $author, $this->authors, true ) ) {
 			return $match[0];
 		}
 
@@ -195,7 +195,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		$comment = get_comment( $comment_id );
 
 		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::key == $comment->comment_type ) {
+		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix ) . '\w+/', $comment->comment_content, $authors );
@@ -215,8 +215,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function ajax_authors() {
 
 		//Sanitize the input safely.
-		if ( isset( $_GET['autocomplete'] ) ) {
-			$term = sanitize_text_field( $_GET['autocomplete'] );
+		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
+			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
 		} else {
 			$term = '';
 		}
@@ -263,7 +263,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'id'     => $author->ID,
 			'key'    => strtolower( $author->user_nicename ),
 			'name'   => $author->display_name,
-			'avatar' => get_avatar( $author->ID, 20 ),
+			'avatar' => WPCOM_Liveblog::get_avatar( $author->ID, 20 ),
 		);
 	}
 

@@ -14,31 +14,31 @@ class PaginationContainer extends Component {
         <div>
           <button
             disabled={page === 1}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
+            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
             onClick={() => getEntriesPaginated(1, 'first')}
           >
             First
           </button>
           <button
             disabled={page === 1}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
+            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
             onClick={() => getEntriesPaginated((page - 1), 'last')}
           >
             Prev
           </button>
         </div>
-        <span className="liveblog-pagination-pages">{page} of {pages}</span>
+        <span className="button button-large liveblog-pagination-pages">{page} of {pages}</span>
         <div>
           <button
             disabled={page === pages}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
+            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
             onClick={() => getEntriesPaginated((page + 1), 'first')}
           >
             Next
           </button>
           <button
             disabled={page === pages}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
+            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
             onClick={() => getEntriesPaginated(pages, 'first')}
           >
             Last
