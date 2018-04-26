@@ -10,7 +10,7 @@ const UpdateButton = ({ polling, click }) => {
         className="liveblog-btn liveblog-update-btn"
         onClick={click}
       >
-        {polling.length} new {polling.length > 1 ? 'entries' : 'entry'} available
+        Load {polling.length} new {polling.length > 1 ? 'posts' : 'post'}
       </button>
     </div>
   );

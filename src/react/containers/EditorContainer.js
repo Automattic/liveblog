@@ -86,13 +86,15 @@ class EditorContainer extends Component {
     });
   }
 
-  publish() {
+  publish(event) {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
+
+    event.preventDefault();
 
     if (isEditing) {
       updateEntry({
@@ -232,19 +234,19 @@ class EditorContainer extends Component {
         <div className="liveblog-editor-tabs">
           <button
             className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'editor' })}
+            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'editor' }); } }
           >
             Visual
           </button>
           <button
             className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'raw' })}
+            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'raw' }); } }
           >
               Text
           </button>
           <button
             className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'preview' })}
+            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'preview' }); } }
           >
               Preview
           </button>
@@ -296,7 +298,7 @@ class EditorContainer extends Component {
           clearable={false}
           cache={false}
         />
-        <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
+        <button className="button button-primary button-large liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </button>
       </div>

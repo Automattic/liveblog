@@ -6,12 +6,12 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 	public function readme_for_github() {
 		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
-		$readme      = file_get_contents( $readme_path );
+		$readme      = file_get_contents( $readme_path ); // @codingStandardsIgnoreLine
 		$readme      = $this->listify_meta( $readme );
 		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
 		$readme      = $this->add_screenshot_links( $readme );
 		$readme      = $this->markdownify_headings( $readme );
-		echo $readme;
+		echo $readme; // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -55,7 +55,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$post_id = $post->ID;
 
 			// get all entries that have been edited in the liveblog
-			$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::key );
+			$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
 			$edit_entries  = $entries_query->get_all_edits( array( 'post_id' => $post_id ) );
 
 			// find correct comment_ids to replace incorrect meta_values
@@ -82,7 +82,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					$entry_id = $edit_entry->get_id();
 
 					// look for replaces property in $correct_ids
-					if ( in_array( $edit_entry->replaces, $correct_ids ) ) {
+					if ( in_array( $edit_entry->replaces, $correct_ids, true ) ) {
 
 						//The edited entry is accurate so we dont need to do anything.
 						WP_CLI::line( 'No action required.. skipping Entry ' . $entry_id );
@@ -90,7 +90,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 					} else {
 
-						for ( $i = 0; $i <= count( $correct_ids ) - 1; $i++ ) {
+						$correct_id_count = count( $correct_ids );
+						for ( $i = 0; $i <= $correct_id_count - 1; $i++ ) {
 
 							// replace with correct meta_value
 							if ( $correct_ids[ $i ] < $entry_id ) {
@@ -99,7 +100,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 								WP_CLI::line( 'Correcting Entry ' . $entry_id . '...' );
 
 								// If this isnt a dry run we can run the database Update.
-								if ( false == $is_dryrun ) {
+								if ( false === $is_dryrun ) {
 									$wpdb->update(
 										$wpdb->commentmeta,
 										array( 'meta_value' => $correct_ids[ $i ] ),
@@ -165,12 +166,12 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			}
 
 			//If we have a dry run flag lets just output what we would be looking to do on a live run.
-			if ( true == $is_dryrun ) {
+			if ( true === $is_dryrun ) {
 				WP_CLI::line( 'Found ' . count( $edit_entries ) . ' Edited Entries on Post ID ' . $post_id );
 			}
 		}
 
-		if ( true == $is_dryrun ) {
+		if ( true === $is_dryrun ) {
 			WP_CLI::success( 'Dry Run Completed. Please check the results and when ready re-run the command without the --dryrun flag.' );
 		} else {
 			WP_CLI::success( 'Fixed all entries on all liveblog posts!' );
@@ -228,7 +229,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		);
 	}
 
-	static function help() {
+	public static function help() {
 		WP_CLI::line(
 			<<<HELP
 usage: wp liveblog readme_for_github
