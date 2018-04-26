@@ -2,14 +2,7 @@
 jQuery( function( $ ) {
 
 	function createEntryFromAdmin(entry, config, nonce = false) {
-		var contributors = [];
-		$( '#react-select-2--value .Select-value-label' )
-			.each( function( i, e ) {
-				contributors
-					.push(
-						$( e ).text()
-					);
-			} );
+		var contributors = jQuery('#liveblog_editor_authors').val().split(',');
 
 		const settings = {
 			url: `${config.endpoint_url}crud/`,
