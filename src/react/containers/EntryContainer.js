@@ -60,13 +60,13 @@ class EntryContainer extends Component {
             ? <button
               className="button button-large liveblog-btn liveblog-btn-small"
               onClick={this.close}
-              >
+            >
             Close Editor
             </button>
             : <button
               className="button button-large liveblog-btn liveblog-btn-smallx"
               onClick={this.edit}
-              >
+            >
               Edit
             </button>
         }

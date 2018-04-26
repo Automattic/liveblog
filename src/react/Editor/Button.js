@@ -6,7 +6,14 @@ const Button = ({ click, onMouseDown, icon, classes, readOnly }) => (
     <button
       disabled={readOnly}
       className={`liveblog-btn liveblog-editor-btn ${classes}`}
-      onClick={onMouseDown || click}>
+      onClick={ (e) => {
+        e.preventDefault();
+        if (onMouseDown) {
+          onMouseDown(e);
+        } else {
+          click(e);
+        }
+      } }>
       <span className={`dashicons dashicons-${icon}`}></span>
     </button>
   </span>
