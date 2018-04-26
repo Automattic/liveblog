@@ -376,6 +376,9 @@ class WPCOM_Liveblog_Rest_Api {
 			'contributor_ids' => self::get_json_param( 'contributor_ids', $json ),
 		);
 
+		// Add author to contributor list
+		$args['contributor_ids'][] = $args['author_id'];
+
 		self::set_liveblog_vars( $args['post_id'] );
 
 		// Attempt to perform the requested action
