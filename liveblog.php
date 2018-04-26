@@ -591,7 +591,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // input var ok
 			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // input var ok
 			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // input var ok
-			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? intval( $_POST['contributor_ids'] ) : false; // input var ok
+			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false; // input var ok
 
 			$entry = self::do_crud_entry( $crud_action, $args );
 
