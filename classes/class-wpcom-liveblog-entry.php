@@ -192,10 +192,18 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function insert( $args ) {
 		$args    = apply_filters( 'liveblog_before_insert_entry', $args );
+
+		$args['user'] = self::handle_author_select( $args, false );
+
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
+
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
+		}
+
 		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
@@ -219,6 +227,12 @@ class WPCOM_Liveblog_Entry {
 		$args['user'] = self::user_object_from_comment_id( $args['entry_id'] );
 		if ( is_wp_error( $args['user'] ) ) {
 			return $args['user'];
+		}
+
+		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
+
+		if ( isset( $args['contributor_ids'] ) ) {
+			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
 		}
 
 		$args    = apply_filters( 'liveblog_before_update_entry', $args );
