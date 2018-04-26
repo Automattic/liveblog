@@ -10,13 +10,19 @@ import {
 
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
 
+const secureAjax = (settings) => {
+  const secureSettings = settings;
+  secureSettings.url = secureSettings.url.replace('http://', 'https://');
+  return ajax(secureSettings);
+};
+
 export function getEntries(page, config, newestEntry) {
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function polling(newestEntryTimestamp, config) {
@@ -27,7 +33,7 @@ export function polling(newestEntryTimestamp, config) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function createEntry(entry, config, nonce = false) {
@@ -48,7 +54,7 @@ export function createEntry(entry, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function updateEntry(entry, config, nonce = false) {
@@ -70,7 +76,7 @@ export function updateEntry(entry, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function deleteEntry(id, config, nonce = false) {
@@ -89,7 +95,7 @@ export function deleteEntry(id, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getEvents(config, newestEntry) {
@@ -98,7 +104,7 @@ export function getEvents(config, newestEntry) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function jumpToEvent(id, config, newestEntry) {
@@ -107,7 +113,7 @@ export function jumpToEvent(id, config, newestEntry) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function deleteEvent(entry, config, nonce = false) {
@@ -127,7 +133,7 @@ export function deleteEvent(entry, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getAuthors(term, config) {
@@ -136,7 +142,7 @@ export function getAuthors(term, config) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getHashtags(term, config) {
@@ -145,7 +151,7 @@ export function getHashtags(term, config) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getPreview(content, config) {
@@ -160,7 +166,7 @@ export function getPreview(content, config) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function uploadImage(formData) {
@@ -172,7 +178,7 @@ export function uploadImage(formData) {
     body: formData,
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getMedia(params) {
@@ -183,5 +189,5 @@ export function getMedia(params) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
