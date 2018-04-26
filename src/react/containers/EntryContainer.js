@@ -8,6 +8,14 @@ import * as userActions from '../actions/userActions';
 import { triggerOembedLoad, formattedTime } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
 
+const authorLink = (author) => {
+  let result = '';
+  if (typeof author !== 'undefined' && author && author.name) {
+    result = `/contributors/${author.name.toLowerCase().replace(' ', '-')}/`;
+  }
+  return result;
+};
+
 class EntryContainer extends Component {
   constructor(props) {
     super(props);
@@ -109,7 +117,7 @@ class EntryContainer extends Component {
                   <a
                     key={author.id}
                     className="liveblog-meta-avatar"
-                    href={`/contributors/${author.name.toLowerCase().replace(' ', '-')}/`}
+                    href={authorLink(author)}
                     dangerouslySetInnerHTML={{ __html: author.avatar }} />
                 ))
               }
@@ -121,7 +129,7 @@ class EntryContainer extends Component {
               <div className="liveblog-meta-authors">
                 {
                   entry.authors.map(author => (
-                    <span className="liveblog-meta-author" key={author.id}><a href={`/contributors/${author.name.toLowerCase().replace(' ', '-')}/`}>{author.name}</a></span>
+                    <span className="liveblog-meta-author" key={author.id}><a href={authorLink(author)}>{author.name}</a></span>
                   ))
                 }
               </div>
