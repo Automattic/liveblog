@@ -1174,10 +1174,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			?>
-			<div class="liveblog-admin-publish-section">
-				<button class="button button-primary button-large liveblog-btn liveblog-admin-publish-btn"><?php echo esc_html__( 'Publish New Entry', 'liveblog' ); ?></button>
-			</div><br />
-			<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div><br /><br />
+			<div class="liveblog-admin-wrapper">
+				<div class="liveblog-admin-publish-section">
+					<button class="button button-primary button-large liveblog-btn liveblog-admin-publish-btn"><?php echo esc_html__( 'Publish New Entry', 'liveblog' ); ?></button>
+				</div>
+				<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div>
+			</div>
 			<?php
 		}
 

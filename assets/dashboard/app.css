@@ -38,8 +38,9 @@ body.wp-admin .liveblog-editor-container {
 	margin-bottom: 2px;
 }
 
-//body.wp-admin .liveblog-editor-tabs,
-//body.wp-admin .liveblog-editor-inner-container,
+body.wp-admin .liveblog-editor-tabs,
+body.wp-admin .liveblog-publish-btn,
+body.wp-admin .liveblog-editor-inner-container,
 body.wp-admin .liveblog-editor-title,
 body.wp-admin .liveblog-share {
 	display: none;
@@ -50,6 +51,16 @@ body.wp-admin .liveblog-pagination button {
 }
 
 .liveblog-admin-publish-section {
-	margin-top: 10px;
+	top: 80px;
+  margin-right: 10px;
+  position: relative;
 	text-align: right;
+  z-index: 1;
+}
+
+body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi {
+  width: 80%;
+}
+{
+  margin-bottom: 30px;
 }
