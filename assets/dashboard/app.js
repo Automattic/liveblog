@@ -43,25 +43,6 @@ jQuery( function( $ ) {
 		} );
 	} );
 
-
-/*{crud_action: "insert", post_id: "171125", content: "<p>sdfsdf</p>", author_id: "127000",…}
-author_id
-:
-"127000"
-content
-:
-"<p>sdfsdf</p>"
-contributor_ids
-:
-false
-crud_action
-:
-"insert"
-post_id
-:
-"171125"
-*/
-
 	var $meta_box = $( '#liveblog.postbox' ),
 		post_id = $( '#post_ID' ).val(),
 		show_error = function( status, code ) {

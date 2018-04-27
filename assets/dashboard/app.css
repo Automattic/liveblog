@@ -52,10 +52,10 @@ body.wp-admin .liveblog-pagination button {
 
 .liveblog-admin-publish-section {
 	top: 80px;
-	margin-right: 10px;
+	left: 82%;
 	position: relative;
-	text-align: right;
 	z-index: 1;
+	width: 200px;
 }
 
 body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi {
