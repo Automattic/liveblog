@@ -595,6 +595,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // input var ok
 			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false; // input var ok
 
+			// Add author to contributor list
+			$args['contributor_ids'][] = $args['author_id'];
+
 			$entry = self::do_crud_entry( $crud_action, $args );
 
 			if ( is_wp_error( $entry ) ) {
