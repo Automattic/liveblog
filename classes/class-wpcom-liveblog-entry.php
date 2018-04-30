@@ -191,7 +191,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
-		$args    = apply_filters( 'liveblog_before_insert_entry', $args );
+		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
 		$args['user'] = self::handle_author_select( $args, false );
 
@@ -444,11 +444,11 @@ class WPCOM_Liveblog_Entry {
 
 		return array_map(
 			function( $contributor ) {
-					if ( 0 === $contributor ) {
-						return false;
-					}
-					$user_object = self::get_userdata_with_filter( $contributor );
-					return self::get_user_data_for_json( $user_object );
+				if ( 0 === $contributor ) {
+					return false;
+				}
+				$user_object = self::get_userdata_with_filter( $contributor );
+				return self::get_user_data_for_json( $user_object );
 			}, $contributors
 		);
 	}
