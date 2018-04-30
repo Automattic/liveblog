@@ -444,6 +444,9 @@ class WPCOM_Liveblog_Entry {
 
 		return array_map(
 			function( $contributor ) {
+					if ( 0 === $contributor ) {
+						return false;
+					}
 					$user_object = self::get_userdata_with_filter( $contributor );
 					return self::get_user_data_for_json( $user_object );
 			}, $contributors
