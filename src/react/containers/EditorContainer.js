@@ -227,6 +227,13 @@ class EditorContainer extends Component {
     } = this.state;
 
     const { isEditing, config } = this.props;
+    const authorIds = authors ?
+      authors.map((author) => {
+        if (author && author.id) {
+          return author.id;
+        }
+        return false;
+      }) : [];
 
     return (
       <div className="liveblog-editor-container">
@@ -301,6 +308,7 @@ class EditorContainer extends Component {
         <button className="button button-primary button-large liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}
         </button>
+        <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
     );
   }

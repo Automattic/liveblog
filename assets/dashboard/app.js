@@ -1,5 +1,48 @@
 /* global ajaxurl, liveblog_admin_settings, jQuery */
 jQuery( function( $ ) {
+
+	function createEntryFromAdmin(entry, config, nonce = false) {
+		var contributors = jQuery('#liveblog_editor_authors').val().split(',');
+
+		const settings = {
+			url: `${config.endpoint_url}crud/`,
+			method: 'POST',
+			data: JSON.stringify( {
+				content: entry.content,
+				crud_action: 'insert',
+				author_id: entry.author,
+				post_id: config.post_id,
+				contributor_ids: contributors,
+			} ),
+			headers: {
+				'Content-Type': 'application/json',
+				'X-WP-Nonce': nonce || config.nonce,
+				'cache-control': 'no-cache',
+			},
+		};
+
+		return $.ajax(settings);
+	}
+	// Set up mce change detection
+	jQuery( document ).on( 'tinymce-editor-init', function( event, editor ) {
+		setTimeout( function() { tinymce.activeEditor.setContent(''); }, 250 );
+		$( 'button.liveblog-admin-publish-btn' ).on( 'click', function( e ) {
+			e.preventDefault();
+			var currentContent = tinymce.activeEditor.getContent(),
+				entry = {
+					content: currentContent,
+					author: 0,
+					contributors: [],
+
+				};
+			createEntryFromAdmin(
+				entry,
+				liveblog_settings,
+			);
+			tinymce.activeEditor.setContent('');
+		} );
+	} );
+
 	var $meta_box = $( '#liveblog.postbox' ),
 		post_id = $( '#post_ID' ).val(),
 		show_error = function( status, code ) {
@@ -21,11 +64,11 @@ jQuery( function( $ ) {
 			var method = 'POST';
 
 		} else {
-			var url    = ajaxurl + '?action=set_liveblog_state_for_post&post_id=' + encodeURIComponent( post_id ) + '&state=' + encodeURIComponent( $( this ).val() ) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
-			url       += '&' + $('input, textarea, select', $meta_box).serialize();
+			var url		= ajaxurl + '?action=set_liveblog_state_for_post&post_id=' + encodeURIComponent( post_id ) + '&state=' + encodeURIComponent( $( this ).val() ) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
+			url			 += '&' + $('input, textarea, select', $meta_box).serialize();
 			var method = 'GET';
 		}
-		
+
 		$.ajax( url, {
 			dataType: 'json',
 			data: data,
@@ -39,7 +82,7 @@ jQuery( function( $ ) {
 					return;
 				}
 			},
-			error:  function( xhr, status, error ) {
+			error:	function( xhr, status, error ) {
 				if (xhr.status && xhr.status > 200) {
 					show_error( xhr.statusText, xhr.status );
 				} else {
