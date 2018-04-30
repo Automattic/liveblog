@@ -1179,7 +1179,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			?>
 			<div class="liveblog-admin-wrapper">
 				<div class="liveblog-admin-publish-section">
-					<button class="button button-primary button-large liveblog-btn liveblog-admin-publish-btn"><?php echo esc_html__( 'Publish New Entry', 'liveblog' ); ?></button>
+					<button class="button button-primary button-large liveblog-btn liveblog-admin-publish-btn">
+						<?php echo esc_html__( 'Push Update', 'liveblog' ); ?></button>
 				</div>
 				<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div>
 			</div>
