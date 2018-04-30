@@ -238,26 +238,28 @@ class EditorContainer extends Component {
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        <div className="liveblog-editor-tabs">
-          <button
-            className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
-            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'editor' }); } }
-          >
-            Visual
-          </button>
-          <button
-            className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
-            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'raw' }); } }
-          >
-              Text
-          </button>
-          <button
-            className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
-            onClick={(e) => { e.preventDefault(); this.setState({ mode: 'preview' }); } }
-          >
-              Preview
-          </button>
-        </div>
+        { (isEditing || config.backend_liveblogging !== '1') &&
+          <div className="liveblog-editor-tabs">
+            <button
+              className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
+              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'editor' }); } }
+            >
+              Visual
+            </button>
+            <button
+              className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
+              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'raw' }); } }
+            >
+                Text
+            </button>
+            <button
+              className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
+              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'preview' }); } }
+            >
+                Preview
+            </button>
+          </div>
+        }
         {
           mode === 'preview' &&
           <PreviewContainer
@@ -266,7 +268,7 @@ class EditorContainer extends Component {
           />
         }
         {
-          mode === 'editor' &&
+          mode === 'editor' && (isEditing || config.backend_liveblogging !== '1') &&
           <Editor
             editorState={editorState}
             onChange={this.onChange}
