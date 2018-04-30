@@ -35,9 +35,12 @@ div#edit-slug-box a:hover {
 }
 body.wp-admin .liveblog-editor-container {
 	border-top: none;
-	margin-bottom: 2px;
+  margin-bottom: 2px;
+  padding-left: 0;
 }
-
+body.wp-admin #poststuff h2.liveblog-editor-subTitle {
+  padding-left: 0;
+}
 body.wp-admin .liveblog-editor-tabs,
 body.wp-admin .liveblog-publish-btn,
 body.wp-admin .liveblog-editor-inner-container,
@@ -64,3 +67,6 @@ body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi 
   z-index: 2;
 }
 
+body.wp-admin .liveblog-editor-container {
+  background-color: #f1f1f1;
+}
