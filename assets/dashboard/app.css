@@ -70,3 +70,11 @@ body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi 
 body.wp-admin .liveblog-editor-container {
   background-color: #f1f1f1;
 }
+
+body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary {
+  background: inherit;
+  color: inherit;
+  box-shadow: none;
+  text-shadow: none;
+  border-color: #cccccc;
+}
