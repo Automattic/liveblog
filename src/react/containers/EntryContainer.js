@@ -129,10 +129,11 @@ class EntryContainer extends Component {
               (entry.authors && entry.authors.length > 0) &&
               <div className="liveblog-meta-authors">
                 {
-                  entry.authors.map(author => (
+                  entry.authors.map((author, index, list) => (
                     author.id &&
                     <span className="liveblog-meta-author" key={author.id}>
                       <a href={authorLink(author)}>{author.name}</a>
+                      {(index < list.length - 2) && ', '}
                     </span>
                   ))
                 }
