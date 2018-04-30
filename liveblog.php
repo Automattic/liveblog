@@ -192,6 +192,34 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			// We need to check the Liveblog autoarchive date on each time a new entry is added or updated to
 			// ensure we extend the date out correctly to the next archive point based on the configured offset.
 			add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'update_autoarchive_expiry' ), 10, 1 );
+
+			// Add a body class to live blogs.
+			add_filter( 'body_class', array( __CLASS__, 'add_live_body_class' ) );
+
+			// Add a body class to live blogs, admin side.
+			add_filter( 'admin_body_class', array( __CLASS__, 'add_live_body_class_admin' ) );
+		}
+
+		/**
+		 * Add a liveblog class to live posts.
+		 */
+		public static function add_live_body_class( $classes ) {
+			if ( self::is_liveblog_post() ) {
+				$classes[] = 'liveblog';
+			}
+
+			return $classes;
+		}
+
+		/**
+		 * Add a liveblog class to live posts.
+		 */
+		public static function add_live_body_class_admin( $classes ) {
+			if ( self::is_liveblog_post() ) {
+				$classes .= ' liveblog ';
+			}
+
+			return $classes;
 		}
 
 		/**
@@ -824,7 +852,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( false === $page && false !== $id ) {
 				$index = array_search( $id, array_keys( $entries ), true );
 				$index++;
-				$page  = ceil( $index / $per_page );
+				$page = ceil( $index / $per_page );
 			}
 
 			$offset  = $per_page * ( $page - 1 );
