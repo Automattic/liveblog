@@ -488,10 +488,9 @@ class WPCOM_Liveblog_Entry {
 			return array();
 		}
 
-		$author       = [ self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) ];
 		$contributors = self::get_contributors_for_json( $comment_id );
 
-		return array_merge( $author, $contributors );
+		return $contributors;
 	}
 }
 
