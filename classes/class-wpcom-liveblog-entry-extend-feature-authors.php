@@ -80,7 +80,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_authors';
 
 		if ( WPCOM_Liveblog::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors' );
+			$endpoint_url = trailingslashit( trailingslashit( apply_filters( 'liveblog_endpoint_url', WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors' ) );
 		}
 
 		// Add our config to the front end autocomplete
