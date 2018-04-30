@@ -235,10 +235,10 @@ class EditorContainer extends Component {
         return false;
       }) : [];
 
-      return (
+    return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        { ( isEditing || config.backend_liveblogging !== '1' ) &&
+        { (isEditing || config.backend_liveblogging !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
               className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
@@ -268,7 +268,7 @@ class EditorContainer extends Component {
           />
         }
         {
-          mode === 'editor' &&  ( isEditing || config.backend_liveblogging !== '1' ) &&
+          mode === 'editor' && (isEditing || config.backend_liveblogging !== '1') &&
           <Editor
             editorState={editorState}
             onChange={this.onChange}
