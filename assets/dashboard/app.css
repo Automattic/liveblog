@@ -71,7 +71,7 @@ body.wp-admin .liveblog-editor-container {
   background-color: #f1f1f1;
 }
 
-body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary {
+body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary#publish {
   background: inherit;
   color: inherit;
   box-shadow: none;
