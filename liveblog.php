@@ -824,7 +824,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( false === $page && false !== $id ) {
 				$index = array_search( $id, array_keys( $entries ), true );
 				$index++;
-				$page  = ceil( $index / $per_page );
+				$page = ceil( $index / $per_page );
 			}
 
 			$offset  = $per_page * ( $page - 1 );
