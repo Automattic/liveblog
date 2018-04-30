@@ -123,36 +123,36 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Include the necessary files
 		 */
 		private static function includes() {
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events-widget.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events-widget.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
 
 			if ( self::use_rest_api() ) {
-				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
+				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php';
 			}
 
 			// Manually include ms.php theme-side in multisite environments because
 			// we need its filesize and available space functions.
 			if ( ! is_admin() && is_multisite() ) {
-				require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+				require_once ABSPATH . 'wp-admin/includes/ms.php';
 			}
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
-				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php' );
+				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php';
 			}
 
-			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php' );
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php';
 		}
 
 		/**
@@ -1233,13 +1233,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$theme_template       = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			if ( file_exists( $child_theme_template ) ) {
-				include( $child_theme_template );
+				include $child_theme_template;
 			} elseif ( file_exists( $theme_template ) ) {
-				include( $theme_template );
+				include $theme_template;
 			} elseif ( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
-				include( self::$custom_template_path . '/' . $template_name );
+				include self::$custom_template_path . '/' . $template_name;
 			} else {
-				include( dirname( __FILE__ ) . '/templates/' . $template_name );
+				include dirname( __FILE__ ) . '/templates/' . $template_name;
 			}
 			return ob_get_clean();
 		}
@@ -1791,15 +1791,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 	/** Plupload Helpers ******************************************************/
 	if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {
-		require_once( ABSPATH . 'wp-includes/load.php' );
+		require_once ABSPATH . 'wp-includes/load.php';
 	}
 
 	if ( ! function_exists( 'size_format' ) ) {
-		require_once( ABSPATH . 'wp-includes/functions.php' );
+		require_once ABSPATH . 'wp-includes/functions.php';
 	}
 
 	if ( ! function_exists( 'wp_max_upload_size' ) ) {
-		require_once( ABSPATH . 'wp-includes/media.php' );
+		require_once ABSPATH . 'wp-includes/media.php';
 	}
 
 endif;
