@@ -42,12 +42,8 @@ body.wp-admin #poststuff h2.liveblog-editor-subTitle {
   padding-left: 0;
 }
 
-body.wp-admin .liveblog-editor-container .liveblog-editor-tabs,
-body.wp-admin .liveblog-editor-container .liveblog-publish-btn,
-body.wp-admin .liveblog-editor-container .liveblog-editor-inner-container,
-body.wp-admin .liveblog-editor-container .liveblog-editor-title,
-body.wp-admin .liveblog-editor-container .liveblog-share {
-//	display: none;
+body.wp-admin .liveblog-share {
+	display: none;
 }
 
 body.wp-admin .liveblog-pagination button {
