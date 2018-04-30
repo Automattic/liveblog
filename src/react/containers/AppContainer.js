@@ -37,7 +37,6 @@ class AppContainer extends Component {
       <div style={{ position: 'relative' }}>
         {showEditor && <EditorContainer isEditing={false} />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        <PaginationContainer />
         <Entries loading={loading} entries={entries} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
