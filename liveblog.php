@@ -1089,7 +1089,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => jetpack_is_mobile(),
+					'mobile'    => function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : false,
 					'supported' => _device_can_upload(),
 				),
 			);
