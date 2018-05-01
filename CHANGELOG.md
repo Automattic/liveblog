@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.8.1
+
+* Fix bug with changing contributors
+* Fix multiple PHP Coding Standards issues
+
+props [paulschreiber](https://github.com/paulschreiber)
+
 ## 1.8
 
 * New: Allow multiple authors for each Liveblog entry
