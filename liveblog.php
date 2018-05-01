@@ -5,8 +5,8 @@
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
  * Version:     1.8.0
- * Author:      WordPress.com VIP, Automattic
- * Author URI: http://vip.wordpress.com/
+ * Author:      WordPress.com VIP, Big Bite Creative and contributors
+ * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
  */
 
