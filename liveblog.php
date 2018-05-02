@@ -4,9 +4,9 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.8.0
- * Author:      WordPress.com VIP, Automattic
- * Author URI: http://vip.wordpress.com/
+ * Version:     1.8.1
+ * Author:      WordPress.com VIP, Big Bite Creative and contributors
+ * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
  */
 
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.8.0';
+		const VERSION                 = '1.8.1';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -58,7 +58,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $is_rest_api_call        = false;
 		public static $auto_archive_days       = null;
 		public static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
-		public static $latest_timestamp        = null;
+		public static $latest_timestamp        = false;
 
 
 		/** Load Methods **********************************************************/
