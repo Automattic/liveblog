@@ -23,10 +23,8 @@ class TinyMCEEditor extends Component {
       jQuery(document).on('tinymce-editor-init', () => {
         tinymce.editors.forEach((ed) => {
           if (this.containerId === ed.id) {
-            console.log(ed);
             ed.on('change blur', () => {
               const content = ed.getContent();
-              console.log(content);
               if (content) {
                 this.props.editorContainer.setState({ rawText: content }, () => {
                   this.props.editorContainer.syncRawTextToEditorState();
