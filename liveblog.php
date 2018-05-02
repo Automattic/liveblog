@@ -807,7 +807,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( $last_known_entry ) {
 				$last_known_entry = explode( '-', $last_known_entry );
 				if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
-					$last_entry_id = $last_known_entry[0];
+					$last_entry_id = (int) $last_known_entry[0];
 					$index         = array_search( $last_entry_id, array_keys( $entries ), true );
 					$entries       = array_slice( $entries, $index, null, true );
 				}
@@ -817,7 +817,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
-				$index = array_search( $id, array_keys( $entries ), true );
+				$index = array_search( (int) $id, array_keys( $entries ), true );
 				$index = $index + 1;
 				$page  = ceil( $index / $per_page );
 			}
