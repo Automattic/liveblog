@@ -106,6 +106,22 @@ class WPCOM_Liveblog_Entry {
 		return mysql2date( 'G', $this->comment->comment_date_gmt );
 	}
 
+	/**
+	 * Retrieve the comment date of the current comment using gmt.
+	 * @param string          $d          Optional. The format of the date. Default user's setting.
+	 * @param int|WP_Comment  $comment_id WP_Comment or ID of the comment for which to get the date.
+	 *                                    Default current comment.
+	 * @return string The comment's date.
+	 */
+	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
+		$comment = get_comment( $comment_id );
+		if ( '' === $d ) {
+			$date = mysql2date( get_option( 'date_format' ), $comment->comment_date_gmt );
+		} else {
+			$date = mysql2date( $d, $comment->comment_date_gmt );
+		}
+	}
+
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
 		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
@@ -120,7 +136,7 @@ class WPCOM_Liveblog_Entry {
 			'css_classes' => $css_classes,
 			'timestamp'   => $this->get_timestamp(),
 			'authors'     => self::get_authors( $entry_id ),
-			'entry_time'  => get_comment_date( 'U', $entry_id ),
+			'entry_time'  => $this->get_comment_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
@@ -142,8 +158,8 @@ class WPCOM_Liveblog_Entry {
 			'avatar_size'            => $avatar_size,
 			'avatar_img'             => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'            => get_comment_author_link( $entry_id ),
-			'entry_date'             => get_comment_date( get_option( 'date_format' ), $entry_id ),
-			'entry_time'             => get_comment_date( get_option( 'time_format' ), $entry_id ),
+			'entry_date'             => $this->get_comment_date_gmt( get_option( 'date_format' ), $entry_id ),
+			'entry_time'             => $this->get_comment_date_gmt( get_option( 'time_format' ), $entry_id ),
 			'timestamp'              => $this->get_timestamp(),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
