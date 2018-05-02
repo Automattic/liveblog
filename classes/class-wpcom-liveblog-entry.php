@@ -106,6 +106,35 @@ class WPCOM_Liveblog_Entry {
 		return mysql2date( 'G', $this->comment->comment_date_gmt );
 	}
 
+	/**
+	 * Retrieve the comment date of the current comment using gmt.
+	 *
+	 * @since 1.5.0
+	 * @since 4.4.0 Added the ability for `$comment_ID` to also accept a WP_Comment object.
+	 *
+	 * @param string          $d          Optional. The format of the date. Default user's setting.
+	 * @param int|WP_Comment  $comment_ID WP_Comment or ID of the comment for which to get the date.
+	 *                                    Default current comment.
+	 * @return string The comment's date.
+	 */
+	public function get_comment_date_gmt( $d = '', $comment_ID = 0 ) {
+	        $comment = get_comment( $comment_ID );
+	        if ( '' == $d )
+	                $date = mysql2date(get_option('date_format'), $comment->comment_date_gmt);
+	        else
+	                $date = mysql2date($d, $comment->comment_date_gmt);
+	        /**
+	         * Filters the returned comment date.
+	         *
+	         * @since 1.5.0
+	         *
+	         * @param string|int $date    Formatted date string or Unix timestamp.
+	         * @param string     $d       The format of the date.
+	         * @param WP_Comment $comment The comment object.
+	         */
+	        return apply_filters( 'get_comment_date_gmt', $date, $d, $comment );
+	}
+
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
 		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
@@ -120,7 +149,7 @@ class WPCOM_Liveblog_Entry {
 			'css_classes' => $css_classes,
 			'timestamp'   => $this->get_timestamp(),
 			'authors'     => self::get_authors( $entry_id ),
-			'entry_time'  => get_comment_date( 'U', $entry_id ),
+			'entry_time'  => $this->get_comment_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
