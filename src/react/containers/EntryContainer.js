@@ -147,7 +147,11 @@ class EntryContainer extends Component {
             this.isEditing()
               ? (
                 <div className="liveblog-entry-edit">
-                  <EditorContainer entry={entry} isEditing={true} />
+                  <EditorContainer
+                    entry={entry}
+                    isEditing={true}
+                    backend={config.backend_liveblogging}
+                  />
                 </div>
               )
               : (
