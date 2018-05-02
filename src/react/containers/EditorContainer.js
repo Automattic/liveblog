@@ -308,7 +308,7 @@ class EditorContainer extends Component {
           cache={false}
         />
         <button className="button button-primary button-large liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
-          {isEditing ? 'Publish Update' : 'Publish New Entry'}
+          {'Post Update'}
         </button>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
