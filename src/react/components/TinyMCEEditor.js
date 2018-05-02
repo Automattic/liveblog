@@ -11,10 +11,13 @@ class TinyMCEEditor extends Component {
     this.editorSettings = {
       tinymce: {
         wpautop: true,
-        plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
-        toolbar1: 'formatselect bold italic | bullist numlist | blockquote | alignleft aligncenter alignright | link unlink | wp_more | spellchecker',
+        plugins: 'charmap colorpicker fullscreen hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview espnFootnote espnPromo espnPullquoteRight espnTwitter espnPullquote espnOrnamentalRule espnESPNVideo espnPodcasts espnDropcap',
+        toolbar1: 'formatselect bold strikethrough bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv footnote ornamental-rule pullquote pullquote-right espn-video dropcap twitter promo podcasts | fullscreen',
+        toolbar2: 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
+
       },
       quicktags: true,
+      mediaButtons: true,
     };
   }
   componentDidMount() {
