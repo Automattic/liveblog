@@ -268,8 +268,9 @@ class EditorContainer extends Component {
           />
         }
         {
-          mode === 'editor' && (isEditing || config.backend_liveblogging !== '1') &&
+          mode === 'editor' &&
           <Editor
+            editorContainer={this}
             editorState={editorState}
             onChange={this.onChange}
             suggestions={suggestions}
@@ -280,6 +281,7 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
+            backend={config.backend_liveblogging}
           />
         }
         {
