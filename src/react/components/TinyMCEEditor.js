@@ -11,7 +11,7 @@ class TinyMCEEditor extends Component {
     this.editorSettings = {
       tinymce: {
         wpautop: true,
-        plugins: 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview espnFootnote espnPromos espnPullquoteRight espnSocial espnPullquote espnOrnamentalRule espnESPNVideo espnPodcasts espnDropcap',
+        plugins: 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview espnFootnote espnESPNPromos espnPullquoteRight espnSocial espnPullquote espnOrnamentalRule espnESPNVideo espnPodcasts espnDropcap',
         toolbar1: 'formatselect bold strikethrough bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv footnote ornamental-rule pullquote pullquote-right espn-video dropcap social espn-promos podcasts | fullscreen',
         toolbar2: 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
         height: 300,
