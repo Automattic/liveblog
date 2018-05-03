@@ -45,7 +45,8 @@ body.wp-admin #poststuff h2.liveblog-editor-subTitle {
 	padding-left: 0;
 }
 
-body.wp-admin .liveblog-share {
+body.wp-admin .liveblog-share,
+body.wp-admin.liveblog.post-type-fte_liveblog #postdivrich {
 	display: none;
 }
 
@@ -53,12 +54,10 @@ body.wp-admin .liveblog-pagination button {
 	margin: 4px;
 }
 
-body.wp-admin .liveblog-admin-publish-section {
-	top: 80px;
-	left: 82%;
-	position: relative;
-	z-index: 1;
-	width: 200px;
+body.wp-admin button.liveblog-publish-btn {
+  width: auto;
+  float: right;
+  margin-top: -64px;
 }
 
 body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi {
@@ -77,4 +76,8 @@ body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary#publish
 	box-shadow: none;
 	text-shadow: none;
 	border-color: #cccccc;
+}
+
+body.wp-admin .liveblog-editor-textarea {
+  width: 100%;
 }

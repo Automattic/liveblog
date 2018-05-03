@@ -1026,6 +1026,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entry_query            = new WPCOM_Liveblog_Entry_Query( get_the_ID(), self::KEY );
 			self::$latest_timestamp = $entry_query->get_latest_timestamp();
 
+			// Use the TinyMCE Editor.
+			if ( apply_filters( 'liveblog_back_end_liveblogging', false ) ) {
+				wp_enqueue_editor();
+			}
+
 			wp_localize_script(
 				self::KEY, 'liveblog_settings',
 				apply_filters(
@@ -1207,10 +1212,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			?>
 			<div class="liveblog-admin-wrapper">
-				<div class="liveblog-admin-publish-section">
-					<button class="button button-primary button-large liveblog-btn liveblog-admin-publish-btn">
-						<?php echo esc_html__( 'Post Update', 'liveblog' ); ?></button>
-				</div>
 				<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div>
 			</div>
 			<?php

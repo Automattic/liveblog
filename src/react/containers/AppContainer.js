@@ -35,9 +35,13 @@ class AppContainer extends Component {
 
     return (
       <div style={{ position: 'relative' }}>
-        {showEditor && <EditorContainer isEditing={false} />}
+        {showEditor &&
+        <EditorContainer
+          isEditing={false}
+          backend={config.backend_liveblogging}
+        />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        <Entries loading={loading} entries={entries} />
+        <Entries loading={loading} entries={entries} config={config}/>
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
       </div>
