@@ -328,11 +328,16 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	private static function user_object_from_comment_id( $comment_id ) {
+		global $coauthors_plus;
 		$original_comment = get_comment( $comment_id );
 		if ( ! $original_comment ) {
 			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
 		}
-		$user_object = get_userdata( $original_comment->user_id );
+		if ( $coauthors_plus ) {
+			$user_object = $coauthors_plus->get_coauthor_by( 'id', $original_comment->user_id );
+		} else {
+			$user_object = get_userdata( $original_comment->user_id );
+		}
 		if ( ! $user_object ) {
 			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
 		}
