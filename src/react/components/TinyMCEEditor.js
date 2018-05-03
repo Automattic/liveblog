@@ -1,4 +1,4 @@
-/* global wp,  tinymce, jQuery, _ */
+/* global wp,  tinymce, _ */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/prop-types */
 
