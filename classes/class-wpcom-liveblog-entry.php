@@ -114,12 +114,15 @@ class WPCOM_Liveblog_Entry {
 	 *                                    Default current comment.
 	 * @return string The comment's date.
 	 */
-	public function get_comment_date_gmt( $d = '', $comment_ID = 0 ) {
-	        $comment = get_comment( $comment_ID );
-	        if ( '' == $d )
-	                $date = mysql2date(get_option('date_format'), $comment->comment_date_gmt);
-	        else
-	                $date = mysql2date($d, $comment->comment_date_gmt);
+	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
+		$comment = get_comment( $comment_id );
+		if ( '' === $d ) {
+			$date = mysql2date(get_option('date_format'), $comment->comment_date_gmt);
+		} else {
+			$date = mysql2date($d, $comment->comment_date_gmt);
+		}
+
+		return $date;
 	}
 
 	public function for_json() {
