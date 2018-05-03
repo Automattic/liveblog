@@ -87,14 +87,13 @@ class EditorContainer extends Component {
   }
 
   publish(event) {
+    event.preventDefault();
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
-
-    event.preventDefault();
 
     if (isEditing) {
       updateEntry({

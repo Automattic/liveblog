@@ -77,3 +77,7 @@ body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary#publish
 	text-shadow: none;
 	border-color: #cccccc;
 }
+
+body.wp-admin .liveblog-editor-textarea {
+  width: 100%;
+}
