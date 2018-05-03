@@ -334,7 +334,7 @@ class WPCOM_Liveblog_Entry {
 		}
 		$user_object = get_userdata( $original_comment->user_id );
 		if ( ! $user_object ) {
-			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
+			return new WP_Error( 'get-userdata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
 	}
