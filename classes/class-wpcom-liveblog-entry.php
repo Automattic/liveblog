@@ -120,6 +120,8 @@ class WPCOM_Liveblog_Entry {
 		} else {
 			$date = mysql2date( $d, $comment->comment_date_gmt );
 		}
+
+		return $date;
 	}
 
 	public function for_json() {
