@@ -1,4 +1,4 @@
-/* global wp,  tinymce, _ */
+/* global wp,  tinymce, _, jQuery */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/prop-types */
 
@@ -24,7 +24,6 @@ class TinyMCEEditor extends Component {
         const currentEditor = _.findWhere(tinymce.editors, { id: this.containerId });
         const $textField = jQuery(`#${this.containerId}`);
         currentEditor.on('change', () => {
-          console.log('change blur', currentEditor);
           const content = currentEditor.getContent();
           if (content) {
             this.props.editorContainer.setState({ rawText: content }, () => {
