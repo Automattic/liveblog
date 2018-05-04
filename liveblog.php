@@ -208,7 +208,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$classes[] = 'liveblog';
 				$state = apply_filters( 'liveblog_default_state', get_post_meta( get_the_ID(), self::KEY, true ) );
 				if ( $state ) {
-					$classes[] = $state;
+					$classes[] = 'liveblog-'. $state;
 				}
 			}
 
@@ -224,7 +224,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 				$state = apply_filters( 'liveblog_default_state', get_post_meta( get_the_ID(), self::KEY, true ) );
 				if ( $state ) {
-					$classes .= $state . ' ';
+					$classes .= 'liveblog-'. $state . ' ';
 				}
 			}
 
