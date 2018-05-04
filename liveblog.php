@@ -206,6 +206,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes[] = 'liveblog';
+				$state = apply_filters( 'liveblog_default_state', get_post_meta( get_the_ID(), self::KEY, true ) );
+				if ( $state ) {
+					$classes[] = 'liveblog-'. $state;
+				}
 			}
 
 			return $classes;
@@ -217,6 +221,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class_admin( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes .= ' liveblog ';
+
+				$state = apply_filters( 'liveblog_default_state', get_post_meta( get_the_ID(), self::KEY, true ) );
+				if ( $state ) {
+					$classes .= 'liveblog-'. $state . ' ';
+				}
 			}
 
 			return $classes;
