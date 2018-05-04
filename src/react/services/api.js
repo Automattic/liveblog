@@ -64,6 +64,8 @@ export function createEntry(entry, config, nonce = false) {
     setTimeout(clearTinyMCEContent, 250);
   }
 
+  jQuery(document).trigger('liveblog-entry-created', [settings]);
+
   return secureAjax(settings);
 }
 
@@ -86,6 +88,8 @@ export function updateEntry(entry, config, nonce = false) {
     },
   };
 
+  jQuery(document).trigger('liveblog-entry-updated', [settings]);
+
   return secureAjax(settings);
 }
 
@@ -104,6 +108,8 @@ export function deleteEntry(id, config, nonce = false) {
       'cache-control': 'no-cache',
     },
   };
+
+  jQuery(document).trigger('liveblog-entry-deleted', [settings]);
 
   return secureAjax(settings);
 }
