@@ -1,13 +1,37 @@
-/* global wp,  tinymce, _, jQuery */
+/* global wp,  tinymce, jQuery */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/prop-types */
 
 import React, { Component } from 'react';
 
+export const getTinyMCEContent = () => {
+  const currentEditor = tinymce.activeEditor;
+  const $textField = jQuery(`#${currentEditor.id}`);
+  if ($textField.is(':visible')) {
+    return $textField.val();
+  }
+
+  return currentEditor ? currentEditor.getContent() : '';
+};
+
+export const clearTinyMCEContent = () => {
+  const currentEditor = tinymce.activeEditor;
+  const $textField = jQuery(`#${currentEditor.id}`);
+  $textField.empty();
+  currentEditor.setContent('');
+};
+
+export const clearAuthors = () => {
+  if (tinymce.activeEditor.clearAuthors) {
+    tinymce.activeEditor.clearAuthors();
+  }
+};
+
+
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
-    this.containerId = `live-editor-${Math.floor(Math.random() * 10000)}`;
+    this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
     this.editorSettings = {
       tinymce: {
         wpautop: true,
@@ -21,26 +45,9 @@ class TinyMCEEditor extends Component {
     };
     setTimeout(() => {
       setTimeout(() => {
-        const currentEditor = _.findWhere(tinymce.editors, { id: this.containerId });
-        const $textField = jQuery(`#${this.containerId}`);
-        currentEditor.on('change', () => {
-          const content = currentEditor.getContent();
-          if (content) {
-            this.props.editorContainer.setState({ rawText: content }, () => {
-              this.props.editorContainer.syncRawTextToEditorState();
-            });
-          }
-        });
-        $textField.on('change blur', () => {
-          const content = $textField.val();
-          if (content) {
-            this.props.editorContainer.setState({ rawText: content }, () => {
-              this.props.editorContainer.syncRawTextToEditorState();
-            });
-          }
-        });
         const stateContent = this.props.editorContainer.getContent();
-        if (stateContent) {
+        tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
+        if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
       }, 500);
@@ -52,8 +59,5 @@ class TinyMCEEditor extends Component {
     return <textarea className="liveblog-editor-textarea" id={this.containerId} />;
   }
 }
-
-TinyMCEEditor.propTypes = {
-};
 
 export default TinyMCEEditor;

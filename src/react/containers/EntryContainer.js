@@ -150,7 +150,7 @@ class EntryContainer extends Component {
                   <EditorContainer
                     entry={entry}
                     isEditing={true}
-                    backend={config.backend_liveblogging}
+                    usetinymce={config.usetinymce}
                   />
                 </div>
               )

@@ -59,6 +59,10 @@ class EditorContainer extends Component {
       editorState,
       rawText: html(convertToHTML(editorState.getCurrentContent())),
     });
+
+    this.clearAuthors = () => this.setState({
+      authors: false,
+    });
   }
 
   setReadOnly(state) {
@@ -279,7 +283,8 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            backend={backend}
+            usetinymce={config.usetinymce}
+            clearAuthors={this.clearAuthors}
           />
         }
         {
@@ -308,7 +313,7 @@ class EditorContainer extends Component {
           cache={false}
         />
         <button className="button button-primary button-large liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
-          {'Post Update'}
+          {isEditing ? 'Save' : 'Post Update'}
         </button>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
