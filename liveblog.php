@@ -539,7 +539,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$post_id = $post->ID;
 				}
 			}
-			$state = get_post_meta( $post_id, self::KEY, true );
+			$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ) );
 			// backwards compatibility with older values
 			if ( 1 === $state ) {
 				$state = 'enable';
