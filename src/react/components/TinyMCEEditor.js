@@ -13,6 +13,13 @@ export const getTinyMCEContent = () => {
 
   return currentEditor ? currentEditor.getContent() : '';
 };
+
+export const clearTinyMCEContent = () => {
+  const currentEditor = tinymce.activeEditor;
+  const $textField = jQuery(`#${currentEditor.id}`);
+  $textField.empty();
+  currentEditor.setContent('');
+};
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);

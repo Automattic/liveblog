@@ -10,6 +10,7 @@ import {
 
 import {
   getTinyMCEContent,
+  clearTinyMCEContent,
 } from '../components/TinyMCEEditor';
 
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
@@ -57,6 +58,11 @@ export function createEntry(entry, config, nonce = false) {
       'cache-control': 'no-cache',
     },
   };
+
+  // Clear TinyMCE after a brief delay.
+  if (config.usetinymce === '1') {
+    setTimeout( clearTinyMCEContent, 250 );
+  }
 
   return secureAjax(settings);
 }
