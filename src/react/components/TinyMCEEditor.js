@@ -4,6 +4,16 @@
 
 import React, { Component } from 'react';
 
+export const getTinyMCEContent = () => {
+  const currentEditor = tinymce.activeEditor;
+  console.log(currentEditor);
+  const $textField = jQuery(`#${currentEditor.id}`);
+  if ($textField.is(':visible')) {
+    return $textField.val();
+  }
+
+  return currentEditor ? currentEditor.getContent() : '';
+};
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
