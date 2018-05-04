@@ -1,3 +1,4 @@
+/* global jQuery */
 /**
  * RxJS ajax pretty much interchangable with axios.
  * Using RxJS ajax as it's already an observable to use with redux-observable.
@@ -7,6 +8,12 @@ import { ajax } from 'rxjs/observable/dom/ajax';
 import {
   getCurrentTimestamp,
 } from '../utils/utils';
+
+import {
+  getTinyMCEContent,
+  clearTinyMCEContent,
+  clearAuthors,
+} from '../components/TinyMCEEditor';
 
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
 
@@ -43,7 +50,7 @@ export function createEntry(entry, config, nonce = false) {
     body: {
       crud_action: 'insert',
       post_id: config.post_id,
-      content: entry.content,
+      content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
     },
@@ -53,6 +60,16 @@ export function createEntry(entry, config, nonce = false) {
       'cache-control': 'no-cache',
     },
   };
+
+  // Clear TinyMCE after a brief delay.
+  if (config.usetinymce === '1') {
+    setTimeout(() => {
+      clearTinyMCEContent();
+      clearAuthors();
+    }, 250);
+  }
+
+  jQuery(document).trigger('liveblog-entry-created', [settings]);
 
   return secureAjax(settings);
 }
@@ -65,7 +82,7 @@ export function updateEntry(entry, config, nonce = false) {
       crud_action: 'update',
       post_id: config.post_id,
       entry_id: entry.id,
-      content: entry.content,
+      content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
     },
@@ -75,6 +92,8 @@ export function updateEntry(entry, config, nonce = false) {
       'cache-control': 'no-cache',
     },
   };
+
+  jQuery(document).trigger('liveblog-entry-updated', [settings]);
 
   return secureAjax(settings);
 }
@@ -94,6 +113,8 @@ export function deleteEntry(id, config, nonce = false) {
       'cache-control': 'no-cache',
     },
   };
+
+  jQuery(document).trigger('liveblog-entry-deleted', [settings]);
 
   return secureAjax(settings);
 }
