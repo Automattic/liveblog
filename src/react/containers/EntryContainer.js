@@ -150,7 +150,7 @@ class EntryContainer extends Component {
                   <EditorContainer
                     entry={entry}
                     isEditing={true}
-                    use_tinymce_editor={config.use_tinymce_editor}
+                    usetinymce={config.usetinymce}
                   />
                 </div>
               )

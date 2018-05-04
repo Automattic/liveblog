@@ -1,4 +1,4 @@
-/* global wp,  tinymce, _, jQuery */
+/* global wp,  tinymce, jQuery */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/prop-types */
 
@@ -31,7 +31,7 @@ class TinyMCEEditor extends Component {
     setTimeout(() => {
       setTimeout(() => {
         const stateContent = this.props.editorContainer.getContent();
-        if (stateContent && '' !== stateContent && '<p></p>' !== stateContent) {
+        if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
       }, 500);

@@ -323,13 +323,12 @@ class EditorWrapper extends Component {
       setReadOnly,
       handleImageUpload,
       defaultImageSize,
-      backend,
-      use_tinymce_editor,
+      usetinymce,
       editorContainer,
     } = this.props;
 
     // Admin liveblogging uses TinyMCE.
-    if (use_tinymce_editor === '1') {
+    if (usetinymce === '1') {
       return <TinyMCEEditor
         editorState={editorState}
         editorContainer={editorContainer}
@@ -401,7 +400,7 @@ EditorWrapper.propTypes = {
   setReadOnly: PropTypes.func,
   defaultImageSize: PropTypes.string,
   backend: PropTypes.string,
-  use_tinymce_editor: PropTypes.string,
+  usetinymce: PropTypes.string,
   editorContainer: PropTypes.object,
 };
 
