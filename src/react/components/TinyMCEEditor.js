@@ -6,7 +6,6 @@ import React, { Component } from 'react';
 
 export const getTinyMCEContent = () => {
   const currentEditor = tinymce.activeEditor;
-  console.log(currentEditor);
   const $textField = jQuery(`#${currentEditor.id}`);
   if ($textField.is(':visible')) {
     return $textField.val();
@@ -31,24 +30,6 @@ class TinyMCEEditor extends Component {
     };
     setTimeout(() => {
       setTimeout(() => {
-        const currentEditor = _.findWhere(tinymce.editors, { id: this.containerId });
-        const $textField = jQuery(`#${this.containerId}`);
-        currentEditor.on('change', () => {
-          const content = currentEditor.getContent();
-          if (content) {
-            this.props.editorContainer.setState({ rawText: content }, () => {
-              this.props.editorContainer.syncRawTextToEditorState();
-            });
-          }
-        });
-        $textField.on('change blur', () => {
-          const content = $textField.val();
-          if (content) {
-            this.props.editorContainer.setState({ rawText: content }, () => {
-              this.props.editorContainer.syncRawTextToEditorState();
-            });
-          }
-        });
         const stateContent = this.props.editorContainer.getContent();
         if (stateContent && '' !== stateContent && '<p></p>' !== stateContent) {
           tinymce.activeEditor.setContent(stateContent);
