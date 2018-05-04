@@ -1077,6 +1077,17 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'endpoint_url'                 => self::get_entries_endpoint_url(),
 						'backend_liveblogging'         => apply_filters( 'liveblog_back_end_liveblogging', false ),
 						'usetinymce'                   => apply_filters( 'liveblog_use_tinymce_editor', false ),
+						'editorSettings'               => apply_filters( 'liveblog_tinymce_editor_settings', array(
+							tinymce: array(
+								'wpautop' => true,
+								'plugins' => 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview espnFootnote  espnPullquoteRight  espnPullquote espnOrnamentalRule espnESPNVideo espnPodcasts espnDropcap',
+								'toolbar1' => 'formatselect bold strikethrough bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv footnote ornamental-rule pullquote pullquote-right espn-video dropcap social espn-promos podcasts | fullscreen',
+								'toolbar2' => 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
+								'height' => 300,
+							),
+							'quicktags' => true,
+							'mediaButtons' => true,
+						) ),
 						'is_admin'                     => is_admin(),
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
