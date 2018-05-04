@@ -9,6 +9,11 @@ class PaginationContainer extends Component {
   render() {
     const { page, pages, getEntriesPaginated } = this.props;
 
+    // Don't diplsay pagination if we only have a single page.
+    if (pages === 1) {
+      return null;
+    }
+
     return (
       <div className="liveblog-pagination">
         <div>
