@@ -59,6 +59,10 @@ class EditorContainer extends Component {
       editorState,
       rawText: html(convertToHTML(editorState.getCurrentContent())),
     });
+
+    this.clearAuthors = () => this.setState({
+      authors: false,
+    });
   }
 
   setReadOnly(state) {
@@ -280,6 +284,7 @@ class EditorContainer extends Component {
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
             usetinymce={config.usetinymce}
+            clearAuthors={this.clearAuthors}
           />
         }
         {

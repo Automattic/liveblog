@@ -12,6 +12,7 @@ import {
 import {
   getTinyMCEContent,
   clearTinyMCEContent,
+  clearAuthors,
 } from '../components/TinyMCEEditor';
 
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
@@ -62,7 +63,10 @@ export function createEntry(entry, config, nonce = false) {
 
   // Clear TinyMCE after a brief delay.
   if (config.usetinymce === '1') {
-    setTimeout(clearTinyMCEContent, 250);
+    setTimeout(() => {
+      clearTinyMCEContent();
+      clearAuthors();
+    }, 250);
   }
 
   jQuery(document).trigger('liveblog-entry-created', [settings]);

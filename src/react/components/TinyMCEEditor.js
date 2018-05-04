@@ -20,10 +20,18 @@ export const clearTinyMCEContent = () => {
   $textField.empty();
   currentEditor.setContent('');
 };
+
+export const clearAuthors = () => {
+  if (tinymce.activeEditor.clearAuthors) {
+    tinymce.activeEditor.clearAuthors();
+  }
+};
+
+
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
-    this.containerId = `live-editor-${Math.floor(Math.random() * 10000)}`;
+    this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
     this.editorSettings = {
       tinymce: {
         wpautop: true,
@@ -38,6 +46,7 @@ class TinyMCEEditor extends Component {
     setTimeout(() => {
       setTimeout(() => {
         const stateContent = this.props.editorContainer.getContent();
+        tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }

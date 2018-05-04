@@ -325,6 +325,7 @@ class EditorWrapper extends Component {
       defaultImageSize,
       usetinymce,
       editorContainer,
+      clearAuthors,
     } = this.props;
 
     // Admin liveblogging uses TinyMCE.
@@ -332,6 +333,7 @@ class EditorWrapper extends Component {
       return <TinyMCEEditor
         editorState={editorState}
         editorContainer={editorContainer}
+        clearAuthors={clearAuthors}
       />;
     }
 
@@ -402,6 +404,7 @@ EditorWrapper.propTypes = {
   backend: PropTypes.string,
   usetinymce: PropTypes.string,
   editorContainer: PropTypes.object,
+  clearAuthors: PropTypes.func,
 };
 
 export default EditorWrapper;
