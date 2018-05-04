@@ -61,7 +61,7 @@ export function createEntry(entry, config, nonce = false) {
 
   // Clear TinyMCE after a brief delay.
   if (config.usetinymce === '1') {
-    setTimeout( clearTinyMCEContent, 250 );
+    setTimeout(clearTinyMCEContent, 250);
   }
 
   return secureAjax(settings);
