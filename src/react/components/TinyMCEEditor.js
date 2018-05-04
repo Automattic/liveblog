@@ -50,7 +50,7 @@ class TinyMCEEditor extends Component {
           }
         });
         const stateContent = this.props.editorContainer.getContent();
-        if (stateContent) {
+        if (stateContent && '' !== stateContent && '<p></p>' !== stateContent) {
           tinymce.activeEditor.setContent(stateContent);
         }
       }, 500);
@@ -62,8 +62,5 @@ class TinyMCEEditor extends Component {
     return <textarea className="liveblog-editor-textarea" id={this.containerId} />;
   }
 }
-
-TinyMCEEditor.propTypes = {
-};
 
 export default TinyMCEEditor;
