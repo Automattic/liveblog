@@ -15,14 +15,14 @@ class PaginationContainer extends Component {
           <button
             disabled={page === 1}
             className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
-            onClick={() => getEntriesPaginated(1, 'first')}
+            onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
           >
             First
           </button>
           <button
             disabled={page === 1}
             className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
-            onClick={() => getEntriesPaginated((page - 1), 'last')}
+            onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
           >
             Prev
           </button>
@@ -32,14 +32,14 @@ class PaginationContainer extends Component {
           <button
             disabled={page === pages}
             className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
-            onClick={() => getEntriesPaginated((page + 1), 'first')}
+            onClick={(e) => { e.preventDefault(); getEntriesPaginated((page + 1), 'first'); } }
           >
             Next
           </button>
           <button
             disabled={page === pages}
             className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
-            onClick={() => getEntriesPaginated(pages, 'first')}
+            onClick={(e) => { e.preventDefault(); getEntriesPaginated(pages, 'first'); } }
           >
             Last
           </button>
