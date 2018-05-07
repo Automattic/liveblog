@@ -31,9 +31,8 @@ export const clearAuthors = () => {
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
-    const {editorSettings} = props;
     this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
-    this.editorSettings = editorSettings;
+    this.editorSettings = window.liveblog_settings.editorSettings;
     setTimeout(() => {
       setTimeout(() => {
         const stateContent = this.props.editorContainer.getContent();
