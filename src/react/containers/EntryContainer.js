@@ -133,7 +133,7 @@ class EntryContainer extends Component {
                     author.id &&
                     <span className="liveblog-meta-author" key={author.id}>
                       <a href={authorLink(author)}>{author.name}</a>
-                      {(index < list.length - 2) && ', '}
+                      {(index < list.length - 1) && ', '}
                     </span>
                   ))
                 }
