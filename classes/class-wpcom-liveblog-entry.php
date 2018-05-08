@@ -263,7 +263,7 @@ class WPCOM_Liveblog_Entry {
 		wp_update_comment(
 			array(
 				'comment_ID'      => $args['entry_id'],
-				'comment_content' => wp_filter_post_kses( $args['content'] ),
+				'comment_content' => $args['content'],
 			)
 		);
 		$entry = self::from_comment( $comment );
