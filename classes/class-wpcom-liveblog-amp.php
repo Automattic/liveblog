@@ -27,7 +27,7 @@ class WPCOM_Liveblog_AMP {
 		];
 
 		self::$styles = [
-			'amp-custom' =>  dirname( __DIR__ ) . '/assets/app.css',
+			'amp-custom' =>  dirname( __DIR__ ) . '/assets/amp.css',
 		];
 
 		add_filter( 'amp_post_template_data', array( __CLASS__, 'append_liveblog_to_content' ), 10, 2 );
