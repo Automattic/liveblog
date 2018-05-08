@@ -12,7 +12,7 @@
 	<div items>
 	<?php foreach ( $this->get( 'entries' ) as $entry ): ?>
 		<?php $this->load_part( 'entry', array(
-			'content' => $entry->content
+			'content' => $entry->amp_content
 		) ); ?>
 	<?php endforeach; ?>
 	</div>
