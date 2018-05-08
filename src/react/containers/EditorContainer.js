@@ -229,7 +229,7 @@ class EditorContainer extends Component {
       readOnly,
     } = this.state;
 
-    const { isEditing, config, backend } = this.props;
+    const { isEditing, config, usetinymce } = this.props;
     const authorIds = authors ?
       authors.map((author) => {
         if (author && author.id) {
@@ -237,10 +237,11 @@ class EditorContainer extends Component {
         }
         return false;
       }) : [];
+
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        { (backend !== '1') &&
+        { (usetinymce !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
               className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
