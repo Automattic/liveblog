@@ -9,6 +9,8 @@ class WPCOM_Liveblog_AMP {
 
 	public static $scripts = [];
 
+	public static $styles = [];
+
 	/**
 	 * Called by WPCOM_Liveblog::load(),
 	 */
@@ -24,7 +26,17 @@ class WPCOM_Liveblog_AMP {
 			'amp-social-share'  => 'https://cdn.ampproject.org/v0/amp-social-share-0.1.js'
 		];
 
+		self::$styles = [
+			'amp-custom' =>  dirname( __DIR__ ) . '/assets/app.css',
+		];
+
 		add_filter( 'amp_post_template_data', array( __CLASS__, 'append_liveblog_to_content' ), 10, 2 );
+
+		add_action( 'amp_post_template_css', function() {
+			foreach ( self::$styles as $style ) {
+				include $style;
+			}
+		} );
 	}
 
 	/**
