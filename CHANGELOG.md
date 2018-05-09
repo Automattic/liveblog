@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.2
+
+* Fix issue with time format (#424)
+* Adds check around the jetpack is_mobile flag (#428)
+* Restore current user back in to localised scripts (#430)
+* Cast liveblog rewrite version before checks (#439)
+
+props [justnorris](https://github.com/justnorris), [mjangda](https://github.com/mjangda), [paulschreiber](https://github.com/paulschreiber), [scottblackburn](https://github.com/scottblackburn)
+
 ## 1.8.1
 
 * Fix bug with changing contributors
