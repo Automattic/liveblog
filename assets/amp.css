@@ -149,6 +149,9 @@
   font-size: 13px;
   line-height: 12px; }
 
+.liveblog-btn--hide {
+  visibility: hidden; }
+
 .liveblog-entry {
   position: relative;
   margin-bottom: 1rem; }
