@@ -49,6 +49,4 @@
 			<?php echo $this->get('content') ?>
 		</div>
 	</div>
-
-
 </div>

@@ -1105,7 +1105,8 @@
   background: #f7f7f7;
   border-top: 2px solid #eee;
   border-bottom: 2px solid #eee;
-  padding: 1em; }
+  padding: 1em;
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif; }
 
 @media (max-width: 58.74em) {
   .liveblog-entry {
