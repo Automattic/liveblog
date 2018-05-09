@@ -13,9 +13,9 @@ const authorLink = (author) => {
   let slug = '';
   if (typeof author !== 'undefined' && author && author.name) {
     slug = author.name.toLowerCase();
-    slug = result.replace( /[^%a-z0-9 _-]/g, '' );
-    slug = result.replace( /\s+/g, '-' );
-    slug = result.replace( /-+/g, '-' );
+    slug = slug.replace( /[^%a-z0-9 _-]/g, '' );
+    slug = slug.replace( /\s+/g, '-' );
+    slug = slug.replace( /-+/g, '-' );
 
     result = `/contributors/${slug}/`;
   }
