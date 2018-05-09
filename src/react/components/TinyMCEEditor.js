@@ -17,7 +17,7 @@ export const getTinyMCEContent = () => {
 export const clearTinyMCEContent = () => {
   const currentEditor = tinymce.activeEditor;
   const $textField = jQuery(`#${currentEditor.id}`);
-  $textField.empty();
+  $textField.val('');
   currentEditor.setContent('');
 };
 
