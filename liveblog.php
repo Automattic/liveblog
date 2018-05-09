@@ -169,7 +169,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'permalink_structure_changed', array( __CLASS__, 'add_rewrite_rules' ) );
 			// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
 			add_action( 'init', array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
-			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+		//	add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );

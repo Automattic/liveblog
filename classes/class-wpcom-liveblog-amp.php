@@ -37,6 +37,8 @@ class WPCOM_Liveblog_AMP {
 				include $style;
 			}
 		} );
+
+		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
 	}
 
 	/**
