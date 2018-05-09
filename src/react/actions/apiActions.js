@@ -12,10 +12,11 @@ export const getEntriesPaginated = (page, scrollTo) => ({
   scrollTo,
 });
 
-export const getEntriesSuccess = (payload, renderNewEntries) => ({
+export const getEntriesSuccess = (payload, renderNewEntries, paginationType) => ({
   type: types.GET_ENTRIES_SUCCESS,
   payload,
   renderNewEntries,
+  paginationType,
 });
 
 export const getEntriesFailed = () => ({

@@ -28,13 +28,14 @@ class AppContainer extends Component {
 
   render() {
     const { page, loading, entries, polling, mergePolling, config } = this.props;
+    const paginationTypeLoadMore = config.paginationType === 'loadMore';
     const canEdit = config.is_liveblog_editable === '1';
 
     return (
       <div style={{ position: 'relative' }}>
-        {(page === 1 && canEdit) && <EditorContainer isEditing={false} />}
+        {(page === 1 || paginationTypeLoadMore) && canEdit && <EditorContainer isEditing={false} />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        <PaginationContainer />
+        {!paginationTypeLoadMore && <PaginationContainer /> }
         <Entries loading={loading} entries={entries} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
@@ -61,8 +62,7 @@ const mapStateToProps = state => ({
   page: state.pagination.page,
   loading: state.api.loading,
   entries: Object.keys(state.api.entries)
-    .map(key => state.api.entries[key])
-    .slice(0, state.config.entries_per_page),
+    .map(key => state.api.entries[key]),
   polling: Object.keys(state.polling.entries),
   config: state.config,
 });

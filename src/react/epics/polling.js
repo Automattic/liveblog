@@ -54,7 +54,7 @@ const mergePollingEpic = (action$, store) =>
       const entries = Object.keys(polling.entries).map(key => polling.entries[key]);
       const pages = Math.max(pagination.pages, polling.pages);
 
-      if (pagination.page === 1) {
+      if (pagination.page === 1 || config.paginationType === 'loadMore') {
         return concat(
           of(mergePollingIntoEntries(entries, pages)),
           of(scrollToEntry(`id_${entries[entries.length - 1].id}`)),

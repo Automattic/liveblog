@@ -7,8 +7,21 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntriesPaginated } = this.props;
+    const { page, pages, getEntriesPaginated, paginationType } = this.props;
 
+    if (paginationType === 'loadMore') {
+      return (
+        <div className="liveblog-pagination">
+          {page !== pages &&
+          <button
+            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
+            onClick={() => getEntriesPaginated(page + 1)}
+          >
+              Load More
+          </button>}
+        </div>
+      );
+    }
     return (
       <div className="liveblog-pagination">
         <div>
@@ -53,11 +66,13 @@ PaginationContainer.propTypes = {
   page: PropTypes.number,
   pages: PropTypes.number,
   getEntriesPaginated: PropTypes.func,
+  paginationType: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   pages: state.pagination.pages,
+  paginationType: state.config.paginationType,
 });
 
 const mapDispatchToProps = dispatch =>

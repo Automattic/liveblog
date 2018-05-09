@@ -28,7 +28,10 @@ export const api = (state = initialState, action) => {
         ...state,
         error: false,
         loading: false,
-        entries: applyUpdate({}, action.payload.entries),
+        entries: applyUpdate(
+          action.paginationType === 'loadMore' ? state.entries : {},
+          action.payload.entries,
+        ),
         newestEntry: getNewestEntry(
           state.newestEntry,
           action.payload.entries[0],
