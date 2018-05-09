@@ -5,7 +5,7 @@
 // Core Styles
 @import "core/utils/animations";
 @import "core/app/all";
-@import "core/editor/all";
+@import "core/editor/amp-required";
 
 
 /**
@@ -186,6 +186,40 @@
 .liveblog-pagination-last {
   background: $color-grey-mid-light;
   color: $color-grey-x-dark;
+}
+
+.liveblog-pagination-pages {
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+}
+
+.liveblog-pagination-btn {
+  background-color: $color-grey-x-dark;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: none;
+  color: white;
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+
+  &:hover {
+    color: white;
+    background: $color-grey-dark;
+  }
+
+  &:visited {
+    color: white;
+  }
+}
+
+
+/**
+* Embeds
+*/
+.liveblog-entry amp-youtube, .liveblog-entry amp-instagram, .liveblog-entry amp-vine {
+  margin: 0 0 1.5em;
 }
 
 

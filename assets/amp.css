@@ -1083,18 +1083,6 @@
   max-width: 100%;
   max-height: 100%; }
 
-.liveblog-html-editor-container {
-  border: 1px solid #bbb;
-  margin-bottom: 1rem; }
-
-.liveblog-html-editor {
-  padding: .5rem;
-  background: #fff; }
-
-.ace_scroll-left {
-  -webkit-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25) !important;
-          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25) !important; }
-
 /**
 * Entries
 */
@@ -1252,3 +1240,32 @@
 .liveblog-pagination-last {
   background: #eee;
   color: #111; }
+
+.liveblog-pagination-pages {
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif; }
+
+.liveblog-pagination-btn {
+  background-color: #111;
+  border: 0;
+  border-radius: 2px;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  color: white;
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1; }
+  .liveblog-pagination-btn:hover {
+    color: white;
+    background: #333; }
+  .liveblog-pagination-btn:visited {
+    color: white; }
+
+/**
+* Embeds
+*/
+.liveblog-entry amp-youtube, .liveblog-entry amp-instagram, .liveblog-entry amp-vine {
+  margin: 0 0 1.5em; }
+
+/*# sourceMappingURL=amp.css.map*/
