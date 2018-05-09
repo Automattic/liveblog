@@ -302,7 +302,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function flush_rewrite_rules() {
-			if ( get_option( 'liveblog_rewrites_version' ) !== self::REWRITES_VERSION ) {
+			$version_option = (int) get_option( 'liveblog_rewrites_version' );
+			if ( self::REWRITES_VERSION !== $version_option ) {
 				flush_rewrite_rules();
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
