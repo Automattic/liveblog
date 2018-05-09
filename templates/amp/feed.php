@@ -8,11 +8,6 @@ $pages  = $this->get( 'pages' );
 
 <div class="amp-wp-article-liveblog">
 
-<?php $this->load_part( 'pagination', array(
-	'links' => $links,
-	'page' => $page,
-	'pages' => $pages
-) ); ?>
 
 <amp-live-list
 	layout="container"
@@ -25,6 +20,7 @@ $pages  = $this->get( 'pages' );
 		on="tap:amp-live-list-insert-blog.update"
 		class="ampstart-btn caps">You have updates</button>
 	<div items>
+
 	<?php foreach ( $this->get( 'entries' ) as $entry ): ?>
 
 		<?php $this->load_part( 'entry', array(
@@ -34,7 +30,6 @@ $pages  = $this->get( 'pages' );
 		) ); ?>
 	<?php endforeach; ?>
 	</div>
-
 
 
 	<?php $this->load_part( 'pagination', array(
