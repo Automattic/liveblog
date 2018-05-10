@@ -1,9 +1,12 @@
-<div class="liveblog-entry" id="post1"
-  data-sort-time="20180424142720">
+<?php
+	$entry_time  =  $this->get('time');
+?>
+
+<div class="liveblog-entry" id="post<?php echo $entry_time; ?>"
+  data-sort-time="<?php echo $entry_time; ?>">
 
 	<aside class="liveblog-entry-aside">
 		<?php
-			$entry_time  =  $this->get('time');
 			$utc_offset  =  get_option( 'gmt_offset' ) . 'hours';
 			$date_format =  get_option( 'date_format' );
 			$entry_date =	date_i18n( $date_format, strtotime( $utc_offset,  $this->get('time') ) );
@@ -20,9 +23,7 @@
 
 			<?php foreach ($this->get('authors') as $author) : ?>
 
-
 			<?php $avatar_url = get_avatar_url( $author['id'] ); ?>
-
 
 			<div class="liveblog-meta-author">
 				<div class="liveblog-meta-author-avatar">

@@ -18,7 +18,7 @@ $pages  = $this->get( 'pages' );
 	<button id="live-list-update-button"
 		update
 		on="tap:amp-live-list-insert-blog.update"
-		class="ampstart-btn caps">You have updates</button>
+		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
 	<div items>
 
 	<?php foreach ( $this->get( 'entries' ) as $entry ): ?>
