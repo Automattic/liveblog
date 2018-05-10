@@ -41,13 +41,11 @@ class WPCOM_Liveblog_AMP {
 
 		//add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
 
-		// add_action( 'amp_post_template_css', function() {
-		// 	foreach ( self::$styles as $style ) {
-		// 		include $style;
-		// 	}
-		// } );
-		//
-		//
+		add_action( 'amp_post_template_css', function() {
+			foreach ( self::$styles as $style ) {
+				include $style;
+			}
+		} );
 
 		function my_enqueue_styles() {
 			wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
