@@ -60,7 +60,7 @@ const webpackConfig = {
                 plugins: () => [
                   autoprefixer({
                     browsers: [
-                      'last 3 version',
+                      'last 1 version',
                       'ie >= 11',
                     ],
                   }),
