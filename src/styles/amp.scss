@@ -192,7 +192,7 @@
   font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
 }
 
-.liveblog-pagination-btn {
+.liveblog-pagination-btn, .ampstart-btn {
   background-color: $color-grey-x-dark;
   border: 0;
   border-radius: 2px;
@@ -203,6 +203,7 @@
   display: inline-block;
   font-size: 14px;
   line-height: 1;
+  padding: .5rem 1rem;
 
   &:hover {
     color: white;
@@ -214,6 +215,9 @@
   }
 }
 
+.ampstart-btn {
+  margin-bottom: 15px;
+}
 
 /**
 * Embeds

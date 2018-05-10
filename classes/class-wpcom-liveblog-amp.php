@@ -39,6 +39,8 @@ class WPCOM_Liveblog_AMP {
 			}
 		}, 10 );
 
+		add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
+
 		// add_action( 'amp_post_template_css', function() {
 		// 	foreach ( self::$styles as $style ) {
 		// 		include $style;
@@ -52,6 +54,32 @@ class WPCOM_Liveblog_AMP {
 		}
 		add_action( 'wp_enqueue_scripts', 'my_enqueue_styles' );
 	}
+
+	public static function append_liveblog_to_metadata( $metadata, $post ) {
+
+        // If we are not viewing a liveblog post then exist the filter.
+        if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+            return $data;
+        }
+
+        $request = self::get_request_data();
+
+        $entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
+
+        // Set the last known entry for users who don't have one yet.
+        if ( $request->last_known_entry === false ) {
+            $request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
+        }
+
+        foreach ( $entries['entries'] as $key => $entry ) {
+            $amp_content                             = self::prepare_entry_content( $entry->content, $entry );
+            $entries['entries'][$key]->amp_content     = $amp_content->get_amp_content();
+        }
+
+        $metadata['liveBlogUpdate'] = $entries;
+
+        return $metadata;
+    }
 
 	/**
 	 * Append Liveblog to Content
