@@ -104,10 +104,14 @@ class WPCOM_Liveblog_AMP {
 
 		$content .= self::get_template(
 			'feed', array(
-				'entries' => self::filter_entries( $entries['entries'] ),
-				'page'    => $entries['page'],
-				'pages'   => $entries['pages'],
-				'links'   => self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
+				'entries'  => self::filter_entries( $entries['entries'] ),
+				'page'     => $entries['page'],
+				'pages'    => $entries['pages'],
+				'links'    => self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
+				'settings' => array(
+					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
+					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval()
+				)
 			)
 		);
 

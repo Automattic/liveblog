@@ -1,8 +1,10 @@
 <?php
 
-$links = $this->get( 'links' );
-$page  = $this->get( 'page' );
-$pages = $this->get( 'pages' );
+$links 			  = $this->get( 'links' );
+$page  			  = $this->get( 'page' );
+$pages 			  = $this->get( 'pages' );
+$entries_per_page = $this->get( 'pages' );
+$refresh_interval = $this->get( 'refresh_interval' );
 
 ?>
 
@@ -11,8 +13,8 @@ $pages = $this->get( 'pages' );
 
 <amp-live-list
 	layout="container"
-	data-poll-interval="15000"
-	data-max-items-per-page="1"
+	data-poll-interval="<?php echo esc_html( $refresh_interval ); ?>"
+	data-max-items-per-page="<?php echo esc_html( $entries_per_page ); ?>"
 	id="amp-live-list-insert-blog">
 
 	<button id="live-list-update-button"
