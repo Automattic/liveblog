@@ -145,15 +145,7 @@ export const daysAgo = (time, utcOffset) => {
  * @param {Number} timestamp Unix Timestamp in seconds
  * @return {String} utcOffset Utc Offset from server
  */
-export const timeAgo = (timestamp, utcOffset, dateFormat) => {
-  const offset = parseInt(utcOffset, 10);
-  const offsetTime = moment.unix(timestamp).utcOffset(offset, true);
-  // If its greater than 30 days ago.
-  if (daysAgo(offsetTime, offset) >= 30) {
-    return offsetTime.formatUsingDateTime(dateFormat);
-  }
-  return offsetTime.fromNow();
-};
+export const timeAgo = timestamp => moment.unix(timestamp).utc().fromNow();
 
 /**
  * Returns a formated string from timestamp in HH MM format.
@@ -162,7 +154,7 @@ export const timeAgo = (timestamp, utcOffset, dateFormat) => {
  */
 export const formattedTime = (timestamp, utcOffset, timeFormat) => {
   const offset = parseInt(utcOffset, 10);
-  return moment.unix(timestamp).utcOffset(offset, true).local().formatUsingDateTime(timeFormat);
+  return moment.unix(timestamp).utcOffset(offset, false).formatUsingDateTime(timeFormat);
 };
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
