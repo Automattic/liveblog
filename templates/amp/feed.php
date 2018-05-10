@@ -3,8 +3,9 @@
 $links 			  = $this->get( 'links' );
 $page  			  = $this->get( 'page' );
 $pages 			  = $this->get( 'pages' );
-$entries_per_page = $this->get( 'pages' );
-$refresh_interval = $this->get( 'refresh_interval' );
+$settings         = $this->get( 'settings' );
+$entries_per_page = $settings['entries_per_page'];
+$refresh_interval = $settings['refresh_interval'];
 
 ?>
 
