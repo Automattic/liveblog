@@ -1,8 +1,8 @@
 <?php
 
-$links  = $this->get( 'links' );
-$page   = $this->get( 'page' );
-$pages  = $this->get( 'pages' );
+$links = $this->get( 'links' );
+$page  = $this->get( 'page' );
+$pages = $this->get( 'pages' );
 
 ?>
 
@@ -21,22 +21,32 @@ $pages  = $this->get( 'pages' );
 		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
 	<div items>
 
-	<?php foreach ( $this->get( 'entries' ) as $entry ): ?>
+	<?php foreach ( $this->get( 'entries' ) as $entry ) : ?>
 
-		<?php $this->load_part( 'entry', array(
-			'content' => $entry->content,
-			'authors' => $entry->authors,
-			'time'	  => $entry->entry_time
-		) ); ?>
+		<?php
+		$this->load_part(
+			'entry', array(
+				'content'  => $entry->content,
+				'authors'  => $entry->authors,
+				'time'     => $entry->entry_time,
+				'date'     => $entry->date,
+				'time_ago' => $entry->time_ago,
+			)
+		);
+		?>
 	<?php endforeach; ?>
 	</div>
 
 
-	<?php $this->load_part( 'pagination', array(
-		'links' => $links,
-		'page' => $page,
-		'pages' => $pages
-	) ); ?>
+	<?php
+	$this->load_part(
+		'pagination', array(
+			'links' => $links,
+			'page'  => $page,
+			'pages' => $pages,
+		)
+	);
+	?>
 
 </amp-live-list>
 </div>

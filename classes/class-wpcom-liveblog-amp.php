@@ -7,10 +7,6 @@
  */
 class WPCOM_Liveblog_AMP {
 
-	public static $scripts = [];
-
-	public static $styles = [];
-
 	/**
 	 * Called by WPCOM_Liveblog::load(),
 	 */
@@ -21,40 +17,65 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
-		self::$scripts = [];
+		// Hook at template_redirect level as some Liveblog hooks require it.
+		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
+	}
 
-		self::$styles = [
-			'amp-custom' =>  dirname( __DIR__ ) . '/assets/amp.css',
-		];
-
-		//var_dump(is_amp_endpoint());
-		//current_theme_supports( 'amp' )
-
-		add_filter( 'template_redirect', function() {
-			if ( is_amp_endpoint() ) {
-				remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
-				add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
-				remove_filter( 'the_content', 'wpautop' );
-				remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
-			}
-		}, 10 );
-
-		//add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
-
-		add_action( 'amp_post_template_css', function() {
-			foreach ( self::$styles as $style ) {
-				include $style;
-			}
-		} );
-
-		function my_enqueue_styles() {
-			wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+	/**
+	 * AMP Setup by removing and adding new hooks.
+	 *
+	 * @return void
+	 */
+	public static function setup() {
+		// If we're on an AMP page then bail.
+		if ( ! is_amp_endpoint() ) {
+			return;
 		}
-		add_action( 'wp_enqueue_scripts', 'my_enqueue_styles' );
+
+		// Remove the standard Liveblog markup which just a <div> for React to render.
+		remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
+
+		// Remove standard Liveblog scripts as custom JS is not required for AMP.
+		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
+
+		// Remove WordPress adding <p> tags as breaks layout.
+		remove_filter( 'the_content', 'wpautop' );
+
+		// Add AMP ready markup to post.
+		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
+
+		// Add AMP CSS for Liveblog.
+		// If this an AMP Theme then use enqueue for styles.
+		if ( current_theme_supports( 'amp' ) ) {
+			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_styles' ) );
+		} else {
+			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
+		}
+	}
+
+	/**
+	 * Print styles out by including file.
+	 *
+	 * @return void
+	 */
+	public function print_styles() {
+		include dirname( __DIR__ ) . '/assets/amp.css';
+	}
+
+	/**
+	 * Enqueue Styles
+	 *
+	 * @return void
+	 */
+	public function enqueue_styles() {
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
 	}
 
 	/**
 	 * Append Liveblog to Content
+	 *
+	 * @param  string $content WordPress Post Content.
+	 * @return string          Updated Content
 	 */
 	public static function append_liveblog_to_content( $content ) {
 		global $post;
@@ -71,33 +92,70 @@ class WPCOM_Liveblog_AMP {
 			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
-		$content .= self::get_template( 'feed', array(
-			'entries' 	=> $entries['entries'],
-			'page'		=> $entries['page'],
-			'pages'		=> $entries['pages'],
-			'links'		=> self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
-		) );
-
-		foreach ( self::$styles as $style ) {
-			//$content .= '<style>' . file_get_contents($style) . '</style>';
-		}
-
-		//$content .= file_get_contents($style);
-
-		// echo '<pre>';
-		// var_dump($content);
-		// echo '</pre>';
+		$content .= self::get_template(
+			'feed', array(
+				'entries' => self::filter_entries( $entries['entries'] ),
+				'page'    => $entries['page'],
+				'pages'   => $entries['pages'],
+				'links'   => self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
+			)
+		);
 
 		return $content;
 	}
 
+	/**
+	 * Filter Entries, adding Time Ago, and Entry Date.
+	 *
+	 * @param  array $entries Entries.
+	 * @return array         Updates Entries
+	 */
+	public static function filter_entries( $entries ) {
+		foreach ( $entries as $key => $entry ) {
+			$entries[ $key ]->time_ago = self::get_entry_time_ago( $entry );
+			$entries[ $key ]->date     = self::get_entry_date( $entry );
+		}
+		return $entries;
+	}
+
+	/**
+	 * Work out Entry time ago.
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Time Ago
+	 */
+	public static function get_entry_time_ago( $entry ) {
+		return human_time_diff( $entry->entry_time, current_time( 'timestamp', true ) ) . ' ago';
+	}
+
+	/**
+	 * Work out Entry date.
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Date
+	 */
+	public static function get_entry_date( $entry ) {
+		$utc_offset  = get_option( 'gmt_offset' ) . 'hours';
+		$date_format = get_option( 'date_format' );
+
+		return date_i18n( $date_format, strtotime( $utc_offset, $entry->entry_time ) );
+	}
+
+	/**
+	 * Gets Pagination Links (First, Last, Next, Previous)
+	 *
+	 * @param  object $request Request Object.
+	 * @param  int    $pages   Number of pages.
+	 * @param  int    $post_id Post ID.
+	 * @return object         Pagination Links
+	 */
 	public static function get_pagination_links( $request, $pages, $post_id ) {
 		$links = array();
 
 		$permalink = amp_get_permalink( $post_id );
 
 		$links['first'] = self::build_paged_permalink( $permalink, 1, $request->last_known_entry );
-		$links['last'] = self::build_paged_permalink( $permalink, $pages, $request->last_known_entry );
+		$links['last']  = self::build_paged_permalink( $permalink, $pages, $request->last_known_entry );
 
 		$links['prev'] = false;
 		if ( $request->page > 1 ) {
@@ -112,8 +170,16 @@ class WPCOM_Liveblog_AMP {
 		return (object) $links;
 	}
 
+	/**
+	 * Builds up a pagination link.
+	 *
+	 * @param  string $permalink        Permalink.
+	 * @param  int    $page             Page Number.
+	 * @param  string $last_known_entry Last Know Entry.
+	 * @return string                   Pagination Link
+	 */
 	public static function build_paged_permalink( $permalink, $page, $last_known_entry ) {
-		return $permalink . '/page/'. $page .'/last-known-entry/' . $last_known_entry;
+		return $permalink . '/page/' . $page . '/last-known-entry/' . $last_known_entry;
 	}
 
 	/**
@@ -122,13 +188,13 @@ class WPCOM_Liveblog_AMP {
 	 * @return object Request Data.
 	 */
 	public static function get_request_data() {
-		$amp  				= get_query_var( 'amp' );
-		$page 				= preg_match( '/page\/(\d*)/', $amp, $matches ) ? (int) $matches[1] : 1;
-		$last_known_entry 	= preg_match( '/last-known-entry\/([\d-]*)/', $amp, $matches ) ? $matches[1] : false;
+		$amp              = get_query_var( 'amp' );
+		$page             = preg_match( '/page\/(\d*)/', $amp, $matches ) ? (int) $matches[1] : 1;
+		$last_known_entry = preg_match( '/last-known-entry\/([\d-]*)/', $amp, $matches ) ? $matches[1] : false;
 
 		return (object) array(
-			'page' 				=> $page,
-			'last_known_entry' 	=> $last_known_entry,
+			'page'             => $page,
+			'last_known_entry' => $last_known_entry,
 		);
 	}
 

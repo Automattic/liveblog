@@ -30,7 +30,7 @@ class WPCOM_Liveblog_AMP_Template {
 
 	/**
 	 * Contrustor
-	 * 
+	 *
 	 * @return void
 	 */
 	public function __contrust() {
@@ -40,14 +40,14 @@ class WPCOM_Liveblog_AMP_Template {
 
 	/**
 	 * Get a template variable.
-	 * 
-	 * @param  string  $name    Name if variable.
-	 * @param  mixed $default  Default value.
+	 *
+	 * @param  string $name    Name if variable.
+	 * @param  mixed  $default  Default value.
 	 * @return mixed          value
 	 */
 	public function get( $name, $default = false ) {
-		if ( isset( $this->data[$name] ) ) {
-			return $this->data[$name];
+		if ( isset( $this->data[ $name ] ) ) {
+			return $this->data[ $name ];
 		}
 		return $default;
 	}
@@ -91,7 +91,7 @@ class WPCOM_Liveblog_AMP_Template {
 	 *
 	 * @param  string $name      Name of Template.
 	 * @param  array  $variables Variables to be passed to Template.
-	 * @return string            Rendered Template
+	 * @return void
 	 */
 	public function load_part( $name, $variables = array() ) {
 		echo WPCOM_Liveblog_AMP::get_template( $name, $variables );
