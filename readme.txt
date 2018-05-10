@@ -2,6 +2,7 @@
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
 Requires at least: 4.4
+Requires PHP: 5.6
 Tested up to: 4.9.5
 Stable tag: 1.8.2
 License: GPLv2 or later
