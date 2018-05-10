@@ -17,7 +17,7 @@
 " data-link-name="">Prev</a>
 
 			</div>
-			<span class="liveblog-pagination-pages"><?php echo esc_html( $this->get( 'page' ) ); ?> of <?php echo esc_url( $this->get( 'pages' ) ); ?></span>
+			<span class="liveblog-pagination-pages"><?php echo esc_html( $this->get( 'page' ) ); ?> of <?php echo esc_html( $this->get( 'pages' ) ); ?></span>
 			<div>
 			<?php if ( $links->next ) : ?>
 				<a href="<?php echo esc_url( $links->next ); ?>" title="Next" class="liveblog-btn liveblog-pagination-btn liveblog-pagination-next" data-link-name="">Next</a>
