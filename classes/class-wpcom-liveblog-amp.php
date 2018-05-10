@@ -19,6 +19,9 @@ class WPCOM_Liveblog_AMP {
 
 		// Hook at template_redirect level as some Liveblog hooks require it.
 		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
+
+		// Add a /pagination to URLs to allow for pagination in AMP.
+		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_pagination' ), 10 );
 	}
 
 	/**
@@ -54,11 +57,18 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
+	 * Add Endpoint for pagination description
+	 */
+	public static function add_endpoint_for_pagination() {
+		add_rewrite_endpoint( 'pagination', EP_PERMALINK, true );
+	}
+
+	/**
 	 * Print styles out by including file.
 	 *
 	 * @return void
 	 */
-	public function print_styles() {
+	public static function print_styles() {
 		include dirname( __DIR__ ) . '/assets/amp.css';
 	}
 
@@ -67,7 +77,7 @@ class WPCOM_Liveblog_AMP {
 	 *
 	 * @return void
 	 */
-	public function enqueue_styles() {
+	public static function enqueue_styles() {
 		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
 	}
 
@@ -179,7 +189,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return string                   Pagination Link
 	 */
 	public static function build_paged_permalink( $permalink, $page, $last_known_entry ) {
-		return $permalink . '/page/' . $page . '/last-known-entry/' . $last_known_entry;
+		return $permalink . '/pagination/page/' . $page . '/entry/' . $last_known_entry;
 	}
 
 	/**
@@ -188,9 +198,14 @@ class WPCOM_Liveblog_AMP {
 	 * @return object Request Data.
 	 */
 	public static function get_request_data() {
-		$amp              = get_query_var( 'amp' );
-		$page             = preg_match( '/page\/(\d*)/', $amp, $matches ) ? (int) $matches[1] : 1;
-		$last_known_entry = preg_match( '/last-known-entry\/([\d-]*)/', $amp, $matches ) ? $matches[1] : false;
+		$pagination       = get_query_var( 'pagination' );
+
+		if ( empty( $pagination ) ) {
+			$pagination = get_query_var( 'amp' );
+		}
+
+		$page             = preg_match( '/page\/(\d*)/', $pagination, $matches ) ? (int) $matches[1] : 1;
+		$last_known_entry = preg_match( '/entry\/([\d-]*)/', $pagination, $matches ) ? $matches[1] : false;
 
 		return (object) array(
 			'page'             => $page,
