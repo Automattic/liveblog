@@ -21,41 +21,49 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
-		self::$scripts = [
-			'amp-live-list' 	=> 'https://cdn.ampproject.org/v0/amp-live-list-0.1.js',
-			'amp-social-share'  => 'https://cdn.ampproject.org/v0/amp-social-share-0.1.js'
-		];
+		self::$scripts = [];
 
 		self::$styles = [
 			'amp-custom' =>  dirname( __DIR__ ) . '/assets/amp.css',
 		];
 
-		add_filter( 'amp_post_template_data', array( __CLASS__, 'append_liveblog_to_content' ), 10, 2 );
+		//var_dump(is_amp_endpoint());
+		//current_theme_supports( 'amp' )
 
-		add_action( 'amp_post_template_css', function() {
-			foreach ( self::$styles as $style ) {
-				include $style;
+		add_filter( 'template_redirect', function() {
+			if ( is_amp_endpoint() ) {
+				remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
+				add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
+				remove_filter( 'the_content', 'wpautop' );
+				remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
 			}
-		} );
+		}, 10 );
 
-		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
+		// add_action( 'amp_post_template_css', function() {
+		// 	foreach ( self::$styles as $style ) {
+		// 		include $style;
+		// 	}
+		// } );
+		//
+		//
+
+		function my_enqueue_styles() {
+			wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+		}
+		add_action( 'wp_enqueue_scripts', 'my_enqueue_styles' );
 	}
 
 	/**
 	 * Append Liveblog to Content
-	 *
-	 * @param  array  $data AMP Data.
-	 * @param  object $post WP Post.
-	 * @return array       Updated AMP Data
 	 */
-	public static function append_liveblog_to_content( $data, $post ) {
-		// If we are not viewing a liveblog post then exist the filter.
+	public static function append_liveblog_to_content( $content ) {
+		global $post;
+
 		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
 			return $data;
 		}
 
 		$request = self::get_request_data();
-
 		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
 
 		// Set the last known entry for users who don't have one yet.
@@ -63,23 +71,24 @@ class WPCOM_Liveblog_AMP {
 			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
-		foreach ( $entries['entries'] as $key => $entry ) {
-			$amp_content 							= self::prepare_entry_content( $entry->content, $entry );
-			$entries['entries'][$key]->amp_content 	= $amp_content->get_amp_content();
-			$data['amp_component_scripts'] 			= array_merge( $data['amp_component_scripts'], $amp_content->get_amp_scripts() );
-			$data['post_amp_styles'] 				= array_merge( $data['post_amp_styles'], $amp_content->get_amp_styles() );
-		}
-
-		$data['amp_component_scripts'] = array_merge( $data['amp_component_scripts'], self::$scripts );
-
-		$data['post_amp_content'] .= self::get_template( 'feed', array(
+		$content .= self::get_template( 'feed', array(
 			'entries' 	=> $entries['entries'],
 			'page'		=> $entries['page'],
 			'pages'		=> $entries['pages'],
 			'links'		=> self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
 		) );
 
-		return $data;
+		foreach ( self::$styles as $style ) {
+			//$content .= '<style>' . file_get_contents($style) . '</style>';
+		}
+
+		//$content .= file_get_contents($style);
+
+		// echo '<pre>';
+		// var_dump($content);
+		// echo '</pre>';
+
+		return $content;
 	}
 
 	public static function get_pagination_links( $request, $pages, $post_id ) {
@@ -133,43 +142,5 @@ class WPCOM_Liveblog_AMP {
 	public static function get_template( $name, $variables = array() ) {
 		$template = new WPCOM_Liveblog_AMP_Template();
 		return $template->render( $name, $variables );
-	}
-
-	public static function prepare_entry_content( $content, $entry ) {
-		$amp_content = new AMP_Content(
-			$content,
-			apply_filters(
-				'amp_content_embed_handlers', array(
-					'AMP_Twitter_Embed_Handler'     => array(),
-					'AMP_YouTube_Embed_Handler'     => array(),
-					'AMP_DailyMotion_Embed_Handler' => array(),
-					'AMP_Vimeo_Embed_Handler'       => array(),
-					'AMP_SoundCloud_Embed_Handler'  => array(),
-					'AMP_Instagram_Embed_Handler'   => array(),
-					'AMP_Vine_Embed_Handler'        => array(),
-					'AMP_Facebook_Embed_Handler'    => array(),
-					'AMP_Pinterest_Embed_Handler'   => array(),
-					'AMP_Gallery_Embed_Handler'     => array(),
-					'WPCOM_AMP_Polldaddy_Embed'     => array(),
-				), $entry
-			),
-			apply_filters(
-				'amp_content_sanitizers', array(
-					'AMP_Style_Sanitizer'             => array(),
-					'AMP_Img_Sanitizer'               => array(),
-					'AMP_Video_Sanitizer'             => array(),
-					'AMP_Audio_Sanitizer'             => array(),
-					'AMP_Playbuzz_Sanitizer'          => array(),
-					'AMP_Iframe_Sanitizer'            => array(
-						'add_placeholder' => true,
-					),
-					'AMP_Tag_And_Attribute_Sanitizer' => array(), // Note: This whitelist sanitizer must come at the end to clean up any remaining issues the other sanitizers didn't catch.
-				), $entry
-			),
-			array(
-				'content_max_width' => 600,
-			)
-		);
-		return $amp_content;
 	}
 }

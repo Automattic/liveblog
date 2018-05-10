@@ -24,7 +24,7 @@ $pages  = $this->get( 'pages' );
 	<?php foreach ( $this->get( 'entries' ) as $entry ): ?>
 
 		<?php $this->load_part( 'entry', array(
-			'content' => $entry->amp_content,
+			'content' => $entry->content,
 			'authors' => $entry->authors,
 			'time'	  => $entry->entry_time
 		) ); ?>
