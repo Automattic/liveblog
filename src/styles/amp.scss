@@ -26,6 +26,10 @@
   }
 }
 
+.liveblog-entry-main .liveblog-entry-content p {
+  margin: 16px 0;
+}
+
 .liveblog-entry a, .liveblog-entry a:visited {
   color: $color-grey-dark;
 }
@@ -215,7 +219,8 @@
   }
 }
 
-.ampstart-btn {
+.live-list .ampstart-btn {
+  display: none;
   margin-bottom: 15px;
 }
 
