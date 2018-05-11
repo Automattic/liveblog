@@ -137,6 +137,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-schema.php' );
 
 			if ( self::use_rest_api() ) {
 				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
@@ -1142,6 +1143,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			// on the same page
 			if ( ! self::is_viewing_liveblog_post() ) {
 				return $content;
+			}
+
+			
+			if ( apply_filters( 'liveblog_enable_schema', true ) ) {
+				$schema  = new WPCOM_Liveblog_Schema( self::$post_id );
+				$content .= $schema->render();
 			}
 
 			$liveblog_output = '<div id="wpcom-liveblog-container" class="' . self::$post_id . '"></div>';
