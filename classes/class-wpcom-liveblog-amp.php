@@ -205,7 +205,7 @@ class WPCOM_Liveblog_AMP {
 		$pagination       = get_query_var( 'pagination' );
 
 		if ( empty( $pagination ) ) {
-			$pagination = get_query_var( 'amp' );
+			$pagination = get_query_var( amp_get_slug() );
 		}
 
 		$page             = preg_match( '/page\/(\d*)/', $pagination, $matches ) ? (int) $matches[1] : 1;
