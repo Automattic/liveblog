@@ -106,6 +106,9 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
  * @param {Object} polling
  */
 export const shouldRenderNewEntries = (page, entries, polling) => {
+  if ( window.liveblog_settings.backend_liveblogging ) {
+    return true;
+  }
   if (page !== 1) return false;
   if (Object.keys(polling).length > 0) return false;
   const element = document.getElementById(Object.keys(entries)[0]);
