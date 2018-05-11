@@ -4,8 +4,9 @@
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby), [philipjohn](http://profiles.wordpress.org/philipjohn)
 * Tags: liveblog
 * Requires at least: 4.4
+* Requires PHP: 5.6
 * Tested up to: 4.9.5
-* Stable tag: 1.8.1
+* Stable tag: 1.8.2
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
