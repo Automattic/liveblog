@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer';
 
-const APP_ADMIN = 'http://wp495.bigbite.site/wp-admin';
-const APP_ADD_NEW = 'http://wp495.bigbite.site/wp-admin/post-new.php';
-const USER = 'admin';
-const PASSWORD = 'password';
+const APP_ADMIN = 'http://liveblogdemo.bigbite.site/wp-admin';
+const APP_ADD_NEW = 'http://liveblogdemo.bigbite.site/wp-admin/post-new.php';
+const USER = 'root';
+const PASSWORD = 'y)uCa%BBSGvXvs&WiU';
 const TIMEOUT = 30000;
 
 let browser;
@@ -25,7 +25,7 @@ const renderEntries = async (amount, content = false) => {
 
 describe('End to End', async () => {
   beforeAll(async () => {
-    browser = await puppeteer.launch({ headless: false, sloMo: 10 });
+    browser = await puppeteer.launch({ headless: false });
     page = await browser.newPage();
   }, TIMEOUT);
 
@@ -93,9 +93,11 @@ describe('End to End', async () => {
 
   it('should render different pages', async () => {
     await page.click('.liveblog-pagination-next');
+    await page.waitFor(4000);
     const feedChildrenCount = await page.evaluate(() =>
       document.querySelector('.liveblog-feed').children.length,
     );
+    await page.waitForSelector('.liveblog-pagination-pages');
     const pagination = await page.evaluate(() =>
       document.querySelector('.liveblog-pagination-pages').innerHTML,
     );
@@ -104,7 +106,8 @@ describe('End to End', async () => {
   }, TIMEOUT);
 
   it('should add a key event', async () => {
-    await page.click('.liveblog-pagination-prev');
+    await page.click('.liveblog-pagination-first');
+    await page.waitFor(4000);
     await renderEntry('/key This is a test key event');
     await page.waitForSelector('.liveblog-event');
     const event = await page.$('.liveblog-event');
