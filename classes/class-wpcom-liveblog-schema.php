@@ -20,7 +20,7 @@ class WPCOM_Liveblog_Schema {
 	 * @param $post_id
 	 */
 	public function __construct( $post_id ) {
-		$this->query   = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::key );
+		$this->query   = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
 		$this->post_id = $post_id;
 
 		// store permalink because it's used in a loop @ convert_entry_to_schema_blog_posting
