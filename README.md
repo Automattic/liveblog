@@ -58,10 +58,10 @@ New iPad announced, launching next week — more info to come. /key
 You can add new commands easily with a filter, the most basic command will add a class to entry, so you could do a simple  `/highlight` which would add `type-highlight` to the entry container, letting you style the background color:
 
 ``` php
-add_filter( 'liveblog_active_commands',  array( __CLASS__, 'add_highlight_command' ), 10 );
+add_filter( 'liveblog_active_commands', 'add_highlight_command', 10 );
 
 
-public static function add_highlight_command( $commands ) {
+function add_highlight_command( $commands ) {
   $commands[] = highlight;
   return $commands;
 }
