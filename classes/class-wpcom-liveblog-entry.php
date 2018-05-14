@@ -97,10 +97,6 @@ class WPCOM_Liveblog_Entry {
 		return $this->type;
 	}
 
-	public function get_author_name() {
-		return get_the_author_meta( 'display_name', $this->comment->user_id );
-	}
-
 	/**
 	 * Get the GMT timestamp for the comment
 	 *
