@@ -20,6 +20,11 @@ class WPCOM_Liveblog_Entry {
 	const CONTRIBUTORS_META_KEY = 'liveblog_contributors';
 
 	/**
+	 * @var string Meta key for storing the headline, if any.
+	 */
+	const HEADLINE_META_KEY = 'liveblog_headline';
+
+	/**
 	 * @var string Whether or not an entry should show an author
 	 */
 	const HIDE_AUTHORS_KEY = 'liveblog_hide_authors';
@@ -140,6 +145,7 @@ class WPCOM_Liveblog_Entry {
 			'authors'     => self::get_authors( $entry_id ),
 			'entry_time'  => $this->get_comment_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
+			'headline'    => self::get_comment_headline_for_json( $entry_id ),
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
@@ -165,6 +171,7 @@ class WPCOM_Liveblog_Entry {
 			'timestamp'              => $this->get_timestamp(),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
+			'headline'               => self::get_comment_headline_for_json( $entry_id ),
 		);
 
 		return $entry;
@@ -218,6 +225,11 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 
+		// Add the headline as comment meta.
+		if ( isset( $args['header'] ) ) {
+			update_comment_meta( $comment->comment_ID, self::HEADLINE_META_KEY, sanitize_text_field( $args['contributor_ids'] ) );
+		}
+
 		if ( isset( $args['contributor_ids'] ) ) {
 			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
 		}
@@ -238,6 +250,11 @@ class WPCOM_Liveblog_Entry {
 	public static function update( $args ) {
 		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+
+		// Add the headline as comment meta.
+		if ( isset( $args['header'] ) ) {
+			update_comment_meta( $comment->comment_ID, self::HEADLINE_META_KEY, sanitize_text_field( $args['contributor_ids'] ) );
 		}
 
 		// always use the original author for the update entry, otherwise until refresh
@@ -474,6 +491,21 @@ class WPCOM_Liveblog_Entry {
 				return self::get_user_data_for_json( $user_object );
 			}, $contributors
 		);
+	}
+
+	/**
+	 * Returns a comment header.
+	 *
+	 * @param int $comment_id The comment id to retrive the metadata.
+	 */
+	private static function get_comment_headline_for_json( $comment_id ) {
+		$headline = get_comment_meta( $comment_id, self::HEADLINE_META_KEY, true );
+
+		if ( ! $headline ) {
+			return '';
+		}
+
+		return $headline;
 	}
 
 	public static function get_userdata_with_filter( $author_id ) {
