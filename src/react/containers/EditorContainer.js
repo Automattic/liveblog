@@ -99,6 +99,7 @@ class EditorContainer extends Component {
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
+    const headline = this.state.headline;
 
     if (isEditing) {
       updateEntry({
@@ -106,6 +107,7 @@ class EditorContainer extends Component {
         content,
         author,
         contributors,
+        headline,
       });
       entryEditClose(entry.id);
       return;
@@ -115,6 +117,7 @@ class EditorContainer extends Component {
       content,
       author,
       contributors,
+      headline,
     });
 
     const newEditorState = EditorState.push(
@@ -129,6 +132,12 @@ class EditorContainer extends Component {
   onSelectAuthorChange(value) {
     this.setState({
       authors: value,
+    });
+  }
+
+  onHeadlineChange(value) {
+    this.setState({
+      headline: value,
     });
   }
 
@@ -242,7 +251,7 @@ class EditorContainer extends Component {
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        <PostHeadline />
+        <PostHeadline onChange={this.onHeadlineChange.bind(this)} />
         { (usetinymce !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
