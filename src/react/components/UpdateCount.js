@@ -6,7 +6,7 @@ const UpdateCount = ({ entries, config }) => {
 
   return (
     <div className="liveblog-update-count">
-      {entries.length} {config.updates}
+      {entries.length} {entries.length > 1 ? config.updates : config.update}
     </div>
   );
 };

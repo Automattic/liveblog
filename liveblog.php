@@ -1105,6 +1105,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'new_updates'                  => __( 'Liveblog: {number} new updates', 'liveblog' ),
 						'create_link_prompt'           => __( 'Provide URL for link:', 'liveblog' ),
 						'updates'                      => __( 'Updates', 'liveblog' ),
+						'update'                       => __( 'Update', 'liveblog' ),
 
 						// Classes
 						'class_term_prefix'            => __( 'term-', 'liveblog' ),
