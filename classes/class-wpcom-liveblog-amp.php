@@ -44,6 +44,8 @@ class WPCOM_Liveblog_AMP {
 		// Remove WordPress adding <p> tags as breaks layout.
 		remove_filter( 'the_content', 'wpautop' );
 
+		add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
+
 		// Add AMP ready markup to post.
 		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
 
@@ -79,6 +81,62 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function enqueue_styles() {
 		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+	}
+
+	public static function append_liveblog_to_metadata( $metadata, $post ) {
+
+		// If we are not viewing a liveblog post then exist the filter.
+		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+			return $data;
+		}
+
+		$request = self::get_request_data();
+
+		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
+
+		// Set the last known entry for users who don't have one yet.
+		if ( $request->last_known_entry === false ) {
+			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
+		}
+
+		$blog_updates = [];
+
+		foreach ( $entries['entries'] as $key => $entry ) {
+			//$amp_content                           = self::prepare_entry_content( $entry->content, $entry );
+			//$entries['entries'][$key]->amp_content = $amp_content->get_amp_content();
+
+			//var_dump( $entry);
+
+			//get publisher info
+
+			$publisher_name = $metadata['publisher']['name'];
+			$publisher_organization = $metadata['publisher']['type'];
+
+			$blog_item = (object)array(
+				'@type'         => 'Blog Posting',
+				'headline'      => 'headline',
+				'url'           => $entry->share_link,
+				'datePublished' => date( "yyyy - mm - dd", $entry->entry_time ),
+				'articleBody'   => (object) array(
+					'@type'     => 'Text',
+				),
+				'publisher'	    => (object) array(
+					'@type'     => $publisher_organization,
+					'name'	    => $publisher_name,
+				),
+			);
+
+			array_push( $blog_updates, $blog_item );
+
+		}
+
+			// var_dump( $blog_updates );
+
+			// die();
+
+		$metadata['liveBlogUpdate'] = $blog_updates;
+
+		return $metadata;
 	}
 
 	/**
