@@ -10,8 +10,14 @@ import EditorContainer from '../containers/EditorContainer';
 
 const authorLink = (author) => {
   let result = '';
+  let slug = '';
   if (typeof author !== 'undefined' && author && author.name) {
-    result = `/contributors/${author.name.toLowerCase().replace(' ', '-')}/`;
+    slug = author.name.toLowerCase();
+    slug = slug.replace( /[^%a-z0-9 _-]/g, '' );
+    slug = slug.replace( /\s+/g, '-' );
+    slug = slug.replace( /-+/g, '-' );
+
+    result = `/contributors/${slug}/`;
   }
   return result;
 };
