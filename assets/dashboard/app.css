@@ -82,3 +82,9 @@ body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary#publish
 body.wp-admin .liveblog-editor-textarea {
   width: 100%;
 }
+
+body.wp-admin.liveblog.post-type-fte_liveblog #post_headline {
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 16px;
+}

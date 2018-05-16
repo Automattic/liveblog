@@ -19,6 +19,7 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 import HTMLInput from '../components/HTMLInput';
+import PostHeadline from '../components/PostHeadline';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
@@ -241,6 +242,7 @@ class EditorContainer extends Component {
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
+        <PostHeadline />
         { (usetinymce !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
