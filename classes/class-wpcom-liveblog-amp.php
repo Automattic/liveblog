@@ -22,6 +22,7 @@ class WPCOM_Liveblog_AMP {
 
 		// Add a /pagination to URLs to allow for pagination in AMP.
 		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_pagination' ), 10 );
+		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_single_entry' ), 10 );
 	}
 
 	/**
@@ -63,6 +64,13 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function add_endpoint_for_pagination() {
 		add_rewrite_endpoint( 'pagination', EP_PERMALINK, true );
+	}
+
+	/**
+	 * Add Endpoint for pagination description
+	 */
+	public static function add_endpoint_for_single_entry() {
+		add_rewrite_endpoint( 'single', EP_PERMALINK, true );
 	}
 
 	/**
@@ -153,6 +161,26 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$request = self::get_request_data();
+
+		if ( 'single' === $request->type ) {
+			$single_entry = get_comment( $request->id );
+
+			//var_dump($single_entry);
+
+			$content .= self::get_template(
+				'entry', array(
+					'content'    => $single_entry->content,
+					'authors'    => $single_entry->authors,
+					'time'       => $single_entry->entry_time,
+					'date'       => $single_entry->date,
+					'time_ago'   => $single_entry->time_ago,
+					'share_link' => $single_entry->share_link,
+				)
+			);
+
+			return $content;
+		}
+
 		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
 
 		// Set the last known entry for users who don't have one yet.
@@ -162,7 +190,7 @@ class WPCOM_Liveblog_AMP {
 
 		$content .= self::get_template(
 			'feed', array(
-				'entries'  => self::filter_entries( $entries['entries'] ),
+				'entries'  => self::filter_entries( $entries['entries'], $post->post_id ),
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
@@ -182,11 +210,15 @@ class WPCOM_Liveblog_AMP {
 	 * @param  array $entries Entries.
 	 * @return array         Updates Entries
 	 */
-	public static function filter_entries( $entries ) {
+	public static function filter_entries( $entries, $post_id ) {
+		$permalink = amp_get_permalink( $post_id );
+
 		foreach ( $entries as $key => $entry ) {
-			$entries[ $key ]->time_ago = self::get_entry_time_ago( $entry );
-			$entries[ $key ]->date     = self::get_entry_date( $entry );
+			$entries[ $key ]->time_ago  = self::get_entry_time_ago( $entry );
+			$entries[ $key ]->date      = self::get_entry_date( $entry );
+			$entries[ $key ]->permalink = self::build_single_entry_permalink( $permalink, $entry->id );
 		}
+
 		return $entries;
 	}
 
@@ -255,6 +287,18 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
+	 * Builds up a pagination link.
+	 *
+	 * @param  string $permalink        Permalink.
+	 * @param  int    $page             Page Number.
+	 * @param  string $last_known_entry Last Know Entry.
+	 * @return string                   Pagination Link
+	 */
+	public static function build_single_entry_permalink( $permalink, $id ) {
+		return $permalink . '/single/' . $id;
+	}
+
+	/**
 	 * Get Page and Last known entry from the request.
 	 *
 	 * @return object Request Data.
@@ -266,12 +310,31 @@ class WPCOM_Liveblog_AMP {
 			$pagination = get_query_var( amp_get_slug() );
 		}
 
-		$page             = preg_match( '/page\/(\d*)/', $pagination, $matches ) ? (int) $matches[1] : 1;
-		$last_known_entry = preg_match( '/entry\/([\d-]*)/', $pagination, $matches ) ? $matches[1] : false;
+		if ( 'pagination' === substr( $pagination, 0, strlen( 'pagination' ) ) ) {
+			return self::get_pagination_request( $pagination );
+		} else if( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
+			return self::get_single_request( $pagination );
+		} else {
+			die;
+		}
+	}
+
+	public static function get_pagination_request( $query_var ) {
+		$page             = preg_match( '/page\/(\d*)/', $query_var, $matches ) ? (int) $matches[1] : 1;
+		$last_known_entry = preg_match( '/entry\/([\d-]*)/', $query_var, $matches ) ? $matches[1] : false;
 
 		return (object) array(
 			'page'             => $page,
 			'last_known_entry' => $last_known_entry,
+		);
+	}
+
+	public static function get_single_request( $query_var ) {
+		$page = preg_match( '/single\/(\d*)/', $query_var, $matches ) ? (int) $matches[1] : null;
+
+		return (object) array(
+			'type' => 'single',
+			'id'   => $page,
 		);
 	}
 
