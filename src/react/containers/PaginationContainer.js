@@ -14,6 +14,43 @@ class PaginationContainer extends Component {
       return null;
     }
 
+    const onClick = (e) => {
+      e.preventDefault();
+      console.log(e.currentTarget.getAttribute('index'));
+      getEntriesPaginated((e.currentTarget.getAttribute('index')), 'first');
+    };
+
+    let i;
+    const pageNavigation = [];
+    for (i = 1; i <= pages; i += 1) {
+      if (page === i) {
+        pageNavigation.push(
+          React.createElement(
+            'span',
+            {
+              key: i,
+              className: 'liveblog-page-navigation-link current',
+            },
+            i,
+          ),
+        );
+      } else {
+        pageNavigation.push(
+          React.createElement(
+            'a',
+            {
+              href: '#',
+              onClick,
+              index: i,
+              key: i,
+              className: 'liveblog-page-navigation-link',
+            },
+            i,
+          ),
+        );
+      }
+    }
+
     return (
       <div className="liveblog-pagination">
         <div>
@@ -32,7 +69,8 @@ class PaginationContainer extends Component {
             Prev
           </button>
         </div>
-        <span className="button button-large liveblog-pagination-pages">{page} of {pages}</span>
+        <span className="liveblog-pagination-pages">{pageNavigation}
+        </span>
         <div>
           <button
             disabled={page === pages}
