@@ -88,3 +88,9 @@ body.wp-admin.liveblog.post-type-fte_liveblog #post_headline {
   margin-bottom: 10px;
   font-size: 16px;
 }
+
+body.wp-admin.liveblog.post-type-fte_liveblog #poststuff h2.liveblog-entry-header {
+  margin-left: 88px;
+  padding-left: 0;
+  font-size: 18px;
+}
