@@ -13,6 +13,7 @@ import {
   getTinyMCEContent,
   clearTinyMCEContent,
   clearAuthors,
+  clearHeadline,
 } from '../components/TinyMCEEditor';
 
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
@@ -67,6 +68,7 @@ export function createEntry(entry, config, nonce = false) {
     setTimeout(() => {
       clearTinyMCEContent();
       clearAuthors();
+      clearHeadline();
     }, 250);
   }
 

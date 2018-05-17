@@ -53,6 +53,7 @@ class EditorContainer extends Component {
       authors: initialAuthors,
       mode: 'editor',
       readOnly: false,
+      headline: '',
       rawText: props.entry ? props.entry.content : '',
     };
 
@@ -63,6 +64,10 @@ class EditorContainer extends Component {
 
     this.clearAuthors = () => this.setState({
       authors: false,
+    });
+
+    this.clearHeadline = () => this.setState({
+      headline: '',
     });
   }
 
@@ -237,6 +242,7 @@ class EditorContainer extends Component {
       mode,
       authors,
       readOnly,
+      headline,
     } = this.state;
 
     const { isEditing, config, usetinymce } = this.props;
@@ -247,11 +253,13 @@ class EditorContainer extends Component {
         }
         return false;
       }) : [];
-
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        <PostHeadline onChange={this.onHeadlineChange.bind(this)} />
+        <PostHeadline
+          onChange={this.onHeadlineChange.bind(this)}
+          headline={headline}
+        />
         { (usetinymce !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
@@ -297,6 +305,7 @@ class EditorContainer extends Component {
             defaultImageSize={config.default_image_size}
             usetinymce={config.usetinymce}
             clearAuthors={this.clearAuthors}
+            clearHeadline={this.clearHeadline}
           />
         }
         {

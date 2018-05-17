@@ -19,6 +19,7 @@ class PostHeadline extends React.Component {
             autoComplete="off"
             placeholder="Enter update headline..."
             onChange={evt => this.updateInputValue(evt)}
+            value={this.props.headline}
           />
         </div>
       </div>
@@ -28,6 +29,7 @@ class PostHeadline extends React.Component {
 
 PostHeadline.propTypes = {
   onChange: PropTypes.func,
+  headline: PropTypes.string,
 };
 
 export default PostHeadline;
