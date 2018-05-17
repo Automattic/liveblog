@@ -88,6 +88,7 @@ export function updateEntry(entry, config, nonce = false) {
       content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
+      headline: entry.headline,
     },
     headers: {
       'Content-Type': 'application/json',
