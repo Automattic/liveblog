@@ -53,7 +53,7 @@ class EditorContainer extends Component {
       authors: initialAuthors,
       mode: 'editor',
       readOnly: false,
-      headline: '',
+      headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
     };
 
