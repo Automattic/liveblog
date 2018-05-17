@@ -9,7 +9,8 @@
   ],
   "globals": {
     "__DEV__": true,
-    "__TEST__": true
+    "__TEST__": true,
+    "_": true
   },
   "env": {
     "browser": true,
