@@ -20,3 +20,13 @@
   font-size: 13px;
   line-height: 12px;
 }
+
+
+.liveblog-pagination-pages a,
+.liveblog-pagination-pages span {
+    padding: 5px;
+}
+
+.liveblog-pagination-pages span.current {
+  font-weight: bold;
+}
