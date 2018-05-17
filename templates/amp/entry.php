@@ -1,5 +1,6 @@
 <?php
 	$entry_time = $this->get( 'time' );
+	$content = $this->get( 'content' );
 ?>
 
 <div class="liveblog-entry" id="post<?php echo esc_attr( $entry_time ); ?>"
@@ -15,23 +16,32 @@
 	<div class="liveblog-entry-main">
 		<header class="liveblog-meta-authors">
 
-			<?php foreach ( $this->get( 'authors' ) as $author ) : ?>
+			<?php if (is_array( $this->get( 'authors' ))): ?>
 
-			<?php $avatar_url = get_avatar_url( $author['id'] ); ?>
+				<?php foreach ( $this->get( 'authors' ) as $author ) : ?>
 
-			<div class="liveblog-meta-author">
-				<div class="liveblog-meta-author-avatar">
-					<amp-img alt="A view of the sea"
-					src="<?php echo esc_html( $avatar_url ); ?>"
-					width="20"
-					height="20"
-					layout="responsive">
-					</amp-img>
-				</div>
-				<span class="liveblog-meta-author-name"><?php echo esc_html( $author['name'] ); ?></span>
-			</div>
+					<?php
+					$this->load_part(
+						'author', array(
+							'author' => $author,
+						)
+					);
+					?>
 
-			<?php endforeach ?>
+				<?php endforeach ?>
+
+
+				<?php else : ?>
+
+				<?php
+				$this->load_part(
+					'author', array(
+						'author' => $authors,
+					)
+				);
+				?>
+
+			<?php endif; ?>
 		</header>
 
 		<div class="liveblog-entry-content">

@@ -165,18 +165,33 @@ class WPCOM_Liveblog_AMP {
 		if ( 'single' === $request->type ) {
 			$single_entry = get_comment( $request->id );
 
-			//var_dump($single_entry);
-
 			$content .= self::get_template(
 				'entry', array(
-					'content'    => $single_entry->content,
-					'authors'    => $single_entry->authors,
+					'content'    => $single_entry->comment_content,
+					'authors'    => $single_entry->comment_author,
 					'time'       => $single_entry->entry_time,
 					'date'       => $single_entry->date,
 					'time_ago'   => $single_entry->time_ago,
 					'share_link' => $single_entry->share_link,
 				)
 			);
+
+			//$single_entry = WPCOM_Liveblog::get_single_entry( $request->id );
+
+			//$single_entry = WPCOM_Liveblog::get_entries_paged( $request->page, $request->id );
+
+			//var_dump($single_entry);
+
+			// $content .= self::get_template(
+			// 	'entry', array(
+			// 		'content'    => $entry->content,
+			// 		'authors'    => $entry->authors,
+			// 		'time'       => $entry->entry_time,
+			// 		'date'       => $entry->date,
+			// 		'time_ago'   => $entry->time_ago,
+			// 		'share_link' => $entry->share_link,
+			// 	)
+			// );
 
 			return $content;
 		}
@@ -314,8 +329,6 @@ class WPCOM_Liveblog_AMP {
 			return self::get_pagination_request( $pagination );
 		} else if( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
 			return self::get_single_request( $pagination );
-		} else {
-			die;
 		}
 	}
 
