@@ -47,7 +47,7 @@ class TinyMCEEditor extends Component {
           tinymce.activeEditor.setContent(stateContent);
         }
       }, 500);
-      const editor = wp.editor.initialize(this.containerId, this.editorSettings);
+      wp.editor.initialize(this.containerId, this.editorSettings);
     }, 1000);
   }
 
