@@ -274,8 +274,8 @@ class WPCOM_Liveblog_Entry {
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 
 		// Add the headline as comment meta.
-		if ( isset( $args['header'] ) ) {
-			update_comment_meta( $comment->comment_ID, self::HEADLINE_META_KEY, sanitize_text_field( $args['contributor_ids'] ) );
+		if ( isset( $args['headline'] ) ) {
+			update_comment_meta(  $args['entry_id'], self::HEADLINE_META_KEY, sanitize_text_field( $args['headline'] ) );
 		}
 
 		wp_update_comment(
@@ -328,7 +328,6 @@ class WPCOM_Liveblog_Entry {
 		if ( is_wp_error( $valid_args ) ) {
 			return $valid_args;
 		}
-		error_log( json_encode( $args, JSON_PRETTY_PRINT ) );
 
 		$new_comment_id = wp_insert_comment(
 			array(
