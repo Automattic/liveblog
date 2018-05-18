@@ -1,6 +1,7 @@
 /* global wp,  tinymce, jQuery */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/prop-types */
+/* eslint no-param-reassign: ["error", { "props": false }] */
 
 import React, { Component } from 'react';
 
@@ -32,21 +33,28 @@ class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
     this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
+    this.wrapper = `${this.containerId}-wrapper`;
     this.editorSettings = window.liveblog_settings.editorSettings;
     setTimeout(() => {
-      setTimeout(() => {
+      this.editorSettings.tinymce.setup = (editor) => {
         const stateContent = this.props.editorContainer.getContent();
-        tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
-        if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
-          tinymce.activeEditor.setContent(stateContent);
-        }
-      }, 500);
+        editor.clearAuthors = this.props.clearAuthors;
+        setTimeout(() => {
+          if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
+            editor.setContent(stateContent);
+          }
+        }, 250);
+      };
       wp.editor.initialize(this.containerId, this.editorSettings);
     }, 1000);
   }
 
   render() {
-    return <textarea className="liveblog-editor-textarea" id={this.containerId} />;
+    return (
+      <div className="liveblog-editor-wrapper" id={this.wrapper}>
+        <textarea className="liveblog-editor-textarea" id={this.containerId} />
+      </div>
+    );
   }
 }
 
