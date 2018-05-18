@@ -11,6 +11,7 @@ import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
+import UpdateCount from '../components/UpdateCount';
 
 class AppContainer extends Component {
   constructor() {
@@ -42,7 +43,8 @@ class AppContainer extends Component {
           usetinymce={config.usetinymce}
         />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        <Entries loading={loading} entries={entries} config={config}/>
+        <UpdateCount entries={entries} config={config} />
+        <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
       </div>

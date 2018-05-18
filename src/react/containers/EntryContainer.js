@@ -13,9 +13,9 @@ const authorLink = (author) => {
   let slug = '';
   if (typeof author !== 'undefined' && author && author.name) {
     slug = author.name.toLowerCase();
-    slug = slug.replace( /[^%a-z0-9 _-]/g, '' );
-    slug = slug.replace( /\s+/g, '-' );
-    slug = slug.replace( /-+/g, '-' );
+    slug = slug.replace(/[^%a-z0-9 _-]/g, '');
+    slug = slug.replace(/\s+/g, '-');
+    slug = slug.replace(/-+/g, '-');
 
     result = `/contributors/${slug}/`;
   }
@@ -149,6 +149,11 @@ class EntryContainer extends Component {
               <abbr title={formattedTime(entry.entry_time, config.utc_offset, 'c')} className="liveblog-timestamp">{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</abbr>
             </a>
           </header>
+          { entry.headline &&
+            <h2 className="liveblog-entry-header">
+              {entry.headline}
+            </h2>
+          }
           {
             this.isEditing()
               ? (

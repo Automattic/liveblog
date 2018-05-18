@@ -67,7 +67,8 @@ body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi 
 	z-index: 2;
 }
 
-body.wp-admin .liveblog-editor-container {
+body.wp-admin .liveblog-editor-container,
+body.wp-admin .liveblog-update-count {
 	background-color: #f1f1f1;
 }
 
@@ -83,7 +84,33 @@ body.wp-admin .liveblog-editor-textarea {
   width: 100%;
 }
 
+body.wp-admin.liveblog.post-type-fte_liveblog #wpcom-liveblog-container .liveblog-update-btn {
+  background-color: #fff;
+}
+
+body.wp-admin.liveblog.post-type-fte_liveblog #post_headline {
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+body.wp-admin.liveblog.post-type-fte_liveblog #poststuff h2.liveblog-entry-header {
+  margin-left: 88px;
+  padding-left: 0;
+  font-size: 18px;
+}
+
+body.wp-admin .liveblog-update-count {
+  padding: 5px;
+  margin-top: 0px;
+}
+
+body.wp-admin .liveblog-entry {
+  background-color: white;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+}
+
 body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .mce-tooltip {
   display: none;
 }
-
