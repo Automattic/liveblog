@@ -19,6 +19,7 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 import HTMLInput from '../components/HTMLInput';
+import PostHeadline from '../components/PostHeadline';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
@@ -52,6 +53,7 @@ class EditorContainer extends Component {
       authors: initialAuthors,
       mode: 'editor',
       readOnly: false,
+      headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
     };
 
@@ -62,6 +64,10 @@ class EditorContainer extends Component {
 
     this.clearAuthors = () => this.setState({
       authors: false,
+    });
+
+    this.clearHeadline = () => this.setState({
+      headline: '',
     });
   }
 
@@ -98,6 +104,7 @@ class EditorContainer extends Component {
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
+    const headline = this.state.headline;
 
     if (isEditing) {
       updateEntry({
@@ -105,6 +112,7 @@ class EditorContainer extends Component {
         content,
         author,
         contributors,
+        headline,
       });
       entryEditClose(entry.id);
       return;
@@ -114,6 +122,7 @@ class EditorContainer extends Component {
       content,
       author,
       contributors,
+      headline,
     });
 
     const newEditorState = EditorState.push(
@@ -128,6 +137,12 @@ class EditorContainer extends Component {
   onSelectAuthorChange(value) {
     this.setState({
       authors: value,
+    });
+  }
+
+  onHeadlineChange(value) {
+    this.setState({
+      headline: value,
     });
   }
 
@@ -227,9 +242,10 @@ class EditorContainer extends Component {
       mode,
       authors,
       readOnly,
+      headline,
     } = this.state;
 
-    const { isEditing, config, backend } = this.props;
+    const { isEditing, config, usetinymce } = this.props;
     const authorIds = authors ?
       authors.map((author) => {
         if (author && author.id) {
@@ -240,7 +256,11 @@ class EditorContainer extends Component {
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        { (backend !== '1') &&
+        <PostHeadline
+          onChange={this.onHeadlineChange.bind(this)}
+          headline={headline}
+        />
+        { (usetinymce !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
               className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
@@ -283,8 +303,9 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            usetinymce={config.usetinymce}
+            usetinymce={usetinymce}
             clearAuthors={this.clearAuthors}
+            clearHeadline={this.clearHeadline}
           />
         }
         {

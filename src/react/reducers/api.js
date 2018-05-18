@@ -1,3 +1,5 @@
+/* global jQuery */
+
 import {
   applyUpdate,
   pollingApplyUpdate,
@@ -43,6 +45,9 @@ export const api = (state = initialState, action) => {
       };
 
     case 'POLLING_SUCCESS':
+      if (action.payload.entries && action.payload.entries.length !== 0) {
+        jQuery(document).trigger('liveblog-post-update', [action.payload]);
+      }
       return {
         ...state,
         error: false,

@@ -10,8 +10,14 @@ import EditorContainer from '../containers/EditorContainer';
 
 const authorLink = (author) => {
   let result = '';
+  let slug = '';
   if (typeof author !== 'undefined' && author && author.name) {
-    result = `/contributors/${author.name.toLowerCase().replace(' ', '-')}/`;
+    slug = author.name.toLowerCase();
+    slug = slug.replace(/[^%a-z0-9 _-]/g, '');
+    slug = slug.replace(/\s+/g, '-');
+    slug = slug.replace(/-+/g, '-');
+
+    result = `/contributors/${slug}/`;
   }
   return result;
 };
@@ -133,7 +139,7 @@ class EntryContainer extends Component {
                     author.id &&
                     <span className="liveblog-meta-author" key={author.id}>
                       <a href={authorLink(author)}>{author.name}</a>
-                      {(index < list.length - 2) && ', '}
+                      {(index < list.length - 1) && ', '}
                     </span>
                   ))
                 }
@@ -143,6 +149,11 @@ class EntryContainer extends Component {
               <abbr title={formattedTime(entry.entry_time, config.utc_offset, 'c')} className="liveblog-timestamp">{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</abbr>
             </a>
           </header>
+          { entry.headline &&
+            <h2 className="liveblog-entry-header">
+              {entry.headline}
+            </h2>
+          }
           {
             this.isEditing()
               ? (

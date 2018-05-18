@@ -206,7 +206,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes[] = 'liveblog';
-				$state = apply_filters( 'liveblog_default_state', get_post_meta( get_the_ID(), self::KEY, true ) );
+				$post_id = get_the_ID();
+				$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 				if ( $state ) {
 					$classes[] = 'liveblog-'. $state;
 				}
@@ -221,8 +222,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class_admin( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes .= ' liveblog ';
-
-				$state = apply_filters( 'liveblog_default_state', get_post_meta( get_the_ID(), self::KEY, true ) );
+				$post_id = get_the_ID();
+				$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 				if ( $state ) {
 					$classes .= 'liveblog-'. $state . ' ';
 				}
@@ -301,7 +302,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function flush_rewrite_rules() {
-			if ( get_option( 'liveblog_rewrites_version' ) !== self::REWRITES_VERSION ) {
+			$version_option = (int) get_option( 'liveblog_rewrites_version' );
+			if ( self::REWRITES_VERSION !== $version_option ) {
 				flush_rewrite_rules();
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
@@ -548,7 +550,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$post_id = $post->ID;
 				}
 			}
-			$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ) );
+			$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 			// backwards compatibility with older values
 			if ( 1 === $state ) {
 				$state = 'enable';
@@ -1077,6 +1079,17 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'endpoint_url'                 => self::get_entries_endpoint_url(),
 						'backend_liveblogging'         => apply_filters( 'liveblog_back_end_liveblogging', false ),
 						'usetinymce'                   => apply_filters( 'liveblog_use_tinymce_editor', false ),
+						'editorSettings'               => apply_filters( 'liveblog_tinymce_editor_settings', array(
+							'tinymce' => array(
+								'wpautop'  => true,
+								'plugins'  => 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview',
+								'toolbar1' => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',
+								'toolbar2' => 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
+								'height'   => 300,
+							),
+							'quicktags'    => true,
+							'mediaButtons' => true,
+						) ),
 						'is_admin'                     => is_admin(),
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
@@ -1091,6 +1104,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'new_update'                   => __( 'Liveblog: {number} new update', 'liveblog' ),
 						'new_updates'                  => __( 'Liveblog: {number} new updates', 'liveblog' ),
 						'create_link_prompt'           => __( 'Provide URL for link:', 'liveblog' ),
+						'updates'                      => __( 'Updates', 'liveblog' ),
+						'update'                       => __( 'Update', 'liveblog' ),
 
 						// Classes
 						'class_term_prefix'            => __( 'term-', 'liveblog' ),

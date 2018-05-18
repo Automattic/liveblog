@@ -17,7 +17,7 @@ export const getTinyMCEContent = () => {
 export const clearTinyMCEContent = () => {
   const currentEditor = tinymce.activeEditor;
   const $textField = jQuery(`#${currentEditor.id}`);
-  $textField.empty();
+  $textField.val('');
   currentEditor.setContent('');
 };
 
@@ -27,26 +27,22 @@ export const clearAuthors = () => {
   }
 };
 
+export const clearHeadline = () => {
+  if (tinymce.activeEditor.clearHeadline) {
+    tinymce.activeEditor.clearHeadline();
+  }
+};
 
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
     this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
-    this.editorSettings = {
-      tinymce: {
-        wpautop: true,
-        plugins: 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview espnFootnote espnESPNPromos espnPullquoteRight espnSocial espnPullquote espnOrnamentalRule espnESPNVideo espnPodcasts espnDropcap',
-        toolbar1: 'formatselect bold strikethrough bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv footnote ornamental-rule pullquote pullquote-right espn-video dropcap social espn-promos podcasts | fullscreen',
-        toolbar2: 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
-        height: 300,
-      },
-      quicktags: true,
-      mediaButtons: true,
-    };
-    setTimeout(() => {
-      setTimeout(() => {
+    this.editorSettings = window.liveblog_settings.editorSettings;
+    setTimeout(() => { // wait for load
+      setTimeout(() => { // wait for editor init
         const stateContent = this.props.editorContainer.getContent();
         tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
+        tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
