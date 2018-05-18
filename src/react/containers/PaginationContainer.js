@@ -16,7 +16,6 @@ class PaginationContainer extends Component {
 
     const onClick = (e) => {
       e.preventDefault();
-      console.log(e.currentTarget.getAttribute('index'));
       getEntriesPaginated((e.currentTarget.getAttribute('index')), 'first');
     };
 
