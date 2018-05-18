@@ -303,7 +303,7 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            usetinymce={config.usetinymce}
+            usetinymce={usetinymce}
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
           />
