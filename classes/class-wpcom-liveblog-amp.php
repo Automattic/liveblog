@@ -57,6 +57,24 @@ class WPCOM_Liveblog_AMP {
 		} else {
 			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
 		}
+
+	}
+
+	/**
+	 * Add default social share options
+	 */
+	public static function add_social_share_options() {
+		if ( defined( 'LIVEBLOG_AMP_SOCIAL_SHARE' ) && false === LIVEBLOG_AMP_SOCIAL_SHARE ) {
+			return array();
+		}
+
+		$social_array = array( 'twitter', 'pinterest', 'email', 'google' );
+
+		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
+			$social_array[] = 'facebook';
+		}
+
+		return apply_filters( 'liveblog_amp_social_share_platforms', $social_array );
 	}
 
 	/**
@@ -167,6 +185,8 @@ class WPCOM_Liveblog_AMP {
 
 			$content .= self::get_template(
 				'entry', array(
+					'single'     => true,
+					'id'         => $request->id,
 					'content'    => $single_entry->comment_content,
 					'authors'    => $single_entry->comment_author,
 					'time'       => $single_entry->entry_time,
@@ -176,11 +196,13 @@ class WPCOM_Liveblog_AMP {
 				)
 			);
 
-			//$single_entry = WPCOM_Liveblog::get_single_entry( $request->id );
+			$entry = WPCOM_Liveblog::get_single_liveblog_entry( $request->id );
 
-			//$single_entry = WPCOM_Liveblog::get_entries_paged( $request->page, $request->id );
+			// $single_entry = WPCOM_Liveblog::get_single_entry( $request->id );
 
-			//var_dump($single_entry);
+			// $single_entry = WPCOM_Liveblog::get_entries_paged( $request->page, $request->id );
+
+			// //var_dump($single_entry);
 
 			// $content .= self::get_template(
 			// 	'entry', array(
@@ -192,6 +214,15 @@ class WPCOM_Liveblog_AMP {
 			// 		'share_link' => $entry->share_link,
 			// 	)
 			// );
+
+			// define('LIVEBLOG_AMP_SOCIAL_SHARE', true);
+
+			// add_filter( 'liveblog_amp_social_share_platforms', function( $platforms ) {
+			// 	unset($platorms['facebook']);
+			// 	return $platforms;
+			// } );
+
+
 
 			return $content;
 		}
@@ -206,12 +237,14 @@ class WPCOM_Liveblog_AMP {
 		$content .= self::get_template(
 			'feed', array(
 				'entries'  => self::filter_entries( $entries['entries'], $post->post_id ),
+				'post_id'  => $post->post_id,
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
-					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval()
+					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
+					'social' => static::add_social_share_options(),
 				)
 			)
 		);

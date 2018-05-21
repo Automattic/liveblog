@@ -1,11 +1,15 @@
 <?php
 
+$post_id          = $this->get( 'post_id' );
 $links            = $this->get( 'links' );
 $page             = $this->get( 'page' );
 $pages            = $this->get( 'pages' );
 $settings         = $this->get( 'settings' );
 $entries_per_page = $settings['entries_per_page'];
 $refresh_interval = $settings['refresh_interval'];
+$social           = $settings['social'];
+
+
 
 ?>
 
@@ -28,12 +32,15 @@ $refresh_interval = $settings['refresh_interval'];
 		<?php
 		$this->load_part(
 			'entry', array(
+				'post_id'    => $post_id,
+				'id'         => $entry->id,
 				'content'    => $entry->content,
 				'authors'    => $entry->authors,
 				'time'       => $entry->entry_time,
 				'date'       => $entry->date,
 				'time_ago'   => $entry->time_ago,
 				'share_link' => $entry->share_link,
+				'social'     => $social,
 			)
 		);
 		?>

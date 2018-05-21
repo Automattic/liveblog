@@ -790,6 +790,23 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
+		 * Get single entry
+		 *
+		 * @param int $id entry id
+		 * @return array An array of json encoded results
+		 */
+		public static function get_single_liveblog_entry( $id = false ) {
+			if ( empty( self::$entry_query ) ) {
+				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
+			}
+
+			$entry = self::$entry_query->get_by_id( $id );
+
+			//var_dump( $entry );
+			//die();
+		}
+
+		/**
 		 * Get all entries for specific page
 		 *
 		 * @param int $page Requested Page.

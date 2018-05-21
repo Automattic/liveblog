@@ -1,6 +1,9 @@
 <?php
+	$id = $this->get( 'id' );
 	$entry_time = $this->get( 'time' );
 	$content = $this->get( 'content' );
+	$social = $this->get( 'social' );
+	$single = $this->get( 'single' );
 ?>
 
 <div class="liveblog-entry" id="post<?php echo esc_attr( $entry_time ); ?>"
@@ -47,27 +50,34 @@
 		<div class="liveblog-entry-content">
 			<?php echo $this->get( 'content' ); ?>
 
+			<?php if ( count( $social ) > 1 ) : ?>
+
+
+				<?php if ( in_array( 'facebook', $social ) ) : ?>
+				<amp-social-share type="facebook"
+					width="45"
+					height="33"
+					data-param-url="/single/<?php echo $id; ?>"></amp-social-share>
+				<?php endif; ?>
+
 			<amp-social-share type="twitter"
 				width="45"
 				height="33"
-				data-param-url="<?php echo esc_html( $this->get( 'share_link' ) ); ?>"></amp-social-share>
-			<amp-social-share type="facebook"
-				width="45"
-				height="33"
-				data-attribution="254325784911610"
-				data-param-url="<?php echo esc_html( $this->get( 'share_link' ) ); ?>"></amp-social-share>
+				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
 			<amp-social-share type="gplus"
 				width="45"
 				height="33"
-				data-param-url="<?php echo esc_html( $this->get( 'share_link' ) ); ?>"></amp-social-share>
+				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
 			<amp-social-share type="email"
 				width="45"
 				height="33"
-				data-param-url="<?php echo esc_html( $this->get( 'share_link' ) ); ?>"></amp-social-share>
+				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
 			<amp-social-share type="pinterest"
 				width="45"
 				height="33"
-				data-param-url="<?php echo esc_html( $this->get( 'share_link' ) ); ?>"></amp-social-share>
+				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
+
+			<?php endif; ?>
 		</div>
 	</div>
 </div>
