@@ -44,7 +44,7 @@ class TinyMCEEditor extends Component {
       this.editorSettings.tinymce.setup = (editor) => {
         const stateContent = this.props.editorContainer.getContent();
         editor.clearAuthors = this.props.clearAuthors;
-        editor..clearHeadline = this.props.clearHeadline;
+        editor.clearHeadline = this.props.clearHeadline;
         setTimeout(() => {
           if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
             editor.setContent(stateContent);
