@@ -144,7 +144,7 @@ class WPCOM_Liveblog_AMP {
 			$publisher_organization = $metadata['publisher']['type'];
 
 			$blog_item = (object)array(
-				'@type'         => 'LiveBlogPosting',
+				'@type'         => 'BlogPosting',
 				'headline'      => 'headline',
 				'url'           => $entry->share_link,
 				'datePublished' => date( 'yyyy - mm - dd', $entry->entry_time ),
