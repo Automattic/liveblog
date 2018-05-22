@@ -121,7 +121,7 @@ class WPCOM_Liveblog_AMP {
 		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
 
 		// Set the last known entry for users who don't have one yet.
-		if ( $request->last_known_entry === false ) {
+		if ( false === $request->last_known_entry ) {
 			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
@@ -129,26 +129,16 @@ class WPCOM_Liveblog_AMP {
 
 
 		foreach ( $entries['entries'] as $key => $entry ) {
-			//$amp_content                           = self::prepare_entry_content( $entry->content, $entry );
-			//$entries['entries'][$key]->amp_content = $amp_content->get_amp_content();
-
-			//var_dump( $entry);
-
-			//get publisher info
-
-					//var_dump($entry->authors);
-
-			//die();
 
 			$publisher_name = $metadata['publisher']['name'];
 			$publisher_organization = $metadata['publisher']['type'];
 
-			$blog_item = (object)array(
+			$blog_item = (object) array(
 				'@type'         => 'BlogPosting',
 				'headline'      => 'headline',
 				'url'           => $entry->share_link,
-				'datePublished' => date('c', $entry->entry_time),
-				'dateModified'  => date('c', $entry->timestamp),
+				'datePublished' => date( 'c', $entry->entry_time ),
+				'dateModified'  => date( 'c', $entry->timestamp ),
 				'author'        => (object) array (
 						'@type' => 'Person',
 						'name'  => $entry->authors[0]['name'],
@@ -156,19 +146,15 @@ class WPCOM_Liveblog_AMP {
 				'articleBody'   => (object) array(
 					'@type'     => 'Text',
 				),
-				'publisher'	    => (object) array(
+				'publisher'     => (object) array(
 					'@type'     => $publisher_organization,
-					'name'	    => $publisher_name,
+					'name'      => $publisher_name,
 				),
 			);
 
 			array_push( $blog_updates, $blog_item );
 
 		}
-
-			// var_dump( $blog_updates );
-
-			// die();
 
 		$metadata['@type'] = 'LiveBlogPosting';
 		$metadata['liveBlogUpdate'] = $blog_updates;
@@ -192,7 +178,7 @@ class WPCOM_Liveblog_AMP {
 		$request = self::get_request_data();
 
 		// Set the last known entry for users who don't have one yet.
-		if ( $request->last_known_entry === false ) {
+		if ( false === $request->last_known_entry ) {
 			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
