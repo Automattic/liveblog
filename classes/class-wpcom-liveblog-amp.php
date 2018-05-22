@@ -169,6 +169,7 @@ class WPCOM_Liveblog_AMP {
 
 			// die();
 
+		$metadata['@type'] = 'LiveBlogPosting';
 		$metadata['liveBlogUpdate'] = $blog_updates;
 
 		return $metadata;
