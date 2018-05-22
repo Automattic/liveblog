@@ -205,6 +205,14 @@ class WPCOM_Liveblog_AMP {
 		return $content;
 	}
 
+
+	/**
+	 * Builds entry data for single liveblog entry template on AMP
+	 *
+	 * @param  array $entries liveblog entries.
+	 * @param  object $request Request Object.
+	 * @return object          template
+	 */
 	public static function build_single_entry( $entries, $request ) {
 		$match = false;
 
@@ -235,6 +243,14 @@ class WPCOM_Liveblog_AMP {
 		return $rendered;
 	}
 
+	/**
+	 * Builds entry data for single liveblog entry template on AMP
+	 *
+	 * @param  array $entries liveblog entries.
+	 * @param  object $request Request Object.
+	 * @param  string $post_id post id.
+	 * @return object          template
+	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
 		$rendered = self::get_template(
 			'feed', array(
@@ -361,7 +377,7 @@ class WPCOM_Liveblog_AMP {
 			$pagination = get_query_var( amp_get_slug() );
 		}
 
-		if( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
+		if ( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
 			return self::get_single_request( $pagination );
 		} else {
 			return self::get_pagination_request( $pagination );
