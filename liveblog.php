@@ -4,9 +4,9 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.8.0
- * Author:      WordPress.com VIP, Automattic
- * Author URI: http://vip.wordpress.com/
+ * Version:     1.8.2
+ * Author:      WordPress.com VIP, Big Bite Creative and contributors
+ * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
  */
 
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.8.0';
+		const VERSION                 = '1.8.2';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -262,7 +262,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function flush_rewrite_rules() {
-			if ( get_option( 'liveblog_rewrites_version' ) !== self::REWRITES_VERSION ) {
+			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
+			if ( self::REWRITES_VERSION !== $rewrites_version ) {
 				flush_rewrite_rules();
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
@@ -807,7 +808,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( $last_known_entry ) {
 				$last_known_entry = explode( '-', $last_known_entry );
 				if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
-					$last_entry_id = $last_known_entry[0];
+					$last_entry_id = (int) $last_known_entry[0];
 					$index         = array_search( $last_entry_id, array_keys( $entries ), true );
 					$entries       = array_slice( $entries, $index, null, true );
 				}
@@ -817,7 +818,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
-				$index = array_search( $id, array_keys( $entries ), true );
+				$index = array_search( (int) $id, array_keys( $entries ), true );
 				$index++;
 				$page  = ceil( $index / $per_page );
 			}
@@ -998,6 +999,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'post_id'                      => get_the_ID(),
 						'state'                        => self::get_liveblog_state(),
 						'is_liveblog_editable'         => self::is_liveblog_editable(),
+						'current_user'           	   => self::get_current_user(),
 						'socketio_enabled'             => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 						'key'                          => self::KEY,
@@ -1089,7 +1091,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => jetpack_is_mobile(),
+					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ),// phpcs:ignore
 					'supported' => _device_can_upload(),
 				),
 			);
