@@ -32,15 +32,16 @@ $social           = $settings['social'];
 		<?php
 		$this->load_part(
 			'entry', array(
-				'post_id'    => $post_id,
-				'id'         => $entry->id,
-				'content'    => $entry->content,
-				'authors'    => $entry->authors,
-				'time'       => $entry->entry_time,
-				'date'       => $entry->date,
-				'time_ago'   => $entry->time_ago,
-				'share_link' => $entry->share_link,
-				'social'     => $social,
+				'post_id'     => $post_id,
+				'id'          => $entry->id,
+				'content'     => $entry->content,
+				'authors'     => $entry->authors,
+				'time'        => $entry->entry_time,
+				'date'        => $entry->date,
+				'time_ago'    => $entry->time_ago,
+				'share_link'  => $entry->share_link,
+				'social'      => $social,
+				'update_time' => $entry->update_time,
 			)
 		);
 		?>

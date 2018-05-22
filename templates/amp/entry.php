@@ -4,9 +4,11 @@
 	$content = $this->get( 'content' );
 	$social = $this->get( 'social' );
 	$single = $this->get( 'single' );
+	$share_link = $this->get( 'share_link' );
+	$update_time = $this->get( 'update_time' );
 ?>
 
-<div class="liveblog-entry" id="post<?php echo esc_attr( $entry_time ); ?>"
+<div class="liveblog-entry" id="post<?php echo esc_attr( $update_time ); ?>"
 	data-sort-time="<?php echo esc_attr( $entry_time ); ?>">
 
 	<aside class="liveblog-entry-aside">
@@ -51,7 +53,7 @@
 			<?php echo $this->get( 'content' ); ?>
 
 			<?php if ( $single ) : ?>
-				<a href="#">View in feed</a>
+				<a href="<?php echo esc_url( $share_link ); ?>">View in feed</a>
 			<?php endif; ?>
 
 			<?php if ( count( $social ) > 1 ) : ?>
@@ -60,7 +62,7 @@
 			<amp-social-share type="facebook"
 				width="45"
 				height="33"
-				data-param-url="/single/<?php echo $id; ?>"></amp-social-share>
+				data-param-url="<?php echo '/single/' . $id; ?>"></amp-social-share>
 			<?php endif; ?>
 
 			<amp-social-share type="twitter"

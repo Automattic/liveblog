@@ -127,6 +127,7 @@ class WPCOM_Liveblog_AMP {
 
 		$blog_updates = [];
 
+
 		foreach ( $entries['entries'] as $key => $entry ) {
 			//$amp_content                           = self::prepare_entry_content( $entry->content, $entry );
 			//$entries['entries'][$key]->amp_content = $amp_content->get_amp_content();
@@ -135,6 +136,10 @@ class WPCOM_Liveblog_AMP {
 
 			//get publisher info
 
+					//var_dump($entry->authors);
+
+			//die();
+
 			$publisher_name = $metadata['publisher']['name'];
 			$publisher_organization = $metadata['publisher']['type'];
 
@@ -142,7 +147,11 @@ class WPCOM_Liveblog_AMP {
 				'@type'         => 'Blog Posting',
 				'headline'      => 'headline',
 				'url'           => $entry->share_link,
-				'datePublished' => date( "yyyy - mm - dd", $entry->entry_time ),
+				'datePublished' => date( 'yyyy - mm - dd', $entry->entry_time ),
+				'author'        => (object) array (
+						'@type' => 'Person',
+						'name'  => $entry->authors[0]['name'],
+				),
 				'articleBody'   => (object) array(
 					'@type'     => 'Text',
 				),
@@ -180,76 +189,69 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
-		if ( 'single' === $request->type ) {
-			$single_entry = get_comment( $request->id );
-
-			$content .= self::get_template(
-				'entry', array(
-					'single'     => true,
-					'id'         => $request->id,
-					'content'    => $single_entry->comment_content,
-					'authors'    => $single_entry->comment_author,
-					'time'       => $single_entry->entry_time,
-					'date'       => $single_entry->date,
-					'time_ago'   => $single_entry->time_ago,
-					'share_link' => $single_entry->share_link,
-				)
-			);
-
-			$entry = WPCOM_Liveblog::get_single_liveblog_entry( $request->id );
-
-			// $single_entry = WPCOM_Liveblog::get_single_entry( $request->id );
-
-			// $single_entry = WPCOM_Liveblog::get_entries_paged( $request->page, $request->id );
-
-			// //var_dump($single_entry);
-
-			// $content .= self::get_template(
-			// 	'entry', array(
-			// 		'content'    => $entry->content,
-			// 		'authors'    => $entry->authors,
-			// 		'time'       => $entry->entry_time,
-			// 		'date'       => $entry->date,
-			// 		'time_ago'   => $entry->time_ago,
-			// 		'share_link' => $entry->share_link,
-			// 	)
-			// );
-
-			// define('LIVEBLOG_AMP_SOCIAL_SHARE', true);
-
-			// add_filter( 'liveblog_amp_social_share_platforms', function( $platforms ) {
-			// 	unset($platorms['facebook']);
-			// 	return $platforms;
-			// } );
-
-
-
-			return $content;
-		}
-
-		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
-
 		// Set the last known entry for users who don't have one yet.
 		if ( $request->last_known_entry === false ) {
 			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
-		$content .= self::get_template(
+		if ( 'single' === $request->type ) {
+			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
+			$content .= self::build_single_entry( $entries, $request );
+		} else {
+			$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
+			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
+		}
+
+		return $content;
+	}
+
+	public static function build_single_entry( $entries, $request ) {
+		$match = false;
+
+		foreach ( $entries['entries'] as $entry ) {
+			if ( (int) $entry->id == (int) $request->id ) {
+				$match = $entry;
+			}
+		}
+
+		if ( false === $match ) {
+			return '';
+		}
+
+		$rendered = self::get_template(
+			'entry', array(
+				'single'      => true,
+				'id'          => $request->id,
+				'content'     => $match->content,
+				'authors'     => $match->authors,
+				'time'        => $match->time,
+				'date'        => $match->date,
+				'time_ago'    => $match->time_ago,
+				'share_link'  => $match->share_link,
+				'update_time' => $match->timestamp,
+			)
+		);
+
+		return $rendered;
+	}
+
+	public static function build_entries_feed( $entries, $request, $post_id ) {
+		$rendered = self::get_template(
 			'feed', array(
-				'entries'  => self::filter_entries( $entries['entries'], $post->post_id ),
-				'post_id'  => $post->post_id,
+				'entries'  => self::filter_entries( $entries['entries'], $post_id ),
+				'post_id'  => $post_id,
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
-				'links'    => self::get_pagination_links( $request, $entries['pages'], $post->post_id ),
+				'links'    => self::get_pagination_links( $request, $entries['pages'], $post_id ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
 					'social' => static::add_social_share_options(),
-				)
+				),
 			)
 		);
 
-		return $content;
+		return $rendered;
 	}
 
 	/**
@@ -262,9 +264,10 @@ class WPCOM_Liveblog_AMP {
 		$permalink = amp_get_permalink( $post_id );
 
 		foreach ( $entries as $key => $entry ) {
-			$entries[ $key ]->time_ago  = self::get_entry_time_ago( $entry );
-			$entries[ $key ]->date      = self::get_entry_date( $entry );
-			$entries[ $key ]->permalink = self::build_single_entry_permalink( $permalink, $entry->id );
+			$entries[ $key ]->time_ago    = self::get_entry_time_ago( $entry );
+			$entries[ $key ]->date        = self::get_entry_date( $entry );
+			$entries[ $key ]->permalink   = self::build_single_entry_permalink( $permalink, $entry->id );
+			$entries[ $key ]->update_time = $entry->timestamp;
 		}
 
 		return $entries;
@@ -358,10 +361,10 @@ class WPCOM_Liveblog_AMP {
 			$pagination = get_query_var( amp_get_slug() );
 		}
 
-		if ( 'pagination' === substr( $pagination, 0, strlen( 'pagination' ) ) ) {
-			return self::get_pagination_request( $pagination );
-		} else if( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
+		if( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
 			return self::get_single_request( $pagination );
+		} else {
+			return self::get_pagination_request( $pagination );
 		}
 	}
 
