@@ -206,10 +206,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes[] = 'liveblog';
-				$post_id = get_the_ID();
-				$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
+				$post_id   = get_the_ID();
+				$state     = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 				if ( $state ) {
-					$classes[] = 'liveblog-'. $state;
+					$classes[] = 'liveblog-' . $state;
 				}
 			}
 
@@ -222,10 +222,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class_admin( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes .= ' liveblog ';
-				$post_id = get_the_ID();
-				$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
+				$post_id  = get_the_ID();
+				$state    = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 				if ( $state ) {
-					$classes .= 'liveblog-'. $state . ' ';
+					$classes .= 'liveblog-' . $state . ' ';
 				}
 			}
 
@@ -1080,7 +1080,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'backend_liveblogging'         => apply_filters( 'liveblog_back_end_liveblogging', false ),
 						'usetinymce'                   => apply_filters( 'liveblog_use_tinymce_editor', false ),
 						'editorSettings'               => apply_filters( 'liveblog_tinymce_editor_settings', array(
-							'tinymce' => array(
+							'tinymce'      => array(
 								'wpautop'  => true,
 								'plugins'  => 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview',
 								'toolbar1' => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',
