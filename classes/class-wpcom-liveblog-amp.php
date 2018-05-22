@@ -147,7 +147,7 @@ class WPCOM_Liveblog_AMP {
 				'@type'         => 'BlogPosting',
 				'headline'      => 'headline',
 				'url'           => $entry->share_link,
-				'datePublished' => date( 'yyyy - mm - dd', $entry->entry_time ),
+				'datePublished' => date('Y-m-d\TH-i-s.\0\0\0\Z', $entry->entry_time),
 				'author'        => (object) array (
 						'@type' => 'Person',
 						'name'  => $entry->authors[0]['name'],
