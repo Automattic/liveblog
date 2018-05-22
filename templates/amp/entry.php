@@ -50,15 +50,18 @@
 		<div class="liveblog-entry-content">
 			<?php echo $this->get( 'content' ); ?>
 
+			<?php if ( $single ) : ?>
+				<a href="#">View in feed</a>
+			<?php endif; ?>
+
 			<?php if ( count( $social ) > 1 ) : ?>
 
-
-				<?php if ( in_array( 'facebook', $social ) ) : ?>
-				<amp-social-share type="facebook"
-					width="45"
-					height="33"
-					data-param-url="/single/<?php echo $id; ?>"></amp-social-share>
-				<?php endif; ?>
+			<?php if ( in_array( 'facebook', $social ) ) : ?>
+			<amp-social-share type="facebook"
+				width="45"
+				height="33"
+				data-param-url="/single/<?php echo $id; ?>"></amp-social-share>
+			<?php endif; ?>
 
 			<amp-social-share type="twitter"
 				width="45"
