@@ -40,7 +40,7 @@ class TinyMCEEditor extends Component {
     this.editorSettings = window.liveblog_settings.editorSettings;
     setTimeout(() => { // wait for load
       setTimeout(() => { // wait for editor init
-        const stateContent = this.props.editorContainer.getContent();
+        const stateContent = this.props.rawText;
         tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
         tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
