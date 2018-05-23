@@ -133,7 +133,7 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'          => $entry_id,
 			'type'        => $this->get_type(),
-			'html'        => $this->render(),
+			//'html'        => $this->render(),
 			'render'      => self::render_content( $this->get_content(), $this->comment ),
 			'content'     => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,

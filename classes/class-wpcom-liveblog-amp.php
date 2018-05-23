@@ -118,6 +118,9 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
+		$publisher_organization  = '';
+		$publisher_name  = '';
+
 		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
 
 		// Set the last known entry for users who don't have one yet.
@@ -127,11 +130,15 @@ class WPCOM_Liveblog_AMP {
 
 		$blog_updates = [];
 
-
 		foreach ( $entries['entries'] as $key => $entry ) {
 
-			$publisher_name = $metadata['publisher']['name'];
-			$publisher_organization = $metadata['publisher']['type'];
+			if ( isset( $metadata['publisher']['name'] ) ) {
+				$publisher_name = $metadata['publisher']['name'];
+			}
+
+			if ( isset( $metadata['publisher']['type'] ) ) {
+				$publisher_organization = $metadata['publisher']['type'];
+			}
 
 			$blog_item = (object) array(
 				'@type'         => 'BlogPosting',
@@ -153,7 +160,6 @@ class WPCOM_Liveblog_AMP {
 			);
 
 			array_push( $blog_updates, $blog_item );
-
 		}
 
 		$metadata['@type'] = 'LiveBlogPosting';
