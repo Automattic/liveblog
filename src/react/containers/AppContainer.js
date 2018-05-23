@@ -43,7 +43,7 @@ class AppContainer extends Component {
           usetinymce={config.usetinymce}
         />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        <UpdateCount entries={entries} config={config} />
+        { isAdmin && <UpdateCount entries={entries} config={config} /> }
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
