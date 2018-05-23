@@ -23,6 +23,9 @@ class WPCOM_Liveblog_AMP {
 		// Add a /pagination to URLs to allow for pagination in AMP.
 		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_pagination' ), 10 );
 		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_single_entry' ), 10 );
+
+		// Add query vars to support pagination and single entries.
+		add_filter( 'query_vars', array( __CLASS__, 'add_customn_query_vars' ), 10 );
 	}
 
 	/**
@@ -58,6 +61,18 @@ class WPCOM_Liveblog_AMP {
 			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
 		}
 
+	}
+
+	/**
+	 * Add query vars to support pagination and single entries.
+	 * @param array $query_vars Allowed Query Variables
+	 */
+	public static function add_customn_query_vars( $query_vars ) {
+		$query_vars[] = 'liveblog_page';
+		$query_vars[] = 'liveblog_id';
+		$query_vars[] = 'liveblog_last';
+
+		return $query_vars;
 	}
 
 	/**
@@ -121,11 +136,11 @@ class WPCOM_Liveblog_AMP {
 		$publisher_organization  = '';
 		$publisher_name  = '';
 
-		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
+		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
 
 		// Set the last known entry for users who don't have one yet.
-		if ( false === $request->last_known_entry ) {
-			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
+		if ( false === $request->last ) {
+			$request->last = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
 		$blog_updates = [];
@@ -184,15 +199,15 @@ class WPCOM_Liveblog_AMP {
 		$request = self::get_request_data();
 
 		// Set the last known entry for users who don't have one yet.
-		if ( false === $request->last_known_entry ) {
-			$request->last_known_entry = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
+		if ( false === $request->last ) {
+			$request->last = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
 
 		if ( 'single' === $request->type ) {
 			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
 			$content .= self::build_single_entry( $entries, $request );
 		} else {
-			$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last_known_entry );
+			$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
 			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
 		}
 
@@ -319,17 +334,17 @@ class WPCOM_Liveblog_AMP {
 
 		$permalink = amp_get_permalink( $post_id );
 
-		$links['first'] = self::build_paged_permalink( $permalink, 1, $request->last_known_entry );
-		$links['last']  = self::build_paged_permalink( $permalink, $pages, $request->last_known_entry );
+		$links['first'] = self::build_paged_permalink( $permalink, 1, $request->last );
+		$links['last']  = self::build_paged_permalink( $permalink, $pages, $request->last );
 
 		$links['prev'] = false;
 		if ( $request->page > 1 ) {
-			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $request->last_known_entry );
+			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $request->last );
 		}
 
 		$links['next'] = false;
 		if ( $request->page < $pages ) {
-			$links['next'] = self::build_paged_permalink( $permalink, $request->page + 1, $request->last_known_entry );
+			$links['next'] = self::build_paged_permalink( $permalink, $request->page + 1, $request->last );
 		}
 
 		return (object) $links;
@@ -340,23 +355,27 @@ class WPCOM_Liveblog_AMP {
 	 *
 	 * @param  string $permalink        Permalink.
 	 * @param  int    $page             Page Number.
-	 * @param  string $last_known_entry Last Know Entry.
+	 * @param  string $Last 			Last Know Entry.
 	 * @return string                   Pagination Link
 	 */
-	public static function build_paged_permalink( $permalink, $page, $last_known_entry ) {
-		return $permalink . '/pagination/page/' . $page . '/entry/' . $last_known_entry;
+	public static function build_paged_permalink( $permalink, $page, $last ) {
+		return add_query_arg( array(
+			'liveblog_page' => $page,
+			'liveblog_last' => $last
+		), $permalink );
 	}
 
 	/**
 	 * Builds up a pagination link.
 	 *
 	 * @param  string $permalink        Permalink.
-	 * @param  int    $page             Page Number.
-	 * @param  string $last_known_entry Last Know Entry.
-	 * @return string                   Pagination Link
+	 * @param  int    $id             	Entry Id.
+	 * @return string                   Entry Link
 	 */
 	public static function build_single_entry_permalink( $permalink, $id ) {
-		return $permalink . '/single/' . $id;
+		return add_query_arg( array(
+			'liveblog_id' => $id,
+		), $permalink );
 	}
 
 	/**
@@ -365,35 +384,10 @@ class WPCOM_Liveblog_AMP {
 	 * @return object Request Data.
 	 */
 	public static function get_request_data() {
-		$pagination       = get_query_var( 'pagination' );
-
-		if ( empty( $pagination ) ) {
-			$pagination = get_query_var( amp_get_slug() );
-		}
-
-		if ( 'single' == substr( $pagination, 0, strlen( 'single' ) ) ) {
-			return self::get_single_request( $pagination );
-		} else {
-			return self::get_pagination_request( $pagination );
-		}
-	}
-
-	public static function get_pagination_request( $query_var ) {
-		$page             = preg_match( '/page\/(\d*)/', $query_var, $matches ) ? (int) $matches[1] : 1;
-		$last_known_entry = preg_match( '/entry\/([\d-]*)/', $query_var, $matches ) ? $matches[1] : false;
-
 		return (object) array(
-			'page'             => $page,
-			'last_known_entry' => $last_known_entry,
-		);
-	}
-
-	public static function get_single_request( $query_var ) {
-		$page = preg_match( '/single\/(\d*)/', $query_var, $matches ) ? (int) $matches[1] : null;
-
-		return (object) array(
-			'type' => 'single',
-			'id'   => $page,
+			'page' => get_query_var( 'liveblog_page', 1 ),
+			'last' => get_query_var( 'liveblog_last', false ),
+			'id'   => get_query_var( 'liveblog_id', false ),
 		);
 	}
 
