@@ -41,13 +41,11 @@ class WPCOM_Liveblog_AMP {
 		// Remove standard Liveblog scripts as custom JS is not required for AMP.
 		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
 
-		// Remove WordPress adding <p> tags as breaks layout.
-		remove_filter( 'the_content', 'wpautop' );
-
+		// Add Liveblog to Schema
 		add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
 
 		// Add AMP ready markup to post.
-		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
+		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 10 );
 
 		// Add AMP CSS for Liveblog.
 		// If this an AMP Theme then use enqueue for styles.
