@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Blogging: at the speed of live.
- * Version:     1.8.1
+ * Version:     1.8.2
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.8.1';
+		const VERSION                 = '1.8.2';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -206,10 +206,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes[] = 'liveblog';
-				$post_id = get_the_ID();
-				$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
+				$post_id   = get_the_ID();
+				$state     = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 				if ( $state ) {
-					$classes[] = 'liveblog-'. $state;
+					$classes[] = 'liveblog-' . $state;
 				}
 			}
 
@@ -222,10 +222,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function add_live_body_class_admin( $classes ) {
 			if ( self::is_liveblog_post() ) {
 				$classes .= ' liveblog ';
-				$post_id = get_the_ID();
-				$state = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
+				$post_id  = get_the_ID();
+				$state    = apply_filters( 'liveblog_default_state', get_post_meta( $post_id, self::KEY, true ), $post_id );
 				if ( $state ) {
-					$classes .= 'liveblog-'. $state . ' ';
+					$classes .= 'liveblog-' . $state . ' ';
 				}
 			}
 
@@ -302,8 +302,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function flush_rewrite_rules() {
-			$version_option = (int) get_option( 'liveblog_rewrites_version' );
-			if ( self::REWRITES_VERSION !== $version_option ) {
+			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
+			if ( self::REWRITES_VERSION !== $rewrites_version ) {
 				flush_rewrite_rules();
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
@@ -851,8 +851,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( $last_known_entry ) {
 				$last_known_entry = explode( '-', $last_known_entry );
 				if ( isset( $last_known_entry[0], $last_known_entry[1] ) ) {
-					$last_entry_id = $last_known_entry[0];
-					$index         = array_search( (int) $last_entry_id, array_keys( $entries ), true );
+					$last_entry_id = (int) $last_known_entry[0];
+					$index         = array_search( $last_entry_id, array_keys( $entries ), true );
 					$entries       = array_slice( $entries, $index, null, true );
 				}
 			}
@@ -1080,7 +1080,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'backend_liveblogging'         => apply_filters( 'liveblog_back_end_liveblogging', false ),
 						'usetinymce'                   => apply_filters( 'liveblog_use_tinymce_editor', false ),
 						'editorSettings'               => apply_filters( 'liveblog_tinymce_editor_settings', array(
-							'tinymce' => array(
+							'tinymce'      => array(
 								'wpautop'  => true,
 								'plugins'  => 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview',
 								'toolbar1' => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',

@@ -275,7 +275,7 @@ class WPCOM_Liveblog_Entry {
 
 		// Add the headline as comment meta.
 		if ( isset( $args['headline'] ) ) {
-			update_comment_meta(  $args['entry_id'], self::HEADLINE_META_KEY, sanitize_text_field( $args['headline'] ) );
+			update_comment_meta( $args['entry_id'], self::HEADLINE_META_KEY, sanitize_text_field( $args['headline'] ) );
 		}
 
 		wp_update_comment(

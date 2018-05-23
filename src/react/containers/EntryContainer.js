@@ -148,12 +148,12 @@ class EntryContainer extends Component {
             <a className="liveblog-meta-time" href={entry.share_link}>
               <abbr title={formattedTime(entry.entry_time, config.utc_offset, 'c')} className="liveblog-timestamp">{formattedTime(entry.entry_time, config.utc_offset, config.time_format)}</abbr>
             </a>
+            { entry.headline &&
+              <h2 className="liveblog-entry-header">
+                {entry.headline}
+              </h2>
+            }
           </header>
-          { entry.headline &&
-            <h2 className="liveblog-entry-header">
-              {entry.headline}
-            </h2>
-          }
           {
             this.isEditing()
               ? (
