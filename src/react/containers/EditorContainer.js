@@ -306,6 +306,7 @@ class EditorContainer extends Component {
             usetinymce={usetinymce}
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
+            rawText={this.state.rawText}
           />
         }
         {

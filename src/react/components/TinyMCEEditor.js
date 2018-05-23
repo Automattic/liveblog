@@ -39,16 +39,15 @@ class TinyMCEEditor extends Component {
     this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
     this.editorSettings = window.liveblog_settings.editorSettings;
     setTimeout(() => { // wait for load
-      setTimeout(() => { // wait for editor init
-        const stateContent = this.props.editorContainer.getContent();
-        tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
-        tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
-        if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
-          tinymce.activeEditor.setContent(stateContent);
-        }
-      }, 500);
+      this.editorSettings.setup = function () { console.log('set up!'); };
       wp.editor.initialize(this.containerId, this.editorSettings);
-    }, 1000);
+      const stateContent = this.props.rawText;
+      tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
+      tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
+      if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
+        tinymce.activeEditor.setContent(stateContent);
+      }
+    }, 10);
   }
 
   render() {
