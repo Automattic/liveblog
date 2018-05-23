@@ -47,7 +47,7 @@ body.wp-admin #poststuff h2.liveblog-editor-subTitle {
 
 body.wp-admin.liveblog-archive .liveblog-editor-container,
 body.wp-admin .liveblog-share,
-body.wp-admin.liveblog.post-type-fte_liveblog #postdivrich {
+body.wp-admin.liveblog #postdivrich {
 	display: none;
 }
 
@@ -72,7 +72,7 @@ body.wp-admin .liveblog-update-count {
 	background-color: #f1f1f1;
 }
 
-body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .button-primary#publish {
+body.wp-admin.liveblog.wp-core-ui .button-primary#publish {
 	background: inherit;
 	color: inherit;
 	box-shadow: none;
@@ -84,17 +84,17 @@ body.wp-admin .liveblog-editor-textarea {
   width: 100%;
 }
 
-body.wp-admin.liveblog.post-type-fte_liveblog #wpcom-liveblog-container .liveblog-update-btn {
+body.wp-admin.liveblog #wpcom-liveblog-container .liveblog-update-btn {
   background-color: #fff;
 }
 
-body.wp-admin.liveblog.post-type-fte_liveblog #post_headline {
+body.wp-admin.liveblog #post_headline {
   width: 100%;
   margin-bottom: 10px;
   font-size: 16px;
 }
 
-body.wp-admin.liveblog.post-type-fte_liveblog #poststuff h2.liveblog-entry-header {
+body.wp-admin.liveblog #poststuff h2.liveblog-entry-header {
   margin-left: 88px;
   padding-left: 0;
   font-size: 18px;
@@ -111,6 +111,6 @@ body.wp-admin .liveblog-entry {
   margin-top: 5px;
 }
 
-body.wp-admin.liveblog.post-type-fte_liveblog.wp-core-ui .mce-tooltip {
+body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
   display: none;
 }
