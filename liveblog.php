@@ -1026,6 +1026,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 						'use_rest_api'                 => intval( self::use_rest_api() ),
 						'endpoint_url'                 => self::get_entries_endpoint_url(),
+						'cross_domain'                 => false,
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
 						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
