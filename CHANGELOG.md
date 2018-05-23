@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.8.2
+
+* Fix issue with time format (#424)
+* Adds check around the jetpack is_mobile flag (#428)
+* Restore current user back in to localised scripts (#430)
+* Cast liveblog rewrite version before checks (#439)
+* Document the minimum PHP version (#447)
+* Fix bug where pagination did not update (#433)
+* Fix GMT offsets in entry times (#432)
+
+props [justnorris](https://github.com/justnorris), [mjangda](https://github.com/mjangda), [paulschreiber](https://github.com/paulschreiber), [philipjohn](https://github.com/philipjohn), [scottblackburn](https://github.com/scottblackburn)
+
 ## 1.8.1
 
 * Fix bug with changing contributors

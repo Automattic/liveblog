@@ -4,8 +4,9 @@
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby), [philipjohn](http://profiles.wordpress.org/philipjohn)
 * Tags: liveblog
 * Requires at least: 4.4
+* Requires PHP: 5.6
 * Tested up to: 4.9.5
-* Stable tag: 1.8.1
+* Stable tag: 1.8.2
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,10 +58,10 @@ New iPad announced, launching next week — more info to come. /key
 You can add new commands easily with a filter, the most basic command will add a class to entry, so you could do a simple  `/highlight` which would add `type-highlight` to the entry container, letting you style the background color:
 
 ``` php
-add_filter( 'liveblog_active_commands',  array( __CLASS__, 'add_highlight_command' ), 10 );
+add_filter( 'liveblog_active_commands', 'add_highlight_command', 10 );
 
 
-public static function add_highlight_command( $commands ) {
+function add_highlight_command( $commands ) {
   $commands[] = highlight;
   return $commands;
 }

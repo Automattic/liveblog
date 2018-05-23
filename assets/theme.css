@@ -28,10 +28,6 @@
   flex-grow: 1;
 }
 
-.liveblog-entry-content * {
-  word-break: break-all;
-}
-
 .entry-content .liveblog-meta-time,
 .entry-content .liveblog-meta-time:hover,
 .entry-content .liveblog-meta-time:focus {
