@@ -6,6 +6,7 @@
 	$single = $this->get( 'single' );
 	$share_link = $this->get( 'share_link' );
 	$update_time = $this->get( 'update_time' );
+	$share_link_amp = $this->get( 'share_link_amp' );
 ?>
 
 <div class="liveblog-entry" id="post<?php echo esc_attr( $update_time ); ?>"
@@ -57,31 +58,12 @@
 			<?php endif; ?>
 
 			<?php if ( count( $social ) > 1 ) : ?>
-
-			<?php if ( in_array( 'facebook', $social ) ) : ?>
-			<amp-social-share type="facebook"
-				width="45"
-				height="33"
-				data-param-url="<?php echo '/single/' . $id; ?>"></amp-social-share>
-			<?php endif; ?>
-
-			<amp-social-share type="twitter"
-				width="45"
-				height="33"
-				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
-			<amp-social-share type="gplus"
-				width="45"
-				height="33"
-				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
-			<amp-social-share type="email"
-				width="45"
-				height="33"
-				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
-			<amp-social-share type="pinterest"
-				width="45"
-				height="33"
-				data-param-url="<?php echo amp_get_permalink( $post_id ) . '/single/' . $id; ?>"></amp-social-share>
-
+				<?php foreach( $social as $platform ): ?>
+				<amp-social-share type="<?php echo $platform ?>"
+					width="45"
+					height="33"
+					data-param-url="<?php echo $share_link_amp ?>"></amp-social-share>
+				<?php endforeach; ?>
 			<?php endif; ?>
 		</div>
 	</div>

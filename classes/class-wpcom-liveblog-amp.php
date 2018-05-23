@@ -20,10 +20,6 @@ class WPCOM_Liveblog_AMP {
 		// Hook at template_redirect level as some Liveblog hooks require it.
 		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
 
-		// Add a /pagination to URLs to allow for pagination in AMP.
-		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_pagination' ), 10 );
-		add_filter( 'init', array( __CLASS__, 'add_endpoint_for_single_entry' ), 10 );
-
 		// Add query vars to support pagination and single entries.
 		add_filter( 'query_vars', array( __CLASS__, 'add_customn_query_vars' ), 10 );
 	}
@@ -65,7 +61,8 @@ class WPCOM_Liveblog_AMP {
 
 	/**
 	 * Add query vars to support pagination and single entries.
-	 * @param array $query_vars Allowed Query Variables
+	 *
+	 * @param array $query_vars Allowed Query Variables.
 	 */
 	public static function add_customn_query_vars( $query_vars ) {
 		$query_vars[] = 'liveblog_page';
@@ -83,27 +80,13 @@ class WPCOM_Liveblog_AMP {
 			return array();
 		}
 
-		$social_array = array( 'twitter', 'pinterest', 'email', 'google' );
+		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
 
 		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
 			$social_array[] = 'facebook';
 		}
 
 		return apply_filters( 'liveblog_amp_social_share_platforms', $social_array );
-	}
-
-	/**
-	 * Add Endpoint for pagination description
-	 */
-	public static function add_endpoint_for_pagination() {
-		add_rewrite_endpoint( 'pagination', EP_PERMALINK, true );
-	}
-
-	/**
-	 * Add Endpoint for pagination description
-	 */
-	public static function add_endpoint_for_single_entry() {
-		add_rewrite_endpoint( 'single', EP_PERMALINK, true );
 	}
 
 	/**
@@ -124,6 +107,13 @@ class WPCOM_Liveblog_AMP {
 		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
 	}
 
+	/**
+	 * Adds Liveblog information to Schema metadata.
+	 *
+	 * @param  array   $metadata  Metadata.
+	 * @param  WP_Post $post    Current Post.
+	 * @return array           Updated Meta
+	 */
 	public static function append_liveblog_to_metadata( $metadata, $post ) {
 
 		// If we are not viewing a liveblog post then exist the filter.
@@ -133,15 +123,10 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
-		$publisher_organization  = '';
-		$publisher_name  = '';
+		$publisher_organization = '';
+		$publisher_name         = '';
 
 		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
-
-		// Set the last known entry for users who don't have one yet.
-		if ( false === $request->last ) {
-			$request->last = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
-		}
 
 		$blog_updates = [];
 
@@ -161,23 +146,23 @@ class WPCOM_Liveblog_AMP {
 				'url'           => $entry->share_link,
 				'datePublished' => date( 'c', $entry->entry_time ),
 				'dateModified'  => date( 'c', $entry->timestamp ),
-				'author'        => (object) array (
-						'@type' => 'Person',
-						'name'  => $entry->authors[0]['name'],
+				'author'        => (object) array(
+					'@type' => 'Person',
+					'name'  => $entry->authors[0]['name'],
 				),
 				'articleBody'   => (object) array(
-					'@type'     => 'Text',
+					'@type' => 'Text',
 				),
 				'publisher'     => (object) array(
-					'@type'     => $publisher_organization,
-					'name'      => $publisher_name,
+					'@type' => $publisher_organization,
+					'name'  => $publisher_name,
 				),
 			);
 
 			array_push( $blog_updates, $blog_item );
 		}
 
-		$metadata['@type'] = 'LiveBlogPosting';
+		$metadata['@type']          = 'LiveBlogPosting';
 		$metadata['liveBlogUpdate'] = $blog_updates;
 
 		return $metadata;
@@ -198,16 +183,13 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
-		// Set the last known entry for users who don't have one yet.
-		if ( false === $request->last ) {
-			$request->last = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
-		}
-
-		if ( 'single' === $request->type ) {
-			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
-			$content .= self::build_single_entry( $entries, $request );
+		if ( $request->id ) {
+			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
+			$request  = self::set_request_last_from_entries( $entries, $request );
+			$content .= self::build_single_entry( $entries, $request, $post->post_id );
 		} else {
-			$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
+			$entries  = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
+			$request  = self::set_request_last_from_entries( $entries, $request );
 			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
 		}
 
@@ -216,17 +198,35 @@ class WPCOM_Liveblog_AMP {
 
 
 	/**
+	 * Set the last known entry for users who don't have one yet.
+	 *
+	 * @param  array  $entries liveblog entries.
+	 * @param  object $request Request Object.
+	 */
+	public function set_request_last_from_entries( $entries, $request ) {
+		if ( false === $request->last ) {
+			$request->last = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
+		}
+
+		return $request;
+	}
+
+	/**
 	 * Builds entry data for single liveblog entry template on AMP
 	 *
-	 * @param  array $entries liveblog entries.
+	 * @param  array  $entries liveblog entries.
 	 * @param  object $request Request Object.
+	 * @param  string $post_id post id.
 	 * @return object          template
 	 */
-	public static function build_single_entry( $entries, $request ) {
+	public static function build_single_entry( $entries, $request, $post_id ) {
+
+		$entries['entries'] = self::filter_entries( $entries['entries'], $post_id );
+
 		$match = false;
 
 		foreach ( $entries['entries'] as $entry ) {
-			if ( (int) $entry->id == (int) $request->id ) {
+			if ( (int) $entry->id === (int) $request->id ) {
 				$match = $entry;
 			}
 		}
@@ -237,15 +237,16 @@ class WPCOM_Liveblog_AMP {
 
 		$rendered = self::get_template(
 			'entry', array(
-				'single'      => true,
-				'id'          => $request->id,
-				'content'     => $match->content,
-				'authors'     => $match->authors,
-				'time'        => $match->time,
-				'date'        => $match->date,
-				'time_ago'    => $match->time_ago,
-				'share_link'  => $match->share_link,
-				'update_time' => $match->timestamp,
+				'single'         => true,
+				'id'             => $request->id,
+				'content'        => $match->content,
+				'authors'        => $match->authors,
+				'time'           => $match->time,
+				'date'           => $match->date,
+				'time_ago'       => $match->time_ago,
+				'share_link'     => $match->share_link,
+				'update_time'    => $match->timestamp,
+				'share_link_amp' => $match->share_link_amp,
 			)
 		);
 
@@ -255,7 +256,7 @@ class WPCOM_Liveblog_AMP {
 	/**
 	 * Builds entry data for single liveblog entry template on AMP
 	 *
-	 * @param  array $entries liveblog entries.
+	 * @param  array  $entries liveblog entries.
 	 * @param  object $request Request Object.
 	 * @param  string $post_id post id.
 	 * @return object          template
@@ -271,7 +272,7 @@ class WPCOM_Liveblog_AMP {
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
-					'social' => static::add_social_share_options(),
+					'social'           => self::add_social_share_options(),
 				),
 			)
 		);
@@ -282,17 +283,18 @@ class WPCOM_Liveblog_AMP {
 	/**
 	 * Filter Entries, adding Time Ago, and Entry Date.
 	 *
-	 * @param  array $entries Entries.
+	 * @param  array  $entries Entries.
+	 * @param  string $post_id post id.
 	 * @return array         Updates Entries
 	 */
 	public static function filter_entries( $entries, $post_id ) {
 		$permalink = amp_get_permalink( $post_id );
 
 		foreach ( $entries as $key => $entry ) {
-			$entries[ $key ]->time_ago    = self::get_entry_time_ago( $entry );
-			$entries[ $key ]->date        = self::get_entry_date( $entry );
-			$entries[ $key ]->permalink   = self::build_single_entry_permalink( $permalink, $entry->id );
-			$entries[ $key ]->update_time = $entry->timestamp;
+			$entries[ $key ]->time_ago       = self::get_entry_time_ago( $entry );
+			$entries[ $key ]->date           = self::get_entry_date( $entry );
+			$entries[ $key ]->update_time    = $entry->timestamp;
+			$entries[ $key ]->share_link_amp = self::build_single_entry_permalink( $permalink, $entry->id );
 		}
 
 		return $entries;
@@ -355,27 +357,31 @@ class WPCOM_Liveblog_AMP {
 	 *
 	 * @param  string $permalink        Permalink.
 	 * @param  int    $page             Page Number.
-	 * @param  string $Last 			Last Know Entry.
+	 * @param  string $last             Last Know Entry.
 	 * @return string                   Pagination Link
 	 */
 	public static function build_paged_permalink( $permalink, $page, $last ) {
-		return add_query_arg( array(
-			'liveblog_page' => $page,
-			'liveblog_last' => $last
-		), $permalink );
+		return add_query_arg(
+			array(
+				'liveblog_page' => $page,
+				'liveblog_last' => $last,
+			), $permalink
+		);
 	}
 
 	/**
 	 * Builds up a pagination link.
 	 *
 	 * @param  string $permalink        Permalink.
-	 * @param  int    $id             	Entry Id.
+	 * @param  int    $id               Entry Id.
 	 * @return string                   Entry Link
 	 */
 	public static function build_single_entry_permalink( $permalink, $id ) {
-		return add_query_arg( array(
-			'liveblog_id' => $id,
-		), $permalink );
+		return add_query_arg(
+			array(
+				'liveblog_id' => $id,
+			), $permalink
+		);
 	}
 
 	/**
