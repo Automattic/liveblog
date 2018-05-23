@@ -133,7 +133,6 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'          => $entry_id,
 			'type'        => $this->get_type(),
-			//'html'        => $this->render(),
 			'render'      => self::render_content( $this->get_content(), $this->comment ),
 			'content'     => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,
@@ -169,24 +168,6 @@ class WPCOM_Liveblog_Entry {
 		);
 
 		return $entry;
-	}
-
-	public function render( $template = 'liveblog-single-entry.php' ) {
-
-		$output = apply_filters( 'liveblog_pre_entry_output', '', $this );
-		if ( ! empty( $output ) ) {
-			return $output;
-		}
-
-		if ( empty( $this->comment->comment_content ) ) {
-			return $output;
-		}
-
-		$entry = $this->get_fields_for_render();
-
-		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
-
-		return WPCOM_Liveblog::get_template_part( $template, $entry );
 	}
 
 	public static function render_content( $content, $comment = false ) {
