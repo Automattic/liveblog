@@ -182,7 +182,11 @@ class WPCOM_Liveblog_Entry {
 			return $output;
 		}
 
-		$entry = $this->get_fields_for_render();
+		$entry   = $this->get_fields_for_render();
+		$comment = get_comment( $entry['entry_id'] );
+		if ( $comment && 'liveblog' !== $comment->comment_approved ) {
+			return $output;
+		}
 
 		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
 
