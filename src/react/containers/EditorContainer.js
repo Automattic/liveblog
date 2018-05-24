@@ -44,7 +44,7 @@ class EditorContainer extends Component {
       initialAuthors = props.entry.authors;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
-      initialAuthors = [props.config.current_user];
+      initialAuthors = (props.config.prefill_author_field === '1') ? [props.config.current_user] : [];
     }
 
     this.state = {
