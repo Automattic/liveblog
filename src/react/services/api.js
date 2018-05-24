@@ -1,3 +1,4 @@
+/* global jQuery */
 /**
  * RxJS ajax pretty much interchangable with axios.
  * Using RxJS ajax as it's already an observable to use with redux-observable.
@@ -8,7 +9,20 @@ import {
   getCurrentTimestamp,
 } from '../utils/utils';
 
+import {
+  getTinyMCEContent,
+  clearTinyMCEContent,
+  clearAuthors,
+  clearHeadline,
+} from '../components/TinyMCEEditor';
+
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
+
+const secureAjax = (settings) => {
+  const secureSettings = settings;
+  secureSettings.url = secureSettings.url.replace('http://', 'https://');
+  return ajax(secureSettings);
+};
 
 export function getEntries(page, config, newestEntry) {
   const settings = {
@@ -16,7 +30,7 @@ export function getEntries(page, config, newestEntry) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function polling(newestEntryTimestamp, config) {
@@ -27,7 +41,7 @@ export function polling(newestEntryTimestamp, config) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function createEntry(entry, config, nonce = false) {
@@ -37,9 +51,10 @@ export function createEntry(entry, config, nonce = false) {
     body: {
       crud_action: 'insert',
       post_id: config.post_id,
-      content: entry.content,
+      content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
+      headline: entry.headline,
     },
     headers: {
       'Content-Type': 'application/json',
@@ -48,7 +63,18 @@ export function createEntry(entry, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  // Clear TinyMCE after a brief delay.
+  if (config.usetinymce === '1') {
+    setTimeout(() => {
+      clearTinyMCEContent();
+      clearAuthors();
+      clearHeadline();
+    }, 250);
+  }
+
+  jQuery(document).trigger('liveblog-entry-created', [settings]);
+
+  return secureAjax(settings);
 }
 
 export function updateEntry(entry, config, nonce = false) {
@@ -59,9 +85,10 @@ export function updateEntry(entry, config, nonce = false) {
       crud_action: 'update',
       post_id: config.post_id,
       entry_id: entry.id,
-      content: entry.content,
+      content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
+      headline: entry.headline,
     },
     headers: {
       'Content-Type': 'application/json',
@@ -70,7 +97,9 @@ export function updateEntry(entry, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  jQuery(document).trigger('liveblog-entry-updated', [settings]);
+
+  return secureAjax(settings);
 }
 
 export function deleteEntry(id, config, nonce = false) {
@@ -89,7 +118,9 @@ export function deleteEntry(id, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  jQuery(document).trigger('liveblog-entry-deleted', [settings]);
+
+  return secureAjax(settings);
 }
 
 export function getEvents(config, newestEntry) {
@@ -98,7 +129,7 @@ export function getEvents(config, newestEntry) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function jumpToEvent(id, config, newestEntry) {
@@ -107,7 +138,7 @@ export function jumpToEvent(id, config, newestEntry) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function deleteEvent(entry, config, nonce = false) {
@@ -127,7 +158,7 @@ export function deleteEvent(entry, config, nonce = false) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getAuthors(term, config) {
@@ -136,7 +167,7 @@ export function getAuthors(term, config) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getHashtags(term, config) {
@@ -145,7 +176,7 @@ export function getHashtags(term, config) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getPreview(content, config) {
@@ -160,7 +191,7 @@ export function getPreview(content, config) {
     },
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function uploadImage(formData) {
@@ -172,7 +203,7 @@ export function uploadImage(formData) {
     body: formData,
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }
 
 export function getMedia(params) {
@@ -183,5 +214,5 @@ export function getMedia(params) {
     method: 'GET',
   };
 
-  return ajax(settings);
+  return secureAjax(settings);
 }

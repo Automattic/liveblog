@@ -20,6 +20,11 @@ class WPCOM_Liveblog_Entry {
 	const CONTRIBUTORS_META_KEY = 'liveblog_contributors';
 
 	/**
+	 * @var string Meta key for storing the headline, if any.
+	 */
+	const HEADLINE_META_KEY = 'liveblog_headline';
+
+	/**
 	 * @var string Whether or not an entry should show an author
 	 */
 	const HIDE_AUTHORS_KEY = 'liveblog_hide_authors';
@@ -106,20 +111,19 @@ class WPCOM_Liveblog_Entry {
 		return mysql2date( 'G', $this->comment->comment_date_gmt );
 	}
 
-
 	/**
 	 * Retrieve the comment date of the current comment using gmt.
 	 * @param string          $d          Optional. The format of the date. Default user's setting.
-	 * @param int|WP_Comment  $comment_ID WP_Comment or ID of the comment for which to get the date.
+	 * @param int|WP_Comment  $comment_id WP_Comment or ID of the comment for which to get the date.
 	 *                                    Default current comment.
 	 * @return string The comment's date.
 	 */
 	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
 		$comment = get_comment( $comment_id );
 		if ( '' === $d ) {
-			$date = mysql2date(get_option('date_format'), $comment->comment_date_gmt);
+			$date = mysql2date( get_option( 'date_format' ), $comment->comment_date_gmt );
 		} else {
-			$date = mysql2date($d, $comment->comment_date_gmt);
+			$date = mysql2date( $d, $comment->comment_date_gmt );
 		}
 
 		return $date;
@@ -135,6 +139,7 @@ class WPCOM_Liveblog_Entry {
 			'type'        => $this->get_type(),
 			'html'        => $this->render(),
 			'render'      => self::render_content( $this->get_content(), $this->comment ),
+			'headline'    => self::get_comment_headline_for_json( $entry_id ),
 			'content'     => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,
 			'timestamp'   => $this->get_timestamp(),
@@ -156,13 +161,14 @@ class WPCOM_Liveblog_Entry {
 			'entry_id'               => $entry_id,
 			'post_id'                => $post_id,
 			'css_classes'            => $css_classes,
+			'headline'               => self::get_comment_headline_for_json( $entry_id ),
 			'content'                => self::render_content( $comment_text, $this->comment ),
 			'original_content'       => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
 			'avatar_size'            => $avatar_size,
 			'avatar_img'             => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'            => get_comment_author_link( $entry_id ),
-			'entry_date'             => get_comment_date( get_option( 'date_format' ), $entry_id ),
-			'entry_time'             => get_comment_date( get_option( 'time_format' ), $entry_id ),
+			'entry_date'             => $this->get_comment_date_gmt( get_option( 'date_format' ), $entry_id ),
+			'entry_time'             => $this->get_comment_date_gmt( get_option( 'time_format' ), $entry_id ),
 			'timestamp'              => $this->get_timestamp(),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
@@ -210,13 +216,18 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
-		$args    = apply_filters( 'liveblog_before_insert_entry', $args );
+		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
 		$args['user'] = self::handle_author_select( $args, false );
 
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
+		}
+
+		// Add the headline as comment meta.
+		if ( isset( $args['headline'] ) ) {
+			update_comment_meta( $comment->comment_ID, self::HEADLINE_META_KEY, sanitize_text_field( $args['headline'] ) );
 		}
 
 		if ( isset( $args['contributor_ids'] ) ) {
@@ -261,10 +272,16 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
+
+		// Add the headline as comment meta.
+		if ( isset( $args['headline'] ) ) {
+			update_comment_meta( $args['entry_id'], self::HEADLINE_META_KEY, sanitize_text_field( $args['headline'] ) );
+		}
+
 		wp_update_comment(
 			array(
 				'comment_ID'      => $args['entry_id'],
-				'comment_content' => wp_filter_post_kses( $args['content'] ),
+				'comment_content' => $args['content'],
 			)
 		);
 		$entry = self::from_comment( $comment );
@@ -311,17 +328,18 @@ class WPCOM_Liveblog_Entry {
 		if ( is_wp_error( $valid_args ) ) {
 			return $valid_args;
 		}
+
 		$new_comment_id = wp_insert_comment(
 			array(
 				'comment_post_ID'      => $args['post_id'],
-				'comment_content'      => wp_filter_post_kses( $args['content'] ),
+				'comment_content'      => $args['content'],
 				'comment_approved'     => 'liveblog',
 				'comment_type'         => 'liveblog',
-				'user_id'              => $args['user']->ID,
+				'user_id'              => isset( $args['user']->ID ) ? $args['user']->ID : '',
 
-				'comment_author'       => $args['user']->display_name,
-				'comment_author_email' => $args['user']->user_email,
-				'comment_author_url'   => $args['user']->user_url,
+				'comment_author'       => isset( $args['user']->display_name ) ? $args['user']->display_name : '',
+				'comment_author_email' => isset( $args['user']->user_email ) ? $args['user']->user_email : '',
+				'comment_author_url'   => isset( $args['user']->user_url ) ? $args['user']->user_url : '',
 			)
 		);
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
@@ -347,13 +365,18 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	private static function user_object_from_comment_id( $comment_id ) {
+		global $coauthors_plus;
 		$original_comment = get_comment( $comment_id );
 		if ( ! $original_comment ) {
 			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
 		}
-		$user_object = get_userdata( $original_comment->user_id );
+		if ( $coauthors_plus ) {
+			$user_object = $coauthors_plus->get_coauthor_by( 'id', $original_comment->user_id );
+		} else {
+			$user_object = get_userdata( $original_comment->user_id );
+		}
 		if ( ! $user_object ) {
-			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
+			return new WP_Error( 'get-userdata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
 	}
@@ -408,10 +431,10 @@ class WPCOM_Liveblog_Entry {
 				wp_update_comment(
 					array(
 						'comment_ID'           => $entry_id,
-						'user_id'              => $args['user']->ID,
-						'comment_author'       => $args['user']->display_name,
-						'comment_author_email' => $args['user']->user_email,
-						'comment_author_url'   => $args['user']->user_url,
+						'user_id'              => isset( $args['user']->ID ) ? $args['user']->ID : '',
+						'comment_author'       => isset( $args['user']->display_name ) ? $args['user']->display_name : '',
+						'comment_author_email' => isset( $args['user']->user_email ) ? $args['user']->user_email : '',
+						'comment_author_url'   => isset( $args['user']->user_url ) ? $args['user']->user_url : '',
 					)
 				);
 
@@ -463,10 +486,26 @@ class WPCOM_Liveblog_Entry {
 
 		return array_map(
 			function( $contributor ) {
-					$user_object = self::get_userdata_with_filter( $contributor );
-					return self::get_user_data_for_json( $user_object );
+				if ( 0 === $contributor ) {
+					return false;
+				}
+				$user_object = self::get_userdata_with_filter( $contributor );
+				return self::get_user_data_for_json( $user_object );
 			}, $contributors
 		);
+	}
+
+	/**
+	 * Returns a comment header.
+	 *
+	 * @param int $comment_id The comment id to retrive the metadata.
+	 */
+	private static function get_comment_headline_for_json( $comment_id ) {
+		$headline = get_comment_meta( $comment_id, self::HEADLINE_META_KEY, true );
+		if ( ! $headline ) {
+			return '';
+		}
+		return $headline;
 	}
 
 	public static function get_userdata_with_filter( $author_id ) {
@@ -504,10 +543,9 @@ class WPCOM_Liveblog_Entry {
 			return array();
 		}
 
-		$author       = [ self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) ];
 		$contributors = self::get_contributors_for_json( $comment_id );
 
-		return array_merge( $author, $contributors );
+		return $contributors;
 	}
 }
 

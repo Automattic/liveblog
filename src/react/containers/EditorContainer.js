@@ -19,6 +19,7 @@ import { getAuthors, getHashtags, uploadImage } from '../services/api';
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 import HTMLInput from '../components/HTMLInput';
+import PostHeadline from '../components/PostHeadline';
 
 import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
 
@@ -43,7 +44,7 @@ class EditorContainer extends Component {
       initialAuthors = props.entry.authors;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
-      initialAuthors = [props.config.current_user];
+      initialAuthors = (props.config.prefill_author_field === '1') ? [props.config.current_user] : [];
     }
 
     this.state = {
@@ -52,12 +53,21 @@ class EditorContainer extends Component {
       authors: initialAuthors,
       mode: 'editor',
       readOnly: false,
+      headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
     };
 
     this.onChange = editorState => this.setState({
       editorState,
       rawText: html(convertToHTML(editorState.getCurrentContent())),
+    });
+
+    this.clearAuthors = () => this.setState({
+      authors: false,
+    });
+
+    this.clearHeadline = () => this.setState({
+      headline: '',
     });
   }
 
@@ -86,13 +96,15 @@ class EditorContainer extends Component {
     });
   }
 
-  publish() {
+  publish(event) {
+    event.preventDefault();
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
+    const headline = this.state.headline;
 
     if (isEditing) {
       updateEntry({
@@ -100,6 +112,7 @@ class EditorContainer extends Component {
         content,
         author,
         contributors,
+        headline,
       });
       entryEditClose(entry.id);
       return;
@@ -109,6 +122,7 @@ class EditorContainer extends Component {
       content,
       author,
       contributors,
+      headline,
     });
 
     const newEditorState = EditorState.push(
@@ -123,6 +137,12 @@ class EditorContainer extends Component {
   onSelectAuthorChange(value) {
     this.setState({
       authors: value,
+    });
+  }
+
+  onHeadlineChange(value) {
+    this.setState({
+      headline: value,
     });
   }
 
@@ -222,33 +242,46 @@ class EditorContainer extends Component {
       mode,
       authors,
       readOnly,
+      headline,
     } = this.state;
 
-    const { isEditing, config } = this.props;
-
+    const { isEditing, config, usetinymce } = this.props;
+    const authorIds = authors ?
+      authors.map((author) => {
+        if (author && author.id) {
+          return author.id;
+        }
+        return false;
+      }) : [];
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
-        <div className="liveblog-editor-tabs">
-          <button
-            className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'editor' })}
-          >
-            Visual
-          </button>
-          <button
-            className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'raw' })}
-          >
-              Text
-          </button>
-          <button
-            className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
-            onClick={() => this.setState({ mode: 'preview' })}
-          >
-              Preview
-          </button>
-        </div>
+        <PostHeadline
+          onChange={this.onHeadlineChange.bind(this)}
+          headline={headline}
+        />
+        { (usetinymce !== '1') &&
+          <div className="liveblog-editor-tabs">
+            <button
+              className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
+              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'editor' }); } }
+            >
+              Visual
+            </button>
+            <button
+              className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
+              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'raw' }); } }
+            >
+                Text
+            </button>
+            <button
+              className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
+              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'preview' }); } }
+            >
+                Preview
+            </button>
+          </div>
+        }
         {
           mode === 'preview' &&
           <PreviewContainer
@@ -259,6 +292,7 @@ class EditorContainer extends Component {
         {
           mode === 'editor' &&
           <Editor
+            editorContainer={this}
             editorState={editorState}
             onChange={this.onChange}
             suggestions={suggestions}
@@ -269,6 +303,10 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
+            usetinymce={usetinymce}
+            clearAuthors={this.clearAuthors}
+            clearHeadline={this.clearHeadline}
+            rawText={this.state.rawText}
           />
         }
         {
@@ -296,9 +334,13 @@ class EditorContainer extends Component {
           clearable={false}
           cache={false}
         />
-        <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
-          {isEditing ? 'Publish Update' : 'Publish New Entry'}
+        <button
+          className="button button-primary button-large liveblog-btn liveblog-publish-btn"
+          onClick={this.publish.bind(this)}
+        >
+          {isEditing ? 'Save' : 'Post Update'}
         </button>
+        <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
     );
   }

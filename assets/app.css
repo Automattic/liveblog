@@ -549,9 +549,6 @@
   font-size: .8rem;
   color: #666; }
 
-.liveblog-event-content {
-  word-break: break-all; }
-
 .liveblog-event-content:hover {
   cursor: pointer;
   text-decoration: underline; }
@@ -827,7 +824,6 @@
 .liveblog-editor-container .public-DraftEditor-content,
 .liveblog-preview {
   max-width: 100%;
-  word-break: break-all;
   min-height: 250px;
   padding: .8rem;
   margin-bottom: .8rem;

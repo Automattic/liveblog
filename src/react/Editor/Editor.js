@@ -9,6 +9,8 @@ import {
   RichUtils,
 } from 'draft-js';
 
+import TinyMCEEditor from '../components/TinyMCEEditor';
+
 import {
   parseTemplate,
   getTriggerRange,
@@ -321,7 +323,23 @@ class EditorWrapper extends Component {
       setReadOnly,
       handleImageUpload,
       defaultImageSize,
+      usetinymce,
+      editorContainer,
+      clearAuthors,
+      clearHeadline,
+      rawText,
     } = this.props;
+
+    // Admin liveblogging uses TinyMCE.
+    if (usetinymce === '1') {
+      return <TinyMCEEditor
+        editorState={editorState}
+        editorContainer={editorContainer}
+        clearAuthors={clearAuthors}
+        clearHeadline={clearHeadline}
+        rawText={rawText}
+      />;
+    }
 
     return (
       <div className="liveblog-editor-inner-container" onDrop={(event) => {
@@ -387,6 +405,12 @@ EditorWrapper.propTypes = {
   readOnly: PropTypes.bool,
   setReadOnly: PropTypes.func,
   defaultImageSize: PropTypes.string,
+  backend: PropTypes.string,
+  usetinymce: PropTypes.string,
+  editorContainer: PropTypes.object,
+  clearAuthors: PropTypes.func,
+  clearHeadline: PropTypes.func,
+  rawText: PropTypes.string,
 };
 
 export default EditorWrapper;

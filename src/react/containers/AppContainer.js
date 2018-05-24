@@ -11,6 +11,7 @@ import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
+import UpdateCount from '../components/UpdateCount';
 
 class AppContainer extends Component {
   constructor() {
@@ -29,13 +30,21 @@ class AppContainer extends Component {
   render() {
     const { page, loading, entries, polling, mergePolling, config } = this.props;
     const canEdit = config.is_liveblog_editable === '1';
+    const frontEndEditing = config.backend_liveblogging !== '1';
+    const isAdmin = config.is_admin;
+    const showEditor = isAdmin || ((page === 1 && canEdit && frontEndEditing));
 
     return (
       <div style={{ position: 'relative' }}>
-        {(page === 1 && canEdit) && <EditorContainer isEditing={false} />}
+        {showEditor &&
+        <EditorContainer
+          isEditing={false}
+          backend={config.backend_liveblogging}
+          usetinymce={config.usetinymce}
+        />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        <PaginationContainer />
-        <Entries loading={loading} entries={entries} />
+        { isAdmin && <UpdateCount entries={entries} config={config} /> }
+        <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
       </div>
