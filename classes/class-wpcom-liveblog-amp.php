@@ -41,18 +41,27 @@ class WPCOM_Liveblog_AMP {
 		// Remove standard Liveblog scripts as custom JS is not required for AMP.
 		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
 
-		// Add Liveblog to Schema
+		// Add Liveblog to Schema.
 		add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
 
-		// Add AMP ready markup to post.
-		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 10 );
+		/**
+		 * If the_content filter is set higher than 7, embeds (for example Twitter) don't
+		 * render on a AMP only theme. Having it set at 7 means we must remove wpauto
+		 * as this affects layout.
+		 */
+		remove_filter( 'the_content', 'wpautop' );
 
-		// Add AMP CSS for Liveblog.
+		// Add AMP ready markup to post.
+		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
+
+		// Add AMP CSS for Liveblog and social meta tags.
 		// If this an AMP Theme then use enqueue for styles.
 		if ( current_theme_supports( 'amp' ) ) {
 			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_styles' ) );
+			add_action( 'wp_head', array( __CLASS__, 'social_meta_tags' ) );
 		} else {
 			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
+			add_action( 'amp_post_template_head', array( __CLASS__, 'social_meta_tags' ) );
 		}
 
 	}
@@ -103,6 +112,68 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function enqueue_styles() {
 		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+	}
+
+
+	/**
+	 * Print soical meta tags
+	 *
+	 * @return void
+	 */
+	public static function social_meta_tags() {
+		global $post;
+
+		// If we are not viewing a liveblog post then exist the filter.
+		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+			return;
+		}
+
+		$request = self::get_request_data();
+
+		// If no entry id set then not on single entry.
+		if ( false === $request->id ) {
+			return;
+		}
+
+		$entry       = self::get_entry( $request->id, $post->ID );
+		$title       = $post->post_title;
+		$description = strip_tags( $entry->content );
+		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
+		$image       = self::get_entry_image( $entry );
+
+		// If the entry doesn't contain images, lets see if the post has featured image.
+		if ( false === $image ) {
+			$image = get_the_post_thumbnail_url( $post->ID );
+		}
+
+		echo '<meta property="og:title" content="' . esc_attr( $title ) . '">';
+		echo '<meta property="og:description" content="' . esc_attr( $description ) . '">';
+		echo '<meta property="og:url" content="' . esc_attr( $url ) . '">';
+		echo '<meta name="twitter:card" content="' . esc_attr( $description ) . '">';
+
+		// If we have an image, lets use it.
+		if ( $image ) {
+				echo '<meta property="og:image" content="' . esc_attr( $image ) . '">';
+		}
+	}
+
+	/**
+	 * Gets the first image within the entry content HTML.
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Image URL
+	 */
+	public static function get_entry_image( $entry ) {
+		$doc = new DOMDocument();
+		$doc->loadHTML( $entry->content );
+
+		$tags = $doc->getElementsByTagName( 'img' );
+
+		foreach ( $tags as $img ) {
+			return $img->getAttribute( 'src' );
+		}
+
+		return false;
 	}
 
 	/**
@@ -219,36 +290,54 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_single_entry( $entries, $request, $post_id ) {
 
-		$entries['entries'] = self::filter_entries( $entries['entries'], $post_id );
+		$entry = self::get_entry( $request->id, $post_id, $entries );
 
-		$match = false;
-
-		foreach ( $entries['entries'] as $entry ) {
-			if ( (int) $entry->id === (int) $request->id ) {
-				$match = $entry;
-			}
-		}
-
-		if ( false === $match ) {
+		if ( false === $entry ) {
 			return '';
 		}
 
 		$rendered = self::get_template(
 			'entry', array(
 				'single'         => true,
-				'id'             => $request->id,
-				'content'        => $match->content,
-				'authors'        => $match->authors,
-				'time'           => $match->time,
-				'date'           => $match->date,
-				'time_ago'       => $match->time_ago,
-				'share_link'     => $match->share_link,
-				'update_time'    => $match->timestamp,
-				'share_link_amp' => $match->share_link_amp,
+				'id'             => $entry->id,
+				'content'        => $entry->content,
+				'authors'        => $entry->authors,
+				'time'           => $entry->time,
+				'date'           => $entry->date,
+				'time_ago'       => $entry->time_ago,
+				'share_link'     => $entry->share_link,
+				'update_time'    => $entry->timestamp,
+				'share_link_amp' => $entry->share_link_amp,
 			)
 		);
 
 		return $rendered;
+	}
+
+
+
+	/**
+	 * Get a single entry.
+	 *
+	 * @param  int   $id      Entry ID.
+	 * @param  int   $post_id Post ID.
+	 * @param  mixed $entries Entries.
+	 * @return object         Entry
+	 */
+	public static function get_entry( $id, $post_id, $entries = false ) {
+		if ( false === $entries ) {
+			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $id );
+		}
+
+		$entries['entries'] = self::filter_entries( $entries['entries'], $post_id );
+
+		foreach ( $entries['entries'] as $entry ) {
+			if ( (int) $entry->id === (int) $id ) {
+				return $entry;
+			}
+		}
+
+		return false;
 	}
 
 	/**
