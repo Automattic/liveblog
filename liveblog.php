@@ -1219,7 +1219,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
-		 * When the liveblog is enabled in the admin, add a div below the title.
+		 * When the liveblog is enabled in the admin, add a container div.
 		 *
 		 * @param string $content
 		 * @return string
