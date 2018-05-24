@@ -21,7 +21,7 @@ class WPCOM_Liveblog_AMP {
 		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
 
 		// Add query vars to support pagination and single entries.
-		add_filter( 'query_vars', array( __CLASS__, 'add_customn_query_vars' ), 10 );
+		add_filter( 'query_vars', array( __CLASS__, 'add_custom_query_vars' ), 10 );
 	}
 
 	/**
@@ -71,7 +71,7 @@ class WPCOM_Liveblog_AMP {
 	 *
 	 * @param array $query_vars Allowed Query Variables.
 	 */
-	public static function add_customn_query_vars( $query_vars ) {
+	public static function add_custom_query_vars( $query_vars ) {
 		$query_vars[] = 'liveblog_page';
 		$query_vars[] = 'liveblog_id';
 		$query_vars[] = 'liveblog_last';
