@@ -68,7 +68,7 @@ class EntryContainer extends Component {
     }
 
     return (
-      <footer className="liveblog-entry-tools">
+      <footer className="">
         {
           this.isEditing()
             ? <button
@@ -78,14 +78,14 @@ class EntryContainer extends Component {
             Close Editor
             </button>
             : <button
-              className="button button-large liveblog-btn liveblog-btn-smallx"
+              className="button button-large liveblog-btn liveblog-btn-small"
               onClick={this.edit}
             >
               Edit
             </button>
         }
         <button
-          className="button button-large button-link-delete liveblog-btn liveblog-btn-small liveblog-btn-delete"
+          className="button button-large liveblog-btn liveblog-btn-small liveblog-btn-delete"
           onClick={this.delete}
         >
           Delete

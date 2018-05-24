@@ -9,7 +9,13 @@ class PostHeadline extends React.Component {
     return (
       <div className="liveblog-post-headline">
         <div className="liveblog-headline">
-          <label className="screen-reader-text" id="headline-prompt-text" htmlFor="headline">Enter update headline here</label>
+          <label
+            className="screen-reader-text"
+            id="headline-prompt-text"
+            htmlFor="headline"
+          >
+              Enter update headline here
+          </label>
           <input
             type="text"
             name="post_headline"
