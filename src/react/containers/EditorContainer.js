@@ -86,7 +86,8 @@ class EditorContainer extends Component {
     });
   }
 
-  publish() {
+  publish(e) {
+    e.preventDefault();
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
