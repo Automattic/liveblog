@@ -51,7 +51,7 @@
 		</header>
 
 		<div class="liveblog-entry-content">
-			<?php echo $this->get( 'content' ); //TODO ?>
+			<?php echo wp_kses_post( $this->get( 'content' ) );  ?>
 
 			<?php if ( $single ) : ?>
 				<a href="<?php echo esc_url( $share_link ); ?>">View in feed</a>
