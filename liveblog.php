@@ -87,6 +87,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			WPCOM_Liveblog_Lazyloader::load();
 			WPCOM_Liveblog_Socketio_Loader::load();
 			WPCOM_Liveblog_Entry_Embed_SDKs::load();
+			WPCOM_Liveblog_AMP::load();
 
 			if ( self::use_rest_api() ) {
 				WPCOM_Liveblog_Rest_Api::load();
@@ -137,6 +138,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php' );
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php' );
 			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp.php' );
+			require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp-template.php' );
 
 			if ( self::use_rest_api() ) {
 				require( dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php' );
@@ -784,6 +787,23 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			return $result;
+		}
+
+		/**
+		 * Get single entry
+		 *
+		 * @param int $id entry id
+		 * @return array An array of json encoded results
+		 */
+		public static function get_single_liveblog_entry( $id = false ) {
+			if ( empty( self::$entry_query ) ) {
+				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
+			}
+
+			$entry = self::$entry_query->get_by_id( $id );
+
+			//var_dump( $entry );
+			//die();
 		}
 
 		/**

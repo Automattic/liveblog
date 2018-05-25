@@ -1,0 +1,244 @@
+// Utils
+@import "core/utils/defaults";
+@import "core/utils/colors";
+@import "~sass-mq/mq";
+// Core Styles
+@import "core/utils/animations";
+@import "core/app/all";
+@import "core/editor/amp-required";
+
+/**
+* Entries
+*/
+.liveblog-entry {
+  display: flex;
+  background: $color-grey-x-light;
+  border-top: 2px solid $color-grey-mid-light;
+  border-bottom: 2px solid $color-grey-mid-light;
+  padding: 1em;
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+}
+
+.liveblog-entry {
+  @include mq($until: medium) {
+    font-size: 14px;
+  }
+}
+
+.liveblog-entry-main .liveblog-entry-content p {
+  margin: 16px 0;
+}
+
+.liveblog-entry a, .liveblog-entry a:visited {
+  color: $color-grey-dark;
+}
+
+.liveblog-entry-main {
+  flex-grow: 1;
+}
+
+.liveblog-entry.is-key-event {
+  border-top: 2px solid $color-grey-x-dark;
+}
+
+.liveblog-entry-edit {
+  margin-left: 60px;
+
+  @include mq($until: medium) {
+    margin-left: 0;
+  }
+}
+
+.liveblog-entry-content {
+  padding-top: 10px;
+}
+
+.liveblog-meta {
+  color: $color-grey-base;
+}
+
+.liveblog-entry-aside {
+  flex-basis: 70px;
+  min-width: 70px;
+  margin-right: 10px;
+}
+
+.liveblog-meta-time {
+  flex-basis: 60px;
+  text-decoration: none;
+}
+
+.entry-content .liveblog-meta-time,
+.entry-content .liveblog-meta-time:hover,
+.entry-content .liveblog-meta-time:focus {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.liveblog-meta-time span {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.liveblog-meta-time span:first-child {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.liveblog-meta-time span {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.liveblog-meta-time span:first-child {
+  font-weight: 600;
+  color: $color-grey-dark;
+  margin-bottom: 5px;
+}
+
+.liveblog-meta-author-name {
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.liveblog-meta-author-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
+}
+
+.liveblog-entry-tools {
+  margin-left: 60px;
+
+  @include mq($until: medium) {
+    margin-left: 0;
+  }
+}
+
+.liveblog-hash {
+  color: $color-primary;
+}
+
+/**
+* Events
+*/
+.liveblog-event {
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+.liveblog-event::before,
+.liveblog-event:only-child::before, {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: -4.5px;
+  width: 10px;
+  height: 10px;
+  background: $color-grey-light;
+  border-radius: 50%;
+  transition: background .3s ease-in-out;
+}
+
+.liveblog-event::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  height: 100%;
+  width: 1px;
+  background: $color-grey-light;
+}
+
+.liveblog-event::before,
+.liveblog-event::after {
+  top: 10px;
+}
+
+.liveblog-event:only-child::after {
+  display: none;
+}
+
+.liveblog-event:not(:only-child):first-child::before,
+.liveblog-event:not(:only-child):last-child::before {
+  height: 1px;
+  border-radius: 0%;
+}
+
+.liveblog-event:not(:only-child):last-child::after {
+  display: none;
+}
+
+.liveblog-event:hover::before {
+  background: $color-grey-dark;
+  transition: background .3s ease-in-out;
+}
+
+.liveblog-event-content {
+  margin-top: 5px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/**
+* Pagination
+*/
+.liveblog-pagination-first,
+.liveblog-pagination-last {
+  background: $color-grey-mid-light;
+  color: $color-grey-x-dark;
+}
+
+.liveblog-pagination-pages {
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+}
+
+.liveblog-pagination-btn, .ampstart-btn {
+  background-color: $color-grey-x-dark;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: none;
+  color: white;
+  font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+  padding: .5rem 1rem;
+
+  &:hover {
+    color: white;
+    background: $color-grey-dark;
+  }
+
+  &:visited {
+    color: white;
+  }
+}
+
+.ampstart-btn {
+  color: #fff;
+  background: $color-primary;
+  font-size: 16px;
+  border-radius: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 15px;
+
+  &:hover {
+    background: lighten($color-primary, 10%);
+  }
+}
+
+.live-list .ampstart-btn {
+  display: none;
+}
+
+/**
+* Embeds
+*/
+.liveblog-entry amp-youtube, .liveblog-entry amp-instagram, .liveblog-entry amp-vine {
+  margin: 0 0 1.5em;
+}
