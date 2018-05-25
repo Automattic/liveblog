@@ -61,7 +61,7 @@ class WPCOM_Liveblog_AMP_Template {
 	 */
 	public function render( $name, $variables = array() ) {
 
-		$name        = ltrim( $name, '/' ) . '.php';
+		$name        = ltrim( esc_attr( $name ), '/' ) . '.php';
 		$theme       = get_template_directory() . $this->theme_template_path . $name;
 		$child_theme = get_stylesheet_directory() . $this->theme_template_path . $name;
 		$plugin      = dirname( __DIR__ ) . $this->plugin_template_path . $name;

@@ -22,7 +22,7 @@
 	<div class="liveblog-entry-main">
 		<header class="liveblog-meta-authors">
 
-			<?php if (is_array( $this->get( 'authors' ))): ?>
+			<?php if ( is_array( $this->get( 'authors' ) ) ): ?>
 
 				<?php foreach ( $this->get( 'authors' ) as $author ) : ?>
 
@@ -51,7 +51,7 @@
 		</header>
 
 		<div class="liveblog-entry-content">
-			<?php echo $this->get( 'content' ); ?>
+			<?php echo $this->get( 'content' ); //TODO ?>
 
 			<?php if ( $single ) : ?>
 				<a href="<?php echo esc_url( $share_link ); ?>">View in feed</a>
@@ -59,10 +59,10 @@
 
 			<?php if ( count( $social ) > 1 ) : ?>
 				<?php foreach( $social as $platform ): ?>
-				<amp-social-share type="<?php echo $platform ?>"
+				<amp-social-share type="<?php echo esc_attr( $platform ) ?>"
 					width="45"
 					height="33"
-					data-param-url="<?php echo $share_link_amp ?>"></amp-social-share>
+					data-param-url="<?php echo esc_attr( $share_link_amp ) ?>"></amp-social-share>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</div>

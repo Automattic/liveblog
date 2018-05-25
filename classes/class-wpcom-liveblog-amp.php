@@ -30,7 +30,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function setup() {
-		// If we're on an AMP page then bail.
+		// If we're not on an AMP page then bail.
 		if ( ! is_amp_endpoint() ) {
 			return;
 		}
@@ -83,10 +83,6 @@ class WPCOM_Liveblog_AMP {
 	 * Add default social share options
 	 */
 	public static function add_social_share_options() {
-		if ( defined( 'LIVEBLOG_AMP_SOCIAL_SHARE' ) && false === LIVEBLOG_AMP_SOCIAL_SHARE ) {
-			return array();
-		}
-
 		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
 
 		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
@@ -136,7 +132,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$entry       = self::get_entry( $request->id, $post->ID );
-		$title       = $post->post_title;
+		$title       = self::get_entry_title( $entry );
 		$description = strip_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
@@ -187,7 +183,7 @@ class WPCOM_Liveblog_AMP {
 
 		// If we are not viewing a liveblog post then exist the filter.
 		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
-			return $data;
+			return $metadata;
 		}
 
 		$request = self::get_request_data();
@@ -199,40 +195,42 @@ class WPCOM_Liveblog_AMP {
 
 		$blog_updates = [];
 
-		foreach ( $entries['entries'] as $key => $entry ) {
+		if ( isset( $entries['entries'] ) && is_array( $entries['entries'] ) ) {
+			foreach ( $entries['entries'] as $key => $entry ) {
 
-			if ( isset( $metadata['publisher']['name'] ) ) {
-				$publisher_name = $metadata['publisher']['name'];
+				if ( isset( $metadata['publisher']['name'] ) ) {
+					$publisher_name = $metadata['publisher']['name'];
+				}
+
+				if ( isset( $metadata['publisher']['type'] ) ) {
+					$publisher_organization = $metadata['publisher']['type'];
+				}
+
+				$blog_item = (object) array(
+					'@type'         => 'BlogPosting',
+					'headline'      => self::get_entry_title( $entry ),
+					'url'           => $entry->share_link,
+					'datePublished' => date( 'c', $entry->entry_time ),
+					'dateModified'  => date( 'c', $entry->timestamp ),
+					'author'        => (object) array(
+						'@type' => 'Person',
+						'name'  => $entry->authors[0]['name'],
+					),
+					'articleBody'   => (object) array(
+						'@type' => 'Text',
+					),
+					'publisher'     => (object) array(
+						'@type' => $publisher_organization,
+						'name'  => $publisher_name,
+					),
+				);
+
+				array_push( $blog_updates, $blog_item );
 			}
 
-			if ( isset( $metadata['publisher']['type'] ) ) {
-				$publisher_organization = $metadata['publisher']['type'];
-			}
-
-			$blog_item = (object) array(
-				'@type'         => 'BlogPosting',
-				'headline'      => 'headline',
-				'url'           => $entry->share_link,
-				'datePublished' => date( 'c', $entry->entry_time ),
-				'dateModified'  => date( 'c', $entry->timestamp ),
-				'author'        => (object) array(
-					'@type' => 'Person',
-					'name'  => $entry->authors[0]['name'],
-				),
-				'articleBody'   => (object) array(
-					'@type' => 'Text',
-				),
-				'publisher'     => (object) array(
-					'@type' => $publisher_organization,
-					'name'  => $publisher_name,
-				),
-			);
-
-			array_push( $blog_updates, $blog_item );
+			$metadata['@type']          = 'LiveBlogPosting';
+			$metadata['liveBlogUpdate'] = $blog_updates;
 		}
-
-		$metadata['@type']          = 'LiveBlogPosting';
-		$metadata['liveBlogUpdate'] = $blog_updates;
 
 		return $metadata;
 	}
@@ -247,7 +245,7 @@ class WPCOM_Liveblog_AMP {
 		global $post;
 
 		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
-			return $data;
+			return $content;
 		}
 
 		$request = self::get_request_data();
@@ -408,6 +406,16 @@ class WPCOM_Liveblog_AMP {
 		$date_format = get_option( 'date_format' );
 
 		return date_i18n( $date_format, strtotime( $utc_offset, $entry->entry_time ) );
+	}
+
+	/**
+	 * Work out Entry title
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Title
+	 */
+	public static function get_entry_title( $entry ) {
+		return wp_trim_words( $entry->content, 10, '...' );
 	}
 
 	/**
