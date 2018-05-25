@@ -106,6 +106,25 @@ class WPCOM_Liveblog_Entry {
 		return mysql2date( 'G', $this->comment->comment_date_gmt );
 	}
 
+
+	/**
+	 * Retrieve the comment date of the current comment using gmt.
+	 * @param string          $d          Optional. The format of the date. Default user's setting.
+	 * @param int|WP_Comment  $comment_ID WP_Comment or ID of the comment for which to get the date.
+	 *                                    Default current comment.
+	 * @return string The comment's date.
+	 */
+	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
+		$comment = get_comment( $comment_id );
+		if ( '' === $d ) {
+			$date = mysql2date(get_option('date_format'), $comment->comment_date_gmt);
+		} else {
+			$date = mysql2date($d, $comment->comment_date_gmt);
+		}
+
+		return $date;
+	}
+
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
 		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
@@ -114,13 +133,12 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'          => $entry_id,
 			'type'        => $this->get_type(),
-			'html'        => $this->render(),
 			'render'      => self::render_content( $this->get_content(), $this->comment ),
 			'content'     => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,
 			'timestamp'   => $this->get_timestamp(),
 			'authors'     => self::get_authors( $entry_id ),
-			'entry_time'  => get_comment_date( 'U', $entry_id ),
+			'entry_time'  => $this->get_comment_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
 		);
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
@@ -150,24 +168,6 @@ class WPCOM_Liveblog_Entry {
 		);
 
 		return $entry;
-	}
-
-	public function render( $template = 'liveblog-single-entry.php' ) {
-
-		$output = apply_filters( 'liveblog_pre_entry_output', '', $this );
-		if ( ! empty( $output ) ) {
-			return $output;
-		}
-
-		if ( empty( $this->comment->comment_content ) ) {
-			return $output;
-		}
-
-		$entry = $this->get_fields_for_render();
-
-		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
-
-		return WPCOM_Liveblog::get_template_part( $template, $entry );
 	}
 
 	public static function render_content( $content, $comment = false ) {
@@ -236,16 +236,18 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$args    = apply_filters( 'liveblog_before_update_entry', $args );
+
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
+
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 		wp_update_comment(
 			array(
-				'comment_ID'      => $args['entry_id'],
-				'comment_content' => wp_filter_post_kses( $args['content'] ),
+				'comment_ID'       => $args['entry_id'],
+				'comment_content'  => wp_filter_post_kses( $args['content'] ),
 			)
 		);
 		$entry = self::from_comment( $comment );
