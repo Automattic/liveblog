@@ -19,7 +19,8 @@ class CodeBlock extends Component {
   /**
    * Handle save.
    */
-  save() {
+  save(e) {
+    e.preventDefault();
     const { code, title } = this.state;
     const { replaceMetadata, setEditMode } = this.props;
     replaceMetadata({ code, title }, true);
@@ -29,7 +30,8 @@ class CodeBlock extends Component {
   /**
    * Set edit mode to false.
    */
-  cancel() {
+  cancel(e) {
+    e.preventDefault();
     const { setEditMode, getMetadata } = this.props;
     const { code, title } = getMetadata();
     this.setState({ code, title });
@@ -74,7 +76,11 @@ class CodeBlock extends Component {
             <span style={{ display: 'inline-block' }} onMouseDown={e => e.preventDefault()}>
               <button
                 className="liveblog-editor-btn liveblog-editor-action-btn"
-                onClick={!edit ? () => setEditMode(true) : this.save.bind(this)}>
+                onClick={!edit ? (e) => {
+                  e.preventDefault();
+                  setEditMode(true);
+                } : this.save.bind(this)}
+              >
                 {edit ? 'Save' : 'Edit'}
               </button>
             </span>
