@@ -1106,6 +1106,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 						'backend_liveblogging'         => apply_filters( 'liveblog_back_end_liveblogging', false ),
 						'is_admin'                     => is_admin(),
+						'is_ssl'                       => is_ssl(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
 						'focus_refresh_interval'       => self::FOCUS_REFRESH_INTERVAL,
