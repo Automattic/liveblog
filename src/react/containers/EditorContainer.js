@@ -206,7 +206,7 @@ class EditorContainer extends Component {
     formData.append('async-upload', file);
 
     return new Promise((resolve) => {
-      uploadImage(formData)
+      uploadImage(formData, config)
         .timeout(60000)
         .map(res => res.response)
         .subscribe((res) => {

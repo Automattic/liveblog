@@ -21,7 +21,7 @@ export function getEntries(page, config, newestEntry) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function polling(newestEntryTimestamp, config) {
@@ -32,7 +32,7 @@ export function polling(newestEntryTimestamp, config) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function createEntry(entry, config, nonce = false) {
@@ -53,7 +53,7 @@ export function createEntry(entry, config, nonce = false) {
     },
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function updateEntry(entry, config, nonce = false) {
@@ -75,7 +75,7 @@ export function updateEntry(entry, config, nonce = false) {
     },
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function deleteEntry(id, config, nonce = false) {
@@ -94,7 +94,7 @@ export function deleteEntry(id, config, nonce = false) {
     },
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function getEvents(config, newestEntry) {
@@ -103,7 +103,7 @@ export function getEvents(config, newestEntry) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function jumpToEvent(id, config, newestEntry) {
@@ -112,7 +112,7 @@ export function jumpToEvent(id, config, newestEntry) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function deleteEvent(entry, config, nonce = false) {
@@ -132,7 +132,7 @@ export function deleteEvent(entry, config, nonce = false) {
     },
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function getAuthors(term, config) {
@@ -141,7 +141,7 @@ export function getAuthors(term, config) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function getHashtags(term, config) {
@@ -150,7 +150,7 @@ export function getHashtags(term, config) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
 export function getPreview(content, config) {
@@ -165,10 +165,10 @@ export function getPreview(content, config) {
     },
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
-export function uploadImage(formData) {
+export function uploadImage(formData, config) {
   const location = window.location;
 
   const settings = {
@@ -177,10 +177,10 @@ export function uploadImage(formData) {
     body: formData,
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
 
-export function getMedia(params) {
+export function getMedia(params, config) {
   const location = window.location;
 
   const settings = {
@@ -188,5 +188,5 @@ export function getMedia(params) {
     method: 'GET',
   };
 
-  return window.liveblog_settings.is_ssl ? secureAjax(settings) : ajax(settings);
+  return config.is_ssl ? secureAjax(settings) : ajax(settings);
 }
