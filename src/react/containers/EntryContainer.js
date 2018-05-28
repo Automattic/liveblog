@@ -73,30 +73,37 @@ class EntryContainer extends Component {
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
         <aside className="liveblog-entry-aside">
-          <a className="liveblog-meta-time" href={entry.share_link} target="_blank">
+          <a className="liveblog-meta-time" href={entry.share_link}>
             <span>{timeAgo(entry.entry_time)}</span>
             <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format)}</span>
           </a>
         </aside>
         <div className="liveblog-entry-main">
-          {
-            (entry.authors && entry.authors.length > 0) &&
-            <header className="liveblog-meta-authors">
-              {
-                entry.authors.map(author => (
-                  <div className="liveblog-meta-author" key={author.id}>
-                    { author.avatar &&
-                      <div
-                        className="liveblog-meta-author-avatar"
-                        dangerouslySetInnerHTML={{ __html: author.avatar }} />
-                    }
-                    <span className="liveblog-meta-author-name"
-                      dangerouslySetInnerHTML={{ __html: author.name }} />
-                  </div>
-                ))
-              }
-            </header>
-          }
+          <header className="liveblog-meta">
+            {
+              (entry.authors && entry.authors.length > 0) &&
+              <div className="liveblog-meta-authors">
+                {
+                  entry.authors.map((author, i) => (
+                    <div className="liveblog-meta-author" key={i}>
+                      { author.avatar &&
+                        <div
+                          className="liveblog-meta-author-avatar"
+                          dangerouslySetInnerHTML={{ __html: author.avatar }} />
+                      }
+                      <span className="liveblog-meta-author-name"
+                        dangerouslySetInnerHTML={{ __html: author.name }} />
+                    </div>
+                  ))
+                }
+              </div>
+            }
+            { entry.headline &&
+              <h2 className="liveblog-entry-header">
+                {entry.headline}
+              </h2>
+            }
+          </header>
           {
             this.isEditing()
               ? (
