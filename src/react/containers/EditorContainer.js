@@ -79,6 +79,9 @@ class EditorContainer extends Component {
 
   getContent() {
     const { editorState } = this.state;
+    if ('1' === this.props.usetinymce) {
+      return editorState.rawText;
+    }
     return convertToHTML(editorState.getCurrentContent());
   }
 
