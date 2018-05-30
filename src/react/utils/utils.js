@@ -106,7 +106,7 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
  * @param {Object} polling
  */
 export const shouldRenderNewEntries = (page, entries, polling) => {
-  if (window.liveblog_settings.backend_liveblogging) {
+  if (window.liveblog_settings.is_admin === '1') {
     return true;
   }
   if (page !== 1) return false;
