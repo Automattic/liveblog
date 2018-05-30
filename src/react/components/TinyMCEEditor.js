@@ -40,12 +40,14 @@ class TinyMCEEditor extends Component {
     this.editorSettings = window.liveblog_settings.editorSettings;
     setTimeout(() => { // wait for load
       wp.editor.initialize(this.containerId, this.editorSettings);
-      const stateContent = this.props.rawText;
-      tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
-      tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
-      if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
-        tinymce.activeEditor.setContent(stateContent);
-      }
+      setTimeout(() => {
+        const stateContent = this.props.rawText;
+        tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
+        tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
+        if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
+          tinymce.activeEditor.setContent(stateContent);
+        }
+      }, 250);
     }, 10);
   }
 
