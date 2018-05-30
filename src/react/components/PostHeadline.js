@@ -2,6 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class PostHeadline extends React.Component {
+  constructor(props) {
+    super(props);
+    this.componentDidUpdate = (nextProps) => {
+      if (nextProps && nextProps.lastUpdate !== this.props.lastUpdate) {
+        this.props.clearHeadline();
+      }
+    };
+  }
   updateInputValue(evt) {
     this.props.onChange(evt.target.value);
   }
@@ -35,6 +43,8 @@ class PostHeadline extends React.Component {
 PostHeadline.propTypes = {
   onChange: PropTypes.func,
   headline: PropTypes.string,
+  lastUpdate: PropTypes.number,
+  clearHeadline: PropTypes.func,
 };
 
 export default PostHeadline;

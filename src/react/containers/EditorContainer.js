@@ -55,15 +55,12 @@ class EditorContainer extends Component {
       readOnly: false,
       headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
+      lastUpdate: new Date().getTime(),
     };
 
     this.onChange = editorState => this.setState({
       editorState,
       rawText: html(convertToHTML(editorState.getCurrentContent())),
-    });
-
-    this.clearAuthors = () => this.setState({
-      authors: false,
     });
 
     this.clearHeadline = () => this.setState({
@@ -131,6 +128,9 @@ class EditorContainer extends Component {
 
     this.onChange(newEditorState);
     this.setState({ readOnly: false });
+    this.setState({
+      lastUpdate: new Date().getTime(),
+    });
   }
 
   onSelectAuthorChange(value) {
@@ -242,6 +242,7 @@ class EditorContainer extends Component {
       authors,
       readOnly,
       headline,
+      lastUpdate,
     } = this.state;
     const { isEditing, config } = this.props;
 
@@ -251,6 +252,8 @@ class EditorContainer extends Component {
         <PostHeadline
           onChange={this.onHeadlineChange.bind(this)}
           headline={headline}
+          lastUpdate={lastUpdate}
+          clearHeadline={this.clearHeadline.bind(this)}
         />
         <div className="liveblog-editor-tabs">
           <button
@@ -292,8 +295,6 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            clearAuthors={this.clearAuthors}
-            clearHeadline={this.clearHeadline}
           />
         }
         {
