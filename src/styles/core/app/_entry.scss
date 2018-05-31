@@ -4,9 +4,6 @@
 }
 
 .liveblog-meta {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: flex-start;
   text-decoration: none;
 }
 
@@ -37,6 +34,10 @@
 
 .liveblog-entry .type-key {
   display: none;
+}
+
+.liveblog-entry-header {
+  padding-top: 0px;
 }
 
 .liveblog-emoji {
