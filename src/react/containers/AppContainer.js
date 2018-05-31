@@ -1,3 +1,4 @@
+/* global jQuery */
 /* eslint-disable class-methods-use-this */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
