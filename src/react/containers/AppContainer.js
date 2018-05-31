@@ -25,6 +25,7 @@ class AppContainer extends Component {
     getEntries(1, window.location.hash);
     startPolling();
     if (this.eventsContainer) getEvents();
+    jQuery(document).trigger('liveblog-loaded');
   }
 
   render() {
