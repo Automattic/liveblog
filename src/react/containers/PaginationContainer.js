@@ -50,19 +50,24 @@ class PaginationContainer extends Component {
       }
     }
 
+    const firstButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-first'].join(' ');
+    const prevButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-prev'].join(' ');
+    const nextButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-next'].join(' ');
+    const lastButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-last'].join(' ');
+
     return (
       <div className="liveblog-pagination">
         <div>
           <button
             disabled={page === 1}
-            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
+            className={firstButtonClassNames}
             onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
           >
             First
           </button>
           <button
             disabled={page === 1}
-            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
+            className={prevButtonClassNames}
             onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
           >
             Prev
@@ -73,14 +78,14 @@ class PaginationContainer extends Component {
         <div>
           <button
             disabled={page === pages}
-            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
+            className={nextButtonClassNames}
             onClick={(e) => { e.preventDefault(); getEntriesPaginated((page + 1), 'first'); } }
           >
             Next
           </button>
           <button
             disabled={page === pages}
-            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
+            className={lastButtonClassNames}
             onClick={(e) => { e.preventDefault(); getEntriesPaginated(pages, 'first'); } }
           >
             Last
