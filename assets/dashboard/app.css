@@ -95,7 +95,6 @@ body.wp-admin.liveblog #post_headline {
 }
 
 body.wp-admin.liveblog #poststuff h2.liveblog-entry-header {
-  margin-left: 88px;
   padding-left: 0;
   font-size: 18px;
 }
