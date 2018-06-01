@@ -1,3 +1,4 @@
+/* global jQuery */
 /* eslint-disable class-methods-use-this */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -25,6 +26,10 @@ class AppContainer extends Component {
     getEntries(1, window.location.hash);
     startPolling();
     if (this.eventsContainer) getEvents();
+    // fire an event to let the WordPress theme know the live blog entries are present
+    setTimeout(() => {
+      jQuery(document).trigger('liveblog-loaded');
+    }, 1000);
   }
 
   render() {

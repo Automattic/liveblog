@@ -67,6 +67,8 @@ class EntryContainer extends Component {
       return false;
     }
 
+    const buttonClassNames = ['button', 'button-large', 'button-link-delete', 'liveblog-btn', 'liveblog-btn-small', 'liveblog-btn-delete'].join(' ');
+
     return (
       <footer className="liveblog-entry-tools">
         {
@@ -85,7 +87,7 @@ class EntryContainer extends Component {
             </button>
         }
         <button
-          className="button button-large button-link-delete liveblog-btn liveblog-btn-small liveblog-btn-delete"
+          className={buttonClassNames}
           onClick={this.delete}
         >
           Delete
