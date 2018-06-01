@@ -108,6 +108,9 @@ class EntryContainer extends Component {
   render() {
     const { entry, config } = this.props;
 
+    // Filter out empty authors.
+    entry.authors = entry.authors.filter(author => (author.id !== null && author.name !== null && author.key !== ''));
+
     return (
       <article
         id={`id_${entry.id}`}
