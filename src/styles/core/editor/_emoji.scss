@@ -1,0 +1,17 @@
+.liveblog-inline-emoji {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  vertical-align: middle;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: -.2ex 0em .2ex;
+  color: rgba(255, 255, 255, 0);
+}
+
+.liveblog-inline-emoji:focus {
+  border: 1px solid black;
+}

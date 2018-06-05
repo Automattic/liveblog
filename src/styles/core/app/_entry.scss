@@ -1,0 +1,59 @@
+.liveblog-entry {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.liveblog-meta {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  text-decoration: none;
+}
+
+.liveblog-meta-authors,
+.liveblog-meta-author {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.liveblog-meta-time span {
+  display: block;
+}
+
+.liveblog-meta-author-avatar img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.liveblog-entry-tools {
+  margin-top: 1rem;
+}
+
+.liveblog-entry-tools .liveblog-btn:first-child {
+  margin-right: .5rem;
+}
+
+.liveblog-entry .type-key {
+  display: none;
+}
+
+.liveblog-emoji {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 1.95ch;
+  max-height: 1em;
+  line-height: inherit;
+  margin: 0em 0em -.2ex;
+}
+
+.liveblog-hash::before {
+  content: "#";
+}
+
+.fb-post.fb_iframe_widget,
+.fb-post.fb_iframe_widget > span,
+.fb-post.fb_iframe_widget iframe {
+  max-width: 100%;
+}

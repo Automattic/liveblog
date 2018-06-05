@@ -1,0 +1,18 @@
+.liveblog-toolbar {
+  background: $color-grey-x-light;
+  border: $base-border-size solid $color-grey-light;
+  border-bottom: none;
+  line-height: 0;
+}
+
+@include mq($until: small) {
+  .liveblog-editor-toolbar-container {
+    order: 2;
+    margin-bottom: 1rem;
+  }
+
+  .liveblog-toolbar {
+    border-top: none;
+    border-bottom: $base-border-size solid $color-grey-light;
+  }
+}

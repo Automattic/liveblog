@@ -1,0 +1,26 @@
+.liveblog-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.liveblog-pagination > * {
+  display: flex;
+  text-align: center;
+}
+
+.liveblog-pagination-btn {
+  margin: 2.5px;
+  font-size: .8rem;
+  padding: .5rem 1rem;
+}
+
+.liveblog-pagination-pages {
+  font-size: 13px;
+  line-height: 12px;
+}
+
+.liveblog-btn--hide {
+  visibility: hidden;
+}

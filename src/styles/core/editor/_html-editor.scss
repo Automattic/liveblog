@@ -1,0 +1,13 @@
+.liveblog-html-editor-container {
+  border: 1px solid $color-grey-light;
+  margin-bottom: 1rem;
+}
+
+.liveblog-html-editor {
+  padding: .5rem;
+  background: #fff;
+}
+
+.ace_scroll-left {
+  box-shadow: $base-drop-shadow !important;
+}

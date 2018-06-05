@@ -1,0 +1,44 @@
+.liveblog-popover {
+  position: absolute;
+  top: 100%;
+  left: .8rem;
+  right: .8rem;
+  z-index: 99;
+  background: #fff;
+  box-shadow: $base-drop-shadow;
+  border-radius: $base-border-radius;
+  border-top: none;
+  animation: scaleUp .2s cubic-bezier(.3, 1.2, .2, 1);
+}
+
+.liveblog-popover-meta {
+  padding: .4rem;
+  font-size: .8rem;
+  color: $color-grey-dark;
+  border-bottom: $base-border-size solid $color-grey-x-light;
+}
+
+.liveblog-popover-item {
+  // Important: makes on mouse down a clickable event on ios.
+  cursor: pointer;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: .4rem;
+  font-size: .8rem;
+  color: $color-grey-dark;
+}
+
+.liveblog-popover-item img {
+  width: 17.5px;
+  height: 17.5px;
+  margin-right: .4rem;
+}
+
+.liveblog-popover-item.is-focused {
+  background: $color-grey-x-light;
+}
+
+.liveblog-popover-item-figure {
+  margin-right: .4rem;
+}

@@ -6,15 +6,15 @@
 			<ul>
 				<li class="active entry"><a href="#">{{entry_tab_label}}</a></li>
 				<li>&bull;</li>
-				<li class="preview"><a href="#"><?php _e( 'Preview', 'liveblog' ); ?></a></li>
+				<li class="preview"><a href="#"><?php esc_html_e( 'Preview', 'liveblog' ); ?></a></li>
 			</ul>
 		</legend>
 			<div class="liveblog-edit-entry">
-				<textarea placeholder="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>" class="liveblog-form-entry" name="liveblog-form-entry" cols="50" rows="5">{{content}}</textarea>
-				<?php if ( apply_filters( 'liveblog_rich_text_editing_allowed', true ) ): ?>
+				<textarea placeholder="<?php esc_attr_e( 'Remember: keep it short! To insert an image, drag and drop it here.', 'liveblog' ); ?>" class="liveblog-form-entry" name="liveblog-form-entry" cols="50" rows="5">{{content}}</textarea>
+				<?php if ( apply_filters( 'liveblog_rich_text_editing_allowed', true ) ) : ?>
 					<label class="liveblog-html-edit-toggle">
 						<input type="checkbox">
-						<?php esc_html_e( 'Edit HTML', 'liveblog' ) ?>
+						<?php esc_html_e( 'Edit HTML', 'liveblog' ); ?>
 					</label>
 					<div class="liveblog-rich-form-entry">
 						<div class="liveblog-edit-commands">
@@ -27,15 +27,15 @@
 							<span tabindex="0" role="button" class="liveblog-formatting-command" data-command="removeFormat" title="<?php esc_attr_e( 'Remove formatting (Ctrl/Cmd + \\)', 'liveblog' ); ?>"><span class="icon"></span><?php esc_html_e( 'Remove formatting', 'liveblog' ); ?></span>
 						</div>
 						<div class="liveblog-rich-text-wrapper">
-							<div class="liveblog-form-rich-entry" contenteditable="true" title="<?php esc_attr_e( "Remember: keep it short! To insert an image, drag and drop it here.", 'liveblog' ); ?>"></div>
+							<div class="liveblog-form-rich-entry" contenteditable="true" title="<?php esc_attr_e( 'Remember: keep it short! To insert an image, drag and drop it here.', 'liveblog' ); ?>"></div>
 						</div>
 					</div>
 				<?php endif; ?>
 				<div class="liveblog-submit-wrapper">
 					<span class="liveblog-submit-spinner"></span>
 					<input type="button" class="liveblog-form-entry-submit button" value="{{submit_label}}" />
-					<a href="#" class="cancel"><?php _e( 'Cancel', 'liveblog' ); ?></a>
-					<a href="#" class="liveblog-entry-delete"><?php _e( 'Delete', 'liveblog' ); ?></a>
+					<a href="#" class="cancel"><?php esc_html_e( 'Cancel', 'liveblog' ); ?></a>
+					<a href="#" class="liveblog-entry-delete"><?php esc_html_e( 'Delete', 'liveblog' ); ?></a>
 				</div>
 			</div>
 			<div class="liveblog-preview">

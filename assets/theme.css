@@ -1,0 +1,151 @@
+/* *
+* Entries
+*/
+
+.liveblog-entry {
+  display: flex;
+  padding: 1rem;
+  background: #f7f7f7;
+  border-top: 2px solid #eee;
+  border-bottom: 2px solid #eee;
+}
+
+.liveblog-entry.is-key-event {
+  border-top: 2px solid #111;
+}
+
+.liveblog-meta {
+  color: #666;
+}
+
+.liveblog-entry-aside {
+  flex-basis: 70px;
+  min-width: 70px;
+  margin-right: 10px;
+}
+
+.liveblog-entry-main {
+  flex-grow: 1;
+}
+
+.liveblog-entry-content * {
+  word-break: break-all;
+}
+
+.entry-content .liveblog-meta-time,
+.entry-content .liveblog-meta-time:hover,
+.entry-content .liveblog-meta-time:focus {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.liveblog-meta-time span {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.liveblog-meta-time span:first-child {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.liveblog-meta-authors {
+  margin-bottom: .5rem;
+}
+
+.liveblog-meta-author {
+  margin-right: 8px;
+}
+
+.liveblog-meta-author-name {
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.liveblog-meta-authour-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
+}
+
+.liveblog-hash {
+  color: #21759b;
+}
+
+/**
+* Events
+*/
+
+.liveblog-event {
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+.liveblog-event::before,
+.liveblog-event:only-child::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: -4.5px;
+  width: 10px;
+  height: 10px;
+  background: #bbb;
+  border-radius: 50%;
+  -webkit-transition: background .3s ease-in-out;
+  -o-transition: background .3s ease-in-out;
+  transition: background .3s ease-in-out;
+}
+
+.liveblog-event::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  height: 100%;
+  width: 1px;
+  background: #bbb;
+}
+
+.liveblog-event::before,
+.liveblog-event::after {
+  top: 10px;
+}
+
+.liveblog-event:only-child::after {
+  display: none;
+}
+
+.liveblog-event:not(:only-child):first-child::before,
+.liveblog-event:not(:only-child):last-child::before {
+  height: 1px;
+  border-radius: 0%;
+}
+
+.liveblog-event:not(:only-child):last-child::after {
+  display: none;
+}
+
+.liveblog-event:hover::before {
+  background: #333;
+  -webkit-transition: background .3s ease-in-out;
+  -o-transition: background .3s ease-in-out;
+  transition: background .3s ease-in-out;
+}
+
+.liveblog-event-content {
+  margin-top: 5px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/**
+* Pagination
+*/
+
+.liveblog-pagination-first,
+.liveblog-pagination-last {
+  background: #eee;
+  color: #111;
+}

@@ -1,0 +1,55 @@
+.liveblog-editor-tabs {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.liveblog-editor-tab {
+  position: relative;
+  z-index: 99;
+  line-height: 1.5;
+  padding: .4rem .8rem;
+  font-size: .8rem;
+  background: $color-grey-mid-light;
+  color: $color-grey-dark;
+  border: $base-border-size solid $color-grey-light;
+  border-radius: $base-border-radius $base-border-radius 0 0;
+  border-bottom: none;
+  font-weight: normal;
+}
+
+.liveblog-editor-tab:hover,
+.liveblog-editor-tab.is-active {
+  background: #fff;
+}
+
+.liveblog-editor-tab.is-active::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+}
+
+.liveblog-editor-tab:first-child.is-active {
+  background: $color-grey-x-light;
+}
+
+.liveblog-editor-tab:first-child.is-active::after {
+  background: $color-grey-x-light;
+}
+
+.liveblog-editor-tab:not(:last-child) {
+  margin-right: .25rem;
+}
+
+@include mq($until: small) {
+  .liveblog-editor-tab:first-child.is-active {
+    background: #fff;
+  }
+
+  .liveblog-editor-tab:first-child.is-active::after {
+    background: #fff;
+  }
+}

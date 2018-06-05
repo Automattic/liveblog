@@ -1,17 +1,16 @@
 === Liveblog ===
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
 Tags: liveblog
-Requires at least: 3.5
-Tested up to: 4.6
-Stable tag: 1.5.1
+Requires at least: 4.4
+Requires PHP: 5.6
+Tested up to: 4.9.5
+Stable tag: 1.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Quick and simple blogging for following fast-paced events.
 
 == Description ==
-
-[wpvideo tWpw6nCt]
 
 Your readers want your updates as quickly as possible, and we think we provide the easiest and the most flexible publishing environment to make that happen. Sometimes though, that’s just not enough.
 
@@ -47,80 +46,4 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 == Changelog ==
 
-= 1.5.1 =
-
-* Fix for duplicate entries with lazyloading (props potatomaster)
-* Fix for formatting tweets with lazyloading (props potatomaster)
-* Restore relative date in entries (props davidbinda)
-* Allow template overrides from child themes (props davidbinda)
-* Fix issue with plupload container (props davidbinda)
-* Fix for broken oEmbeds in Liveblog entries (props philipjohn)
-
-= 1.5 =
-
-* New "Key Events" feature
-* New "Lazyloading" feature
-* Improved escaping
-
-People who helped make this happen: Jason Agnew, Josh Betz, Sarah Blackstock, Stephane Boisvert, Ian Dunn, Scott Evans, Thorsten Frommen, Mark Goodyear, Chris Hardie, Philip John, Paul Kevan, Connor Parks
-
-= 1.4 =
-
-* Rich-text editing!
-* Archived liveblogs now display in chronological order (live ones show reverse chron)
-* New and udpated translations
-* Bump to fix SVN sync issues (thanks @kevinlisota)
-
-= 1.3.1 =
-
-* Fixed a bug where liveblog would show up in secondary loops
-
-= 1.3 =
-
-**The liveblog plugin now requires WordPress 3.5.**
-
-New functionality:
-
-* Liveblog archiving
-* Shows automatically new entries, with a slick notification bar if we have scrolled out of view. With the help of [@borkweb](https://github.com/borkweb) and [@zbtirrell](https://github.com/zbtirrell)
-* Front-end editing
-* Pasting an image URL embeds the image
-
-Translations:
-
-* German by [@cfoellmann](https://github.com/cfoellmann)
-* Spanish by [@elarequi](http://profiles.wordpress.org/elarequi)
-
-Also a lot of internal improvements and bug fixes. See the [full list of
-closed issues](https://github.com/Automattic/liveblog/issues?milestone=3&state=closed).
-
-= 1.2 =
-
-New functionality:
-
-* Introduce many new hooks and filters, which help customization without changing the plugin code.
-* Allow shortcodes and OEmbed in liveblog entries
-* Translations:
-	- Spanish by [@elarequi](http://profiles.wordpress.org/elarequi)
-	- Dutch by [@defries](https://github.com/defries)
-	- Catalan by [@gasparappa](https://github.com/gasparappa)
-	- German by [@cfoellmann](https://github.com/cfoellmann)
-* Add github-friendly version of `readme.txt`
-* Optimize PNG files
-
-Fixed problems:
-
-* Fix JavaScript errors on IE8, props [@pippercameron](https://github.com/pippercameron)
-* Fix preview tab
-* Compatibility with plupload 1.5.4, props [@borkweb](https://github.com/borkweb)
-
-= 1.1 =
-* Backwards compatibility for 3.4
-* Support for non-pretty permalinks
-* Support for permalinks without trailing slashes
-* Fix preview tab
-
-= 1.0 =
-* Initial release
-
-
+Please see the [changelog on Github](https://github.com/Automattic/liveblog/blob/master/CHANGELOG.md).

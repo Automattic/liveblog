@@ -3,9 +3,10 @@
 
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby), [philipjohn](http://profiles.wordpress.org/philipjohn)
 * Tags: liveblog
-* Requires at least: 3.5
-* Tested up to: 4.4
-* Stable tag: 1.5
+* Requires at least: 4.4
+* Requires PHP: 5.6
+* Tested up to: 4.9.5
+* Stable tag: 1.8.2
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,8 +15,6 @@
 Quick and simple blogging for following fast-paced events.
 
 ## Description
-
-https://videopress.com/v/tWpw6nCt
 
 Your readers want your updates as quickly as possible, and we think we provide the easiest and the most flexible publishing environment to make that happen. Sometimes though, that’s just not enough.
 
@@ -59,10 +58,10 @@ New iPad announced, launching next week — more info to come. /key
 You can add new commands easily with a filter, the most basic command will add a class to entry, so you could do a simple  `/highlight` which would add `type-highlight` to the entry container, letting you style the background color:
 
 ``` php
-add_filter( 'liveblog_active_commands',  array( __CLASS__, 'add_highlight_command' ), 10 );
+add_filter( 'liveblog_active_commands', 'add_highlight_command', 10 );
 
 
-public static function add_highlight_command( $commands ) {
+function add_highlight_command( $commands ) {
   $commands[] = highlight;
   return $commands;
 }
@@ -120,8 +119,8 @@ An example of a template file is:
 **Format:** This is how each entries content is filtered, there are three inbuilt formats:
 
 * Full - which shows content without filtering
-* First Sentence - which will return everything until it hits either `.?!`  
-* First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.  
+* First Sentence - which will return everything until it hits either `.?!`
+* First Linebreak - which will return everything until it hits a linebreak (Shift + Enter) or `<br />`.
 
 Formats add an extra level of control to how the key events section looks. If using the `timeline` template with `first sentence` and the following is entered into the new entry box:
 ```
@@ -185,7 +184,7 @@ Selecting which template or format to use for liveblog happens in the admin pane
 #### Managing Hashtags
 Hashtags are manageable in the admin area. Under Posts there will be a menu for Hashtags. Please note that the slug is used, not the name.
 
-#### Emjoi's
+#### Emojis
 When a `:emoji:` is inserted into an entry it is converted into:
 
 `<img src="//s.w.org/images/core/emoji/72x72/1f44d.png" class="liveblog-emoji emoji-+1">`
@@ -294,6 +293,62 @@ public static function filter( $class_prefix ) {
 }
 ```
 
+### Shortcode Filtering
+Developers have to ability to exclude shortcodes from being used within the content of a live entry. By default the in built key events widget short code is excluded, but others can be added easily enough from within the themes ``` functions.php ```.
+
+``` php
+    // Added to Functions.php
+
+    function liveblog_entry_add_restricted_shortcodes() {
+
+    	add_filter( 'liveblog_entry_restrict_shortcodes', 'add_shortcode_restriction', 10, 1 );
+
+    	function add_shortcode_restriction( $restricted_shortcodes ) {
+
+    		$restricted_shortcodes['my-shortcode'] = 'This Text Will Be Inserted Instead Of The Shortcode!';
+    		$restricted_shortcodes['my-other-shortcode'] = '<h1>Here is a Markup Shortcode Replacement</h1>';
+
+    		return $restricted_shortcodes;
+    	}
+    }
+
+    add_action( 'init', 'liveblog_entry_add_restricted_shortcodes' );
+
+```
+
+The functionality takes a associative array of key value pairs where the key is the shortcode to be looked up and the value is the replacement string.
+
+So, given the example above an editor adding any of the shortcode formats:
+
+``` [my-shortcode]``` / ``` [my-shortcode][/my-shortcode]``` / ``` [my-shortcode arg="20"][/my-shortcode]```
+
+would see ``` This Text Will Be Inserted Instead Of The Shortcode! ``` outputted on live entry.
+
+By default the inbuilt ``` [liveblog_key_events] ``` shortcode is replaced with ```We Are Blogging Live! Check Out The Key Events in The Sidebar```.
+
+To override this behaviour simple redefine the array key value:
+
+``` php
+$restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output for the shortcode! <a href="/">Click Here to Find Out More!</a>';
+```
+
+### Auto Archiving of Live Blog Posts
+This feature was added at the request of the community and solves the issues where Editors will forget to archive old Live Blog's leaving them live indefinitely.
+
+Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the date of the latest liveblog entry + the number of days configured.
+
+Once the expiry date is met the live blog post will be auto archived. It is however possible to re-enable an auto archived Live Blog Post,
+simply click the enable button in the post Liveblog meta box and the expiry will be extended by the number of days configured from the latest liveblog entry date. The auto archiving feature will then re-archive the post at the new expiry date.
+
+In order to configure the number of days to autoarchive after, a filter has been implemented. By default the value is NULL and as such disables the feature. To enable it simply apply a value to the filter e.g:
+
+```
+add_filter( 'liveblog_auto_archive_days', function( $auto_archive_days ) {
+  $auto_archive_days = 50;
+  return $auto_archive_days;
+}, 10, 1 );
+```
+
 ### WebSocket support
 
 By default this plugin uses AJAX polling to update the list of Liveblog entries. This means that there is a delay of a few seconds between the moment a entry is created and the moment it is displayed to the users. For a close to real-time experience, it is possible to configure Liveblog to use WebSockets instead of AJAX polling. To achieve this, Liveblog uses [Socket.io](http://socket.io), [Redis](http://redis.io) and [socket.io-php-emitter](https://github.com/rase-/socket.io-php-emitter) (responsible for sending messages from PHP to the Socket.io server via Redis).
@@ -380,79 +435,3 @@ If for some reason the plugin is not able to use WebSockets to refresh the list 
 ![Adding images is a matter of just drag-and-drop](https://raw.github.com/Automattic/liveblog/master/screenshot-5.png)
 ![Dragged photos are automatically inserted](https://raw.github.com/Automattic/liveblog/master/screenshot-6.png)
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
-
-## Changelog
-
-### 1.5
-
-* New "Key Events" feature
-* New "Lazyloading" feature
-* Improved escaping
-
-People who helped make this happen: Jason Agnew, Josh Betz, Sarah Blackstock, Stephane Boisvert, Ian Dunn, Scott Evans, Thorsten Frommen, Mark Goodyear, Chris Hardie, Philip John, Paul Kevan, Connor Parks
-
-### 1.4.1
-
-* Bump tested tag to 4.2.2.
-* Added Composer support!
-
-### 1.4
-
-* Rich-text editing!
-* Archived liveblogs now display in chronological order (live ones show reverse chron)
-* New and udpated translations
-* Bump to fix SVN sync issues (thanks @kevinlisota)
-
-### 1.3.1
-
-* Fixed a bug where liveblog would show up in secondary loops
-
-### 1.3
-
-**The liveblog plugin now requires WordPress 3.5.**
-
-New functionality:
-
-* Liveblog archiving
-* Shows automatically new entries, with a slick notification bar if we have scrolled out of view. With the help of [@borkweb](https://github.com/borkweb) and [@zbtirrell](https://github.com/zbtirrell)
-* Front-end editing
-* Pasting an image URL embeds the image
-
-Translations:
-
-* German by [@cfoellmann](https://github.com/cfoellmann)
-* Spanish by [@elarequi](http://profiles.wordpress.org/elarequi)
-
-Also a lot of internal improvements and bug fixes. See the [full list of
-closed issues](https://github.com/Automattic/liveblog/issues?milestone=3&state=closed).
-
-### 1.2
-
-New functionality:
-
-* Introduce many new hooks and filters, which help customization without changing the plugin code.
-* Allow shortcodes and OEmbed in liveblog entries
-* Translations:
-	- Spanish by [@elarequi](http://profiles.wordpress.org/elarequi)
-	- Dutch by [@defries](https://github.com/defries)
-	- Catalan by [@gasparappa](https://github.com/gasparappa)
-	- German by [@cfoellmann](https://github.com/cfoellmann)
-* Add github-friendly version of `readme.txt`
-* Optimize PNG files
-
-Fixed problems:
-
-* Fix JavaScript errors on IE8, props [@pippercameron](https://github.com/pippercameron)
-* Fix preview tab
-* Compatibility with plupload 1.5.4, props [@borkweb](https://github.com/borkweb)
-
-### 1.1
-
-* Backwards compatibility for 3.4
-* Support for non-pretty permalinks
-* Support for permalinks without trailing slashes
-* Fix preview tab
-
-### 1.0
-
-* Initial release

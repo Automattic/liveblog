@@ -1,0 +1,8 @@
+@keyframes scaleUp {
+  0% {
+    transform: scaleY(.8);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}

@@ -1,0 +1,156 @@
+.liveblog-editor-btn {
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: middle;
+  font: inherit;
+  line-height: normal;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  overflow: visible;
+  user-select: none;
+  white-space: normal;
+  padding: .5rem;
+  margin: 0;
+  background: transparent;
+  border-radius: 0;
+  color: $color-grey-dark;
+  transition: none;
+}
+
+.liveblog-editor-btn:hover {
+  background: #fff;
+}
+
+.liveblog-editor-btn[disabled] {
+  opacity: .5;
+  cursor: auto;
+}
+
+.liveblog-editor-btn[disabled]:hover {
+  background: transparent;
+}
+
+.liveblog-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-grow: 1;
+
+  @include mq($until: x-small) {
+    justify-content: center;
+    margin-top: .25rem;
+  }
+}
+
+.liveblog-editor-actions > *:not(:first-child) {
+  margin-left: .5rem;
+}
+
+.liveblog-editor-action-btn {
+  background: $color-primary;
+  color: #fff;
+  font-size: .8rem;
+  padding: .5rem 1rem;
+  border-radius: $base-border-radius;
+}
+
+.liveblog-editor-action-btn:hover {
+  background: lighten($color-primary, 5%);
+}
+
+.liveblog-editor-action-btn.has-icon {
+  padding-left: .4rem;
+}
+
+.liveblog-editor-action-btn .dashicons {
+  display: inline-block;
+  font-size: 15px;
+  height: 3px;
+  margin-right: .25rem;
+}
+
+.liveblog-editor-cancel-btn {
+  font-size: .8rem;
+  padding: .5rem 1rem;
+  background: $color-warning;
+  color: #fff;
+  border-radius: $base-border-radius;
+}
+
+.liveblog-editor-cancel-btn:hover {
+  background: lighten($color-warning, 5%);
+}
+
+.liveblog-editor-delete {
+  color: $color-warning;
+  cursor: pointer;
+  transition: none;
+}
+
+.liveblog-editor-delete:hover {
+  transition: none;
+  transform: scale(1.1);
+}
+
+.liveblog-image-upload-btn {
+  position: absolute;
+  bottom: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .2rem;
+  padding: .35rem;
+  font-size: .8rem;
+  font-weight: normal;
+  border: $base-border-size solid $color-grey-light;
+  background-color: $color-grey-x-light;
+  border-radius: $base-border-radius;
+  color: $color-grey-dark;
+}
+
+.liveblog-image-upload-btn .dashicons {
+  margin-right: .35rem;
+}
+
+@include mq($until: small) {
+  .liveblog-image-upload-btn-text {
+    display: none;
+  }
+
+  .liveblog-image-upload-btn .dashicons {
+    margin-right: 0;
+  }
+}
+
+.liveblog-image-upload-btn:hover {
+  background-color: #fff;
+  transition: .25s background-color ease-in-out;
+}
+
+.liveblog-publish-btn,
+.liveblog-save-btn {
+  background: $color-primary;
+}
+
+.liveblog-publish-btn {
+  width: 100%;
+}
+
+.liveblog-publish-btn:hover,
+.liveblog-save-btn:hover {
+  background: lighten($color-primary, 5%);
+}
+
+.liveblog-save-btn,
+.liveblog-cancel-btn,
+.liveblog-publish-btn {
+  font-size: .9rem;
+}
+
+.liveblog-cancel-btn {
+  background: $color-grey-light;
+  color: $color-grey-dark;
+}
