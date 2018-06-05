@@ -30,6 +30,8 @@ class EditorContainer extends Component {
 
     let initialEditorState;
     let initialAuthors;
+    let keyEvent;
+    let entryId;
 
     if (props.entry) {
       initialEditorState = EditorState.createWithContent(
@@ -41,9 +43,13 @@ class EditorContainer extends Component {
         decorators,
       );
       initialAuthors = props.entry.authors;
+      keyEvent = props.entry.key_event;
+      entryId = props.entry.id;
     } else {
       initialEditorState = EditorState.createEmpty(decorators);
       initialAuthors = [props.config.current_user];
+      keyEvent = false;
+      entryId = '';
     }
 
     this.state = {
@@ -53,6 +59,8 @@ class EditorContainer extends Component {
       mode: 'editor',
       readOnly: false,
       rawText: props.entry ? props.entry.content : '',
+      isKeyEvent: keyEvent,
+      entryId,
     };
 
     this.onChange = editorState => this.setState({
@@ -65,6 +73,10 @@ class EditorContainer extends Component {
     this.setState({
       readOnly: state,
     });
+  }
+
+  onToggleKeyEvent() {
+    this.setState({ isKeyEvent: !this.state.isKeyEvent });
   }
 
   getContent() {
@@ -88,7 +100,7 @@ class EditorContainer extends Component {
 
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState, authors } = this.state;
+    const { editorState, authors, isKeyEvent } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
@@ -100,6 +112,7 @@ class EditorContainer extends Component {
         content,
         author,
         contributors,
+        isKeyEvent,
       });
       entryEditClose(entry.id);
       return;
@@ -109,6 +122,7 @@ class EditorContainer extends Component {
       content,
       author,
       contributors,
+      isKeyEvent,
     });
 
     const newEditorState = EditorState.push(
@@ -117,7 +131,10 @@ class EditorContainer extends Component {
     );
 
     this.onChange(newEditorState);
-    this.setState({ readOnly: false });
+    this.setState({
+      readOnly: false,
+      isKeyEvent: false,
+    });
   }
 
   onSelectAuthorChange(value) {
@@ -222,6 +239,8 @@ class EditorContainer extends Component {
       mode,
       authors,
       readOnly,
+      isKeyEvent,
+      entryId,
     } = this.state;
 
     const { isEditing, config } = this.props;
@@ -284,6 +303,19 @@ class EditorContainer extends Component {
             width="100%"
           />
         }
+        <div className="liveblog-metabox-key-events-checkbox">
+          <label
+            htmlFor={`key-event-checkbox-${entryId}`}
+          >
+            <input
+              type="checkbox"
+              id={`key-event-checkbox-${entryId}`}
+              onChange={this.onToggleKeyEvent.bind(this)}
+              checked={isKeyEvent}
+            />
+            Key Event
+          </label>
+        </div>
         <h2 className="liveblog-editor-subTitle">Authors:</h2>
         <Async
           multi={true}
@@ -310,6 +342,7 @@ EditorContainer.propTypes = {
   entry: PropTypes.object,
   entryEditClose: PropTypes.func,
   createEntry: PropTypes.func,
+  onToggleKeyEvent: PropTypes.func,
   isEditing: PropTypes.bool,
   authors: PropTypes.array,
   getAuthors: PropTypes.func,
