@@ -290,19 +290,6 @@ class EditorContainer extends Component {
             defaultImageSize={config.default_image_size}
           />
         }
-        <div className="liveblog-metabox-key-events-checkbox">
-          <label
-            htmlFor={`key-event-checkbox-${entryId}`}
-          >
-            <input
-              type="checkbox"
-              id={`key-event-checkbox-${entryId}`}
-              onChange={this.onToggleKeyEvent.bind(this)}
-              checked={isKeyEvent}
-            />
-            Key Event
-          </label>
-        </div>
         {
           mode === 'raw' &&
           <HTMLInput
@@ -316,6 +303,19 @@ class EditorContainer extends Component {
             width="100%"
           />
         }
+        <div className="liveblog-metabox-key-events-checkbox">
+          <label
+            htmlFor={`key-event-checkbox-${entryId}`}
+          >
+            <input
+              type="checkbox"
+              id={`key-event-checkbox-${entryId}`}
+              onChange={this.onToggleKeyEvent.bind(this)}
+              checked={isKeyEvent}
+            />
+            Key Event
+          </label>
+        </div>
         <h2 className="liveblog-editor-subTitle">Authors:</h2>
         <Async
           multi={true}
