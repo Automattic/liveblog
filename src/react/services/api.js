@@ -14,6 +14,7 @@ export function getEntries(page, config, newestEntry) {
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -25,6 +26,7 @@ export function polling(newestEntryTimestamp, config) {
   const settings = {
     url: `${config.endpoint_url}entries/${(newestEntryTimestamp + 1) || 0}/${timestamp}/`,
     method: 'GET',
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -46,6 +48,7 @@ export function createEntry(entry, config, nonce = false) {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -68,6 +71,7 @@ export function updateEntry(entry, config, nonce = false) {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -87,6 +91,7 @@ export function deleteEntry(id, config, nonce = false) {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -95,6 +100,7 @@ export function deleteEntry(id, config, nonce = false) {
 export function getEvents(config, newestEntry) {
   const settings = {
     url: `${config.endpoint_url}get-key-events/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
+    crossDomain: config.cross_domain,
     method: 'GET',
   };
 
@@ -104,6 +110,7 @@ export function getEvents(config, newestEntry) {
 export function jumpToEvent(id, config, newestEntry) {
   const settings = {
     url: `${config.endpoint_url}jump-to-key-event/${id}/${newestEntry.id || 0}-${newestEntry.timestamp || 0}`,
+    crossDomain: config.cross_domain,
     method: 'GET',
   };
 
@@ -125,6 +132,7 @@ export function deleteEvent(entry, config, nonce = false) {
       'X-WP-Nonce': nonce || config.nonce,
       'cache-control': 'no-cache',
     },
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -134,6 +142,7 @@ export function getAuthors(term, config) {
   const settings = {
     url: `${config.autocomplete[3].url}${term}`,
     method: 'GET',
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -143,6 +152,7 @@ export function getHashtags(term, config) {
   const settings = {
     url: `${config.autocomplete[2].url}${term}`,
     method: 'GET',
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
@@ -158,6 +168,7 @@ export function getPreview(content, config) {
     headers: {
       'Content-Type': 'application/json',
     },
+    crossDomain: config.cross_domain,
   };
 
   return ajax(settings);
