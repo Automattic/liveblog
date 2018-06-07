@@ -127,8 +127,6 @@ class WPCOM_Liveblog_Lazyloader {
 			return;
 		}
 
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
-
 		add_filter( 'liveblog_display_archive_query_args', array( __CLASS__, 'display_archive_query_args' ), 20 );
 	}
 
