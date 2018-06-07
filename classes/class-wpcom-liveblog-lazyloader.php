@@ -141,9 +141,11 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function admin_notices() {
 
-		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array(
-			'plugin' => 'Lazyload Liveblog Entries',
-		) );
+		echo WPCOM_Liveblog::get_template_part(
+			'lazyload-notice.php', array(
+				'plugin' => 'Lazyload Liveblog Entries',
+			)
+		);
 	}
 
 	/**
@@ -164,9 +166,11 @@ class WPCOM_Liveblog_Lazyloader {
 		$plugin_path = dirname( __FILE__ );
 		$temp        = plugin_dir_path( $plugin_path ) . $path;
 		wp_enqueue_script( $handle, plugins_url( $path, $plugin_path ), array( 'liveblog' ), filemtime( $temp ), true );
-		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
-			'loadMoreText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
-		) );
+		wp_localize_script(
+			$handle, 'liveblogLazyloaderSettings', array(
+				'loadMoreText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
+			)
+		);
 	}
 
 	/**

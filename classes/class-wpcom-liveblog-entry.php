@@ -117,9 +117,9 @@ class WPCOM_Liveblog_Entry {
 	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
 		$comment = get_comment( $comment_id );
 		if ( '' === $d ) {
-			$date = mysql2date(get_option('date_format'), $comment->comment_date_gmt);
+			$date = mysql2date( get_option( 'date_format' ), $comment->comment_date_gmt );
 		} else {
-			$date = mysql2date($d, $comment->comment_date_gmt);
+			$date = mysql2date( $d, $comment->comment_date_gmt );
 		}
 
 		return $date;
@@ -191,7 +191,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
-		$args    = apply_filters( 'liveblog_before_insert_entry', $args );
+		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
 		$args['user'] = self::handle_author_select( $args, false );
 
@@ -235,7 +235,7 @@ class WPCOM_Liveblog_Entry {
 			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
 		}
 
-		$args    = apply_filters( 'liveblog_before_update_entry', $args );
+		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -246,8 +246,8 @@ class WPCOM_Liveblog_Entry {
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 		wp_update_comment(
 			array(
-				'comment_ID'       => $args['entry_id'],
-				'comment_content'  => wp_filter_post_kses( $args['content'] ),
+				'comment_ID'      => $args['entry_id'],
+				'comment_content' => wp_filter_post_kses( $args['content'] ),
 			)
 		);
 		$entry = self::from_comment( $comment );
