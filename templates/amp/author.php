@@ -1,5 +1,5 @@
 <?php
-	$author = $this->get( 'author' );
+	$author     = $this->get( 'author' );
 	$avatar_url = get_avatar_url( $author['id'] );
 ?>
 

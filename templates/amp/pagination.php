@@ -3,9 +3,9 @@
 			<div>
 			<?php $links = $this->get( 'links' ); ?>
 
-			<?php if ( $links->prev ): ?>
 				<a href="<?php echo esc_url( $links->first ); ?>" title="<?php _e( 'First', 'liveblog' ); ?>" class="liveblog-btn liveblog-pagination-btn" data-link-name="">First</a>
 				<a href="<?php echo esc_url( $links->prev ); ?>" title="<?php _e( 'Prev', 'liveblog' ); ?>" class="liveblog-btn liveblog-pagination-btn liveblog-pagination-prev" data-link-name="">Prev</a>
+			<?php if ( $links->prev ) : ?>
 			<?php endif; ?>
 			</div>
 

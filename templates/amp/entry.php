@@ -1,11 +1,11 @@
 <?php
-	$id = $this->get( 'id' );
-	$entry_time = $this->get( 'time' );
-	$content = $this->get( 'content' );
-	$social = $this->get( 'social' );
-	$single = $this->get( 'single' );
-	$share_link = $this->get( 'share_link' );
-	$update_time = $this->get( 'update_time' );
+	$id             = $this->get( 'id' );
+	$entry_time     = $this->get( 'time' );
+	$content        = $this->get( 'content' );
+	$social         = $this->get( 'social' );
+	$single         = $this->get( 'single' );
+	$share_link     = $this->get( 'share_link' );
+	$update_time    = $this->get( 'update_time' );
 	$share_link_amp = $this->get( 'share_link_amp' );
 ?>
 
