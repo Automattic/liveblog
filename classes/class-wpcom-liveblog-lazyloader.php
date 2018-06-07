@@ -147,29 +147,6 @@ class WPCOM_Liveblog_Lazyloader {
 	}
 
 	/**
-	 * Enqueues the lazyloader script file.
-	 *
-	 * @wp-hook wp_enqueue_scripts
-	 *
-	 * @return void
-	 */
-	public static function enqueue_script() {
-
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
-			return;
-		}
-
-		$handle      = 'liveblog-lazyloader';
-		$path        = 'js/liveblog-lazyloader.js';
-		$plugin_path = dirname( __FILE__ );
-		$temp        = plugin_dir_path( $plugin_path ) . $path;
-		wp_enqueue_script( $handle, plugins_url( $path, $plugin_path ), array( 'liveblog' ), filemtime( $temp ), true );
-		wp_localize_script( $handle, 'liveblogLazyloaderSettings', array(
-			'loadMoreText' => esc_html__( 'Load more entries&hellip;', 'liveblog' ),
-		) );
-	}
-
-	/**
 	 * Limits the initially displayed Liveblog entries.
 	 *
 	 * @param array $args Query args.
