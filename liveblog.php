@@ -1016,7 +1016,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'post_id'                      => get_the_ID(),
 						'state'                        => self::get_liveblog_state(),
 						'is_liveblog_editable'         => self::is_liveblog_editable(),
-						'current_user'           	   => self::get_current_user(),
+						'current_user'                 => self::get_current_user(),
 						'socketio_enabled'             => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 						'key'                          => self::KEY,
