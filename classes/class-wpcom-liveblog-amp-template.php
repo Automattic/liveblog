@@ -75,7 +75,7 @@ class WPCOM_Liveblog_AMP_Template {
 			$path = $plugin;
 		}
 
-		if ( $path === false ) {
+		if ( false === $path ) {
 			return 'Template Not Found: ' . $name;
 		}
 
