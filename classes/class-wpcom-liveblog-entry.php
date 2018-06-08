@@ -489,8 +489,11 @@ class WPCOM_Liveblog_Entry {
 
 		$author       = [ self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) ];
 		$contributors = self::get_contributors_for_json( $comment_id );
-
-		return array_merge( $author, $contributors );
+		
+		//Clears empty users in the array if there was an error retrieving the user
+		return array_filter( array_merge( $author, $contributors ), function( $item ) {
+			return ! empty( $item );
+		});
 	}
 }
 
