@@ -209,7 +209,6 @@ class WPCOM_Liveblog_Entry {
 				$wpcom_liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
 				$content                    = $wpcom_liveblog_entry_embed->autoembed( $content, $comment );
 			}
-
 			$content = do_shortcode( $content );
 		}
 
