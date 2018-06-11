@@ -32,6 +32,7 @@ class WPCOM_Liveblog_Entry {
 	private $comment;
 	private $type = 'new';
 	private static $allowed_tags_for_entry;
+	private static $rendered_content = [];
 
 	/**
 	 * Define the Lookup array for any shortcodes that should be stripped and replaced
@@ -198,15 +199,22 @@ class WPCOM_Liveblog_Entry {
 	public static function render_content( $content, $comment = false ) {
 		global $wp_embed;
 
+		// Cache rendered comment content to avoid double running shortcodes.
+		if ( self::$rendered_content[ $comment->comment_ID ] ) {
+			return self::$rendered_content[ $comment->comment_ID ];
+		}
+
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
 				$wpcom_liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
 				$content                    = $wpcom_liveblog_entry_embed->autoembed( $content, $comment );
 			}
+
 			$content = do_shortcode( $content );
 		}
 
-		return apply_filters( 'comment_text', $content, $comment );
+		self::$rendered_content[ $comment->comment_ID ] = apply_filters( 'comment_text', $content, $comment );
+		return self::$rendered_content[ $comment->comment_ID ];
 	}
 
 	/**
