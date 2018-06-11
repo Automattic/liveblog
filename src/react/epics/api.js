@@ -80,6 +80,7 @@ const getPaginatedEntriesEpic = (action$, store) =>
                 store.getState().api.entries,
                 store.getState().polling.entries,
               ),
+              store.getState().config.paginationType,
             )),
             of(scrollToEntry(getScrollToId(res.response.entries, scrollTo))),
           ),
