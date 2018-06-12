@@ -7,21 +7,27 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntriesPaginated, paginationType } = this.props;
+    const { page, pages, getEntriesPaginated, paginationType, isLoading } = this.props;
 
     if (paginationType === 'loadMore') {
       return (
         <div className="liveblog-pagination">
-          {page !== pages &&
-          <button
-            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-loadmore"
-            onClick={(e) => {
-              e.preventDefault();
-              getEntriesPaginated(page + 1);
-            }}
-          >
-              Load More
-          </button>}
+          {
+            (page !== pages) &&
+              (
+                isLoading ?
+                  <span className="liveblog-submit-spinner" /> :
+                  <button
+                    className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-loadmore"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      getEntriesPaginated(page + 1);
+                    }}
+                  >
+                  Load More
+                  </button>
+              )
+          }
         </div>
       );
     }
@@ -118,12 +124,14 @@ PaginationContainer.propTypes = {
   pages: PropTypes.number,
   getEntriesPaginated: PropTypes.func,
   paginationType: PropTypes.string,
+  isLoading: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   pages: state.pagination.pages,
   paginationType: state.config.paginationType,
+  isLoading: state.api.loading,
 });
 
 const mapDispatchToProps = dispatch =>
