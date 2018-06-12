@@ -7,7 +7,24 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntriesPaginated } = this.props;
+    const { page, pages, getEntriesPaginated, paginationType } = this.props;
+
+    if (paginationType === 'loadMore') {
+      return (
+        <div className="liveblog-pagination">
+          {page !== pages &&
+          <button
+            className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-loadmore"
+            onClick={(e) => {
+              e.preventDefault();
+              getEntriesPaginated(page + 1);
+            }}
+          >
+              Load More
+          </button>}
+        </div>
+      );
+    }
 
     // Don't diplsay pagination if we only have a single page.
     if (pages === 1) {
@@ -100,11 +117,13 @@ PaginationContainer.propTypes = {
   page: PropTypes.number,
   pages: PropTypes.number,
   getEntriesPaginated: PropTypes.func,
+  paginationType: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   pages: state.pagination.pages,
+  paginationType: state.config.paginationType,
 });
 
 const mapDispatchToProps = dispatch =>
