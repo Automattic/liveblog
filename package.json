@@ -46,7 +46,7 @@
     "js-beautify": "^1.7.5",
     "lodash-es": "^4.17.4",
     "moment": "^2.20.1",
-    "node-sass": "^4.5.3",
+    "node-sass": "^4.9.0",
     "postcss-loader": "^2.0.8",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
