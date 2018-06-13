@@ -21,7 +21,6 @@ const DeleteConfirmation = ({ onConfirmDelete, onCancel }) => (
   </div>
 );
 
-
 DeleteConfirmation.propTypes = {
   entry: PropTypes.object,
   onConfirmDelete: PropTypes.func,
