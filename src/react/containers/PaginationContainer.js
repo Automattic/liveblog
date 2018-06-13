@@ -1,3 +1,4 @@
+import ScrollTrigger from 'react-scroll-trigger';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
@@ -11,24 +12,29 @@ class PaginationContainer extends Component {
 
     if (paginationType === 'loadMore') {
       return (
-        <div className="liveblog-pagination">
-          {
-            (page !== pages) &&
-              (
-                isLoading ?
-                  <span className="liveblog-submit-spinner" /> :
-                  <button
-                    className="button button-large liveblog-btn liveblog-pagination-btn liveblog-pagination-loadmore"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      getEntriesPaginated(page + 1);
-                    }}
-                  >
-                  Load More
-                  </button>
-              )
-          }
-        </div>
+        <span>
+          <ScrollTrigger onEnter={() => getEntriesPaginated(page + 1)} onExit={() => {}} />
+
+          <div className="liveblog-pagination">
+            {
+              (page !== pages) &&
+                (
+                  isLoading ?
+                    <span className="liveblog-submit-spinner" /> :
+                    <button
+                      className="button button-large liveblog-btn
+                        liveblog-pagination-btn liveblog-pagination-loadmore"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        getEntriesPaginated(page + 1);
+                      }}
+                    >
+                    Load More
+                    </button>
+                )
+            }
+          </div>
+        </span>
       );
     }
 
