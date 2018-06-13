@@ -57,3 +57,26 @@
 .fb-post.fb_iframe_widget iframe {
   max-width: 100%;
 }
+
+.liveblog-entry-delete-confirm {
+  background: $color-grey-x-light;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.liveblog-entry-delete-confirm-buttons {
+  display: flex;
+}
+
+.liveblog-entry-delete-confirm-buttons button:first-child {
+  margin-right: .5rem;
+}

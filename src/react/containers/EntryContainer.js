@@ -88,16 +88,12 @@ class EntryContainer extends Component {
           </a>
         </aside>
         <div className="liveblog-entry-main">
-
-        {this.state.showPopup ?
-          <DeleteConfirmation
-            text='Close Me' onConfirmDelete={this.delete} onCancel={this.togglePopup.bind(this)}
-          />
-          : null
-        }
-
-
-
+          {this.state.showPopup ?
+            <DeleteConfirmation
+              onConfirmDelete={this.delete} onCancel={this.togglePopup.bind(this)}
+            />
+            : null
+          }
           {
             (entry.authors && entry.authors.length > 0) &&
             <header className="liveblog-meta-authors">
