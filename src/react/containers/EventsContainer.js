@@ -69,7 +69,9 @@ class EventsContainer extends Component {
         </ul>
         {this.state.showPopup ?
           <DeleteConfirmation
-            text="Are you sure you want to remove this entry as a key event?" onConfirmDelete={() => this.deleteKeyEvent()} onCancel={this.togglePopup.bind(this)}
+            text="Are you sure you want to remove this entry as a key event?"
+            onConfirmDelete={() => this.deleteKeyEvent()}
+            onCancel={this.togglePopup.bind(this)}
           />
           : null
         }
