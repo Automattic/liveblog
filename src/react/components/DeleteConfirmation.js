@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const DeleteConfirmation = ({ onConfirmDelete, onCancel }) => (
+const DeleteConfirmation = ({ text, onConfirmDelete, onCancel }) => (
   <div className="liveblog-entry-delete-confirm">
-    <p>Are you sure you want to delete this entry?</p>
+    <p>{text}</p>
     <div className="liveblog-entry-delete-confirm-buttons">
       <button
         className="liveblog-btn liveblog-btn-small"
@@ -25,6 +25,7 @@ DeleteConfirmation.propTypes = {
   entry: PropTypes.object,
   onConfirmDelete: PropTypes.func,
   onCancel: PropTypes.func,
+  text: PropTypes.string,
 };
 
 export default DeleteConfirmation;

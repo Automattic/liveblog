@@ -90,7 +90,7 @@ class EntryContainer extends Component {
         <div className="liveblog-entry-main">
           {this.state.showPopup ?
             <DeleteConfirmation
-              onConfirmDelete={this.delete} onCancel={this.togglePopup.bind(this)}
+              text="Are you sure you want to delete this entry?" onConfirmDelete={this.delete} onCancel={this.togglePopup.bind(this)}
             />
             : null
           }
