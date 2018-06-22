@@ -134,7 +134,7 @@ export function getEvents(config, newestEntry) {
 
 export function jumpToEvent(id, config, newestEntry) {
   const settings = {
-    url: `${config.endpoint_url}jump-to-key-event/${id}/${newestEntry.id || 0}-${newestEntry.timestamp || 0}`,
+    url: `${config.endpoint_url}jump-to-key-event/${id}/${newestEntry.id || 0}-${newestEntry.timestamp || 0}${config.paginationType === 'loadMore' ? '/all' : ''}`,
     method: 'GET',
   };
 

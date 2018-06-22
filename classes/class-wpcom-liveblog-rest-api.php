@@ -327,6 +327,31 @@ class WPCOM_Liveblog_Rest_Api {
 			)
 		);
 
+		/*
+		 * Returns all entries from most recent thru including key entry
+		 *
+		 * /<post_id>/jump-to-key-event/<id>/<last_known_entry>
+		 *
+		 */
+		register_rest_route(
+			self::$api_namespace, '/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)/all',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'load_all_and_jump_to_key_event' ),
+				'args'     => array(
+					'post_id'          => array(
+						'required' => true,
+					),
+					'id'               => array(
+						'required' => true,
+					),
+					'last_known_entry' => array(
+						'required' => true,
+					),
+				),
+			)
+		);
+
 	}
 
 	/**
@@ -583,6 +608,26 @@ class WPCOM_Liveblog_Rest_Api {
 		WPCOM_Liveblog::prevent_caching_if_needed();
 
 		return $key_events;
+	}
+
+	/**
+	 * Load all entries thru a key event.
+	 */
+	public static function load_all_and_jump_to_key_event( WP_REST_Request $request ) {
+
+		// Get required parameters from the request
+		$post_id          = $request->get_param( 'post_id' );
+		$id               = $request->get_param( 'id' );
+		$last_known_entry = $request->get_param( 'last_known_entry' );
+
+		self::set_liveblog_vars( $post_id );
+
+		$entries = WPCOM_Liveblog::get_entries_paged( false, $last_known_entry, $id, true );
+
+		// Possibly do not cache the response
+		WPCOM_Liveblog::prevent_caching_if_needed();
+
+		return $entries;
 	}
 
 	/**

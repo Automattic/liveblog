@@ -835,15 +835,16 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @param int $page Requested Page.
 		 * @param string $last_know_entry id-timestamp of the last rendered entry.
 		 * @param int $id entry id
+		 * @param bool $all retun all pages last known
 		 * @return array An array of json encoded results
 		 */
-		public static function get_entries_paged( $page, $last_known_entry = false, $id = false ) {
+		public static function get_entries_paged( $page, $last_known_entry = false, $id = false, $all = false ) {
 
 			if ( empty( self::$entry_query ) ) {
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+			$per_page = $all ? 10000 : WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 			$entries = self::$entry_query->get_all_entries_asc();
 			$entries = self::flatten_entries( $entries );
