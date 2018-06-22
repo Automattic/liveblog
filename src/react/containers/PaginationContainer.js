@@ -8,7 +8,7 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntriesPaginated, paginationType, isLoading } = this.props;
+    const { page, pages, getEntriesPaginated, paginationType, isLoading, autoLoad } = this.props;
 
     if (paginationType === 'loadMore') {
       return (
@@ -16,7 +16,7 @@ class PaginationContainer extends Component {
           <ScrollTrigger
             onEnter={() => {
               // Load the next page of entries if available.
-              if ( page !== pages ) {
+              if (autoLoad && page !== pages) {
                 getEntriesPaginated(page + 1);
               }
             } }
@@ -138,6 +138,7 @@ PaginationContainer.propTypes = {
   pages: PropTypes.number,
   getEntriesPaginated: PropTypes.func,
   paginationType: PropTypes.string,
+  autoLoad: PropTypes.string,
   isLoading: PropTypes.bool,
 };
 
@@ -145,6 +146,7 @@ const mapStateToProps = state => ({
   page: state.pagination.page,
   pages: state.pagination.pages,
   paginationType: state.config.paginationType,
+  autoLoad: state.config.autoLoad,
   isLoading: state.api.loading,
 });
 
