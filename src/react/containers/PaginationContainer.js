@@ -13,7 +13,15 @@ class PaginationContainer extends Component {
     if (paginationType === 'loadMore') {
       return (
         <span>
-          <ScrollTrigger onEnter={() => getEntriesPaginated(page + 1)} onExit={() => {}} />
+          <ScrollTrigger
+            onEnter={() => {
+              // Load the next page of entries if available.
+              if ( page !== pages ) {
+                getEntriesPaginated(page + 1);
+              }
+            } }
+            onExit={() => {}}
+          />
 
           <div className="liveblog-pagination">
             {
