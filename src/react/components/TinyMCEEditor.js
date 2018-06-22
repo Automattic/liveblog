@@ -47,6 +47,7 @@ class TinyMCEEditor extends Component {
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
+        tinymce.activeEditor.focus(); // Set focus to active editor
       }, 250);
     }, 10);
   }

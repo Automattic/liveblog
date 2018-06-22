@@ -38,7 +38,7 @@ class PaginationContainer extends Component {
       );
     }
 
-    // Don't diplsay pagination if we only have a single page.
+    // Don't display pagination if we only have a single page.
     if (pages === 1) {
       return null;
     }
