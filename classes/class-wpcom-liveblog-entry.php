@@ -200,7 +200,7 @@ class WPCOM_Liveblog_Entry {
 		global $wp_embed;
 
 		// Cache rendered comment content to avoid double running shortcodes.
-		if ( self::$rendered_content[ $comment->comment_ID ] ) {
+		if ( isset( self::$rendered_content[ $comment->comment_ID ] ) ) {
 			return self::$rendered_content[ $comment->comment_ID ];
 		}
 
