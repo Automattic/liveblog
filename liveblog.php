@@ -47,7 +47,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		const RESPONSE_CACHE_MAX_AGE          = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
 		const USE_REST_API                    = true; // Use the REST API if current version is at least MIN_WP_REST_API_VERSION. Allows for easy disabling/enabling
 		const DEFAULT_IMAGE_SIZE              = 'full'; // The default image size to use when inserting media frm the media library.
-    const MAX_LAZY_LOAD_ENTRY_COUNT       = 10000; // When lazy-loading, fetch up to this many posts
+		const MAX_LAZY_LOAD_ENTRY_COUNT       = 10000; // When lazy-loading, fetch up to this many posts
 
 		/** Variables *************************************************************/
 
