@@ -3,10 +3,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import Loadable from 'react-loadable';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
-import EditorContainer from '../containers/EditorContainer';
+
+
+const EditorContainer = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: "chunk-[request][index]" */ '../containers/EditorContainer'),
+  loading() {
+    return <div>Loading...</div>;
+  },
+});
 
 class EntryContainer extends Component {
   constructor(props) {

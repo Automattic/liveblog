@@ -16,7 +16,7 @@ const webpackConfig = {
   entry: {
     app: path.join(__dirname, paths.entry),
     amp: path.join(__dirname, './src/react/amp.js'),
-    vendor: ['react', 'moment'],
+    vendor: ['react', 'moment', 'redux', 'react-dom', 'immutable', 'react-redux'],
   },
 
   output: {
@@ -33,14 +33,6 @@ const webpackConfig = {
         use: [
           {
             loader: 'babel-loader',
-          },
-          {
-            loader: 'eslint-loader',
-            options: {
-              configFile: '.eslintrc',
-              emitError: false,
-              emitWarning: true,
-            },
           },
         ],
       },

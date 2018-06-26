@@ -3,14 +3,23 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import Loadable from 'react-loadable';
+
 import * as apiActions from '../actions/apiActions';
 import * as configActions from '../actions/configActions';
 import * as eventsActions from '../actions/eventsActions';
-import EditorContainer from '../containers/EditorContainer';
 import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
+
+const EditorContainer = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: "chunk-[request][index]" */ '../containers/EditorContainer'),
+  loading() {
+    return <div>Loading...</div>;
+  },
+});
 
 class AppContainer extends Component {
   constructor() {
