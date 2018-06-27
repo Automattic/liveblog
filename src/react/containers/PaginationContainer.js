@@ -94,42 +94,46 @@ class PaginationContainer extends Component {
 
     return (
       <div className="liveblog-pagination">
-        {
-          (page !== 1) &&
-          <div>
-            <button
-              className={firstButtonClassNames}
-              onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
-            >
-              First
-            </button>
-            <button
-              className={prevButtonClassNames}
-              onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
-            >
-              Prev
-            </button>
-          </div>
-        }
+        <div>
+          {
+            (page !== 1) &&
+            <span>
+              <button
+                className={firstButtonClassNames}
+                onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
+              >
+                First
+              </button>
+              <button
+                className={prevButtonClassNames}
+                onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
+              >
+                Prev
+              </button>
+            </span>
+          }
+        </div>
         <span className="liveblog-pagination-pages">{pageNavigation}
         </span>
-        {
-          (page !== pages) &&
-          <div>
-            <button
-              className={nextButtonClassNames}
-              onClick={(e) => { e.preventDefault(); getEntriesPaginated((page + 1), 'first'); } }
-            >
-              Next
-            </button>
-            <button
-              className={lastButtonClassNames}
-              onClick={(e) => { e.preventDefault(); getEntriesPaginated(pages, 'first'); } }
-            >
-              Last
-            </button>
-          </div>
-        }
+        <div>
+          {
+            (page !== pages) &&
+            <span>
+              <button
+                className={nextButtonClassNames}
+                onClick={(e) => { e.preventDefault(); getEntriesPaginated((page + 1), 'first'); } }
+              >
+                Next
+              </button>
+              <button
+                className={lastButtonClassNames}
+                onClick={(e) => { e.preventDefault(); getEntriesPaginated(pages, 'first'); } }
+              >
+                Last
+              </button>
+            </span>
+          }
+        </div>
       </div>
     );
   }
