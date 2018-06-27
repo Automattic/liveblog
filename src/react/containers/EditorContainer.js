@@ -101,10 +101,10 @@ class EditorContainer extends Component {
 
   publish(event) {
     event.preventDefault();
-    const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
+    const { updateEntry, entry, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
-    const authorIds = authors.map(author => author.id);
+    const authorIds = authors ? authors.map(author => author.id) : [];
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
     const headline = this.state.headline;
@@ -117,7 +117,6 @@ class EditorContainer extends Component {
         contributors,
         headline,
       });
-      entryEditClose(entry.id);
       return;
     }
 
@@ -248,7 +247,9 @@ class EditorContainer extends Component {
       headline,
     } = this.state;
 
-    const { isEditing, config, usetinymce } = this.props;
+    const { isEditing, config, usetinymce, api } = this.props;
+    const failed = api.message || '';
+
     const authorIds = authors ?
       authors.map((author) => {
         if (author && author.id) {
@@ -342,6 +343,7 @@ class EditorContainer extends Component {
           onClick={this.publish.bind(this)}>
           {isEditing ? 'Save' : 'Post Update'}
         </button>
+        <span className={ `liveblog-update-fail${api.error ? '' : ' hidden'}` }>{ failed }</span>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
     );
