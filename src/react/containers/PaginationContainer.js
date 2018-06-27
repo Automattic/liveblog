@@ -94,22 +94,23 @@ class PaginationContainer extends Component {
 
     return (
       <div className="liveblog-pagination">
-        <div>
-          <button
-            disabled={page === 1}
-            className={firstButtonClassNames}
-            onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
-          >
-            First
-          </button>
-          <button
-            disabled={page === 1}
-            className={prevButtonClassNames}
-            onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
-          >
-            Prev
-          </button>
-        </div>
+        {
+          (page !== 1) &&
+          <div>
+            <button
+              className={firstButtonClassNames}
+              onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
+            >
+              First
+            </button>
+            <button
+              className={prevButtonClassNames}
+              onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
+            >
+              Prev
+            </button>
+          </div>
+        }
         <span className="liveblog-pagination-pages">{pageNavigation}
         </span>
         <div>
