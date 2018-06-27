@@ -1004,15 +1004,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ) );
 			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ) );
 
-			// Load Vendor Script Files
+			// Load Client Scripts
 			wp_enqueue_script( self::KEY . '_vendor', plugins_url( 'assets/vendor.js', __FILE__ ), array(), self::VERSION, true );
-
-			// Load Authoring Script
-			if(self::is_liveblog_editable()) {
-				wp_enqueue_script( self::KEY . '_chunk', plugins_url( 'assets/0.js', __FILE__ ), array(), self::VERSION, true );
-			}
-
-			// Load Client React Script
 			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __FILE__ ), array(), self::VERSION, true );
 
 			if ( self::is_liveblog_editable() ) {
@@ -1026,6 +1019,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				apply_filters(
 					'liveblog_settings', array(
 						'permalink'                    => get_permalink(),
+						'plugin_dir'                   => plugin_dir_url( __FILE__ ),
 						'post_id'                      => get_the_ID(),
 						'state'                        => self::get_liveblog_state(),
 						'is_liveblog_editable'         => self::is_liveblog_editable(),

@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const paths = {
   entry: './src/react/index.js',
@@ -22,6 +22,7 @@ const webpackConfig = {
   output: {
     path: path.join(__dirname, paths.out),
     filename: '[name].js',
+    chunkFilename: '[name].bundle.js',
   },
 
   module: {
@@ -33,6 +34,14 @@ const webpackConfig = {
         use: [
           {
             loader: 'babel-loader',
+          },
+          {
+            loader: 'eslint-loader',
+            options: {
+              configFile: '.eslintrc',
+              emitError: false,
+              emitWarning: true,
+            },
           },
         ],
       },
@@ -46,7 +55,7 @@ const webpackConfig = {
               options: {
                 sourceMap: false,
                 minimize: true,
-              }
+              },
             },
             {
               loader: 'postcss-loader',
@@ -65,8 +74,8 @@ const webpackConfig = {
               loader: 'sass-loader',
               options: {
                 sourceMap: false,
-              }
-            }
+              },
+            },
           ],
         }),
       },
@@ -93,11 +102,8 @@ const webpackConfig = {
       __PROD__: JSON.stringify(process.env.NODE_ENV === 'production'),
       __TEST__: JSON.stringify(process.env.NODE_ENV === 'test'),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env': {
-        NODE_ENV: 'production',
-      },
     }),
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',

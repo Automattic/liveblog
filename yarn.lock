@@ -820,6 +820,10 @@ babel-plugin-transform-strict-mode@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
+babel-plugin-webpack-async-module-name@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-webpack-async-module-name/-/babel-plugin-webpack-async-module-name-1.0.2.tgz#80dbe02f6611dddc2d34d9870c03975c6a977259"
+
 babel-preset-airbnb@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/babel-preset-airbnb/-/babel-preset-airbnb-2.4.0.tgz#1b1476f3fafd3c7abc22fa97f932f9e021301450"

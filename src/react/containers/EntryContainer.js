@@ -3,19 +3,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Loadable from 'react-loadable';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
-
-
-const EditorContainer = Loadable({
-  loader: () =>
-    import(/* webpackChunkName: "chunk-[request][index]" */ '../containers/EditorContainer'),
-  loading() {
-    return <div>Loading...</div>;
-  },
-});
+import Editor from '../components/Editor';
 
 class EntryContainer extends Component {
   constructor(props) {
@@ -110,7 +101,7 @@ class EntryContainer extends Component {
             this.isEditing()
               ? (
                 <div className="liveblog-entry-edit">
-                  <EditorContainer entry={entry} isEditing={true} />
+                  <Editor entry={entry} isEditing={true} />
                 </div>
               )
               : (
