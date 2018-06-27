@@ -82,8 +82,6 @@ export const updateEntry = payload => ({
 
 export const updateEntrySuccess = payload => ({
   type: types.UPDATE_ENTRY_SUCCESS,
-  updateError: 'none',
-  isEditing: false,
   payload,
 });
 
