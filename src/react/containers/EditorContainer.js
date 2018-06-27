@@ -343,7 +343,7 @@ class EditorContainer extends Component {
           onClick={this.publish.bind(this)}>
           {isEditing ? 'Save' : 'Post Update'}
         </button>
-        <span className={ `liveblog-update-fail${api.error ? '' : ' hidden'}` }>{ failed }</span>
+        <span className={ `liveblog-update-fail${(api.error && failed) ? '' : ' hidden'}` }>{ failed }</span>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
     );
