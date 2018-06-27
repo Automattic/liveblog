@@ -70,6 +70,17 @@
   margin-bottom: .6rem;
 }
 
+.liveblog-update-fail {
+  float: right;
+  display: inline-block;
+  color: $color-warning;
+  margin-top: -20px;
+  &.hidden {
+    opacity: 0;
+    transition: opacity 2s linear;
+  }
+}
+
 @include mq($until: small) {
   .liveblog-editor-container .public-DraftEditor-content {
     margin-bottom: 0;
