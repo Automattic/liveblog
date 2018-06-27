@@ -79,6 +79,7 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: true,
+        message: action.message.message,
       };
 
     case 'DELETE_ENTRY_SUCCESS':
@@ -105,6 +106,7 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: true,
+        message: action.payload.message,
       };
 
     case 'MERGE_POLLING_INTO_ENTRIES':
