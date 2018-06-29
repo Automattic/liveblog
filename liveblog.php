@@ -1005,7 +1005,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ) );
 
 			// Load Client Scripts
-			wp_enqueue_script( self::KEY . '_vendor', plugins_url( 'assets/vendor.js', __FILE__ ), array(), self::VERSION, true );
 			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __FILE__ ), array(), self::VERSION, true );
 
 			if ( self::is_liveblog_editable() ) {
