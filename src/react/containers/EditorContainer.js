@@ -55,6 +55,7 @@ class EditorContainer extends Component {
       readOnly: false,
       headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
+      canPublish: false,
     };
 
     this.onChange = editorState => this.setState({
@@ -68,6 +69,10 @@ class EditorContainer extends Component {
 
     this.clearHeadline = () => this.setState({
       headline: '',
+    });
+
+    this.setPostingEnable = state => this.setState({
+      canPublish: state,
     });
   }
 
@@ -246,6 +251,7 @@ class EditorContainer extends Component {
       authors,
       readOnly,
       headline,
+      canPublish,
     } = this.state;
 
     const { isEditing, config, usetinymce } = this.props;
@@ -310,6 +316,7 @@ class EditorContainer extends Component {
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}
+            setPostingEnable={this.setPostingEnable}
           />
         }
         {
@@ -338,6 +345,7 @@ class EditorContainer extends Component {
           cache={false}
         />
         <button
+          disabled={ canPublish ? '' : 'disabled'}
           className="button button-primary button-large liveblog-btn liveblog-publish-btn"
           onClick={this.publish.bind(this)}>
           {isEditing ? 'Save' : 'Post Update'}

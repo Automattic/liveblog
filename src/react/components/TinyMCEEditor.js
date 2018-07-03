@@ -3,6 +3,7 @@
 /* eslint-disable react/prop-types */
 
 import React, { Component } from 'react';
+import { debounce } from 'lodash-es';
 
 export const getTinyMCEContent = () => {
   const currentEditor = tinymce.activeEditor;
@@ -33,6 +34,14 @@ export const clearHeadline = () => {
   }
 };
 
+export const setPostingEnable = () => {
+  if (tinymce.activeEditor.setPostingEnable) {
+    const content = tinymce.activeEditor.getContent();
+    const postingEnabled = content.length > 0 && content.length < 65535;
+    tinymce.activeEditor.setPostingEnable(postingEnabled);
+  }
+};
+
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
@@ -44,9 +53,15 @@ class TinyMCEEditor extends Component {
         const stateContent = this.props.rawText;
         tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
         tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
+        tinymce.activeEditor.setPostingEnable = this.props.setPostingEnable;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
+        tinymce.activeEditor.off('input');
+        tinymce.activeEditor.on('input', debounce(() => {
+          setPostingEnable();
+        }, 250));
+        setPostingEnable();
         tinymce.activeEditor.focus(); // Set focus to active editor
       }, 250);
     }, 10);

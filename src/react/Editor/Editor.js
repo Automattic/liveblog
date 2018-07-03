@@ -328,6 +328,7 @@ class EditorWrapper extends Component {
       clearAuthors,
       clearHeadline,
       rawText,
+      setPostingEnable,
     } = this.props;
 
     // Admin liveblogging uses TinyMCE.
@@ -338,6 +339,7 @@ class EditorWrapper extends Component {
         clearAuthors={clearAuthors}
         clearHeadline={clearHeadline}
         rawText={rawText}
+        setPostingEnable={setPostingEnable}
       />;
     }
 
@@ -411,6 +413,7 @@ EditorWrapper.propTypes = {
   clearAuthors: PropTypes.func,
   clearHeadline: PropTypes.func,
   rawText: PropTypes.string,
+  setPostingEnable: PropTypes.func,
 };
 
 export default EditorWrapper;
