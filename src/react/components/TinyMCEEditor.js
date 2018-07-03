@@ -57,8 +57,8 @@ class TinyMCEEditor extends Component {
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
-        tinymce.activeEditor.off('input');
-        tinymce.activeEditor.on('input', debounce(() => {
+        tinymce.activeEditor.off('keyup');
+        tinymce.activeEditor.on('keyup', debounce(() => {
           setPostingEnable();
         }, 250));
         setPostingEnable();
