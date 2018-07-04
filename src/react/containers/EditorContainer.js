@@ -55,6 +55,8 @@ class EditorContainer extends Component {
       readOnly: false,
       headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
+      error: false,
+      errorMessage: '',
     };
 
     this.onChange = editorState => this.setState({
@@ -68,6 +70,11 @@ class EditorContainer extends Component {
 
     this.clearHeadline = () => this.setState({
       headline: '',
+    });
+
+    this.setError = (error, errorMessage) => this.setState({
+      error,
+      errorMessage,
     });
   }
 
@@ -245,10 +252,11 @@ class EditorContainer extends Component {
       authors,
       readOnly,
       headline,
+      error,
+      errorMessage,
     } = this.state;
 
-    const { isEditing, config, usetinymce, api } = this.props;
-    const failed = api.message || '';
+    const { isEditing, config, usetinymce } = this.props;
 
     const authorIds = authors ?
       authors.map((author) => {
@@ -311,6 +319,7 @@ class EditorContainer extends Component {
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}
+            setError={this.setError}
           />
         }
         {
@@ -343,7 +352,7 @@ class EditorContainer extends Component {
           onClick={this.publish.bind(this)}>
           {isEditing ? 'Save' : 'Post Update'}
         </button>
-        <span className={ `liveblog-update-fail${(api.error && failed) ? '' : ' hidden'}` }>{ failed }</span>
+        <span className={ `liveblog-update-fail${(error) ? '' : ' hidden'}` }>{ errorMessage }</span>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
     );

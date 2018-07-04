@@ -44,12 +44,31 @@ class TinyMCEEditor extends Component {
         const stateContent = this.props.rawText;
         tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
         tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
+        tinymce.activeEditor.setError = this.props.setError;
+        tinymce.activeEditor.isError = false;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
         tinymce.activeEditor.focus(); // Set focus to active editor
       }, 250);
     }, 10);
+  }
+
+  componentDidUpdate() {
+    const thisError = this.props.editorContainer.props.api.error;
+    /*
+    could have used prevProps here to check error in previous props
+    but somehow both previous and current props are same
+    Using `isError` for current editor, we can prevent infinite loop
+     */
+    if (thisError && tinymce.activeEditor.setError && !tinymce.activeEditor.isError) {
+      tinymce.activeEditor.setError(true, this.props.editorContainer.props.api.errorMessage);
+      tinymce.activeEditor.isError = true;
+      setTimeout(() => {
+        tinymce.activeEditor.setError(false, this.props.editorContainer.props.api.errorMessage);
+        tinymce.activeEditor.isError = false;
+      }, 500);
+    }
   }
 
   render() {

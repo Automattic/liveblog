@@ -106,7 +106,7 @@ export const api = (state = initialState, action) => {
       return {
         ...state,
         error: true,
-        message: action.message.message,
+        errorMessage: action.message.response.message,
       };
 
     case 'MERGE_POLLING_INTO_ENTRIES':
