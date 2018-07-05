@@ -264,6 +264,11 @@ class EditorContainer extends Component {
 
     const { isEditing, config, usetinymce } = this.props;
 
+    const errorData = {
+      error: this.props.error || false,
+      errorMessage: this.props.errorMessage || '',
+    };
+
     const authorIds = authors ?
       authors.map((author) => {
         if (author && author.id) {
@@ -327,6 +332,7 @@ class EditorContainer extends Component {
             rawText={this.state.rawText}
             setPostingEnable={this.setPostingEnable}
             setError={this.setError}
+            errorData={errorData}
           />
         }
         {

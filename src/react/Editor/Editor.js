@@ -330,6 +330,7 @@ class EditorWrapper extends Component {
       rawText,
       setPostingEnable,
       setError,
+      errorData,
     } = this.props;
 
     // Admin liveblogging uses TinyMCE.
@@ -342,6 +343,7 @@ class EditorWrapper extends Component {
         rawText={rawText}
         setPostingEnable={setPostingEnable}
         setError={setError}
+        errorData={errorData}
       />;
     }
 
@@ -417,6 +419,7 @@ EditorWrapper.propTypes = {
   rawText: PropTypes.string,
   setPostingEnable: PropTypes.func,
   setError: PropTypes.func,
+  errorData: PropTypes.object,
 };
 
 export default EditorWrapper;
