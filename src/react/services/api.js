@@ -21,7 +21,13 @@ export function getEntries(page, config, newestEntry) {
 }
 
 export function polling(newestEntryTimestamp, config) {
-  const timestamp = getCurrentTimestamp() + config.timeDifference;
+  let timestamp = getCurrentTimestamp() + config.timeDifference;
+
+  // Round out the timestamp to get a higher cache hitrate.
+  // Rather than a random scatter of timestamps,
+  // this allows multiple clients to make a request with the same timestamp.
+  const refreshInterval = parseInt(config.refresh_interval, 10);
+  timestamp = Math.round(timestamp / refreshInterval) * refreshInterval;
 
   const settings = {
     url: `${config.endpoint_url}entries/${(newestEntryTimestamp + 1) || 0}/${timestamp}/`,
