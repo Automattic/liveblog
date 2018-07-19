@@ -138,7 +138,6 @@ class WPCOM_Liveblog_Lazyloader {
 	 * @return void
 	 */
 	public static function admin_notices() {
-
 		echo wp_kses_post(
 			WPCOM_Liveblog::get_template_part(
 				'lazyload-notice.php', array(
