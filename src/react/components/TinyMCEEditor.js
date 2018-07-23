@@ -36,11 +36,11 @@ export const clearHeadline = () => {
   }
 };
 
-export const setPostingEnable = () => {
-  if (tinymce.activeEditor.setPostingEnable) {
+export const setEnablePosting = () => {
+  if (tinymce.activeEditor.setEnablePosting) {
     const content = tinymce.activeEditor.getContent();
     const postingEnabled = content.length > 0 && content.length < maxContentLength;
-    tinymce.activeEditor.setPostingEnable(postingEnabled);
+    tinymce.activeEditor.setEnablePosting(postingEnabled);
   }
 };
 
@@ -55,7 +55,7 @@ class TinyMCEEditor extends Component {
         const stateContent = this.props.rawText;
         tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
         tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
-        tinymce.activeEditor.setPostingEnable = this.props.setPostingEnable;
+        tinymce.activeEditor.setEnablePosting = this.props.setEnablePosting;
         tinymce.activeEditor.setError = this.props.setError;
         tinymce.activeEditor.isError = false;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
@@ -63,9 +63,9 @@ class TinyMCEEditor extends Component {
         }
         tinymce.activeEditor.off('keyup');
         tinymce.activeEditor.on('keyup', debounce(() => {
-          setPostingEnable();
+          setEnablePosting();
         }, 250));
-        setPostingEnable();
+        setEnablePosting();
         tinymce.activeEditor.focus(); // Set focus to active editor
       }, 250);
     }, 10);

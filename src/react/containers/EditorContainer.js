@@ -73,7 +73,7 @@ class EditorContainer extends Component {
       headline: '',
     });
 
-    this.setPostingEnable = state => this.setState({
+    this.setEnablePosting = state => this.setState({
       canPublish: state,
     });
 
@@ -330,7 +330,7 @@ class EditorContainer extends Component {
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}
-            setPostingEnable={this.setPostingEnable}
+            setEnablePosting={this.setEnablePosting}
             setError={this.setError}
             errorData={errorData}
           />

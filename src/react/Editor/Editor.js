@@ -328,7 +328,7 @@ class EditorWrapper extends Component {
       clearAuthors,
       clearHeadline,
       rawText,
-      setPostingEnable,
+      setEnablePosting,
       setError,
       errorData,
     } = this.props;
@@ -341,7 +341,7 @@ class EditorWrapper extends Component {
         clearAuthors={clearAuthors}
         clearHeadline={clearHeadline}
         rawText={rawText}
-        setPostingEnable={setPostingEnable}
+        setEnablePosting={setEnablePosting}
         setError={setError}
         errorData={errorData}
       />;
@@ -417,7 +417,7 @@ EditorWrapper.propTypes = {
   clearAuthors: PropTypes.func,
   clearHeadline: PropTypes.func,
   rawText: PropTypes.string,
-  setPostingEnable: PropTypes.func,
+  setEnablePosting: PropTypes.func,
   setError: PropTypes.func,
   errorData: PropTypes.object,
 };
