@@ -39,7 +39,7 @@ export const clearHeadline = () => {
 export const setEnablePosting = () => {
   if (tinymce.activeEditor.setEnablePosting) {
     const content = tinymce.activeEditor.getContent();
-    const postingEnabled = content.length > 0 && content.length < maxContentLength;
+    const postingEnabled = content.length > 0 && content.length <= maxContentLength;
     tinymce.activeEditor.setEnablePosting(postingEnabled);
   }
 };
