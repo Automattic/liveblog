@@ -5,6 +5,8 @@
 import React, { Component } from 'react';
 import { debounce } from 'lodash-es';
 
+export const maxContentLength = 65535;
+
 export const getTinyMCEContent = () => {
   const currentEditor = tinymce.activeEditor;
   const $textField = jQuery(`#${currentEditor.id}`);
@@ -37,7 +39,7 @@ export const clearHeadline = () => {
 export const setPostingEnable = () => {
   if (tinymce.activeEditor.setPostingEnable) {
     const content = tinymce.activeEditor.getContent();
-    const postingEnabled = content.length > 0 && content.length < 65535;
+    const postingEnabled = content.length > 0 && content.length < maxContentLength;
     tinymce.activeEditor.setPostingEnable(postingEnabled);
   }
 };
