@@ -945,6 +945,17 @@
   font-weight: 500;
   margin-bottom: .6rem; }
 
+.liveblog-update-fail {
+  float: right;
+  display: inline-block;
+  color: #bc0b0b;
+  margin-top: -20px; }
+  .liveblog-update-fail.hidden {
+    opacity: 0;
+    -webkit-transition: opacity 2s linear;
+    -o-transition: opacity 2s linear;
+    transition: opacity 2s linear; }
+
 @media (max-width: 47.49em) {
   .liveblog-editor-container .public-DraftEditor-content {
     margin-bottom: 0; } }
