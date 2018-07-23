@@ -167,8 +167,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'permalink_structure_changed', array( __CLASS__, 'add_rewrite_rules' ) );
 			// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
 			add_action( 'init', array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
-			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
-			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ), 99 );
+			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ), 99 );
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
@@ -1043,6 +1043,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( apply_filters( 'liveblog_back_end_liveblogging', false ) ) {
 				wp_enqueue_editor();
 			}
+			
+			$editor_styles = self::get_tinymce_editor_stylesheet();
 
 			wp_localize_script(
 				self::KEY, 'liveblog_settings',
@@ -1091,6 +1093,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 								'toolbar1' => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',
 								'toolbar2' => 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
 								'height'   => 300,
+								'content_css' => ! empty( $editor_styles ) ? $editor_styles : '',
 							),
 							'quicktags'    => true,
 							'mediaButtons' => true,
@@ -1176,6 +1179,32 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			$wp_scripts->add_data( 'wp-plupload', 'data', $script );
+		}
+		
+		/**
+		 * Get TinyMCE editor stylesheet
+		 *
+		 * @return string
+		 */
+		private static function get_tinymce_editor_stylesheet() {
+			$suffix = SCRIPT_DEBUG ? '' : '.min';
+			$version = 'ver=' . get_bloginfo( 'version' );
+			
+			// Default stylesheets from WordPress core
+			$mce_css = includes_url( "css/dashicons$suffix.css?$version" ) . ',' . includes_url( "js/tinymce/skins/wordpress/wp-content.css?$version" );
+			
+			$editor_styles = get_editor_stylesheets();
+			if ( ! empty( $editor_styles ) ) {
+				// Force urlencoding of commas.
+				foreach ( $editor_styles as $key => $url ) {
+					if ( false !== strpos( $url, ',' ) ) {
+						$editor_styles[ $key ] = str_replace( ',', '%2C', $url );
+					}
+				}
+				$mce_css .= ',' . implode( ',', $editor_styles );
+			}
+			
+			return $mce_css;
 		}
 
 		/**
