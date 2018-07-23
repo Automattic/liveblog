@@ -3,6 +3,9 @@
 /* eslint-disable react/prop-types */
 
 import React, { Component } from 'react';
+import { debounce } from 'lodash-es';
+
+export const maxContentLength = 65535;
 
 export const getTinyMCEContent = () => {
   const currentEditor = tinymce.activeEditor;
@@ -33,6 +36,14 @@ export const clearHeadline = () => {
   }
 };
 
+export const setEnablePosting = () => {
+  if (tinymce.activeEditor.setEnablePosting) {
+    const content = tinymce.activeEditor.getContent();
+    const postingEnabled = content.length > 0 && content.length < maxContentLength;
+    tinymce.activeEditor.setEnablePosting(postingEnabled);
+  }
+};
+
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
@@ -44,12 +55,40 @@ class TinyMCEEditor extends Component {
         const stateContent = this.props.rawText;
         tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
         tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
+        tinymce.activeEditor.setEnablePosting = this.props.setEnablePosting;
+        tinymce.activeEditor.setError = this.props.setError;
+        tinymce.activeEditor.isError = false;
         if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
           tinymce.activeEditor.setContent(stateContent);
         }
+        tinymce.activeEditor.off('keyup');
+        tinymce.activeEditor.on('keyup', debounce(() => {
+          setEnablePosting();
+        }, 250));
+        setEnablePosting();
         tinymce.activeEditor.focus(); // Set focus to active editor
       }, 250);
     }, 10);
+  }
+
+  componentDidUpdate() {
+    const {
+      error,
+      errorMessage,
+    } = this.props.errorData;
+    /*
+    could have used prevProps here to check error in previous props
+    but somehow both previous and current props are same
+    Using `isError` for current editor, we can prevent infinite loop
+     */
+    if (error && tinymce.activeEditor.setError && !tinymce.activeEditor.isError) {
+      tinymce.activeEditor.setError(true, errorMessage);
+      tinymce.activeEditor.isError = true;
+      setTimeout(() => {
+        tinymce.activeEditor.setError(false, errorMessage);
+        tinymce.activeEditor.isError = false;
+      }, 500);
+    }
   }
 
   render() {

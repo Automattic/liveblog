@@ -55,6 +55,9 @@ class EditorContainer extends Component {
       readOnly: false,
       headline: props.entry ? props.entry.headline : '',
       rawText: props.entry ? props.entry.content : '',
+      canPublish: false,
+      error: false,
+      errorMessage: '',
     };
 
     this.onChange = editorState => this.setState({
@@ -68,6 +71,15 @@ class EditorContainer extends Component {
 
     this.clearHeadline = () => this.setState({
       headline: '',
+    });
+
+    this.setEnablePosting = state => this.setState({
+      canPublish: state,
+    });
+
+    this.setError = (error, errorMessage) => this.setState({
+      error,
+      errorMessage,
     });
   }
 
@@ -101,10 +113,10 @@ class EditorContainer extends Component {
 
   publish(event) {
     event.preventDefault();
-    const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
+    const { updateEntry, entry, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
-    const authorIds = authors.map(author => author.id);
+    const authorIds = authors ? authors.map(author => author.id) : [];
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
     const headline = this.state.headline;
@@ -117,7 +129,6 @@ class EditorContainer extends Component {
         contributors,
         headline,
       });
-      entryEditClose(entry.id);
       return;
     }
 
@@ -246,9 +257,18 @@ class EditorContainer extends Component {
       authors,
       readOnly,
       headline,
+      canPublish,
+      error,
+      errorMessage,
     } = this.state;
 
     const { isEditing, config, usetinymce } = this.props;
+
+    const errorData = {
+      error: this.props.error || false,
+      errorMessage: this.props.errorMessage || '',
+    };
+
     const authorIds = authors ?
       authors.map((author) => {
         if (author && author.id) {
@@ -310,6 +330,9 @@ class EditorContainer extends Component {
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}
+            setEnablePosting={this.setEnablePosting}
+            setError={this.setError}
+            errorData={errorData}
           />
         }
         {
@@ -338,10 +361,12 @@ class EditorContainer extends Component {
           cache={false}
         />
         <button
+          disabled={ canPublish ? '' : 'disabled'}
           className="button button-primary button-large liveblog-btn liveblog-publish-btn"
           onClick={this.publish.bind(this)}>
           {isEditing ? 'Save' : 'Post Update'}
         </button>
+        <span className={ `liveblog-update-fail${(error) ? '' : ' hidden'}` }>{ errorMessage }</span>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
     );

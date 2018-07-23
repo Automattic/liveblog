@@ -35,6 +35,7 @@ import {
 } from '../utils/utils';
 
 import {
+  entryEditClose,
   scrollToEntry,
 } from '../actions/userActions';
 
@@ -102,8 +103,15 @@ const updateEntryEpic = (action$, store) =>
     .switchMap(({ payload }) =>
       updateEntry(payload, store.getState().config, store.getState().api.nonce)
         .timeout(10000)
-        .map(res => updateEntrySuccess(res.response))
-        .catch(error => of(updateEntryFailed(error))),
+        .flatMap(res =>
+          concat(
+            of(updateEntrySuccess(res.response)),
+            of(entryEditClose(res.response.entries[0].id)),
+          ),
+        )
+        .catch(
+          error => of(updateEntryFailed(error)),
+        ),
     );
 
 const deleteEntryEpic = (action$, store) =>

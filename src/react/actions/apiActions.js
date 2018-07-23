@@ -54,9 +54,10 @@ export const createEntrySuccess = payload => ({
   payload,
 });
 
-export const createEntryFailed = () => ({
+export const createEntryFailed = message => ({
   type: types.CREATE_ENTRY_FAILED,
   error: true,
+  message,
 });
 
 export const deleteEntry = payload => ({
@@ -84,9 +85,10 @@ export const updateEntrySuccess = payload => ({
   payload,
 });
 
-export const updateEntryFailed = () => ({
+export const updateEntryFailed = message => ({
   type: types.UPDATE_ENTRY_FAILED,
   error: true,
+  message,
 });
 
 export const mergePolling = () => ({
