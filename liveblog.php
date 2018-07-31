@@ -1188,10 +1188,24 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		private static function get_tinymce_editor_stylesheet() {
 			$suffix = SCRIPT_DEBUG ? '' : '.min';
-			$version = 'ver=' . get_bloginfo( 'version' );
+			$mce_css = array();
 			
-			// Default stylesheets from WordPress core
-			$mce_css = includes_url( "css/dashicons$suffix.css?$version" ) . ',' . includes_url( "js/tinymce/skins/wordpress/wp-content.css?$version" );
+			/*
+			 * Default stylesheets from WordPress core
+			 *
+			 * Copied from _WP_Editors::default_settings() since it's a private function.
+			 */
+			$mce_css[] = add_query_arg( array(
+					'ver' => WPCOM_Liveblog::VERSION
+				),
+				includes_url( "css/dashicons$suffix.css" )
+			);
+			
+			$mce_css[] = add_query_arg( array(
+					'ver' => WPCOM_Liveblog::VERSION
+				),
+				includes_url( "js/tinymce/skins/wordpress/wp-content.css" )
+			);
 			
 			$editor_styles = get_editor_stylesheets();
 			if ( ! empty( $editor_styles ) ) {
@@ -1200,11 +1214,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					if ( false !== strpos( $url, ',' ) ) {
 						$editor_styles[ $key ] = str_replace( ',', '%2C', $url );
 					}
+					$mce_css[] = $editor_styles[$key];
 				}
-				$mce_css .= ',' . implode( ',', $editor_styles );
 			}
 			
-			return $mce_css;
+			return implode( ',', $mce_css );
 		}
 
 		/**
