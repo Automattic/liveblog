@@ -41,6 +41,13 @@ export const setEnablePosting = () => {
     const content = tinymce.activeEditor.getContent();
     const postingEnabled = content.length > 0 && content.length <= maxContentLength;
     tinymce.activeEditor.setEnablePosting(postingEnabled);
+
+    // show long text error message
+    if (!postingEnabled && content.length > 0) {
+      tinymce.activeEditor.setError(true, 'Text is too long!');
+    } else {
+      tinymce.activeEditor.setError(false, '');
+    }
   }
 };
 

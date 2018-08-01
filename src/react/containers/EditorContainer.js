@@ -265,8 +265,8 @@ class EditorContainer extends Component {
     const { isEditing, config, usetinymce } = this.props;
 
     const errorData = {
-      error: this.props.error || false,
-      errorMessage: this.props.errorMessage || '',
+      error: this.props.api.error || false,
+      errorMessage: this.props.api.errorMessage || '',
     };
 
     const authorIds = authors ?
