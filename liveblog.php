@@ -1093,7 +1093,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 								'toolbar1' => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',
 								'toolbar2' => 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
 								'height'   => 300,
-								'content_css' => ! empty( $editor_styles ) ? $editor_styles : '',
+								'content_css' => empty( $editor_styles ) ? '' : $editor_styles,
 							),
 							'quicktags'    => true,
 							'mediaButtons' => true,
@@ -1204,7 +1204,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$mce_css[] = add_query_arg( array(
 					'ver' => WPCOM_Liveblog::VERSION
 				),
-				includes_url( "js/tinymce/skins/wordpress/wp-content.css" )
+				includes_url( 'js/tinymce/skins/wordpress/wp-content.css' )
 			);
 			
 			$editor_styles = get_editor_stylesheets();
