@@ -44,7 +44,7 @@ export const setEnablePosting = () => {
 
     // show long text error message
     if (!postingEnabled && content.length > 0) {
-      tinymce.activeEditor.setError(true, 'Text is too long!');
+      tinymce.activeEditor.setError(true, 'This post is too long. Live blog posts are limited to 65535 characters.');
     } else {
       tinymce.activeEditor.setError(false, '');
     }
