@@ -5,7 +5,8 @@
     "type"       : "wordpress-plugin",
     "license"    : "GPL-2.0+",
     "require"    : {
-        "wp-coding-standards/wpcs": "^0.14.0",
+        "wp-coding-standards/wpcs": "^1.0.0",
+        "automattic/vipwpcs": "^0.2.4",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
         "composer/installers": "~1.0",
         "rase/socket.io-emitter": "~0.7.0",
