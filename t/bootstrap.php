@@ -13,8 +13,8 @@ function _manually_load_plugin() {
 
 function _set_global_wp_query() {
 	if ( ! isset( $GLOBALS['wp_query'] ) ) {
-		$GLOBALS['wp_the_query'] = new WP_Query();
-		$GLOBALS['wp_query']     = $GLOBALS['wp_the_query'];
+		$GLOBALS['wp_the_query'] = new WP_Query(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		$GLOBALS['wp_query']     = $GLOBALS['wp_the_query']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	}
 }
 

@@ -1000,8 +1000,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$use_rest_api = 1;
 				}
 
-				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard/app.css', __FILE__ ) );
-				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ), array(), true );
+				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard/app.css', __FILE__ ), array(), self::VERSION, false );
+				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ), array(), self::VERSION, false );
 				wp_localize_script(
 					'liveblog-admin', 'liveblog_admin_settings', array(
 						'nonce_key'                    => self::NONCE_KEY,
@@ -1028,8 +1028,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ) );
-			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ) );
+			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ), array(), self::VERSION );
+			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ), array(), self::VERSION );
 			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __FILE__ ), array(), self::VERSION, true );
 
 			if ( self::is_liveblog_editable() ) {
@@ -1746,11 +1746,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$status                       = absint( $status );
 			$official_message             = isset( $wp_header_to_desc[ $status ] ) ? $wp_header_to_desc[ $status ] : '';
-			$wp_header_to_desc[ $status ] = self::sanitize_http_header( $message );
+			$wp_header_to_desc[ $status ] = self::sanitize_http_header( $message ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 
 			status_header( $status );
 
-			$wp_header_to_desc[ $status ] = $official_message;
+			$wp_header_to_desc[ $status ] = $official_message; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 		}
 
 		/**
