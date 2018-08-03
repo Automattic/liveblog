@@ -1043,7 +1043,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( apply_filters( 'liveblog_back_end_liveblogging', false ) ) {
 				wp_enqueue_editor();
 			}
-			
+
 			$editor_styles = self::get_tinymce_editor_stylesheet();
 
 			wp_localize_script(
@@ -1086,18 +1086,20 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'prefill_author_field'         => apply_filters( 'liveblog_prefill_author_field', true ),
 						'backend_liveblogging'         => apply_filters( 'liveblog_back_end_liveblogging', false ),
 						'usetinymce'                   => apply_filters( 'liveblog_use_tinymce_editor', false ),
-						'editorSettings'               => apply_filters( 'liveblog_tinymce_editor_settings', array(
-							'tinymce'      => array(
-								'wpautop'  => true,
-								'plugins'  => 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview',
-								'toolbar1' => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',
-								'toolbar2' => 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
-								'height'   => 300,
-								'content_css' => empty( $editor_styles ) ? '' : $editor_styles,
-							),
-							'quicktags'    => true,
-							'mediaButtons' => true,
-						) ),
+						'editorSettings'               => apply_filters(
+							'liveblog_tinymce_editor_settings', array(
+								'tinymce'      => array(
+									'wpautop'     => true,
+									'plugins'     => 'charmap colorpicker hr lists paste textcolor fullscreen wordpress wpautoresize wpeditimage wpemoji wpgallery wplink wptextpattern hr image  lists media paste tabfocus  wordpress wpautoresize wpdialogs wpeditimage wpgallery wplink wptextpattern wpview',
+									'toolbar1'    => 'formatselect bold italic bullist numlist blockquote alignleft aligncenter alignright link wp_more  wp_adv | fullscreen',
+									'toolbar2'    => 'strikethru hr underline justifyfull forecolor | pastetext pasteword removeformat | media charmap | outdent indent | undo redo wp_help',
+									'height'      => 300,
+									'content_css' => empty( $editor_styles ) ? '' : $editor_styles,
+								),
+								'quicktags'    => true,
+								'mediaButtons' => true,
+							)
+						),
 						'is_admin'                     => is_admin(),
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
@@ -1180,33 +1182,35 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$wp_scripts->add_data( 'wp-plupload', 'data', $script );
 		}
-		
+
 		/**
 		 * Get TinyMCE editor stylesheet
 		 *
 		 * @return string
 		 */
 		private static function get_tinymce_editor_stylesheet() {
-			$suffix = SCRIPT_DEBUG ? '' : '.min';
+			$suffix  = SCRIPT_DEBUG ? '' : '.min';
 			$mce_css = array();
-			
+
 			/*
 			 * Default stylesheets from WordPress core
 			 *
 			 * Copied from _WP_Editors::default_settings() since it's a private function.
 			 */
-			$mce_css[] = add_query_arg( array(
-					'ver' => WPCOM_Liveblog::VERSION
+			$mce_css[] = add_query_arg(
+				array(
+					'ver' => self::VERSION,
 				),
 				includes_url( "css/dashicons$suffix.css" )
 			);
-			
-			$mce_css[] = add_query_arg( array(
-					'ver' => WPCOM_Liveblog::VERSION
+
+			$mce_css[] = add_query_arg(
+				array(
+					'ver' => self::VERSION,
 				),
 				includes_url( 'js/tinymce/skins/wordpress/wp-content.css' )
 			);
-			
+
 			$editor_styles = get_editor_stylesheets();
 			if ( ! empty( $editor_styles ) ) {
 				// Force urlencoding of commas.
@@ -1214,10 +1218,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					if ( false !== strpos( $url, ',' ) ) {
 						$editor_styles[ $key ] = str_replace( ',', '%2C', $url );
 					}
-					$mce_css[] = $editor_styles[$key];
+					$mce_css[] = $editor_styles[ $key ];
 				}
 			}
-			
+
 			return implode( ',', $mce_css );
 		}
 
