@@ -39,7 +39,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		}
 
 		foreach ( self::$sdks as $name => $url ) {
-			wp_enqueue_script( $name, esc_url( $url ), false );
+			wp_enqueue_script( $name, esc_url( $url ), array(), WPCOM_Liveblog::VERSION, false );
 		}
 	}
 

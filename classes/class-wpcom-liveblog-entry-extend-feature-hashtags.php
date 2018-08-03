@@ -180,7 +180,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix ) . '(\w\-?)+/', $comment->comment_content, $terms );
+			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '(\w\-?)+/', $comment->comment_content, $terms );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $terms[0] );
@@ -259,7 +259,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// Remove the where clause's section about the name.
 		$clauses['where'] = preg_replace(
 			array(
-				'~\\(\\(.*(?=' . preg_quote( "(t.slug LIKE '" ) . ')~',
+				'~\\(\\(.*(?=' . preg_quote( "(t.slug LIKE '", '~' ) . ')~',
 				'~(%\'\\))\\)~',
 			),
 			'($1',

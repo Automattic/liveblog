@@ -107,7 +107,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', array(), WPCOM_Liveblog::VERSION );
 	}
 
 
@@ -133,7 +133,7 @@ class WPCOM_Liveblog_AMP {
 
 		$entry       = self::get_entry( $request->id, $post->ID );
 		$title       = self::get_entry_title( $entry );
-		$description = strip_tags( $entry->content );
+		$description = wp_strip_all_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
 
