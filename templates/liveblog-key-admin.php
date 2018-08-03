@@ -4,13 +4,13 @@
 	<select id="liveblog-key-template-name" name="liveblog-key-template-name">
 		<?php foreach ( $templates as $template ) : ?>
 		<option
-		<?php
-		if ( $template === $current_key_template ) :
-?>
+			<?php
+			if ( $template === $current_key_template ) :
+				?>
 selected="selected" <?php endif; ?> value="<?php echo esc_attr( $template ); ?>">
 									<?php
 									echo esc_html( ucwords( str_replace( '-', ' ', $template ) ) );
-?>
+									?>
 </option>
 		<?php endforeach; ?>
 	</select>
@@ -20,11 +20,11 @@ selected="selected" <?php endif; ?> value="<?php echo esc_attr( $template ); ?>"
 			<option
 			<?php
 			if ( $format === $current_key_format ) :
-?>
+				?>
 selected="selected" <?php endif; ?> value="<?php echo esc_attr( $format ); ?>">
 									<?php
 									echo esc_html( ucwords( str_replace( '-', ' ', $format ) ) );
-?>
+									?>
 </option>
 		<?php endforeach; ?>
 	</select>
