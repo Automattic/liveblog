@@ -195,42 +195,44 @@ class WPCOM_Liveblog_AMP {
 
 		$blog_updates = [];
 
-		if ( isset( $entries['entries'] ) && is_array( $entries['entries'] ) ) {
-			foreach ( $entries['entries'] as $key => $entry ) {
+		if ( ! isset( $entries[ 'entries' ] ) || ! is_array( $entries[ 'entries' ] ) ) {
+			return $metadata;
+		}
 
-				if ( isset( $metadata['publisher']['name'] ) ) {
-					$publisher_name = $metadata['publisher']['name'];
-				}
+		foreach ( $entries[ 'entries' ] as $key => $entry ) {
 
-				if ( isset( $metadata['publisher']['type'] ) ) {
-					$publisher_organization = $metadata['publisher']['type'];
-				}
-
-				$blog_item = array(
-					'@type'         => 'BlogPosting',
-					'headline'      => self::get_entry_title( $entry ),
-					'url'           => $entry->share_link,
-					'datePublished' => date( 'c', $entry->entry_time ),
-					'dateModified'  => date( 'c', $entry->timestamp ),
-					'author'        => array(
-						'@type' => 'Person',
-						'name'  => $entry->authors[0]['name'],
-					),
-					'articleBody'   => array(
-						'@type' => 'Text',
-					),
-					'publisher'     => array(
-						'@type' => $publisher_organization,
-						'name'  => $publisher_name,
-					),
-				);
-
-				array_push( $blog_updates, json_decode( json_encode( $blog_item ) ) );
+			if ( isset( $metadata[ 'publisher' ][ 'name' ] ) ) {
+				$publisher_name = $metadata[ 'publisher' ][ 'name' ];
 			}
 
-			$metadata['@type']          = 'LiveBlogPosting';
-			$metadata['liveBlogUpdate'] = $blog_updates;
+			if ( isset( $metadata[ 'publisher' ][ 'type' ] ) ) {
+				$publisher_organization = $metadata[ 'publisher' ][ 'type' ];
+			}
+
+			$blog_item = [
+				'@type'         => 'BlogPosting',
+				'headline'      => self::get_entry_title( $entry ),
+				'url'           => $entry->share_link,
+				'datePublished' => date( 'c', $entry->entry_time ),
+				'dateModified'  => date( 'c', $entry->timestamp ),
+				'author'        => [
+					'@type' => 'Person',
+					'name'  => $entry->authors[ 0 ][ 'name' ],
+				],
+				'articleBody'   => [
+					'@type' => 'Text',
+				],
+				'publisher'     => [
+					'@type' => $publisher_organization,
+					'name'  => $publisher_name,
+				],
+			];
+
+			array_push( $blog_updates, json_decode( json_encode( $blog_item ) ) );
 		}
+
+		$metadata[ '@type' ]          = 'LiveBlogPosting';
+		$metadata[ 'liveBlogUpdate' ] = $blog_updates;
 
 		return $metadata;
 	}
