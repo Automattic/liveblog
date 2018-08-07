@@ -198,16 +198,17 @@ class WPCOM_Liveblog_AMP {
 
 		foreach ( $entries[ 'entries' ] as $key => $entry ) {
 			$blog_item = [
-				'@type'         => 'BlogPosting',
-				'headline'      => self::get_entry_title( $entry ),
-				'url'           => $entry->share_link,
-				'datePublished' => date( 'c', $entry->entry_time ),
-				'dateModified'  => date( 'c', $entry->timestamp ),
-				'author'        => [
+				'@type'            => 'BlogPosting',
+				'headline'         => self::get_entry_title( $entry ),
+				'url'              => $entry->share_link,
+				'mainEntityOfPage' => $entry->share_link,
+				'datePublished'    => date( 'c', $entry->entry_time ),
+				'dateModified'     => date( 'c', $entry->timestamp ),
+				'author'           => [
 					'@type' => 'Person',
 					'name'  => $entry->authors[ 0 ][ 'name' ],
 				],
-				'articleBody'   => [
+				'articleBody'      => [
 					'@type' => 'Text',
 				],
 			];
