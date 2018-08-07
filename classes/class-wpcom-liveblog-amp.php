@@ -213,15 +213,8 @@ class WPCOM_Liveblog_AMP {
 				],
 			];
 
-			if ( isset( $metadata['publisher'], $metadata['publisher']['name'], $metadata['publisher']['@type'] ) ) {
-				$blog_item['publisher'] = [
-					'@type' => $metadata['publisher']['@type'],
-					'name'  => $metadata['publisher']['name']
-				];
-
-				if ( isset( $metadata['publisher']['logo'] ) ) {
-					$blog_item['publisher']['logo'] = $metadata['publisher']['logo'];
-				}
+			if ( isset( $metadata['publisher'] ) ) {
+				$blog_item['publisher'] = $metadata['publisher'];
 			}
 
 			$blog_updates[] = json_decode( json_encode( $blog_item ) );
