@@ -223,11 +223,11 @@ class WPCOM_Liveblog_AMP {
 				}
 			}
 
-			array_push( $blog_updates, json_decode( json_encode( $blog_item ) ) );
+			$blog_updates[] = json_decode( json_encode( $blog_item ) );
 		}
 
-		$metadata[ '@type' ]          = 'LiveBlogPosting';
-		$metadata[ 'liveBlogUpdate' ] = $blog_updates;
+		$metadata['@type']          = 'LiveBlogPosting';
+		$metadata['liveBlogUpdate'] = $blog_updates;
 
 		return $metadata;
 	}
