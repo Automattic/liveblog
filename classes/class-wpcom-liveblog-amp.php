@@ -202,8 +202,8 @@ class WPCOM_Liveblog_AMP {
 					$publisher_name = $metadata['publisher']['name'];
 				}
 
-				if ( isset( $metadata['publisher']['type'] ) ) {
-					$publisher_organization = $metadata['publisher']['type'];
+				if ( isset( $metadata['publisher']['@type'] ) ) {
+					$publisher_organization = $metadata['publisher']['@type'];
 				}
 
 				$blog_item = (object) array(
