@@ -4,8 +4,10 @@
 	<rule ref="WordPress-VIP"/>
 	<rule ref="WordPress-Extra"/>
 
-	<arg value="s"/>
-	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+	<arg name="colors"/>
+	<arg name="basepath" value="."/>
+	<arg name="parallel" value="50"/>
 	<file>.</file>
 
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
