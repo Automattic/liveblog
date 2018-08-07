@@ -206,26 +206,26 @@ class WPCOM_Liveblog_AMP {
 					$publisher_organization = $metadata['publisher']['type'];
 				}
 
-				$blog_item = (object) array(
+				$blog_item = array(
 					'@type'         => 'BlogPosting',
 					'headline'      => self::get_entry_title( $entry ),
 					'url'           => $entry->share_link,
 					'datePublished' => date( 'c', $entry->entry_time ),
 					'dateModified'  => date( 'c', $entry->timestamp ),
-					'author'        => (object) array(
+					'author'        => array(
 						'@type' => 'Person',
 						'name'  => $entry->authors[0]['name'],
 					),
-					'articleBody'   => (object) array(
+					'articleBody'   => array(
 						'@type' => 'Text',
 					),
-					'publisher'     => (object) array(
+					'publisher'     => array(
 						'@type' => $publisher_organization,
 						'name'  => $publisher_name,
 					),
 				);
 
-				array_push( $blog_updates, $blog_item );
+				array_push( $blog_updates, json_decode( json_encode( $blog_item ) ) );
 			}
 
 			$metadata['@type']          = 'LiveBlogPosting';
