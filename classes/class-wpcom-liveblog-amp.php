@@ -188,9 +188,6 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
-		$publisher_organization = '';
-		$publisher_name         = '';
-
 		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
 
 		$blog_updates = [];
@@ -200,15 +197,6 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		foreach ( $entries[ 'entries' ] as $key => $entry ) {
-
-			if ( isset( $metadata[ 'publisher' ][ 'name' ] ) ) {
-				$publisher_name = $metadata[ 'publisher' ][ 'name' ];
-			}
-
-			if ( isset( $metadata[ 'publisher' ][ 'type' ] ) ) {
-				$publisher_organization = $metadata[ 'publisher' ][ 'type' ];
-			}
-
 			$blog_item = [
 				'@type'         => 'BlogPosting',
 				'headline'      => self::get_entry_title( $entry ),
@@ -222,11 +210,14 @@ class WPCOM_Liveblog_AMP {
 				'articleBody'   => [
 					'@type' => 'Text',
 				],
-				'publisher'     => [
-					'@type' => $publisher_organization,
-					'name'  => $publisher_name,
-				],
 			];
+
+			if ( isset( $metadata['publisher'], $metadata['publisher']['name'], $metadata['publisher']['@type'] ) ) {
+				$blog_item['publisher'] = [
+					'@type' => $metadata['publisher']['@type'],
+					'name'  => $metadata['publisher']['name']
+				];
+			}
 
 			array_push( $blog_updates, json_decode( json_encode( $blog_item ) ) );
 		}
