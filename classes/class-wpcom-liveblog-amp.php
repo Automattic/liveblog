@@ -217,6 +217,10 @@ class WPCOM_Liveblog_AMP {
 					'@type' => $metadata['publisher']['@type'],
 					'name'  => $metadata['publisher']['name']
 				];
+
+				if ( isset( $metadata['publisher']['logo'] ) ) {
+					$blog_item['publisher']['logo'] = $metadata['publisher']['logo'];
+				}
 			}
 
 			array_push( $blog_updates, json_decode( json_encode( $blog_item ) ) );
