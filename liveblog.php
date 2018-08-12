@@ -173,6 +173,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
+			add_action( 'wp_head', array( __CLASS__, 'print_liveblog_metadata' ) );
 		}
 
 		/**
@@ -1769,6 +1770,80 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$refresh_interval = apply_filters( 'liveblog_refresh_interval', $refresh_interval );
 			$refresh_interval = apply_filters( 'liveblog_post_' . self::$post_id . '_refresh_interval', $refresh_interval );
 			return $refresh_interval;
+		}
+
+		/**
+		 * Generates metadata for a single liveblog
+		 *
+		 * @param  array   $metadata Metadata.
+		 * @param  WP_Post $post     Current Post.
+		 * @return array             Updated Meta
+		 */
+		public static function get_liveblog_metadata() {
+
+			// If we are not viewing a liveblog post then exist the filter.
+			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+				return $metadata;
+			}
+
+			$request = self::get_request_data();
+
+			$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
+
+			$blog_updates = [];
+
+			if ( ! isset( $entries[ 'entries' ] ) || ! is_array( $entries[ 'entries' ] ) ) {
+				return $metadata;
+			}
+
+			foreach ( $entries[ 'entries' ] as $key => $entry ) {
+				$blog_item = [
+					'@type'            => 'BlogPosting',
+					'headline'         => self::get_entry_title( $entry ),
+					'url'              => $entry->share_link,
+					'mainEntityOfPage' => $entry->share_link,
+					'datePublished'    => date( 'c', $entry->entry_time ),
+					'dateModified'     => date( 'c', $entry->timestamp ),
+					'author'           => [
+						'@type' => 'Person',
+						'name'  => $entry->authors[ 0 ][ 'name' ],
+					],
+					'articleBody'      => [
+						'@type' => 'Text',
+					],
+				];
+
+				if ( isset( $metadata['publisher'] ) ) {
+					$blog_item['publisher'] = $metadata['publisher'];
+				}
+
+				$blog_updates[] = json_decode( json_encode( $blog_item ) );
+			}
+
+			$metadata['@type']          = 'LiveBlogPosting';
+			$metadata['liveBlogUpdate'] = $blog_updates;
+
+			apply_filters( 'liveblog_metadata', $metadata, $post );
+
+			return $metadata;
+		}
+
+		public function print_liveblog_metadata() {
+
+			// Bail if we are not viewing a liveblog.
+			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+				return;
+			}
+
+			$metadata = self::get_liveblog_metadata();
+			if ( empty( $metadata ) ) {
+				return;
+			}
+
+			?>
+			<script type="application/ld+json"><?php echo wp_json_encode( $metadata ); ?></script>
+			<?php
+
 		}
 
 	}
