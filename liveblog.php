@@ -1781,6 +1781,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function get_liveblog_metadata() {
 
+			global $post;
+
 			// If we are not viewing a liveblog post then exist the filter.
 			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
 				return $metadata;
@@ -1828,14 +1830,16 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $metadata;
 		}
 
-		public function print_liveblog_metadata() {
+		public static function print_liveblog_metadata() {
+
+			global $post;
 
 			// Bail if we are not viewing a liveblog.
 			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
 				return;
 			}
 
-			$metadata = self::get_liveblog_metadata();
+			$metadata = WPCOM_Liveblog::get_liveblog_metadata();
 			if ( empty( $metadata ) ) {
 				return;
 			}
@@ -1844,6 +1848,19 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			<script type="application/ld+json"><?php echo wp_json_encode( $metadata ); ?></script>
 			<?php
 
+		}
+
+		/**
+		 * Get Page and Last known entry from the request.
+		 *
+		 * @return object Request Data.
+		 */
+		public static function get_request_data() {
+			return (object) array(
+				'page' => get_query_var( 'liveblog_page', 1 ),
+				'last' => get_query_var( 'liveblog_last', false ),
+				'id'   => get_query_var( 'liveblog_id', false ),
+			);
 		}
 
 	}

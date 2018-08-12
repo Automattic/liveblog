@@ -124,7 +124,7 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
-		$request = self::get_request_data();
+		$request = WPCOM_Liveblog::get_request_data();
 
 		// If no entry id set then not on single entry.
 		if ( false === $request->id ) {
@@ -205,7 +205,7 @@ class WPCOM_Liveblog_AMP {
 			return $content;
 		}
 
-		$request = self::get_request_data();
+		$request = WPCOM_Liveblog::get_request_data();
 
 		if ( $request->id ) {
 			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
@@ -433,19 +433,6 @@ class WPCOM_Liveblog_AMP {
 			array(
 				'liveblog_id' => $id,
 			), $permalink
-		);
-	}
-
-	/**
-	 * Get Page and Last known entry from the request.
-	 *
-	 * @return object Request Data.
-	 */
-	public static function get_request_data() {
-		return (object) array(
-			'page' => get_query_var( 'liveblog_page', 1 ),
-			'last' => get_query_var( 'liveblog_last', false ),
-			'id'   => get_query_var( 'liveblog_id', false ),
 		);
 	}
 
