@@ -1825,7 +1825,17 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$metadata['@type']          = 'LiveBlogPosting';
 			$metadata['liveBlogUpdate'] = $blog_updates;
 
-			apply_filters( 'liveblog_metadata', $metadata, $post );
+			/**
+			 * Filters lhe Liveblog metadata.
+			 *
+			 * Allows plugins and themes to adapt the metadata printed by the
+			 * liveblog into the head, describing the liveblog and it's entries.
+			 *
+			 * @since 1.9
+			 *
+			 * @param array $metadata An array of metadata.
+			 */
+			$metadata = apply_filters( 'liveblog_metadata', $metadata, $post );
 
 			return $metadata;
 		}
