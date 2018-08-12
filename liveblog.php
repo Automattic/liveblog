@@ -1801,7 +1801,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			foreach ( $entries[ 'entries' ] as $key => $entry ) {
 				$blog_item = [
 					'@type'            => 'BlogPosting',
-					'headline'         => self::get_entry_title( $entry ),
+					'headline'         => WPCOM_Liveblog_Entry::get_entry_title( $entry ),
 					'url'              => $entry->share_link,
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => date( 'c', $entry->entry_time ),

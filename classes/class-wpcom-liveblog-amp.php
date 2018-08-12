@@ -132,7 +132,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$entry       = self::get_entry( $request->id, $post->ID );
-		$title       = self::get_entry_title( $entry );
+		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
 		$description = strip_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
@@ -363,16 +363,6 @@ class WPCOM_Liveblog_AMP {
 		$date_format = get_option( 'date_format' );
 
 		return date_i18n( $date_format, strtotime( $utc_offset, $entry->entry_time ) );
-	}
-
-	/**
-	 * Work out Entry title
-	 *
-	 * @param  object $entry Entry.
-	 * @return string        Title
-	 */
-	public static function get_entry_title( $entry ) {
-		return wp_trim_words( $entry->content, 10, '...' );
 	}
 
 	/**
