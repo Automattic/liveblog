@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="Custom ruleset for Liveblog">
 
-	<rule ref="WordPress-Core"/>
-	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress"/>
 	<rule ref="WordPressVIPMinimum"/>
 
 	<arg value="sp"/>
