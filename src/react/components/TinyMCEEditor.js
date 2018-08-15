@@ -71,10 +71,10 @@ class TinyMCEEditor extends Component {
         tinymce.activeEditor.off('keyup');
         tinymce.activeEditor.on('keyup', debounce(() => {
           setEnablePosting();
-        }, 250));
+        }, 500));
         setEnablePosting();
         tinymce.activeEditor.focus(); // Set focus to active editor
-      }, 250);
+      }, 500);
     }, 10);
   }
 
