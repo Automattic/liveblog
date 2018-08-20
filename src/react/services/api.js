@@ -34,7 +34,7 @@ export function getEntries(page, config, newestEntry) {
 }
 
 export function polling(newestEntryTimestamp, config) {
-  let timestamp = getCurrentTimestamp() + config.timeDifference;
+  let timestamp = getCurrentTimestamp();
   // Round out the timestamp to get a higher cache hitrate.
   // Rather than a random scatter of timestamps,
   // this allows multiple clients to make a request with the same timestamp.
