@@ -86,7 +86,8 @@ class EditorContainer extends Component {
     });
   }
 
-  publish() {
+  publish(e) {
+    e.preventDefault();
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
@@ -205,7 +206,7 @@ class EditorContainer extends Component {
     formData.append('async-upload', file);
 
     return new Promise((resolve) => {
-      uploadImage(formData)
+      uploadImage(formData, config)
         .timeout(60000)
         .map(res => res.response)
         .subscribe((res) => {

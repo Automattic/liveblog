@@ -10,10 +10,13 @@ import '../styles/core.scss';
 Polyfills();
 
 const store = configureStore();
+const el = document.getElementById('wpcom-liveblog-container');
 
-ReactDOM.render(
-  <Provider store={store}>
-    <AppContainer />
-  </Provider>,
-  document.getElementById('wpcom-liveblog-container'),
-);
+if (el) {
+  ReactDOM.render(
+    <Provider store={store}>
+      <AppContainer />
+    </Provider>,
+    el,
+  );
+}
