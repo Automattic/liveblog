@@ -1024,7 +1024,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$back_end_blogging = apply_filters( 'liveblog_back_end_liveblogging', false );
 
-			if ( ! self::is_viewing_liveblog_post() && ( ! $back_end_blogging && ! is_admin() ) ) {
+			if ( ! self::is_viewing_liveblog_post() && ! ( $back_end_blogging && is_admin() ) ) {
 				return;
 			}
 
