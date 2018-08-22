@@ -139,6 +139,9 @@ class EditorContainer extends Component {
       headline,
     });
 
+    // Prevent publish empty posts when creating new editor.
+    this.setEnablePosting(false);
+
     const newEditorState = EditorState.push(
       editorState,
       ContentState.createFromText(''),
