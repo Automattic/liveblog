@@ -8,7 +8,7 @@
 class WPCOM_Liveblog_AMP {
 
 	/**
-	 * AMP adss the following query string to requests when polling.
+	 * AMP adds the following query string to requests when polling.
 	 */
 	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
 
@@ -523,6 +523,6 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function is_amp_polling() {
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // input var okay.
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
 	}
 }
