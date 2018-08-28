@@ -519,7 +519,7 @@ class WPCOM_Liveblog_AMP {
 	/**
 	 * Is this an AMP polling request.
 	 *
-	 * @return boolean AMP polling request.
+	 * @return bool AMP polling request.
 	 */
 	public static function is_amp_polling() {
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification

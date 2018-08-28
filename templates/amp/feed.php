@@ -28,7 +28,7 @@ $social           = $settings['social'];
 		<?php if ( $last === false ): ?>
 			on="tap:amp-live-list-insert-blog.update"
 		<?php else: ?>
-			on="tap: AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
+			on="tap:AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
 		<?php endif ?>
 		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
 	<div items>
