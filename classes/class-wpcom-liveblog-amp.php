@@ -250,6 +250,11 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
+		// If AMP Polling request don't restrict content so it knows there is updates are available.
+		if ( self::is_amp_polling() ) {
+			$request->last = false;
+		}
+
 		if ( $request->id ) {
 			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
 			$request  = self::set_request_last_from_entries( $entries, $request );
@@ -354,6 +359,7 @@ class WPCOM_Liveblog_AMP {
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post_id ),
+				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
@@ -431,6 +437,7 @@ class WPCOM_Liveblog_AMP {
 
 		$permalink = amp_get_permalink( $post_id );
 
+		$links['base']  = self::build_paged_permalink( $permalink, 1, false );
 		$links['first'] = self::build_paged_permalink( $permalink, 1, $request->last );
 		$links['last']  = self::build_paged_permalink( $permalink, $pages, $request->last );
 
@@ -502,5 +509,18 @@ class WPCOM_Liveblog_AMP {
 	public static function get_template( $name, $variables = array() ) {
 		$template = new WPCOM_Liveblog_AMP_Template();
 		return $template->render( $name, $variables );
+	}
+
+	/**
+	 * Is this an AMP polling request.
+	 *
+	 * @return boolean AMP polling request.
+	 */
+	public static function is_amp_polling() {
+		$amp_latest_update_time = filter_input( INPUT_GET, 'amp_latest_update_time', FILTER_SANITIZE_STRING );
+		if ( ! empty( $amp_latest_update_time ) ) {
+			return true;
+		}
+		return false;
 	}
 }

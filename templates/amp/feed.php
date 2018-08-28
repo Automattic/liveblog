@@ -4,6 +4,7 @@ $post_id          = $this->get( 'post_id' );
 $links            = $this->get( 'links' );
 $page             = $this->get( 'page' );
 $pages            = $this->get( 'pages' );
+$last             = $this->get( 'last' );
 $settings         = $this->get( 'settings' );
 $entries_per_page = $settings['entries_per_page'];
 $refresh_interval = $settings['refresh_interval'];
@@ -24,7 +25,11 @@ $social           = $settings['social'];
 
 	<button id="live-list-update-button"
 		update
-		on="tap:amp-live-list-insert-blog.update"
+		<?php if ( $last === false ): ?>
+			on="tap:amp-live-list-insert-blog.update"
+		<?php else: ?>
+			on="tap: AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
+		<?php endif ?>
 		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
 	<div items>
 
