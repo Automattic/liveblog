@@ -8,6 +8,11 @@
 class WPCOM_Liveblog_AMP {
 
 	/**
+	 * AMP adss the following query string to requests when polling.
+	 */
+	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
+
+	/**
 	 * Called by WPCOM_Liveblog::load(),
 	 */
 	public static function load() {
@@ -517,10 +522,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return boolean AMP polling request.
 	 */
 	public static function is_amp_polling() {
-		$amp_latest_update_time = filter_input( INPUT_GET, 'amp_latest_update_time', FILTER_SANITIZE_STRING );
-		if ( ! empty( $amp_latest_update_time ) ) {
-			return true;
-		}
-		return false;
+		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // input var okay.
 	}
 }
