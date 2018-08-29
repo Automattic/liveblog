@@ -38,7 +38,7 @@ export const clearHeadline = () => {
 
 export const setEnablePosting = () => {
   if (tinymce.activeEditor.setEnablePosting) {
-    const content = tinymce.activeEditor.getContent();
+    const content = getTinyMCEContent();
     const postingEnabled = content.length > 0 && content.length <= maxContentLength;
     tinymce.activeEditor.setEnablePosting(postingEnabled);
 
@@ -70,6 +70,9 @@ class TinyMCEEditor extends Component {
         }
         tinymce.activeEditor.off('keyup');
         tinymce.activeEditor.on('keyup', debounce(() => {
+          setEnablePosting();
+        }, 500));
+        jQuery(document.getElementById(this.containerId)).on('keyup', debounce(() => {
           setEnablePosting();
         }, 500));
         setEnablePosting();
