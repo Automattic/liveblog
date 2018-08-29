@@ -60,7 +60,7 @@ class TinyMCEEditor extends Component {
     window.liveblogInitInstance = () => {
       jQuery(document).trigger('liveblogTinyMCEReady');
     };
-    setTimeout(() => { // wait for load
+    jQuery(document).on('ready', () => {
       wp.editor.initialize(this.containerId, this.editorSettings);
       jQuery(document).on('liveblogTinyMCEReady', () => {
         const stateContent = this.props.rawText;
@@ -79,7 +79,7 @@ class TinyMCEEditor extends Component {
         setEnablePosting();
         tinymce.activeEditor.focus(); // Set focus to active editor
       });
-    }, 10);
+    });
   }
 
   componentDidUpdate() {
