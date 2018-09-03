@@ -443,7 +443,7 @@ class WPCOM_Liveblog_AMP {
 		$permalink = amp_get_permalink( $post_id );
 
 		$links['base']  = self::build_paged_permalink( $permalink, 1, false );
-		$links['first'] = self::build_paged_permalink( $permalink, 1, $request->last );
+		$links['first'] = self::build_paged_permalink( $permalink, 1, false );
 		$links['last']  = self::build_paged_permalink( $permalink, $pages, $request->last );
 
 		$links['prev'] = false;
