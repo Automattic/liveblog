@@ -1842,10 +1842,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		public static function print_liveblog_metadata() {
 
-			global $post;
-
 			// Bail if we are not viewing a liveblog.
-			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+			if ( WPCOM_Liveblog::is_liveblog_post( get_the_ID() ) === false ) {
 				return;
 			}
 
