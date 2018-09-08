@@ -1783,7 +1783,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			global $post;
 
-			// If we are not viewing a liveblog post then exist the filter.
+			// If we are not viewing a liveblog post then exit the filter.
 			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
 				return $metadata;
 			}
@@ -1826,7 +1826,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$metadata['liveBlogUpdate'] = $blog_updates;
 
 			/**
-			 * Filters lhe Liveblog metadata.
+			 * Filters the Liveblog metadata.
 			 *
 			 * Allows plugins and themes to adapt the metadata printed by the
 			 * liveblog into the head, describing the liveblog and it's entries.
