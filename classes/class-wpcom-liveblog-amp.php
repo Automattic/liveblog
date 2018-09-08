@@ -124,7 +124,7 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
-		$request = self::get_request_data();
+		$request = WPCOM_Liveblog::get_request_data();
 
 		// If no entry id set then not on single entry.
 		if ( false === $request->id ) {
@@ -132,7 +132,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$entry       = self::get_entry( $request->id, $post->ID );
-		$title       = self::get_entry_title( $entry );
+		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
 		$description = strip_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
@@ -181,47 +181,13 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function append_liveblog_to_metadata( $metadata, $post ) {
 
-		// If we are not viewing a liveblog post then exist the filter.
-		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
-			return $metadata;
+		// Only append metadata to Liveblogs.
+		if ( false !== WPCOM_Liveblog::is_liveblog_post( $post->ID ) ) {
+			/**
+			 * This filter is documented in liveblog.php
+			 */
+			$metadata = WPCOM_Liveblog::get_liveblog_metadata();
 		}
-
-		$request = self::get_request_data();
-
-		$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
-
-		$blog_updates = [];
-
-		if ( ! isset( $entries[ 'entries' ] ) || ! is_array( $entries[ 'entries' ] ) ) {
-			return $metadata;
-		}
-
-		foreach ( $entries[ 'entries' ] as $key => $entry ) {
-			$blog_item = [
-				'@type'            => 'BlogPosting',
-				'headline'         => self::get_entry_title( $entry ),
-				'url'              => $entry->share_link,
-				'mainEntityOfPage' => $entry->share_link,
-				'datePublished'    => date( 'c', $entry->entry_time ),
-				'dateModified'     => date( 'c', $entry->timestamp ),
-				'author'           => [
-					'@type' => 'Person',
-					'name'  => $entry->authors[ 0 ][ 'name' ],
-				],
-				'articleBody'      => [
-					'@type' => 'Text',
-				],
-			];
-
-			if ( isset( $metadata['publisher'] ) ) {
-				$blog_item['publisher'] = $metadata['publisher'];
-			}
-
-			$blog_updates[] = json_decode( json_encode( $blog_item ) );
-		}
-
-		$metadata['@type']          = 'LiveBlogPosting';
-		$metadata['liveBlogUpdate'] = $blog_updates;
 
 		return $metadata;
 	}
@@ -239,7 +205,7 @@ class WPCOM_Liveblog_AMP {
 			return $content;
 		}
 
-		$request = self::get_request_data();
+		$request = WPCOM_Liveblog::get_request_data();
 
 		if ( $request->id ) {
 			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
@@ -400,16 +366,6 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
-	 * Work out Entry title
-	 *
-	 * @param  object $entry Entry.
-	 * @return string        Title
-	 */
-	public static function get_entry_title( $entry ) {
-		return wp_trim_words( $entry->content, 10, '...' );
-	}
-
-	/**
 	 * Gets Pagination Links (First, Last, Next, Previous)
 	 *
 	 * @param  object $request Request Object.
@@ -467,19 +423,6 @@ class WPCOM_Liveblog_AMP {
 			array(
 				'liveblog_id' => $id,
 			), $permalink
-		);
-	}
-
-	/**
-	 * Get Page and Last known entry from the request.
-	 *
-	 * @return object Request Data.
-	 */
-	public static function get_request_data() {
-		return (object) array(
-			'page' => get_query_var( 'liveblog_page', 1 ),
-			'last' => get_query_var( 'liveblog_last', false ),
-			'id'   => get_query_var( 'liveblog_id', false ),
 		);
 	}
 
