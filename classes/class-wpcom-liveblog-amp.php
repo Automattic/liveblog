@@ -270,7 +270,7 @@ class WPCOM_Liveblog_AMP {
 	 * @param  array  $entries liveblog entries.
 	 * @param  object $request Request Object.
 	 */
-	public function set_request_last_from_entries( $entries, $request ) {
+	public static function set_request_last_from_entries( $entries, $request ) {
 		if ( false === $request->last ) {
 			$request->last = $entries['entries'][0]->id . '-' . $entries['entries'][0]->timestamp;
 		}
