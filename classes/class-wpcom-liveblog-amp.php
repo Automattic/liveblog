@@ -8,6 +8,11 @@
 class WPCOM_Liveblog_AMP {
 
 	/**
+	 * AMP adds the following query string to requests when polling.
+	 */
+	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
+
+	/**
 	 * Called by WPCOM_Liveblog::load(),
 	 */
 	public static function load() {
@@ -250,6 +255,11 @@ class WPCOM_Liveblog_AMP {
 
 		$request = self::get_request_data();
 
+		// If AMP Polling request don't restrict content so it knows there is updates are available.
+		if ( self::is_amp_polling() ) {
+			$request->last = false;
+		}
+
 		if ( $request->id ) {
 			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
 			$request  = self::set_request_last_from_entries( $entries, $request );
@@ -354,6 +364,7 @@ class WPCOM_Liveblog_AMP {
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post_id ),
+				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
@@ -431,12 +442,14 @@ class WPCOM_Liveblog_AMP {
 
 		$permalink = amp_get_permalink( $post_id );
 
-		$links['first'] = self::build_paged_permalink( $permalink, 1, $request->last );
+		$links['base']  = self::build_paged_permalink( $permalink, 1, false );
+		$links['first'] = self::build_paged_permalink( $permalink, 1, false );
 		$links['last']  = self::build_paged_permalink( $permalink, $pages, $request->last );
 
 		$links['prev'] = false;
 		if ( $request->page > 1 ) {
-			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $request->last );
+			$keep_postion  = ( (int) $request->page === 2 ) ? false : $request->last;
+			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $keep_postion );
 		}
 
 		$links['next'] = false;
@@ -502,5 +515,15 @@ class WPCOM_Liveblog_AMP {
 	public static function get_template( $name, $variables = array() ) {
 		$template = new WPCOM_Liveblog_AMP_Template();
 		return $template->render( $name, $variables );
+	}
+
+	/**
+	 * Is this an AMP polling request.
+	 *
+	 * @return bool AMP polling request.
+	 */
+	public static function is_amp_polling() {
+		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
 	}
 }
