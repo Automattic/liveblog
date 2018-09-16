@@ -492,6 +492,17 @@ class WPCOM_Liveblog_Entry {
 
 		return array_merge( $author, $contributors );
 	}
+
+	/**
+	 * Work out Entry title
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Title
+	 */
+	public static function get_entry_title( $entry ) {
+		return wp_trim_words( $entry->content, 10, '...' );
+	}
+
 }
 
 WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();
