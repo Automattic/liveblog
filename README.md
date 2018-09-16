@@ -456,13 +456,13 @@ You can also add photos from the internet by pasting in the direct URL to the im
 ![add photos](http://vip.files.wordpress.com/2013/01/drag.png)
 
 #### Embedding Media
-To embed the media, simply paste the URL while viewing the media into the posting box on its own line. More details can be found about each media type in the links below: 
+To embed the media, simply paste the URL while viewing the media into the posting box on its own line. More details can be found about each media type in the links below:
 * [Tweets](http://en.support.wordpress.com/twitter/twitter-embeds/)
 * [YouTube videos](http://en.support.wordpress.com/videos/youtube)
 * [Vimeo videos](http://en.support.wordpress.com/videos/vimeo/)
 * [Instagram photos](http://en.support.wordpress.com/images/instagram/)
 * [Hulu clips](http://en.support.wordpress.com/videos/hulu/)
-* [Spotify songs](http://en.support.wordpress.com/audio/spotify/) 
+* [Spotify songs](http://en.support.wordpress.com/audio/spotify/)
 
 ![Screen shot for media embeds](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-12-32-59-pm.png)
 
