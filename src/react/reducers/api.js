@@ -60,17 +60,25 @@ export const api = (state = initialState, action) => {
           : state.newestEntry,
       };
 
+    case 'CREATE_ENTRY':
+      return {
+        ...state,
+        isPublishingNew: true,
+      };
+
     case 'CREATE_ENTRY_SUCCESS':
       return {
         ...state,
         error: false,
         nonce: action.payload.nonce,
+        isPublishingNew: false,
       };
 
     case 'CREATE_ENTRY_FAILED':
       return {
         ...state,
         error: true,
+        isPublishingNew: false,
       };
 
     case 'DELETE_ENTRY_SUCCESS':
