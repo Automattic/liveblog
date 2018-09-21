@@ -9,19 +9,22 @@ class PaginationContainer extends Component {
   render() {
     const { page, pages, getEntriesPaginated } = this.props;
 
+    const isFirstPage = (page === 1);
+    const isLastPage = (page === pages);
+
     return (
       <div className="liveblog-pagination">
         <div>
           <button
-            disabled={page === 1}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-first"
+            disabled={isFirstPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-first ${isFirstPage && 'liveblog-btn--hide'}`}
             onClick={() => getEntriesPaginated(1, 'first')}
           >
             First
           </button>
           <button
-            disabled={page === 1}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-prev"
+            disabled={isFirstPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-prev ${isFirstPage && 'liveblog-btn--hide'}`}
             onClick={() => getEntriesPaginated((page - 1), 'last')}
           >
             Prev
@@ -30,15 +33,15 @@ class PaginationContainer extends Component {
         <span className="liveblog-pagination-pages">{page} of {pages}</span>
         <div>
           <button
-            disabled={page === pages}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-next"
+            disabled={isLastPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-next ${isLastPage && 'liveblog-btn--hide'}`}
             onClick={() => getEntriesPaginated((page + 1), 'first')}
           >
             Next
           </button>
           <button
-            disabled={page === pages}
-            className="liveblog-btn liveblog-pagination-btn liveblog-pagination-last"
+            disabled={isLastPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-last ${isLastPage && 'liveblog-btn--hide'}`}
             onClick={() => getEntriesPaginated(pages, 'first')}
           >
             Last
