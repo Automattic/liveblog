@@ -101,7 +101,6 @@ class EditorContainer extends Component {
         author,
         contributors,
       });
-      entryEditClose(entry.id);
       return;
     }
 
@@ -322,7 +321,6 @@ EditorContainer.propTypes = {
   config: PropTypes.object,
   updateEntry: PropTypes.func,
   entry: PropTypes.object,
-  entryEditClose: PropTypes.func,
   createEntry: PropTypes.func,
   isEditing: PropTypes.bool,
   isPublishing: PropTypes.bool,
