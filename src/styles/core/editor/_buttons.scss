@@ -150,6 +150,19 @@
   font-size: .9rem;
 }
 
+.liveblog-publish-btn--active {
+  &, &:hover {
+    animation: liveblog-publish-btn--active-animation 2.5s infinite linear;
+    background-size: 100px 100%;
+    background-image: linear-gradient(-45deg,darken($color-primary, 5%) 28%,$color-primary 0,$color-primary 72%,darken($color-primary, 5%) 0);
+  }
+}
+@keyframes liveblog-publish-btn--active-animation {
+	0% {
+		background-position: 200px 0;
+	}
+}
+
 .liveblog-cancel-btn {
   background: $color-grey-light;
   color: $color-grey-dark;
