@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { timeAgo } from '../utils/utils';
+
+import { timeAgo, sanitizeHTML } from '../utils/utils';
 
 const Event = ({ event, click, onDelete, canEdit, utcOffset, dateFormat }) => (
   <li className="liveblog-event">
@@ -14,7 +15,7 @@ const Event = ({ event, click, onDelete, canEdit, utcOffset, dateFormat }) => (
         <span
           className="liveblog-event-content"
           onClick={click}
-          dangerouslySetInnerHTML={{ __html: event.key_event_content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHTML(event.key_event_content) }}
         />
       </div>
     </div>

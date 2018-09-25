@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 import moment from './extendedMoment';
 
 /* eslint-disable no-param-reassign */
@@ -199,4 +201,36 @@ export const getScrollToId = (entries, key) => {
   }
 
   return `id_${entries[0].id}`;
+};
+
+/**
+ * Sanitize HTML for output. Help prevent XSS attacks.
+ *
+ * @link https://www.npmjs.com/package/dompurify
+ * @param  {string} dirty HTML to sanitize
+ * @return {string} sanitized HTML
+ */
+export const sanitizeHTML = (dirty) => {
+  // Whitelist iframes for the plugins 'embded media' feature.
+  const iframeWhitelist = [
+    'www.hulu.com',
+    'player.hulu.com',
+    'open.spotify.com',
+    'player.vimeo.com',
+    'www.youtube.com',
+    // Instagram and Twitter don't use iframes.
+  ];
+  const regex = RegExp(`^(https:|)//(${iframeWhitelist.join('|')})/`, 'im');
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'IFRAME') {
+      const iframeSrc = node.getAttribute('src');
+      if (iframeSrc && !iframeSrc.match(regex)) {
+        node.removeAttribute('src');
+      }
+    }
+  });
+  const clean = DOMPurify.sanitize(dirty, {
+    ADD_TAGS: ['iframe'],
+  });
+  return clean;
 };

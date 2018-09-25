@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { sanitizeHTML } from '../utils/utils';
+
 class AuthorSelectOption extends Component {
   handleMouseDown(event) {
     const { onSelect, option } = this.props;
@@ -28,7 +30,10 @@ class AuthorSelectOption extends Component {
         onMouseEnter={this.handleMouseEnter.bind(this)}
         onMouseMove={this.handleMouseMove.bind(this)}
       >
-        { option.avatar && <div dangerouslySetInnerHTML={{ __html: option.avatar }} /> }
+        {
+          option.avatar &&
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(option.avatar) }} />
+        }
         {option.name}
       </div>
     );

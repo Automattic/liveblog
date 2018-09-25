@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { getPreview } from '../services/api';
 import Loader from '../components/Loader';
+import { sanitizeHTML } from '../utils/utils';
 
 class PreviewContainer extends Component {
   constructor(props) {
@@ -41,7 +42,7 @@ class PreviewContainer extends Component {
     return (
       <div
         className="liveblog-preview"
-        dangerouslySetInnerHTML={{ __html: entryContent }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(entryContent) }}
       />
     );
   }

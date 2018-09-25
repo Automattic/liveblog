@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
-import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
+import { triggerOembedLoad, timeAgo, formattedTime, sanitizeHTML } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
 
 class EntryContainer extends Component {
@@ -88,10 +88,10 @@ class EntryContainer extends Component {
                     { author.avatar &&
                       <div
                         className="liveblog-meta-author-avatar"
-                        dangerouslySetInnerHTML={{ __html: author.avatar }} />
+                        dangerouslySetInnerHTML={{ __html: sanitizeHTML(author.avatar) }} />
                     }
                     <span className="liveblog-meta-author-name"
-                      dangerouslySetInnerHTML={{ __html: author.name }} />
+                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(author.name) }} />
                   </div>
                 ))
               }
@@ -107,7 +107,7 @@ class EntryContainer extends Component {
               : (
                 <div
                   className="liveblog-entry-content"
-                  dangerouslySetInnerHTML={{ __html: entry.render }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(entry.render) }}
                 />
               )
           }
