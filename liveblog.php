@@ -1208,6 +1208,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$liveblog_output = '<div id="wpcom-liveblog-container" class="' . self::$post_id . '"></div>';
 
 			$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
+			
+			if ( false === apply_filters( 'liveblog_output_at_bottom', true ) ) {
+				return wp_kses_post( $liveblog_output ) . $content;
+			}
 
 			return $content . wp_kses_post( $liveblog_output );
 		}
