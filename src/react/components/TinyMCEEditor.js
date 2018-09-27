@@ -51,38 +51,76 @@ export const setEnablePosting = () => {
   }
 };
 
+/**
+ * Define a function TinyMCE can call when an instance of an editor is initialized.
+ *
+ * @return {void}
+ */
+export const maybeCreateLiveblogInitInstanceCallback = () => {
+  if (!window.liveblogInitInstance) {
+    window.liveblogInitInstance = () => {
+      jQuery(document).trigger('liveblogTinyMCEReady');
+    };
+  }
+};
+
+/**
+ * Whether an editor be initialized using wp.editor.initialize.
+ *
+ * @return {Boolean} True if wp, wp.editor, and tinymce are present on the window.
+ */
+export const editorCanInitialize = () => !!(wp && wp.editor && tinymce);
+
 class TinyMCEEditor extends Component {
   constructor(props) {
     super(props);
     this.containerId = `live-editor-${Math.floor(Math.random() * 100000)}`;
     this.editorSettings = window.liveblog_settings.editorSettings;
-    // Define a function TinyMCE can call when the instance is initialized.
-    window.liveblogInitInstance = () => {
-      jQuery(document).trigger('liveblogTinyMCEReady');
-    };
-    jQuery(document).on('ready', () => {
+    this.canInitialize = false;
+
+    // Ensure tinymce initialization callback is defined.
+    maybeCreateLiveblogInitInstanceCallback();
+
+    // Bind editor setup callback to the tinymce initialization event.
+    jQuery(document).on('liveblogTinyMCEReady', this.setupEditor.bind(this));
+  }
+
+  /**
+   * Sets up the activeEditor to be used with this component instance.
+   *
+   * @memberof TinyMCEEditor
+   */
+  setupEditor() {
+    const stateContent = this.props.rawText;
+    tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
+    tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
+    tinymce.activeEditor.setEnablePosting = this.props.setEnablePosting;
+    tinymce.activeEditor.setError = this.props.setError;
+    tinymce.activeEditor.isError = false;
+    if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
+      tinymce.activeEditor.setContent(stateContent);
+    }
+    tinymce.activeEditor.off('keyup');
+    tinymce.activeEditor.on('keyup', debounce(() => {
+      setEnablePosting();
+    }, 500));
+    jQuery(document.getElementById(this.containerId)).on('keyup', debounce(() => {
+      setEnablePosting();
+    }, 500));
+    setEnablePosting();
+    tinymce.activeEditor.focus(); // Set focus to active editor
+  }
+
+  componentDidMount() {
+    if (editorCanInitialize()) {
+      // If the editor can be initialized, do so.
       wp.editor.initialize(this.containerId, this.editorSettings);
-      jQuery(document).on('liveblogTinyMCEReady', () => {
-        const stateContent = this.props.rawText;
-        tinymce.activeEditor.clearAuthors = this.props.clearAuthors;
-        tinymce.activeEditor.clearHeadline = this.props.clearHeadline;
-        tinymce.activeEditor.setEnablePosting = this.props.setEnablePosting;
-        tinymce.activeEditor.setError = this.props.setError;
-        tinymce.activeEditor.isError = false;
-        if (stateContent && stateContent !== '' && stateContent !== '<p></p>') {
-          tinymce.activeEditor.setContent(stateContent);
-        }
-        tinymce.activeEditor.off('keyup');
-        tinymce.activeEditor.on('keyup', debounce(() => {
-          setEnablePosting();
-        }, 500));
-        jQuery(document.getElementById(this.containerId)).on('keyup', debounce(() => {
-          setEnablePosting();
-        }, 500));
-        setEnablePosting();
-        tinymce.activeEditor.focus(); // Set focus to active editor
+    } else {
+      // If the editor can't be initialized yet, try again on document ready.
+      jQuery(document).on('ready', () => {
+        wp.editor.initialize(this.containerId, this.editorSettings);
       });
-    });
+    }
   }
 
   componentDidUpdate() {
