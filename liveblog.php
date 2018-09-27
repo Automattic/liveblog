@@ -1209,7 +1209,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
 			
-			if ( false === apply_filters( 'liveblog_output_at_bottom', true ) ) {
+			if ( true === apply_filters( 'liveblog_output_at_top', false ) ) {
 				return wp_kses_post( $liveblog_output ) . $content;
 			}
 
