@@ -6,7 +6,7 @@
 <div class="liveblog-meta-author">
 	<div class="liveblog-meta-author-avatar">
 		<amp-img alt="A view of the sea"
-		src="<?php echo esc_html( $avatar_url ); ?>"
+		src="<?php echo esc_url( $avatar_url ); ?>"
 		width="20"
 		height="20"
 		layout="responsive">

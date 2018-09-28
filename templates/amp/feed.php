@@ -19,8 +19,8 @@ $social           = $settings['social'];
 
 <amp-live-list
 	layout="container"
-	data-poll-interval="<?php echo esc_html( $refresh_interval ); ?>"
-	data-max-items-per-page="<?php echo esc_html( $entries_per_page ); ?>"
+	data-poll-interval="<?php echo esc_attr( $refresh_interval ); ?>"
+	data-max-items-per-page="<?php echo esc_attr( $entries_per_page ); ?>"
 	id="amp-live-list-insert-blog">
 
 	<button id="live-list-update-button"
