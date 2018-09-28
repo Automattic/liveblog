@@ -1824,7 +1824,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$blog_item['publisher'] = $metadata['publisher'];
 				}
 
-				$blog_updates[] = json_decode( json_encode( $blog_item ) );
+				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
 			}
 
 			$metadata['@type']          = 'LiveBlogPosting';
