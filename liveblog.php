@@ -1784,7 +1784,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @param  WP_Post $post     Current Post.
 		 * @return array             Updated Meta
 		 */
-		public static function get_liveblog_metadata() {
+		public static function get_liveblog_metadata( $metadata, $post ) {
 
 			global $post;
 
