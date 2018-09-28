@@ -58,7 +58,7 @@ class WPCOM_Liveblog_Socketio {
 		try {
 			self::$redis_client->connect();
 			self::$emitter = new SocketIO\Emitter( self::$redis_client );
-		} catch ( Exception $exception ) {
+		} catch ( Exception $exception ) { // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
 			self::add_redis_error();
 		}
 	}
