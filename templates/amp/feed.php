@@ -25,7 +25,7 @@ $social           = $settings['social'];
 
 	<button id="live-list-update-button"
 		update
-		<?php if ( $last === false ) : ?>
+		<?php if ( false === $last ) : ?>
 			on="tap:amp-live-list-insert-blog.update"
 		<?php else : ?>
 			on="tap:AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
