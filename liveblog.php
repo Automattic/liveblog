@@ -1803,7 +1803,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return $metadata;
 			}
 
-			foreach ( $entries['entries'] as $key => $entry ) {
+			foreach ( $entries['entries'] as $entry ) {
 				$blog_item = [
 					'@type'            => 'BlogPosting',
 					'headline'         => WPCOM_Liveblog_Entry::get_entry_title( $entry ),

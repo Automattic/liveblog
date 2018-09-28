@@ -46,7 +46,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$test_array = array();
 
-		foreach ( $collection as $key => $value ) {
+		foreach ( $collection as $value ) {
 			$test_array = array_merge( $test_array, $value );
 		}
 
