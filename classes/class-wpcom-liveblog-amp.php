@@ -138,7 +138,7 @@ class WPCOM_Liveblog_AMP {
 
 		$entry       = self::get_entry( $request->id, $post->ID );
 		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
-		$description = strip_tags( $entry->content );
+		$description = wp_strip_all_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
 

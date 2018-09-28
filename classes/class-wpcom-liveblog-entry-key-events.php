@@ -308,7 +308,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$content = preg_replace( '/(.*?[?!.](?=\s|$)).*/', '\\1', $content );
 
 		// Strip it of all non-accepted tags.
-		$content = strip_tags( $content, '<strong></strong><em></em><span></span><img>' );
+		$content = wp_strip_all_tags( $content, '<strong></strong><em></em><span></span><img>' );
 
 		return $content;
 	}
@@ -329,7 +329,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$content = explode( '<br />', $content );
 
 		// Strip it of all non-accepted tags.
-		$content = strip_tags( $content[0], '<strong></strong><em></em><span></span><img>' );
+		$content = wp_strip_all_tags( $content[0], '<strong></strong><em></em><span></span><img>' );
 
 		return $content;
 	}
