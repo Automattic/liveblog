@@ -802,7 +802,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			$entry = self::$entry_query->get_by_id( $id );
+			self::$entry_query->get_by_id( $id );
 		}
 
 		/**

@@ -579,7 +579,6 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get required parameters from the request
 		$post_id          = $request->get_param( 'post_id' );
-		$last_known_entry = $request->get_param( 'last_known_entry' );
 
 		self::set_liveblog_vars( $post_id );
 

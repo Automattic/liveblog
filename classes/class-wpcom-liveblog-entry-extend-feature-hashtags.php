@@ -144,7 +144,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 
 		// If it doesn't exist, then make it.
 		if ( ! get_term_by( 'slug', $hashtag, self::$taxonomy ) ) {
-			$error = wp_insert_term( $hashtag, self::$taxonomy );
+			wp_insert_term( $hashtag, self::$taxonomy );
 		}
 
 		// Replace the #hashtag content with a styled

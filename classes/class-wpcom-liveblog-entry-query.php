@@ -8,7 +8,6 @@
 class WPCOM_Liveblog_Entry_Query {
 
 	public function __construct( $post_id, $key ) {
-		global $wp_version;
 		$this->post_id = $post_id;
 		$this->key     = $key;
 	}

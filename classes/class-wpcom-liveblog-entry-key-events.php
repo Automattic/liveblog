@@ -150,9 +150,6 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Get the entry content
 		$content = $object->get_content();
 
-		// Use the currently set template.
-		$template = self::get_current_template( $post_id );
-
 		// Set if key event
 		$entry['key_event'] = self::is_key_event( $entry['id'] );
 

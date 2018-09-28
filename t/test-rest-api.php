@@ -283,7 +283,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Then delete it
 		$args  = array( 'entry_id' => $new_entry_id );
-		$entry = WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
+		WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
 
 		// Check that it was sent to the trash
 		$deleted_entry = get_comment( $new_entry_id );

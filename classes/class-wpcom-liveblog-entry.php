@@ -171,8 +171,6 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public static function render_content( $content, $comment = false ) {
-		global $wp_embed;
-
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
 				$wpcom_liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
