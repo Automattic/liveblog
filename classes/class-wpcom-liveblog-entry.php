@@ -500,7 +500,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return string        Title
 	 */
 	public static function get_entry_title( $entry ) {
-		return wp_trim_words( $entry->content, 10, '...' );
+		return wp_trim_words( $entry->content, 10, '…' );
 	}
 
 }
