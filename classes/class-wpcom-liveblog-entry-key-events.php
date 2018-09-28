@@ -219,7 +219,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Add the custom template fields to the editor.
 		$extra_fields[] = WPCOM_Liveblog::get_template_part(
-			'liveblog-key-admin.php', array(
+			'liveblog-key-admin.php',
+			array(
 				'current_key_template' => get_post_meta( $post_id, self::META_KEY_TEMPLATE, true ),
 				'current_key_format'   => get_post_meta( $post_id, self::META_KEY_FORMAT, true ),
 				'current_key_limit'    => get_post_meta( $post_id, self::META_KEY_LIMIT, true ),
@@ -350,7 +351,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$atts = shortcode_atts(
 			array(
 				'title' => 'Key Events',
-			), $atts
+			),
+			$atts
 		);
 
 		// The args to pass into the entry query.
@@ -378,7 +380,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 			// Render the actual template.
 			return WPCOM_Liveblog::get_template_part(
-				'liveblog-key-events.php', array(
+				'liveblog-key-events.php',
+				array(
 					'entries'  => $entries,
 					'title'    => $atts['title'],
 					'template' => $template[0],

@@ -141,7 +141,8 @@ class WPCOM_Liveblog_Lazyloader {
 
 		echo wp_kses_post(
 			WPCOM_Liveblog::get_template_part(
-				'lazyload-notice.php', array(
+				'lazyload-notice.php',
+				array(
 					'plugin' => 'Lazyload Liveblog Entries',
 				)
 			)

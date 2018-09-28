@@ -25,9 +25,9 @@ $social           = $settings['social'];
 
 	<button id="live-list-update-button"
 		update
-		<?php if ( $last === false ): ?>
+		<?php if ( $last === false ) : ?>
 			on="tap:amp-live-list-insert-blog.update"
-		<?php else: ?>
+		<?php else : ?>
 			on="tap:AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
 		<?php endif ?>
 		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
@@ -36,7 +36,8 @@ $social           = $settings['social'];
 	<?php foreach ( $this->get( 'entries' ) as $entry ) : ?>
 		<?php
 		$this->load_part(
-			'entry', array(
+			'entry',
+			array(
 				'post_id'        => $post_id,
 				'id'             => $entry->id,
 				'content'        => $entry->content,
@@ -57,7 +58,8 @@ $social           = $settings['social'];
 
 	<?php
 	$this->load_part(
-		'pagination', array(
+		'pagination',
+		array(
 			'links' => $links,
 			'page'  => $page,
 			'pages' => $pages,

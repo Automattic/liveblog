@@ -43,7 +43,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// generated hashtag html back to the
 		// raw input format (e.g #hashtag).
 		$this->revert_regex = implode(
-			'', array(
+			'',
+			array(
 				preg_quote( '<span class="liveblog-hash ', '~' ),
 				preg_quote( $this->class_prefix, '~' ),
 				'([^"]+)',
@@ -87,7 +88,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
-			'liveblog_hashtag_config', array(
+			'liveblog_hashtag_config',
+			array(
 				'type'        => 'ajax',
 				'cache'       => 1000 * 60,
 				'regex'       => '#([\w\d\-]*)$',

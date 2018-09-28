@@ -126,7 +126,8 @@ class WPCOM_Liveblog_Socketio {
 		);
 
 		wp_localize_script(
-			$handle, 'liveblog_socketio_settings',
+			$handle,
+			'liveblog_socketio_settings',
 			apply_filters(
 				'liveblog_socketio_settings',
 				array(

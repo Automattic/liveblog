@@ -262,7 +262,8 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$rendered = self::get_template(
-			'entry', array(
+			'entry',
+			array(
 				'single'         => true,
 				'id'             => $entry->id,
 				'content'        => $entry->content,
@@ -315,7 +316,8 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
 		$rendered = self::get_template(
-			'feed', array(
+			'feed',
+			array(
 				'entries'  => self::filter_entries( $entries['entries'], $post_id ),
 				'post_id'  => $post_id,
 				'page'     => $entries['page'],
@@ -420,7 +422,8 @@ class WPCOM_Liveblog_AMP {
 			array(
 				'liveblog_page' => $page,
 				'liveblog_last' => $last,
-			), $permalink
+			),
+			$permalink
 		);
 	}
 
@@ -435,7 +438,8 @@ class WPCOM_Liveblog_AMP {
 		return add_query_arg(
 			array(
 				'liveblog_id' => $id,
-			), $permalink
+			),
+			$permalink
 		);
 	}
 
