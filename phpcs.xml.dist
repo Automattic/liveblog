@@ -8,6 +8,7 @@
 	<arg name="colors"/>
 	<arg name="basepath" value="."/>
 	<arg name="parallel" value="50"/>
+	<arg name="extensions" value="php"/>
 	<file>.</file>
 
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
