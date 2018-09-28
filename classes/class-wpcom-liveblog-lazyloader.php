@@ -139,9 +139,13 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function admin_notices() {
 
-		echo WPCOM_Liveblog::get_template_part( 'lazyload-notice.php', array(
-			'plugin' => 'Lazyload Liveblog Entries',
-		) );
+		echo wp_kses_post(
+			WPCOM_Liveblog::get_template_part(
+				'lazyload-notice.php', array(
+					'plugin' => 'Lazyload Liveblog Entries',
+				)
+			)
+		);
 	}
 
 	/**

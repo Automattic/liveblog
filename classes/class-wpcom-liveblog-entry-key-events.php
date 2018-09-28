@@ -355,8 +355,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// The args to pass into the entry query.
 		$args = array(
-			'meta_key'   => self::META_KEY,
-			'meta_value' => self::META_VALUE,
+			'meta_key'   => self::META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			'meta_value' => self::META_VALUE, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 		);
 
 		$limit = get_post_meta( $post->ID, self::META_KEY_LIMIT, true );
@@ -398,7 +398,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::KEY );
 		$key_events = $query->get(
 			array(
-				'meta_query' => array(
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					array(
 						'key'     => self::META_KEY,
 						'value'   => self::META_VALUE,
