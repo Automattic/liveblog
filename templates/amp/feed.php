@@ -1,5 +1,4 @@
 <?php
-
 $post_id          = $this->get( 'post_id' );
 $links            = $this->get( 'links' );
 $page             = $this->get( 'page' );
@@ -9,13 +8,9 @@ $settings         = $this->get( 'settings' );
 $entries_per_page = $settings['entries_per_page'];
 $refresh_interval = $settings['refresh_interval'];
 $social           = $settings['social'];
-
-
-
 ?>
 
 <div class="amp-wp-article-liveblog">
-
 
 <amp-live-list
 	layout="container"
