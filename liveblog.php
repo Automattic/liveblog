@@ -63,6 +63,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $auto_archive_days       = null;
 		public static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
 		public static $latest_timestamp        = false;
+		public static $supported_post_types    = array();
 
 
 		/** Load Methods **********************************************************/
@@ -254,7 +255,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			 * Add liveblog support to the 'post' post type. This is done here so
 			 * we can possibly introduce this to other post types later.
 			 */
-			add_post_type_support( 'post', self::KEY );
+			$post_types = array( 'post' );
+			self::$supported_post_types = apply_filters( 'liveblog_modify_supported_post_types', $post_types );
+			foreach ( self::$supported_post_types as $post_type ) {
+				add_post_type_support( $post_type, self::key );
+			}
 
 			/**
 			 * Apply a Filter to Setup our Auto Archive Days.
@@ -499,14 +504,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return bool
 		 */
 		public static function is_viewing_liveblog_post() {
-			return (bool) ( is_single() && self::is_liveblog_post() );
+			return (bool) ( is_singular( self::$supported_post_types ) && self::is_liveblog_post() );
 		}
 
 		/**
 		 * One of: 'enable', 'archive', false.
 		 */
 		public static function get_liveblog_state( $post_id = null ) {
-			if ( ! is_single() && ! is_admin() && ! self::$is_rest_api_call ) {
+			if ( ! is_singular( self::$supported_post_types ) && ! is_admin() && ! self::$is_rest_api_call ) {
 				return false;
 			}
 			if ( empty( $post_id ) ) {
