@@ -5,8 +5,8 @@
 * Tags: liveblog
 * Requires at least: 4.4
 * Requires PHP: 5.6
-* Tested up to: 4.9.5
-* Stable tag: 1.8.2
+* Tested up to: 4.9.8
+* Stable tag: 1.9
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,8 +28,6 @@ Here’s what makes it special:
  * Viewers of your Liveblog get new entries served to them instantly and automatically, without needing to refresh their browser.
  * Your authors can drag-and-drop photos right into the Liveblog area, without needing to navigate to separate browser tabs or windows.
  * There’s no need for a separate site dedicated to liveblogging: *every* post can be a liveblog, even existing ones.
-
-[Check out our in-depth documentation.](http://vip.wordpress.com/documentation/using-the-liveblog-plugin/)
 
 If you'd like to check out the code and contribute, [join us on github](https://github.com/Automattic/liveblog), pull requests are more than welcome.
 
@@ -435,3 +433,92 @@ If for some reason the plugin is not able to use WebSockets to refresh the list 
 ![Adding images is a matter of just drag-and-drop](https://raw.github.com/Automattic/liveblog/master/screenshot-5.png)
 ![Dragged photos are automatically inserted](https://raw.github.com/Automattic/liveblog/master/screenshot-6.png)
 ![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
+
+## In-Depth Documentation
+
+#### Creating a Liveblog
+The liveblog lives inside of a regular WordPress post. First create a new post, complete with title, category, and maybe a short introduction. Once the liveblog plugin is installed, you will see a liveblog box on your "Edit Post" page. Simply click "Enable" to activate it, and publish the post.
+
+If you can't find the box, be sure that it is toggled on under "Screen Options" in the top right corner of posting page.
+
+![Screen options](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-12-19-13-pm.png)
+
+#### Posting to the Liveblog
+To post to the liveblog, navigate to the live post, and start typing. Click "Publish Update," and your readers will see the post appear at the top of their screen. That's all there is to it.
+
+![Click Publish Update](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-12-21-43-pm.png)
+
+#### Adding a Photo
+To add a photo to your update, simply drag-and-drop it into the posting box from your desktop. It will upload the image and include a link. To see the image, click "Preview."
+
+You can also add photos from the internet by pasting in the direct URL to the image.
+
+![add photos](http://vip.files.wordpress.com/2013/01/drag.png)
+
+#### Embedding Media
+To embed the media, simply paste the URL while viewing the media into the posting box on its own line. More details can be found about each media type in the links below:
+* [Tweets](http://en.support.wordpress.com/twitter/twitter-embeds/)
+* [YouTube videos](http://en.support.wordpress.com/videos/youtube)
+* [Vimeo videos](http://en.support.wordpress.com/videos/vimeo/)
+* [Instagram photos](http://en.support.wordpress.com/images/instagram/)
+* [Hulu clips](http://en.support.wordpress.com/videos/hulu/)
+* [Spotify songs](http://en.support.wordpress.com/audio/spotify/)
+
+![Screen shot for media embeds](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-12-32-59-pm.png)
+
+#### Formatting a Post
+The liveblog posting box takes standard HTML formatting. To format text, simply wrap it in HTML tags.
+
+Examples:
+
+* &lt;strong&gt;<strong>bold</strong>&lt;/strong&gt;
+* &lt;i&gt;<em>itals</em>&lt;/i&gt;
+* &lt;u&gt;<span style="text-decoration: underline;">underline</span>&lt;/u&gt;
+
+Links that are pasted directly the posting box will also be automatically hyperlinked.
+
+#### Manually embed a Liveblog
+
+Sometimes you may need to manually insert the Liveblog into your theme. For this, we provide a function which simply outputs the Liveblog HTML on a post where the Liveblog is enabled.
+> wpcom_liveblog_get_output
+
+#### Editing Previous Posts
+While a liveblog is enabled, you can edit previous posts by clicking the "Edit" button next to the update.
+
+![Edit post](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-11-40-43-am.png)
+
+#### Archiving a Liveblog
+Once the event has wrapped up, you can archive your liveblog. This means that visitors will still be able to see the blog, but the editing tools will go away and the post will stop polling for updates. You can archive and re-enable a liveblog from the Edit Post page.
+
+![Archiving a liveblog](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-11-15-12-am.png)
+
+When a liveblog is archived, your editors will see a notification that says the liveblog must be enabled to accept new posts.
+
+![Notification that liveblog must be enables](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-11-19-52-am.png)
+
+#### "Smart" Updates
+The liveblog uses smart updates, making it easy for your readers to enjoy your liveblog without being overwhelmed with updates. If the reader's browser is at the top of the post, new posts will automatically appear, highlighted in yellow.
+
+![Screenshot of smart updates](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-11-32-38-am.png)
+
+However, if your reader has scrolled down the post to catch up on previous updates, liveblog will wait to update with new posts. Instead, a notification bar will appear at the top of the screen. When the reader clicks on the bar, the new updates will resume loading at the top of the page.
+
+![Screenshot of notification](http://vip.files.wordpress.com/2013/01/screen-shot-2013-01-18-at-11-30-51-am.png)
+
+Post times are also now relative, which means it will display as “2 minutes ago,” with the time updating every minute.
+
+#### Overriding default templates
+Templates used by the plugin can be found in the <a href="https://github.com/Automattic/liveblog/tree/master/templates">/templates/ directory</a> of the plugin.
+
+You can edit these files in an upgrade-safe way using overrides. Copy the files you want to change into a directory named /liveblog within the root of your theme, keeping the same filename.
+
+Eg: In order to override a single entry template copy <a href="https://github.com/Automattic/liveblog/blob/master/templates/liveblog-single-entry.php">templates/liveblog-single-entry.php</a> to yourtheme/liveblog/liveblog-single-entry.php
+
+The copied file will now override the Liveblog default template file.
+
+Check out the [related code on GitHub.](https://github.com/Automattic/liveblog/blob/master/liveblog.php#L875,L896)
+
+#### Custom location for Liveblog templates
+In case the /liveblog directory in the root of your theme is not what would suit your needs, you can take advantage of the `liveblog_template_path` filter and pass in a custom absolute path without trailing slash which would then be used for template look-up.
+
+[Check out the related code.](https://github.com/Automattic/liveblog/blob/master/liveblog.php#L262,L268)

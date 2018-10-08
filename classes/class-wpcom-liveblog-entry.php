@@ -133,7 +133,6 @@ class WPCOM_Liveblog_Entry {
 		$entry = array(
 			'id'          => $entry_id,
 			'type'        => $this->get_type(),
-			'html'        => $this->render(),
 			'render'      => self::render_content( $this->get_content(), $this->comment ),
 			'content'     => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
 			'css_classes' => $css_classes,
@@ -169,24 +168,6 @@ class WPCOM_Liveblog_Entry {
 		);
 
 		return $entry;
-	}
-
-	public function render( $template = 'liveblog-single-entry.php' ) {
-
-		$output = apply_filters( 'liveblog_pre_entry_output', '', $this );
-		if ( ! empty( $output ) ) {
-			return $output;
-		}
-
-		if ( empty( $this->comment->comment_content ) ) {
-			return $output;
-		}
-
-		$entry = $this->get_fields_for_render();
-
-		$entry = apply_filters( 'liveblog_entry_template_variables', $entry );
-
-		return WPCOM_Liveblog::get_template_part( $template, $entry );
 	}
 
 	public static function render_content( $content, $comment = false ) {
@@ -255,16 +236,18 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$args    = apply_filters( 'liveblog_before_update_entry', $args );
+
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
+
 		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 		wp_update_comment(
 			array(
-				'comment_ID'      => $args['entry_id'],
-				'comment_content' => wp_filter_post_kses( $args['content'] ),
+				'comment_ID'       => $args['entry_id'],
+				'comment_content'  => wp_filter_post_kses( $args['content'] ),
 			)
 		);
 		$entry = self::from_comment( $comment );
@@ -509,6 +492,17 @@ class WPCOM_Liveblog_Entry {
 
 		return array_merge( $author, $contributors );
 	}
+
+	/**
+	 * Work out Entry title
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Title
+	 */
+	public static function get_entry_title( $entry ) {
+		return wp_trim_words( $entry->content, 10, '...' );
+	}
+
 }
 
 WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();
