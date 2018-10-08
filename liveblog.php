@@ -258,7 +258,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$post_types = array( 'post' );
 			self::$supported_post_types = apply_filters( 'liveblog_modify_supported_post_types', $post_types );
 			foreach ( self::$supported_post_types as $post_type ) {
-				add_post_type_support( $post_type, self::key );
+				add_post_type_support( $post_type, self::KEY );
 			}
 
 			/**
