@@ -802,9 +802,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			$entry = self::$entry_query->get_by_id( $id );
-
-			//var_dump( $entry );
-			//die();
 		}
 
 		/**
