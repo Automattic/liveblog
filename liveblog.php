@@ -258,11 +258,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$post_types = array( 'post' );
 
 			/**
-			 * Filters post types supported by liveblog.
+			 * Filters post types supported by this plugin.
 			 *
-			 * @since 2.0
+			 * @since 2.0.0
 			 *
-			 * @param array An array of supported post types.
+			 * @param array Supported post types.
 			 */
 			self::$supported_post_types = apply_filters( 'liveblog_supported_post_types', $post_types );
 
