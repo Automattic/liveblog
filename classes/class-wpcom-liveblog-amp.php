@@ -112,7 +112,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', array(), WPCOM_Liveblog::VERSION );
 	}
 
 
@@ -138,7 +138,7 @@ class WPCOM_Liveblog_AMP {
 
 		$entry       = self::get_entry( $request->id, $post->ID );
 		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
-		$description = strip_tags( $entry->content );
+		$description = wp_strip_all_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
 
@@ -262,7 +262,8 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$rendered = self::get_template(
-			'entry', array(
+			'entry',
+			array(
 				'single'         => true,
 				'id'             => $entry->id,
 				'content'        => $entry->content,
@@ -315,7 +316,8 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
 		$rendered = self::get_template(
-			'feed', array(
+			'feed',
+			array(
 				'entries'  => self::filter_entries( $entries['entries'], $post_id ),
 				'post_id'  => $post_id,
 				'page'     => $entries['page'],
@@ -420,7 +422,8 @@ class WPCOM_Liveblog_AMP {
 			array(
 				'liveblog_page' => $page,
 				'liveblog_last' => $last,
-			), $permalink
+			),
+			$permalink
 		);
 	}
 
@@ -435,7 +438,8 @@ class WPCOM_Liveblog_AMP {
 		return add_query_arg(
 			array(
 				'liveblog_id' => $id,
-			), $permalink
+			),
+			$permalink
 		);
 	}
 

@@ -63,7 +63,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/entries/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/entries/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_entries' ),
@@ -89,7 +90,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/crud([/]*)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/crud([/]*)',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'crud_entry' ),
@@ -121,7 +123,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_lazyload_entries' ),
@@ -146,7 +149,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)([/]*)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)([/]*)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_single_entry' ),
@@ -168,7 +172,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/preview([/]*)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/preview([/]*)',
 			array(
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'format_preview_entry' ),
@@ -191,7 +196,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/authors([/]*)(?P<term>.*)',
+			self::$api_namespace,
+			'/authors([/]*)(?P<term>.*)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_authors' ),
@@ -214,7 +220,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/hashtags([/]*)(?P<term>.*)',
+			self::$api_namespace,
+			'/hashtags([/]*)(?P<term>.*)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_hashtag_terms' ),
@@ -233,7 +240,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/post_state([/]*)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/post_state([/]*)',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'update_post_state' ),
@@ -265,7 +273,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/get-entries/(?P<page>\d+)/(?P<last_known_entry>[^\/]+)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/get-entries/(?P<page>\d+)/(?P<last_known_entry>[^\/]+)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_entries_paged' ),
@@ -290,7 +299,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'get_key_events' ),
@@ -309,7 +319,8 @@ class WPCOM_Liveblog_Rest_Api {
 		 *
 		 */
 		register_rest_route(
-			self::$api_namespace, '/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
+			self::$api_namespace,
+			'/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'jump_to_key_event' ),
@@ -597,7 +608,6 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Get required parameters from the request
 		$post_id          = $request->get_param( 'post_id' );
-		$last_known_entry = $request->get_param( 'last_known_entry' );
 
 		self::set_liveblog_vars( $post_id );
 

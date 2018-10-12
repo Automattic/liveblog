@@ -67,7 +67,9 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 				   INNER JOIN $wpdb->comments
 				   ON $wpdb->comments.comment_id = $wpdb->commentmeta.comment_id
 				   WHERE comment_post_id = %d )
-				 ORDER BY comment_id ASC", $post_id, $post_id
+				 ORDER BY comment_id ASC",
+					$post_id,
+					$post_id
 				)
 			);
 			$correct_ids       = wp_list_pluck( $correct_ids_array, 'comment_id' );
@@ -114,14 +116,15 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			}
 
 			// find comment_ids object with correct content for replacement
-			$correct_contents = $wpdb->get_results(  // phpcs:ignore
+			$correct_contents = $wpdb->get_results( // phpcs:ignore
 				$wpdb->prepare(
 					"SELECT comment_id, comment_content
 					 FROM $wpdb->comments
 					 WHERE comment_post_id = %d
 					 GROUP BY comment_content
 					 HAVING count(comment_content) = 2
-					 ORDER BY comment_id ASC", $post_id
+					 ORDER BY comment_id ASC",
+					$post_id
 				)
 			);
 
@@ -133,7 +136,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					INNER JOIN $wpdb->comments
 					ON $wpdb->comments.comment_id = $wpdb->commentmeta.comment_id
 					WHERE comment_post_id = %d
-					ORDER BY meta_value ASC", $post_id
+					ORDER BY meta_value ASC",
+					$post_id
 				)
 			);
 
@@ -210,7 +214,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					array_map(
 						function( $username ) {
 							return "[$username](http://profiles.wordpress.org/$username)";
-						}, preg_split( '/\s*,\s*/', $matches[1] )
+						},
+						preg_split( '/\s*,\s*/', $matches[1] )
 					)
 				);
 				return 'Contributors: ' . implode( ', ', $links );

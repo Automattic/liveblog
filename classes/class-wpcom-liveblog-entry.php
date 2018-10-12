@@ -253,7 +253,7 @@ class WPCOM_Liveblog_Entry {
 			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
 		}
 
-		$args    = apply_filters( 'liveblog_before_update_entry', $args );
+		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
