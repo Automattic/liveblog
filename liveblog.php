@@ -838,7 +838,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
 				$index = array_search( (int) $id, array_keys( $entries ), true );
-				$index = $index++;
+				$index++;
 				$page  = ceil( $index / $per_page );
 			}
 
