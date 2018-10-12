@@ -844,7 +844,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$offset  = $per_page * ( $page - 1 );
 			$entries = array_slice( $entries, $offset, $per_page );
-			$entries_for_json = self::entries_for_json( $entries );
+			$entries = self::entries_for_json( $entries );
 
 			$result = array(
 				'entries' => $entries,
@@ -852,7 +852,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'pages'   => (int) $pages,
 			);
 
-			if ( ! empty( $entries_for_json ) ) {
+			if ( ! empty( $entries ) ) {
 				do_action( 'liveblog_entry_request', $result );
 				self::$do_not_cache_response = true;
 			} else {
