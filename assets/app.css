@@ -1346,10 +1346,6 @@
   color: #bbb;
   font-family: "Lucida Console", Monaco, monospace; }
 
-.liveblog-codeblock-textarea:-ms-input-placeholder {
-  color: #bbb;
-  font-family: "Lucida Console", Monaco, monospace; }
-
 .liveblog-codeblock-textarea::-ms-input-placeholder {
   color: #bbb;
   font-family: "Lucida Console", Monaco, monospace; }
@@ -1491,10 +1487,6 @@
   font-size: 15px; }
 
 .liveblog-media-search-container input::-webkit-input-placeholder {
-  color: #bbb;
-  font-size: 14px; }
-
-.liveblog-media-search-container input:-ms-input-placeholder {
   color: #bbb;
   font-size: 14px; }
 
