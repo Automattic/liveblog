@@ -87,52 +87,44 @@ class PaginationContainer extends Component {
       }
     }
 
-    const firstButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-first'].join(' ');
-    const prevButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-prev'].join(' ');
-    const nextButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-next'].join(' ');
-    const lastButtonClassNames = ['button', 'button-large', 'liveblog-btn', 'liveblog-pagination-btn', 'liveblog-pagination-last'].join(' ');
+    const isFirstPage = (page === 1);
+    const isLastPage = (page === pages);
 
     return (
       <div className="liveblog-pagination">
         <div>
-          {
-            (page !== 1) &&
-            <span>
-              <button
-                className={firstButtonClassNames}
-                onClick={(e) => { e.preventDefault(); getEntriesPaginated(1, 'first'); } }
-              >
-                First
-              </button>
-              <button
-                className={prevButtonClassNames}
-                onClick={(e) => { e.preventDefault(); getEntriesPaginated((page - 1), 'last'); } }
-              >
-                Prev
-              </button>
-            </span>
-          }
+          <button
+            disabled={isFirstPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-first ${isFirstPage && 'liveblog-btn--hide'}`}
+            onClick={() => getEntriesPaginated(1, 'first')}
+          >
+            First
+          </button>
+          <button
+            disabled={isFirstPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-prev ${isFirstPage && 'liveblog-btn--hide'}`}
+            onClick={() => getEntriesPaginated((page - 1), 'last')}
+          >
+            Prev
+          </button>
         </div>
         <span className="liveblog-pagination-pages">{pageNavigation}
         </span>
         <div>
-          {
-            (page !== pages) &&
-            <span>
-              <button
-                className={nextButtonClassNames}
-                onClick={(e) => { e.preventDefault(); getEntriesPaginated((page + 1), 'first'); } }
-              >
-                Next
-              </button>
-              <button
-                className={lastButtonClassNames}
-                onClick={(e) => { e.preventDefault(); getEntriesPaginated(pages, 'first'); } }
-              >
-                Last
-              </button>
-            </span>
-          }
+          <button
+            disabled={isLastPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-next ${isLastPage && 'liveblog-btn--hide'}`}
+            onClick={() => getEntriesPaginated((page + 1), 'first')}
+          >
+            Next
+          </button>
+          <button
+            disabled={isLastPage}
+            className={`liveblog-btn liveblog-pagination-btn liveblog-pagination-last ${isLastPage && 'liveblog-btn--hide'}`}
+            onClick={() => getEntriesPaginated(pages, 'first')}
+          >
+            Last
+          </button>
         </div>
       </div>
     );

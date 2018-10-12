@@ -3,8 +3,8 @@
 /**
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
- * Description: Blogging: at the speed of live.
- * Version:     1.8.2
+ * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
+ * Version:     1.9
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.8.3';
+		const VERSION                 = '1.9';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -88,6 +88,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			WPCOM_Liveblog_Lazyloader::load();
 			WPCOM_Liveblog_Socketio_Loader::load();
 			WPCOM_Liveblog_Entry_Embed_SDKs::load();
+			WPCOM_Liveblog_AMP::load();
 
 			if ( self::use_rest_api() ) {
 				WPCOM_Liveblog_Rest_Api::load();
@@ -138,6 +139,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp-template.php';
 
 			if ( self::use_rest_api() ) {
 				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php';
@@ -173,6 +176,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
 			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
 			add_action( 'edit_form_after_editor', array( __CLASS__, 'add_liveblog_after_editor' ) );
+			add_action( 'wp_head', array( __CLASS__, 'print_liveblog_metadata' ) );
 		}
 
 		/**
@@ -831,6 +835,23 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
+		 * Get single entry
+		 *
+		 * @param int $id entry id
+		 * @return array An array of json encoded results
+		 */
+		public static function get_single_liveblog_entry( $id = false ) {
+			if ( empty( self::$entry_query ) ) {
+				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
+			}
+
+			$entry = self::$entry_query->get_by_id( $id );
+
+			//var_dump( $entry );
+			//die();
+		}
+
+		/**
 		 * Get all entries for specific page
 		 *
 		 * @param int $page Requested Page.
@@ -1102,6 +1123,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 							)
 						),
 						'is_admin'                     => is_admin(),
+						'cross_domain'                 => false,
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
 						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
@@ -1892,6 +1914,105 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$refresh_interval = apply_filters( 'liveblog_refresh_interval', $refresh_interval );
 			$refresh_interval = apply_filters( 'liveblog_post_' . get_the_ID() . '_refresh_interval', $refresh_interval );
 			return $refresh_interval;
+		}
+
+		/**
+		 * Generates metadata for a single liveblog
+		 *
+		 * @param  array   $metadata Metadata.
+		 * @param  WP_Post $post     Current Post.
+		 * @return array             Updated Meta
+		 */
+		public static function get_liveblog_metadata() {
+
+			global $post;
+
+			// If we are not viewing a liveblog post then exit the filter.
+			if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+				return $metadata;
+			}
+
+			$request = self::get_request_data();
+
+			$entries = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
+
+			$blog_updates = [];
+
+			if ( ! isset( $entries[ 'entries' ] ) || ! is_array( $entries[ 'entries' ] ) ) {
+				return $metadata;
+			}
+
+			foreach ( $entries[ 'entries' ] as $key => $entry ) {
+				$blog_item = [
+					'@type'            => 'BlogPosting',
+					'headline'         => WPCOM_Liveblog_Entry::get_entry_title( $entry ),
+					'url'              => $entry->share_link,
+					'mainEntityOfPage' => $entry->share_link,
+					'datePublished'    => date( 'c', $entry->entry_time ),
+					'dateModified'     => date( 'c', $entry->timestamp ),
+					'author'           => [
+						'@type' => 'Person',
+						'name'  => $entry->authors[ 0 ][ 'name' ],
+					],
+					'articleBody'      => [
+						'@type' => 'Text',
+					],
+				];
+
+				if ( isset( $metadata['publisher'] ) ) {
+					$blog_item['publisher'] = $metadata['publisher'];
+				}
+
+				$blog_updates[] = json_decode( json_encode( $blog_item ) );
+			}
+
+			$metadata['@type']          = 'LiveBlogPosting';
+			$metadata['liveBlogUpdate'] = $blog_updates;
+
+			/**
+			 * Filters the Liveblog metadata.
+			 *
+			 * Allows plugins and themes to adapt the metadata printed by the
+			 * liveblog into the head, describing the liveblog and it's entries.
+			 *
+			 * @since 1.9
+			 *
+			 * @param array $metadata An array of metadata.
+			 */
+			$metadata = apply_filters( 'liveblog_metadata', $metadata, $post );
+
+			return $metadata;
+		}
+
+		public static function print_liveblog_metadata() {
+
+			// Bail if we are not viewing a liveblog.
+			if ( WPCOM_Liveblog::is_liveblog_post( get_the_ID() ) === false ) {
+				return;
+			}
+
+			$metadata = WPCOM_Liveblog::get_liveblog_metadata();
+			if ( empty( $metadata ) ) {
+				return;
+			}
+
+			?>
+			<script type="application/ld+json"><?php echo wp_json_encode( $metadata ); ?></script>
+			<?php
+
+		}
+
+		/**
+		 * Get Page and Last known entry from the request.
+		 *
+		 * @return object Request Data.
+		 */
+		public static function get_request_data() {
+			return (object) array(
+				'page' => get_query_var( 'liveblog_page', 1 ),
+				'last' => get_query_var( 'liveblog_last', false ),
+				'id'   => get_query_var( 'liveblog_id', false ),
+			);
 		}
 
 	}
