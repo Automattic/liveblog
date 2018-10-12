@@ -101,7 +101,8 @@ class TinyMCEEditor extends Component {
       tinymce.activeEditor.setContent(stateContent);
     }
     tinymce.activeEditor.off('keyup');
-    tinymce.activeEditor.on('keyup', debounce(() => {
+    // The change event handles the case of "Add Media" button press
+    tinymce.activeEditor.on('keyup change', debounce(() => {
       setEnablePosting();
     }, 500));
     jQuery(document.getElementById(this.containerId)).on('keyup', debounce(() => {
