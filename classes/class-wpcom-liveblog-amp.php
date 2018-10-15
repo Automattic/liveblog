@@ -191,7 +191,7 @@ class WPCOM_Liveblog_AMP {
 			/**
 			 * This filter is documented in liveblog.php
 			 */
-			$metadata = WPCOM_Liveblog::get_liveblog_metadata();
+			$metadata = WPCOM_Liveblog::get_liveblog_metadata( $metadata, $post );
 		}
 
 		return $metadata;
