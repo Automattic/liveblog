@@ -25,7 +25,7 @@ $social           = $settings['social'];
 		<?php else : ?>
 			on="tap:AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
 		<?php endif ?>
-		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
+		class="ampstart-btn caps"><?php esc_html_e( 'Load new posts' ); ?></button>
 	<div items>
 
 	<?php foreach ( $this->get( 'entries' ) as $entry ) : ?>
