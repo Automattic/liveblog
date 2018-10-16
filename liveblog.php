@@ -323,7 +323,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * the current post output. If nothing needs to be added, we redirect back
 		 * to the permalink.
 		 *
-		 * @return If request has been handled
+		 * return if request has been handled
 		 */
 		public static function handle_request() {
 
