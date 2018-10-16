@@ -334,7 +334,7 @@ class WPCOM_Liveblog_Entry {
 		}
 		$user_object = get_userdata( $original_comment->user_id );
 		if ( ! $user_object ) {
-			return new WP_Error( 'get-usedata', __( 'Error retrieving user', 'liveblog' ) );
+			return new WP_Error( 'get-userdata', __( 'Error retrieving user', 'liveblog' ) );
 		}
 		return $user_object;
 	}
@@ -461,7 +461,7 @@ class WPCOM_Liveblog_Entry {
 	 * @param object $user The user object
 	 */
 	private static function get_user_data_for_json( $user ) {
-		if ( is_wp_error( $user ) ) {
+		if ( is_wp_error( $user ) || ! is_object( $user ) ) {
 			return array();
 		}
 
@@ -499,7 +499,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return string        Title
 	 */
 	public static function get_entry_title( $entry ) {
-		return wp_trim_words( $entry->content, 10, '...' );
+		return wp_trim_words( $entry->content, 10, '…' );
 	}
 
 }
