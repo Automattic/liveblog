@@ -395,7 +395,7 @@ class WPCOM_Liveblog_AMP {
 
 		$links['prev'] = false;
 		if ( $request->page > 1 ) {
-			$keep_postion  = ( (int) $request->page === 2 ) ? false : $request->last;
+			$keep_postion  = ( 2 === (int) $request->page ) ? false : $request->last;
 			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $keep_postion );
 		}
 
