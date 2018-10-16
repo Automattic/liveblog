@@ -149,7 +149,7 @@ add_filter(
 	function( $can_edit ) {
 
 		// Retain super admin access for A12s.
-		if ( is_automattician() || ( defined( 'A8C_PROXIED_REQUEST' ) && A8C_PROXIED_REQUEST ) ) {
+		if ( is_automattician() || ( defined( 'A8C_PROXIED_REQUEST' ) && A8C_PROXIED_REQUEST ) ) { // phpcs:ignore WordPressVIPMinimum.Constants.ConstantRestrictions.ConstantRestrictions
 			return $can_edit;
 		}
 
