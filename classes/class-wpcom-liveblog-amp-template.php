@@ -82,7 +82,7 @@ class WPCOM_Liveblog_AMP_Template {
 		$this->data = $variables;
 
 		ob_start();
-		include $path;
+		include $path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
 		return ob_get_clean();
 	}
 
