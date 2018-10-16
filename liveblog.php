@@ -1786,8 +1786,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function get_liveblog_metadata( $metadata, $post ) {
 
-			global $post;
-
 			// If we are not viewing a liveblog post then exit the filter.
 			if ( self::is_liveblog_post( $post->ID ) === false ) {
 				return $metadata;
