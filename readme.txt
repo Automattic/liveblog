@@ -8,7 +8,7 @@ Stable tag: 1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Quick and simple blogging for following fast-paced events.
+Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
 
 == Description ==
 

@@ -12,7 +12,7 @@
 
 [![Build Status](https://travis-ci.org/Automattic/liveblog.svg?branch=master)](https://travis-ci.org/Automattic/liveblog)
 
-Quick and simple blogging for following fast-paced events.
+Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
 
 ## Description
 

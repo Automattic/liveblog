@@ -45,7 +45,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// generated author html back to the
 		// raw input format (e.g @author).
 		$this->revert_regex = implode(
-			'', array(
+			'',
+			array(
 				preg_quote( '<a href="', '~' ),
 				'[^"]+',
 				preg_quote( '" class="liveblog-author ', '~' ),
@@ -87,7 +88,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
-			'liveblog_author_config', array(
+			'liveblog_author_config',
+			array(
 				'type'        => 'ajax',
 				'cache'       => 1000 * 60 * 30,
 				'url'         => esc_url( $endpoint_url ),
@@ -198,7 +200,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix ) . '\w+/', $comment->comment_content, $authors );
+			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $comment->comment_content, $authors );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $authors[0] );

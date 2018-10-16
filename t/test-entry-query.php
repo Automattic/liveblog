@@ -24,7 +24,7 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	public function test_get_latest_should_return_the_latest_comment_if_more_than_one() {
-		$id_first     = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
+		$id_first     = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) ); // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
 		$id_second    = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
 		$latest_entry = $this->entry_query->get_latest();
 		$this->assertEquals( $id_second, $latest_entry->get_id() );

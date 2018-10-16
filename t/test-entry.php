@@ -72,8 +72,8 @@ class Test_Entry extends WP_UnitTestCase {
 	}
 
 	public function test_update_should_update_original_entry() {
-		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::update(
+		$entry = $this->insert_entry();
+		WPCOM_Liveblog_Entry::update(
 			$this->build_entry_args(
 				array(
 					'entry_id' => $entry->get_id(),
@@ -81,7 +81,7 @@ class Test_Entry extends WP_UnitTestCase {
 				)
 			)
 		);
-		$query        = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
+		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertEquals( 'updated', $query->get_by_id( $entry->get_id() )->get_content() );
 	}
 
@@ -99,9 +99,9 @@ class Test_Entry extends WP_UnitTestCase {
 	}
 
 	public function test_delete_should_delete_original_entry() {
-		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
-		$query        = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
+		$entry = $this->insert_entry();
+		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
+		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
 	}
 

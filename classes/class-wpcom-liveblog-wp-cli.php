@@ -32,7 +32,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			array(
 				'order'    => 'ASC',
 				'orderby'  => 'ID',
-				'meta_key' => 'liveblog',
+				'meta_key' => 'liveblog', // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_key
 			)
 		);
 
@@ -59,15 +59,17 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$edit_entries  = $entries_query->get_all_edits( array( 'post_id' => $post_id ) );
 
 			// find correct comment_ids to replace incorrect meta_values
-			$correct_ids_array = $wpdb->get_results(
+			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT comment_id FROM $wpdb->comments
-				 WHERE comment_post_id = %d AND comment_id NOT IN
-				 ( SELECT $wpdb->commentmeta.comment_id FROM $wpdb->commentmeta
-				   INNER JOIN $wpdb->comments
-				   ON $wpdb->comments.comment_id = $wpdb->commentmeta.comment_id
-				   WHERE comment_post_id = %d )
-				 ORDER BY comment_id ASC", $post_id, $post_id
+					WHERE comment_post_id = %d AND comment_id NOT IN
+					( SELECT $wpdb->commentmeta.comment_id FROM $wpdb->commentmeta
+					INNER JOIN $wpdb->comments
+					ON $wpdb->comments.comment_id = $wpdb->commentmeta.comment_id
+					WHERE comment_post_id = %d )
+					ORDER BY comment_id ASC",
+					$post_id,
+					$post_id
 				)
 			);
 			$correct_ids       = wp_list_pluck( $correct_ids_array, 'comment_id' );
@@ -101,9 +103,11 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 								// If this isnt a dry run we can run the database Update.
 								if ( false === $is_dryrun ) {
-									$wpdb->update(
+									$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 										$wpdb->commentmeta,
-										array( 'meta_value' => $correct_ids[ $i ] ),
+										array(
+											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_value
+										),
 										array( 'comment_id' => $entry_id )
 									);
 								}
@@ -114,26 +118,28 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			}
 
 			// find comment_ids object with correct content for replacement
-			$correct_contents = $wpdb->get_results(
+			$correct_contents = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT comment_id, comment_content
-					 FROM $wpdb->comments
-					 WHERE comment_post_id = %d
-					 GROUP BY comment_content
-					 HAVING count(comment_content) = 2
-					 ORDER BY comment_id ASC", $post_id
+					FROM $wpdb->comments
+					WHERE comment_post_id = %d
+					GROUP BY comment_content
+					HAVING count(comment_content) = 2
+					ORDER BY comment_id ASC",
+					$post_id
 				)
 			);
 
 			// find comment_ids that NEED to be replaced
-			$entries_replace = $wpdb->get_results(
+			$entries_replace = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT DISTINCT meta_value
 					FROM $wpdb->commentmeta
 					INNER JOIN $wpdb->comments
 					ON $wpdb->comments.comment_id = $wpdb->commentmeta.comment_id
 					WHERE comment_post_id = %d
-					ORDER BY meta_value ASC", $post_id
+					ORDER BY meta_value ASC",
+					$post_id
 				)
 			);
 
@@ -151,7 +157,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					$content = $correct_contents[ $replaced ]->comment_content;
 
 					if ( false === $is_dryrun ) {
-						$wpdb->update(
+						$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 							$wpdb->comments,
 							array( 'comment_content' => $content ),
 							array( 'comment_id' => $entry_replace->meta_value )
@@ -210,7 +216,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					array_map(
 						function( $username ) {
 							return "[$username](http://profiles.wordpress.org/$username)";
-						}, preg_split( '/\s*,\s*/', $matches[1] )
+						},
+						preg_split( '/\s*,\s*/', $matches[1] )
 					)
 				);
 				return 'Contributors: ' . implode( ', ', $links );
