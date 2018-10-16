@@ -578,7 +578,7 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_key_events( WP_REST_Request $request ) {
 
 		// Get required parameters from the request
-		$post_id          = $request->get_param( 'post_id' );
+		$post_id = $request->get_param( 'post_id' );
 
 		self::set_liveblog_vars( $post_id );
 

@@ -839,7 +839,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( false === $page && false !== $id ) {
 				$index = array_search( (int) $id, array_keys( $entries ), true );
 				$index++;
-				$page  = ceil( $index / $per_page );
+				$page = ceil( $index / $per_page );
 			}
 
 			$offset  = $per_page * ( $page - 1 );
@@ -1117,7 +1117,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ),// phpcs:ignore
+					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ),
 					'supported' => _device_can_upload(),
 				),
 			);
