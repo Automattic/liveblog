@@ -117,7 +117,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function show_old_wp_notice() {
 			global $wp_version;
 			$min_version = self::MIN_WP_VERSION;
-			echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ); // phpcs:ignore
+			echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
