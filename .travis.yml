@@ -13,17 +13,17 @@ matrix:
         # aliased to a recent 5.6.x version
         - php: '5.6'
           env:
-            #- SNIFF=1
             - WP_VERSION=latest
             - WP_MULTISITE=0
         - php: '5.6'
           env:
-            #- SNIFF=1
             - WP_VERSION=latest
             - WP_MULTISITE=1
         # aliased to a recent 7.x version
         - php: '7.0'
-          env: WP_VERSION=latest
+          env:
+            - SNIFF=1
+            - WP_VERSION=latest
         # aliased to a recent hhvm version
         - php: 'hhvm'
           env: WP_VERSION=latest
