@@ -460,6 +460,6 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function is_amp_polling() {
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected
 	}
 }
