@@ -31,8 +31,6 @@ class WPCOM_Liveblog_AMP {
 
 	/**
 	 * AMP Setup by removing and adding new hooks.
-	 *
-	 * @return void
 	 */
 	public static function setup() {
 		// If we're not on an AMP page then bail.
