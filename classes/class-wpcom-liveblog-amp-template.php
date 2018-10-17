@@ -33,7 +33,7 @@ class WPCOM_Liveblog_AMP_Template {
 	 *
 	 * @return void
 	 */
-	public function __contrust() {
+	public function __construct() {
 		$this->theme_template_path  = apply_filters( 'liveblog_amp_theme_template_path', $this->theme_template_path );
 		$this->plugin_template_path = apply_filters( 'liveblog_amp_plugin_template_path', $this->plugin_template_path );
 	}
@@ -75,14 +75,14 @@ class WPCOM_Liveblog_AMP_Template {
 			$path = $plugin;
 		}
 
-		if ( $path === false ) {
+		if ( false === $path ) {
 			return 'Template Not Found: ' . $name;
 		}
 
 		$this->data = $variables;
 
 		ob_start();
-		include $path;
+		include $path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
 		return ob_get_clean();
 	}
 
@@ -94,6 +94,6 @@ class WPCOM_Liveblog_AMP_Template {
 	 * @return void
 	 */
 	public function load_part( $name, $variables = array() ) {
-		echo WPCOM_Liveblog_AMP::get_template( $name, $variables );
+		echo WPCOM_Liveblog_AMP::get_template( $name, $variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

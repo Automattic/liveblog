@@ -24,12 +24,7 @@ matrix:
           env:
             - SNIFF=1
             - WP_VERSION=latest
-        # aliased to a recent hhvm version
-        - php: 'hhvm'
-          env: WP_VERSION=latest
 
-    allow_failures:
-        - php: 'hhvm'
 
 before_script:
     # Set up CodeSniffer

@@ -150,9 +150,6 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Get the entry content
 		$content = $object->get_content();
 
-		// Use the currently set template.
-		$template = self::get_current_template( $post_id );
-
 		// Set if key event
 		$entry['key_event'] = self::is_key_event( $entry['id'] );
 
@@ -219,7 +216,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Add the custom template fields to the editor.
 		$extra_fields[] = WPCOM_Liveblog::get_template_part(
-			'liveblog-key-admin.php', array(
+			'liveblog-key-admin.php',
+			array(
 				'current_key_template' => get_post_meta( $post_id, self::META_KEY_TEMPLATE, true ),
 				'current_key_format'   => get_post_meta( $post_id, self::META_KEY_FORMAT, true ),
 				'current_key_limit'    => get_post_meta( $post_id, self::META_KEY_LIMIT, true ),
@@ -307,7 +305,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$content = preg_replace( '/(.*?[?!.](?=\s|$)).*/', '\\1', $content );
 
 		// Strip it of all non-accepted tags.
-		$content = strip_tags( $content, '<strong></strong><em></em><span></span><img>' );
+		$content = wp_strip_all_tags( $content, '<strong></strong><em></em><span></span><img>' );
 
 		return $content;
 	}
@@ -328,7 +326,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$content = explode( '<br />', $content );
 
 		// Strip it of all non-accepted tags.
-		$content = strip_tags( $content[0], '<strong></strong><em></em><span></span><img>' );
+		$content = wp_strip_all_tags( $content[0], '<strong></strong><em></em><span></span><img>' );
 
 		return $content;
 	}
@@ -350,13 +348,14 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$atts = shortcode_atts(
 			array(
 				'title' => 'Key Events',
-			), $atts
+			),
+			$atts
 		);
 
 		// The args to pass into the entry query.
 		$args = array(
-			'meta_key'   => self::META_KEY,
-			'meta_value' => self::META_VALUE,
+			'meta_key'   => self::META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			'meta_value' => self::META_VALUE, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 		);
 
 		$limit = get_post_meta( $post->ID, self::META_KEY_LIMIT, true );
@@ -378,7 +377,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 			// Render the actual template.
 			return WPCOM_Liveblog::get_template_part(
-				'liveblog-key-events.php', array(
+				'liveblog-key-events.php',
+				array(
 					'entries'  => $entries,
 					'title'    => $atts['title'],
 					'template' => $template[0],
@@ -398,7 +398,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::KEY );
 		$key_events = $query->get(
 			array(
-				'meta_query' => array(
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					array(
 						'key'     => self::META_KEY,
 						'value'   => self::META_VALUE,

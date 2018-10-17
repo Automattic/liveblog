@@ -62,7 +62,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// generated author html back to the
 		// raw input format (e.g /key).
 		$this->revert_regex = implode(
-			'', array(
+			'',
+			array(
 				preg_quote( '<span class="liveblog-command ', '~' ),
 				preg_quote( $this->class_prefix_local, '~' ),
 				'([^"]+)',
@@ -103,7 +104,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
-			'liveblog_command_config', array(
+			'liveblog_command_config',
+			array(
 				'trigger'     => '/',
 				'data'        => $this->get_commands(),
 				'displayKey'  => false,

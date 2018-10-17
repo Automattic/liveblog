@@ -31,8 +31,6 @@ class WPCOM_Liveblog_AMP {
 
 	/**
 	 * AMP Setup by removing and adding new hooks.
-	 *
-	 * @return void
 	 */
 	public static function setup() {
 		// If we're not on an AMP page then bail.
@@ -103,7 +101,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		include dirname( __DIR__ ) . '/assets/amp.css';
+		echo esc_html( file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' ) );
 	}
 
 	/**
@@ -112,7 +110,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css' );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', array(), WPCOM_Liveblog::VERSION );
 	}
 
 
@@ -138,7 +136,7 @@ class WPCOM_Liveblog_AMP {
 
 		$entry       = self::get_entry( $request->id, $post->ID );
 		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
-		$description = strip_tags( $entry->content );
+		$description = wp_strip_all_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
 
@@ -191,7 +189,7 @@ class WPCOM_Liveblog_AMP {
 			/**
 			 * This filter is documented in liveblog.php
 			 */
-			$metadata = WPCOM_Liveblog::get_liveblog_metadata();
+			$metadata = WPCOM_Liveblog::get_liveblog_metadata( $metadata, $post );
 		}
 
 		return $metadata;
@@ -262,7 +260,8 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$rendered = self::get_template(
-			'entry', array(
+			'entry',
+			array(
 				'single'         => true,
 				'id'             => $entry->id,
 				'content'        => $entry->content,
@@ -315,7 +314,8 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
 		$rendered = self::get_template(
-			'feed', array(
+			'feed',
+			array(
 				'entries'  => self::filter_entries( $entries['entries'], $post_id ),
 				'post_id'  => $post_id,
 				'page'     => $entries['page'],
@@ -395,7 +395,7 @@ class WPCOM_Liveblog_AMP {
 
 		$links['prev'] = false;
 		if ( $request->page > 1 ) {
-			$keep_postion  = ( (int) $request->page === 2 ) ? false : $request->last;
+			$keep_postion  = ( 2 === (int) $request->page ) ? false : $request->last;
 			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $keep_postion );
 		}
 
@@ -420,7 +420,8 @@ class WPCOM_Liveblog_AMP {
 			array(
 				'liveblog_page' => $page,
 				'liveblog_last' => $last,
-			), $permalink
+			),
+			$permalink
 		);
 	}
 
@@ -435,7 +436,8 @@ class WPCOM_Liveblog_AMP {
 		return add_query_arg(
 			array(
 				'liveblog_id' => $id,
-			), $permalink
+			),
+			$permalink
 		);
 	}
 
@@ -458,6 +460,6 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function is_amp_polling() {
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected
 	}
 }

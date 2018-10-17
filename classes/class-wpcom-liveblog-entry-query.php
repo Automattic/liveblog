@@ -8,7 +8,6 @@
 class WPCOM_Liveblog_Entry_Query {
 
 	public function __construct( $post_id, $key ) {
-		global $wp_version;
 		$this->post_id = $post_id;
 		$this->key     = $key;
 	}
@@ -44,7 +43,7 @@ class WPCOM_Liveblog_Entry_Query {
 		$defaults = array(
 			'orderby'  => 'comment_date_gmt',
 			'order'    => 'ASC',
-			'meta_key' => 'liveblog_replaces',
+			'meta_key' => 'liveblog_replaces', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'status'   => 'liveblog',
 		);
 

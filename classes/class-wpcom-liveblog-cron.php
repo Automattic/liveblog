@@ -44,7 +44,7 @@ class WPCOM_Liveblog_Cron {
 				array(
 					'order'    => 'ASC',
 					'orderby'  => 'ID',
-					'meta_key' => 'liveblog',
+					'meta_key' => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 				)
 			);
 

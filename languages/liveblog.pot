@@ -1,60 +1,60 @@
-# Copyright (C) 2016 Liveblog
+# Copyright (C) 2018 Liveblog
 # This file is distributed under the same license as the Liveblog package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Liveblog 1.5\n"
+"Project-Id-Version: Liveblog 1.8.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/liveblog\n"
-"POT-Creation-Date: 2016-01-15 19:14:37+00:00\n"
+"POT-Creation-Date: 2018-06-22 22:36:43+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:247
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:281
 msgctxt "taxonomy general name"
 msgid "Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:248
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:282
 msgctxt "taxonomy singular name"
 msgid "Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:249
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:283
 msgid "Search Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:250
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:284
 msgid "All Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:251
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:285
 msgid "Parent Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:252
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:286
 msgid "Parent Hashtag:"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:253
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:287
 msgid "Edit Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:254
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:288
 msgid "Update Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:255
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:289
 msgid "Add New Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:256
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:290
 msgid "New Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:257
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:291
 msgid "Hashtags"
 msgstr ""
 
@@ -77,264 +77,270 @@ msgid ""
 "Liveblog configuration inside each post."
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-key-events.php:203
+#: classes/class-wpcom-liveblog-entry-key-events.php:226
 msgid "Template:"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-key-events.php:204
+#: classes/class-wpcom-liveblog-entry-key-events.php:227
 msgid "Format:"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-key-events.php:205
+#: classes/class-wpcom-liveblog-entry-key-events.php:228
 msgid ""
 "Set template for key events shortcode, select a format and restrict most "
 "recent shown."
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-key-events.php:206
+#: classes/class-wpcom-liveblog-entry-key-events.php:229
 msgid "Limit"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-key-events.php:207
+#: classes/class-wpcom-liveblog-entry-key-events.php:230
 msgid "Save"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:151
-#: classes/class-wpcom-liveblog-entry.php:186
-#: classes/class-wpcom-liveblog-entry.php:202
+#: classes/class-wpcom-liveblog-entry.php:222
+#: classes/class-wpcom-liveblog-entry.php:267
+#: classes/class-wpcom-liveblog-entry.php:283
 msgid "Missing entry ID"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:205
-msgid "Key event not deleted"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry.php:229
+#: classes/class-wpcom-liveblog-entry.php:312
 msgid "Error posting entry"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:233
-#: classes/class-wpcom-liveblog-entry.php:251
+#: classes/class-wpcom-liveblog-entry.php:316
+#: classes/class-wpcom-liveblog-entry.php:335
 msgid "Error retrieving comment"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:242
+#. translators: 1: argument
+#: classes/class-wpcom-liveblog-entry.php:326
 msgid "Missing entry argument: %s"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:255
+#: classes/class-wpcom-liveblog-entry.php:339
 msgid "Error retrieving user"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-lazyloader.php:190
-#: templates/liveblog-loop.php:17
-msgid "Load more entries&hellip;"
+#: classes/class-wpcom-liveblog-socketio-loader.php:100
+msgid ""
+"It is necessary to install socket.io-php-emitter in order to use Liveblog "
+"plugin with WebSocket support enabled."
 msgstr ""
 
-#: liveblog.php:313
+#. translators: 1: current PHP version, 2: minimum required PHP version
+#: classes/class-wpcom-liveblog-socketio-loader.php:122
+msgid ""
+"Your current PHP is version %1$s, which is too old to run the Liveblog "
+"plugin with WebSocket support enabled. The minimum required version is %2$s. "
+"Please, either update PHP or disable WebSocket support by removing or "
+"setting to false the constant LIVEBLOG_USE_SOCKETIO in wp-config.php."
+msgstr ""
+
+#: classes/class-wpcom-liveblog-socketio.php:83
+msgid ""
+"Liveblog was unable to connect to the Redis server. Please check your "
+"configuration."
+msgstr ""
+
+#: classes/class-wpcom-liveblog-socketio.php:137
+msgid "Unable to connect to the server to get new entries"
+msgstr ""
+
+#: liveblog.php:283
+msgid "No Liveblog post ID is set yet"
+msgstr ""
+
+#: liveblog.php:407
 msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
 msgstr ""
 
-#: liveblog.php:458
+#. translators: 1: crud action
+#: liveblog.php:591
 msgid "Invalid entry crud_action: %s"
 msgstr ""
 
-#: liveblog.php:602
+#: liveblog.php:944
 msgid "Unknown liveblog action"
 msgstr ""
 
-#: liveblog.php:628 liveblog.php:708
+#: liveblog.php:984 liveblog.php:1058
 msgid "Error {error-code}: {error-message}"
 msgstr ""
 
-#: liveblog.php:629 liveblog.php:709
+#: liveblog.php:985 liveblog.php:1059
 msgid "Error: {error-message}"
 msgstr ""
 
-#: liveblog.php:649
-msgid "%s ago"
-msgstr ""
-
-#: liveblog.php:650
-msgid "a few seconds"
-msgstr ""
-
-#: liveblog.php:651
-msgid "a minute"
-msgstr ""
-
-#: liveblog.php:652
-msgid "%d minutes"
-msgstr ""
-
-#: liveblog.php:653
-msgid "an hour"
-msgstr ""
-
-#: liveblog.php:654
-msgid "%d hours"
-msgstr ""
-
-#: liveblog.php:655
-msgid "a day"
-msgstr ""
-
-#: liveblog.php:656
-msgid "%d days"
-msgstr ""
-
-#: liveblog.php:657
-msgid "a month"
-msgstr ""
-
-#: liveblog.php:658
-msgid "%d months"
-msgstr ""
-
-#: liveblog.php:659
-msgid "a year"
-msgstr ""
-
-#: liveblog.php:660
-msgid "%d years"
-msgstr ""
-
-#: liveblog.php:706
+#: liveblog.php:1056
 msgid "Do you really want to delete this entry? There is no way back."
 msgstr ""
 
-#: liveblog.php:707
+#: liveblog.php:1057
 msgid "Do you want to delete this key entry?"
 msgstr ""
 
-#: liveblog.php:710
+#: liveblog.php:1060
 msgid "Liveblog: {number} new update"
 msgstr ""
 
-#: liveblog.php:711
+#: liveblog.php:1061
 msgid "Liveblog: {number} new updates"
 msgstr ""
 
-#: liveblog.php:712
+#: liveblog.php:1062
 msgid "Provide URL for link:"
 msgstr ""
 
-#: liveblog.php:715
+#: liveblog.php:1065
 msgid "term-"
 msgstr ""
 
-#: liveblog.php:716
+#: liveblog.php:1066
 msgid "type-alert"
 msgstr ""
 
-#: liveblog.php:717
+#: liveblog.php:1067
 msgid "type-key"
 msgstr ""
 
-#: liveblog.php:721
+#: liveblog.php:1073
 msgid "Loading preview…"
 msgstr ""
 
-#: liveblog.php:722
+#: liveblog.php:1074
 msgid "New Entry"
 msgstr ""
 
-#: liveblog.php:723
+#: liveblog.php:1075
 msgid "Publish Update"
 msgstr ""
 
-#: liveblog.php:724
+#: liveblog.php:1076
 msgid "Edit Entry"
 msgstr ""
 
-#: liveblog.php:725
+#: liveblog.php:1077
 msgid "Update"
 msgstr ""
 
-#: liveblog.php:745
+#: liveblog.php:1100
 msgid "Allowed Files"
 msgstr ""
 
-#. #-#-#-#-#  liveblog.pot (Liveblog 1.5)  #-#-#-#-#
+#. #-#-#-#-#  liveblog.pot (Liveblog 1.8.2)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: liveblog.php:880 liveblog.php:963
+#: liveblog.php:1246 liveblog.php:1451
 msgid "Liveblog"
 msgstr ""
 
-#: liveblog.php:896
+#: liveblog.php:1278
 msgid "Enable"
 msgstr ""
 
-#: liveblog.php:897
+#: liveblog.php:1279
 msgid ""
 "Enables liveblog on this post. Posting tools are enabled for editors, "
 "visitors get the latest updates."
 msgstr ""
 
-#: liveblog.php:897
+#. translators: 1: post url
+#: liveblog.php:1281
 msgid ""
 "There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s"
 "\">Visit the liveblog &rarr;</a>"
 msgstr ""
 
-#: liveblog.php:898
+#: liveblog.php:1287
 msgid "Archive"
 msgstr ""
 
-#: liveblog.php:899
+#: liveblog.php:1288
 msgid ""
 "Archives the liveblog on this post. Visitors still see the liveblog entries, "
 "but posting tools are hidden."
 msgstr ""
 
-#: liveblog.php:899
+#. translators: 1: archive url
+#: liveblog.php:1290
 msgid ""
 "There is an <strong>archived</strong> liveblog on this post. <a href=\"%s"
 "\">Visit the liveblog archive &rarr;</a>"
 msgstr ""
 
-#: liveblog.php:905
+#: liveblog.php:1299
 msgid "This is a normal WordPress post, without a liveblog."
 msgstr ""
 
-#: liveblog.php:908
+#: liveblog.php:1302
 msgid "Settings have been successfully updated."
 msgstr ""
 
-#: liveblog.php:966
+#. translators: 1: post ID
+#: liveblog.php:1322
+msgid "The post is a revision: %s"
+msgstr ""
+
+#. translators: 1: post ID
+#: liveblog.php:1326
+msgid "Non-existing post ID: %s"
+msgstr ""
+
+#: liveblog.php:1453
 msgid "Liveblog (archived)"
 msgstr ""
 
-#: liveblog.php:996
+#: liveblog.php:1483
 msgid "Filter liveblogs"
 msgstr ""
 
-#: liveblog.php:997
+#: liveblog.php:1484
 msgid "Any liveblogs"
 msgstr ""
 
-#: liveblog.php:998
+#: liveblog.php:1485
 msgid "Enabled liveblogs"
 msgstr ""
 
-#: liveblog.php:999
+#: liveblog.php:1486
 msgid "Archived liveblogs"
 msgstr ""
 
-#: liveblog.php:1000
+#: liveblog.php:1487
 msgid "No liveblogs"
 msgstr ""
 
-#: liveblog.php:1067
+#: liveblog.php:1552
 msgid "Cheatin', uh?"
 msgstr ""
 
-#: liveblog.php:1078
+#: liveblog.php:1563
 msgid "Sorry, we could not authenticate you."
 msgstr ""
 
+#: templates/amp/feed.php:28
+msgid "You have updates"
+msgstr ""
+
+#: templates/amp/pagination.php:7
+msgid "First"
+msgstr ""
+
+#: templates/amp/pagination.php:8
+msgid "Prev"
+msgstr ""
+
+#: templates/amp/pagination.php:15
+msgid "Next"
+msgstr ""
+
+#: templates/amp/pagination.php:16
+msgid "Last"
+msgstr ""
+
 #. translators: 1: plugin name, 2: plugins page URL
-#: templates/lazyload-notice.php:6
+#: templates/lazyload-notice.php:7
 msgid ""
 "Please <a href=\"%2$s\">deactivate the %1$s plugin</a> as Liveblog itself "
 "comes now with built-in lazyloading."
@@ -416,18 +422,24 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: templates/liveblog-loop.php:3
+#. translators: 1: edit post url
+#: templates/liveblog-loop.php:5
 msgid ""
 "<strong>This liveblog is archived.</strong> If you need to publish new "
 "updates or edit or delete the old ones, you need to <a href=\"%s\">enable it "
 "first</a>."
 msgstr ""
 
+#: templates/liveblog-loop.php:20
+msgid "Load more entries&hellip;"
+msgstr ""
+
 #: templates/liveblog-single-entry.php:12
 msgid "Edit"
 msgstr ""
 
-#: templates/old-wp-notice.php:3
+#. translators: 1: version, 2: update url, 3: deactivate url
+#: templates/old-wp-notice.php:5
 msgid ""
 "Your current WordPress is version %1$s, which is too old to run the liveblog "
 "plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s"
@@ -444,9 +456,9 @@ msgid "Blogging: at the speed of live."
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "WordPress.com VIP, Automattic"
+msgid "WordPress.com VIP, Big Bite Creative and contributors"
 msgstr ""
 
 #. Author URI of the plugin/theme
-msgid "http://vip.wordpress.com/"
+msgid "https://github.com/Automattic/liveblog/graphs/contributors"
 msgstr ""
