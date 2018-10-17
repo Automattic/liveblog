@@ -1,5 +1,5 @@
 <?php
-	$id             = $this->get( 'id' );
+	$id             = $this->get( 'id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	$entry_time     = $this->get( 'time' );
 	$content        = $this->get( 'content' );
 	$social         = $this->get( 'social' );
