@@ -69,7 +69,12 @@ export const maybeCreateLiveblogInitInstanceCallback = () => {
  *
  * @return {Boolean} True if wp, wp.editor, and tinymce are present on the window.
  */
-export const editorCanInitialize = () => !!(wp && wp.editor && tinymce);
+export const editorCanInitialize = () => {
+  if (typeof wp === 'undefined' || typeof wp.editor === 'undefined' || typeof tinymce === 'undefined') {
+    return false;
+  }
+  return true;
+};
 
 class TinyMCEEditor extends Component {
   constructor(props) {
