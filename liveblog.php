@@ -1996,7 +1996,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			$metadata = self::get_liveblog_metadata();
+			$metadata = [];
+			global $post;
+			$metadata = self::get_liveblog_metadata( $metadata, $post );
 			if ( empty( $metadata ) ) {
 				return;
 			}
