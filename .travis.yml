@@ -2,10 +2,10 @@ language: php
 
 cache:
     apt: true
-    yarn: true
+    npm: true
     directories:
         - $HOME/.composer/cache/files
-        - $HOME/.yarn/node_modules
+        - $HOME/.npm/node_modules
         - node_modules
 
 matrix:
@@ -46,7 +46,7 @@ before_script:
     # Set up unit tests
     - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
     # Install npm modules
-    - yarn
+    - npm install
 
 script:
     # Search for PHP syntax errors.
