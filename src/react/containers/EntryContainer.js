@@ -12,13 +12,18 @@ class EntryContainer extends Component {
   constructor(props) {
     super(props);
 
+    this.state = { isDeleting: false };
+
     this.isEditing = () => {
       const { user, entry } = this.props;
       return user.entries[entry.id] && user.entries[entry.id].isEditing;
     };
     this.edit = () => this.props.entryEditOpen(this.props.entry.id);
     this.close = () => this.props.entryEditClose(this.props.entry.id);
-    this.delete = () => this.props.deleteEntry(this.props.entry.id);
+    this.delete = () => {
+      this.setState({ isDeleting: true });
+      this.props.deleteEntry(this.props.entry.id);
+    };
     this.scrollIntoView = () => {
       this.node.scrollIntoView({ block: 'start', behavior: 'instant' });
       this.props.resetScrollOnEntry(`id_${this.props.entry.id}`);
@@ -43,6 +48,7 @@ class EntryContainer extends Component {
 
   entryActions() {
     const { config } = this.props;
+    const { isDeleting } = this.state;
     if (config.is_liveblog_editable !== '1') return false;
 
     return (
@@ -57,10 +63,10 @@ class EntryContainer extends Component {
             </button>
         }
         <button
-          className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
+          className={`liveblog-btn liveblog-btn-small liveblog-btn-delete ${isDeleting ? 'liveblog-btn-delete--active' : ''}`}
           onClick={this.delete}
         >
-          Delete
+          { isDeleting ? 'Deleting...' : 'Delete' }
         </button>
       </footer>
     );

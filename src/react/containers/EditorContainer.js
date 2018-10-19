@@ -87,7 +87,7 @@ class EditorContainer extends Component {
   }
 
   publish() {
-    const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
+    const { updateEntry, entry, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
@@ -101,7 +101,6 @@ class EditorContainer extends Component {
         author,
         contributors,
       });
-      entryEditClose(entry.id);
       return;
     }
 
@@ -224,7 +223,20 @@ class EditorContainer extends Component {
       readOnly,
     } = this.state;
 
-    const { isEditing, config } = this.props;
+    const { isEditing, config, api, user, entry } = this.props;
+
+    const isPublishingUpdate = (
+      entry && user.entries[entry.id] && user.entries[entry.id].isPublishing
+    );
+    const isPublishingNew = (!isEditing && api.isPublishingNew);
+    const isPublishing = (isPublishingNew || isPublishingUpdate);
+
+    let publishBtnText;
+    if (isPublishing) {
+      publishBtnText = 'Publishing...';
+    } else {
+      publishBtnText = isEditing ? 'Publish Update' : 'Publish New Entry';
+    }
 
     return (
       <div className="liveblog-editor-container">
@@ -296,8 +308,8 @@ class EditorContainer extends Component {
           clearable={false}
           cache={false}
         />
-        <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
-          {isEditing ? 'Publish Update' : 'Publish New Entry'}
+        <button className={`liveblog-btn liveblog-publish-btn ${isPublishing ? 'liveblog-publish-btn--active' : ''}`} onClick={this.publish.bind(this)}>
+          { publishBtnText }
         </button>
       </div>
     );
@@ -305,12 +317,13 @@ class EditorContainer extends Component {
 }
 
 EditorContainer.propTypes = {
+  api: PropTypes.object,
   config: PropTypes.object,
   updateEntry: PropTypes.func,
   entry: PropTypes.object,
-  entryEditClose: PropTypes.func,
   createEntry: PropTypes.func,
   isEditing: PropTypes.bool,
+  isPublishing: PropTypes.bool,
   authors: PropTypes.array,
   getAuthors: PropTypes.func,
 };

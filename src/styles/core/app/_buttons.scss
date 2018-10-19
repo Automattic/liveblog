@@ -64,3 +64,15 @@
   background: darken($color-warning, 10%);
 }
 
+.liveblog-btn-delete--active {
+  &, &:hover {
+    animation: liveblog-btn-delete--active-animation 2.5s infinite linear;
+    background-size: 100px 100%;
+    background-image: linear-gradient(-45deg,darken($color-warning, 5%) 28%,$color-warning 0,$color-warning 72%,darken($color-warning, 5%) 0);
+  }
+}
+@keyframes liveblog-btn-delete--active-animation {
+	0% {
+		background-position: 200px 0;
+	}
+}
