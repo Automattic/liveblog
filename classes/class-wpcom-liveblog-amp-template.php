@@ -82,7 +82,7 @@ class WPCOM_Liveblog_AMP_Template {
 		$this->data = $variables;
 
 		ob_start();
-		include $path;
+		include $path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
 		return ob_get_clean();
 	}
 
@@ -94,6 +94,6 @@ class WPCOM_Liveblog_AMP_Template {
 	 * @return void
 	 */
 	public function load_part( $name, $variables = array() ) {
-		echo WPCOM_Liveblog_AMP::get_template( $name, $variables );
+		echo WPCOM_Liveblog_AMP::get_template( $name, $variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

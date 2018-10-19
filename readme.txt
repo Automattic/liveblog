@@ -1,10 +1,10 @@
 === Liveblog ===
-Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby
+Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby, philipjohn
 Tags: liveblog
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 4.9.8
-Stable tag: 1.9
+Stable tag: 1.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ Here’s what makes it special:
  * Your authors can drag-and-drop photos right into the Liveblog area, without needing to navigate to separate browser tabs or windows.
  * There’s no need for a separate site dedicated to liveblogging: *every* post can be a liveblog, even existing ones.
 
-[Check out our in-depth documentation.](http://vip.wordpress.com/documentation/using-the-liveblog-plugin/)
+[Check out our in-depth documentation.](https://github.com/Automattic/liveblog#liveblog)
 
 If you'd like to check out the code and contribute, [join us on github](https://github.com/Automattic/liveblog), pull requests are more than welcome.
 

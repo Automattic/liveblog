@@ -77,8 +77,8 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 			$handlers = array_replace_recursive( $GLOBALS['wp_embed']->handlers, $this->handlers );
 		}
 		ksort( $handlers );
-		foreach ( $handlers as $priority => $handlers ) {
-			foreach ( $handlers as $id => $handler ) {
+		foreach ( $handlers as $handlers ) {
+			foreach ( $handlers as $handler ) {
 				if ( preg_match( $handler['regex'], $url, $matches ) && is_callable( $handler['callback'] ) ) {
 					$return = call_user_func( $handler['callback'], $matches, $attr, $url, $rawattr );
 					if ( false !== $return ) {

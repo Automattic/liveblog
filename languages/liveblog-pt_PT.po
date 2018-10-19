@@ -1,83 +1,500 @@
+# Copyright (C) 2018 Liveblog
+# This file is distributed under the same license as the Liveblog package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Liveblog 1.2\n"
-"POT-Creation-Date: 2012-10-28 12:00+0100\n"
-"PO-Revision-Date: 2012-12-27 12:14-0000\n"
-"Last-Translator: Filipe Varela <keoshi@keoshi.com>\n"
-"Language-Team: Filipe Varela <keoshi@keoshi.com>\n"
-"Language: Portuguese\n"
+"Project-Id-Version: Liveblog 1.8.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/liveblog\n"
+"POT-Creation-Date: 2018-06-22 22:36:43+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.4\n"
-"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e;esc_attr_e\n"
-"X-Poedit-Basepath: .\n"
+"PO-Revision-Date: 2018-06-23 00:07+0100\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.0.6\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: pt_PT\n"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:222
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:281
+msgctxt "taxonomy general name"
+msgid "Hashtags"
+msgstr "Etiquetas"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:282
+msgctxt "taxonomy singular name"
+msgid "Hashtag"
+msgstr "Etiqueta"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:283
+msgid "Search Hashtags"
+msgstr "Pesquisar etiquetas"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:284
+msgid "All Hashtags"
+msgstr "Todas as etiquetas"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:285
+msgid "Parent Hashtag"
+msgstr "Etiqueta superior"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:286
+msgid "Parent Hashtag:"
+msgstr "Etiqueta superior:"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:287
+msgid "Edit Hashtag"
+msgstr "Editar etiqueta"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:288
+msgid "Update Hashtag"
+msgstr "Atualizar etiqueta"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:289
+msgid "Add New Hashtag"
+msgstr "Adicionar nova etiqueta"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:290
+msgid "New Hashtag"
+msgstr "Nova etiqueta"
+
+#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:291
+msgid "Hashtags"
+msgstr "Etiquetas"
+
+#: classes/class-wpcom-liveblog-entry-key-events-widget.php:33
+msgid ""
+"A list of key events displayed when the user is viewing a Liveblog post."
+msgstr ""
+"A lista dos principais eventos é exibida quando o utilizador está a "
+"visualizar um post no Liveblog."
+
+#: classes/class-wpcom-liveblog-entry-key-events-widget.php:38
+msgid "Liveblog Key Events Widget"
+msgstr "Widget com os eventos principais"
+
+#: classes/class-wpcom-liveblog-entry-key-events-widget.php:80
+msgid "Title:"
+msgstr "Título:"
+
+#: classes/class-wpcom-liveblog-entry-key-events-widget.php:84
+msgid ""
+"Note: the number of key events displayed in the widget is defined in the "
+"Liveblog configuration inside each post."
+msgstr ""
+"Nota: o número de eventos principais mostrados no widget é definido na "
+"configuração do Liveblog dentro de cada post."
+
+#: classes/class-wpcom-liveblog-entry-key-events.php:226
+msgid "Template:"
+msgstr "Tema:"
+
+#: classes/class-wpcom-liveblog-entry-key-events.php:227
+msgid "Format:"
+msgstr "Formato:"
+
+#: classes/class-wpcom-liveblog-entry-key-events.php:228
+msgid ""
+"Set template for key events shortcode, select a format and restrict most "
+"recent shown."
+msgstr ""
+"Definir o modelo para o shortcode dos eventos principais, selecione o "
+"formato e restrinja a exibição mais recente."
+
+#: classes/class-wpcom-liveblog-entry-key-events.php:229
+msgid "Limit"
+msgstr "Limite"
+
+#: classes/class-wpcom-liveblog-entry-key-events.php:230
+msgid "Save"
+msgstr "Guardar"
+
+#: classes/class-wpcom-liveblog-entry.php:222
+#: classes/class-wpcom-liveblog-entry.php:267
+#: classes/class-wpcom-liveblog-entry.php:283
+msgid "Missing entry ID"
+msgstr "O ID do evento está em falta"
+
+#: classes/class-wpcom-liveblog-entry.php:312
+msgid "Error posting entry"
+msgstr "Erro ao publicar"
+
+#: classes/class-wpcom-liveblog-entry.php:316
+#: classes/class-wpcom-liveblog-entry.php:335
+msgid "Error retrieving comment"
+msgstr "Erro no comentário"
+
+#. translators: 1: argument
+#: classes/class-wpcom-liveblog-entry.php:326
+msgid "Missing entry argument: %s"
+msgstr "Argumento em falta: %s"
+
+#: classes/class-wpcom-liveblog-entry.php:339
+msgid "Error retrieving user"
+msgstr "Erro no utilizador"
+
+#: classes/class-wpcom-liveblog-socketio-loader.php:100
+msgid ""
+"It is necessary to install socket.io-php-emitter in order to use Liveblog "
+"plugin with WebSocket support enabled."
+msgstr ""
+"É necessário instalar socket.io-php-emitter para usar o plugin com suporte a "
+"WebSocket ativado."
+
+#. translators: 1: current PHP version, 2: minimum required PHP version
+#: classes/class-wpcom-liveblog-socketio-loader.php:122
+msgid ""
+"Your current PHP is version %1$s, which is too old to run the Liveblog "
+"plugin with WebSocket support enabled. The minimum required version is %2$s. "
+"Please, either update PHP or disable WebSocket support by removing or "
+"setting to false the constant LIVEBLOG_USE_SOCKETIO in wp-config.php."
+msgstr ""
+"A sua versão atual do PHP é %1$s, que é demasiado antiga para o Liveblog com "
+"suporte a WebSocket. A versão mínima é %s$s. Por favor, atualize o PHP ou "
+"desative o suporte a WebSocket removendo ou definido como false a constante "
+"LIVEBLOG_USE_SOCKETIO no ficheiro wp-config.php."
+
+#: classes/class-wpcom-liveblog-socketio.php:83
+msgid ""
+"Liveblog was unable to connect to the Redis server. Please check your "
+"configuration."
+msgstr ""
+"O Liveblog não se conseguiu ligar ao servidor Redis. Por favor reveja a sua "
+"configuração."
+
+#: classes/class-wpcom-liveblog-socketio.php:137
+msgid "Unable to connect to the server to get new entries"
+msgstr "Não foi possível ligar ao servidor para carregar novas entradas."
+
+#: liveblog.php:283
+msgid "No Liveblog post ID is set yet"
+msgstr "O ID do artigo do Liveblog ainda não está definido."
+
+#: liveblog.php:407
 msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
 msgstr ""
-"Registo de data/hora em falta. URL correcto: <permalink>/liveblog/<from>/</"
-"to>/"
+"A data e hora não estão disponíveis. URL correto: <permalink>/liveblog/"
+"<from>/</to>/"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:351
-msgid "Sorry, that post is not accepting Liveblog entries."
-msgstr "Lamentamos, mas este artigo não aceita entradas de Liveblog."
+#. translators: 1: crud action
+#: liveblog.php:591
+msgid "Invalid entry crud_action: %s"
+msgstr "Entrada inválida crud_action: %s"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:375
-msgid "Error posting entry"
-msgstr "Erro ao publicar a entrada"
-
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:417
+#: liveblog.php:944
 msgid "Unknown liveblog action"
-msgstr "Acção de Liveblog desconhecida"
+msgstr "Ação desconhecida no liveblog"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:478
-#, php-format
-msgid "%d new update"
-msgstr "%d nova actualização"
+#: liveblog.php:984 liveblog.php:1058
+msgid "Error {error-code}: {error-message}"
+msgstr "Erro {error-code}: {error-message}"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:479
-#, php-format
-msgid "%d new updates"
-msgstr "%d novas actualizações"
+#: liveblog.php:985 liveblog.php:1059
+msgid "Error: {error-message}"
+msgstr "Erro: {error-message}"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:480
-msgid "Do you really want do delete this entry? There is no way back."
+#: liveblog.php:1056
+msgid "Do you really want to delete this entry? There is no way back."
 msgstr ""
-"Tem a certeza que deseja eliminar esta entrada? Esta acção é irreversível."
+"Quer mesmo remover esta entrada? Depois de remover não poderá ser recuperada."
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:501
+#: liveblog.php:1057
+msgid "Do you want to delete this key entry?"
+msgstr "Quer remover a entrada principal?"
+
+#: liveblog.php:1060
+msgid "Liveblog: {number} new update"
+msgstr "Liveblog: {number} nova atualização"
+
+#: liveblog.php:1061
+msgid "Liveblog: {number} new updates"
+msgstr "Liveblog: {number} nova atualizações"
+
+#: liveblog.php:1062
+msgid "Provide URL for link:"
+msgstr "Por favor forneça um URL:"
+
+#: liveblog.php:1065
+msgid "term-"
+msgstr "term-"
+
+#: liveblog.php:1066
+msgid "type-alert"
+msgstr "type-alert"
+
+#: liveblog.php:1067
+msgid "type-key"
+msgstr "type-key"
+
+#: liveblog.php:1073
+msgid "Loading preview…"
+msgstr "A carregar pré-visualização…"
+
+#: liveblog.php:1074
+msgid "New Entry"
+msgstr "Nova entrada"
+
+#: liveblog.php:1075
+msgid "Publish Update"
+msgstr "Publicar atualização"
+
+#: liveblog.php:1076
+msgid "Edit Entry"
+msgstr "Editar entrada"
+
+#: liveblog.php:1077
+msgid "Update"
+msgstr "Atualizar"
+
+#: liveblog.php:1100
 msgid "Allowed Files"
-msgstr "Ficheiros Permitidos"
+msgstr "Ficheiros permitidos"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:612
+#. Plugin Name of the plugin/theme
+#: liveblog.php:1246 liveblog.php:1451
 msgid "Liveblog"
 msgstr "Liveblog"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:671
+#: liveblog.php:1278
+msgid "Enable"
+msgstr "Ativar"
+
+#: liveblog.php:1279
+msgid ""
+"Enables liveblog on this post. Posting tools are enabled for editors, "
+"visitors get the latest updates."
+msgstr ""
+"Ativar liveblog neste artigo. As ferramentas de publicação estão ativadas "
+"para editores, os visitantes recebem as atualizações mais recentes."
+
+#. translators: 1: post url
+#: liveblog.php:1281
+msgid ""
+"There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog &rarr;</a>"
+msgstr ""
+"Há um liveblog ativo neste artigo. <a href=“%s”>Ver liveblog &rarr;</a>"
+
+#: liveblog.php:1287
+msgid "Archive"
+msgstr "Arquivo"
+
+#: liveblog.php:1288
+msgid ""
+"Archives the liveblog on this post. Visitors still see the liveblog entries, "
+"but posting tools are hidden."
+msgstr ""
+"Arquivar o liveblog neste artigo. Os visitantes ainda poderão ver as "
+"entradas do liveblog, mas as ferramentas de publicação estarão ocultas."
+
+#. translators: 1: archive url
+#: liveblog.php:1290
+msgid ""
+"There is an <strong>archived</strong> liveblog on this post. <a href=\"%s"
+"\">Visit the liveblog archive &rarr;</a>"
+msgstr ""
+"Há um liveblog <strong>arquivado</strong> neste artigo. <a href=“%s”>Ver o "
+"arquivo do liveblog &rarr;</a>"
+
+#: liveblog.php:1299
+msgid "This is a normal WordPress post, without a liveblog."
+msgstr "Isto é um artigo normal do WordPress, sem liveblog."
+
+#: liveblog.php:1302
+msgid "Settings have been successfully updated."
+msgstr "As definições foram atualizadas com sucesso."
+
+#. translators: 1: post ID
+#: liveblog.php:1322
+msgid "The post is a revision: %s"
+msgstr "O artigo é a revisão: %s."
+
+#. translators: 1: post ID
+#: liveblog.php:1326
+msgid "Non-existing post ID: %s"
+msgstr "O ID do artigo não existe: %s"
+
+#: liveblog.php:1453
+msgid "Liveblog (archived)"
+msgstr "Liveblog (arquivado)"
+
+#: liveblog.php:1483
+msgid "Filter liveblogs"
+msgstr "Filtrar liveblogs"
+
+#: liveblog.php:1484
+msgid "Any liveblogs"
+msgstr "Sem liveblogs"
+
+#: liveblog.php:1485
+msgid "Enabled liveblogs"
+msgstr "Liveblogs ativos."
+
+#: liveblog.php:1486
+msgid "Archived liveblogs"
+msgstr "Liveblogs arquivados"
+
+#: liveblog.php:1487
+msgid "No liveblogs"
+msgstr "Sem liveblogs"
+
+#: liveblog.php:1552
 msgid "Cheatin', uh?"
-msgstr "A tentar enganar, hein?"
+msgstr "Cheatin', uh?"
 
-#: C:\Users\Gaspar\Desktop\liveblog/liveblog.php:682
+#: liveblog.php:1563
 msgid "Sorry, we could not authenticate you."
-msgstr "Lamentamos, mas foi impossível autenticá-lo."
+msgstr "Sem sessão iniciada."
 
-#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:7
-msgid "New Entry"
-msgstr "Nova Entrada"
+#: templates/amp/feed.php:28
+msgid "You have updates"
+msgstr "Atualizações disponíveis"
 
-#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:9
+#: templates/amp/pagination.php:7
+msgid "First"
+msgstr "Primeira"
+
+#: templates/amp/pagination.php:8
+msgid "Prev"
+msgstr "Anterior"
+
+#: templates/amp/pagination.php:15
+msgid "Next"
+msgstr "Próximo"
+
+#: templates/amp/pagination.php:16
+msgid "Last"
+msgstr "Última"
+
+#. translators: 1: plugin name, 2: plugins page URL
+#: templates/lazyload-notice.php:7
+msgid ""
+"Please <a href=\"%2$s\">deactivate the %1$s plugin</a> as Liveblog itself "
+"comes now with built-in lazyloading."
+msgstr ""
+"Por favor <a href=“%2$s”>desative o plugin %1$s</a> já que o Liveblog já tem "
+"incorporado um mecanismo de lazyloading."
+
+#: templates/liveblog-form.php:9
 msgid "Preview"
-msgstr "Pré-Visualização"
+msgstr "Pré-visualizar"
 
-#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:13
+#: templates/liveblog-form.php:13 templates/liveblog-form.php:30
 msgid "Remember: keep it short! To insert an image, drag and drop it here."
-msgstr "Lembre-se: seja breve! Para inserir uma imagem, arraste-a para aqui."
+msgstr ""
+"Lembre-se: mantenha o texto curto! Para inserir uma imagem, arraste e solte-"
+"a aqui."
 
-#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-form.php:16
-msgid "Publish Update"
-msgstr "Publicar Actualização"
+#: templates/liveblog-form.php:17
+msgid "Edit HTML"
+msgstr "Editar HTML"
 
-#: C:\Users\Gaspar\Desktop\liveblog/templates/liveblog-single-entry.php:12
+#: templates/liveblog-form.php:21
+msgid "Bold (Ctrl/Cmd + B)"
+msgstr "Negrito (Ctrl/Cmd + B)"
+
+#: templates/liveblog-form.php:21
+msgid "Bold"
+msgstr "Negrito"
+
+#: templates/liveblog-form.php:22
+msgid "Italics (Ctrl/Cmd + I)"
+msgstr "Itálico (Ctrl/Cmd + I)"
+
+#: templates/liveblog-form.php:22
+msgid "Italics"
+msgstr "Itálico"
+
+#: templates/liveblog-form.php:23
+msgid "Underline (Ctrl/Cmd + U)"
+msgstr "Sublinhado (Ctrl/Cmd + U)"
+
+#: templates/liveblog-form.php:23
+msgid "Underline"
+msgstr "Sublinhado"
+
+#: templates/liveblog-form.php:24
+msgid "Srike-through (Ctrl/Cmd + S)"
+msgstr "Rasurado (Ctrl/Cmd + S)"
+
+#: templates/liveblog-form.php:24
+msgid "Srike-through"
+msgstr "Rasurado"
+
+#: templates/liveblog-form.php:25
+msgid "Link (Ctrl/Cmd + K)"
+msgstr "Link (Ctrl/Cmd + K)"
+
+#: templates/liveblog-form.php:25
+msgid "Link"
+msgstr "Link"
+
+#: templates/liveblog-form.php:26
+msgid "Unlink (Ctrl/Cmd + L)"
+msgstr "Remover link (Ctrl/Cmd + L)"
+
+#: templates/liveblog-form.php:26
+msgid "Unlink"
+msgstr "Remover link"
+
+#: templates/liveblog-form.php:27
+msgid "Remove formatting (Ctrl/Cmd + \\)"
+msgstr "Remover formatação (Ctrl/Cmd + \\)"
+
+#: templates/liveblog-form.php:27
+msgid "Remove formatting"
+msgstr "Remover formatação"
+
+#: templates/liveblog-form.php:37
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: templates/liveblog-form.php:38 templates/liveblog-single-entry.php:12
 msgid "Delete"
 msgstr "Eliminar"
+
+#. translators: 1: edit post url
+#: templates/liveblog-loop.php:5
+msgid ""
+"<strong>This liveblog is archived.</strong> If you need to publish new "
+"updates or edit or delete the old ones, you need to <a href=\"%s\">enable it "
+"first</a>."
+msgstr ""
+"<strong>Este liveblog encontra-se arquivado.</strong> Se precisar de "
+"publicar novas atualizações, editar ou eliminar entradas terá que o <a "
+"href=“%s”>ativar primeiro</a>."
+
+#: templates/liveblog-loop.php:20
+msgid "Load more entries&hellip;"
+msgstr "Carregar mais&hellip;"
+
+#: templates/liveblog-single-entry.php:12
+msgid "Edit"
+msgstr "Editar"
+
+#. translators: 1: version, 2: update url, 3: deactivate url
+#: templates/old-wp-notice.php:5
+msgid ""
+"Your current WordPress is version %1$s, which is too old to run the liveblog "
+"plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s"
+"\">update WordPress</a>, or <a href=\"%4$s\">deactivate the liveblog plugin</"
+"a>."
+msgstr ""
+"A versão atual do WordPress é %1$, demasiado antiga para o plugin. A versão "
+"mínima é  %2$s. Por favor, <a href=“%3$s”>atualize o WordPress</a> ou  <a "
+"href=“%4$s”>remova o plugin</a>."
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/extend/plugins/liveblog/"
+msgstr "http://wordpress.org/extend/plugins/liveblog/"
+
+#. Description of the plugin/theme
+msgid "Blogging: at the speed of live."
+msgstr "Blogging: at the speed of live."
+
+#. Author of the plugin/theme
+msgid "WordPress.com VIP, Big Bite Creative and contributors"
+msgstr "WordPress.com VIP, Big Bite Creative and contributors"
+
+#. Author URI of the plugin/theme
+msgid "https://github.com/Automattic/liveblog/graphs/contributors"
+msgstr "https://github.com/Automattic/liveblog/graphs/contributors"
