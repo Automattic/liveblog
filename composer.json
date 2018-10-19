@@ -1,12 +1,15 @@
 {
-    "name"       : "automattic/liveblog",
-    "description": "Liveblogging done right. Using WordPress.",
-    "homepage"   : "https://github.com/Automattic/liveblog",
-    "type"       : "wordpress-plugin",
-    "license"    : "GPL-2.0+",
-    "require"    : {
-        "composer/installers": "~1.0",
-        "rase/socket.io-emitter": "~0.7.0",
-        "predis/predis": "~1.0.3"
-    }
+	"name"       : "automattic/liveblog",
+	"description": "Liveblogging done right. Using WordPress.",
+	"homepage"   : "https://github.com/Automattic/liveblog",
+	"type"       : "wordpress-plugin",
+	"license"    : "GPL-2.0+",
+	"require-dev"    : {
+		"wp-coding-standards/wpcs": "~1.1.0",
+		"automattic/vipwpcs": "~0.3.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
+		"composer/installers": "~1.0",
+		"rase/socket.io-emitter": "~0.7.0",
+		"predis/predis": "~1.0.3"
+	}
 }

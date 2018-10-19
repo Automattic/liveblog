@@ -914,7 +914,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// generated emoji html back to the
 		// raw input format (e.g :poop:).
 		$this->revert_regex = implode(
-			'', array(
+			'',
+			array(
 				preg_quote( '<img src="', '~' ),
 				preg_quote( $this->emoji_cdn, '~' ),
 				'[^"]+',
@@ -952,7 +953,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// config, after first allowing other plugins,
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
-			'liveblog_emoji_config', array(
+			'liveblog_emoji_config',
+			array(
 				'type'        => 'static',
 				'data'        => $emojis,
 				'search'      => 'key',
@@ -984,7 +986,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// Then pass it into a filter to allow plugins,
 		// themes, etc. to customise the output.
 		return apply_filters(
-			'liveblog_emoji_map', array(
+			'liveblog_emoji_map',
+			array(
 				'key'   => $key,
 				'name'  => $key,
 				'image' => strtolower( $val ),
@@ -1093,7 +1096,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix ) . '\w+/', $comment->comment_content, $emojis );
+			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $comment->comment_content, $emojis );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $emojis[0] );

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.1
+
+* Multiple coding standards fixes
+* Removes unused debug code
+* Fix rendering embeds upon entry updates
+* Avoid null dereference in `get_user_data_for_json()`
+* Improvements to code review process
+
+props, [cain](https://github.com/cain), [GaryJones](https://github.com/GaryJones), [maevelander](https://github.com/maevelander), [paulschreiber](https://github.com/paulschreiber), [philipjohn](https://github.com/philipjohn), [rgllm](https://github.com/rgllm), [rogertheriault](https://github.com/rogertheriault)
+
 ## 1.9
 
 * Round out polling timestamp for improved performance (#496)
