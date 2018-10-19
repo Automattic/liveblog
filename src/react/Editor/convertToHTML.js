@@ -4,6 +4,8 @@
 import React from 'react';
 import { convertToHTML } from 'draft-convert';
 
+import { sanitizeHTML } from '../utils/utils';
+
 export default contentState =>
   convertToHTML({
     styleToHTML: () => {},
@@ -22,7 +24,7 @@ export default contentState =>
             <div>
               <div
                 id={`liveblog-codeblock-identifier-${entity.getData().title.replace(/\s+/g, '-')}`}
-                dangerouslySetInnerHTML={{ __html: entity.getData().code }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(entity.getData().code) }}
               />
             </div>
           );
