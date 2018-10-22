@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
 import { html } from 'js-beautify';
+import { debounce } from 'lodash-es';
 
 import { EditorState, ContentState } from 'draft-js';
 
@@ -59,6 +60,8 @@ class EditorContainer extends Component {
       editorState,
       rawText: html(convertToHTML(editorState.getCurrentContent())),
     });
+
+    this.getUsers = debounce(this.getUsers.bind(this), props.config.author_list_debounce_time);
   }
 
   setReadOnly(state) {
@@ -292,7 +295,7 @@ class EditorContainer extends Component {
           labelKey="name"
           onChange={this.onSelectAuthorChange.bind(this)}
           optionComponent={AuthorSelectOption}
-          loadOptions={this.getUsers.bind(this)}
+          loadOptions={this.getUsers}
           clearable={false}
           cache={false}
         />
