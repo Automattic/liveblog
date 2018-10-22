@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.9
+ * Version:     1.9.1
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.9';
+		const VERSION                 = '1.9.1';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -118,7 +118,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function show_old_wp_notice() {
 			global $wp_version;
 			$min_version = self::MIN_WP_VERSION;
-			echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ); // phpcs:ignore
+			echo self::get_template_part( 'old-wp-notice.php', compact( 'wp_version', 'min_version' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -309,7 +309,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function flush_rewrite_rules() {
 			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
 			if ( self::REWRITES_VERSION !== $rewrites_version ) {
-				flush_rewrite_rules();
+				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
 		}
@@ -364,7 +364,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * the current post output. If nothing needs to be added, we redirect back
 		 * to the permalink.
 		 *
-		 * @return If request has been handled
+		 * return if request has been handled
 		 */
 		public static function handle_request() {
 
@@ -846,7 +846,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			self::$entry_query->get_by_id( $id );
+			return self::$entry_query->get_by_id( $id );
 		}
 
 		/**
@@ -1195,7 +1195,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore
+					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.wp_is_mobile_wp_is_mobile
 					'supported' => _device_can_upload(),
 				),
 			);
@@ -1367,11 +1367,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$theme_template       = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			if ( file_exists( $child_theme_template ) ) {
-				include $child_theme_template;
+				include $child_theme_template; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
 			} elseif ( file_exists( $theme_template ) ) {
-				include $theme_template;
+				include $theme_template; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
 			} elseif ( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
-				include self::$custom_template_path . '/' . $template_name;
+				include self::$custom_template_path . '/' . $template_name; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
 			} else {
 				include dirname( __FILE__ ) . '/templates/' . $template_name;
 			}
@@ -1930,8 +1930,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function get_liveblog_metadata( $metadata, $post ) {
 
-			global $post;
-
 			// If we are not viewing a liveblog post then exit the filter.
 			if ( self::is_liveblog_post( $post->ID ) === false ) {
 				return $metadata;
@@ -1955,14 +1953,17 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => date( 'c', $entry->entry_time ),
 					'dateModified'     => date( 'c', $entry->timestamp ),
-					'author'           => [
-						'@type' => 'Person',
-						'name'  => $entry->authors[0]['name'],
-					],
 					'articleBody'      => [
 						'@type' => 'Text',
 					],
 				];
+
+				if ( isset( $entry->authors[0]['name'] ) ) {
+					$blog_item['author'] = [
+						'@type' => 'Person',
+						'name'  => $entry->authors[0]['name'],
+					];
+				}
 
 				if ( isset( $metadata['publisher'] ) ) {
 					$blog_item['publisher'] = $metadata['publisher'];
@@ -1996,7 +1997,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			$metadata = self::get_liveblog_metadata();
+			global $post;
+			$metadata = self::get_liveblog_metadata( [], $post );
 			if ( empty( $metadata ) ) {
 				return;
 			}

@@ -508,7 +508,7 @@ class WPCOM_Liveblog_Entry {
 	 * @param object $user The user object
 	 */
 	private static function get_user_data_for_json( $user ) {
-		if ( is_wp_error( $user ) ) {
+		if ( is_wp_error( $user ) || ! is_object( $user ) ) {
 			return array();
 		}
 
@@ -545,7 +545,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return string        Title
 	 */
 	public static function get_entry_title( $entry ) {
-		return wp_trim_words( $entry->content, 10, '...' );
+		return wp_trim_words( $entry->content, 10, '…' );
 	}
 
 }

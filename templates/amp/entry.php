@@ -1,5 +1,5 @@
 <?php
-	$id             = $this->get( 'id' );
+	$id             = $this->get( 'id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	$entry_time     = $this->get( 'time' );
 	$content        = $this->get( 'content' );
 	$social         = $this->get( 'social' );
@@ -64,7 +64,7 @@
 				<amp-social-share type="<?php echo esc_attr( $platform ); ?>"
 					width="45"
 					height="33"
-					data-param-url="<?php echo esc_attr( $share_link_amp ); ?>"></amp-social-share>
+					data-param-url="<?php echo esc_url( $share_link_amp ); ?>"></amp-social-share>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</div>

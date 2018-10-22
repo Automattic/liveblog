@@ -31,8 +31,6 @@ class WPCOM_Liveblog_AMP {
 
 	/**
 	 * AMP Setup by removing and adding new hooks.
-	 *
-	 * @return void
 	 */
 	public static function setup() {
 		// If we're not on an AMP page then bail.
@@ -103,7 +101,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		include dirname( __DIR__ ) . '/assets/amp.css';
+		echo esc_html( file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' ) );
 	}
 
 	/**
@@ -397,7 +395,7 @@ class WPCOM_Liveblog_AMP {
 
 		$links['prev'] = false;
 		if ( $request->page > 1 ) {
-			$keep_postion  = ( (int) $request->page === 2 ) ? false : $request->last;
+			$keep_postion  = ( 2 === (int) $request->page ) ? false : $request->last;
 			$links['prev'] = self::build_paged_permalink( $permalink, $request->page - 1, $keep_postion );
 		}
 
@@ -462,6 +460,6 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function is_amp_polling() {
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected
 	}
 }
