@@ -163,7 +163,7 @@ class WPCOM_Liveblog_Extra_Metadata {
 		if ( $url || $title ) {
 			$metadata['event']['@type'] = 'Event';
 
-			if ( $name ) {
+			if ( $title ) {
 				$metadata['event']['name'] = esc_html( $title );
 			}
 
