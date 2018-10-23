@@ -1,15 +1,38 @@
 .liveblog-feed {
   min-height: 200px;
   position: relative;
-}
 
-.liveblog-feed.is-loading::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, .7);
+	&:before {
+		display: none;
+		content: '';
+		color: #000;
+		font-size: 8px;
+		margin: 100px auto;
+		width: 1em;
+		height: 1em;
+		border-radius: 50%;
+		position: relative;
+		text-indent: -9999em;
+		-webkit-animation: load4 1.3s infinite linear;
+		animation: load4 1.3s infinite linear;
+		-webkit-transform: translateZ(0);
+		-ms-transform: translateZ(0);
+		transform: translateZ(0);
+		z-index: 1;
+	}
+	&.is-loading {
+		&:before {
+			display: block;
+		}
+    &:after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, .7);
+    }
+  }
 }
