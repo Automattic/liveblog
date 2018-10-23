@@ -1070,6 +1070,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'class_alert'                  => __( 'type-alert', 'liveblog' ),
 						'class_key'                    => __( 'type-key', 'liveblog' ),
 
+						/**
+						 * Filters the Author list debounce time, defaults to 500ms.
+						 *
+						 * @since 1.9.2
+						 *
+						 * @param int $time Author list debounce time.
+						 */
 						'author_list_debounce_time'    => apply_filters( 'liveblog_author_list_debounce_time', self::AUTHOR_LIST_DEBOUNCE_TIME ),
 					)
 				)
