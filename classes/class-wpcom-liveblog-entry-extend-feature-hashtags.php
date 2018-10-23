@@ -39,6 +39,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// the generated hashtag class.
 		$this->class_prefix = apply_filters( 'liveblog_hashtag_class', $this->class_prefix );
 
+		// Set a better regex for hashtags to allow for hex values in content.
+		$this->set_regex( '~(?:(?<!\S)|>?)(?:(?<!&|&amp;))((?:' . implode( '|', $this->get_prefixes() ) . ')([0-9_\-\p{L}]*))~um' );
+
 		// This is the regex used to revert the
 		// generated hashtag html back to the
 		// raw input format (e.g #hashtag).
