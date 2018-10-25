@@ -96,6 +96,17 @@ class EditorContainer extends Component {
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
+    const htmlregex = /<(img|picture|video|audio|canvas|svg|iframe|embed) ?.*>/;
+
+    // We don't want an editor publishing empty entries
+    // So we must check if there is any text within the editor
+    // If we fail to find text then we should check for a valid
+    // list of html elements, mainly visual for example images.
+    if (!editorState.getCurrentContent().getPlainText().trim()) {
+      if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
+        return;
+      }
+    }
 
     if (isEditing) {
       updateEntry({
