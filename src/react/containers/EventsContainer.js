@@ -11,11 +11,11 @@ import Event from '../components/Event';
 
 class EventsContainer extends Component {
   renderEvents() {
-    const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat } = this.props;
+    const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat, title } = this.props;
 
     return (
       <div>
-        <h2 className="widget-title">Key Events</h2>
+        { (title !== '') ? <h2 className="widget-title">{title}</h2> : null }
         <ul className="liveblog-events">
           {Object.keys(events).map((key, i) =>
             <Event
@@ -50,6 +50,7 @@ EventsContainer.propTypes = {
   canEdit: PropTypes.bool,
   utcOffset: PropTypes.string,
   dateFormat: PropTypes.string,
+  title: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
