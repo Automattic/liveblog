@@ -7,6 +7,7 @@ import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
 import EditorContainer from '../containers/EditorContainer';
+import DeleteConfirmation from '../components/DeleteConfirmation';
 
 class EntryContainer extends Component {
   constructor(props) {
@@ -23,6 +24,15 @@ class EntryContainer extends Component {
       this.node.scrollIntoView({ block: 'start', behavior: 'instant' });
       this.props.resetScrollOnEntry(`id_${this.props.entry.id}`);
     };
+    this.state = {
+      showPopup: false,
+    };
+  }
+
+  togglePopup() {
+    this.setState({
+      showPopup: !this.state.showPopup,
+    });
   }
 
   componentDidMount() {
@@ -58,8 +68,7 @@ class EntryContainer extends Component {
         }
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
-          onClick={this.delete}
-        >
+          onClick={this.togglePopup.bind(this)}>
           Delete
         </button>
       </footer>
@@ -82,6 +91,14 @@ class EntryContainer extends Component {
           </a>
         </aside>
         <div className="liveblog-entry-main">
+          {this.state.showPopup ?
+            <DeleteConfirmation
+              text="Are you sure you want to delete this entry?"
+              onConfirmDelete={this.delete}
+              onCancel={this.togglePopup.bind(this)}
+            />
+            : null
+          }
           {
             (entry.authors && entry.authors.length > 0) &&
             <header className="liveblog-meta-authors">
@@ -130,6 +147,7 @@ EntryContainer.propTypes = {
   deleteEntry: PropTypes.func,
   activateScrolling: PropTypes.bool,
   resetScrollOnEntry: PropTypes.func,
+  showPopup: PropTypes.bool,
 };
 
 const mapStateToProps = state => state;
