@@ -8,10 +8,48 @@ import { connect } from 'react-redux';
 import * as eventsActions from '../actions/eventsActions';
 
 import Event from '../components/Event';
+import DeleteConfirmation from '../components/DeleteConfirmation';
 
 class EventsContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showPopup: false,
+      keyEventToRemove: null,
+    };
+
+    this.delete = (key) => {
+      /* eslint no-alert: 0 */
+      if (window.confirm('Are you sure you want to delete this entry?')) {
+        this.props.deleteEvent(key);
+      }
+    };
+  }
+
+  confirmDeletion(key) {
+    this.setState({
+      keyEventToRemove: key,
+    });
+
+    this.togglePopup(); // Keep key here to bind to render of delete popup
+  }
+
+  deleteKeyEvent() {
+    this.props.deleteEvent(this.state.keyEventToRemove);
+
+    this.setState({
+      showPopup: !this.state.showPopup,
+    });
+  }
+
+  togglePopup() {
+    this.setState({
+      showPopup: !this.state.showPopup,
+    });
+  }
+
   renderEvents() {
-    const { events, deleteEvent, jumpToEvent, canEdit, utcOffset, dateFormat, title } = this.props;
+    const { events, jumpToEvent, canEdit, utcOffset, dateFormat, title } = this.props;
 
     return (
       <div>
@@ -22,13 +60,21 @@ class EventsContainer extends Component {
               key={i}
               event={events[key]}
               click={() => jumpToEvent(events[key].id)}
-              onDelete={() => deleteEvent(events[key])}
+              onDelete={() => this.confirmDeletion(events[key])}
               canEdit={canEdit}
               utcOffset={utcOffset}
               dateFormat={dateFormat}
             />,
           )}
         </ul>
+        {this.state.showPopup ?
+          <DeleteConfirmation
+            text="Are you sure you want to remove this entry as a key event?"
+            onConfirmDelete={() => this.deleteKeyEvent()}
+            onCancel={this.togglePopup.bind(this)}
+          />
+          : null
+        }
       </div>
     );
   }
