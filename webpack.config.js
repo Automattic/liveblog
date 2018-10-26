@@ -20,6 +20,7 @@ const webpackConfig = {
   output: {
     path: path.join(__dirname, paths.out),
     filename: '[name].js',
+    chunkFilename: '[name].bundle.js',
   },
 
   module: {
@@ -52,7 +53,7 @@ const webpackConfig = {
               options: {
                 sourceMap: false,
                 minimize: true,
-              }
+              },
             },
             {
               loader: 'postcss-loader',
@@ -71,8 +72,8 @@ const webpackConfig = {
               loader: 'sass-loader',
               options: {
                 sourceMap: false,
-              }
-            }
+              },
+            },
           ],
         }),
       },
@@ -100,6 +101,7 @@ const webpackConfig = {
       __TEST__: JSON.stringify(process.env.NODE_ENV === 'test'),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
 };
 

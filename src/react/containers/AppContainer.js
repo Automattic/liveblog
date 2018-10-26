@@ -3,14 +3,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+
 import * as apiActions from '../actions/apiActions';
 import * as configActions from '../actions/configActions';
 import * as eventsActions from '../actions/eventsActions';
-import EditorContainer from '../containers/EditorContainer';
 import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
+import Editor from '../components/Editor';
 
 class AppContainer extends Component {
   constructor() {
@@ -32,7 +33,7 @@ class AppContainer extends Component {
 
     return (
       <div style={{ position: 'relative' }}>
-        {(page === 1 && canEdit) && <EditorContainer isEditing={false} />}
+        {(page === 1 && canEdit) && <Editor isEditing={false} />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
         <PaginationContainer />
         <Entries loading={loading} entries={entries} />
