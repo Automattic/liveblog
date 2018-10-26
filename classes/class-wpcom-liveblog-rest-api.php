@@ -651,7 +651,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
-			return $json[ $param ];
+			return html_entity_decode( $json[ $param ] );
 		}
 		return false;
 	}
