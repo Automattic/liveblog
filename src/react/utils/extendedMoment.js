@@ -1,7 +1,6 @@
 /* eslint-disable no-confusing-arrow */
 /* eslint-disable func-names */
 import moment from 'moment';
-
 /**
  * PHP => moment.js
  * Will take a php date format and convert it into a JS format for moment
