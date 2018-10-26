@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
-import Editor from '../containers/Editor';
+import Editor from '../components/Editor';
 import DeleteConfirmation from '../components/DeleteConfirmation';
 
 class EntryContainer extends Component {
