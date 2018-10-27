@@ -20,7 +20,7 @@ export const polling = (state = initialState, action) => {
           ? {}
           : applyUpdate(
             state.entries,
-            action.payload.entries.filter(entry => entry.type === 'new'),
+            action.payload.entries,
           ),
         newestEntry: getNewestEntry(
           state.newestEntry,
