@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
 import { html } from 'js-beautify';
+import { debounce } from 'lodash-es';
 
 import { EditorState, ContentState } from 'draft-js';
 
@@ -81,6 +82,8 @@ class EditorContainer extends Component {
       error,
       errorMessage,
     });
+
+    this.getUsers = debounce(this.getUsers.bind(this), props.config.author_list_debounce_time);
   }
 
   setReadOnly(state) {
@@ -120,6 +123,17 @@ class EditorContainer extends Component {
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
     const headline = this.state.headline;
+    const htmlregex = /<(img|picture|video|audio|canvas|svg|iframe|embed) ?.*>/;
+
+    // We don't want an editor publishing empty entries
+    // So we must check if there is any text within the editor
+    // If we fail to find text then we should check for a valid
+    // list of html elements, mainly visual for example images.
+    if (!editorState.getCurrentContent().getPlainText().trim()) {
+      if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
+        return;
+      }
+    }
 
     if (isEditing) {
       updateEntry({
@@ -359,7 +373,7 @@ class EditorContainer extends Component {
           labelKey="name"
           onChange={this.onSelectAuthorChange.bind(this)}
           optionComponent={AuthorSelectOption}
-          loadOptions={this.getUsers.bind(this)}
+          loadOptions={this.getUsers}
           clearable={false}
           cache={false}
         />

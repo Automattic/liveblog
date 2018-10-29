@@ -4,7 +4,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.9.1
+ * Version:     1.9.2
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.9.1';
+		const VERSION                 = '1.9.2';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -48,6 +48,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		const USE_REST_API                    = true; // Use the REST API if current version is at least MIN_WP_REST_API_VERSION. Allows for easy disabling/enabling
 		const DEFAULT_IMAGE_SIZE              = 'full'; // The default image size to use when inserting media frm the media library.
 		const MAX_LAZY_LOAD_ENTRY_COUNT       = 10000; // When lazy-loading, fetch up to this many posts
+		const AUTHOR_LIST_DEBOUNCE_TIME       = 500; // This is the time ms to debounce the async author list.
 
 		/** Variables *************************************************************/
 
@@ -1054,8 +1055,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ), array(), self::VERSION );
-			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ), array(), self::VERSION );
+			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ) );
+			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ) );
+
+			// Load Client Scripts
 			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __FILE__ ), array(), self::VERSION, true );
 
 			if ( self::is_liveblog_editable() ) {
@@ -1079,6 +1082,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'liveblog_settings',
 					array(
 						'permalink'                    => get_permalink(),
+						'plugin_dir'                   => plugin_dir_url( __FILE__ ),
 						'post_id'                      => get_the_ID(),
 						'state'                        => self::get_liveblog_state(),
 						'is_liveblog_editable'         => self::is_liveblog_editable(),
@@ -1151,6 +1155,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'class_term_prefix'            => __( 'term-', 'liveblog' ),
 						'class_alert'                  => __( 'type-alert', 'liveblog' ),
 						'class_key'                    => __( 'type-key', 'liveblog' ),
+
+						/**
+						 * Filters the Author list debounce time, defaults to 500ms.
+						 *
+						 * @since 1.9.2
+						 *
+						 * @param int $time Author list debounce time.
+						 */
+						'author_list_debounce_time'    => apply_filters( 'liveblog_author_list_debounce_time', self::AUTHOR_LIST_DEBOUNCE_TIME ),
 					)
 				)
 			);
