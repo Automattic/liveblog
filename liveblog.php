@@ -1850,8 +1850,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			global $post;
-			$metadata = self::get_liveblog_metadata( [], $post );
+			$metadata = self::get_liveblog_metadata( [], get_post() );
 			if ( empty( $metadata ) ) {
 				return;
 			}
