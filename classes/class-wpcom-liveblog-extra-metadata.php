@@ -139,7 +139,7 @@ class WPCOM_Liveblog_Extra_Metadata {
 		$meta = get_post_meta( $post->ID, self::METADATA_KEY, true );
 
 		if ( ! $meta ) {
-			return;
+			return $metadata;
 		}
 
 		$start = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : false;
