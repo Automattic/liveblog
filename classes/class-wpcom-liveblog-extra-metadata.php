@@ -164,8 +164,8 @@ class WPCOM_Liveblog_Extra_Metadata {
 			$metadata['coverageEndTime'] = $formatted_end;
 		}
 
-		// Add Event Title and Event URL as Event subproperties.
-		if ( $url || $title || $location ) {
+		// Add Event metadata if required fields are set.
+		if ( $url && $title ) {
 			$metadata['about']['@type'] = 'Event';
 
 			if ( $title ) {
@@ -177,11 +177,15 @@ class WPCOM_Liveblog_Extra_Metadata {
 			}
 
 			if ( $location ) {
-				$metatadata['about']['location'] = esc_url( $location );
+				$metadata['about']['location'] = esc_html( $location );
+			}
+
+			if ( $formatted_start ) {
+				$metadata['about']['startDate'] = $formatted_start;
 			}
 
 			if ( $formatted_end ) {
-				$metadata['about']['startTime'] = $formatted_end;
+				$metadata['about']['endDate'] = $formatted_end;
 			}
 		}
 		return $metadata;
