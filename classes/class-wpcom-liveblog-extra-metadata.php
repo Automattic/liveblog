@@ -166,22 +166,22 @@ class WPCOM_Liveblog_Extra_Metadata {
 
 		// Add Event Title and Event URL as Event subproperties.
 		if ( $url || $title || $location ) {
-			$metadata['event']['@type'] = 'Event';
+			$metadata['about']['@type'] = 'Event';
 
 			if ( $title ) {
-				$metadata['event']['name'] = esc_html( $title );
+				$metadata['about']['name'] = esc_html( $title );
 			}
 
 			if ( $url ) {
-				$metadata['event']['url'] = esc_url( $url );
+				$metadata['about']['url'] = esc_url( $url );
 			}
 
 			if ( $location ) {
-				$metatadata['event']['location'] = esc_url( $location );
+				$metatadata['about']['location'] = esc_url( $location );
 			}
 
 			if ( $formatted_end ) {
-				$metadata['event']['startTime'] = $formatted_end;
+				$metadata['about']['startTime'] = $formatted_end;
 			}
 		}
 		return $metadata;
