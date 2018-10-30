@@ -1,7 +1,9 @@
 <?php
-	$author     = $this->get( 'author' );
+$author = $this->get( 'author' );
+
+if ( $author ) :
 	$avatar_url = get_avatar_url( $author['id'] );
-?>
+	?>
 
 <div class="liveblog-meta-author">
 	<div class="liveblog-meta-author-avatar">
@@ -14,3 +16,4 @@
 	</div>
 	<span class="liveblog-meta-author-name"><?php echo esc_html( $author['name'] ); ?></span>
 </div>
+<?php endif; ?>
