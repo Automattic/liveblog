@@ -91,9 +91,9 @@ class WPCOM_Liveblog_AMP {
 		/**
 		 * Filter Liveblog AMP Facebook share app id
 		 *
-		 * @param string $app_id The Facebook application id to enable sharing to Facebook.
+		 * @param mixed $app_id Facebook app id to enable Facebook sharing, default false.
 		 */
-		$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', '' );
+		$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
 
 		if ( ! empty( $facebook_app_id ) ) {
 			$social_array[] = 'facebook';
