@@ -1829,7 +1829,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			];
 
 			$tags = get_the_tags();
-			if ( $tags ) {
+			if ( $tags && ! is_wp_error( $tags ) ) {
 				$liveblog_metadata['keywords'] = join( ', ', wp_list_pluck( $tags, 'name' ) );
 			}
 
