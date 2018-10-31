@@ -21,7 +21,6 @@ class WPCOM_Liveblog_Extra_Metadata {
 	 */
 	public static function load() {
 		add_action( 'add_meta_boxes', [ __CLASS__, 'add_meta_box' ] );
-		add_filter( 'liveblog_metadata', [ __CLASS__, 'liveblog_append_additional_metadata'], 10, 2 );
 		add_action( 'save_post', [ __CLASS__, 'save_post' ], 10, 3 );
 	}
 
@@ -113,14 +112,14 @@ class WPCOM_Liveblog_Extra_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_metadata_metabox( $post ) {
-		$meta      = get_post_meta( $post->ID, self::METADATA_KEY, true );
-		$start     = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : '';
-		$end       = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : '';
-		$url       = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] :'';
-		$title     = isset( $meta[ self::METADATA_EVENT_TITLE ] ) ? $meta[ self::METADATA_EVENT_TITLE ] :'';
-		$location  = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] :'';
-		$format    = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
-		$name      = function( $key ) {
+		$meta     = get_post_meta( $post->ID, self::METADATA_KEY, true );
+		$start    = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : '';
+		$end      = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : '';
+		$url      = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] :'';
+		$title    = isset( $meta[ self::METADATA_EVENT_TITLE ] ) ? $meta[ self::METADATA_EVENT_TITLE ] :'';
+		$location = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] :'';
+		$format   = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
+		$name     = function( $key ) {
 			return self::METADATA_KEY . '[' . $key . ']';
 		};
 
@@ -139,18 +138,18 @@ class WPCOM_Liveblog_Extra_Metadata {
 	 * @param  \WP_Post $post     WP_Post object.
 	 * @return array              An array of metadata.
 	 */
-	public static function liveblog_append_additional_metadata( $metadata, $post ) {
+	public static function liveblog_append_event_metadata( $metadata, $post ) {
 		$meta = get_post_meta( $post->ID, self::METADATA_KEY, true );
 
 		if ( ! $meta ) {
 			return $metadata;
 		}
 
-		$start     = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : false;
-		$end       = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : false;
-		$url       = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] : false;
-		$title     = isset( $meta[ self::METADATA_EVENT_TITLE ] ) ? $meta[ self::METADATA_EVENT_TITLE ] : false;
-		$location  = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] : '';
+		$start    = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : false;
+		$end      = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : false;
+		$url      = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] :false;
+		$title    = isset( $meta[ self::METADATA_EVENT_TITLE ] ) ? $meta[ self::METADATA_EVENT_TITLE ] :false;
+		$location = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] : '';
 
 		// Assume the start time is the very beginning of the day.
 		$formatted_start = self::format_metadata_8601( $start . ' 00:00:00' );
@@ -180,7 +179,7 @@ class WPCOM_Liveblog_Extra_Metadata {
 				$metadata['about']['location'] = esc_html( $location );
 			}
 
-			if ( $formatted_start ) {
+ 			if ( $formatted_start ) {
 				$metadata['about']['startDate'] = $formatted_start;
 			}
 

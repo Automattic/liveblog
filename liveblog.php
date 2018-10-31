@@ -1947,13 +1947,51 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$entries = self::get_entries_paged( $request->page, $request->last );
 
-			$blog_updates = [];
+			$url = get_permalink();
+			$liveblog_metadata  = [
+				'@context'       => 'http://schema.org',
+				'@type'          => 'LiveBlogPosting',
+				'mainEntityOfPage' => [
+					'@type' => 'WebPage',
+					'@id'   => $url,
+				],
+				'publisher'        => [
+					'@type' => 'Organization',
+					'name'  => get_bloginfo( 'name' ),
+				],
+				'headline'       => get_the_title(),
+				'url'            => $url,
+				'datePublished'  => get_the_date( 'c' ),
+				'dateModified'   => get_the_modified_date( 'c' ),
+			];
 
-			if ( ! isset( $entries['entries'] ) || ! is_array( $entries['entries'] ) ) {
-				return $metadata;
+			$tags = get_the_tags();
+			if ( $tags ) {
+				$liveblog_metadata['keywords'] = join( ', ', wp_list_pluck( $tags, 'name' ) );
 			}
 
+			if ( has_post_thumbnail() ) {
+				$image_data        = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
+				$liveblog_metadata['image'] = [
+					'@type'  => 'ImageObject',
+					'url'    => $image_data[0],
+					'width'  => $image_data[1],
+					'height' => $image_data[2],
+				];
+			}
+
+			$logo = apply_filters( 'liveblog_metadata_publisher_logo', [] );
+			if ( $logo ) {
+				$liveblog_metadata['publisher']['logo']          = $logo;
+				$liveblog_metadata['publisher']['logo']['@type'] = 'ImageObject';
+			}
+
+			$liveblog_metadata = WPCOM_Liveblog_Extra_Metadata::liveblog_append_event_metadata( $liveblog_metadata, $post );
+
+			$last_entry = false;
+			$blog_updates = [];
 			foreach ( $entries['entries'] as $entry ) {
+				$last_entry = $entry;
 				$blog_item = [
 					'@type'            => 'BlogPosting',
 					'headline'         => WPCOM_Liveblog_Entry::get_entry_title( $entry ),
@@ -1986,9 +2024,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
 			}
+			$liveblog_metadata['liveBlogUpdate'] = $blog_updates;
+			if ( $last_entry ) {
+				$liveblog_metadata['dateModified'] = date( 'c', $last_entry->timestamp );
+			}
 
-			$metadata['@type']          = 'LiveBlogPosting';
-			$metadata['liveBlogUpdate'] = $blog_updates;
+			$metadata = array_merge( $liveblog_metadata, $metadata );
 
 			/**
 			 * Filters the Liveblog metadata.
@@ -2007,6 +2048,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		public static function print_liveblog_metadata() {
 
+			if ( ( defined( 'VIP_GO_ENV' ) && 'production' === VIP_GO_ENV ) || ( defined( 'WPCOM_IS_VIP_ENV' ) && true === WPCOM_IS_VIP_ENV )
+				|| ( ! defined( 'VIP_GO_ENV' ) && ! defined( 'WPCOM_IS_VIP_ENV' ) && false === SCRIPT_DEBUG ) ) {
+				$json_mpde = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+			} else {
+				$json_mpde = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT;
+			}
+
 			// Bail if we are not viewing a liveblog.
 			if ( self::is_liveblog_post( get_the_ID() ) === false ) {
 				return;
@@ -2019,7 +2067,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			?>
-			<script type="application/ld+json"><?php echo wp_json_encode( $metadata ); ?></script>
+			<script type="application/ld+json"><?php echo wp_json_encode( $metadata, $json_mpde ); ?></script>
 			<?php
 
 		}
