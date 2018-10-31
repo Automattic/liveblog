@@ -168,15 +168,18 @@ class WPCOM_Liveblog_Event_Metadata {
 			$metadata['about']['@type'] = 'Event';
 
 			if ( $title ) {
-				$metadata['about']['name'] = esc_html( $title );
+				$metadata['about']['name'] = $title;
 			}
 
 			if ( $url ) {
-				$metadata['about']['url'] = esc_url( $url );
+				$metadata['about']['url'] = $url;
 			}
 
 			if ( $location ) {
-				$metadata['about']['location'] = esc_html( $location );
+				$metadata['about']['location'] = [
+					'@type' => 'Place',
+					'address' => $location,
+				];
 			}
 
  			if ( $formatted_start ) {
@@ -187,6 +190,7 @@ class WPCOM_Liveblog_Event_Metadata {
 				$metadata['about']['endDate'] = $formatted_end;
 			}
 		}
+
 		return $metadata;
 	}
 
