@@ -85,6 +85,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			WPCOM_Liveblog_Entry_Key_Events::load();
 			WPCOM_Liveblog_Entry_Key_Events_Widget::load();
 			WPCOM_Liveblog_Entry_Extend::load();
+			WPCOM_Liveblog_Event_Metadata::load();
 			WPCOM_Liveblog_Lazyloader::load();
 			WPCOM_Liveblog_Socketio_Loader::load();
 			WPCOM_Liveblog_Entry_Embed_SDKs::load();
@@ -135,6 +136,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-event-metadata.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php';
