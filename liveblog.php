@@ -1868,8 +1868,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				];
 
 				// Add the LiveBlogPost image to the BlogPosting.
-				if ( ! isset( $blog_item['image'] ) && isset( $metadata['image'] ) ) {
-					$blog_item['image'] = $metadata['image'];
+				if ( ! isset( $blog_item['image'] ) && isset( $liveblog_metadata['image'] ) ) {
+					$blog_item['image'] = $liveblog_metadata['image'];
 				}
 
 				if ( isset( $entry->authors[0]['name'] ) ) {
@@ -1877,12 +1877,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'@type' => 'Person',
 						'name'  => $entry->authors[0]['name'],
 					];
-				} else if ( isset( $metadata['publisher'] ) ) {
-					$blog_item['author'] = $metadata['publisher'];
+				} else if ( isset( $liveblog_metadata['publisher'] ) ) {
+					$blog_item['author'] = $liveblog_metadata['publisher'];
 				}
 
-				if ( isset( $metadata['publisher'] ) ) {
-					$blog_item['publisher'] = $metadata['publisher'];
+				if ( isset( $liveblog_metadata['publisher'] ) ) {
+					$blog_item['publisher'] = $liveblog_metadata['publisher'];
 				}
 
 				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
