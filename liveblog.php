@@ -1966,11 +1966,18 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					],
 				];
 
+				// Add the LiveBlogPost image to the BlogPosting.
+				if ( isset( $metadata['image'] ) ) {
+					$blog_item['image'] = $metadata['image'];
+				}
+
 				if ( isset( $entry->authors[0]['name'] ) ) {
 					$blog_item['author'] = [
 						'@type' => 'Person',
 						'name'  => $entry->authors[0]['name'],
 					];
+				} else if ( isset( $metadata['publisher'] ) ) {
+					$blog_item['author'] = $metadata['publisher'];
 				}
 
 				if ( isset( $metadata['publisher'] ) ) {
