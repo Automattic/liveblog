@@ -1967,7 +1967,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				];
 
 				// Add the LiveBlogPost image to the BlogPosting.
-				if ( isset( $metadata['image'] ) ) {
+				if ( ! ( isset( $blog_item['image'] ) && isset( $metadata['image'] ) ) ) {
 					$blog_item['image'] = $metadata['image'];
 				}
 
