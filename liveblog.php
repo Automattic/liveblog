@@ -54,6 +54,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $post_id                = null;
 		private static $entry_query           = null;
 		private static $do_not_cache_response = false;
+		private static $cache_control_max_age = null;
 		private static $custom_template_path  = null;
 
 		public static $is_rest_api_call        = false;
@@ -429,9 +430,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$latest_timestamp = null;
 			$entries_for_json = array();
 
-			// Do not cache if it's too soon
-			if ( $end_timestamp > time() ) {
-				self::$do_not_cache_response = true;
+			$now = time();
+
+			// If end timestamp is in future, set a cache TTL until it's not
+			if ( $end_timestamp > $now ) {
+				self::$cache_control_max_age = $end_timestamp - $now;
 			}
 
 			if ( empty( self::$entry_query ) ) {
@@ -1680,6 +1683,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function prevent_caching_if_needed() {
 			if ( self::$do_not_cache_response ) {
 				nocache_headers();
+			} else if ( self::$cache_control_max_age ) {
+				header( 'Cache-control: max-age=' . self::$cache_control_max_age );
+				header( 'Expires: ' . gmdate( 'D, d M Y H:i:s \G\M\T', time() + self::$cache_control_max_age ) );
 			}
 		}
 
