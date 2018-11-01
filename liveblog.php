@@ -1860,9 +1860,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => date( 'c', $entry->entry_time ),
 					'dateModified'     => date( 'c', $entry->timestamp ),
-					'articleBody'      => [
-						'@type' => 'Text',
-					],
+					'articleBody'      => wp_strip_all_tags( $entry->content ),
 				];
 
 				// Add the LiveBlogPost image to the BlogPosting.
