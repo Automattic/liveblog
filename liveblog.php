@@ -1851,10 +1851,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$liveblog_metadata = WPCOM_Liveblog_Event_Metadata::liveblog_append_event_metadata( $liveblog_metadata, $post );
 
-			$last_entry = false;
 			$blog_updates = [];
 			foreach ( $entries['entries'] as $entry ) {
-				$last_entry = $entry;
 				$blog_item = [
 					'@type'            => 'BlogPosting',
 					'headline'         => WPCOM_Liveblog_Entry::get_entry_title( $entry ),
@@ -1888,8 +1886,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
 			}
 			$liveblog_metadata['liveBlogUpdate'] = $blog_updates;
-			if ( $last_entry ) {
-				$liveblog_metadata['dateModified'] = date( 'c', $last_entry->timestamp );
+			if ( isset( $entries['entries'][0] ) ) {
+				$liveblog_metadata['dateModified'] = date( 'c', $entries['entries'][0]->timestamp );
 			}
 
 			$metadata = array_merge( $liveblog_metadata, $metadata );
