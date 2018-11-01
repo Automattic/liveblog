@@ -865,7 +865,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 		/**
 		 * Convert array of entries to their json response
-		 * @param type $entries
+		 * @param array $entries
 		 * @return array
 		 */
 		public static function entries_for_json( $entries ) {
