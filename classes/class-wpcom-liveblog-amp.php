@@ -38,6 +38,11 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
+		// if we're not on a live page, then bail
+		if ( ! WPCOM_Liveblog::is_liveblog_post() ) {
+			return;
+		}
+
 		// Remove the standard Liveblog markup which just a <div> for React to render.
 		remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
 
@@ -66,7 +71,6 @@ class WPCOM_Liveblog_AMP {
 			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
 			add_action( 'amp_post_template_head', array( __CLASS__, 'social_meta_tags' ) );
 		}
-
 	}
 
 	/**
