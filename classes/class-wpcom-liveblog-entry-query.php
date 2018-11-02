@@ -172,6 +172,27 @@ class WPCOM_Liveblog_Entry_Query {
 		return $this->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 	}
 
+	/**
+	 * Get entries between two timestamps, using a Date Query.
+	 *
+	 * @param int $start_timestamp
+	 * @param int $end_timestamp
+	 * @return array
+	 */
+	public function get_between_timestamps_with_query( $start_timestamp, $end_timestamp ) {
+		$args = array(
+			'date_query' => array(
+				'after' => date( 'c' , $start_timestamp ),
+				'before' => date( 'c' , $end_timestamp ),
+				'inclusive' => true,
+			),
+		);
+
+		$entries = $this->get( $args );
+
+		return self::remove_replaced_entries( $entries );
+	}
+
 	public function has_any() {
 		return (bool) $this->get();
 	}
