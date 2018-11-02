@@ -193,6 +193,53 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $entries );
 	}
 
+	/**
+	 * Get the total number of entries for a Liveblog post
+	 *
+	 * The total entries is the count of _all_ entries, minus deletions
+	 *
+	 * Deletions are stored as regular comments, but with no content and a
+	 * "replaces" meta value
+	 *
+	 * NOTE - currently updates are counted as entries, which is probably wrong
+	 * and will throw off pagination, but this is designed to match the behavior
+	 * in WPCOM_Liveblog::flatten_entries(), which is also used for pagination calculation
+	 *
+	 * @return int
+	 */
+	public function count_entries() {
+		$latest_timestamp = $this->get_latest_timestamp();
+
+		$cache_key = $this->key . '_entries_count_' . $this->post_id . '_' . $latest_timestamp;
+
+		$count = wp_cache_get( $cache_key, 'liveblog' );
+
+		if ( false !== $count ) {
+			return $count;
+		}
+
+		// Count all comments, excluding deletions
+		global $wpdb;
+
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) as count FROM $wpdb->comments WHERE
+					comment_post_id = %d
+					AND comment_type = %s
+					AND comment_approved = %s
+					AND comment_content != %s",
+				$this->post_id,
+				$this->key,
+				$this->key,
+				''
+			)
+		);
+
+		wp_cache_set( $cache_key, $count, 'liveblog' );
+
+		return $count;
+	}
+
 	public function has_any() {
 		return (bool) $this->get();
 	}
