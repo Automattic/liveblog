@@ -145,31 +145,6 @@ class WPCOM_Liveblog_Entry {
 		return (object) $entry;
 	}
 
-	public function get_fields_for_render() {
-		$entry_id     = $this->replaces ? $this->replaces : $this->comment->comment_ID;
-		$post_id      = $this->comment->comment_post_ID;
-		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
-		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
-		$entry        = array(
-			'entry_id'               => $entry_id,
-			'post_id'                => $post_id,
-			'css_classes'            => $css_classes,
-			'content'                => self::render_content( $comment_text, $this->comment ),
-			'original_content'       => apply_filters( 'liveblog_before_edit_entry', $comment_text ),
-			'avatar_size'            => $avatar_size,
-			'avatar_img'             => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
-			'author_link'            => get_comment_author_link( $entry_id ),
-			'entry_date'             => get_comment_date( get_option( 'date_format' ), $entry_id ),
-			'entry_time'             => get_comment_date( get_option( 'time_format' ), $entry_id ),
-			'timestamp'              => $this->get_timestamp(),
-			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
-			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
-		);
-
-		return $entry;
-	}
-
 	public static function render_content( $content, $comment = false ) {
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
