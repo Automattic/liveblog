@@ -452,7 +452,13 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public static function get_userdata_with_filter( $author_id ) {
-		return apply_filters( 'liveblog_userdata', get_userdata( $author_id ), $author_id );
+		if ( apply_filters( 'liveblog_fetch_userdata', true ) ) {
+			$userdata = get_userdata( $author_id );
+		} else {
+			$userdata = null;
+		}
+
+		return apply_filters( 'liveblog_userdata', $userdata, $author_id );
 	}
 
 	/**
