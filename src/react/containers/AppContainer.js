@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import * as apiActions from '../actions/apiActions';
 import * as configActions from '../actions/configActions';
 import * as eventsActions from '../actions/eventsActions';
+import * as userActions from '../actions/userActions';
 import EditorContainer from '../containers/EditorContainer';
 import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
@@ -21,7 +22,7 @@ class AppContainer extends Component {
   }
 
   componentDidMount() {
-    const { loadConfig, getEntries, getEvents, startPolling } = this.props;
+    const { loadConfig, getEntries, getEvents, startPolling, scrollToEntry } = this.props;
     loadConfig(window.liveblog_settings);
     getEntries(1, window.location.hash);
     startPolling();
@@ -30,6 +31,11 @@ class AppContainer extends Component {
     setTimeout(() => {
       jQuery(document).trigger('liveblog-loaded');
     }, 1000);
+
+    // If there is a hash link to specific entry, scroll again once all entries are rendered.
+    if (!isNaN(window.location.hash)) {
+      scrollToEntry(`id_${window.location.hash}`);
+    }
   }
 
   render() {
@@ -75,6 +81,7 @@ AppContainer.propTypes = {
   polling: PropTypes.array,
   mergePolling: PropTypes.func,
   config: PropTypes.object,
+  scrollToEntry: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -91,6 +98,7 @@ const mapDispatchToProps = dispatch =>
     ...configActions,
     ...apiActions,
     ...eventsActions,
+    ...userActions,
   }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);
