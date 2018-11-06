@@ -339,7 +339,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return HTML for avatar
 		 */
 		public static function get_avatar( $user_id, $size ) {
-			return apply_filters( 'liveblog_author_avatar', get_avatar( $user_id, $size ), $user_id, $size );
+			if ( apply_filters( 'liveblog_fetch_avatar_data', true ) ) {
+				$avatar_data = get_avatar( $user_id, $size );
+			} else {
+				$avatar_data = null;
+			}
+
+			return apply_filters( 'liveblog_author_avatar', $avatar_data, $user_id, $size );
 		}
 
 		/**
