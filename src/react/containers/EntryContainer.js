@@ -114,7 +114,7 @@ class EntryContainer extends Component {
     const { entry, config } = this.props;
 
     // Filter out empty authors.
-    entry.authors = entry.authors.filter(author => (author.id !== null && author.name !== null && author.key !== ''));
+    entry.authors = Array.isArray(entry.authors) && entry.authors.filter(author => (author.id !== null && author.name !== null && author.key !== ''));
 
     return (
       <article
