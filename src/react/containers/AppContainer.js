@@ -33,8 +33,9 @@ class AppContainer extends Component {
     }, 1000);
 
     // If there is a hash link to specific entry, scroll again once all entries are rendered.
-    if (!isNaN(window.location.hash)) {
-      scrollToEntry(`id_${window.location.hash}`);
+    const hashId = window.location.hash.split('#')[1];
+    if (!isNaN(hashId)) {
+      scrollToEntry(`id_${hashId}`);
     }
   }
 
