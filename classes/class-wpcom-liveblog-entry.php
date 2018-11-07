@@ -317,7 +317,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	private static function validate_args( $args ) {
-		$required_keys = array( 'post_id', 'user' );
+		$required_keys = array( 'post_id', 'user', 'content' );
 		foreach ( $required_keys as $key ) {
 			if ( ! isset( $args[ $key ] ) || ! $args[ $key ] ) {
 				// translators: 1: argument
