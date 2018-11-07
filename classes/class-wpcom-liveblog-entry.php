@@ -127,7 +127,7 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
-		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
+		$css_classes = implode( ' ', apply_filters( 'comment_class', [ 'liveblog' ], 'liveblog', $entry_id, $this->comment, $this->comment->comment_post_ID ) );
 		$share_link  = get_permalink( $this->get_post_id() ) . '#' . $entry_id;
 
 		$entry = array(
@@ -150,7 +150,7 @@ class WPCOM_Liveblog_Entry {
 		$post_id      = $this->comment->comment_post_ID;
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
 		$comment_text = get_comment_text( $entry_id );
-		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
+		$css_classes = implode( ' ', apply_filters( 'comment_class', [ 'liveblog' ], 'liveblog', $entry_id, $this->comment, $post_id ) );
 		$entry        = array(
 			'entry_id'               => $entry_id,
 			'post_id'                => $post_id,
