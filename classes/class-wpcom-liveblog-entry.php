@@ -132,7 +132,7 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
-		$css_classes = implode( ' ', apply_filters( 'comment_class', [ 'liveblog', 'even' ], 'liveblog even', $entry_id, $this->comment, $this->comment->comment_post_ID ) );
+		$css_classes = implode( ' ', apply_filters( 'comment_class', [ 'liveblog' ], 'liveblog', $entry_id, $this->comment, $this->comment->comment_post_ID ) );
 		$share_link  = get_permalink( $this->get_post_id() ) . '#' . $entry_id;
 
 		$entry = array(
