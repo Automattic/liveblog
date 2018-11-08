@@ -121,28 +121,32 @@ export const api = (state = initialState, action) => {
       };
 
     case 'SCROLL_TO_ENTRY':
-      return {
-        ...state,
-        entries: {
-          ...state.entries,
-          [action.payload]: {
-            ...state.entries[action.payload],
-            activateScrolling: true,
+      return state.entries[action.payload]
+        ? {
+          ...state,
+          entries: {
+            ...state.entries,
+            [action.payload]: {
+              ...state.entries[action.payload],
+              activateScrolling: true,
+            },
           },
-        },
-      };
+        }
+        : state;
 
     case 'RESET_SCROLL_ON_ENTRY':
-      return {
-        ...state,
-        entries: {
-          ...state.entries,
-          [action.payload]: {
-            ...state.entries[action.payload],
-            activateScrolling: false,
+      return state.entries[action.payload]
+        ? {
+          ...state,
+          entries: {
+            ...state.entries,
+            [action.payload]: {
+              ...state.entries[action.payload],
+              activateScrolling: false,
+            },
           },
-        },
-      };
+        }
+        : state;
 
     case 'LOAD_CONFIG':
       return {
