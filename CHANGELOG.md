@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.3
+
+* Improve caching by setting a short TTL on future timestamps (#542)
+
 ## 1.9.2
 
 * Fix for overzealous API requests in author list (#417)
