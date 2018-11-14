@@ -494,6 +494,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 			$pages       = false;
 			$per_page    = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+			$flattened   = false;
+			$total       = false;
 
 			if ( ! empty( $entries ) ) {
 				/**
@@ -505,7 +507,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$entries_for_json[] = $entry->for_json();
 				}
 
-				$pages = ceil( count( self::flatten_entries( $all_entries ) ) / $per_page );
+				$flattened = self::flatten_entries( $all_entries );
+				$total     = count( $flattened );
+				$pages     = ceil( $total / $per_page );
 			}
 
 			// Create the result array
@@ -514,6 +518,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'latest_timestamp' => $latest_timestamp,
 				'refresh_interval' => self::get_refresh_interval(),
 				'pages'            => $pages,
+				'total'            => $total,
 			);
 
 			if ( ! empty( $entries_for_json ) ) {
@@ -889,7 +894,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 			}
 
-			$pages = ceil( count( $entries ) / $per_page );
+			$total = count( $entries );
+			$pages = ceil( $total / $per_page );
 
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
@@ -906,6 +912,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'entries' => $entries,
 				'page'    => (int) $page,
 				'pages'   => (int) $pages,
+				'total'   => (int) $total,
 			);
 
 			if ( ! empty( $entries ) ) {
