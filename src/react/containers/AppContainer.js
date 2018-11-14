@@ -40,7 +40,7 @@ class AppContainer extends Component {
   }
 
   render() {
-    const { page, loading, entries, polling, mergePolling, config } = this.props;
+    const { page, loading, entries, polling, mergePolling, config, total } = this.props;
     const paginationTypeLoadMore = config.paginationType === 'loadMore';
     const canEdit = config.is_liveblog_editable === '1';
     const frontEndEditing = config.backend_liveblogging !== '1';
@@ -61,7 +61,7 @@ class AppContainer extends Component {
           usetinymce={config.usetinymce}
         />}
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        { isAdmin && <UpdateCount entries={entries} config={config} /> }
+        { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
@@ -83,11 +83,13 @@ AppContainer.propTypes = {
   mergePolling: PropTypes.func,
   config: PropTypes.object,
   scrollToEntry: PropTypes.func,
+  total: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   loading: state.api.loading,
+  total: state.api.total,
   entries: Object.keys(state.api.entries)
     .map(key => state.api.entries[key]),
   polling: Object.keys(state.polling.entries),
