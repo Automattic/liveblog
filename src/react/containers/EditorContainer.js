@@ -260,9 +260,12 @@ class EditorContainer extends Component {
       authors,
       readOnly,
       headline,
-      canPublish,
       error,
       errorMessage,
+    } = this.state;
+
+    let {
+      canPublish,
     } = this.state;
 
     const { isEditing, config, usetinymce } = this.props;
@@ -279,6 +282,10 @@ class EditorContainer extends Component {
         }
         return false;
       }) : [];
+
+    if (window.liveblog_settings.author_required && window.liveblog_settings.author_required === '1' && !authors.length) {
+      canPublish = false;
+    }
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
