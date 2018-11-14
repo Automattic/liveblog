@@ -116,7 +116,7 @@ class EditorContainer extends Component {
 
   publish(event) {
     event.preventDefault();
-    const { updateEntry, entry, createEntry, isEditing } = this.props;
+    const { updateEntry, entry, createEntry, isEditing, usetinymce } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors ? authors.map(author => author.id) : [];
@@ -129,7 +129,7 @@ class EditorContainer extends Component {
     // So we must check if there is any text within the editor
     // If we fail to find text then we should check for a valid
     // list of html elements, mainly visual for example images.
-    if (!editorState.getCurrentContent().getPlainText().trim()) {
+    if (!editorState.getCurrentContent().getPlainText().trim() && usetinymce !== '1') {
       if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
         return;
       }
