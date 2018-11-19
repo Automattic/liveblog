@@ -51,7 +51,7 @@ class WPCOM_Liveblog_Event_Metadata {
 	 * @param  int  $post_id Post ID.
 	 * @return bool          Boolean true if successful update, false on failure.
 	 */
-	public function save_post( $post_id ) {
+	public static function save_post( $post_id ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return false;
 		}
