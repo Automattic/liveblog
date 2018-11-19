@@ -94,7 +94,7 @@ class EditorContainer extends Component {
 
   getContent() {
     const { editorState } = this.state;
-    if (this.props.usetinymce === '1') {
+    if (this.props.useTinyMCE === '1') {
       return editorState.rawText;
     }
     return convertToHTML(editorState.getCurrentContent());
@@ -116,7 +116,7 @@ class EditorContainer extends Component {
 
   publish(event) {
     event.preventDefault();
-    const { updateEntry, entry, createEntry, isEditing } = this.props;
+    const { updateEntry, entry, createEntry, isEditing, useTinyMCE } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors ? authors.map(author => author.id) : [];
@@ -129,7 +129,7 @@ class EditorContainer extends Component {
     // So we must check if there is any text within the editor
     // If we fail to find text then we should check for a valid
     // list of html elements, mainly visual for example images.
-    if (!editorState.getCurrentContent().getPlainText().trim()) {
+    if (!editorState.getCurrentContent().getPlainText().trim() && useTinyMCE !== '1') {
       if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
         return;
       }
@@ -279,7 +279,7 @@ class EditorContainer extends Component {
       errorMessage,
     } = this.state;
 
-    const { isEditing, config, usetinymce } = this.props;
+    const { isEditing, config, useTinyMCE } = this.props;
 
     const errorData = {
       error: this.props.api.error || false,
@@ -300,7 +300,7 @@ class EditorContainer extends Component {
           onChange={this.onHeadlineChange.bind(this)}
           headline={headline}
         />
-        { (usetinymce !== '1') &&
+        { (useTinyMCE !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
               className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
@@ -343,7 +343,7 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            usetinymce={usetinymce}
+            useTinyMCE={useTinyMCE}
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}

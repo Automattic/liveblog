@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "extends": [
 	  "airbnb-base",
 	  "plugin:react/recommended"
@@ -9,8 +10,7 @@
   ],
   "globals": {
     "__DEV__": true,
-    "__TEST__": true,
-    "_": true
+    "__TEST__": true
   },
   "env": {
     "browser": true,
@@ -20,6 +20,8 @@
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
-    }
+    },
+    "sourceType": "module",
+    "allowImportExportEverywhere": true
   }
 }

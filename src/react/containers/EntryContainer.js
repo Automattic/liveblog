@@ -181,7 +181,7 @@ class EntryContainer extends Component {
             this.isEditing()
               ? (
                 <div className="liveblog-entry-edit">
-                  <Editor entry={entry} isEditing={true} usetinymce={config.usetinymce} />
+                  <Editor entry={entry} isEditing={true} useTinyMCE={config.usetinymce} />
                 </div>
               )
               : (
