@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.3
+
+* Improve caching by setting a short TTL on future timestamps (#542)
+
+## 1.9.2
+
+* Fix for overzealous API requests in author list (#417)
+* Prevent empty entries (#475)
+* Restored customisable Key Events widget title (#372)
+* Restore deletion confirmation for entries (#482)
+* Performance improvements to the build (#495)
+
+props [cain](https://github.com/cain), [GaryJones](https://github.com/GaryJones), [jasonagnew](https://github.com/jasonagnew), [kevinlisota](https://github.com/kevinlisota), [lidocaine](https://github.com/lidocaine), [maxhartshorn](https://github.com/maxhartshorn), [no-sws](https://github.com/no-sws), [paulschreiber](https://github.com/paulschreiber), [philipjohn](https://github.com/philipjohn), [sathyapulse](https://github.com/sathyapulse), [scottblackburn](https://github.com/scottblackburn), [sboisvert](https://github.com/sboisvert), [tomjn](https://github.com/tomjn)
+
 ## 1.9.1
 
 * Multiple coding standards fixes
