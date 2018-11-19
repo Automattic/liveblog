@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Extra_Metadata
+ * Class WPCOM_Liveblog_Event_Metadata
  *
- * Adds Support for Extra LiveBlogPosting Metadata
+ * Adds Support for Event LiveBlogPosting Metadata
  */
-class WPCOM_Liveblog_Extra_Metadata {
-	const METABOX_KEY             = 'liveblog_extra_metdata_metabox';
-	const METADATA_KEY            = 'liveblog_extra_metadata';
-	const METADATA_NONCE          = 'liveblog_extra_metadata_nonce';
-	const METADATA_NONCE_FIELD    = 'liveblog_extra_metadata_nonce_';
+class WPCOM_Liveblog_Event_Metadata {
+	const METABOX_KEY             = 'liveblog_event_metdata_metabox';
+	const METADATA_KEY            = 'liveblog_event_metadata';
+	const METADATA_NONCE          = 'liveblog_event_metadata_nonce';
+	const METADATA_NONCE_FIELD    = 'liveblog_event_metadata_nonce_';
 	const METADATA_START_TIME     = 'start_time';
 	const METADATA_END_TIME       = 'end_time';
 	const METADATA_EVENT_TITLE    = 'event_title';
@@ -37,7 +37,7 @@ class WPCOM_Liveblog_Extra_Metadata {
 
 		add_meta_box(
 			self::METABOX_KEY,
-			__( 'Extra Liveblog Metadata', 'liveblog' ),
+			__( 'Liveblog Event Metadata', 'liveblog' ),
 			[ __CLASS__, 'liveblog_metadata_metabox' ],
 			null,
 			'side',
@@ -46,7 +46,7 @@ class WPCOM_Liveblog_Extra_Metadata {
 	}
 
 	/**
-	 * Update extra metadata on save_post.
+	 * Update event metadata on save_post.
 	 *
 	 * @param  int  $post_id Post ID.
 	 * @return bool          Boolean true if successful update, false on failure.
@@ -76,9 +76,9 @@ class WPCOM_Liveblog_Extra_Metadata {
 	}
 
 	/**
-	 * Save extra metadata.
+	 * Save event metadata.
 	 *
-	 * @param  array $metadata An array of extra metadata.
+	 * @param  array $metadata An array of event metadata.
 	 * @param  int   $post_id  Post ID.
 	 * @return bool            Boolean true if successful update, false on failure.
 	 */
@@ -168,15 +168,18 @@ class WPCOM_Liveblog_Extra_Metadata {
 			$metadata['about']['@type'] = 'Event';
 
 			if ( $title ) {
-				$metadata['about']['name'] = esc_html( $title );
+				$metadata['about']['name'] = $title;
 			}
 
 			if ( $url ) {
-				$metadata['about']['url'] = esc_url( $url );
+				$metadata['about']['url'] = $url;
 			}
 
 			if ( $location ) {
-				$metadata['about']['location'] = esc_html( $location );
+				$metadata['about']['location'] = [
+					'@type' => 'Place',
+					'address' => $location,
+				];
 			}
 
  			if ( $formatted_start ) {
@@ -187,6 +190,7 @@ class WPCOM_Liveblog_Extra_Metadata {
 				$metadata['about']['endDate'] = $formatted_end;
 			}
 		}
+
 		return $metadata;
 	}
 
