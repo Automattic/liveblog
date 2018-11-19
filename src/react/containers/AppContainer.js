@@ -53,7 +53,7 @@ class AppContainer extends Component {
           <Editor
             isEditing={false}
             backend={config.backend_liveblogging}
-            usetinymce={config.usetinymce}
+            useTinyMCE={config.usetinymce}
           />
         }
         <UpdateButton polling={polling} click={() => mergePolling()} />

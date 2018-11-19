@@ -323,7 +323,7 @@ class EditorWrapper extends Component {
       setReadOnly,
       handleImageUpload,
       defaultImageSize,
-      usetinymce,
+      useTinyMCE,
       editorContainer,
       clearAuthors,
       clearHeadline,
@@ -334,7 +334,7 @@ class EditorWrapper extends Component {
     } = this.props;
 
     // Admin liveblogging uses TinyMCE.
-    if (usetinymce === '1') {
+    if (useTinyMCE === '1') {
       return <TinyMCEEditor
         editorState={editorState}
         editorContainer={editorContainer}
@@ -412,7 +412,7 @@ EditorWrapper.propTypes = {
   setReadOnly: PropTypes.func,
   defaultImageSize: PropTypes.string,
   backend: PropTypes.string,
-  usetinymce: PropTypes.string,
+  useTinyMCE: PropTypes.string,
   editorContainer: PropTypes.object,
   clearAuthors: PropTypes.func,
   clearHeadline: PropTypes.func,
