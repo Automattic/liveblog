@@ -4,16 +4,17 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+
 import * as apiActions from '../actions/apiActions';
 import * as configActions from '../actions/configActions';
 import * as eventsActions from '../actions/eventsActions';
 import * as userActions from '../actions/userActions';
-import EditorContainer from '../containers/EditorContainer';
 import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
 import UpdateCount from '../components/UpdateCount';
+import Editor from '../components/Editor';
 
 class AppContainer extends Component {
   constructor() {
@@ -54,17 +55,19 @@ class AppContainer extends Component {
 
     return (
       <div style={{ position: 'relative' }}>
-        {showEditor &&
-        <EditorContainer
-          isEditing={false}
-          backend={config.backend_liveblogging}
-          usetinymce={config.usetinymce}
-        />}
+        {
+          showEditor &&
+          <Editor
+            isEditing={false}
+            backend={config.backend_liveblogging}
+            useTinyMCE={config.usetinymce}
+          />
+        }
         <UpdateButton polling={polling} click={() => mergePolling()} />
         { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
-        {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
+        {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
       </div>
     );
   }

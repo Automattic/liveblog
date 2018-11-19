@@ -1,0 +1,26 @@
+.liveblog-key-events {
+  position: relative;
+  overflow-y: visible;
+}
+
+.liveblog-key-events .liveblog-entry-delete-confirm {
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 20px auto 20px auto;
+  padding: 10px;
+  border: 1px solid $color-grey-mid-light;
+  width: 90%;
+  max-height: 150px;
+  z-index: 10;
+
+  p {
+    text-align: center;
+    font-size: .9rem;
+    margin-bottom: 10px;
+  }
+
+  @include mq($until: medium) {
+    min-height: 130px;
+    max-width: 300px;
+  }
+}

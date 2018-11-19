@@ -413,7 +413,12 @@ class WPCOM_Liveblog_Rest_Api {
 			'headline'        => self::get_json_param( 'headline', $json ),
 		);
 
-		// Add author to contributor list
+		// Ensure contributor_ids is an array.
+		if ( ! is_array( $args['contributor_ids'] ) ) {
+			$args[ 'contributor_ids'] = [];
+		}
+
+		// Add author to contributor list.
 		$args['contributor_ids'][] = $args['author_id'];
 
 		self::set_liveblog_vars( $args['post_id'] );
@@ -700,7 +705,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
-			return $json[ $param ];
+			return html_entity_decode( $json[ $param ] );
 		}
 		return false;
 	}

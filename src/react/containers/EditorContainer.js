@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
 import { html } from 'js-beautify';
+import { debounce } from 'lodash-es';
 
 import { EditorState, ContentState } from 'draft-js';
 
@@ -81,6 +82,8 @@ class EditorContainer extends Component {
       error,
       errorMessage,
     });
+
+    this.getUsers = debounce(this.getUsers.bind(this), props.config.author_list_debounce_time);
   }
 
   setReadOnly(state) {
@@ -91,7 +94,7 @@ class EditorContainer extends Component {
 
   getContent() {
     const { editorState } = this.state;
-    if (this.props.usetinymce === '1') {
+    if (this.props.useTinyMCE === '1') {
       return editorState.rawText;
     }
     return convertToHTML(editorState.getCurrentContent());
@@ -113,13 +116,24 @@ class EditorContainer extends Component {
 
   publish(event) {
     event.preventDefault();
-    const { updateEntry, entry, createEntry, isEditing } = this.props;
+    const { updateEntry, entry, createEntry, isEditing, useTinyMCE } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors ? authors.map(author => author.id) : [];
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
     const headline = this.state.headline;
+    const htmlregex = /<(img|picture|video|audio|canvas|svg|iframe|embed) ?.*>/;
+
+    // We don't want an editor publishing empty entries
+    // So we must check if there is any text within the editor
+    // If we fail to find text then we should check for a valid
+    // list of html elements, mainly visual for example images.
+    if (!editorState.getCurrentContent().getPlainText().trim() && useTinyMCE !== '1') {
+      if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
+        return;
+      }
+    }
 
     if (isEditing) {
       updateEntry({
@@ -268,7 +282,7 @@ class EditorContainer extends Component {
       canPublish,
     } = this.state;
 
-    const { isEditing, config, usetinymce } = this.props;
+    const { isEditing, config, useTinyMCE } = this.props;
 
     const errorData = {
       error: this.props.api.error || false,
@@ -293,7 +307,7 @@ class EditorContainer extends Component {
           onChange={this.onHeadlineChange.bind(this)}
           headline={headline}
         />
-        { (usetinymce !== '1') &&
+        { (useTinyMCE !== '1') &&
           <div className="liveblog-editor-tabs">
             <button
               className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
@@ -336,7 +350,7 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            usetinymce={usetinymce}
+            useTinyMCE={useTinyMCE}
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}
@@ -366,7 +380,7 @@ class EditorContainer extends Component {
           labelKey="name"
           onChange={this.onSelectAuthorChange.bind(this)}
           optionComponent={AuthorSelectOption}
-          loadOptions={this.getUsers.bind(this)}
+          loadOptions={this.getUsers}
           clearable={false}
           cache={false}
         />
