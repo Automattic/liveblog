@@ -59,7 +59,7 @@ export function createEntry(entry, config, nonce = false) {
     body: {
       crud_action: 'insert',
       post_id: config.post_id,
-      content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
+      content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
       headline: entry.headline,
@@ -73,7 +73,7 @@ export function createEntry(entry, config, nonce = false) {
   };
 
   // Clear TinyMCE after a brief delay.
-  if (config.usetinymce === '1') {
+  if (config.use_tinymce === '1') {
     setTimeout(() => {
       clearTinyMCEContent();
       clearAuthors();
@@ -94,7 +94,7 @@ export function updateEntry(entry, config, nonce = false) {
       crud_action: 'update',
       post_id: config.post_id,
       entry_id: entry.id,
-      content: (config.usetinymce === '1') ? getTinyMCEContent() : entry.content,
+      content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
       author_id: entry.author,
       contributor_ids: entry.contributors,
       headline: entry.headline,
