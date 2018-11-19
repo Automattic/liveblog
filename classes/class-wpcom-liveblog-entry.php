@@ -404,6 +404,8 @@ class WPCOM_Liveblog_Entry {
 
 				update_comment_meta( $entry_id, self::HIDE_AUTHORS_KEY, false );
 			}
+		} elseif ( empty( $args['author_id'] ) && WPCOM_Liveblog::is_author_required() ) {
+			return false;
 		} else {
 			update_comment_meta( $entry_id, self::HIDE_AUTHORS_KEY, true );
 		}

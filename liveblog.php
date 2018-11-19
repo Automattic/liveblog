@@ -1137,6 +1137,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						),
 						'is_admin'                     => is_admin(),
 						'cross_domain'                 => false,
+						'author_required'              => self::is_author_required(),
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
 						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
@@ -2089,6 +2090,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'last' => get_query_var( 'liveblog_last', false ),
 				'id'   => get_query_var( 'liveblog_id', false ),
 			);
+		}
+
+		/**
+		 * Helper function to determine whether author is required or not
+		 *
+		 * @return bool
+		 */
+		public static function is_author_required() {
+			return apply_filters( 'liveblog_author_required', false );
 		}
 
 	}
