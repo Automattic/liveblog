@@ -265,7 +265,7 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 		$args['content'] = '';
-		$comment         = self::insert_comment( $args );
+		$comment         = self::insert_comment( $args, false );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
@@ -287,8 +287,8 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
-	private static function insert_comment( $args ) {
-		$valid_args = self::validate_args( $args );
+	private static function insert_comment( $args, $content_required = true ) {
+		$valid_args = self::validate_args( $args, $content_required );
 		if ( is_wp_error( $valid_args ) ) {
 			return $valid_args;
 		}
@@ -317,8 +317,13 @@ class WPCOM_Liveblog_Entry {
 		return $comment;
 	}
 
-	private static function validate_args( $args ) {
-		$required_keys = array( 'post_id', 'user', 'content' );
+	private static function validate_args( $args, $content_required = true ) {
+		$required_keys = array( 'post_id', 'user' );
+
+		if ( $content_required ) {
+			array_push( $required_keys, 'content' );
+		}
+
 		foreach ( $required_keys as $key ) {
 			if ( ! isset( $args[ $key ] ) || ! $args[ $key ] ) {
 				// translators: 1: argument
