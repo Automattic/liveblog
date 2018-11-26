@@ -52,7 +52,8 @@ class EntryContainer extends Component {
     };
   }
 
-  togglePopup() {
+  togglePopup(event) {
+    event.preventDefault();
     this.setState({
       showPopup: !this.state.showPopup,
     });
