@@ -101,7 +101,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		echo esc_html( file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' ) );
+		echo wp_kses_post( file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' ) );
 	}
 
 	/**
