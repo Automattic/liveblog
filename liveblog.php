@@ -2026,13 +2026,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => date( 'c', $entry->entry_time ),
 					'dateModified'     => date( 'c', $entry->timestamp ),
+					'image'            => WPCOM_Liveblog_Entry::get_entry_first_image( $entry ),
 					'articleBody'      => [
 						'@type' => 'Text',
 					],
 				];
 
 				// Add the LiveBlogPost image to the BlogPosting.
-				if ( ( ! isset( $blog_item['image'] ) && isset( $metadata['image'] ) ) ) {
+				if ( ( ! isset( $blog_item['image'] ) || empty( $blog_item['image'] ) ) && isset( $metadata['image'] ) ) {
 					$blog_item['image'] = $metadata['image'];
 				}
 
