@@ -535,6 +535,38 @@ class WPCOM_Liveblog_Entry {
 		return wp_trim_words( $entry->content, 10, '…' );
 	}
 
+	/**
+	 * Get Entry first image if present.
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Image src.
+	 */
+	public static function get_entry_first_image( $entry ) {
+		$entry_id = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_id() : $entry->id;
+		$entry_content = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_content() : $entry->content;
+		$key    = 'liveblog_entry_' . $entry_id . 'first_image';
+		$cached = wp_cache_get( $key, 'liveblog' );
+		
+		if ( false === $cached ) {
+			preg_match( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $entry_content, $image );		
+			$cached = isset( $image['src'] ) ? $image['src'] : '';	
+			wp_cache_set( $key, $cached, 'liveblog' );
+		}
+
+		return $cached;
+	}
+	
+	/**
+	 * Get featured image for entry.
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Featured image src.
+	 */
+	public static function get_entry_featured_image_src( $entry ) {
+		$image = self::get_entry_first_image( $entry );
+		return apply_filters( 'liveblog_entry_featured_image', $image, $entry );
+	}
+
 }
 
 WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();
