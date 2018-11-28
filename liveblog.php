@@ -2026,7 +2026,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => date( 'c', $entry->entry_time ),
 					'dateModified'     => date( 'c', $entry->timestamp ),
-					'image'            => WPCOM_Liveblog_Entry::get_entry_first_image( $entry ),
+					'image'            => WPCOM_Liveblog_Entry::get_entry_featured_image_src( $entry ),
 					'articleBody'      => [
 						'@type' => 'Text',
 					],

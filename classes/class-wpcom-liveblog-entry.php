@@ -553,6 +553,17 @@ class WPCOM_Liveblog_Entry {
 
 		return $cached;
 	}
+	
+	/**
+	 * Get featured image for entry.
+	 *
+	 * @param  object $entry Entry.
+	 * @return string        Featured image src.
+	 */
+	public static function get_entry_featured_image_src( $entry ) {
+		$image = self::get_entry_first_image( $entry );
+		return apply_filters( 'liveblog_entry_featured_image', $image, $entry );
+	}
 
 }
 
