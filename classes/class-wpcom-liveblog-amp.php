@@ -101,7 +101,11 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		echo esc_html( file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' ) );
+		$css      = file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' );
+		$safe_css = wp_check_invalid_utf8( $css );
+		$safe_css = _wp_specialchars( $safe_css );
+
+		echo $safe_css;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
