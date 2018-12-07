@@ -38,7 +38,7 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
-		// if we're not on a live page, then bail
+		// If we're not on a liveblog, then bail.
 		if ( ! WPCOM_Liveblog::is_liveblog_post() ) {
 			return;
 		}
