@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.4
+
+* Send the correct data to get_liveblog_metadata() (#558)
+* Render AMP css safe without using esc_html to pass AMP validation (#586)
+* Don't run WPCOM_Liveblog_AMP::setup() on non-live posts. (#593)
+
 ## 1.9.3
 
 * Improve caching by setting a short TTL on future timestamps (#542)
