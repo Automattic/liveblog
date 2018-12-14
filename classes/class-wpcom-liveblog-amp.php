@@ -381,10 +381,9 @@ class WPCOM_Liveblog_AMP {
 	 * @return string        Date
 	 */
 	public static function get_entry_date( $entry ) {
-		$utc_offset  = get_option( 'gmt_offset' ) . 'hours';
 		$date_format = get_option( 'date_format' );
 
-		return date_i18n( $date_format, strtotime( $utc_offset, $entry->entry_time ) );
+		return date_i18n( $date_format, $entry->entry_time );
 	}
 
 	/**
