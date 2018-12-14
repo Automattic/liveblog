@@ -150,12 +150,10 @@ export const timeAgo = timestamp => moment.unix(timestamp).utc().fromNow();
 /**
  * Returns a formated string from timestamp in HH MM format.
  * @param {Number} timestamp
- * @return {String} utcOffset Utc Offset from server
+ * @return {String} timezoneString time zone from server
  */
-export const formattedTime = (timestamp, utcOffset, timeFormat) => {
-  const offset = parseInt(utcOffset, 10);
-  return moment.unix(timestamp).utcOffset(offset, false).formatUsingDateTime(timeFormat);
-};
+export const formattedTime = (timestamp, timezoneString, timeFormat) =>
+  moment.unix(timestamp).tz(timezoneString).formatUsingDateTime(timeFormat);
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
 
