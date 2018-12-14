@@ -101,7 +101,7 @@ EventsContainer.propTypes = {
 
 const mapStateToProps = state => ({
   dateFormat: state.config.date_format,
-  utcOffset: state.config.utc_offset,
+  timezoneString: state.config.timezone_string,
   events: state.events.entries,
   canEdit: state.config.is_liveblog_editable === '1',
 });

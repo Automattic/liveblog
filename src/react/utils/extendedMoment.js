@@ -1,6 +1,8 @@
 /* eslint-disable no-confusing-arrow */
 /* eslint-disable func-names */
 import moment from 'moment';
+import 'moment-timezone';
+
 /**
  * PHP => moment.js
  * Will take a php date format and convert it into a JS format for moment
