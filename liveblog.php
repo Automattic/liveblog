@@ -1194,19 +1194,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
-		 * Return the posting area for the end-user to liveblog from
-		 *
-		 * @return string
-		 */
-		private static function get_editor_output() {
-			if ( ! self::is_liveblog_editable() ) {
-				return;
-			}
-
-			return self::get_template_part( 'liveblog-form.php' );
-		}
-
-		/**
 		 * Get all the liveblog entries for this post
 		 */
 		private static function get_all_entry_output() {
