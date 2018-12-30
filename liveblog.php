@@ -1741,26 +1741,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
-		 * Convert bytes to hour
-		 *
-		 * @param string $bytes
-		 * @return string
-		 */
-		private static function convert_bytes_to_hr( $bytes ) {
-			$units = array(
-				0 => 'B',
-				1 => 'kB',
-				2 => 'MB',
-				3 => 'GB',
-			);
-			$log   = log( $bytes, 1024 );
-			$power = (int) $log;
-			$size  = pow( 1024, $log - $power );
-
-			return $size . $units[ $power ];
-		}
-
-		/**
 		 * Get the maximum upload file size
 		 *
 		 * @see wp_max_upload_size()
