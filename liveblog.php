@@ -1740,26 +1740,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			return $bytes;
 		}
 
-		/**
-		 * Convert bytes to hour
-		 *
-		 * @param string $bytes
-		 * @return string
-		 */
-		private static function convert_bytes_to_hr( $bytes ) {
-			$units = array(
-				0 => 'B',
-				1 => 'kB',
-				2 => 'MB',
-				3 => 'GB',
-			);
-			$log   = log( $bytes, 1024 );
-			$power = (int) $log;
-			$size  = pow( 1024, $log - $power );
-
-			return $size . $units[ $power ];
-		}
-
 		private static function is_wp_too_old() {
 			global $wp_version;
 			// if WordPress is loaded in a function the version variables aren't globalized

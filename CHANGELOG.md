@@ -190,8 +190,6 @@ Fixed problems:
 * Initial release
 
 
-## Props
-
 [borkweb]: https://github.com/borkweb
 [cain]: https://github.com/cain
 [cfoellmann]: https://github.com/cfoellmann
