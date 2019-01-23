@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.5
+
+* Fix PHP 7.3 continue switch warning (#617)
+* Remove unused get_fields_for_render() (#597)
+
 ## 1.9.4
 
 * Send the correct data to get_liveblog_metadata() (#558)
