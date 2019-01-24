@@ -1668,7 +1668,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function prevent_caching_if_needed() {
 			if ( self::$do_not_cache_response ) {
 				nocache_headers();
-			} else if ( self::$cache_control_max_age ) {
+			} elseif ( self::$cache_control_max_age ) {
 				header( 'Cache-control: max-age=' . self::$cache_control_max_age );
 				header( 'Expires: ' . gmdate( 'D, d M Y H:i:s \G\M\T', time() + self::$cache_control_max_age ) );
 			}
