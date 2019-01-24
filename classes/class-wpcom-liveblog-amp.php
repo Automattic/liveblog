@@ -38,7 +38,7 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
-		// if we're not on a live page, then bail
+		// If we're not on a liveblog, then bail.
 		if ( ! WPCOM_Liveblog::is_liveblog_post() ) {
 			return;
 		}
@@ -112,7 +112,11 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		echo file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' );
+		$css      = file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' );
+		$safe_css = wp_check_invalid_utf8( $css );
+		$safe_css = _wp_specialchars( $safe_css );
+
+		echo $safe_css;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

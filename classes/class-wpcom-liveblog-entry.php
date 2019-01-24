@@ -546,16 +546,16 @@ class WPCOM_Liveblog_Entry {
 		$entry_content = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_content() : $entry->content;
 		$key    = 'liveblog_entry_' . $entry_id . 'first_image';
 		$cached = wp_cache_get( $key, 'liveblog' );
-		
+
 		if ( false === $cached ) {
-			preg_match( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $entry_content, $image );		
-			$cached = isset( $image['src'] ) ? $image['src'] : '';	
+			preg_match( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $entry_content, $image );
+			$cached = isset( $image['src'] ) ? $image['src'] : '';
 			wp_cache_set( $key, $cached, 'liveblog' );
 		}
 
 		return $cached;
 	}
-	
+
 	/**
 	 * Get featured image for entry.
 	 *
