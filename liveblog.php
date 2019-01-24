@@ -719,7 +719,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			if ( ! empty( $entries_for_json ) ) {
 				// Entries found
-				$result_for_json['index']             = (int) filter_input( INPUT_GET, 'index' );
+				$result_for_json['index']             = filter_input( INPUT_GET, 'index', FILTER_SANITIZE_NUMBER_INT );
 				$result_for_json['nextTimestamp']     = $next_timestamp;
 				$result_for_json['previousTimestamp'] = $previous_timestamp;
 
@@ -780,7 +780,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$result = array(
 				'entries' => $entries_for_json,
-				'index'   => (int) filter_input( INPUT_GET, 'index' ),
+				'index'   => filter_input( INPUT_GET, 'index', FILTER_SANITIZE_NUMBER_INT ),
 			);
 
 			if ( ! empty( $entries_for_json ) ) {
