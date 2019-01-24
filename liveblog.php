@@ -449,8 +449,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Legacy endpoint for pre 4.4 installs
 		 */
 		public static function ajax_entries_between() {
-			$response_args = array();
-
 			// Look for entry boundaries
 			list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
 
@@ -778,7 +776,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			if ( ! empty( $entries_for_json ) ) {
 				// Entries found
-				$result_for_json['index']             = (int) filter_input( INPUT_GET, 'index' );
+				$result_for_json['index']             = filter_input( INPUT_GET, 'index', FILTER_SANITIZE_NUMBER_INT );
 				$result_for_json['nextTimestamp']     = $next_timestamp;
 				$result_for_json['previousTimestamp'] = $previous_timestamp;
 
@@ -839,7 +837,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$result = array(
 				'entries' => $entries_for_json,
-				'index'   => (int) filter_input( INPUT_GET, 'index' ),
+				'index'   => filter_input( INPUT_GET, 'index', FILTER_SANITIZE_NUMBER_INT ),
 			);
 
 			if ( ! empty( $entries_for_json ) ) {
@@ -1066,8 +1064,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ) );
-			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ) );
+			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ), array(), self::VERSION );
+			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ), array(), self::VERSION );
 
 			// Load Client Scripts
 			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __FILE__ ), array(), self::VERSION, true );
@@ -1803,7 +1801,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function prevent_caching_if_needed() {
 			if ( self::$do_not_cache_response ) {
 				nocache_headers();
-			} else if ( self::$cache_control_max_age ) {
+			} elseif ( self::$cache_control_max_age ) {
 				header( 'Cache-control: max-age=' . self::$cache_control_max_age );
 				header( 'Expires: ' . gmdate( 'D, d M Y H:i:s \G\M\T', time() + self::$cache_control_max_age ) );
 			}
