@@ -20,8 +20,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		parent::tearDown();
 
 		/** @var WP_REST_Server $wp_rest_server */
-		global $wp_rest_server;
-		$wp_rest_server = null;
+		global $wp_rest_server; // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
+		$wp_rest_server = null; // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
 	}
 
 	/**
