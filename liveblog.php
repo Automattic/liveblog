@@ -400,8 +400,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Legacy endpoint for pre 4.4 installs
 		 */
 		public static function ajax_entries_between() {
-			$response_args = array();
-
 			// Look for entry boundaries
 			list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
 
