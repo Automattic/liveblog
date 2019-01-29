@@ -1325,6 +1325,31 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
+		 * When the liveblog is enabled in the admin, add a div below the title.
+		 *
+		 * @param string $content
+		 * @return string
+		 */
+		public static function add_liveblog_after_editor() {
+			global $post;
+
+			if ( ! $post ) {
+				return;
+			}
+			$post_id = $post->ID;
+
+			if ( ! self::is_liveblog_post( $post_id ) ) {
+				return;
+			}
+
+			?>
+			<div class="liveblog-admin-wrapper">
+				<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div>
+			</div>
+			<?php
+		}
+
+		/**
 		 * Get all the liveblog entries for this post
 		 */
 		private static function get_all_entry_output() {
