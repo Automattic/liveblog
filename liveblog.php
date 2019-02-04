@@ -1110,7 +1110,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'latest_entry_timestamp'       => $entry_query->get_latest_timestamp(),
 						'latest_entry_id'              => $entry_query->get_latest_id(),
 						'timestamp'                    => time(),
-						'utc_offset'                   => get_option( 'gmt_offset' ) * 60, // in minutes
+						'utc_offset'                   => get_option( 'gmt_offset' ) * 3600, // in seconds
 						'timezone_string'              => get_option( 'timezone_string' ),
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => get_option( 'time_format' ),
