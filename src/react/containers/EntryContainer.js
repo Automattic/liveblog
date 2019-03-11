@@ -44,7 +44,7 @@ class EntryContainer extends Component {
       this.props.deleteEntry(this.props.entry.id);
     };
     this.scrollIntoView = () => {
-      this.node.scrollIntoView({ block: 'start', behavior: 'instant' });
+      this.node.scrollIntoView({ block: 'start', behavior: 'smooth' });
       this.props.resetScrollOnEntry(`id_${this.props.entry.id}`);
     };
     this.state = {
