@@ -7,6 +7,9 @@
 	$share_link     = $this->get( 'share_link' );
 	$update_time    = $this->get( 'update_time' );
 	$share_link_amp = $this->get( 'share_link_amp' );
+
+	/* This filter is defined in class-wpcom-liveblog-amp.php */
+	$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
 ?>
 
 <div class="liveblog-entry" id="post<?php echo esc_attr( $update_time ); ?>"
@@ -40,14 +43,14 @@
 
 				<?php else : ?>
 
-				<?php
-				$this->load_part(
-					'author',
-					array(
-						'author' => $authors,
-					)
-				);
-				?>
+					<?php
+					$this->load_part(
+						'author',
+						array(
+							'author' => $authors,
+						)
+					);
+					?>
 
 			<?php endif; ?>
 		</header>
@@ -64,7 +67,11 @@
 				<amp-social-share type="<?php echo esc_attr( $platform ); ?>"
 					width="45"
 					height="33"
-					data-param-url="<?php echo esc_url( $share_link_amp ); ?>"></amp-social-share>
+					data-param-url="<?php echo esc_url( $share_link_amp ); ?>"
+					<?php if ( 'facebook' === $platform ) : ?>
+						data-param-app_id="<?php echo esc_attr( $facebook_app_id ); ?>"
+					<?php endif; ?>
+				></amp-social-share>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</div>

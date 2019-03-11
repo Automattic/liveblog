@@ -12,6 +12,9 @@ Polyfills();
 const store = configureStore();
 const placeholder = document.getElementById('wpcom-liveblog-container');
 
+/* eslint-disable camelcase, no-undef */
+__webpack_public_path__ = `${window.liveblog_settings.plugin_dir}assets/`;
+
 if (placeholder) {
   ReactDOM.render(
     <Provider store={store}>

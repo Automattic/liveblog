@@ -38,6 +38,11 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
+		// If we're not on a liveblog, then bail.
+		if ( ! WPCOM_Liveblog::is_liveblog_post() ) {
+			return;
+		}
+
 		// Remove the standard Liveblog markup which just a <div> for React to render.
 		remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
 
@@ -66,7 +71,6 @@ class WPCOM_Liveblog_AMP {
 			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
 			add_action( 'amp_post_template_head', array( __CLASS__, 'social_meta_tags' ) );
 		}
-
 	}
 
 	/**
@@ -88,7 +92,14 @@ class WPCOM_Liveblog_AMP {
 	public static function add_social_share_options() {
 		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
 
-		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
+		/**
+		 * Filter Liveblog AMP Facebook share app id
+		 *
+		 * @param string $app_id The Facebook application id to enable sharing to Facebook.
+		 */
+		$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
+
+		if ( ! empty( $facebook_app_id ) ) {
 			$social_array[] = 'facebook';
 		}
 
@@ -101,7 +112,11 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		echo esc_html( file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' ) );
+		$css      = file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' );
+		$safe_css = wp_check_invalid_utf8( $css );
+		$safe_css = _wp_specialchars( $safe_css );
+
+		echo $safe_css;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -370,10 +385,9 @@ class WPCOM_Liveblog_AMP {
 	 * @return string        Date
 	 */
 	public static function get_entry_date( $entry ) {
-		$utc_offset  = get_option( 'gmt_offset' ) . 'hours';
 		$date_format = get_option( 'date_format' );
 
-		return date_i18n( $date_format, strtotime( $utc_offset, $entry->entry_time ) );
+		return date_i18n( $date_format, $entry->entry_time );
 	}
 
 	/**

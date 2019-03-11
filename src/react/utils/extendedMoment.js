@@ -1,6 +1,7 @@
 /* eslint-disable no-confusing-arrow */
 /* eslint-disable func-names */
 import moment from 'moment';
+import 'moment-timezone';
 
 /**
  * PHP => moment.js

@@ -4,15 +4,17 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+
 import * as apiActions from '../actions/apiActions';
 import * as configActions from '../actions/configActions';
 import * as eventsActions from '../actions/eventsActions';
-import EditorContainer from '../containers/EditorContainer';
+import * as userActions from '../actions/userActions';
 import Entries from '../components/Entries';
 import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
 import UpdateCount from '../components/UpdateCount';
+import Editor from '../components/Editor';
 
 class AppContainer extends Component {
   constructor() {
@@ -21,7 +23,7 @@ class AppContainer extends Component {
   }
 
   componentDidMount() {
-    const { loadConfig, getEntries, getEvents, startPolling } = this.props;
+    const { loadConfig, getEntries, getEvents, startPolling, scrollToEntry } = this.props;
     loadConfig(window.liveblog_settings);
     getEntries(1, window.location.hash);
     startPolling();
@@ -30,10 +32,16 @@ class AppContainer extends Component {
     setTimeout(() => {
       jQuery(document).trigger('liveblog-loaded');
     }, 1000);
+
+    // If there is a hash link to specific entry, scroll again once all entries are rendered.
+    const hashId = window.location.hash.split('#')[1];
+    if (!isNaN(hashId)) {
+      scrollToEntry(`id_${hashId}`);
+    }
   }
 
   render() {
-    const { page, loading, entries, polling, mergePolling, config } = this.props;
+    const { page, loading, entries, polling, mergePolling, config, total } = this.props;
     const paginationTypeLoadMore = config.paginationType === 'loadMore';
     const canEdit = config.is_liveblog_editable === '1';
     const frontEndEditing = config.backend_liveblogging !== '1';
@@ -47,17 +55,19 @@ class AppContainer extends Component {
 
     return (
       <div style={{ position: 'relative' }}>
-        {showEditor &&
-        <EditorContainer
-          isEditing={false}
-          backend={config.backend_liveblogging}
-          usetinymce={config.usetinymce}
-        />}
+        {
+          showEditor &&
+          <Editor
+            isEditing={false}
+            backend={config.backend_liveblogging}
+            useTinyMCE={config.use_tinymce}
+          />
+        }
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        { isAdmin && <UpdateCount entries={entries} config={config} /> }
+        { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
-        {this.eventsContainer && <EventsContainer container={this.eventsContainer} />}
+        {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
       </div>
     );
   }
@@ -75,11 +85,14 @@ AppContainer.propTypes = {
   polling: PropTypes.array,
   mergePolling: PropTypes.func,
   config: PropTypes.object,
+  scrollToEntry: PropTypes.func,
+  total: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
   page: state.pagination.page,
   loading: state.api.loading,
+  total: state.api.total,
   entries: Object.keys(state.api.entries)
     .map(key => state.api.entries[key]),
   polling: Object.keys(state.polling.entries),
@@ -91,6 +104,7 @@ const mapDispatchToProps = dispatch =>
     ...configActions,
     ...apiActions,
     ...eventsActions,
+    ...userActions,
   }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);

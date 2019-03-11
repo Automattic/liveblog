@@ -12,6 +12,7 @@ export const initialState = {
   entries: {},
   newestEntry: false,
   nonce: false,
+  total: 0,
 };
 
 export const api = (state = initialState, action) => {
@@ -38,6 +39,7 @@ export const api = (state = initialState, action) => {
           state.newestEntry,
           action.payload.entries[0],
         ),
+        total: action.payload.total,
       };
 
     case 'GET_ENTRIES_FAILED':
@@ -73,6 +75,7 @@ export const api = (state = initialState, action) => {
         ...state,
         error: false,
         nonce: action.payload.nonce,
+        total: state.total + 1,
       };
 
     case 'CREATE_ENTRY_FAILED':
@@ -87,6 +90,7 @@ export const api = (state = initialState, action) => {
         ...state,
         error: false,
         nonce: action.payload.nonce,
+        total: state.total - 1,
       };
 
     case 'DELETE_ENTRY_FAILED':
@@ -121,28 +125,32 @@ export const api = (state = initialState, action) => {
       };
 
     case 'SCROLL_TO_ENTRY':
-      return {
-        ...state,
-        entries: {
-          ...state.entries,
-          [action.payload]: {
-            ...state.entries[action.payload],
-            activateScrolling: true,
+      return state.entries[action.payload]
+        ? {
+          ...state,
+          entries: {
+            ...state.entries,
+            [action.payload]: {
+              ...state.entries[action.payload],
+              activateScrolling: true,
+            },
           },
-        },
-      };
+        }
+        : state;
 
     case 'RESET_SCROLL_ON_ENTRY':
-      return {
-        ...state,
-        entries: {
-          ...state.entries,
-          [action.payload]: {
-            ...state.entries[action.payload],
-            activateScrolling: false,
+      return state.entries[action.payload]
+        ? {
+          ...state,
+          entries: {
+            ...state.entries,
+            [action.payload]: {
+              ...state.entries[action.payload],
+              activateScrolling: false,
+            },
           },
-        },
-      };
+        }
+        : state;
 
     case 'LOAD_CONFIG':
       return {
