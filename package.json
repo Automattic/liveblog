@@ -62,7 +62,8 @@
 		"redux": "^3.7.2",
 		"redux-devtools-extension": "^2.13.2",
 		"redux-observable": "^0.16.0",
-		"rxjs": "^5.4.3"
+		"rxjs": "^5.4.3",
+		"smoothscroll-polyfill": "^0.4.3"
 	},
 	"scripts": {
 		"lint-scripts": "./node_modules/.bin/eslint ./src/react/",
