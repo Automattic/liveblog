@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ComponentsOverwriter = require('./loaders/plugin');
 
 const paths = {
   entry: './src/react/index.js',
@@ -36,7 +37,7 @@ const webpackConfig = {
           {
             loader: 'eslint-loader',
             options: {
-              configFile: '.eslintrc',
+              configFile: '.eslintrc.js',
               emitError: false,
               emitWarning: true,
             },
@@ -102,6 +103,7 @@ const webpackConfig = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new ComponentsOverwriter(process.env.LIVEBLOG_ALTERNATE_SOURCE_DIR),
   ],
 };
 

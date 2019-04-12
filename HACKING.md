@@ -35,3 +35,6 @@ Pretty straight-forward:
 * The methods responsible for responding to AJAX requests are prefixed with `ajax_`. There's most of the action.
 * `WPCOM_Liveblog_Entry_Query` is responsible for searching for entries by different criteria. Its methods usually return arrays of instances of `WPCOM_Liveblog_Entry`.
 * `WPCOM_Liveblog_Entry` represents a liveblog entry. It contains all the comment data and some functionality, mostly around rendering it in different contexts.
+
+# Overwriting default React components without modifying source code
+To run an example of experiment: LIVEBLOG_ALTERNATE_SOURCE_DIR=./altSource yarn build
