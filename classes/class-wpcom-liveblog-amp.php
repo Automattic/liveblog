@@ -287,6 +287,7 @@ class WPCOM_Liveblog_AMP {
 				'share_link'     => $entry->share_link,
 				'update_time'    => $entry->timestamp,
 				'share_link_amp' => $entry->share_link_amp,
+				'headline'       => $entry->headline,
 			)
 		);
 
