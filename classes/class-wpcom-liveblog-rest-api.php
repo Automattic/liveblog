@@ -415,7 +415,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		// Ensure contributor_ids is an array.
 		if ( ! is_array( $args['contributor_ids'] ) ) {
-			$args[ 'contributor_ids'] = [];
+			$args['contributor_ids'] = [];
 		}
 
 		// Add author to contributor list.
@@ -709,5 +709,4 @@ class WPCOM_Liveblog_Rest_Api {
 		}
 		return false;
 	}
-
 }
