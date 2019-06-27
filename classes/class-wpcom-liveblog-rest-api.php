@@ -705,6 +705,14 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
+
+			// contributor IDs is an array; html_entity_decode() only works on strings
+			if ( is_array( $json[ $param ] ) ) {
+				$values = $json[ $param ]; // copy the array; don't modify the original in-place
+				array_walk( $values, 'html_entity_decode');
+				return $values;
+			}
+
 			return html_entity_decode( $json[ $param ] );
 		}
 		return false;
