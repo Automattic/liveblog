@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.6
+
+* Ensure delete confirmation is above content
+* Add smooth scrolling
+* Restore multiple coauthors functionality
+
 ## 1.9.5
 
 * Fix PHP 7.3 continue switch warning (#617)
