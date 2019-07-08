@@ -60,8 +60,7 @@ export function createEntry(entry, config, nonce = false) {
       crud_action: 'insert',
       post_id: config.post_id,
       content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
-      author_id: entry.author,
-      contributor_ids: entry.contributors,
+      author_ids: entry.authorIds,
       headline: entry.headline,
     },
     headers: {
@@ -95,8 +94,7 @@ export function updateEntry(entry, config, nonce = false) {
       post_id: config.post_id,
       entry_id: entry.id,
       content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
-      author_id: entry.author,
-      contributor_ids: entry.contributors,
+      author_ids: entry.authorIds,
       headline: entry.headline,
     },
     headers: {
