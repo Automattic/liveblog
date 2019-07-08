@@ -18,7 +18,7 @@ class WPCOM_Liveblog_CPT {
 	 * @return object|WP_Error
 	 */
 	public static function register_post_type() {
-		self::$cpt_slug = apply_filter( 'wpcom_liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
+		self::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
 
 		return register_post_type(
 			self::$cpt_slug,
