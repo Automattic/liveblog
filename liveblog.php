@@ -692,7 +692,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return mixed The result of the crud method
 		 */
 		public static function do_crud_entry( $crud_action, $args ) {
-
 			$args['user'] = wp_get_current_user();
 			$entry        = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
 			if ( ! is_wp_error( $entry ) ) {
