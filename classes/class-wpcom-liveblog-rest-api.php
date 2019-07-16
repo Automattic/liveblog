@@ -408,18 +408,9 @@ class WPCOM_Liveblog_Rest_Api {
 			'post_id'         => self::get_json_param( 'post_id', $json ),
 			'content'         => self::get_json_param( 'content', $json ),
 			'entry_id'        => self::get_json_param( 'entry_id', $json ),
-			'author_id'       => self::get_json_param( 'author_id', $json ),
-			'contributor_ids' => self::get_json_param( 'contributor_ids', $json ),
+			'author_ids'      => self::get_json_param( 'author_ids', $json ),
 			'headline'        => self::get_json_param( 'headline', $json ),
 		);
-
-		// Ensure contributor_ids is an array.
-		if ( ! is_array( $args['contributor_ids'] ) ) {
-			$args['contributor_ids'] = [];
-		}
-
-		// Add author to contributor list.
-		$args['contributor_ids'][] = $args['author_id'];
 
 		self::set_liveblog_vars( $args['post_id'] );
 
