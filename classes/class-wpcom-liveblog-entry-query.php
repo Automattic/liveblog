@@ -192,7 +192,7 @@ class WPCOM_Liveblog_Entry_Query {
 			return null;
 		}
 
-		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
+		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_post' ), $comments );
 	}
 
 	public static function remove_replaced_entries( $entries = array(), $number = 0 ) {

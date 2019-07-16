@@ -61,9 +61,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_author_revert_regex', $this->revert_regex );
 
-		// We hook into the comment_class filter to
-		// be able to alter the comment content.
-		add_filter( 'comment_class', array( $this, 'add_author_class_to_entry' ), 10, 3 );
+		// We hook into the post_class filter to
+		// be able to alter the entry content.
+		add_filter( 'post_class', array( $this, 'add_author_class_to_entry' ), 10, 3 );
 
 		// Add an ajax endpoint to find the authors
 		// which is to be used on the front end.
@@ -189,22 +189,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 *
 	 * @param array  $classes
 	 * @param string $class
-	 * @param int    $comment_id
+	 * @param int    $post_id
 	 * @return array
 	 */
-	public function add_author_class_to_entry( $classes, $class, $comment_id ) {
+	public function add_author_class_to_entry( $classes, $class, $post_id ) {
 		$authors = array();
-		$comment = get_comment( $comment_id );
+		$entry = get_post( $post_id );
 
-		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
 
-			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $comment->comment_content, $authors );
+		// Grab all the prefixed classes applied.
+		preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $entry->post_content, $authors );
 
-			// Append the first class to the classes array.
-			$classes = array_merge( $classes, $authors[0] );
-		}
+		// Append the first class to the classes array.
+		$classes = array_merge( $classes, $authors[0] );
 
 		return $classes;
 	}
@@ -268,5 +265,4 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'avatar' => WPCOM_Liveblog::get_avatar( $author->ID, 20 ),
 		);
 	}
-
 }
