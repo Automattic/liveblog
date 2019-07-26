@@ -2,8 +2,6 @@
 
 /**
  * Responsible for querying the Liveblog entries.
- *
- * Much of the work is currently done by WordPress's comments API.
  */
 class WPCOM_Liveblog_Entry_Query {
 
@@ -15,60 +13,61 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Query the database for specific liveblog entries
 	 *
-	 * @param array $args the same args for the core `get_comments()`.
+	 * @param array $args the same args for the core `get_posts()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
 	public function get( $args = array() ) {
 		$defaults = array(
-			'post_id' => $this->post_id,
-			'orderby' => 'comment_date_gmt',
-			'order'   => 'DESC',
-			'type'    => $this->key,
-			'status'  => $this->key,
+			'post_type'   => WPCOM_Liveblog_CPT::$cpt_slug,
+			'post_parent' => $this->post_id,
+			'orderby'     => 'post_date_gmt',
+			'order'       => 'DESC',
 		);
 
-		$args     = wp_parse_args( $args, $defaults );
-		$comments = get_comments( $args );
+		$args    = wp_parse_args( $args, $defaults );
 
-		return self::entries_from_comments( $comments );
+		error_log(var_export($args,true));
+		$entries = get_posts( $args );
+		error_log(var_export($entries,true));
+
+		return self::entries_from_posts( $entries );
 	}
 
 	/**
 	 * Query the database for all edited liveblog entries associated with $post_id
 	 *
-	 * @param array $args the same args for the core `get_comments()`.
+	 * @param array $args the same args for the core `get_posts()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
 	public function get_all_edits( $args = array() ) {
 		$defaults = array(
-			'orderby'  => 'comment_date_gmt',
+			'orderby'  => 'post_date_gmt',
 			'order'    => 'ASC',
 			'meta_key' => 'liveblog_replaces', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			'status'   => 'liveblog',
 		);
 
 		$args     = wp_parse_args( $args, $defaults );
-		$comments = get_comments( $args );
+		$entries = get_posts( $args );
 
-		return self::entries_from_comments( $comments );
+		return self::entries_from_posts( $entries );
 	}
 	/**
 	 * Get all of the liveblog entries
 	 *
-	 * @param array $args the same args for the core `get_comments()`
+	 * @param array $args the same args for the core `get_posts()`
 	 */
 	public function get_all( $args = array() ) {
 		// Due to liveblog lazy loading, duplicate entries may be displayed
-		// if we actually pass the 'number' argument to get_comments
+		// if we actually pass the 'posts_per_page' argument to get_posts
 		// in this class.
 		//
 		// We don't want to remove the parameter entirely for backwards compatibility
 		// since this is a public method, but we need instead to handle it as part
 		// of remove_replaced_entries after we retrieve the entire result set.
 		$number = 0;
-		if ( isset( $args['number'] ) ) {
-			$number = intval( $args['number'] );
-			unset( $args['number'] );
+		if ( isset( $args['posts_per_page'] ) ) {
+			$number = intval( $args['posts_per_page'] );
+			unset( $args['posts_per_page'] );
 		}
 
 		return self::remove_replaced_entries( $this->get( $args ), $number );
@@ -79,23 +78,25 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	public function get_by_id( $id ) {
-		$comment = get_comment( $id );
+		$entry = get_post( $id );
 		/*
+		 * TODO: Update comment for WP_Post
+		 *
 		 * When running tests, WP_Comment's comment_ID and comment_post_ID return strings. However, post_id
 		 * returns a string (test_update_should_update_original_entry) or
 		 * an integer (test_get_by_id_should_return_the_entry). For this to pass, coerce comment_post_ID to
 		 * an integer before using a strict comparison.
 		 */
-		if ( intval( $comment->comment_post_ID ) !== intval( $this->post_id ) || $comment->comment_type !== $this->key || $comment->comment_approved !== $this->key ) {
+		if ( intval( $entry->post_parent ) !== intval( $this->post_id ) ) {
 			return null;
 		}
-		$entries = self::entries_from_comments( array( $comment ) );
+		$entries = self::entries_from_posts( array( $entry ) );
 		return $entries[0];
 	}
 
 	public function get_latest() {
 
-		$entries = $this->get( array( 'number' => 1 ) );
+		$entries = $this->get( array( 'posts_per_page' => 1 ) );
 
 		if ( empty( $entries ) ) {
 			return null;
@@ -186,13 +187,13 @@ class WPCOM_Liveblog_Entry_Query {
 		return $all_entries_asc;
 	}
 
-	public static function entries_from_comments( $comments = array() ) {
+	public static function entries_from_posts( $entries = array() ) {
 
-		if ( empty( $comments ) ) {
+		if ( empty( $entries ) ) {
 			return null;
 		}
 
-		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_post' ), $comments );
+		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_post' ), $entries );
 	}
 
 	public static function remove_replaced_entries( $entries = array(), $number = 0 ) {
