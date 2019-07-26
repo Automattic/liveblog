@@ -929,9 +929,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_emoji_revert_regex', $this->revert_regex );
 
-		// We hook into the comment_class filter to
-		// be able to alter the comment content.
-		add_filter( 'comment_class', array( $this, 'add_emoji_class_to_entry' ), 10, 3 );
+		// We hook into the post_class filter to
+		// be able to alter the post content.
+		add_filter( 'post_class', array( $this, 'add_emoji_class_to_entry' ), 10, 3 );
 	}
 
 	/**
@@ -1084,19 +1084,19 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 *
 	 * @param array  $classes
 	 * @param string $class
-	 * @param int    $comment_id
+	 * @param int    $entry_id
 	 *
 	 * @return array
 	 */
-	public function add_emoji_class_to_entry( $classes, $class, $comment_id ) {
+	public function add_emoji_class_to_entry( $classes, $class, $entry_id ) {
 		$emojis  = array();
-		$comment = get_comment( $comment_id );
+		$entry = get_post( $entry_id );
 
-		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
+		// Check if the post is a live blog.
+		if ( WPCOM_Liveblog_CPT::$cpt_slug === get_post_type( $entry_id ) ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $comment->comment_content, $emojis );
+			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $entry->post_content, $emojis );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $emojis[0] );
