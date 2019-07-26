@@ -193,11 +193,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * @return array
 	 */
 	public function add_author_class_to_entry( $classes, $class, $post_id ) {
-		$authors = array();
-		$entry = get_post( $post_id );
+		if ( ! $post_id ) {
+			return $classes;
+		}
 
+		$entry = get_post( $post_id );
+		if ( ! is_object( $entry ) ) {
+			return $classes;
+		}
 
 		// Grab all the prefixed classes applied.
+		$authors = array();
 		preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $entry->post_content, $authors );
 
 		// Append the first class to the classes array.

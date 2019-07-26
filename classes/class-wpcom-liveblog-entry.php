@@ -109,6 +109,10 @@ class WPCOM_Liveblog_Entry {
 	 * @return string The post's date.
 	 */
 	public function get_entry_date_gmt( $d = '', $post_id = 0 ) {
+		if ( ! $post_id ) {
+			return;
+		}
+
 		$entry = get_post( $post_id );
 		if ( '' === $d ) {
 			$date = mysql2date( get_option( 'date_format' ), $entry->post_date_gmt );
@@ -121,6 +125,10 @@ class WPCOM_Liveblog_Entry {
 
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
+		if ( ! $entry_id ) {
+			return false;
+		}
+
 		$css_classes = implode( ' ', apply_filters( 'post_class', [ 'liveblog' ], 'liveblog', $entry_id ) );
 		$share_link  = add_query_arg( [ 'lbup' => $entry_id ], get_permalink( $this->get_post_id() ) );
 
