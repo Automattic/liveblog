@@ -266,6 +266,7 @@ class WPCOM_Liveblog_Entry {
 				'post_content'     => $args['content'],
 				'post_title'       => $args['headline'],
 				'post_type'        => WPCOM_Liveblog_CPT::$cpt_slug,
+				'post_status'      => 'publish',
 			)
 		);
 
