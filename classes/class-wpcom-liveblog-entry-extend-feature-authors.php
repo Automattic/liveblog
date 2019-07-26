@@ -189,15 +189,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 *
 	 * @param array  $classes
 	 * @param string $class
-	 * @param int    $post_id
+	 * @param int    $entry_id
 	 * @return array
 	 */
-	public function add_author_class_to_entry( $classes, $class, $post_id ) {
-		if ( ! $post_id ) {
+	public function add_author_class_to_entry( $classes, $class, $entry_id ) {
+		if ( ! $entry_id ) {
 			return $classes;
 		}
 
-		$entry = get_post( $post_id );
+		$entry = get_post( $entry_id );
 		if ( ! is_object( $entry ) ) {
 			return $classes;
 		}
