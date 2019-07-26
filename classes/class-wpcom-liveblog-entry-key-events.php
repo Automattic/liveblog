@@ -107,7 +107,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @return mixed
 	 */
 	public static function is_key_event( $id ) {
-		if ( self::META_VALUE === get_comment_meta( $id, self::META_KEY, true ) ) {
+		if ( self::META_VALUE === get_post_meta( $id, self::META_KEY, true ) ) {
 			return true;
 		}
 		return false;
@@ -122,7 +122,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @param $post_id
 	 */
 	public static function add_key_action( $content, $id, $post_id ) {
-		add_comment_meta( $id, self::META_KEY, self::META_VALUE );
+		add_post_meta( $id, self::META_KEY, self::META_VALUE );
 	}
 
 	/**
@@ -131,7 +131,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @param $id
 	 */
 	public static function remove_key_action( $content, $id ) {
-		delete_comment_meta( $id, self::META_KEY, self::META_VALUE );
+		delete_post_meta( $id, self::META_KEY, self::META_VALUE );
 		return str_replace( '/key', '', $content );
 	}
 
