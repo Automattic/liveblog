@@ -11,7 +11,7 @@ class WPCOM_Liveblog_VIPGo_Helper {
 	/**
 	 * Purge LiveBlog edge cache (Varnish) on liveblog updates.
 	 *
-	 * @param int $liveblog_update_id Update comment id.
+	 * @param int $liveblog_update_id Update entry id.
 	 * @param int $post_id            Parent LiveBlog post id.
 	 * @return void
 	 */
