@@ -76,9 +76,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_command_revert_regex', $this->revert_regex );
 
-		// We hook into the comment_class filter to
-		// be able to alter the comment content.
-		add_filter( 'comment_class', array( $this, 'add_type_class_to_entry' ), 10, 3 );
+		// We hook into the post_class filter to
+		// be able to alter the post content.
+		add_filter( 'post_class', array( $this, 'add_type_class_to_entry' ), 10, 3 );
 
 		// Hook into the entry saving to
 		// execute the command logic.
@@ -191,18 +191,18 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 *
 	 * @param array  $classes
 	 * @param string $class
-	 * @param int    $comment_id
+	 * @param int    $entry_id
 	 * @return array
 	 */
-	public function add_type_class_to_entry( $classes, $class, $comment_id ) {
+	public function add_type_class_to_entry( $classes, $class, $entry_id ) {
 		$types   = array();
-		$comment = get_comment( $comment_id );
+		$entry = get_post( $entry_id );
 
-		// Check if the comment is a live blog comment.
-		if ( WPCOM_Liveblog::KEY === $comment->comment_type ) {
+		// Check if the post is a live blog.
+		if ( WPCOM_Liveblog_CPT::$cpt_slug === get_post_type( $entry_id ) ) {
 
 			// Grab all the prefixed classes applied.
-			preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $comment->comment_content, $types );
+			preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $entry->post_content, $types );
 
 			// Append the first class to the classes array.
 			$classes = array_merge( $classes, $types[0] );
@@ -230,7 +230,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 */
 	public function do_action_per_type( $id, $post_id ) {
 		$types   = array();
-		$content = get_comment_text( $id );
+		$entry   = get_post( $id );
+		$content = $entry->post_content;
 
 		// Match all of the command types.
 		preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $content, $types );
