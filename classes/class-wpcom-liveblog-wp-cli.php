@@ -15,7 +15,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	}
 
 	/**
-	 * Fix wp_commentmeta table so archived liveblog posts comments display properly.
+	 * Fix wp_postmeta table so archived liveblog entries display properly.
 	 *
 	 * @subcommand fix-archive
 	*/

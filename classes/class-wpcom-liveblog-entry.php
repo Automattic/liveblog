@@ -396,7 +396,7 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Return an array of authors.
 	 *
-	 * @param number $entry_id The id of the comment.
+	 * @param number $entry_id The id of the post.
 	 */
 	public static function get_authors( $entry_id ) {
 		$contributors = get_coauthors( $entry_id );
