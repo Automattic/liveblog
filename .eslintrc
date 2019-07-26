@@ -4,6 +4,9 @@
 		"airbnb-base",
 		"plugin:react/recommended"
 	],
+	"rules": {
+		"yoda": 0
+	},
 	"plugins": [
 		"jest",
 		"react"
