@@ -1,5 +1,5 @@
 <?php
-class WPCOM_Liveblog_VIPGo_Helper {
+class Liveblog_VIPGo_Helper { // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 
 	/**
 	 * Hook actions and filters
@@ -45,4 +45,4 @@ class WPCOM_Liveblog_VIPGo_Helper {
 	}
 }
 
-add_action( 'after_setup_theme', [ 'WPCOM_Liveblog_VIPGo_Helper', 'hooks' ] );
+add_action( 'after_setup_theme', [ 'Liveblog_VIPGo_Helper', 'hooks' ] );
