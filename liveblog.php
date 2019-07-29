@@ -1422,7 +1422,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function display_meta_box( $post ) {
 
 			// Get and display the metabox content
-			echo self::get_meta_box( $post );
+			echo wp_kses( self::get_meta_box( $post ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		}
 
 		/**
@@ -1648,7 +1648,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'archive' => __( 'Archived liveblogs', 'liveblog' ),
 				'none'    => __( 'No liveblogs', 'liveblog' ),
 			];
-			echo self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) );
+			echo wp_kses_post( self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		}
 
 		/**
