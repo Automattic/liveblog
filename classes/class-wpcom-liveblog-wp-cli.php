@@ -1,9 +1,6 @@
 <?php
-WP_CLI::add_command( 'liveblog', 'WPCOM_Liveblog_WP_CLI' );
-
+// phpcs:ignore WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli
 class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
- // phpcs:ignore WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli
-
 
 	public function readme_for_github() {
 		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
@@ -246,3 +243,5 @@ HELP
 		);
 	}
 }
+
+WP_CLI::add_command( 'liveblog', 'WPCOM_Liveblog_WP_CLI' );

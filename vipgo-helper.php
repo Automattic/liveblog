@@ -1,5 +1,5 @@
-<?php
-class Liveblog_VIPGo_Helper { // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
+class Liveblog_VIPGo_Helper {
 
 	/**
 	 * Hook actions and filters
