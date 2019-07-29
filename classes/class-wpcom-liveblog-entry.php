@@ -406,10 +406,10 @@ class WPCOM_Liveblog_Entry {
 
 		return array_map(
 			function( $contributor ) {
-				if ( 0 === $contributor ) {
+				if ( 0 === $contributor->ID ) {
 					return false;
 				}
-				$user_object = self::get_userdata_with_filter( $contributor );
+				$user_object = self::get_userdata_with_filter( $contributor->ID );
 				return self::get_user_data_for_json( $user_object );
 			}, $contributors
 		);
