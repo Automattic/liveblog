@@ -225,12 +225,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function ajax_terms() {
 
-		//Sanitize the input safely.
-		if ( isset( $_GET['autocomplete'] ) ) {
-			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) );
-		} else {
-			$search_term = '';
-		}
+		$search_term = filter_input( INPUT_GET, 'autocomplete', FILTER_SANITIZE_STRING );
 
 		// Get a list of hashtags matching the 'autocomplete' request variable
 		$terms = $this->get_hashtag_terms( $search_term );

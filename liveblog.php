@@ -638,21 +638,17 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$args = [];
 
-			$crud_action = isset( $_POST['crud_action'] ) ? sanitize_text_field( wp_unslash( $_POST['crud_action'] ) ) : 0;
+			$crud_action = filter_input( INPUT_POST, 'crud_action', FILTER_SANITIZE_STRING ) || 0;
 
 			if ( ! self::is_valid_crud_action( $crud_action ) ) {
 				// translators: 1: crud action
 				self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 			}
 
-			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : '';
-			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
-			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false;
-			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false;
-
-			// Add author to contributor list
-			$args['contributor_ids'][] = $args['author_id'];
+			$args['post_id']    = filter_input( INPUT_POST, 'post_id', FILTER_SANITIZE_NUMBER_INT );
+			$args['content']    = filter_input( INPUT_POST, 'content', FILTER_SANITIZE_STRING );
+			$args['entry_id']   = filter_input( INPUT_POST, 'entry_id', FILTER_SANITIZE_NUMBER_INT );
+			$args['author_ids'] = filter_input( INPUT_POST, 'author_ids', FILTER_SANITIZE_NUMBER_INT, FILTER_REQUIRE_ARRAY );
 
 			$entry = self::do_crud_entry( $crud_action, $args );
 
@@ -971,7 +967,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function ajax_preview_entry() {
-			$entry_content = isset( $_REQUEST['entry_content'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['entry_content'] ) ) : '';
+			$entry_content = filter_input( INPUT_POST, 'entry_content', FILTER_SANITIZE_STRING );
 			$entry_content = self::format_preview_entry( $entry_content );
 
 			self::json_return( $entry_content );
@@ -1469,13 +1465,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function admin_ajax_set_liveblog_state_for_post() {
-			$post_id   = isset( $_REQUEST['post_id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['post_id'] ) ) : 0;
-			$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
+			$post_id   = filter_input( INPUT_POST, 'post_id', FILTER_SANITIZE_NUMBER_INT ) || 0;
+			$new_state = filter_input( INPUT_POST, 'state', FILTER_SANITIZE_STRING );
 
 			self::ajax_current_user_can_edit_liveblog();
 			self::ajax_check_nonce();
 
-			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); //input var ok
+			// Filter the contents of $_REQUEST inside the actions corresponding to liveblog_admin_settings_update
+			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			if ( ! $meta_box ) {
 
@@ -1509,6 +1506,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return false;
 			}
 
+			// Filter the contents of $_REQUEST inside the actions corresponding to liveblog_admin_settings_update
 			do_action( 'liveblog_admin_settings_update', $request_vars, $post_id );
 
 			self::set_liveblog_state( $post_id, $new_state );
