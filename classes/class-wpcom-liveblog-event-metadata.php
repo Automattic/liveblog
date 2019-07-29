@@ -62,12 +62,12 @@ class WPCOM_Liveblog_Event_Metadata {
 		}
 
 		// Confirm nonce is present.
-		if ( ! isset( $_POST[ self::METADATA_NONCE ] ) ) { // input var okay
+		if ( ! isset( $_POST[ self::METADATA_NONCE ] ) ) {
 			return false;
 		}
 
 		// Verify nonces.
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::METADATA_NONCE ] ) ), self::METADATA_NONCE_FIELD . $post_id ) ) { // input var okay
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::METADATA_NONCE ] ) ), self::METADATA_NONCE_FIELD . $post_id ) ) {
 			return false;
 		};
 
@@ -85,7 +85,7 @@ class WPCOM_Liveblog_Event_Metadata {
 	 */
 	protected static function save_post_meta( $metadata, $post_id ) {
 		// Save the Liveblog Metadata
-		if ( isset( $metadata ) && is_array( $metadata ) ) { // input var okay
+		if ( isset( $metadata ) && is_array( $metadata ) ) {
 			$fields = [
 				self::METADATA_START_TIME,
 				self::METADATA_END_TIME,
@@ -97,8 +97,8 @@ class WPCOM_Liveblog_Event_Metadata {
 			$values = [];
 			foreach ( $fields as $field ) {
 				$values[ $field ] = isset( $metadata[ $field ] )
-					? sanitize_text_field( wp_unslash( $metadata[ $field ] ) )
-					: '';
+				? sanitize_text_field( wp_unslash( $metadata[ $field ] ) )
+				: '';
 			}
 			return update_post_meta( $post_id, self::METADATA_KEY, $values );
 		}

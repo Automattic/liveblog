@@ -39,7 +39,7 @@ add_action(
 			}
 		);
 		// If a site's permalink structure does not end with a trailing slash the url created by liveblog will redirect.
-		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) { // input var ok
+		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) {
 			add_action(
 				'wp',
 				function() {
