@@ -1,17 +1,18 @@
 <?php
 WP_CLI::add_command( 'liveblog', 'WPCOM_Liveblog_WP_CLI' );
 
-class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command { // phpcs:ignore WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli
+class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
+ // phpcs:ignore WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli
 
 
 	public function readme_for_github() {
 		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
-		$readme      = file_get_contents( $readme_path );
+		$readme      = file_get_contents( $readme_path ); // phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
 		$readme      = $this->listify_meta( $readme );
 		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
 		$readme      = $this->add_screenshot_links( $readme );
 		$readme      = $this->markdownify_headings( $readme );
-		echo $readme;
+		echo $readme; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -106,7 +107,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command { // phpcs:ignore WordPressVI
 									$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 										$wpdb->postmeta,
 										[
-											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_value
+											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 										],
 										[ 'post_id' => $entry_id ]
 									);
