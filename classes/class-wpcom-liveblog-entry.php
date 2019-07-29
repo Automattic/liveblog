@@ -414,8 +414,6 @@ class WPCOM_Liveblog_Entry {
 			},
 			$contributors
 		);
-
-		return $contributors;
 	}
 
 
