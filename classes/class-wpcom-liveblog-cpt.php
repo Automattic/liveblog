@@ -23,14 +23,14 @@ class WPCOM_Liveblog_CPT {
 		return register_post_type(
 			self::$cpt_slug,
 			[
-				'labels'        => [
-					'name'               => 'Live blogs',
-					'singular_name'      => 'Live blog',
+				'labels'    => [
+					'name'          => 'Live blogs',
+					'singular_name' => 'Live blog',
 				],
-				'menu_icon'     => 'dashicons-admin-post'
+				'menu_icon' => 'dashicons-admin-post',
 			]
 		);
 	}
 }
 
-add_action( 'init', [ 'WPCOM_Liveblog_CPT', 'register_post_type'] );
+add_action( 'init', [ 'WPCOM_Liveblog_CPT', 'register_post_type' ] );

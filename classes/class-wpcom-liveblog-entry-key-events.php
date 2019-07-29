@@ -22,19 +22,19 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Template to render entries
 	 */
-	protected static $available_templates = array(
-		'timeline' => array( 'liveblog-key-single-timeline.php', 'ul', 'liveblog-key-timeline' ),
-		'list'     => array( 'liveblog-key-single-list.php', 'ul', 'liveblog-key-list' ),
-	);
+	protected static $available_templates = [
+		'timeline' => [ 'liveblog-key-single-timeline.php', 'ul', 'liveblog-key-timeline' ],
+		'list'     => [ 'liveblog-key-single-list.php', 'ul', 'liveblog-key-list' ],
+	];
 
 	/**
 	 * Available content formats
 	 */
-	protected static $available_formats = array(
-		'first-linebreak' => array( __CLASS__, 'format_content_first_linebreak' ),
-		'first-sentence'  => array( __CLASS__, 'format_content_first_sentence' ),
+	protected static $available_formats = [
+		'first-linebreak' => [ __CLASS__, 'format_content_first_linebreak' ],
+		'first-sentence'  => [ __CLASS__, 'format_content_first_sentence' ],
 		'full'            => false,
-	);
+	];
 
 	/**
 	 * Called by WPCOM_Liveblog::load(), it attaches the
@@ -44,30 +44,30 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Hook into the WordPress init filter to make
 		// sure the templates are registered.
-		add_action( 'init', array( __CLASS__, 'add_templates' ), 11 );
+		add_action( 'init', [ __CLASS__, 'add_templates' ], 11 );
 
 		// Hook into the liveblog_active_commands
 		// filter to append the /key command.
-		add_filter( 'liveblog_active_commands', array( __CLASS__, 'add_key_command' ), 10 );
+		add_filter( 'liveblog_active_commands', [ __CLASS__, 'add_key_command' ], 10 );
 
 		// Hook into the liveblog_entry_for_json filter
 		// to inject the rendered key template.
-		add_filter( 'liveblog_entry_for_json', array( __CLASS__, 'render_key_template' ), 10, 2 );
+		add_filter( 'liveblog_entry_for_json', [ __CLASS__, 'render_key_template' ], 10, 2 );
 
 		// Hook into the liveblog_admin_add_settings filter
 		// to add the key event admin options.
-		add_filter( 'liveblog_admin_add_settings', array( __CLASS__, 'add_admin_options' ), 10, 2 );
+		add_filter( 'liveblog_admin_add_settings', [ __CLASS__, 'add_admin_options' ], 10, 2 );
 
 		// Add the liveblog_key_events shortcode.
-		add_shortcode( 'liveblog_key_events', array( __CLASS__, 'shortcode' ) );
+		add_shortcode( 'liveblog_key_events', [ __CLASS__, 'shortcode' ] );
 
 		// Hook into the after action for the key
 		// command to run the key command.
-		add_action( 'liveblog_command_key_after', array( __CLASS__, 'add_key_action' ), 10, 3 );
+		add_action( 'liveblog_command_key_after', [ __CLASS__, 'add_key_action' ], 10, 3 );
 
 		// Hook into the liveblog_admin_settings_update action
 		// to save the key event template.
-		add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
+		add_action( 'liveblog_admin_settings_update', [ __CLASS__, 'save_template_option' ], 10, 3 );
 	}
 
 	/**
@@ -217,7 +217,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Add the custom template fields to the editor.
 		$extra_fields[] = WPCOM_Liveblog::get_template_part(
 			'liveblog-key-admin.php',
-			array(
+			[
 				'current_key_template' => get_post_meta( $post_id, self::META_KEY_TEMPLATE, true ),
 				'current_key_format'   => get_post_meta( $post_id, self::META_KEY_FORMAT, true ),
 				'current_key_limit'    => get_post_meta( $post_id, self::META_KEY_LIMIT, true ),
@@ -228,7 +228,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 				'key_button'           => __( 'Save', 'liveblog' ),
 				'templates'            => array_keys( self::$available_templates ),
 				'formats'              => array_keys( self::$available_formats ),
-			)
+			]
 		);
 
 		return $extra_fields;
@@ -320,7 +320,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function format_content_first_linebreak( $content ) {
 
 		// Standardise returns into <br /> for linebreaks.
-		$content = str_replace( array( "\r", "\n" ), '<br />', $content );
+		$content = str_replace( [ "\r", "\n" ], '<br />', $content );
 
 		// Explode the content by the linebreaks.
 		$content = explode( '<br />', $content );
@@ -346,17 +346,17 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Define the default shortcode attributes.
 		$atts = shortcode_atts(
-			array(
+			[
 				'title' => 'Key Events',
-			),
+			],
 			$atts
 		);
 
 		// The args to pass into the entry query.
-		$args = array(
+		$args = [
 			'meta_key'   => self::META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'meta_value' => self::META_VALUE, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-		);
+		];
 
 		$limit = get_post_meta( $post->ID, self::META_KEY_LIMIT, true );
 		if ( isset( $limit ) ) {
@@ -378,13 +378,13 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			// Render the actual template.
 			return WPCOM_Liveblog::get_template_part(
 				'liveblog-key-events.php',
-				array(
+				[
 					'entries'  => $entries,
 					'title'    => $atts['title'],
 					'template' => $template[0],
 					'wrap'     => $template[1],
 					'class'    => $template[2],
-				)
+				]
 			);
 		}
 	}
@@ -397,19 +397,19 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	public static function all() {
 		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::KEY );
 		$key_events = $query->get(
-			array(
-				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					array(
+			[
+				'meta_query' => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					[
 						'key'     => self::META_KEY,
 						'value'   => self::META_VALUE,
 						'compare' => '===',
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 
 		if ( null === $key_events ) {
-			return array();
+			return [];
 		}
 		return $key_events;
 	}

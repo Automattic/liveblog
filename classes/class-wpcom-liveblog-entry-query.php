@@ -16,19 +16,19 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $args the same args for the core `get_posts()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
-	public function get( $args = array() ) {
-		$defaults = array(
+	public function get( $args = [] ) {
+		$defaults = [
 			'post_type'   => WPCOM_Liveblog_CPT::$cpt_slug,
 			'post_parent' => $this->post_id,
 			'orderby'     => 'post_date_gmt',
 			'order'       => 'DESC',
-		);
+		];
 
-		$args    = wp_parse_args( $args, $defaults );
+		$args = wp_parse_args( $args, $defaults );
 
-		error_log(var_export($args,true));
+		error_log( var_export( $args, true ) );
 		$entries = get_posts( $args );
-		error_log(var_export($entries,true));
+		error_log( var_export( $entries, true ) );
 
 		return self::entries_from_posts( $entries );
 	}
@@ -39,14 +39,14 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $args the same args for the core `get_posts()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
-	public function get_all_edits( $args = array() ) {
-		$defaults = array(
+	public function get_all_edits( $args = [] ) {
+		$defaults = [
 			'orderby'  => 'post_date_gmt',
 			'order'    => 'ASC',
 			'meta_key' => 'liveblog_replaces', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-		);
+		];
 
-		$args     = wp_parse_args( $args, $defaults );
+		$args    = wp_parse_args( $args, $defaults );
 		$entries = get_posts( $args );
 
 		return self::entries_from_posts( $entries );
@@ -56,7 +56,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 *
 	 * @param array $args the same args for the core `get_posts()`
 	 */
-	public function get_all( $args = array() ) {
+	public function get_all( $args = [] ) {
 		// Due to liveblog lazy loading, duplicate entries may be displayed
 		// if we actually pass the 'posts_per_page' argument to get_posts
 		// in this class.
@@ -73,7 +73,7 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $this->get( $args ), $number );
 	}
 
-	public function count( $args = array() ) {
+	public function count( $args = [] ) {
 		return count( $this->get_all( $args ) );
 	}
 
@@ -90,13 +90,13 @@ class WPCOM_Liveblog_Entry_Query {
 		if ( intval( $entry->post_parent ) !== intval( $this->post_id ) ) {
 			return null;
 		}
-		$entries = self::entries_from_posts( array( $entry ) );
+		$entries = self::entries_from_posts( [ $entry ] );
 		return $entries[0];
 	}
 
 	public function get_latest() {
 
-		$entries = $this->get( array( 'posts_per_page' => 1 ) );
+		$entries = $this->get( [ 'posts_per_page' => 1 ] );
 
 		if ( empty( $entries ) ) {
 			return null;
@@ -149,7 +149,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @return array
 	 */
 	public function find_between_timestamps( $entries, $start_timestamp, $end_timestamp ) {
-		$entries_between = array();
+		$entries_between = [];
 
 		foreach ( (array) $entries as $entry ) {
 			if ( $entry->get_timestamp() >= $start_timestamp && $entry->get_timestamp() <= $end_timestamp ) {
@@ -182,21 +182,21 @@ class WPCOM_Liveblog_Entry_Query {
 		if ( false !== $cached_entries_asc ) {
 			return $cached_entries_asc;
 		}
-		$all_entries_asc = $this->get( array( 'order' => 'ASC' ) );
+		$all_entries_asc = $this->get( [ 'order' => 'ASC' ] );
 		wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
 		return $all_entries_asc;
 	}
 
-	public static function entries_from_posts( $entries = array() ) {
+	public static function entries_from_posts( $entries = [] ) {
 
 		if ( empty( $entries ) ) {
 			return null;
 		}
 
-		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_post' ), $entries );
+		return array_map( [ 'WPCOM_Liveblog_Entry', 'from_post' ], $entries );
 	}
 
-	public static function remove_replaced_entries( $entries = array(), $number = 0 ) {
+	public static function remove_replaced_entries( $entries = [], $number = 0 ) {
 		if ( empty( $entries ) ) {
 			return $entries;
 		}
@@ -219,7 +219,7 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	public static function assoc_array_by_id( $entries ) {
-		$result = array();
+		$result = [];
 
 		foreach ( (array) $entries as $entry ) {
 			$result[ $entry->get_id() ] = $entry;
@@ -240,7 +240,7 @@ class WPCOM_Liveblog_Entry_Query {
 
 		$entries = $this->get_all();
 		if ( ! $entries ) {
-			return array();
+			return [];
 		}
 
 		if ( $max_timestamp ) {

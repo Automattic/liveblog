@@ -103,7 +103,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 			if ( ! $dry_run ) {
 				$new_entry_id = wp_insert_post(
-					array(
+					[
 						'post_parent'   => $liveblog_id,
 						'post_content'  => $content,
 						'post_title'    => $headline,
@@ -111,7 +111,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 						'post_status'   => 'publish',
 						'post_date'     => $lb_comment->comment_date,
 						'post_date_gmt' => $lb_comment->comment_date_gmt,
-					)
+					]
 				);
 
 				if ( $new_entry_id ) {

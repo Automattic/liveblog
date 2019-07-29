@@ -24,20 +24,20 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	public function test_get_latest_should_return_the_latest_comment_if_more_than_one() {
-		$id_first     = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) ); // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
-		$id_second    = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
+		$id_first     = $this->create_comment( [ 'comment_date_gmt' => self::JAN_1_MYSQL ] ); // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
+		$id_second    = $this->create_comment( [ 'comment_date_gmt' => self::JAN_2_MYSQL ] );
 		$latest_entry = $this->entry_query->get_latest();
 		$this->assertEquals( $id_second, $latest_entry->get_id() );
 	}
 
 	public function test_get_latest_timestamp_should_properly_convert_to_unix_timestamp() {
-		$this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
+		$this->create_comment( [ 'comment_date_gmt' => self::JAN_1_MYSQL ] );
 		$this->assertEquals( self::JAN_1_TIMESTAMP, $this->entry_query->get_latest_timestamp() );
 	}
 
 	public function test_get_between_timestamps_should_return_an_entry_between_two_timestamps() {
-		$id_first  = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
-		$id_second = $this->create_comment( array( 'comment_date_gmt' => self::JAN_2_MYSQL ) );
+		$id_first  = $this->create_comment( [ 'comment_date_gmt' => self::JAN_1_MYSQL ] );
+		$id_second = $this->create_comment( [ 'comment_date_gmt' => self::JAN_2_MYSQL ] );
 		$entries   = $this->entry_query->get_between_timestamps( self::JAN_1_TIMESTAMP - 10, self::JAN_2_TIMESTAMP + 10 );
 		$this->assertEquals( 2, count( $entries ) );
 		$ids = $this->get_ids_from_entries( $entries );
@@ -46,40 +46,40 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	public function test_get_between_timestamps_should_return_entries_on_the_border() {
-		$id      = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
+		$id      = $this->create_comment( [ 'comment_date_gmt' => self::JAN_1_MYSQL ] );
 		$entries = $this->entry_query->get_between_timestamps( self::JAN_1_TIMESTAMP, self::JAN_1_TIMESTAMP + 1 );
 		$ids     = $this->get_ids_from_entries( $entries );
-		$this->assertEquals( array( $id ), $ids );
+		$this->assertEquals( [ $id ], $ids );
 	}
 
 	public function test_get_only_matches_comments_with_the_key_as_approved_status() {
-		$this->create_comment( array( 'comment_approved' => 'wink' ) );
+		$this->create_comment( [ 'comment_approved' => 'wink' ] );
 		$entries = $this->entry_query->get_all();
 		$this->assertEquals( 0, count( $entries ) );
 	}
 
 	public function test_remove_replaced_entries_should_remove_entries_replacing_other_entries() {
-		$entries = array();
+		$entries = [];
 
-		$entries[0] = new WPCOM_Liveblog_Entry( (object) array( 'comment_ID' => 1 ) );
+		$entries[0] = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1 ] );
 
-		$entries[1]           = new WPCOM_Liveblog_Entry( (object) array( 'comment_ID' => 1000 ) );
+		$entries[1]           = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1000 ] );
 		$entries[1]->replaces = 1;
 
 		$filtered_entries = WPCOM_Liveblog_Entry_Query::remove_replaced_entries( $entries );
-		$this->assertEquals( array( 1 ), $this->get_ids_from_entries( $filtered_entries ) );
+		$this->assertEquals( [ 1 ], $this->get_ids_from_entries( $filtered_entries ) );
 	}
 
 	public function test_remove_replaced_entries_should_not_remove_entries_replacing_non_existing_entries() {
-		$entries = array();
+		$entries = [];
 
-		$entries[0] = new WPCOM_Liveblog_Entry( (object) array( 'comment_ID' => 1 ) );
+		$entries[0] = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1 ] );
 
-		$entries[1]           = new WPCOM_Liveblog_Entry( (object) array( 'comment_ID' => 1000 ) );
+		$entries[1]           = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1000 ] );
 		$entries[1]->replaces = 999;
 
 		$filtered_entries = WPCOM_Liveblog_Entry_Query::remove_replaced_entries( $entries );
-		$this->assertEquals( array( 1, 1000 ), $this->get_ids_from_entries( $filtered_entries ) );
+		$this->assertEquals( [ 1, 1000 ], $this->get_ids_from_entries( $filtered_entries ) );
 	}
 
 	public function test_get_by_id_should_return_the_entry() {
@@ -113,23 +113,23 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	}
 
 	public function test_count_honors_the_query_args() {
-		$this->create_comment( array( 'comment_author_email' => 'baba@example.org' ) );
-		$this->create_comment( array( 'comment_author_email' => 'dyado@example.org' ) );
-		$this->assertEquals( 1, $this->entry_query->count( array( 'author_email' => 'baba@example.org' ) ) );
+		$this->create_comment( [ 'comment_author_email' => 'baba@example.org' ] );
+		$this->create_comment( [ 'comment_author_email' => 'dyado@example.org' ] );
+		$this->assertEquals( 1, $this->entry_query->count( [ 'author_email' => 'baba@example.org' ] ) );
 	}
 
-	private function create_comment( $args = array() ) {
-		$defaults = array(
+	private function create_comment( $args = [] ) {
+		$defaults = [
 			'comment_post_ID'  => $this->entry_query->post_id,
 			'comment_approved' => $this->entry_query->key,
 			'comment_type'     => $this->entry_query->key,
-		);
+		];
 		$args     = array_merge( $defaults, $args );
 		return $this->factory->comment->create( $args );
 	}
 
 	private function get_ids_from_entries( $entries ) {
-		return array_values( array_map( array( __CLASS__, 'get_entry_id' ), $entries ) );
+		return array_values( array_map( [ __CLASS__, 'get_entry_id' ], $entries ) );
 	}
 
 	public static function get_entry_id( $entry ) {

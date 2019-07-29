@@ -32,7 +32,7 @@ $social           = $settings['social'];
 		<?php
 		$this->load_part(
 			'entry',
-			array(
+			[
 				'post_id'        => $post_id,
 				'id'             => $entry->id,
 				'content'        => $entry->content,
@@ -44,7 +44,7 @@ $social           = $settings['social'];
 				'social'         => $social,
 				'update_time'    => $entry->update_time,
 				'share_link_amp' => $entry->share_link_amp,
-			)
+			]
 		);
 		?>
 	<?php endforeach; ?>
@@ -54,11 +54,11 @@ $social           = $settings['social'];
 	<?php
 	$this->load_part(
 		'pagination',
-		array(
+		[
 			'links' => $links,
 			'page'  => $page,
 			'pages' => $pages,
-		)
+		]
 	);
 	?>
 
