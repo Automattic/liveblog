@@ -59,7 +59,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$edit_entries  = $entries_query->get_all_edits( [ 'post_id' => $post_id ] );
 
 			// find correct posst_ids to replace incorrect meta_values
-			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT post_id FROM $wpdb->posts
 					WHERE post_parent = %d AND post_id NOT IN
@@ -103,7 +103,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 								// If this isnt a dry run we can run the database Update.
 								if ( false === $is_dryrun ) {
-									$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+									$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 										$wpdb->postmeta,
 										[
 											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_value
@@ -118,7 +118,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			}
 
 			// find post_ids object with correct content for replacement
-			$correct_contents = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+			$correct_contents = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT ID, post_content
 					FROM $wpdb->posts
@@ -131,7 +131,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			);
 
 			// find post IDs that NEED to be replaced
-			$entries_replace = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+			$entries_replace = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT DISTINCT meta_value
 					FROM $wpdb->postmeta
@@ -157,7 +157,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					$content = $correct_contents[ $replaced ]->post_content;
 
 					if ( false === $is_dryrun ) {
-						$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+						$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 							$wpdb->posts,
 							[ 'post_content' => $content ],
 							[ 'ID' => $entry_replace->meta_value ]
