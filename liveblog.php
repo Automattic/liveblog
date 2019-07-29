@@ -309,7 +309,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function flush_rewrite_rules() {
 			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
 			if ( self::REWRITES_VERSION !== $rewrites_version ) {
-				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules
+				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
 		}
