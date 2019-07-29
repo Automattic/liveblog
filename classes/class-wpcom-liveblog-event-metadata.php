@@ -72,7 +72,8 @@ class WPCOM_Liveblog_Event_Metadata {
 		};
 
 		// Save meta data.
-		return self::save_post_meta( $_POST[ self::METADATA_KEY ], $post_id );
+		$metadata = isset( $_POST[ self::METADATA_KEY ] ) ? wp_unslash( $_POST[ self::METADATA_KEY ] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		return self::save_post_meta( $metadata, $post_id );
 	}
 
 	/**
