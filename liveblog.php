@@ -1008,7 +1008,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return string
 		 */
 		public static function add_post_class( $classes, $class, $entry_id ) {
-			if ( WPCOM_Liveblog_CPT::$cpt_slug === get_post_type( $entry_id ) ) {
+			if ( get_post_type( $entry_id ) === WPCOM_Liveblog_CPT::$cpt_slug ) {
 				$classes[] = 'liveblog-entry';
 				$classes[] = 'liveblog-entry-class-' . $entry_id;
 			}
