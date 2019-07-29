@@ -1221,7 +1221,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = [
 				'defaults' => $defaults,
 				'browser'  => [
-					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.wp_is_mobile_wp_is_mobile
+					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_is_mobile_wp_is_mobile
 					'supported' => _device_can_upload(),
 				],
 			];
