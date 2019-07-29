@@ -26,21 +26,21 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 *
 	 * @var string
 	 */
-	protected $commands = [];
+	protected $commands = array();
 
 	/**
 	 * The character prefixes.
 	 *
 	 * @var array
 	 */
-	protected $prefixes = [ '/', '\x{002f}' ];
+	protected $prefixes = array( '/', '\x{002f}' );
 
 	/**
 	 * An filters cache for the filter.
 	 *
 	 * @var array
 	 */
-	protected $filters = [];
+	protected $filters = array();
 
 	/**
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
@@ -56,21 +56,21 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		// Allow plugins, themes, etc. to change
 		// the current command set.
-		add_action( 'after_setup_theme', [ $this, 'custom_commands' ], 10 );
+		add_action( 'after_setup_theme', array( $this, 'custom_commands' ), 10 );
 
 		// This is the regex used to revert the
 		// generated author html back to the
 		// raw input format (e.g /key).
 		$this->revert_regex = implode(
 			'',
-			[
+			array(
 				preg_quote( '<span class="liveblog-command ', '~' ),
 				preg_quote( $this->class_prefix_local, '~' ),
 				'([^"]+)',
 				preg_quote( '">', '~' ),
 				'([^"]+)',
 				preg_quote( '</span>', '~' ),
-			]
+			)
 		);
 
 		// Allow plugins, themes, etc. to change the revert regex.
@@ -78,11 +78,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		// We hook into the post_class filter to
 		// be able to alter the post content.
-		add_filter( 'post_class', [ $this, 'add_type_class_to_entry' ], 10, 3 );
+		add_filter( 'post_class', array( $this, 'add_type_class_to_entry' ), 10, 3 );
 
 		// Hook into the entry saving to
 		// execute the command logic.
-		add_action( 'liveblog_insert_entry', [ $this, 'do_action_per_type' ], 10, 2 );
+		add_action( 'liveblog_insert_entry', array( $this, 'do_action_per_type' ), 10, 2 );
 	}
 
 	/**
@@ -105,7 +105,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
 			'liveblog_command_config',
-			[
+			array(
 				'trigger'     => '/',
 				'data'        => $this->get_commands(),
 				'displayKey'  => false,
@@ -114,7 +114,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 				'replaceText' => '/$',
 				'name'        => 'Command',
 				'template'    => false,
-			]
+			)
 		);
 
 		return $config;
@@ -139,13 +139,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 		// Store the filters on the object for
 		// use in another function.
-		$this->filters = [];
+		$this->filters = array();
 
 		// Map over every match and apply it via the
 		// preg_replace_callback method.
 		$entry['content'] = preg_replace_callback(
 			$this->get_regex(),
-			[ $this, 'preg_replace_callback' ],
+			array( $this, 'preg_replace_callback' ),
 			$entry['content']
 		);
 
@@ -195,7 +195,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return array
 	 */
 	public function add_type_class_to_entry( $classes, $class, $entry_id ) {
-		$types = [];
+		$types   = array();
 		$entry = get_post( $entry_id );
 
 		// Check if the post is a live blog.
@@ -229,7 +229,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	 * @return void
 	 */
 	public function do_action_per_type( $id, $post_id ) {
-		$types   = [];
+		$types   = array();
 		$entry   = get_post( $id );
 		$content = $entry->post_content;
 

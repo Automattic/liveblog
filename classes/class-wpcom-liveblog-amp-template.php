@@ -26,7 +26,7 @@ class WPCOM_Liveblog_AMP_Template {
 	 *
 	 * @var array
 	 */
-	public $data = [];
+	public $data = array();
 
 	/**
 	 * Contrustor
@@ -59,7 +59,7 @@ class WPCOM_Liveblog_AMP_Template {
 	 * @param  array  $variables Variables to be passed to Template.
 	 * @return string            Rendered Template
 	 */
-	public function render( $name, $variables = [] ) {
+	public function render( $name, $variables = array() ) {
 
 		$name        = ltrim( esc_attr( $name ), '/' ) . '.php';
 		$theme       = get_template_directory() . $this->theme_template_path . $name;
@@ -93,7 +93,7 @@ class WPCOM_Liveblog_AMP_Template {
 	 * @param  array  $variables Variables to be passed to Template.
 	 * @return void
 	 */
-	public function load_part( $name, $variables = [] ) {
+	public function load_part( $name, $variables = array() ) {
 		echo WPCOM_Liveblog_AMP::get_template( $name, $variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

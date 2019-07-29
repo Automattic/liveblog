@@ -44,7 +44,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$collection = $wp_filter[ $hook_name ];
 
-		$test_array = [];
+		$test_array = array();
 
 		foreach ( $collection as $value ) {
 			$test_array = array_merge( $test_array, $value );
@@ -241,7 +241,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	public function test_crud_action_insert() {
 
 		$user  = $this->factory->user->create_and_get();
-		$args  = [ 'user' => $user ];
+		$args  = array( 'user' => $user );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
 
 		$this->assertInternalType( 'array', $entry );
@@ -256,10 +256,10 @@ class Test_REST_API extends WP_UnitTestCase {
 	public function test_crud_action_update() {
 
 		$new_entry = $this->setup_entry_test_state();
-		$args      = [
+		$args      = array(
 			'entry_id' => $new_entry[0]->get_id(),
 			'content'  => 'Updated Test Liveblog entry',
-		];
+		);
 		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
 
 		$this->assertInternalType( 'array', $entry );
@@ -282,7 +282,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete it
-		$args = [ 'entry_id' => $new_entry_id ];
+		$args = array( 'entry_id' => $new_entry_id );
 		WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
 
 		// Check that it was sent to the trash
@@ -298,11 +298,11 @@ class Test_REST_API extends WP_UnitTestCase {
 	public function test_crud_action_delete_key() {
 
 		// First create an entry with a key
-		$new_entry    = $this->setup_entry_test_state( 1, [ 'content' => 'Test Liveblog entry with /key' ] );
+		$new_entry    = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete the key
-		$args  = [ 'entry_id' => $new_entry_id ];
+		$args  = array( 'entry_id' => $new_entry_id );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
 
 		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error
@@ -351,11 +351,11 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Create a temporary hashtag
 		$this->factory->term->create(
-			[
+			array(
 				'name'     => 'coolhashtag',
 				'taxonomy' => 'hashtags',
 				'slug'     => 'coolhashtag',
-			]
+			)
 		);
 
 		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag
@@ -378,12 +378,12 @@ class Test_REST_API extends WP_UnitTestCase {
 		$state = 'enable';
 
 		// Additional request variables used in the liveblog_admin_settings_update action
-		$request_vars = [
+		$request_vars = array(
 			'state'                        => $state,
 			'liveblog-key-template-name'   => 'list',
 			'liveblog-key-template-format' => 'full',
 			'liveblog-key-limit'           => '5',
-		];
+		);
 
 		// Save post state and return the metabox markup
 		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
@@ -433,9 +433,9 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// The POST data to insert
 		$post_vars = $this->build_entry_args(
-			[
+			array(
 				'crud_action' => 'insert',
-			]
+			)
 		);
 
 		// Try to access the endpoint and insert an entry
@@ -507,7 +507,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	public function test_endpoint_entry_preview() {
 
 		// The POST data to preview
-		$post_vars = [ 'entry_content' => 'Test Liveblog entry with /key' ];
+		$post_vars = array( 'entry_content' => 'Test Liveblog entry with /key' );
 
 		// Try to access the endpoint
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/preview' );
@@ -531,17 +531,17 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Create 2 authors
 		$this->factory->user->create(
-			[
+			array(
 				'role'         => 'author',
 				'display_name' => 'Josh Smith',
-			]
+			)
 		);
 
 		$this->factory->user->create(
-			[
+			array(
 				'role'         => 'author',
 				'display_name' => 'John Doe',
-			]
+			)
 		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
@@ -563,18 +563,18 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Create 2 hashtags
 		$this->factory->term->create(
-			[
+			array(
 				'name'     => 'coolhashtag',
 				'taxonomy' => 'hashtags',
 				'slug'     => 'coolhashtag',
-			]
+			)
 		);
 		$this->factory->term->create(
-			[
+			array(
 				'name'     => 'coolhashtag2',
 				'taxonomy' => 'hashtags',
 				'slug'     => 'coolhashtag2',
-			]
+			)
 		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
@@ -601,12 +601,12 @@ class Test_REST_API extends WP_UnitTestCase {
 		$post = $this->factory->post->create_and_get();
 
 		// The POST data
-		$post_vars = [
+		$post_vars = array(
 			'state'           => 'enable',
 			'template_name'   => 'list',
 			'template_format' => 'full',
 			'limit'           => '5',
-		];
+		);
 
 		// Try to access the endpoint
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
@@ -631,12 +631,12 @@ class Test_REST_API extends WP_UnitTestCase {
 		$post = $this->factory->post->create_and_get();
 
 		// The POST data
-		$post_vars = [
+		$post_vars = array(
 			'state'           => 'enable',
 			'template_name'   => 'list',
 			'template_format' => 'full',
 			'limit'           => '5',
-		];
+		);
 
 		// Try to access the endpoint to set the post as a liveblog
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
@@ -660,10 +660,10 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// The POST data to insert
 		$post_vars = $this->build_entry_args(
-			[
+			array(
 				'crud_action' => 'insert',
 				'post_id'     => $post_id,
-			]
+			)
 		);
 
 		// Try to access the endpoint and insert an entry
@@ -714,7 +714,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	}
 
-	private function setup_entry_test_state( $number_of_entries = 1, $args = [] ) {
+	private function setup_entry_test_state( $number_of_entries = 1, $args = array() ) {
 		$entries = $this->insert_entries( $number_of_entries, $args );
 
 		$this->set_liveblog_vars();
@@ -727,8 +727,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		WPCOM_Liveblog::$post_id          = 1;
 	}
 
-	private function insert_entries( $number_of_entries = 1, $args = [] ) {
-		$entries = [];
+	private function insert_entries( $number_of_entries = 1, $args = array() ) {
+		$entries = array();
 
 		$user         = $this->factory->user->create_and_get();
 		$args['user'] = $user;
@@ -740,11 +740,11 @@ class Test_REST_API extends WP_UnitTestCase {
 		return $entries;
 	}
 
-	private function build_entry_args( $args = [] ) {
-		$defaults = [
+	private function build_entry_args( $args = array() ) {
+		$defaults = array(
 			'post_id' => 1,
 			'content' => 'Test Liveblog entry',
-		];
+		);
 		return array_merge( $defaults, $args );
 	}
 
@@ -753,9 +753,9 @@ class Test_REST_API extends WP_UnitTestCase {
 	 */
 	private function set_author_user() {
 		$author_id = $this->factory->user->create(
-			[
+			array(
 				'role' => 'author',
-			]
+			)
 		);
 
 		wp_set_current_user( $author_id );
@@ -772,7 +772,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Make the new post a liveblog
 		$state        = 'enable';
-		$request_vars = [ 'state' => $state ];
+		$request_vars = array( 'state' => $state );
 		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		return $post_id;

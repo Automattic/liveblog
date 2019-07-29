@@ -23,10 +23,10 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		// Hook at template_redirect level as some Liveblog hooks require it.
-		add_filter( 'template_redirect', [ __CLASS__, 'setup' ], 10 );
+		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
 
 		// Add query vars to support pagination and single entries.
-		add_filter( 'query_vars', [ __CLASS__, 'add_custom_query_vars' ], 10 );
+		add_filter( 'query_vars', array( __CLASS__, 'add_custom_query_vars' ), 10 );
 	}
 
 	/**
@@ -44,13 +44,13 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		// Remove the standard Liveblog markup which just a <div> for React to render.
-		remove_filter( 'the_content', [ 'WPCOM_Liveblog', 'add_liveblog_to_content' ], 20 );
+		remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
 
 		// Remove standard Liveblog scripts as custom JS is not required for AMP.
-		remove_action( 'wp_enqueue_scripts', [ 'WPCOM_Liveblog', 'enqueue_scripts' ] );
+		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
 
 		// Add Liveblog to Schema.
-		add_filter( 'amp_post_template_metadata', [ __CLASS__, 'append_liveblog_to_metadata' ], 10, 2 );
+		add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
 
 		/**
 		 * If the_content filter is set higher than 7, embeds (for example Twitter) don't
@@ -60,16 +60,16 @@ class WPCOM_Liveblog_AMP {
 		remove_filter( 'the_content', 'wpautop' );
 
 		// Add AMP ready markup to post.
-		add_filter( 'the_content', [ __CLASS__, 'append_liveblog_to_content' ], 7 );
+		add_filter( 'the_content', array( __CLASS__, 'append_liveblog_to_content' ), 7 );
 
 		// Add AMP CSS for Liveblog and social meta tags.
 		// If this an AMP Theme then use enqueue for styles.
 		if ( current_theme_supports( 'amp' ) ) {
-			add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_styles' ] );
-			add_action( 'wp_head', [ __CLASS__, 'social_meta_tags' ] );
+			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_styles' ) );
+			add_action( 'wp_head', array( __CLASS__, 'social_meta_tags' ) );
 		} else {
-			add_action( 'amp_post_template_css', [ __CLASS__, 'print_styles' ] );
-			add_action( 'amp_post_template_head', [ __CLASS__, 'social_meta_tags' ] );
+			add_action( 'amp_post_template_css', array( __CLASS__, 'print_styles' ) );
+			add_action( 'amp_post_template_head', array( __CLASS__, 'social_meta_tags' ) );
 		}
 	}
 
@@ -90,7 +90,7 @@ class WPCOM_Liveblog_AMP {
 	 * Add default social share options
 	 */
 	public static function add_social_share_options() {
-		$social_array = [ 'twitter', 'pinterest', 'email', 'gplus' ];
+		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
 
 		/**
 		 * Filter Liveblog AMP Facebook share app id
@@ -125,7 +125,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', [], WPCOM_Liveblog::VERSION );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', array(), WPCOM_Liveblog::VERSION );
 	}
 
 
@@ -276,7 +276,7 @@ class WPCOM_Liveblog_AMP {
 
 		$rendered = self::get_template(
 			'entry',
-			[
+			array(
 				'single'         => true,
 				'id'             => $entry->id,
 				'content'        => $entry->content,
@@ -288,7 +288,7 @@ class WPCOM_Liveblog_AMP {
 				'update_time'    => $entry->timestamp,
 				'share_link_amp' => $entry->share_link_amp,
 				'headline'       => $entry->headline,
-			]
+			)
 		);
 
 		return $rendered;
@@ -331,19 +331,19 @@ class WPCOM_Liveblog_AMP {
 	public static function build_entries_feed( $entries, $request, $post_id ) {
 		$rendered = self::get_template(
 			'feed',
-			[
+			array(
 				'entries'  => self::filter_entries( $entries['entries'], $post_id ),
 				'post_id'  => $post_id,
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post_id ),
 				'last'     => get_query_var( 'liveblog_last', false ),
-				'settings' => [
+				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
 					'social'           => self::add_social_share_options(),
-				],
-			]
+				),
+			)
 		);
 
 		return $rendered;
@@ -400,7 +400,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return object         Pagination Links
 	 */
 	public static function get_pagination_links( $request, $pages, $post_id ) {
-		$links = [];
+		$links = array();
 
 		$permalink = amp_get_permalink( $post_id );
 
@@ -432,10 +432,10 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_paged_permalink( $permalink, $page, $last ) {
 		return add_query_arg(
-			[
+			array(
 				'liveblog_page' => $page,
 				'liveblog_last' => $last,
-			],
+			),
 			$permalink
 		);
 	}
@@ -449,9 +449,9 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_single_entry_permalink( $permalink, $id ) {
 		return add_query_arg(
-			[
+			array(
 				'liveblog_id' => $id,
-			],
+			),
 			$permalink
 		);
 	}
@@ -463,7 +463,7 @@ class WPCOM_Liveblog_AMP {
 	 * @param  array  $variables Variables to be passed to Template.
 	 * @return string            Rendered Template
 	 */
-	public static function get_template( $name, $variables = [] ) {
+	public static function get_template( $name, $variables = array() ) {
 		$template = new WPCOM_Liveblog_AMP_Template();
 		return $template->render( $name, $variables );
 	}

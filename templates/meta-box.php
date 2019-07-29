@@ -1,31 +1,31 @@
 <?php
-	$meta_box_allowed_tags = [
-		'select' => [
-			'id'    => [],
-			'class' => [],
-			'name'  => [],
-		],
-		'option' => [
-			'value'    => [],
-			'selected' => [],
-		],
-		'label'  => [
-			'for' => [],
-		],
-		'input'  => [
-			'id'    => [],
-			'class' => [],
-			'type'  => [],
-			'value' => [],
-			'name'  => [],
-		],
-		'button' => [
-			'id'    => [],
-			'class' => [],
-			'type'  => [],
-			'value' => [],
-		],
-	]
+	$meta_box_allowed_tags = array(
+		'select' => array(
+			'id'    => array(),
+			'class' => array(),
+			'name'  => array(),
+		),
+		'option' => array(
+			'value'    => array(),
+			'selected' => array(),
+		),
+		'label'  => array(
+			'for' => array(),
+		),
+		'input'  => array(
+			'id'    => array(),
+			'class' => array(),
+			'type'  => array(),
+			'value' => array(),
+			'name'  => array(),
+		),
+		'button' => array(
+			'id'    => array(),
+			'class' => array(),
+			'type'  => array(),
+			'value' => array(),
+		),
+	)
 	?>
 <p class="error"></p>
 <p class="success"><?php echo esc_html( $update_text ); ?></p>

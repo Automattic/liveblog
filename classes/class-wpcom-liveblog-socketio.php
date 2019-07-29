@@ -46,13 +46,13 @@ class WPCOM_Liveblog_Socketio {
 
 		self::load_settings();
 
-		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_scripts' ] );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
 		self::$redis_client = new Predis\Client(
-			[
+			array(
 				'host' => self::$redis_host,
 				'port' => self::$redis_port,
-			]
+			)
 		);
 
 		try {
@@ -70,7 +70,7 @@ class WPCOM_Liveblog_Socketio {
 	 * @return void
 	 */
 	private static function add_redis_error() {
-		add_action( 'admin_notices', [ __CLASS__, 'show_redis_error' ] );
+		add_action( 'admin_notices', array( __CLASS__, 'show_redis_error' ) );
 	}
 
 	/**
@@ -116,11 +116,11 @@ class WPCOM_Liveblog_Socketio {
 
 		$handle = 'liveblog-socket.io';
 
-		wp_enqueue_script( 'socket.io', plugins_url( 'js/socket.io.min.js', dirname( __FILE__ ) ), [], '1.4.4', true );
+		wp_enqueue_script( 'socket.io', plugins_url( 'js/socket.io.min.js', dirname( __FILE__ ) ), array(), '1.4.4', true );
 		wp_enqueue_script(
 			$handle,
 			plugins_url( 'js/liveblog-socket.io.js', dirname( __FILE__ ) ),
-			[ 'jquery', 'socket.io', WPCOM_Liveblog::KEY ],
+			array( 'jquery', 'socket.io', WPCOM_Liveblog::KEY ),
 			WPCOM_Liveblog::VERSION,
 			true
 		);
@@ -130,13 +130,13 @@ class WPCOM_Liveblog_Socketio {
 			'liveblog_socketio_settings',
 			apply_filters(
 				'liveblog_socketio_settings',
-				[
+				array(
 					'url'               => self::$url,
 					'post_key'          => self::get_post_key(),
 
 					// i18n
 					'unable_to_connect' => esc_html__( 'Unable to connect to the server to get new entries', 'liveblog' ),
-				]
+				)
 			)
 		);
 	}

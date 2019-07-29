@@ -19,14 +19,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 *
 	 * @var array
 	 */
-	protected $prefixes = [ '@', '\x{0040}' ];
+	protected $prefixes = array( '@', '\x{0040}' );
 
 	/**
 	 * An author cache for the filter.
 	 *
 	 * @var array
 	 */
-	protected $authors = [];
+	protected $authors = array();
 
 	/**
 	 * Called by WPCOM_Liveblog_Entry_Extend::load()
@@ -46,7 +46,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// raw input format (e.g @author).
 		$this->revert_regex = implode(
 			'',
-			[
+			array(
 				preg_quote( '<a href="', '~' ),
 				'[^"]+',
 				preg_quote( '" class="liveblog-author ', '~' ),
@@ -55,7 +55,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 				preg_quote( '"', '~' ),
 				'[^>]*>\\1',
 				preg_quote( '</a>', '~' ),
-			]
+			)
 		);
 
 		// Allow plugins, themes, etc. to change the revert regex.
@@ -63,11 +63,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// We hook into the post_class filter to
 		// be able to alter the entry content.
-		add_filter( 'post_class', [ $this, 'add_author_class_to_entry' ], 10, 3 );
+		add_filter( 'post_class', array( $this, 'add_author_class_to_entry' ), 10, 3 );
 
 		// Add an ajax endpoint to find the authors
 		// which is to be used on the front end.
-		add_action( 'wp_ajax_liveblog_authors', [ $this, 'ajax_authors' ] );
+		add_action( 'wp_ajax_liveblog_authors', array( $this, 'ajax_authors' ) );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
 			'liveblog_author_config',
-			[
+			array(
 				'type'        => 'ajax',
 				'cache'       => 1000 * 60 * 30,
 				'url'         => esc_url( $endpoint_url ),
@@ -101,7 +101,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 				'trigger'     => '@',
 				'name'        => 'Author',
 				'replaceText' => '@$',
-			]
+			)
 		);
 
 		return $config;
@@ -116,22 +116,22 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function filter( $entry ) {
 
 		// The args used in the get_users query.
-		$args = [
+		$args = array(
 			'who'    => 'authors',
-			'fields' => [ 'user_nicename' ],
-		];
+			'fields' => array( 'user_nicename' ),
+		);
 
 		// Map the authors and store them on the object
 		// for use in another function, we need
 		// them to be lowercased.
 		$authors       = apply_filters( 'liveblog_author_list', get_users( $args ), '' );
-		$this->authors = array_map( [ $this, 'map_authors' ], $authors );
+		$this->authors = array_map( array( $this, 'map_authors' ), $authors );
 
 		// Map over every match and apply it via the
 		// preg_replace_callback method.
 		$entry['content'] = preg_replace_callback(
 			$this->get_regex(),
-			[ $this, 'preg_replace_callback' ],
+			array( $this, 'preg_replace_callback' ),
 			$entry['content']
 		);
 
@@ -203,7 +203,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		}
 
 		// Grab all the prefixed classes applied.
-		$authors = [];
+		$authors = array();
 		preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '\w+/', $entry->post_content, $authors );
 
 		// Append the first class to the classes array.
@@ -236,11 +236,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	public function get_authors( $term ) {
 
 		// The args used in the get_users query.
-		$args = [
+		$args = array(
 			'who'    => 'authors',
-			'fields' => [ 'ID', 'user_nicename', 'display_name' ],
+			'fields' => array( 'ID', 'user_nicename', 'display_name' ),
 			'number' => 10,
-		];
+		);
 
 		// If there is no search term then search
 		// for nothing to get everything.
@@ -252,7 +252,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// Map the authors into the expected format.
 		$authors = apply_filters( 'liveblog_author_list', get_users( $args ), $term );
-		$users   = array_map( [ $this, 'map_ajax_authors' ], $authors );
+		$users   = array_map( array( $this, 'map_ajax_authors' ), $authors );
 
 		return $users;
 	}
@@ -264,11 +264,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * @return string
 	 */
 	public function map_ajax_authors( $author ) {
-		return [
+		return array(
 			'id'     => $author->ID,
 			'key'    => strtolower( $author->user_nicename ),
 			'name'   => $author->display_name,
 			'avatar' => WPCOM_Liveblog::get_avatar( $author->ID, 20 ),
-		];
+		);
 	}
 }

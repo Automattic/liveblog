@@ -76,7 +76,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 			echo wp_kses_post(
 				WPCOM_Liveblog::get_template_part(
 					'liveblog-socketio-error.php',
-					[ 'message' => $message ]
+					array( 'message' => $message )
 				)
 			);
 		}
@@ -88,7 +88,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 * @return void
 	 */
 	private static function add_socketio_emitter_required_error() {
-		add_action( 'admin_notices', [ __CLASS__, 'show_socketio_emitter_required_error' ] );
+		add_action( 'admin_notices', array( __CLASS__, 'show_socketio_emitter_required_error' ) );
 	}
 
 	/**
@@ -108,7 +108,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 * @return void
 	 */
 	private static function add_old_php_for_socketio_error() {
-		add_action( 'admin_notices', [ __CLASS__, 'show_old_php_for_socketio_error' ] );
+		add_action( 'admin_notices', array( __CLASS__, 'show_old_php_for_socketio_error' ) );
 	}
 
 	/**

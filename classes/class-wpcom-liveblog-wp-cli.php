@@ -29,11 +29,11 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		WP_CLI::line( 'Finding All Live Blog Entries..' );
 
 		$posts = new WP_Query(
-			[
+			array(
 				'order'    => 'ASC',
 				'orderby'  => 'ID',
 				'meta_key' => 'liveblog', // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_key
-			]
+			)
 		);
 
 		//How many live blogs do we have?
@@ -56,7 +56,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 			// get all entries that have been edited in the liveblog
 			$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
-			$edit_entries  = $entries_query->get_all_edits( [ 'post_id' => $post_id ] );
+			$edit_entries  = $entries_query->get_all_edits( array( 'post_id' => $post_id ) );
 
 			// find correct posst_ids to replace incorrect meta_values
 			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
@@ -105,10 +105,10 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 								if ( false === $is_dryrun ) {
 									$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 										$wpdb->postmeta,
-										[
+										array(
 											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_value
-										],
-										[ 'post_id' => $entry_id ]
+										),
+										array( 'post_id' => $entry_id )
 									);
 								}
 							}
@@ -159,8 +159,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					if ( false === $is_dryrun ) {
 						$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
 							$wpdb->posts,
-							[ 'post_content' => $content ],
-							[ 'ID' => $entry_replace->meta_value ]
+							array( 'post_content' => $content ),
+							array( 'ID' => $entry_replace->meta_value )
 						);
 					}
 

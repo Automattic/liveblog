@@ -32,9 +32,9 @@
 					<?php
 					$this->load_part(
 						'author',
-						[
+						array(
 							'author' => $author,
-						]
+						)
 					);
 					?>
 
@@ -46,9 +46,9 @@
 					<?php
 					$this->load_part(
 						'author',
-						[
+						array(
 							'author' => $authors,
-						]
+						)
 					);
 					?>
 

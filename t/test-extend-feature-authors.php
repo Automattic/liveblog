@@ -8,9 +8,9 @@ class Test_Extend_Feature_Authors extends WP_UnitTestCase {
 	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Authors::get_config()
 	 */
 	public function test_get_config_filter_executes() {
-		add_filter( 'liveblog_author_config', [ $this, 'example_test_filter' ], 1, 10 );
+		add_filter( 'liveblog_author_config', array( $this, 'example_test_filter' ), 1, 10 );
 		$class  = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
-		$config = [];
+		$config = array();
 		$test   = $class->get_config( $config );
 
 		$this->assertTrue( is_array( $test ) );

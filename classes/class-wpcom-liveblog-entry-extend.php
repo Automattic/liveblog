@@ -13,7 +13,7 @@ class WPCOM_Liveblog_Entry_Extend {
 	 *
 	 * @var array
 	 */
-	public static $autocomplete = [];
+	public static $autocomplete = array();
 
 	/**
 	 * Autocomplete features
@@ -27,11 +27,11 @@ class WPCOM_Liveblog_Entry_Extend {
 	 * it attaches the new command.
 	 */
 	public static function load() {
-		add_filter( 'liveblog_before_insert_entry', [ __CLASS__, 'strip_input' ], 1 );
-		add_filter( 'liveblog_before_update_entry', [ __CLASS__, 'strip_input' ], 1 );
-		add_filter( 'liveblog_before_insert_entry', [ __CLASS__, 'fix_links_wrapped_in_div' ], 1 );
-		add_filter( 'liveblog_before_update_entry', [ __CLASS__, 'fix_links_wrapped_in_div' ], 1 );
-		add_filter( 'liveblog_before_preview_entry', [ __CLASS__, 'fix_links_wrapped_in_div' ], 1 );
+		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'strip_input' ), 1 );
+		add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'strip_input' ), 1 );
+		add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
+		add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
+		add_filter( 'liveblog_before_preview_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
 
 		// Allow the features to be seperated in multiple ways: via spaces,
 		// pipes or commas. This line explodes via spaces and pipes then
@@ -59,11 +59,11 @@ class WPCOM_Liveblog_Entry_Extend {
 			$feature = new $class();
 
 			// Add all the basic (common) feature filters.
-			add_filter( 'liveblog_extend_autocomplete', [ $feature, 'get_config' ], 10 );
-			add_filter( 'liveblog_before_insert_entry', [ $feature, 'filter' ], 10 );
-			add_filter( 'liveblog_before_update_entry', [ $feature, 'filter' ], 10 );
-			add_filter( 'liveblog_before_preview_entry', [ $feature, 'filter' ], 10 );
-			add_filter( 'liveblog_before_edit_entry', [ $feature, 'revert' ], 10 );
+			add_filter( 'liveblog_extend_autocomplete', array( $feature, 'get_config' ), 10 );
+			add_filter( 'liveblog_before_insert_entry', array( $feature, 'filter' ), 10 );
+			add_filter( 'liveblog_before_update_entry', array( $feature, 'filter' ), 10 );
+			add_filter( 'liveblog_before_preview_entry', array( $feature, 'filter' ), 10 );
+			add_filter( 'liveblog_before_edit_entry', array( $feature, 'revert' ), 10 );
 
 			// Set the prefixes to the filtered prefixes.
 			// This allows themes, plugins, etc. to change prefixes.

@@ -27,7 +27,7 @@ class WPCOM_Liveblog_Cron {
 			wp_schedule_event( strtotime( 'today midnight' ), 'daily', 'auto_archive_check_hook' );
 		}
 
-		add_action( 'auto_archive_check_hook', [ __CLASS__, 'execute_auto_archive_housekeeping' ] );
+		add_action( 'auto_archive_check_hook', array( __CLASS__, 'execute_auto_archive_housekeeping' ) );
 	}
 
 	/**
@@ -41,11 +41,11 @@ class WPCOM_Liveblog_Cron {
 		if ( null !== WPCOM_Liveblog::$auto_archive_days ) {
 
 			$posts = new WP_Query(
-				[
+				array(
 					'order'    => 'ASC',
 					'orderby'  => 'ID',
 					'meta_key' => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				]
+				)
 			);
 
 			foreach ( $posts->posts as $post ) {
