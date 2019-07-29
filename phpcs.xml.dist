@@ -2,7 +2,8 @@
 <ruleset name="Custom ruleset for Liveblog">
 
 	<rule ref="WordPress-Extra"/>
-	<rule ref="WordPressVIPMinimum"/>
+	<rule ref="WordPress-VIP-Go" />
+	<rule ref="Generic.Arrays.DisallowLongArraySyntax" />
 
 	<arg value="sp"/>
 	<arg name="colors"/>
