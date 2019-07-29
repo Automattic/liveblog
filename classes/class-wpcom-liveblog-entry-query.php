@@ -24,11 +24,8 @@ class WPCOM_Liveblog_Entry_Query {
 			'order'       => 'DESC',
 		];
 
-		$args = wp_parse_args( $args, $defaults );
-
-		error_log( var_export( $args, true ) );
+		$args    = wp_parse_args( $args, $defaults );
 		$entries = get_posts( $args );
-		error_log( var_export( $entries, true ) );
 
 		return self::entries_from_posts( $entries );
 	}
