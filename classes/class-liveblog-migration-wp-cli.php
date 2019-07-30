@@ -172,8 +172,6 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 			WP_CLI::line( '!!! No old posts will be deleted.' );
 		}
 
-		self::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', WPCOM_Liveblog_CPT::DEFAULT_CPT_SLUG );
-
 		$live_blogs = self::get_liveblog_ids();
 		WP_CLI::line( 'Found ' . count( $live_blogs ) . ' live blogs' );
 
@@ -200,4 +198,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 	}
 }
 
+add_action( 'init', function() {
+	Liveblog_Migration_WP_CLI::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', WPCOM_Liveblog_CPT::DEFAULT_CPT_SLUG );
+});
 WP_CLI::add_command( 'liveblog', 'Liveblog_Migration_WP_CLI' );
