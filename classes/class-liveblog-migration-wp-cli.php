@@ -51,7 +51,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 	 */
 	public function convert_liveblog( $args, $assoc_args ) {
 
-		if ( ! isset( $assoc_args['id'] ) && ! intval( $assoc_args['id'] ) ) {
+		if ( ! isset( $assoc_args['id'] ) || ! intval( $assoc_args['id'] ) ) {
 			WP_CLI::error( 'You must supply a post ID to convert.' );
 			exit;
 		}
