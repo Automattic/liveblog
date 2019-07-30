@@ -120,7 +120,9 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 					$coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
 
-					update_post_meta( $new_entry_id, 'livepress_id', $livepress_id );
+					if ( $livepress_id ) {
+						update_post_meta( $new_entry_id, 'livepress_id', $livepress_id );
+					}
 					update_post_meta( $new_entry_id, 'liveblog_id', $lb_comment->comment_ID );
 
 					// delete post. wp_delete_post() also deletes postmeta.
