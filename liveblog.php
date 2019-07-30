@@ -949,10 +949,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$type = $entry->get_type();
 				$id   = $entry->get_id();
 
-				if ( ! empty( $entry->replaces ) ) {
-					$id = $entry->replaces;
-				}
-
 				switch ( $type ) {
 					case 'new':
 						$flatten[ $id ] = $entry;

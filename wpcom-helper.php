@@ -121,7 +121,7 @@ add_action(
 
 add_action(
 	'liveblog_update_entry',
-	function( $new_entry_id, $replaces_entry_id ) {
+	function( $new_entry_id ) {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'update' );
 	},
 	10,
