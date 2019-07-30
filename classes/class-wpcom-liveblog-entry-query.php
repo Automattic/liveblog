@@ -16,13 +16,14 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param array $args the same args for the core `get_posts()`.
 	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
 	 */
-	public function get( $args = array() ) {
-		$defaults = array(
-			'post_type'   => WPCOM_Liveblog_CPT::$cpt_slug,
-			'post_parent' => $this->post_id,
-			'orderby'     => 'post_date_gmt',
-			'order'       => 'DESC',
-		);
+	public function get( $args = [] ) {
+		$defaults = [
+			'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
+			'post_parent'    => $this->post_id,
+			'orderby'        => 'post_date_gmt',
+			'order'          => 'DESC',
+			'posts_per_page' => WPCOM_Liveblog::MAX_LAZY_LOAD_ENTRY_COUNT,
+		];
 
 		$args    = wp_parse_args( $args, $defaults );
 		$entries = get_posts( $args );
