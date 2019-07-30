@@ -91,16 +91,16 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 		$post_count = 0;
 		foreach ( $live_blog_comments as $lb_comment ) {
-			WP_CLI::line( 'Found live blog post ID ' . $lb_comment->ID );
+			WP_CLI::line( 'Found live blog comment ID ' . $lb_comment->comment_ID );
 			$content = trim( $lb_comment->comment_content );
 			if ( ! $content ) {
-				WP_CLI::line( 'Skipping blank post ' . $lb_comment->ID );
+				WP_CLI::line( 'Skipping blank comment ' . $lb_comment->comment_ID );
 				continue;
 			}
 
-			$headline     = get_comment_meta( $lb_comment->ID, 'liveblog_headline', true );
-			$authors      = get_comment_meta( $lb_comment->ID, 'liveblog_contributors', true );
-			$livepress_id = get_comment_meta( $lb_comment->ID, 'livepress_id', true );
+			$headline     = get_comment_meta( $lb_comment->comment_ID, 'liveblog_headline', true );
+			$authors      = get_comment_meta( $lb_comment->comment_ID, 'liveblog_contributors', true );
+			$livepress_id = get_comment_meta( $lb_comment->comment_ID, 'livepress_id', true );
 
 			if ( ! $dry_run ) {
 				$new_entry_id = wp_insert_post(
@@ -116,23 +116,23 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 				);
 
 				if ( $new_entry_id ) {
-					WP_CLI::line( 'Inserted live blog comment ID ' . $lb_comment->ID . ' as post ID ' . $new_entry_id );
+					WP_CLI::line( 'Inserted live blog comment ID ' . $lb_comment->comment_ID . ' as post ID ' . $new_entry_id );
 
 					$coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
 
 					update_post_meta( $new_entry_id, 'livepress_id', $livepress_id );
-					update_post_meta( $new_entry_id, 'liveblog_id', $lb_comment->ID );
+					update_post_meta( $new_entry_id, 'liveblog_id', $lb_comment->comment_ID );
 
 					// delete post. wp_delete_post() also deletes postmeta.
 					if ( $delete ) {
-						if ( false === wp_delete_comment( $lb_comment->ID, true ) ) {
-							WP_CLI::error( 'Failed to delete comment ' . $lb_comment->ID );
+						if ( false === wp_delete_comment( $lb_comment->comment_ID, true ) ) {
+							WP_CLI::error( 'Failed to delete comment ' . $lb_comment->comment_ID );
 						} else {
-							WP_CLI::line( 'Deleted comment ' . $lb_comment->ID );
+							WP_CLI::line( 'Deleted comment ' . $lb_comment->comment_ID );
 						}
 					}
 				} else {
-					WP_CLI::error( 'Failed to create post for liveblog comment ID ' . $lb_comment->ID );
+					WP_CLI::error( 'Failed to create post for liveblog comment ID ' . $lb_comment->comment_ID );
 				}
 			}
 
