@@ -16,6 +16,10 @@ class WPCOM_Liveblog_VIPGo_Helper {
 	 * @return void
 	 */
 	public static function purge_liveblog_edge_cache( $liveblog_update_id, $post_id ) {
+		if ( ! defined( 'VIP_GO_ENV' ) || false === VIP_GO_ENV ) {
+			return;
+		}
+
 		if ( ! function_exists( 'wpcom_vip_purge_edge_cache_for_url' ) ) {
 			return;
 		}
