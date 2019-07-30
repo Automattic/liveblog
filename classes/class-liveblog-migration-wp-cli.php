@@ -139,41 +139,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 			$post_count++;
 		}
 
-		self::convert_liveblog_event_data( $liveblog_id, $dry_run );
-
-		// delete postmeta: _livepress_feed_link, livepress_alert_sent, _livepress_post_header_enabled, _livepress_live_status, _livepress_status_uuid, _livepress_update_meta, livepress_feed_order, _livepress_feed_link
 		if ( ! $dry_run ) {
-			if ( $delete ) {
-				delete_post_meta( $liveblog_id, '_livepress_feed_link' );
-				delete_post_meta( $liveblog_id, 'livepress_alert_sent' );
-				delete_post_meta( $liveblog_id, '_livepress_post_header_enabled' );
-				delete_post_meta( $liveblog_id, '_livepress_live_status' );
-				delete_post_meta( $liveblog_id, '_livepress_update_meta' );
-				delete_post_meta( $liveblog_id, '_livepress_status_uuid' );
-				delete_post_meta( $liveblog_id, '_livepress_json_ld' );
-				delete_post_meta( $liveblog_id, 'livepress_feed_order' );
-
-				// delete _livepress_lp_shortlink_*
-				$meta_count = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-					$wpdb->prepare(
-						"DELETE FROM $wpdb->postmeta WHERE post_id = %d AND meta_key LIKE %s",
-						$liveblog_id,
-						'_livepress_lp_shortlink%'
-					)
-				);
-				if ( $meta_count ) {
-					WP_CLI::line( 'Removed ' . $meta_count . ' shortlinks for liveblog ID' . $liveblog_id );
-				}
-
-				// set the content to blank -- some old sticky posts used the parent post
-				wp_update_post(
-					[
-						'ID'           => $liveblog_id,
-						'post_content' => '',
-					]
-				);
-			}
-
 			WP_CLI::success( 'Converted live blog ID ' . $liveblog_id );
 		}
 	}
