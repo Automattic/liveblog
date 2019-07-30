@@ -30,23 +30,24 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 	/**
 	 * Convert one live blog from comments to posts
 	 *  - Per post:
-	 *  - content (comment)
-	 *  - timestamp (comment)
-	 *  - headline (commentmeta)
-	 *  - authors (commentmeta)
-	 *  - livepress comment ID (commentmeta)
+	 *  - content (post)
+	 *  - timestamp (post)
+	 *  - headline (post)
+	 *  - authors (coauthors plus)
+	 *  - livepress comment ID (postmeta)
+	 *  - liveblog comment ID (postmeta)
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp livepress convert-liveblog --id=12345
-	 *     wp livepress convert-liveblog --id=12345 --dry-run
-	 *     wp livepress convert-liveblog --id=12345 --dry-run=false
-	 *     wp livepress convert-liveblog --id=12345 --dry-run=false --delete=false
-	 *     wp livepress convert-liveblog --id=12345 --dry-run=false --delete=true
+	 *     wp livepress convert --id=12345
+	 *     wp livepress convert --id=12345 --dry-run
+	 *     wp livepress convert --id=12345 --dry-run=false
+	 *     wp livepress convert --id=12345 --dry-run=false --delete=false
+	 *     wp livepress convert --id=12345 --dry-run=false --delete=true
 	 *
 	 * @synposis --id [--dry-run] [--delete]
 	 *
-	 * @subcommand convert-liveblog
+	 * @subcommand convert
 	 */
 	public function convert_liveblog( $args, $assoc_args ) {
 
