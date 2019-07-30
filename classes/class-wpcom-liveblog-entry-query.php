@@ -18,10 +18,11 @@ class WPCOM_Liveblog_Entry_Query {
 	 */
 	public function get( $args = [] ) {
 		$defaults = [
-			'post_type'   => WPCOM_Liveblog_CPT::$cpt_slug,
-			'post_parent' => $this->post_id,
-			'orderby'     => 'post_date_gmt',
-			'order'       => 'DESC',
+			'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
+			'post_parent'    => $this->post_id,
+			'orderby'        => 'post_date_gmt',
+			'order'          => 'DESC',
+			'posts_per_page' => WPCOM_Liveblog::MAX_LAZY_LOAD_ENTRY_COUNT,
 		];
 
 		$args    = wp_parse_args( $args, $defaults );
