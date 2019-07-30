@@ -74,11 +74,32 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 		global $wpdb;
 		global $coauthors_plus;
 
+		// when a comment is updated, there will be multiple version of it
+		// you want the latest version of the content, but the earliest version of the timestamp
+
+		$live_blog_comment_replacements = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT $wpdb->commentmeta.comment_ID, $wpdb->commentmeta.meta_value
+				FROM $wpdb->commentmeta
+				JOIN $wpdb->comments ON $wpdb->commentmeta.comment_id = $wpdb->comments.comment_id
+				WHERE $wpdb->commentmeta.meta_key='liveblog_replaces' AND $wpdb->comments.comment_post_id = %d",
+				$liveblog_id
+			)
+		);
+
+		$comment_ids_to_skip = [];
+		$comment_id_map = [];
+		foreach ( $live_blog_comment_replacements as $item ) {
+			// skip anything marked as being replaced
+			$comment_ids_to_skip[] = $item->comment_ID;
+		}
+		$comment_ids_to_skip_string = join( ', ', $comment_ids_to_skip );
+
 		$live_blog_comments = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"SELECT comment_ID, comment_content, comment_date, comment_date_gmt
 				FROM $wpdb->comments
-				WHERE comment_type = 'liveblog' AND comment_post_ID = %d
+				WHERE comment_type = 'liveblog' AND comment_post_ID = %d AND comment_ID NOT IN ($comment_ids_to_skip_string)
 				ORDER BY comment_date_gmt ASC",
 				$liveblog_id
 			)
