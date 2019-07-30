@@ -31,24 +31,6 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Query the database for all edited liveblog entries associated with $post_id
-	 *
-	 * @param array $args the same args for the core `get_posts()`.
-	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
-	 */
-	public function get_all_edits( $args = [] ) {
-		$defaults = [
-			'orderby'  => 'post_date_gmt',
-			'order'    => 'ASC',
-			'meta_key' => 'liveblog_replaces', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-		];
-
-		$args    = wp_parse_args( $args, $defaults );
-		$entries = get_posts( $args );
-
-		return self::entries_from_posts( $entries );
-	}
-	/**
 	 * Get all of the liveblog entries
 	 *
 	 * @param array $args the same args for the core `get_posts()`
@@ -57,17 +39,13 @@ class WPCOM_Liveblog_Entry_Query {
 		// Due to liveblog lazy loading, duplicate entries may be displayed
 		// if we actually pass the 'posts_per_page' argument to get_posts
 		// in this class.
-		//
-		// We don't want to remove the parameter entirely for backwards compatibility
-		// since this is a public method, but we need instead to handle it as part
-		// of remove_replaced_entries after we retrieve the entire result set.
 		$number = 0;
 		if ( isset( $args['posts_per_page'] ) ) {
 			$number = intval( $args['posts_per_page'] );
 			unset( $args['posts_per_page'] );
 		}
 
-		return self::remove_replaced_entries( $this->get( $args ), $number );
+		return $this->get( $args );
 	}
 
 	public function count( $args = [] ) {
@@ -154,7 +132,7 @@ class WPCOM_Liveblog_Entry_Query {
 			}
 		}
 
-		return self::remove_replaced_entries( $entries_between );
+		return $entries_between;
 	}
 
 	/**
@@ -177,7 +155,7 @@ class WPCOM_Liveblog_Entry_Query {
 		$cached_entries_asc_key = $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc     = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
 		if ( false !== $cached_entries_asc ) {
-			return $cached_entries_asc;
+			// return $cached_entries_asc;
 		}
 		$all_entries_asc = $this->get( [ 'order' => 'ASC' ] );
 		wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
@@ -191,28 +169,6 @@ class WPCOM_Liveblog_Entry_Query {
 		}
 
 		return array_map( [ 'WPCOM_Liveblog_Entry', 'from_post' ], $entries );
-	}
-
-	public static function remove_replaced_entries( $entries = [], $number = 0 ) {
-		if ( empty( $entries ) ) {
-			return $entries;
-		}
-
-		$entries_by_id = self::assoc_array_by_id( $entries );
-
-		foreach ( (array) $entries_by_id as $id => $entry ) {
-			if ( ! empty( $entry->replaces ) && isset( $entries_by_id[ $entry->replaces ] ) ) {
-				unset( $entries_by_id[ $id ] );
-			}
-		}
-
-		// If a number of entries is set and we have more than that amount of entries,
-		// return just that slice.
-		if ( $number > 0 && count( $entries_by_id ) > $number ) {
-			$entries_by_id = array_slice( $entries_by_id, 0, $number );
-		}
-
-		return $entries_by_id;
 	}
 
 	public static function assoc_array_by_id( $entries ) {

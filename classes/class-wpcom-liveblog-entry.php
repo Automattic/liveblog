@@ -7,12 +7,6 @@ class WPCOM_Liveblog_Entry {
 
 	const DEFAULT_AVATAR_SIZE = 30;
 
-	/**
-	 * @var string In case the current entry is an edit (replaces) of
-	 * another entry, we store the other entry's ID in this meta key.
-	 */
-	const REPLACES_META_KEY = 'liveblog_replaces';
-
 	private $entry;
 	private $type = 'new';
 	private static $allowed_tags_for_entry;
@@ -30,13 +24,6 @@ class WPCOM_Liveblog_Entry {
 
 	public function __construct( $entry ) {
 		$this->entry    = $entry;
-		$this->replaces = get_post_meta( $entry->ID, self::REPLACES_META_KEY, true );
-		if ( $this->replaces && $this->get_content() ) {
-			$this->type = 'update';
-		}
-		if ( $this->replaces && ! $this->get_content() ) {
-			$this->type = 'delete';
-		}
 	}
 
 	public static function generate_allowed_tags_for_entry() {
@@ -124,7 +111,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public function for_json() {
-		$entry_id = $this->replaces ? $this->replaces : $this->get_id();
+		$entry_id = $this->get_id();
 		if ( ! $entry_id ) {
 			return false;
 		}
