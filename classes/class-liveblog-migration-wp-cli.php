@@ -78,7 +78,8 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 			$wpdb->prepare(
 				"SELECT comment_ID, comment_content, comment_date, comment_date_gmt
 				FROM $wpdb->comments
-				WHERE comment_type = 'liveblog' AND comment_post_ID = %d",
+				WHERE comment_type = 'liveblog' AND comment_post_ID = %d
+				ORDER BY comment_date_gmt ASC",
 				$liveblog_id
 			)
 		);
