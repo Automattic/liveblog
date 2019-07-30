@@ -154,6 +154,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php';
+				require dirname( __FILE__ ) . '/classes/class-liveblog-migration-wp-cli.php';
 			}
 
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php';
