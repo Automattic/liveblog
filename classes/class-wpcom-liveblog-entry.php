@@ -190,32 +190,38 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Updates an exsting entry
 	 *
-	 * Inserts a new entry, which replaces the original entry.
-	 *
 	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function update( $args ) {
+
 		if ( ! $args['entry_id'] ) {
-			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+			return new WP_Error( 'entry-update', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
 		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
-		$entry = self::insert_entry( $args );
-		if ( is_wp_error( $entry ) ) {
-			return $entry;
+		$post_data = [
+			'ID'           => $args['entry_id'],
+			'post_content' => $args['content'],
+			'post_title'   => $args['headline'],
+		];
+
+		$updated_entry_id = wp_update_post( $post_data );
+		if ( ! $updated_entry_id ) {
+			return new WP_Error( 'entry-update', __( 'Updating post failed', 'liveblog' ) );
 		}
 
-		do_action( 'liveblog_update_entry', $entry->ID, $args['post_id'] );
-		add_post_meta( $entry->ID, self::REPLACES_META_KEY, $args['entry_id'] );
+		global $coauthors_plus;
+		$coauthors_plus->add_coauthors( $args['entry_id'], $args['author_ids'], false, 'id' );
 
-		$entry = wp_update_post(
-			[
-				'ID'           => $args['entry_id'],
-				'post_content' => $args['content'],
-			]
-		);
+		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
+		do_action( 'liveblog_update_entry', $args['entry_id'], $args['post_id'] );
+
+		$entry_post = get_post( $updated_entry_id );
+		$entry = self::from_post( $entry_post );
+		$entry->type = 'update';
+
 		return $entry;
 	}
 
