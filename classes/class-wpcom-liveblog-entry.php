@@ -236,10 +236,15 @@ class WPCOM_Liveblog_Entry {
 			return $entry;
 		}
 
+		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
 		do_action( 'liveblog_delete_entry', $entry->ID, $args['post_id'] );
-		add_post_meta( $entry->ID, self::REPLACES_META_KEY, $args['entry_id'] );
 
-		$entry = wp_delete_post( $args['entry_id'] );
+		$entry_post = wp_delete_post( $args['entry_id'] );
+		$entry      = self::from_post( $entry_post );
+
+		$entry->type = 'delete';
+		$entry->content = '';
+
 		return $entry;
 	}
 
