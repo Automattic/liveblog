@@ -155,7 +155,7 @@ class WPCOM_Liveblog_Entry_Query {
 		$cached_entries_asc_key = $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc     = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
 		if ( false !== $cached_entries_asc ) {
-			// return $cached_entries_asc;
+			return $cached_entries_asc;
 		}
 		$all_entries_asc = $this->get( [ 'order' => 'ASC' ] );
 		wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
