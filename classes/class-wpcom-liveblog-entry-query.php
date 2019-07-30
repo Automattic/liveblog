@@ -25,10 +25,7 @@ class WPCOM_Liveblog_Entry_Query {
 		);
 
 		$args    = wp_parse_args( $args, $defaults );
-
-		error_log(var_export($args,true));
 		$entries = get_posts( $args );
-		error_log(var_export($entries,true));
 
 		return self::entries_from_posts( $entries );
 	}
