@@ -76,7 +76,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 		$live_blog_comments = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"SELECT ID, comment_content, comment_date, comment_date_gmt
+				"SELECT comment_ID, comment_content, comment_date, comment_date_gmt
 				FROM $wpdb->comments
 				WHERE comment_type = 'liveblog' AND comment_post_ID = %d",
 				$liveblog_id
