@@ -8,7 +8,7 @@
  */
 class WPCOM_Liveblog_CPT {
 
-	const DEFAULT_CPT_SLUG = 'wpcom_liveblog';
+	const DEFAULT_CPT_SLUG = 'liveblog';
 
 	public static $cpt_slug;
 
