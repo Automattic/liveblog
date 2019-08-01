@@ -39,7 +39,7 @@ add_action(
 			}
 		);
 		// If a site's permalink structure does not end with a trailing slash the url created by liveblog will redirect.
-		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) { // input var ok
+		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) {
 			add_action(
 				'wp',
 				function() {
@@ -149,7 +149,7 @@ add_filter(
 	function( $can_edit ) {
 
 		// Retain super admin access for A12s.
-		if ( is_automattician() || ( defined( 'A8C_PROXIED_REQUEST' ) && A8C_PROXIED_REQUEST ) ) { // phpcs:ignore WordPressVIPMinimum.Constants.ConstantRestrictions.ConstantRestrictions
+		if ( is_automattician() || ( defined( 'A8C_PROXIED_REQUEST' ) && A8C_PROXIED_REQUEST ) ) { // phpcs:ignore WordPressVIPMinimum.Constants.RestrictedConstants.UsingRestrictedConstant
 			return $can_edit;
 		}
 

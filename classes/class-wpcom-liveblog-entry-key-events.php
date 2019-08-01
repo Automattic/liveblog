@@ -170,17 +170,20 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 */
 	public static function save_template_option( $response, $post_id ) {
 
+		$state         = filter_var( $response['state'], FILTER_SANITIZE_STRING );
+		$template_name = filter_var( $response['liveblog-key-template-name'], FILTER_SANITIZE_STRING );
+
 		// Only save / update the template option if the response
 		// state is `liveblog-key-template-save` and the
 		// `liveblog-key-template-name` is not empty.
-		if ( 'liveblog-key-template-save' === $response['state'] && ! empty( $response['liveblog-key-template-name'] ) ) {
+		if ( 'liveblog-key-template-save' === $state && $template_name ) {
 
 			// The default template.
 			$template = 'timeline';
 
 			// Grab the template from the available templates if it exists.
-			if ( isset( self::$available_templates[ $response['liveblog-key-template-name'] ] ) ) {
-				$template = $response['liveblog-key-template-name'];
+			if ( isset( self::$available_templates[ $template_name ] ) ) {
+				$template = $template_name;
 			}
 
 			// Store this template on the post.
@@ -190,16 +193,17 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			$format = 'first-linebreak';
 
 			// Grab the format from the available formats if it exists.
-			if ( isset( self::$available_formats[ $response['liveblog-key-template-format'] ] ) ) {
-				$format = $response['liveblog-key-template-format'];
+			$template_format = filter_var( $response['liveblog-key-template-format'], FILTER_SANITIZE_STRING );
+			if ( isset( self::$available_formats[ $template_format ] ) ) {
+				$format = $template_format;
 			}
 
 			// Store this format on the post.
 			update_post_meta( $post_id, self::META_KEY_FORMAT, $format );
 
 			// If isn't a valid number turns it into 0, which returns all key events
-			$limit = absint( $response['liveblog-key-limit'] );
-			if ( isset( $limit ) ) {
+			$limit = absint( filter_var( $response['liveblog-key-limit'], FILTER_SANITIZE_NUMBER_INT ) );
+			if ( $limit ) {
 				update_post_meta( $post_id, self::META_KEY_LIMIT, $limit );
 			}
 		}

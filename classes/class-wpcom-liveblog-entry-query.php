@@ -169,7 +169,7 @@ class WPCOM_Liveblog_Entry_Query {
 			return null;
 		}
 
-		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_post' ), $entries );
+		return array_map( [ 'WPCOM_Liveblog_Entry', 'from_post' ], $entries );
 	}
 
 	public static function assoc_array_by_id( $entries ) {

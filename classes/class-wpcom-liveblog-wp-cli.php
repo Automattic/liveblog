@@ -1,17 +1,15 @@
 <?php
-WP_CLI::add_command( 'liveblog', 'WPCOM_Liveblog_WP_CLI' );
-
+// phpcs:ignore WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli
 class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
-
 
 	public function readme_for_github() {
 		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
-		$readme      = file_get_contents( $readme_path ); // @codingStandardsIgnoreLine
+		$readme      = file_get_contents( $readme_path ); // phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
 		$readme      = $this->listify_meta( $readme );
 		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
 		$readme      = $this->add_screenshot_links( $readme );
 		$readme      = $this->markdownify_headings( $readme );
-		echo $readme; // @codingStandardsIgnoreLine
+		echo $readme; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -61,7 +59,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			//$edit_entries  = $entries_query->get_all_edits( [ 'post_id' => $post_id ] );
 
 			// find correct posst_ids to replace incorrect meta_values
-			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT post_id FROM $wpdb->posts
 					WHERE post_parent = %d AND post_id NOT IN
@@ -105,12 +103,12 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 								// If this isnt a dry run we can run the database Update.
 								if ( false === $is_dryrun ) {
-									$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+									$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 										$wpdb->postmeta,
-										array(
-											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_value
-										),
-										array( 'post_id' => $entry_id )
+										[
+											'meta_value' => $correct_ids[ $i ], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+										],
+										[ 'post_id' => $entry_id ]
 									);
 								}
 							}
@@ -120,7 +118,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			}
 
 			// find post_ids object with correct content for replacement
-			$correct_contents = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+			$correct_contents = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT ID, post_content
 					FROM $wpdb->posts
@@ -133,7 +131,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			);
 
 			// find post IDs that NEED to be replaced
-			$entries_replace = $wpdb->get_results( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+			$entries_replace = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT DISTINCT meta_value
 					FROM $wpdb->postmeta
@@ -159,7 +157,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					$content = $correct_contents[ $replaced ]->post_content;
 
 					if ( false === $is_dryrun ) {
-						$wpdb->update( // phpcs:ignore WordPress.VIP.DirectDatabaseQuery.DirectQuery, WordPress.VIP.DirectDatabaseQuery.NoCaching
+						$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 							$wpdb->posts,
 							array( 'post_content' => $content ),
 							array( 'ID' => $entry_replace->meta_value )
@@ -247,3 +245,5 @@ HELP
 		);
 	}
 }
+
+WP_CLI::add_command( 'liveblog', 'WPCOM_Liveblog_WP_CLI' );

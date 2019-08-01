@@ -206,7 +206,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$entry = get_post( $entry_id );
 
 		// Check if the post is a live blog.
-		if ( WPCOM_Liveblog_CPT::$cpt_slug === get_post_type( $entry_id ) ) {
+		if ( get_post_type( $entry_id ) === WPCOM_Liveblog_CPT::$cpt_slug ) {
 
 			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)' . preg_quote( $this->class_prefix, '/' ) . '(\w\-?)+/', $entry->post_content, $terms );
@@ -225,12 +225,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function ajax_terms() {
 
-		//Sanitize the input safely.
-		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
-			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
-		} else {
-			$search_term = '';
-		}
+		$search_term = filter_input( INPUT_GET, 'autocomplete', FILTER_SANITIZE_STRING );
 
 		// Get a list of hashtags matching the 'autocomplete' request variable
 		$terms = $this->get_hashtag_terms( $search_term );

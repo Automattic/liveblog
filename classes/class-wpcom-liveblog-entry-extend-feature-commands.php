@@ -199,7 +199,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$entry = get_post( $entry_id );
 
 		// Check if the post is a live blog.
-		if ( WPCOM_Liveblog_CPT::$cpt_slug === get_post_type( $entry_id ) ) {
+		if ( get_post_type( $entry_id ) === WPCOM_Liveblog_CPT::$cpt_slug ) {
 
 			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $entry->post_content, $types );

@@ -62,17 +62,18 @@ class WPCOM_Liveblog_Event_Metadata {
 		}
 
 		// Confirm nonce is present.
-		if ( ! isset( $_POST[ self::METADATA_NONCE ] ) ) { // input var okay
+		if ( ! isset( $_POST[ self::METADATA_NONCE ] ) ) {
 			return false;
 		}
 
 		// Verify nonces.
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::METADATA_NONCE ] ) ), self::METADATA_NONCE_FIELD . $post_id ) ) { // input var okay
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::METADATA_NONCE ] ) ), self::METADATA_NONCE_FIELD . $post_id ) ) {
 			return false;
 		};
 
 		// Save meta data.
-		return self::save_post_meta( $_POST[ self::METADATA_KEY ], $post_id );
+		$metadata = isset( $_POST[ self::METADATA_KEY ] ) ? wp_unslash( $_POST[ self::METADATA_KEY ] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		return self::save_post_meta( $metadata, $post_id );
 	}
 
 	/**
@@ -84,7 +85,7 @@ class WPCOM_Liveblog_Event_Metadata {
 	 */
 	protected static function save_post_meta( $metadata, $post_id ) {
 		// Save the Liveblog Metadata
-		if ( isset( $metadata ) && is_array( $metadata ) ) { // input var okay
+		if ( isset( $metadata ) && is_array( $metadata ) ) {
 			$fields = [
 				self::METADATA_START_TIME,
 				self::METADATA_END_TIME,
@@ -96,8 +97,8 @@ class WPCOM_Liveblog_Event_Metadata {
 			$values = [];
 			foreach ( $fields as $field ) {
 				$values[ $field ] = isset( $metadata[ $field ] )
-					? sanitize_text_field( wp_unslash( $metadata[ $field ] ) )
-					: '';
+				? sanitize_text_field( wp_unslash( $metadata[ $field ] ) )
+				: '';
 			}
 			return update_post_meta( $post_id, self::METADATA_KEY, $values );
 		}
@@ -124,11 +125,12 @@ class WPCOM_Liveblog_Event_Metadata {
 		};
 
 		wp_nonce_field( self::METADATA_NONCE_FIELD . $post->ID, self::METADATA_NONCE );
-		printf( $format, esc_attr( $name( self::METADATA_START_TIME ) ), 'date', 'Coverage Start Date', $start );
-		printf( $format, esc_attr( $name( self::METADATA_END_TIME ) ), 'date', 'Coverage End Date', $end );
-		printf( $format, esc_attr( $name( self::METADATA_EVENT_TITLE ) ), 'text', 'Event Title', $title );
-		printf( $format, esc_attr( $name( self::METADATA_EVENT_URL ) ), 'text', 'Event URL', $url );
-		printf( $format, esc_attr( $name( self::METADATA_EVENT_LOCATION ) ), 'text', 'Event Location', $location );
+
+		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_START_TIME ) ), 'date', 'Coverage Start Date', $start ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_END_TIME ) ), 'date', 'Coverage End Date', $end ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_TITLE ) ), 'text', 'Event Title', $title ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_URL ) ), 'text', 'Event URL', $url ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_LOCATION ) ), 'text', 'Event Location', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 	}
 
 	/**

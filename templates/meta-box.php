@@ -1,32 +1,3 @@
-<?php
-	$meta_box_allowed_tags = array(
-		'select' => array(
-			'id'    => array(),
-			'class' => array(),
-			'name'  => array(),
-		),
-		'option' => array(
-			'value'    => array(),
-			'selected' => array(),
-		),
-		'label'  => array(
-			'for' => array(),
-		),
-		'input'  => array(
-			'id'    => array(),
-			'class' => array(),
-			'type'  => array(),
-			'value' => array(),
-			'name'  => array(),
-		),
-		'button' => array(
-			'id'    => array(),
-			'class' => array(),
-			'type'  => array(),
-			'value' => array(),
-		),
-	)
-	?>
 <p class="error"></p>
 <p class="success"><?php echo esc_html( $update_text ); ?></p>
 <h2><?php echo wp_kses_post( $active_text ); ?></h2>
@@ -48,5 +19,5 @@ foreach ( $buttons as $button ) :
 </ul>
 <?php
 foreach ( $extra_fields as $fields ) :
-	echo wp_kses( $fields, $meta_box_allowed_tags );
+	echo wp_kses( $fields, WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 endforeach;

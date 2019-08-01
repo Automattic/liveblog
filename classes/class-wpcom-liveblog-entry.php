@@ -411,8 +411,6 @@ class WPCOM_Liveblog_Entry {
 				return self::get_user_data_for_json( $user_object );
 			}, $contributors
 		);
-
-		return $contributors;
 	}
 
 
