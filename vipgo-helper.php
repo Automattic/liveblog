@@ -11,11 +11,15 @@ class WPCOM_Liveblog_VIPGo_Helper {
 	/**
 	 * Purge LiveBlog edge cache (Varnish) on liveblog updates.
 	 *
-	 * @param int $liveblog_update_id Update comment id.
+	 * @param int $liveblog_update_id Update entry id.
 	 * @param int $post_id            Parent LiveBlog post id.
 	 * @return void
 	 */
 	public static function purge_liveblog_edge_cache( $liveblog_update_id, $post_id ) {
+		if ( ! defined( 'VIP_GO_ENV' ) || false === VIP_GO_ENV ) {
+			return;
+		}
+
 		if ( ! function_exists( 'wpcom_vip_purge_edge_cache_for_url' ) ) {
 			return;
 		}

@@ -120,8 +120,6 @@ class EditorContainer extends Component {
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors ? authors.map(author => author.id) : [];
-    const author = authorIds.length > 0 ? authorIds[0] : false;
-    const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
     const headline = this.state.headline;
     const htmlregex = /<(img|picture|video|audio|canvas|svg|iframe|embed) ?.*>/;
 
@@ -139,8 +137,8 @@ class EditorContainer extends Component {
       updateEntry({
         id: entry.id,
         content,
-        author,
-        contributors,
+        authors,
+        authorIds,
         headline,
       });
       return;
@@ -148,8 +146,8 @@ class EditorContainer extends Component {
 
     createEntry({
       content,
-      author,
-      contributors,
+      authors,
+      authorIds,
       headline,
     });
 

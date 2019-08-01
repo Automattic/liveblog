@@ -15,11 +15,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	/**
 	 * The main Liveblog class used to setup everything this plugin needs.
 	 *
-	 * Liveblog currently uses a custom comment-type to circumvent post cache
-	 * issues frequently experienced by other live-blog implimentations. It comes
-	 * with a simple and effective templating mechanism, complete with all of the
-	 * CSS, JS, and AJAX needed to make this a turn-key installation.
-	 *
 	 * This class is a big container for a bunch of static methods, similar to a
 	 * factory but without object inheritance or instantiation.
 	 */
@@ -128,6 +123,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Include the necessary files
 		 */
 		private static function includes() {
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cpt.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php';
@@ -158,6 +154,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php';
+				require dirname( __FILE__ ) . '/classes/class-liveblog-migration-wp-cli.php';
 			}
 
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php';
@@ -190,7 +187,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		private static function add_filters() {
 			add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
-			add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 10, 3 );
+			add_filter( 'post_class', array( __CLASS__, 'add_post_class' ), 10, 3 );
 			add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key' ), 10, 2 );
 
 			// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post.
@@ -396,7 +393,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			if ( self::is_initial_page_request() ) {
 				// we need to add the liveblog after the shortcodes are run, because we already
-				// process shortcodes in the comment contents and if we left any (like in the original content)
+				// process shortcodes in the post contents and if we left any (like in the original content)
 				// we wouldn't like them to be processed
 				add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
 			} else {
@@ -691,7 +688,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return mixed The result of the crud method
 		 */
 		public static function do_crud_entry( $crud_action, $args ) {
-
 			$args['user'] = wp_get_current_user();
 			$entry        = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
 			if ( ! is_wp_error( $entry ) ) {
@@ -954,10 +950,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$type = $entry->get_type();
 				$id   = $entry->get_id();
 
-				if ( ! empty( $entry->replaces ) ) {
-					$id = $entry->replaces;
-				}
-
 				switch ( $type ) {
 					case 'new':
 						$flatten[ $id ] = $entry;
@@ -1007,16 +999,20 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		/** Comment Methods *******************************************************/
 
 		/**
-		 * Add a liveblog class to each comment, so they can be styled
+		 * Add a liveblog class to each post, so they can be styled
 		 *
 		 * @param array $classes
 		 * @return string
 		 */
-		public static function add_comment_class( $classes, $class, $comment_id ) {
-			if ( self::KEY === get_comment_type( $comment_id ) ) {
+		public static function add_post_class( $classes, $class, $entry_id ) {
+			$entry = get_post( $entry_id );
+
+			// add classes to individual updates, but not the parent liveblog
+			if ( WPCOM_Liveblog_CPT::$cpt_slug === $entry->post_type && 0 !== $entry->post_parent ) {
 				$classes[] = 'liveblog-entry';
-				$classes[] = 'liveblog-entry-class-' . $comment_id;
+				$classes[] = 'liveblog-entry-class-' . $entry_id;
 			}
+
 			return $classes;
 		}
 
