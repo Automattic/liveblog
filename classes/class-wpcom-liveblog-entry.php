@@ -23,7 +23,7 @@ class WPCOM_Liveblog_Entry {
 	);
 
 	public function __construct( $entry ) {
-		$this->entry    = $entry;
+		$this->entry = $entry;
 	}
 
 	public static function generate_allowed_tags_for_entry() {
@@ -205,8 +205,8 @@ class WPCOM_Liveblog_Entry {
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
 		do_action( 'liveblog_update_entry', $args['entry_id'], $args['post_id'] );
 
-		$entry_post = get_post( $updated_entry_id );
-		$entry = self::from_post( $entry_post );
+		$entry_post  = get_post( $updated_entry_id );
+		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
 
 		return $entry;
@@ -235,7 +235,7 @@ class WPCOM_Liveblog_Entry {
 		$entry_post = wp_delete_post( $args['entry_id'] );
 		$entry      = self::from_post( $entry_post );
 
-		$entry->type = 'delete';
+		$entry->type    = 'delete';
 		$entry->content = '';
 
 		return $entry;

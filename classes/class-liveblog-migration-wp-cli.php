@@ -88,7 +88,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 		);
 
 		$comment_ids_to_skip = [];
-		$comment_id_map = [];
+		$comment_id_map      = [];
 		foreach ( $live_blog_comment_replacements as $item ) {
 			// skip anything marked as being replaced
 			$comment_ids_to_skip[] = $item->comment_ID;
@@ -96,11 +96,11 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 		$comment_ids_to_skip_string = join( ', ', $comment_ids_to_skip );
 
 		$live_blog_comments = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT comment_ID, comment_content, comment_date, comment_date_gmt
 				FROM $wpdb->comments
-				WHERE comment_type = 'liveblog' AND comment_post_ID = %d AND comment_ID NOT IN ($comment_ids_to_skip_string)
-				ORDER BY comment_date_gmt ASC",
+				WHERE comment_type = 'liveblog' AND comment_post_ID = %d AND comment_ID NOT IN ($comment_ids_to_skip_string)" . // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'ORDER BY comment_date_gmt ASC',
 				$liveblog_id
 			)
 		);
@@ -222,7 +222,10 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 	}
 }
 
-add_action( 'init', function() {
-	Liveblog_Migration_WP_CLI::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', WPCOM_Liveblog_CPT::DEFAULT_CPT_SLUG );
-});
+add_action(
+	'init',
+	function() {
+		Liveblog_Migration_WP_CLI::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', WPCOM_Liveblog_CPT::DEFAULT_CPT_SLUG );
+	}
+);
 WP_CLI::add_command( 'liveblog', 'Liveblog_Migration_WP_CLI' );
