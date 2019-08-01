@@ -26,7 +26,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 *
 	 * @var string
 	 */
-	protected $emojis = array(
+	protected $emojis = [
 		'+1'                              => '1F44D',
 		'-1'                              => '1F44E',
 		'100'                             => '1F4AF',
@@ -872,14 +872,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		'yum'                             => '1F60B',
 		'zap'                             => '26A1',
 		'zzz'                             => '1F4A4',
-	);
+	];
 
 	/**
 	 * The character prefixes.
 	 *
 	 * @var array
 	 */
-	protected $prefixes = array( ':', '\x{003a}' );
+	protected $prefixes = [ ':', '\x{003a}' ];
 
 	/**
 	 * The emoji cdn.
@@ -915,7 +915,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// raw input format (e.g :poop:).
 		$this->revert_regex = implode(
 			'',
-			array(
+			[
 				preg_quote( '<img src="', '~' ),
 				preg_quote( $this->emoji_cdn, '~' ),
 				'[^"]+',
@@ -923,7 +923,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 				preg_quote( $this->class_prefix, '~' ),
 				'([^"]+)',
 				preg_quote( '">', '~' ),
-			)
+			]
 		);
 
 		// Allow plugins, themes, etc. to change the revert regex.
@@ -931,7 +931,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 
 		// We hook into the post_class filter to
 		// be able to alter the post content.
-		add_filter( 'post_class', array( $this, 'add_emoji_class_to_entry' ), 10, 3 );
+		add_filter( 'post_class', [ $this, 'add_emoji_class_to_entry' ], 10, 3 );
 	}
 
 	/**
@@ -942,7 +942,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return array
 	 */
 	public function get_config( $config ) {
-		$emojis = array();
+		$emojis = [];
 
 		// Map the emojis into the format the front end expects it.
 		foreach ( $this->get_emojis() as $key => $val ) {
@@ -954,7 +954,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// themes, etc. to modify it as required
 		$config[] = apply_filters(
 			'liveblog_emoji_config',
-			array(
+			[
 				'type'        => 'static',
 				'data'        => $emojis,
 				'search'      => 'key',
@@ -965,7 +965,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 				'name'        => 'Emoji',
 				'cdn'         => esc_url( $this->emoji_cdn ),
 				'template'    => '<img src="' . esc_url( $this->emoji_cdn ) . '${image}.png" height="20" width="20" /> ${name}',
-			)
+			]
 		);
 
 		return $config;
@@ -987,11 +987,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// themes, etc. to customise the output.
 		return apply_filters(
 			'liveblog_emoji_map',
-			array(
+			[
 				'key'   => $key,
 				'name'  => $key,
 				'image' => strtolower( $val ),
-			)
+			]
 		);
 	}
 
@@ -1033,7 +1033,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		// preg_replace_callback method.
 		$entry['content'] = preg_replace_callback(
 			$this->get_regex(),
-			array( $this, 'preg_replace_callback' ),
+			[ $this, 'preg_replace_callback' ],
 			$entry['content']
 		);
 
@@ -1089,8 +1089,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	 * @return array
 	 */
 	public function add_emoji_class_to_entry( $classes, $class, $entry_id ) {
-		$emojis  = array();
-		$entry = get_post( $entry_id );
+		$emojis = [];
+		$entry  = get_post( $entry_id );
 
 		// Check if the post is a live blog.
 		if ( get_post_type( $entry_id ) === WPCOM_Liveblog_CPT::$cpt_slug ) {

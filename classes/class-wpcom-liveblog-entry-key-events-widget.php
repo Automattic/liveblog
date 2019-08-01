@@ -14,7 +14,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * widget.
 	 */
 	public static function load() {
-		add_action( 'widgets_init', array( __CLASS__, 'widgets_init' ) );
+		add_action( 'widgets_init', [ __CLASS__, 'widgets_init' ] );
 	}
 
 	/**
@@ -28,10 +28,10 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * Configure widget
 	 */
 	public function __construct() {
-		$widget_ops = array(
+		$widget_ops = [
 			'class_name'  => 'liveblog-key-events-widget',
 			'description' => __( 'A list of key events displayed when the user is viewing a Liveblog post.', 'liveblog' ),
-		);
+		];
 
 		parent::__construct(
 			'liveblog-key-events-widget',
@@ -49,7 +49,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
-		$shortcode_output = WPCOM_Liveblog_Entry_Key_Events::shortcode( array( 'title' => false ) );
+		$shortcode_output = WPCOM_Liveblog_Entry_Key_Events::shortcode( [ 'title' => false ] );
 
 		if ( is_null( $shortcode_output ) ) {
 			// Don't display the widget if there are no key events to show.
@@ -95,7 +95,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return array Updated safe values to be saved.
 	 */
 	public function update( $new_instance, $old_instance ) {
-		$instance          = array();
+		$instance          = [];
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
 
 		return $instance;

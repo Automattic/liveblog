@@ -27,11 +27,11 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		WP_CLI::line( 'Finding All Live Blog Entries..' );
 
 		$posts = new WP_Query(
-			array(
+			[
 				'order'    => 'ASC',
 				'orderby'  => 'ID',
 				'meta_key' => 'liveblog', // phpcs:ignore WordPress.VIP.SlowDBQuery.slow_db_query_meta_key
-			)
+			]
 		);
 
 		//How many live blogs do we have?
@@ -159,8 +159,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					if ( false === $is_dryrun ) {
 						$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 							$wpdb->posts,
-							array( 'post_content' => $content ),
-							array( 'ID' => $entry_replace->meta_value )
+							[ 'post_content' => $content ],
+							[ 'ID' => $entry_replace->meta_value ]
 						);
 					}
 

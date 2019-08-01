@@ -18,9 +18,9 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * @var array|mixed|void
 	 */
-	public static $restricted_shortcodes = array(
+	public static $restricted_shortcodes = [
 		'liveblog_key_events' => '',
-	);
+	];
 
 	public function __construct( $entry ) {
 		$this->entry = $entry;
@@ -34,18 +34,18 @@ class WPCOM_Liveblog_Entry {
 		/**
 		 * Expand with additional tags that we want to allow.
 		*/
-		$additional_tags           = array();
-		$additional_tags['iframe'] = array(
-			'src'             => array(),
-			'height'          => array(),
-			'width'           => array(),
-			'frameborder'     => array(),
-			'allowfullscreen' => array(),
-		);
-		$additional_tags['source'] = array(
-			'src'  => array(),
-			'type' => array(),
-		);
+		$additional_tags           = [];
+		$additional_tags['iframe'] = [
+			'src'             => [],
+			'height'          => [],
+			'width'           => [],
+			'frameborder'     => [],
+			'allowfullscreen' => [],
+		];
+		$additional_tags['source'] = [
+			'src'  => [],
+			'type' => [],
+		];
 
 		self::$allowed_tags_for_entry = array_merge(
 			$additional_tags,
@@ -119,7 +119,7 @@ class WPCOM_Liveblog_Entry {
 		$css_classes = implode( ' ', apply_filters( 'post_class', [ 'liveblog' ], 'liveblog', $entry_id ) );
 		$share_link  = add_query_arg( [ 'lbup' => $entry_id ], get_permalink( $this->get_post_id() ) );
 
-		$entry = array(
+		$entry = [
 			'id'          => $entry_id,
 			'type'        => $this->get_type(),
 			'render'      => self::render_content( $this->get_content(), $this->entry ),
@@ -130,7 +130,7 @@ class WPCOM_Liveblog_Entry {
 			'authors'     => self::get_authors( $entry_id ),
 			'entry_time'  => $this->get_entry_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
-		);
+		];
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
 	}
@@ -259,13 +259,13 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$new_entry_id = wp_insert_post(
-			array(
-				'post_parent'      => $args['post_id'],
-				'post_content'     => $args['content'],
-				'post_title'       => $args['headline'],
-				'post_type'        => WPCOM_Liveblog_CPT::$cpt_slug,
-				'post_status'      => 'publish',
-			)
+			[
+				'post_parent'  => $args['post_id'],
+				'post_content' => $args['content'],
+				'post_title'   => $args['headline'],
+				'post_type'    => WPCOM_Liveblog_CPT::$cpt_slug,
+				'post_status'  => 'publish',
+			]
 		);
 
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
@@ -284,7 +284,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	private static function validate_args( $args, $content_required = true ) {
-		$required_keys = array( 'post_id', 'user' );
+		$required_keys = [ 'post_id', 'user' ];
 
 		if ( $content_required ) {
 			array_push( $required_keys, 'content' );
@@ -316,7 +316,7 @@ class WPCOM_Liveblog_Entry {
 			foreach ( self::$restricted_shortcodes as $key => $value ) {
 
 				// Regex Pattern will match all shortcode formats.
-				$pattern = get_shortcode_regex( array( $key ) );
+				$pattern = get_shortcode_regex( [ $key ] );
 
 				// if there's a match we replace it with the configured replacement.
 				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
@@ -347,10 +347,10 @@ class WPCOM_Liveblog_Entry {
 				$args['user'] = $user_object;
 
 				wp_update_post(
-					array(
-						'ID'           => $entry_id,
-						'user_id'      => isset( $args['user']->ID ) ? $args['user']->ID : '',
-					)
+					[
+						'ID'      => $entry_id,
+						'user_id' => isset( $args['user']->ID ) ? $args['user']->ID : '',
+					]
 				);
 
 			}
@@ -378,16 +378,16 @@ class WPCOM_Liveblog_Entry {
 	 */
 	private static function get_user_data_for_json( $user ) {
 		if ( is_wp_error( $user ) || ! is_object( $user ) ) {
-			return array();
+			return [];
 		}
 
 		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
-		return array(
+		return [
 			'id'     => $user->ID,
 			'key'    => strtolower( $user->user_nicename ),
 			'name'   => $user->display_name,
 			'avatar' => WPCOM_Liveblog::get_avatar( $user->ID, $avatar_size ),
-		);
+		];
 	}
 
 
@@ -399,7 +399,7 @@ class WPCOM_Liveblog_Entry {
 	public static function get_authors( $entry_id ) {
 		$contributors = get_coauthors( $entry_id );
 		if ( ! $contributors ) {
-			return array();
+			return [];
 		}
 
 		return array_map(
@@ -409,7 +409,8 @@ class WPCOM_Liveblog_Entry {
 				}
 				$user_object = self::get_userdata_with_filter( $contributor->ID );
 				return self::get_user_data_for_json( $user_object );
-			}, $contributors
+			},
+			$contributors
 		);
 	}
 
@@ -431,10 +432,10 @@ class WPCOM_Liveblog_Entry {
 	 * @return string        Image src.
 	 */
 	public static function get_entry_first_image( $entry ) {
-		$entry_id = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_id() : $entry->id;
+		$entry_id      = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_id() : $entry->id;
 		$entry_content = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_content() : $entry->content;
-		$key    = 'liveblog_entry_' . $entry_id . 'first_image';
-		$cached = wp_cache_get( $key, 'liveblog' );
+		$key           = 'liveblog_entry_' . $entry_id . 'first_image';
+		$cached        = wp_cache_get( $key, 'liveblog' );
 
 		if ( false === $cached ) {
 			preg_match( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $entry_content, $image );

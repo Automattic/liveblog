@@ -253,7 +253,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	public function autoembed_callback( $match ) {
 		$oldval              = $this->linkifunknown;
 		$this->linkifunknown = false;
-		$return              = $this->shortcode( array(), $match[2] );
+		$return              = $this->shortcode( [], $match[2] );
 		$this->linkifunknown = $oldval;
 
 		return $match[1] . $return . $match[3];
@@ -278,14 +278,14 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		}
 
 		// Replace line breaks from all HTML elements with placeholders.
-		$content = wp_replace_in_html_tags( $content, array( "\n" => '<!-- wp-line-break -->' ) );
+		$content = wp_replace_in_html_tags( $content, [ "\n" => '<!-- wp-line-break -->' ] );
 
 		// Find URLs that are on their own line.
 		if ( preg_match( '#(^|\s|>)https?://#i', $content ) ) {
 			// Find URLs on their own line.
-			$content = preg_replace_callback( '|^(\s*)(https?://[^\s<>"]+)(\s*)$|im', array( $this, 'autoembed_callback' ), $content );
+			$content = preg_replace_callback( '|^(\s*)(https?://[^\s<>"]+)(\s*)$|im', [ $this, 'autoembed_callback' ], $content );
 			// Find URLs in their own paragraph.
-			$content = preg_replace_callback( '|(<p(?: [^>]*)?>\s*)(https?://[^\s<>"]+)(\s*<\/p>)|i', array( $this, 'autoembed_callback' ), $content );
+			$content = preg_replace_callback( '|(<p(?: [^>]*)?>\s*)(https?://[^\s<>"]+)(\s*<\/p>)|i', [ $this, 'autoembed_callback' ], $content );
 		}
 
 		// Put the line breaks back.

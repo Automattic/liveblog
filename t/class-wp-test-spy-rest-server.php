@@ -24,7 +24,7 @@ class WP_Test_Spy_REST_Server extends WP_REST_Server {
 	 * @return mixed
 	 */
 	public function __call( $method, $args ) {
-		return call_user_func_array( array( $this, $method ), $args );
+		return call_user_func_array( [ $this, $method ], $args );
 	}
 
 	/**
