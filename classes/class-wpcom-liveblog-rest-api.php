@@ -112,7 +112,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required'          => false,
 						'sanitize_callback' => [ __CLASS__, 'sanitize_numeric' ],
 					],
-					'status'    => [
+					'status'      => [
 						'required'          => false,
 						'default'           => 'draft',
 						'validate_callback' => [ __CLASS__, 'sanitize_status' ],
@@ -385,11 +385,10 @@ class WPCOM_Liveblog_Rest_Api {
 		$start_timestamp = $request->get_param( 'start_time' );
 		$end_timestamp   = $request->get_param( 'end_time' );
 
-		$nonce = $request->get_header( 'x-wp-nonce' );
-
 		self::set_liveblog_vars( $post_id );
 
-		add_filter('liveblog_query_args', [__CLASS__, 'maybe_allow_draft_post'] );
+		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
+
 		// Get liveblog entries within the start and end boundaries
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
 
@@ -449,7 +448,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		add_filter('liveblog_query_args', [__CLASS__, 'maybe_allow_draft_post'] );
+		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		// Get liveblog entries too be lazyloaded
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
@@ -596,13 +595,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		if ( isset( $_REQUEST['_wpnonce'] ) ) {
-			$nonce = $_REQUEST['_wpnonce'];
-		} elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
-			$nonce = $_SERVER['HTTP_X_WP_NONCE'];
-		}
-
-		add_filter('liveblog_query_args', [__CLASS__, 'maybe_allow_draft_post'] );
+		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		$entries = WPCOM_Liveblog::get_entries_paged( $page, $last_known_entry );
 
@@ -714,7 +707,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return int $param as an integer. 0 if $param is not a valid status
 	 */
 	public static function sanitize_staus( $param, $request, $key ) {
-		return in_array( $param, [ 'publish','draft' ], true );
+		return in_array( $param, [ 'publish', 'draft' ], true );
 	}
 
 	/**
@@ -738,16 +731,24 @@ class WPCOM_Liveblog_Rest_Api {
 		return false;
 	}
 
-	public static function maybe_allow_draft_post( $args ){
+	/**
+	 * Checks to see if the current request includes a nonce so
+	 * that we can expose draft post in the api response
+	 *
+	 * @param $args
+	 *
+	 * @return mixed
+	 */
+	public static function maybe_allow_draft_post( $args ) {
 		$nonce = null;
 		if ( isset( $_REQUEST['_wpnonce'] ) ) {
-			$nonce = $_REQUEST['_wpnonce'];
+			$nonce = sanitize_text_field( $_REQUEST['_wpnonce'] ); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		} elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
-			$nonce = $_SERVER['HTTP_X_WP_NONCE'];
+			$nonce = sanitize_text_field( $_SERVER['HTTP_X_WP_NONCE'] );
 		}
 
-		if( wp_verify_nonce( $nonce, 'wp_rest' ) ){
-			$args['post_status'] = ['draft', 'publish'];
+		if ( wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			$args['post_status'] = [ 'draft', 'publish' ];
 		}
 
 		return $args;

@@ -1056,12 +1056,19 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::add_default_plupload_settings();
 			}
 
-			if( is_admin() ){
-				add_filter( 'liveblog_query_args', function( $args ){
-					$args['post_status'] = ['draft','publish'];
-					return $args;
-				} );
+			if ( is_admin() ) {
+				/**
+				 * Allow draft and publish post in the admin
+				 */
+				add_filter(
+					'liveblog_query_args',
+					function( $args ) {
+						$args['post_status'] = [ 'draft', 'publish' ];
+						return $args;
+					} 
+				);
 			}
+
 			$entry_query            = new WPCOM_Liveblog_Entry_Query( get_the_ID(), self::KEY );
 			self::$latest_timestamp = $entry_query->get_latest_timestamp();
 

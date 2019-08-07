@@ -25,7 +25,7 @@ class WPCOM_Liveblog_Entry_Query {
 			'posts_per_page' => WPCOM_Liveblog::MAX_LAZY_LOAD_ENTRY_COUNT,
 		];
 
-		$args    = apply_filters( 'liveblog_query_args', wp_parse_args( $args, $defaults ) );
+		$args = apply_filters( 'liveblog_query_args', wp_parse_args( $args, $defaults ) );
 
 		$entries = get_posts( $args );
 
