@@ -89,6 +89,9 @@ class WPCOM_Liveblog_Entry {
 	 * @return string
 	 */
 	public function get_timestamp() {
+		if( 'draft' === $this->entry->post_status ){
+			return mysql2date( 'G', get_gmt_from_date( $this->entry->post_date ) );
+		}
 		return mysql2date( 'G', $this->entry->post_date_gmt );
 	}
 
@@ -197,7 +200,7 @@ class WPCOM_Liveblog_Entry {
 			'ID'           => $args['entry_id'],
 			'post_content' => $args['content'],
 			'post_title'   => $args['headline'],
-			'post_status'   => $args['status'],
+			'post_status'  => $args['status'],
 		];
 
 		$updated_entry_id = wp_update_post( $post_data );

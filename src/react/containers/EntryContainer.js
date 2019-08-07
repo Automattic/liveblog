@@ -38,6 +38,7 @@ class EntryContainer extends Component {
     this.updateStatus = (status) => {
       const { entry, updateEntry } = this.props;
       const { id, content, authors, authorIds, headline } = entry;
+
       updateEntry({
         id,
         content,
@@ -45,6 +46,7 @@ class EntryContainer extends Component {
         authorIds,
         headline,
         status,
+        statusUpdate: true,
       });
     };
     this.close = (event) => {
@@ -114,7 +116,7 @@ class EntryContainer extends Component {
             </button>
         }
         <button
-          className="liveblog-btn liveblog-btn-small liveblog-btn-status"
+          className={`button button-large liveblog-btn liveblog-btn-smallx liveblog-btn-status ${statusLabel.toLowerCase()}`}
           onClick={ (event) => {
             event.preventDefault();
             this.updateStatus(statusLabel.toLowerCase());

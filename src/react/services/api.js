@@ -25,7 +25,6 @@ const secureAjax = (settings) => {
 };
 
 export function getEntries(page, config, newestEntry) {
-  console.log( newestEntry );
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
@@ -109,9 +108,10 @@ export function updateEntry(entry, config, nonce = false) {
       crud_action: 'update',
       post_id: config.post_id,
       entry_id: entry.id,
-      content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
+      content: (config.use_tinymce === '1' && !entry.statusUpdate) ? getTinyMCEContent() : entry.content,
       author_ids: entry.authorIds,
       headline: entry.headline,
+      status: entry.status,
     },
     headers: {
       'Content-Type': 'application/json',

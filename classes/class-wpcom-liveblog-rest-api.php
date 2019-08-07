@@ -115,7 +115,7 @@ class WPCOM_Liveblog_Rest_Api {
 					'status'    => [
 						'required'          => false,
 						'default'           => 'draft',
-						'sanitize_callback' => [ __CLASS__, 'sanitize_status' ],
+						'validate_callback' => [ __CLASS__, 'sanitize_status' ],
 					],
 				],
 			]

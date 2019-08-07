@@ -54,6 +54,15 @@
   background: darken($color-primary, 10%);
 }
 
+.liveblog-btn-status{
+  margin-right: .5rem;
+}
+
+.liveblog-btn-status.publish{
+  background: $color-primary;
+  color: #fff;
+}
+
 .liveblog-btn-delete {
   background: $color-warning;
   color: #fff;

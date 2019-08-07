@@ -29,10 +29,15 @@
 
 .liveblog-entry-tools {
   margin-top: 1rem;
+  margin-left: 1rem;
 }
 
-.liveblog-entry-tools .liveblog-btn:first-child {
+.liveblog-entry-tools .liveblog-btn {
   margin-right: .5rem;
+}
+
+.liveblog-entry-tools .liveblog-btn:last-child {
+  margin-right: 0;
 }
 
 .liveblog-entry .type-key {

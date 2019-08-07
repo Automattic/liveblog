@@ -1058,7 +1058,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			if( is_admin() ){
 				add_filter( 'liveblog_query_args', function( $args ){
-					$args = ['draft','publish'];
+					$args['post_status'] = ['draft','publish'];
 					return $args;
 				} );
 			}

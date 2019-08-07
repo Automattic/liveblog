@@ -9443,7 +9443,6 @@ var secureAjax = function secureAjax(settings) {
 };
 
 function getEntries(page, config, newestEntry) {
-  console.log(newestEntry);
   var settings = {
     url: config.endpoint_url + 'get-entries/' + page + '/' + (newestEntry.id || config.latest_entry_id) + '-' + (newestEntry.timestamp || config.latest_entry_timestamp),
     method: 'GET',
@@ -9531,9 +9530,10 @@ function updateEntry(entry, config) {
       crud_action: 'update',
       post_id: config.post_id,
       entry_id: entry.id,
-      content: config.use_tinymce === '1' ? (0, _TinyMCEEditor.getTinyMCEContent)() : entry.content,
+      content: config.use_tinymce === '1' && !entry.statusUpdate ? (0, _TinyMCEEditor.getTinyMCEContent)() : entry.content,
       author_ids: entry.authorIds,
-      headline: entry.headline
+      headline: entry.headline,
+      status: entry.status
     },
     headers: {
       'Content-Type': 'application/json',
@@ -67282,8 +67282,6 @@ var getEntriesEpic = function getEntriesEpic(action$, store) {
       if (!isNaN(id)) return (0, _of.of)((0, _eventsActions.jumpToEvent)(id));
     }
 
-    console.log(store.getState().config);
-
     return (0, _api.getEntries)(page, store.getState().config, store.getState().api.newestEntry).timeout(10000).map(function (res) {
       return (0, _apiActions.getEntriesSuccess)(res.response, (0, _utils.shouldRenderNewEntries)(store.getState().pagination.page, store.getState().api.entries, store.getState().polling.entries));
     }).catch(function (error) {
@@ -74944,13 +74942,15 @@ var EntryContainer = function (_Component) {
           authorIds = entry.authorIds,
           headline = entry.headline;
 
+
       updateEntry({
         id: id,
         content: content,
         authors: authors,
         authorIds: authorIds,
         headline: headline,
-        status: status
+        status: status,
+        statusUpdate: true
       });
     };
     _this.close = function (event) {
@@ -75036,7 +75036,7 @@ var EntryContainer = function (_Component) {
         _react2.default.createElement(
           'button',
           {
-            className: 'liveblog-btn liveblog-btn-small liveblog-btn-status',
+            className: 'button button-large liveblog-btn liveblog-btn-smallx liveblog-btn-status ' + statusLabel.toLowerCase(),
             onClick: function onClick(event) {
               event.preventDefault();
               _this2.updateStatus(statusLabel.toLowerCase());
