@@ -52,6 +52,8 @@ const getEntriesEpic = (action$, store) =>
         if (!isNaN(id)) return of(jumpToEvent(id));
       }
 
+      console.log(store.getState().config);
+
       return getEntries(page, store.getState().config, store.getState().api.newestEntry)
         .timeout(10000)
         .map(res =>

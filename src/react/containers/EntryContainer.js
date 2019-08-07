@@ -35,6 +35,18 @@ class EntryContainer extends Component {
       event.preventDefault();
       this.props.entryEditOpen(this.props.entry.id);
     };
+    this.updateStatus = (status) => {
+      const { entry, updateEntry } = this.props;
+      const { id, content, authors, authorIds, headline } = entry;
+      updateEntry({
+        id,
+        content,
+        authors,
+        authorIds,
+        headline,
+        status,
+      });
+    };
     this.close = (event) => {
       event.preventDefault();
       this.props.entryEditClose(this.props.entry.id);
@@ -76,7 +88,10 @@ class EntryContainer extends Component {
   }
 
   entryActions() {
-    const { config } = this.props;
+    const { config, entry } = this.props;
+    const { status } = entry;
+    const statusLabel = 'publish' === status ? 'Draft' : 'Publish';
+
     if (!config.is_admin && (config.is_liveblog_editable !== '1' || config.backend_liveblogging === '1')) {
       return false;
     }
@@ -98,6 +113,14 @@ class EntryContainer extends Component {
               Edit
             </button>
         }
+        <button
+          className="liveblog-btn liveblog-btn-small liveblog-btn-status"
+          onClick={ (event) => {
+            event.preventDefault();
+            this.updateStatus(statusLabel.toLowerCase());
+          }}>
+          {statusLabel}
+        </button>
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
           onClick={this.togglePopup.bind(this)}>
@@ -206,6 +229,7 @@ EntryContainer.propTypes = {
   entry: PropTypes.object,
   entryEditOpen: PropTypes.func,
   entryEditClose: PropTypes.func,
+  updateEntry: PropTypes.func,
   deleteEntry: PropTypes.func,
   activateScrolling: PropTypes.bool,
   resetScrollOnEntry: PropTypes.func,

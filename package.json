@@ -66,7 +66,7 @@
 		"smoothscroll-polyfill": "^0.4.3"
 	},
 	"scripts": {
-		"lint-scripts": "./node_modules/.bin/eslint ./src/react/",
+		"lint-scripts": "./node_modules/.bin/eslint --fix ./src/react/",
 		"lint-styles": "./node_modules/.bin/stylelint \"src/styles/**/*.scss\"",
 		"test": "./node_modules/.bin/jest",
 		"build": "NODE_ENV=production webpack -p",

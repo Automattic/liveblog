@@ -71,6 +71,10 @@ class WPCOM_Liveblog_Entry {
 		return $this->entry->post_content;
 	}
 
+	public function get_status() {
+		return $this->entry->post_status;
+	}
+
 	public function get_headline() {
 		return $this->entry->post_title;
 	}
@@ -130,6 +134,7 @@ class WPCOM_Liveblog_Entry {
 			'authors'     => self::get_authors( $entry_id ),
 			'entry_time'  => $this->get_entry_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
+			'status'      => self::get_status(),
 		];
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
@@ -192,6 +197,7 @@ class WPCOM_Liveblog_Entry {
 			'ID'           => $args['entry_id'],
 			'post_content' => $args['content'],
 			'post_title'   => $args['headline'],
+			'post_status'   => $args['status'],
 		];
 
 		$updated_entry_id = wp_update_post( $post_data );
@@ -264,7 +270,7 @@ class WPCOM_Liveblog_Entry {
 				'post_content' => $args['content'],
 				'post_title'   => $args['headline'],
 				'post_type'    => WPCOM_Liveblog_CPT::$cpt_slug,
-				'post_status'  => 'publish',
+				'post_status'  => $args['status'],
 			]
 		);
 
@@ -413,7 +419,6 @@ class WPCOM_Liveblog_Entry {
 			$contributors
 		);
 	}
-
 
 	/**
 	 * Work out Entry title

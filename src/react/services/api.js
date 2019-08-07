@@ -25,11 +25,19 @@ const secureAjax = (settings) => {
 };
 
 export function getEntries(page, config, newestEntry) {
+  console.log( newestEntry );
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
     crossDomain: config.cross_domain,
   };
+
+  if (config.backend_liveblogging) {
+    settings.headers = {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
+    };
+  }
 
   return secureAjax(settings);
 }
@@ -49,6 +57,13 @@ export function polling(newestEntryTimestamp, config) {
     crossDomain: config.cross_domain,
   };
 
+  if (config.backend_liveblogging) {
+    settings.headers = {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
+    };
+  }
+
   return secureAjax(settings);
 }
 
@@ -62,6 +77,7 @@ export function createEntry(entry, config, nonce = false) {
       content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
       author_ids: entry.authorIds,
       headline: entry.headline,
+      status: entry.status,
     },
     headers: {
       'Content-Type': 'application/json',
