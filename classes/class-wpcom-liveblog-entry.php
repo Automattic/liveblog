@@ -9,6 +9,7 @@ class WPCOM_Liveblog_Entry {
 
 	private $entry;
 	private $type = 'new';
+	private static $default_post_status = 'draft';
 	private static $allowed_tags_for_entry;
 	private static $rendered_content = [];
 
@@ -89,9 +90,9 @@ class WPCOM_Liveblog_Entry {
 	 * @return string
 	 */
 	public function get_timestamp() {
-		// For draft post we need to use post_date as post_date_gtm is set to 00:00:00
+		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
 		if ( 'draft' === $this->entry->post_status ) {
-			return mysql2date( 'G', get_gmt_from_date( $this->entry->post_date ) );
+			return mysql2date( 'G', $this->entry->post_modified_gmt );
 		}
 		return mysql2date( 'G', $this->entry->post_date_gmt );
 	}
@@ -109,10 +110,20 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$entry = get_post( $post_id );
-		if ( '' === $d ) {
-			$date = mysql2date( get_option( 'date_format' ), $entry->post_date_gmt );
+
+		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
+		if ( 'draft' === $entry->post_status ) {
+			if ( '' === $d ) {
+				$date = mysql2date( get_option( 'date_format' ), $entry->post_modified_gmt );
+			} else {
+				$date = mysql2date( $d, $entry->post_modified_gmt );
+			}
 		} else {
-			$date = mysql2date( $d, $entry->post_date_gmt );
+			if ( '' === $d ) {
+				$date = mysql2date( get_option( 'date_format' ), $entry->post_date_gmt );
+			} else {
+				$date = mysql2date( $d, $entry->post_date_gmt );
+			}
 		}
 
 		return $date;
@@ -201,7 +212,7 @@ class WPCOM_Liveblog_Entry {
 			'ID'           => $args['entry_id'],
 			'post_content' => $args['content'],
 			'post_title'   => $args['headline'],
-			'post_status'  => $args['status'],
+			'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 		];
 
 		$updated_entry_id = wp_update_post( $post_data );
@@ -274,7 +285,7 @@ class WPCOM_Liveblog_Entry {
 				'post_content' => $args['content'],
 				'post_title'   => $args['headline'],
 				'post_type'    => WPCOM_Liveblog_CPT::$cpt_slug,
-				'post_status'  => empty( $args['status'] ) ? 'draft' : $args['status'],
+				'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 			]
 		);
 

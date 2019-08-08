@@ -106,6 +106,7 @@ class WPCOM_Liveblog_Entry_Query {
 
 		$latest = $this->get_latest();
 
+
 		if ( is_null( $latest ) ) {
 			return null;
 		}
