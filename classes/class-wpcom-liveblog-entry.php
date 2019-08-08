@@ -8,7 +8,7 @@ class WPCOM_Liveblog_Entry {
 	const DEFAULT_AVATAR_SIZE = 30;
 
 	private $entry;
-	private $type = 'new';
+	private $type                       = 'new';
 	private static $default_post_status = 'draft';
 	private static $allowed_tags_for_entry;
 	private static $rendered_content = [];
