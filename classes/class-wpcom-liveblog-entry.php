@@ -92,6 +92,9 @@ class WPCOM_Liveblog_Entry {
 	public function get_timestamp() {
 		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
 		if ( 'draft' === $this->entry->post_status ) {
+			if( '0000-00-00 00:00:00' === $this->entry->post_modified_gmt ){
+				return mysql2date( 'G', get_gmt_from_date( $this->entry->post_modified ) );
+			}
 			return mysql2date( 'G', $this->entry->post_modified_gmt );
 		}
 		return mysql2date( 'G', $this->entry->post_date_gmt );
@@ -114,9 +117,17 @@ class WPCOM_Liveblog_Entry {
 		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
 		if ( 'draft' === $entry->post_status ) {
 			if ( '' === $d ) {
-				$date = mysql2date( get_option( 'date_format' ), $entry->post_modified_gmt );
+				if( '0000-00-00 00:00:00' === $entry->post_modified_gmt ){
+					$date = mysql2date( get_option( 'date_format' ), get_gmt_from_date( $entry->post_modified ) );
+				} else{
+					$date = mysql2date( get_option( 'date_format' ), $entry->post_modified_gmt );
+				}
 			} else {
-				$date = mysql2date( $d, $entry->post_modified_gmt );
+				if( '0000-00-00 00:00:00' === $entry->post_modified_gmt ){
+					$date = mysql2date( $d, get_gmt_from_date( $entry->post_modified ) );
+				} else{
+					$date = mysql2date( $d, $entry->post_modified_gmt );
+				}
 			}
 		} else {
 			if ( '' === $d ) {
