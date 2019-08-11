@@ -19,8 +19,8 @@ const webpackConfig = {
 
   output: {
     path: path.join(__dirname, paths.out),
-    filename: '[name].js',
-    chunkFilename: '[name].bundle.js',
+    filename: '[name].js?v=[hash:6]',
+    chunkFilename: '[name].bundle.js?v=[hash:6]',
   },
 
   module: {
