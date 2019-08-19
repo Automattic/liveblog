@@ -109,7 +109,7 @@ class WPCOM_Liveblog_CPT {
 	public static function hierarchical_posts_filter( $query ) {
 		global $pagenow, $typenow;
 
-		if ( is_admin() && 'edit.php' == $pagenow && in_array( $typenow, [ self::$cpt_slug ], true ) ) {
+		if ( is_admin() && 'edit.php' === $pagenow && in_array( $typenow, [ self::$cpt_slug ], true ) ) {
 			$query->query_vars['post_parent'] = 0;
 		}
 
