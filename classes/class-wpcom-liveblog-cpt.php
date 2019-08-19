@@ -19,9 +19,9 @@ class WPCOM_Liveblog_CPT {
 	 */
 	public static function register_post_type() {
 
-		add_action( 'before_delete_post', array( __CLASS__, 'delete_children' ) );
-		add_action( 'pre_get_posts', array( __CLASS__, 'filter_children_from_query' ) );
-		add_filter( 'parse_query', array( __CLASS__, 'hierarchical_posts_filter' ) );
+		add_action( 'before_delete_post', [ __CLASS__, 'delete_children' ] );
+		add_action( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
+		add_filter( 'parse_query', [ __CLASS__, 'hierarchical_posts_filter' ] );
 
 		self::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
 
@@ -45,8 +45,8 @@ class WPCOM_Liveblog_CPT {
 	public static function delete_children( $parent ) {
 
 		// Remove the query filter.
-		remove_filter( 'parse_query', array( __CLASS__, 'hierarchical_posts_filter' ) );
-		remove_filter( 'pre_get_posts', array( __CLASS__, 'filter_children_from_query' ) );
+		remove_filter( 'parse_query', [  __CLASS__, 'hierarchical_posts_filter' ] );
+		remove_filter( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
 		$parent = (int) $parent; // Force a cast as an integer.
 
 		$post = get_post( $parent );
@@ -66,7 +66,7 @@ class WPCOM_Liveblog_CPT {
 		);
 
 		// Remove the action so it doesn't fire again
-		remove_action( 'before_delete_post', array( __CLASS__, 'delete_children' ) );
+		remove_action( 'before_delete_post', [ __CLASS__, 'delete_children' ] );
 
 		foreach ( $children as $child ) {
 			// Never delete top level posts!
@@ -75,9 +75,10 @@ class WPCOM_Liveblog_CPT {
 			}
 			wp_delete_post( $child->ID, true );
 		}
-		add_action( 'before_delete_post', array( __CLASS__, 'delete_children' ) );
-		add_filter( 'parse_query', array( __CLASS__, 'hierarchical_posts_filter' ) );
-		add_filter( 'pre_get_posts', array( __CLASS__, 'filter_children_from_query' ) );
+
+		add_action( 'before_delete_post', [ __CLASS__, 'delete_children' ] );
+		add_action( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
+		add_filter( 'parse_query', [ __CLASS__, 'hierarchical_posts_filter' ] );
 
 	}
 
@@ -86,7 +87,7 @@ class WPCOM_Liveblog_CPT {
 		$post_type = $query->get( 'post_type' );
 
 		// only applies to indexes and post format
-		if ( ( $query->is_home() || $query->is_archive() ) && ( empty( $post_type ) || in_array( $post_type, [ self::$cpt_slug ] ) ) ) {
+		if ( ( $query->is_home() || $query->is_archive() ) && ( empty( $post_type ) || in_array( $post_type, [ self::$cpt_slug ], true ) ) ) {
 			$parent = $query->get( 'post_parent' );
 			if ( empty( $parent ) ) {
 				$query->set( 'post_parent', 0 );
@@ -108,7 +109,7 @@ class WPCOM_Liveblog_CPT {
 	public static function hierarchical_posts_filter( $query ) {
 		global $pagenow, $typenow;
 
-		if ( is_admin() && 'edit.php' == $pagenow && in_array( $typenow, [ self::$cpt_slug ] ) ) {
+		if ( is_admin() && 'edit.php' == $pagenow && in_array( $typenow, [ self::$cpt_slug ], true ) ) {
 			$query->query_vars['post_parent'] = 0;
 		}
 
