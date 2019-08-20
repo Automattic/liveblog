@@ -54,7 +54,6 @@ class AppContainer extends Component {
         frontEndEditing
       );
 
-    console.log(total);
     return (
       <div style={{ position: 'relative' }}>
         {
