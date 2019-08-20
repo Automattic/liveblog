@@ -31,7 +31,7 @@ export function getEntries(page, config, newestEntry) {
     crossDomain: config.cross_domain,
   };
 
-  if (config.backend_liveblogging) {
+  if (config.is_admin) {
     settings.headers = {
       'Content-Type': 'application/json',
       'X-WP-Nonce': config.nonce,
@@ -56,7 +56,7 @@ export function polling(newestEntryTimestamp, config) {
     crossDomain: config.cross_domain,
   };
 
-  if (config.backend_liveblogging) {
+  if (config.is_admin) {
     settings.headers = {
       'Content-Type': 'application/json',
       'X-WP-Nonce': config.nonce,

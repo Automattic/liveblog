@@ -68,6 +68,7 @@ export const api = (state = initialState, action) => {
             state.entries,
           )
           : state.newestEntry,
+        total: action.payload.total ? action.payload.total : state.total,
       };
 
     case 'CREATE_ENTRY_SUCCESS':

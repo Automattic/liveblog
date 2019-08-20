@@ -53,7 +53,7 @@ const getEntriesEpic = (action$, store) =>
       }
 
       return getEntries(page, store.getState().config, store.getState().api.newestEntry)
-        .timeout(10000)
+        .timeout(60000)
         .map(res =>
           getEntriesSuccess(
             res.response,

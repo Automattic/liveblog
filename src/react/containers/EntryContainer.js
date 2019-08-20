@@ -37,7 +37,8 @@ class EntryContainer extends Component {
     };
     this.updateStatus = (status) => {
       const { entry, updateEntry } = this.props;
-      const { id, content, authors, authorIds, headline } = entry;
+      const { id, content, authors, headline } = entry;
+      const authorIds = authors.map(author => author.id);
 
       updateEntry({
         id,
@@ -92,7 +93,8 @@ class EntryContainer extends Component {
   entryActions() {
     const { config, entry } = this.props;
     const { status } = entry;
-    const statusLabel = 'publish' === status ? 'Draft' : 'Publish';
+    const statusLabel = 'publish' === status ? 'Revert to Draft' : 'Publish';
+    const newStatus = 'publish' === status ? 'draft' : 'publish';
 
     if (!config.is_admin && (config.is_liveblog_editable !== '1' || config.backend_liveblogging === '1')) {
       return false;
@@ -116,10 +118,10 @@ class EntryContainer extends Component {
             </button>
         }
         <button
-          className={`button button-large liveblog-btn liveblog-btn-smallx liveblog-btn-status ${statusLabel.toLowerCase()}`}
+          className={`button button-large liveblog-btn liveblog-btn-smallx liveblog-btn-status ${newStatus}`}
           onClick={ (event) => {
             event.preventDefault();
-            this.updateStatus(statusLabel.toLowerCase());
+            this.updateStatus(newStatus);
           }}>
           {statusLabel}
         </button>
