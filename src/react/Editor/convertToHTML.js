@@ -10,7 +10,11 @@ export default contentState =>
     blockToHTML: (block) => {
       if (block.type === 'atomic') {
         const currentBlock = contentState.getBlockForKey(block.key);
-        const entity = contentState.getEntity(currentBlock.getEntityAt(0));
+        const entityAtZero = currentBlock.getEntityAt(0);
+        if (!entityAtZero) {
+          return '<p />';
+        }
+        const entity = contentState.getEntity(entityAtZero);
         const type = entity.getType();
 
         if (type === 'image') {
