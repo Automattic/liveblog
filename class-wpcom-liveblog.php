@@ -1140,6 +1140,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 							]
 						),
 						'is_admin'                     => is_admin(),
+						'status'                       => 'any',
 						'cross_domain'                 => false,
 						'author_required'              => self::is_author_required(),
 

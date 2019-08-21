@@ -746,9 +746,15 @@ class WPCOM_Liveblog_Rest_Api {
 		} elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
 			$nonce = sanitize_text_field( $_SERVER['HTTP_X_WP_NONCE'] );
 		}
+		$allowed_status = [ 'draft', 'publish' ];
 
-		if ( wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			$args['post_status'] = [ 'draft', 'publish' ];
+		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && is_user_logged_in() ) {
+			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
+			if( in_array( $status,  $allowed_status) ){
+				$args['post_status'] = $status;
+			} else{
+				$args['post_status'] = $allowed_status;
+			}
 		}
 
 		return $args;

@@ -36,6 +36,10 @@ export function getEntries(page, config, newestEntry) {
       'Content-Type': 'application/json',
       'X-WP-Nonce': config.nonce,
     };
+
+    if ('any' !== config.status) {
+      settings.url = `${settings.url}?filter-status=${config.status}`;
+    }
   }
 
   return secureAjax(settings);
@@ -61,6 +65,10 @@ export function polling(newestEntryTimestamp, config) {
       'Content-Type': 'application/json',
       'X-WP-Nonce': config.nonce,
     };
+
+    if ('any' !== config.status) {
+      settings.url = `${settings.url}?filter-status=${config.status}`;
+    }
   }
 
   return secureAjax(settings);

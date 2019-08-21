@@ -13,6 +13,7 @@ export const initialState = {
   newestEntry: false,
   nonce: false,
   total: 0,
+  status: 'any',
 };
 
 export const api = (state = initialState, action) => {
@@ -161,7 +162,11 @@ export const api = (state = initialState, action) => {
           timestamp: parseInt(action.payload.latest_entry_timestamp, 10),
         },
       };
-
+    case 'SET_STATUS':
+      return {
+        ...state,
+        status: action.payload.status,
+      };
     default:
       return state;
   }

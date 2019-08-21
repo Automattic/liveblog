@@ -5,6 +5,11 @@
   line-height: 0;
 }
 
+.liveblog-update-count label{
+  margin-left: 20px;
+  margin-right: 5px;
+}
+
 @include mq($until: small) {
   .liveblog-editor-toolbar-container {
     order: 2;
