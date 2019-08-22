@@ -751,7 +751,7 @@ class WPCOM_Liveblog_Rest_Api {
 		}
 		$allowed_status = [ 'draft', 'publish' ];
 
-		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && is_user_logged_in() ) {
+		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
 			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
 			if ( in_array( $status, $allowed_status ) ) {
 				$args['post_status'] = $status;
@@ -771,7 +771,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return bool
 	 */
 	public function bypass_cache( $enabled ) {
-		if ( is_user_logged_in() ) {
+		if ( WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
 			return true;
 		}
 
