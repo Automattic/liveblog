@@ -387,6 +387,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
+		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
 		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		// Get liveblog entries within the start and end boundaries
@@ -448,6 +449,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
+		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
 		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		// Get liveblog entries too be lazyloaded
@@ -595,6 +597,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
+		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
 		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		$entries = WPCOM_Liveblog::get_entries_paged( $page, $last_known_entry );
@@ -750,13 +753,28 @@ class WPCOM_Liveblog_Rest_Api {
 
 		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && is_user_logged_in() ) {
 			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
-			if( in_array( $status,  $allowed_status) ){
+			if ( in_array( $status, $allowed_status ) ) {
 				$args['post_status'] = $status;
-			} else{
+			} else {
 				$args['post_status'] = $allowed_status;
 			}
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Bypass cache when logged in so we can see the different post statuses
+	 *
+	 * @param $enabled
+	 *
+	 * @return bool
+	 */
+	public function bypass_cache( $enabled ) {
+		if ( is_user_logged_in() ) {
+			return true;
+		}
+
+		return $enabled;
 	}
 }
