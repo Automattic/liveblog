@@ -770,7 +770,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 *
 	 * @return bool
 	 */
-	public function bypass_cache( $enabled ) {
+	public static function bypass_cache( $enabled ) {
 		if ( WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
 			return true;
 		}
