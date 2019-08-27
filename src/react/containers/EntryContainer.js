@@ -50,10 +50,6 @@ class EntryContainer extends Component {
         statusUpdate: true,
       });
     };
-    this.close = (event) => {
-      event.preventDefault();
-      this.props.entryEditClose(this.props.entry.id);
-    };
     this.delete = (event) => {
       event.preventDefault();
       this.props.deleteEntry(this.props.entry.id);
@@ -93,7 +89,7 @@ class EntryContainer extends Component {
   entryActions() {
     const { config, entry } = this.props;
     const { status } = entry;
-    const statusLabel = 'publish' === status ? 'Revert to Draft' : 'Publish';
+    const statusLabel = 'publish' === status ? 'Unpublish' : 'Publish';
     const newStatus = 'publish' === status ? 'draft' : 'publish';
 
     if (!config.is_admin && (config.is_liveblog_editable !== '1' || config.backend_liveblogging === '1')) {
@@ -103,22 +99,15 @@ class EntryContainer extends Component {
     return (
       <footer className="liveblog-entry-tools">
         {
-          this.isEditing()
-            ? <button
-              className="button button-large liveblog-btn liveblog-btn-small"
-              onClick={this.close}
-            >
-            Close Editor
-            </button>
-            : <button
-              className="button button-large liveblog-btn liveblog-btn-smallx"
-              onClick={this.edit}
-            >
+          'draft' === status && <button
+            className="liveblog-btn liveblog-btn-small liveblog-btn-edit"
+            onClick={this.edit}
+          >
               Edit
-            </button>
+          </button>
         }
         <button
-          className={`button button-large liveblog-btn liveblog-btn-smallx liveblog-btn-status ${newStatus}`}
+          className={`liveblog-btn liveblog-btn-small liveblog-btn-status ${newStatus}`}
           onClick={ (event) => {
             event.preventDefault();
             this.updateStatus(newStatus);
@@ -219,7 +208,7 @@ class EntryContainer extends Component {
                 />
               )
           }
-          {this.entryActions()}
+          {!this.isEditing() && this.entryActions()}
           {this.entryShare()}
         </div>
       </article>
@@ -232,7 +221,6 @@ EntryContainer.propTypes = {
   config: PropTypes.object,
   entry: PropTypes.object,
   entryEditOpen: PropTypes.func,
-  entryEditClose: PropTypes.func,
   updateEntry: PropTypes.func,
   deleteEntry: PropTypes.func,
   activateScrolling: PropTypes.bool,

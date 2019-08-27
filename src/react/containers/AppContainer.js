@@ -15,6 +15,7 @@ import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
 import UpdateCount from '../components/UpdateCount';
+import StatusFilter from '../components/StatusFilter';
 import Editor from '../components/Editor';
 
 class AppContainer extends Component {
@@ -65,10 +66,12 @@ class AppContainer extends Component {
           />
         }
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
+
+        { isAdmin && <StatusFilter /> }
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
+        { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
       </div>
     );
   }

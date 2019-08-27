@@ -67,6 +67,10 @@ body.wp-admin button.liveblog-draft-btn {
 	margin-left: 10px;
 }
 
+body.wp-admin button.liveblog-close-btn {
+	margin-left: 10px;
+}
+
 body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi {
 	width: calc( 100% - 210px );
 	margin-bottom: 30px;
@@ -74,7 +78,17 @@ body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi 
 	display: inline-block;
 }
 
+body.wp-admin .liveblog-admin-wrapper .liveblog-entry-edit .liveblog-editor-container .Select--multi {
+	width: calc( 100% - 310px );
+	margin-left: 10px;
+}
+
+body.wp-admin .liveblog-admin-wrapper .liveblog-entry-edit .liveblog-editor-container .liveblog-editor-subTitle {
+	margin-left: 10px;
+}
+
 body.wp-admin .liveblog-editor-container,
+body.wp-admin .liveblog-status-filters,
 body.wp-admin .liveblog-update-count {
 	background-color: #f1f1f1;
 }
@@ -106,17 +120,39 @@ body.wp-admin.liveblog #poststuff h2.liveblog-entry-header {
   font-size: 18px;
 }
 
-body.wp-admin .liveblog-update-count {
-  padding: 5px;
+body.wp-admin .liveblog-status-filters{
+  padding: 8px;
   margin-top: 0px;
+}
+
+body.wp-admin .liveblog-status-filters strong{
+	padding-right: 20px;
+}
+
+body.wp-admin .liveblog-status-filters a,
+body.wp-admin .liveblog-status-filters span{
+	margin-right: 20px;
+}
+
+body.wp-admin .liveblog-status-filters span{
+	color: #72777c;
+}
+
+body.wp-admin .liveblog-update-count {
+	padding: 8px;
+	margin:0;
 }
 
 body.wp-admin .liveblog-entry {
   background-color: white;
   border: 1px solid #ccc;
-  margin-top: 5px;
+  margin: 5px 5px 0;
 }
 
 body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
   display: none;
+}
+
+#wpcom-liveblog-container {
+	padding-bottom: 3px;
 }

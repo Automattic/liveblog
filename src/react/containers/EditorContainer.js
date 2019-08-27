@@ -78,6 +78,11 @@ class EditorContainer extends Component {
       canPublish: state,
     });
 
+    this.close = (event) => {
+      event.preventDefault();
+      this.props.entryEditClose(this.props.entry.id);
+    };
+
     this.setError = (error, errorMessage) => this.setState({
       error,
       errorMessage,
@@ -400,8 +405,17 @@ class EditorContainer extends Component {
             event.preventDefault();
             this.publish('publish');
           } }>
-          {isEditing ? 'Save' : 'Post Update'}
+          {isEditing ? 'Publish' : 'Post Update'}
         </button>
+
+        {
+          isEditing && <button
+            className="button button-large liveblog-btn liveblog-btn-small liveblog-close-btn"
+            onClick={this.close}
+          >
+             Close Editor
+          </button>
+        }
         <span className={ `liveblog-update-fail${(error) ? '' : ' hidden'}` }>{ errorMessage }</span>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>
