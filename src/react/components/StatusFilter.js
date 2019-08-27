@@ -10,7 +10,7 @@ const StatusFilter = ({ setStatus, getEntries }) => {
   const statuses = [
     { value: 'any', label: 'All Entries' },
     { value: 'draft', label: 'Draft Entries' },
-    { value: 'publish', label: 'Publish Entries' },
+    { value: 'publish', label: 'Published Entries' },
   ];
 
   const [filter, setState] = useState('any');
