@@ -97,6 +97,12 @@ class WPCOM_Liveblog_Entry {
 			}
 			return mysql2date( 'G', $this->entry->post_modified_gmt );
 		}
+
+		//Use modified date if its greater that post date
+		if( strtotime( $this->entry->post_modified_gmt)  > strtotime( $this->entry->post_date_gmt )){
+			return mysql2date( 'G', $this->entry->post_modified_gmt );
+		}
+
 		return mysql2date( 'G', $this->entry->post_date_gmt );
 	}
 
@@ -130,10 +136,16 @@ class WPCOM_Liveblog_Entry {
 				}
 			}
 		} else {
+			$date = $entry->post_date_gmt;
+
+			//Use modified date if its greater that post date
+			if( strtotime( $entry->post_modified_gmt) > strtotime($entry->post_date_gmt )){
+				$date = $entry->post_modified_gmt;
+			}
 			if ( '' === $d ) {
-				$date = mysql2date( get_option( 'date_format' ), $entry->post_date_gmt );
+				$date = mysql2date( get_option( 'date_format' ), $date );
 			} else {
-				$date = mysql2date( $d, $entry->post_date_gmt );
+				$date = mysql2date( $d, $date );
 			}
 		}
 
