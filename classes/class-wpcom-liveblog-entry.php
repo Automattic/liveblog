@@ -99,7 +99,7 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		//Use modified date if its greater that post date
-		if( strtotime( $this->entry->post_modified_gmt)  > strtotime( $this->entry->post_date_gmt )){
+		if ( strtotime( $this->entry->post_modified_gmt ) > strtotime( $this->entry->post_date_gmt ) ) {
 			return mysql2date( 'G', $this->entry->post_modified_gmt );
 		}
 
@@ -139,7 +139,7 @@ class WPCOM_Liveblog_Entry {
 			$date = $entry->post_date_gmt;
 
 			//Use modified date if its greater that post date
-			if( strtotime( $entry->post_modified_gmt) > strtotime($entry->post_date_gmt )){
+			if ( strtotime( $entry->post_modified_gmt ) > strtotime( $entry->post_date_gmt ) ) {
 				$date = $entry->post_modified_gmt;
 			}
 			if ( '' === $d ) {
