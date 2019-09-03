@@ -133,15 +133,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp-template.php';
 
 			require dirname( __FILE__ ) . '/classes/slack/async/class-wp-async-task.php';
-			require dirname( __FILE__ ) . '/classes/slack/async/class-slack-process-entry-async-task.php';
-			require dirname( __FILE__ ) . '/classes/slack/settings/class-slack-settings.php';
-			require dirname( __FILE__ ) . '/classes/slack/settings/class-author-settings.php';
-			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-liveblog-webhook-api.php';
-			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-liveblog-slash-command-api.php';
-			require dirname( __FILE__ ) . '/classes/slack/tools/class-export-authors.php';
-			require dirname( __FILE__ ) . '/classes/slack/tools/class-import-authors-slack-id.php';
-			require dirname( __FILE__ ) . '/classes/slack/tools/class-markdown-parser.php';
-			require dirname( __FILE__ ) . '/classes/slack/class-slack-liveblog.php';
+			require dirname( __FILE__ ) . '/classes/slack/async/class-wpcom-liveblog-slack-process-entry-async-task.php';
+			require dirname( __FILE__ ) . '/classes/slack/settings/class-wpcom-liveblog-slack-settings.php';
+			require dirname( __FILE__ ) . '/classes/slack/settings/class-wpcom-liveblog-author-settings.php';
+			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-wpcom-liveblog-webhook-api.php';
+			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-wpcom-liveblog-slash-command-api.php';
+			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-export-authors.php';
+			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-import-authors-slack-id.php';
+			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-markdown-parser.php';
+			require dirname( __FILE__ ) . '/classes/slack/class-wpcom-liveblog-slack.php';
 
 
 			if ( self::use_rest_api() ) {

@@ -22,7 +22,7 @@ class WPCOM_Liveblog_Slack_Settings {
 			'type'        => 'checkbox',
 			'description' => 'Enable the event endpoint at %slack-event-endpoint%',
 		],
-		'enable_entry_updates' => [
+		'enable_entry_updates'  => [
 			'label'       => 'Enable Entry Updates',
 			'type'        => 'checkbox',
 			'description' => 'Enable the ability to update an entry from slack',

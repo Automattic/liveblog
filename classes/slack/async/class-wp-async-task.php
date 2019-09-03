@@ -44,10 +44,11 @@ if ( ! class_exists( 'WP_Async_Task' ) ) {
 		 * @var string
 		 */
 		protected $action;
+		
 		/**
 		 * @var array
 		 */
-		protected $_body_data;
+		protected $body_data;
 		/**
 		 * Constructor to wire up the necessary actions
 		 *
@@ -89,9 +90,9 @@ if ( ! class_exists( 'WP_Async_Task' ) ) {
 			} catch ( Exception $e ) {
 				return;
 			}
-			$data['action']   = "wp_async_$this->action";
-			$data['_nonce']   = $this->create_async_nonce();
-			$this->_body_data = $data;
+			$data['action']  = "wp_async_$this->action";
+			$data['_nonce']  = $this->create_async_nonce();
+			$this->body_data = $data;
 			if ( ! has_action( 'shutdown', [ $this, 'launch_on_shutdown' ] ) ) {
 				add_action( 'shutdown', [ $this, 'launch_on_shutdown' ] );
 			}
@@ -112,16 +113,16 @@ if ( ! class_exists( 'WP_Async_Task' ) ) {
 		 * @uses wp_remote_post()
 		 */
 		public function launch_on_shutdown() {
-			if ( ! empty( $this->_body_data ) ) {
+			if ( ! empty( $this->body_data ) ) {
 				$cookies = [];
-				foreach ( $_COOKIE as $name => $value ) {
+				foreach ( $_COOKIE as $name => $value ) { //phpcs:ignore WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___COOKIE
 					$cookies[] = "$name=" . rawurlencode( maybe_serialize( $value ) );
 				}
 				$request_args = [
 					'timeout'   => 0.01,
 					'blocking'  => false,
 					'sslverify' => apply_filters( 'https_local_ssl_verify', true ),
-					'body'      => $this->_body_data,
+					'body'      => $this->body_data,
 					'headers'   => [
 						'cookie' => implode( '; ', $cookies ),
 					],
@@ -148,8 +149,8 @@ if ( ! class_exists( 'WP_Async_Task' ) ) {
 			}
 			add_filter(
 				'wp_die_handler',
-				function() {
-					die(); //phpcs:ignore WordPressVIPMinimum.Hooks.AlwaysReturnInFilter.MissingReturnStatement
+				function() { //phpcs:ignore WordPressVIPMinimum.Hooks.AlwaysReturnInFilter.MissingReturnStatement
+					die();
 				} 
 			);
 			wp_die();
