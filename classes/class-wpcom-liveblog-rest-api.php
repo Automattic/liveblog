@@ -753,7 +753,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
 			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
-			if ( in_array( $status, $allowed_status ) ) {
+			if ( in_array( $status, $allowed_status, true ) ) {
 				$args['post_status'] = $status;
 			} else {
 				$args['post_status'] = $allowed_status;
