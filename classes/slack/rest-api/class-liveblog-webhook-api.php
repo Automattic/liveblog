@@ -164,9 +164,9 @@ class WPCOM_Liveblog_Webhook_API {
 
 		$client_msg_id  = $body->event->message->client_msg_id ?? $body->event->client_msg_id;
 		$liveblog_entry = self::get_entry_by_message_id( $client_msg_id ?? 0 );
-		$disable_edits  = isset( $settings['disable_entry_updates'] ) && 'on' === $settings['disable_entry_updates'];
+		$allow_edits  = isset( $settings['enable_entry_updates'] ) && 'on' === $settings['enable_entry_updates'];
 
-		if ( ! $disable_edits && $is_edit && $liveblog_entry && 'draft' === $liveblog_entry->post_status ) {
+		if ( $allow_edits && $is_edit && $liveblog_entry && 'draft' === $liveblog_entry->post_status ) {
 			$entry_data = self::sanitize_entry( $body->event->message->text );
 
 			$entry = WPCOM_Liveblog_Entry::update(

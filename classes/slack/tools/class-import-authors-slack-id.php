@@ -21,7 +21,7 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 		register_importer(
 			'author-slack-id',
 			'Liveblog Slack Author IDs',
-			'Populate author Slack IDs to be used in the slack Liveblog integration.',
+			'Populate author Slack IDs to be used in the Liveblog integration.',
 			[
 				__CLASS__,
 				'slack_id_import',

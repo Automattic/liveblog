@@ -22,10 +22,10 @@ class WPCOM_Liveblog_Slack_Settings {
 			'type'        => 'checkbox',
 			'description' => 'Enable the event endpoint at %slack-event-endpoint%',
 		],
-		'disable_entry_updates' => [
-			'label'       => 'Disable Entry Updates',
+		'enable_entry_updates' => [
+			'label'       => 'Enable Entry Updates',
 			'type'        => 'checkbox',
-			'description' => 'Disable the ability to update an entry from slack',
+			'description' => 'Enable the ability to update an entry from slack',
 		],
 	];
 
@@ -98,7 +98,7 @@ class WPCOM_Liveblog_Slack_Settings {
 		}
 
 		if ( ! empty( $args['description'] ) ) {
-			echo wp_kses_post( str_replace( '%slack-event-endpoint%', sprintf( '<i>%s</i>', home_url( '/wp-json/abc' . WPCOM_Liveblog_Webhook_API::EVENT_ENDPOINT ) ), $args['description'] ) );
+			echo wp_kses_post( str_replace( '%slack-event-endpoint%', sprintf( '<i>%s</i>', home_url( '/wp-json/liveblog/' . WPCOM_Liveblog_Webhook_API::EVENT_ENDPOINT ) ), $args['description'] ) );
 		}
 	}
 
