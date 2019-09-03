@@ -98,14 +98,12 @@ class EntryContainer extends Component {
 
     return (
       <footer className="liveblog-entry-tools">
-        {
-          'draft' === status && <button
-            className="liveblog-btn liveblog-btn-small liveblog-btn-edit"
-            onClick={this.edit}
-          >
-              Edit
-          </button>
-        }
+        <button
+          className="liveblog-btn liveblog-btn-small liveblog-btn-edit"
+          onClick={this.edit}
+        >
+          Edit
+        </button>
         <button
           className={`liveblog-btn liveblog-btn-small liveblog-btn-status ${newStatus}`}
           onClick={ (event) => {

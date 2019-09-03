@@ -67,7 +67,11 @@ class AppContainer extends Component {
         }
         <UpdateButton polling={polling} click={() => mergePolling()} />
 
-        { isAdmin && <StatusFilter /> }
+        <div id="liveblog-action-wrapper">
+          { isAdmin && <StatusFilter /> }
+          { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
+        </div>
+
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
