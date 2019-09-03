@@ -25,7 +25,8 @@ class WPCOM_Liveblog_Entry_Query {
 			'posts_per_page' => WPCOM_Liveblog::MAX_LAZY_LOAD_ENTRY_COUNT,
 		];
 
-		$args    = wp_parse_args( $args, $defaults );
+		$args = apply_filters( 'liveblog_query_args', wp_parse_args( $args, $defaults ) );
+
 		$entries = get_posts( $args );
 
 		return self::entries_from_posts( $entries );
@@ -153,13 +154,17 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	public function get_all_entries_asc() {
+		$force                  = apply_filters( 'liveblog_all_entries_bypass_cache', false );
 		$cached_entries_asc_key = $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc     = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
-		if ( false !== $cached_entries_asc ) {
+		if ( ! $force && false !== $cached_entries_asc ) {
 			return $cached_entries_asc;
 		}
+
 		$all_entries_asc = $this->get( [ 'order' => 'ASC' ] );
-		wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
+		if ( ! $force ) {
+			wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
+		}
 		return $all_entries_asc;
 	}
 

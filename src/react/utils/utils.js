@@ -86,6 +86,10 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
       };
     }
 
+    if (entry.status === 'draft' && Object.prototype.hasOwnProperty.call(accumulator, id) && entry.timestamp > accumulator[id].timestamp) {
+      accumulator[id] = entry;
+    }
+
     if (entry.type === 'update' && Object.prototype.hasOwnProperty.call(accumulator, id)) {
       accumulator[id] = entry;
     }
@@ -129,6 +133,7 @@ export const getNewestEntry = (current, update, entries = false) => {
     return getItemOfObject(entries, 1);
   }
   if (current.timestamp > update.timestamp) return current;
+
   return update;
 };
 

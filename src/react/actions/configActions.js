@@ -10,3 +10,8 @@ export const updateInterval = payload => ({
   type: types.UPDATE_INTERVAL,
   payload,
 });
+
+export const setStatus = payload => ({
+  type: types.SET_STATUS,
+  payload,
+});

@@ -1,5 +1,6 @@
 /* global jQuery */
 /* eslint-disable class-methods-use-this */
+/* eslint-disable class-methods-use-this */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
@@ -14,6 +15,7 @@ import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
 import UpdateCount from '../components/UpdateCount';
+import StatusFilter from '../components/StatusFilter';
 import Editor from '../components/Editor';
 
 class AppContainer extends Component {
@@ -64,10 +66,16 @@ class AppContainer extends Component {
           />
         }
         <UpdateButton polling={polling} click={() => mergePolling()} />
-        { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
+
+        <div id="liveblog-action-wrapper">
+          { isAdmin && <StatusFilter /> }
+          { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
+        </div>
+
         <Entries loading={loading} entries={entries} config={config} />
         <PaginationContainer />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
+        { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
       </div>
     );
   }

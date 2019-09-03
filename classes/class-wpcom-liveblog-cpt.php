@@ -46,7 +46,7 @@ class WPCOM_Liveblog_CPT {
 
 		// Remove the query filter.
 		remove_filter( 'parse_query', [ __CLASS__, 'hierarchical_posts_filter' ] );
-		remove_filter( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
+		remove_action( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
 		$parent = (int) $parent; // Force a cast as an integer.
 
 		$post = get_post( $parent );
@@ -57,7 +57,7 @@ class WPCOM_Liveblog_CPT {
 		}
 
 		// Get all children
-		$children = get_children(
+		$children = new WP_Query(
 			[
 				'post_type'        => self::$cpt_slug,
 				'post_parent'      => $parent,
@@ -68,12 +68,14 @@ class WPCOM_Liveblog_CPT {
 		// Remove the action so it doesn't fire again
 		remove_action( 'before_delete_post', [ __CLASS__, 'delete_children' ] );
 
-		foreach ( $children as $child ) {
-			// Never delete top level posts!
-			if ( 0 === (int) $child->post_parent ) {
-				continue;
+		if( $children->have_posts() ){
+			foreach ( $children->posts as $child ) {
+				// Never delete top level posts!
+				if ( 0 === (int) $child->post_parent ) {
+					continue;
+				}
+				wp_delete_post( $child->ID, true );
 			}
-			wp_delete_post( $child->ID, true );
 		}
 
 		add_action( 'before_delete_post', [ __CLASS__, 'delete_children' ] );

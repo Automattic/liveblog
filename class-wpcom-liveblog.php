@@ -10,7 +10,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.9.6';
+		const VERSION                 = '1.9.7';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -1056,6 +1056,19 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::add_default_plupload_settings();
 			}
 
+			if ( is_admin() ) {
+				/**
+				 * Allow draft and publish post in the admin
+				 */
+				add_filter(
+					'liveblog_query_args',
+					function( $args ) {
+						$args['post_status'] = [ 'draft', 'publish' ];
+						return $args;
+					} 
+				);
+			}
+
 			$entry_query            = new WPCOM_Liveblog_Entry_Query( get_the_ID(), self::KEY );
 			self::$latest_timestamp = $entry_query->get_latest_timestamp();
 
@@ -1127,6 +1140,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 							]
 						),
 						'is_admin'                     => is_admin(),
+						'status'                       => 'any',
 						'cross_domain'                 => false,
 						'author_required'              => self::is_author_required(),
 

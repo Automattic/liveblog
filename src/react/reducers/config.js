@@ -19,6 +19,12 @@ export const config = (state = initialState, action) => {
         refresh_interval: action.payload,
       };
 
+    case 'SET_STATUS':
+      return {
+        ...state,
+        status: action.payload,
+      };
+
     default:
       return state;
   }

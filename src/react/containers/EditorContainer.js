@@ -78,6 +78,11 @@ class EditorContainer extends Component {
       canPublish: state,
     });
 
+    this.close = (event) => {
+      event.preventDefault();
+      this.props.entryEditClose(this.props.entry.id);
+    };
+
     this.setError = (error, errorMessage) => this.setState({
       error,
       errorMessage,
@@ -114,8 +119,7 @@ class EditorContainer extends Component {
     });
   }
 
-  publish(event) {
-    event.preventDefault();
+  publish(status) {
     const { updateEntry, entry, createEntry, isEditing, useTinyMCE } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
@@ -140,6 +144,7 @@ class EditorContainer extends Component {
         authors,
         authorIds,
         headline,
+        status,
       });
       return;
     }
@@ -149,6 +154,7 @@ class EditorContainer extends Component {
       authors,
       authorIds,
       headline,
+      status,
     });
 
     // Prevent publish empty posts when creating new editor.
@@ -384,10 +390,32 @@ class EditorContainer extends Component {
         />
         <button
           disabled={ canPublish ? '' : 'disabled'}
-          className="button button-primary button-large liveblog-btn liveblog-publish-btn"
-          onClick={this.publish.bind(this)}>
-          {isEditing ? 'Save' : 'Post Update'}
+          className="button button-secondary button-large liveblog-btn liveblog-draft-btn"
+          onClick={ (event) => {
+            event.preventDefault();
+            this.publish('draft');
+          } }>
+            Save Draft
         </button>
+
+        <button
+          disabled={ canPublish ? '' : 'disabled'}
+          className="button button-primary button-large liveblog-btn liveblog-publish-btn"
+          onClick={ (event) => {
+            event.preventDefault();
+            this.publish('publish');
+          } }>
+          {isEditing ? 'Publish' : 'Post Update'}
+        </button>
+
+        {
+          isEditing && <button
+            className="button button-large liveblog-btn liveblog-btn-small liveblog-close-btn"
+            onClick={this.close}
+          >
+             Close Editor
+          </button>
+        }
         <span className={ `liveblog-update-fail${(error) ? '' : ' hidden'}` }>{ errorMessage }</span>
         <input type="hidden" id="liveblog_editor_authors" value={authorIds.join(',')} />
       </div>

@@ -112,6 +112,11 @@ class WPCOM_Liveblog_Rest_Api {
 						'required'          => false,
 						'sanitize_callback' => [ __CLASS__, 'sanitize_numeric' ],
 					],
+					'status'      => [
+						'required'          => false,
+						'default'           => 'draft',
+						'validate_callback' => [ __CLASS__, 'sanitize_status' ],
+					],
 				],
 			]
 		);
@@ -382,6 +387,9 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
+		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
+		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
+
 		// Get liveblog entries within the start and end boundaries
 		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
 
@@ -411,6 +419,7 @@ class WPCOM_Liveblog_Rest_Api {
 			'entry_id'   => self::get_json_param( 'entry_id', $json ),
 			'author_ids' => self::get_json_param( 'author_ids', $json ),
 			'headline'   => self::get_json_param( 'headline', $json ),
+			'status'     => self::get_json_param( 'status', $json ),
 		];
 
 		self::set_liveblog_vars( $args['post_id'] );
@@ -439,6 +448,9 @@ class WPCOM_Liveblog_Rest_Api {
 		$min_timestamp = $request->get_param( 'min_time' );
 
 		self::set_liveblog_vars( $post_id );
+
+		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
+		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		// Get liveblog entries too be lazyloaded
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
@@ -585,6 +597,9 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
+		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
+		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
+
 		$entries = WPCOM_Liveblog::get_entries_paged( $page, $last_known_entry );
 
 		// Possibly do not cache the response
@@ -690,6 +705,15 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
+	 * Sanitization callback to ensure a valid post status
+	 *
+	 * @return int $param as an integer. 0 if $param is not a valid status
+	 */
+	public static function sanitize_staus( $param, $request, $key ) {
+		return in_array( $param, [ 'publish', 'draft' ], true );
+	}
+
+	/**
 	 * Get parameter from JSON
 	 * @param string $param
 	 * @param array  $json
@@ -708,5 +732,49 @@ class WPCOM_Liveblog_Rest_Api {
 			return html_entity_decode( $json[ $param ] );
 		}
 		return false;
+	}
+
+	/**
+	 * Checks to see if the current request includes a nonce so
+	 * that we can expose draft post in the api response
+	 *
+	 * @param $args
+	 *
+	 * @return mixed
+	 */
+	public static function maybe_allow_draft_post( $args ) {
+		$nonce = null;
+		if ( isset( $_REQUEST['_wpnonce'] ) ) {
+			$nonce = sanitize_text_field( $_REQUEST['_wpnonce'] ); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		} elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
+			$nonce = sanitize_text_field( $_SERVER['HTTP_X_WP_NONCE'] );
+		}
+		$allowed_status = [ 'draft', 'publish' ];
+
+		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
+			if ( in_array( $status, $allowed_status, true ) ) {
+				$args['post_status'] = $status;
+			} else {
+				$args['post_status'] = $allowed_status;
+			}
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Bypass cache when logged in so we can see the different post statuses
+	 *
+	 * @param $enabled
+	 *
+	 * @return bool
+	 */
+	public static function bypass_cache( $enabled ) {
+		if ( WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+			return true;
+		}
+
+		return $enabled;
 	}
 }

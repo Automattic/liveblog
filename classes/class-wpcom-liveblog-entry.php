@@ -8,7 +8,8 @@ class WPCOM_Liveblog_Entry {
 	const DEFAULT_AVATAR_SIZE = 30;
 
 	private $entry;
-	private $type = 'new';
+	private $type                       = 'new';
+	private static $default_post_status = 'draft';
 	private static $allowed_tags_for_entry;
 	private static $rendered_content = [];
 
@@ -71,6 +72,10 @@ class WPCOM_Liveblog_Entry {
 		return $this->entry->post_content;
 	}
 
+	public function get_status() {
+		return $this->entry->post_status;
+	}
+
 	public function get_headline() {
 		return $this->entry->post_title;
 	}
@@ -85,6 +90,19 @@ class WPCOM_Liveblog_Entry {
 	 * @return string
 	 */
 	public function get_timestamp() {
+		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
+		if ( 'draft' === $this->entry->post_status ) {
+			if ( '0000-00-00 00:00:00' === $this->entry->post_modified_gmt ) {
+				return mysql2date( 'G', get_gmt_from_date( $this->entry->post_modified ) );
+			}
+			return mysql2date( 'G', $this->entry->post_modified_gmt );
+		}
+
+		//Use modified date if its greater that post date
+		if ( strtotime( $this->entry->post_modified_gmt ) > strtotime( $this->entry->post_date_gmt ) ) {
+			return mysql2date( 'G', $this->entry->post_modified_gmt );
+		}
+
 		return mysql2date( 'G', $this->entry->post_date_gmt );
 	}
 
@@ -101,10 +119,34 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		$entry = get_post( $post_id );
-		if ( '' === $d ) {
-			$date = mysql2date( get_option( 'date_format' ), $entry->post_date_gmt );
+
+		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
+		if ( 'draft' === $entry->post_status ) {
+			if ( '' === $d ) {
+				if ( '0000-00-00 00:00:00' === $entry->post_modified_gmt ) {
+					$date = mysql2date( get_option( 'date_format' ), get_gmt_from_date( $entry->post_modified ) );
+				} else {
+					$date = mysql2date( get_option( 'date_format' ), $entry->post_modified_gmt );
+				}
+			} else {
+				if ( '0000-00-00 00:00:00' === $entry->post_modified_gmt ) {
+					$date = mysql2date( $d, get_gmt_from_date( $entry->post_modified ) );
+				} else {
+					$date = mysql2date( $d, $entry->post_modified_gmt );
+				}
+			}
 		} else {
-			$date = mysql2date( $d, $entry->post_date_gmt );
+			$date = $entry->post_date_gmt;
+
+			//Use modified date if its greater that post date
+			if ( strtotime( $entry->post_modified_gmt ) > strtotime( $entry->post_date_gmt ) ) {
+				$date = $entry->post_modified_gmt;
+			}
+			if ( '' === $d ) {
+				$date = mysql2date( get_option( 'date_format' ), $date );
+			} else {
+				$date = mysql2date( $d, $date );
+			}
 		}
 
 		return $date;
@@ -130,6 +172,7 @@ class WPCOM_Liveblog_Entry {
 			'authors'     => self::get_authors( $entry_id ),
 			'entry_time'  => $this->get_entry_date_gmt( 'U', $entry_id ),
 			'share_link'  => $share_link,
+			'status'      => self::get_status(),
 		];
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
@@ -192,6 +235,7 @@ class WPCOM_Liveblog_Entry {
 			'ID'           => $args['entry_id'],
 			'post_content' => $args['content'],
 			'post_title'   => $args['headline'],
+			'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 		];
 
 		$updated_entry_id = wp_update_post( $post_data );
@@ -264,7 +308,7 @@ class WPCOM_Liveblog_Entry {
 				'post_content' => $args['content'],
 				'post_title'   => $args['headline'],
 				'post_type'    => WPCOM_Liveblog_CPT::$cpt_slug,
-				'post_status'  => 'publish',
+				'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 			]
 		);
 
@@ -413,7 +457,6 @@ class WPCOM_Liveblog_Entry {
 			$contributors
 		);
 	}
-
 
 	/**
 	 * Work out Entry title

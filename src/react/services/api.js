@@ -31,6 +31,17 @@ export function getEntries(page, config, newestEntry) {
     crossDomain: config.cross_domain,
   };
 
+  if (config.is_admin) {
+    settings.headers = {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
+    };
+
+    if ('any' !== config.status) {
+      settings.url = `${settings.url}?filter-status=${config.status}`;
+    }
+  }
+
   return secureAjax(settings);
 }
 
@@ -49,6 +60,17 @@ export function polling(newestEntryTimestamp, config) {
     crossDomain: config.cross_domain,
   };
 
+  if (config.is_admin) {
+    settings.headers = {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
+    };
+
+    if ('any' !== config.status) {
+      settings.url = `${settings.url}?filter-status=${config.status}`;
+    }
+  }
+
   return secureAjax(settings);
 }
 
@@ -62,6 +84,7 @@ export function createEntry(entry, config, nonce = false) {
       content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
       author_ids: entry.authorIds,
       headline: entry.headline,
+      status: entry.status,
     },
     headers: {
       'Content-Type': 'application/json',
@@ -93,9 +116,10 @@ export function updateEntry(entry, config, nonce = false) {
       crud_action: 'update',
       post_id: config.post_id,
       entry_id: entry.id,
-      content: (config.use_tinymce === '1') ? getTinyMCEContent() : entry.content,
+      content: (config.use_tinymce === '1' && !entry.statusUpdate) ? getTinyMCEContent() : entry.content,
       author_ids: entry.authorIds,
       headline: entry.headline,
+      status: entry.status,
     },
     headers: {
       'Content-Type': 'application/json',
