@@ -72,9 +72,9 @@ class WPCOM_Liveblog_Markdown_Parser {
 				$regex,
 				function ( $matches ) use ( $regex ) {
 					if ( '/(#+)(.*)/' === $regex ) {
-						return call_user_func( [ __CLASS__, Markdown_Parser::$block_rules[ $regex ] ], $matches[1], $matches[2] );
+						return call_user_func( [ __CLASS__, WPCOM_Liveblog_Markdown_Parser::$block_rules[ $regex ] ], $matches[1], $matches[2] );
 					} else {
-						return call_user_func( [ __CLASS__, Markdown_Parser::$block_rules[ $regex ] ], $matches[1] );
+						return call_user_func( [ __CLASS__, WPCOM_Liveblog_Markdown_Parser::$block_rules[ $regex ] ], $matches[1] );
 					}
 				},
 				$text 
