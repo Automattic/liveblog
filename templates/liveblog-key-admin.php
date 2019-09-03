@@ -33,4 +33,8 @@ selected="selected" <?php endif; ?> value="<?php echo esc_attr( $format ); ?>">
 	<button type="button" class="button button-primary liveblog-key-template-save" value="liveblog-key-template-save"><?php echo esc_html( $key_button ); ?></button>
 </p>
 <p class="howto"><?php echo esc_html( $key_description ); ?></p>
-
+<p>
+<p>
+	<label for="liveblog-slack-channel">Slack Channel </label>
+	<input type="text" id="liveblog-slack-channel" name="liveblog-slack-channel" class="widefat" value="<?php echo esc_attr( $slack_channel ); ?>">
+</p>

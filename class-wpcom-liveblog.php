@@ -136,7 +136,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/slack/async/class-slack-process-entry-async-task.php';
 			require dirname( __FILE__ ) . '/classes/slack/settings/class-slack-settings.php';
 			require dirname( __FILE__ ) . '/classes/slack/settings/class-author-settings.php';
-			require dirname( __FILE__ ) . '/classes/slack/settings/class-liveblog-settings.php';
 			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-liveblog-webhook-api.php';
 			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-liveblog-slash-command-api.php';
 			require dirname( __FILE__ ) . '/classes/slack/tools/class-export-authors.php';

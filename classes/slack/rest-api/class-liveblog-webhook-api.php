@@ -396,7 +396,7 @@ class WPCOM_Liveblog_Webhook_API {
 				'post_type'      => 'fte_liveblog',
 				'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
-						'key'     => WPCOM_Liveblog_Channel_Settings::SLACK_CHANNEL_META,
+						'key'     => WPCOM_Liveblog_Entry_Key_Events::META_KEY_SLACK_CHANNEL,
 						'value'   => $channel_id,
 						'compare' => '=',
 					],

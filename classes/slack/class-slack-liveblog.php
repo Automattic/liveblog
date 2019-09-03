@@ -14,7 +14,6 @@ class WPCOM_Liveblog_Slack {
 
 		WPCOM_Liveblog_Slack_Settings::hooks();
 		WPCOM_Liveblog_Author_Settings::hooks();
-		WPCOM_Liveblog_Channel_Settings::hooks();
 		WPCOM_Liveblog_Webhook_API::hooks();
 		WPCOM_Liveblog_Slash_Command_API::hooks();
 		WPCOM_Liveblog_Import_Authors_Slack_ID::hooks();
