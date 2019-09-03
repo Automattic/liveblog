@@ -204,7 +204,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 			WP_CLI::line( 'Found live blog ID ' . $lb->ID );
 			$blog_count++;
 
-			self::convert_live_blog(
+			self::convert_liveblog(
 				[],
 				[
 					'id'      => $lb->ID,
