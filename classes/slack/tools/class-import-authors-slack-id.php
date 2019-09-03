@@ -67,7 +67,7 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 		$csv_file = file( $file );
 
 		if ( false !== $csv_file ) {
-			$csv_content = str_getcsv($csv_file[0], "\r");
+			$csv_content = str_getcsv( $csv_file[0], "\r" );
 			$csv_content = array_map( 'str_getcsv', $csv_content );
 
 			foreach ( $csv_content as  $data ) {

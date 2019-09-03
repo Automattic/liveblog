@@ -68,7 +68,7 @@ class WPCOM_Liveblog_CPT {
 		// Remove the action so it doesn't fire again
 		remove_action( 'before_delete_post', [ __CLASS__, 'delete_children' ] );
 
-		if( $children->have_posts() ){
+		if ( $children->have_posts() ) {
 			foreach ( $children->posts as $child ) {
 				// Never delete top level posts!
 				if ( 0 === (int) $child->post_parent ) {
