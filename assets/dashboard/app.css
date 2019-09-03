@@ -87,6 +87,19 @@ body.wp-admin .liveblog-admin-wrapper .liveblog-entry-edit .liveblog-editor-cont
 	margin-left: 10px;
 }
 
+body.wp-admin #liveblog-action-wrapper{
+	display: flex;
+}
+
+body.wp-admin #liveblog-action-wrapper .liveblog-status-filters,
+body.wp-admin #liveblog-action-wrapper .liveblog-update-count{
+	width: 100%;
+}
+
+body.wp-admin #liveblog-action-wrapper .liveblog-update-count {
+	text-align: right;
+}
+
 body.wp-admin .liveblog-editor-container,
 body.wp-admin .liveblog-status-filters,
 body.wp-admin .liveblog-update-count {
@@ -155,4 +168,15 @@ body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
 
 #wpcom-liveblog-container {
 	padding-bottom: 3px;
+}
+
+@media ( max-width: 760px ) {
+	body.wp-admin #liveblog-action-wrapper{
+		display: block;
+	}
+
+	body.wp-admin #liveblog-action-wrapper .liveblog-update-count {
+		text-align: left;
+	}
+
 }
