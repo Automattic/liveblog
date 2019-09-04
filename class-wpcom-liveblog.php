@@ -1065,7 +1065,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					function( $args ) {
 						$args['post_status'] = [ 'draft', 'publish' ];
 						return $args;
-					} 
+					}
 				);
 			}
 
