@@ -88,7 +88,6 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 		);
 
 		$comment_ids_to_skip = [];
-		$comment_id_map      = [];
 		foreach ( $live_blog_comment_replacements as $item ) {
 			// skip anything marked as being replaced
 			$comment_ids_to_skip[] = $item->comment_ID;

@@ -179,8 +179,6 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	public static function render_content( $content, $entry = false ) {
-		global $wp_embed;
-
 		// Cache rendered entry content to avoid double running shortcodes.
 		if ( isset( self::$rendered_content[ $entry->ID ] ) ) {
 			return self::$rendered_content[ $entry->ID ];
