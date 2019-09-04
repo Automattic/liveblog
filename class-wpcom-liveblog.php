@@ -1380,11 +1380,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$theme_template       = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			if ( file_exists( $child_theme_template ) ) {
-				include $child_theme_template; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
+				include $child_theme_template; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
 			} elseif ( file_exists( $theme_template ) ) {
-				include $theme_template; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
+				include $theme_template; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
 			} elseif ( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
-				include self::$custom_template_path . '/' . $template_name; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.IncludingFile
+				include self::$custom_template_path . '/' . $template_name; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.NotAbsolutePath
 			} else {
 				include dirname( __FILE__ ) . '/templates/' . $template_name;
 			}
