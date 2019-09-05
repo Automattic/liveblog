@@ -1,3 +1,15 @@
+<?php 
+	$current_key_template = $template_variables['current_key_template'] ?? '';
+	$current_key_format   = $template_variables['current_key_format'] ?? '';
+	$current_key_limit    = $template_variables['current_key_limit'] ?? '';
+	$key_name             = $template_variables['key_name'] ?? '';
+	$key_format_name      = $template_variables['key_format_name'] ?? '';
+	$key_description      = $template_variables['key_description'] ?? '';
+	$key_limit            = $template_variables['key_limit'] ?? '';
+	$key_button           = $template_variables['key_button'] ?? '';
+	$templates            = $template_variables['templates'] ?? [];
+	$formats              = $template_variables['formats'] ?? [];
+?>
 <hr/>
 <p>
 	<label for="liveblog-key-template-name"><?php echo esc_html( $key_name ); ?> </label>

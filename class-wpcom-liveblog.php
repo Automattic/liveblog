@@ -1376,7 +1376,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function get_template_part( $template_name, $template_variables = [] ) {
 			ob_start();
-			extract( $template_variables );
 			$theme_template       = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			if ( file_exists( $child_theme_template ) ) {
