@@ -1,3 +1,8 @@
+<?php 
+	$show_archived_message = $template_variables['show_archived_message'] ?? '';
+	$entries               = $template_variables['show_archived_message'] ?? [];
+?>
+
 <?php if ( $show_archived_message ) : ?>
 <div class="liveblog-archived-message">
 	<?php

@@ -53,7 +53,8 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$post_id = $post->ID;
 
 			// get all entries that have been edited in the liveblog
-			$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
+			//$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
+			$edit_entries = [];
 
 			// find correct posst_ids to replace incorrect meta_values
 			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

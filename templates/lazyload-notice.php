@@ -1,3 +1,7 @@
+<?php 
+	$plugin = $template_variables['plugin'] ?? '';
+?>
+
 <div class="error">
 <p>
 <?php

@@ -1,3 +1,9 @@
+<?php 
+	$active_text  = $template_variables['active_text'] ?? '';
+	$buttons      = $template_variables['buttons'] ?? [];
+	$update_text  = $template_variables['update_text'] ?? '';
+	$extra_fields = $template_variables['extra_fields'] ?? [];
+?>
 <p class="error"></p>
 <p class="success"><?php echo esc_html( $update_text ); ?></p>
 <h2><?php echo wp_kses_post( $active_text ); ?></h2>

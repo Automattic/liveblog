@@ -27,9 +27,9 @@ class WPCOM_Liveblog_Entry_Query {
 
 		$args = apply_filters( 'liveblog_query_args', wp_parse_args( $args, $defaults ) );
 
-		$entries = get_posts( $args );
+		$entries = new WP_Query( $args );
 
-		return self::entries_from_posts( $entries );
+		return self::entries_from_posts( $entries->posts );
 	}
 
 	/**
@@ -41,9 +41,7 @@ class WPCOM_Liveblog_Entry_Query {
 		// Due to liveblog lazy loading, duplicate entries may be displayed
 		// if we actually pass the 'posts_per_page' argument to get_posts
 		// in this class.
-		$number = 0;
 		if ( isset( $args['posts_per_page'] ) ) {
-			$number = intval( $args['posts_per_page'] );
 			unset( $args['posts_per_page'] );
 		}
 
