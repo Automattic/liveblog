@@ -9,6 +9,7 @@
 	$key_button           = $template_variables['key_button'] ?? '';
 	$templates            = $template_variables['templates'] ?? [];
 	$formats              = $template_variables['formats'] ?? [];
+	$slack_channel        = $template_variables['slack_channel'] ?? [];
 ?>
 <hr/>
 <p>
