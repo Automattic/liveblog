@@ -267,6 +267,9 @@ class WPCOM_Liveblog_Rest_Api {
 					'limit'           => [
 						'required' => true,
 					],
+					'slack_channel'   => [
+						'required' => false,
+					],
 				],
 			]
 		);
@@ -567,6 +570,7 @@ class WPCOM_Liveblog_Rest_Api {
 			'liveblog-key-template-name'   => $request->get_param( 'template_name' ),
 			'liveblog-key-template-format' => $request->get_param( 'template_format' ),
 			'liveblog-key-limit'           => $request->get_param( 'limit' ),
+			'liveblog-slack-channel'       => $request->get_param( 'slack_channel' ),
 		];
 
 		self::set_liveblog_vars( $post_id );

@@ -132,6 +132,18 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp-template.php';
 
+			require dirname( __FILE__ ) . '/classes/slack/async/class-wp-async-task.php';
+			require dirname( __FILE__ ) . '/classes/slack/async/class-wpcom-liveblog-slack-process-entry-async-task.php';
+			require dirname( __FILE__ ) . '/classes/slack/settings/class-wpcom-liveblog-slack-settings.php';
+			require dirname( __FILE__ ) . '/classes/slack/settings/class-wpcom-liveblog-author-settings.php';
+			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-wpcom-liveblog-webhook-api.php';
+			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-wpcom-liveblog-slash-command-api.php';
+			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-export-authors.php';
+			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-import-authors-slack-id.php';
+			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-markdown-parser.php';
+			require dirname( __FILE__ ) . '/classes/slack/class-wpcom-liveblog-slack.php';
+
+
 			if ( self::use_rest_api() ) {
 				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php';
 			}
@@ -1648,7 +1660,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'archive' => __( 'Archived liveblogs', 'liveblog' ),
 				'none'    => __( 'No liveblogs', 'liveblog' ),
 			];
-			echo wp_kses_post( self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+			echo wp_kses( self::get_template_part( 'restrict-manage-posts.php', compact( 'options' ) ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		}
 
 		/**

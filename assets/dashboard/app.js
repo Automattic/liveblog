@@ -18,6 +18,7 @@ jQuery( function( $ ) {
 			data['template_name']                   = encodeURIComponent( $( '#liveblog-key-template-name' ).val() );
 			data['template_format']                 = encodeURIComponent( $( '#liveblog-key-template-format' ).val() );
 			data['limit']                           = encodeURIComponent( $( '#liveblog-key-limit' ).val() );
+			data['slack_channel']                   = encodeURIComponent( $( '#liveblog-slack-channel' ).val() );
 			data[liveblog_admin_settings.nonce_key] = liveblog_admin_settings.nonce;
 			var method = 'POST';
 
