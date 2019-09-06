@@ -80,10 +80,14 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
     const id = `id_${entry.id}`;
 
     if (entry.type === 'new' && renderNewEntries) {
-      accumulator = {
-        [id]: entry,
-        ...accumulator,
-      };
+      if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
+        accumulator[id] = entry;
+      } else {
+        accumulator = {
+          [id]: entry,
+          ...accumulator,
+        };
+      }
     }
 
     if (entry.status === 'draft' && Object.prototype.hasOwnProperty.call(accumulator, id) && entry.timestamp > accumulator[id].timestamp) {

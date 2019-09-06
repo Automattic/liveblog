@@ -27,7 +27,7 @@ const StatusFilter = ({ setStatus, getEntries }) => {
           getEntries(1, window.location.hash);
         }}
         key={status.value}
-        className="button-link">{status.label}</a> : <span>{status.label}</span>;
+        className="button-link">{status.label}</a> : <span key={status.value}>{status.label}</span>;
       }) }
 
     </div>

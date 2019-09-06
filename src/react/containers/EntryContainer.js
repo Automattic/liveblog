@@ -109,7 +109,7 @@ class EntryContainer extends Component {
           onClick={ (event) => {
             event.preventDefault();
             this.updateStatus(newStatus);
-          }}>
+          } } key={entry.entry_time}>
           {statusLabel}
         </button>
         <button
@@ -137,7 +137,6 @@ class EntryContainer extends Component {
 
     // Filter out empty authors.
     entry.authors = Array.isArray(entry.authors) && entry.authors.filter(author => (author.id !== null && author.name !== null && author.key !== ''));
-
     return (
       <article
         id={`id_${entry.id}`}
