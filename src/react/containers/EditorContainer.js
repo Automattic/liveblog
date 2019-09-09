@@ -407,7 +407,6 @@ class EditorContainer extends Component {
           onClick={ (event) => {
             event.preventDefault();
             if (isEditing) {
-              console.log(status);
               this.publish(status);
             } else {
               this.publish('publish');
