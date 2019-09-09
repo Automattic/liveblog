@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import * as configActions from '../actions/configActions';
 import * as apiActions from '../actions/apiActions';
 
-const StatusFilter = ({ setStatus, getEntries }) => {
+const StatusFilter = ({ loading, setStatus, getEntries }) => {
   const statuses = [
     { value: 'any', label: 'All Entries' },
     { value: 'draft', label: 'Draft Entries' },
@@ -20,7 +20,7 @@ const StatusFilter = ({ setStatus, getEntries }) => {
       <strong>Filter Entries:</strong>
 
       { statuses.map((status) => {
-        return filter !== status.value ? <a href="#" onClick={ (e) => {
+        return filter !== status.value && !loading ? <a href="#" onClick={ (e) => {
           e.preventDefault();
           setStatus(status.value);
           setState(status.value);
@@ -37,6 +37,7 @@ const StatusFilter = ({ setStatus, getEntries }) => {
 StatusFilter.propTypes = {
   setStatus: PropTypes.func,
   getEntries: PropTypes.func,
+  loading: PropTypes.bool,
 };
 
 const mapStateToProps = state => state;
