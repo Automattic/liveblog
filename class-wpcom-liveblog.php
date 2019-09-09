@@ -511,8 +511,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			// append hidden entries to the response if they exist
-			$hidden_entries = WPCOM_Liveblog_Entry::get_hidden_entries( self::$post_id, WPCOM_Liveblog::current_user_can_edit_liveblog() );
-			if( ! empty( $hidden_entries ) ){
+			$hidden_entries = WPCOM_Liveblog_Entry::get_hidden_entries( self::$post_id, self::current_user_can_edit_liveblog() );
+			if ( ! empty( $hidden_entries ) ) {
 				$entries_for_json = array_merge( $entries_for_json, $hidden_entries );
 			}
 

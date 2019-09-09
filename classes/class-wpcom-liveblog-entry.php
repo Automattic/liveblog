@@ -236,7 +236,7 @@ class WPCOM_Liveblog_Entry {
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
 		do_action( 'liveblog_update_entry', $args['entry_id'], $args['post_id'] );
 
-		$entry_post  = get_post( $updated_entry_id );
+		$entry_post = get_post( $updated_entry_id );
 
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
@@ -272,7 +272,7 @@ class WPCOM_Liveblog_Entry {
 		// When an entry is deleted we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry->ID, $entry->post_parent, 'delete' );
 
-		$entry      = self::from_post( $entry_post );
+		$entry = self::from_post( $entry_post );
 
 		$entry->type    = 'delete';
 		$entry->content = '';
@@ -504,12 +504,12 @@ class WPCOM_Liveblog_Entry {
 	 * @param      $liveblog_id
 	 * @param      $add
 	 */
-	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ){
-		$cached_key = 'hidden_entries_'. $liveblog_id;
+	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ) {
+		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 		$hidden_entries = (array) get_transient( $cached_key );
 
-		if( 'publish' !== $status ){
+		if ( 'publish' !== $status ) {
 			$hidden_entries[ $post_id ] = $status;
 		} else {
 			unset( $hidden_entries[ $post_id ] );
@@ -526,13 +526,13 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * @return array
 	 */
-	public static function get_hidden_entries( $liveblog_id, $only_deleted = true ){
-		$entries = [];
-		$cached_key = 'hidden_entries_'. $liveblog_id;
+	public static function get_hidden_entries( $liveblog_id, $only_deleted = true ) {
+		$entries        = [];
+		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 
-		foreach ( $hidden_entries as $entry_id => $status ){
-			if( $only_deleted && 'delete' !== $status ){
+		foreach ( $hidden_entries as $entry_id => $status ) {
+			if ( $only_deleted && 'delete' !== $status ) {
 				continue;
 			}
 
