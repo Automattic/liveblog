@@ -271,7 +271,7 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry is deleted we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry->ID, $entry->post_parent, 'delete' );
-
+		self::store_updated_entries( $entry_post, $entry->post_parent );
 		$entry = self::from_post( $entry_post );
 
 		$entry->type    = 'delete';
@@ -507,7 +507,6 @@ class WPCOM_Liveblog_Entry {
 	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ) {
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
-		$hidden_entries = (array) get_transient( $cached_key );
 
 		if ( 'publish' !== $status ) {
 			$hidden_entries[ $post_id ] = $status;
@@ -551,6 +550,44 @@ class WPCOM_Liveblog_Entry {
 			];
 		}
 
+		return $entries;
+	}
+
+	/**
+	 * Store entries that have been updated so we can pass the update to the admin and front-end
+	 *
+	 * @param $entry_post
+	 * @param $liveblog_id
+	 */
+	public static function store_updated_entries($entry_post, $liveblog_id ) {
+		$cached_key     = 'updated_entries_' . $liveblog_id;
+		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+
+		$entry       = self::from_post( $entry_post );
+		$entry->type = 'update';
+		$updated_entries[ $entry_post->ID ] = $entry;
+
+		wp_cache_set( $cached_key, array_filter( $updated_entries ), 'liveblog', MINUTE_IN_SECONDS * 5 );
+	}
+
+	/**
+	 * Return a list of updated entries
+	 *
+	 * @param $liveblog_id
+	 *
+	 * @return array
+	 */
+	public static function get_updated_entries( $liveblog_id, $only_published = true ) {
+		$entries = [];
+		$cached_key     = 'updated_entries_' . $liveblog_id;
+		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+
+		foreach ( $updated_entries as  $entry_id => $entry ){
+			if( $only_published && 'draft' === $entry ){
+				continue;
+			}
+			$entries[] = $entry;
+		}
 		return $entries;
 	}
 }

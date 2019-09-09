@@ -516,6 +516,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$entries_for_json = array_merge( $entries_for_json, $hidden_entries );
 			}
 
+			// append updated entries to the response if they exist
+			$updated_entries = WPCOM_Liveblog_Entry::get_updated_entries( self::$post_id, ! self::current_user_can_edit_liveblog() );
+			if ( ! empty( $updated_entries ) ) {
+				$entries_for_json = array_merge( $entries_for_json, $updated_entries );
+			}
+
 			// Create the result array
 			$result = [
 				'entries'          => $entries_for_json,
