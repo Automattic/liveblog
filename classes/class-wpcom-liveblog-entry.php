@@ -98,11 +98,6 @@ class WPCOM_Liveblog_Entry {
 			return mysql2date( 'G', $this->entry->post_modified_gmt );
 		}
 
-		//Use modified date if its greater that post date
-		if ( strtotime( $this->entry->post_modified_gmt ) > strtotime( $this->entry->post_date_gmt ) ) {
-			return mysql2date( 'G', $this->entry->post_modified_gmt );
-		}
-
 		return mysql2date( 'G', $this->entry->post_date_gmt );
 	}
 
@@ -136,16 +131,10 @@ class WPCOM_Liveblog_Entry {
 				}
 			}
 		} else {
-			$date = $entry->post_date_gmt;
-
-			//Use modified date if its greater that post date
-			if ( strtotime( $entry->post_modified_gmt ) > strtotime( $entry->post_date_gmt ) ) {
-				$date = $entry->post_modified_gmt;
-			}
 			if ( '' === $d ) {
-				$date = mysql2date( get_option( 'date_format' ), $date );
+				$date = mysql2date( get_option( 'date_format' ), $entry->post_date_gmt );
 			} else {
-				$date = mysql2date( $d, $date );
+				$date = mysql2date( $d, $entry->post_date_gmt );
 			}
 		}
 
@@ -248,6 +237,10 @@ class WPCOM_Liveblog_Entry {
 		do_action( 'liveblog_update_entry', $args['entry_id'], $args['post_id'] );
 
 		$entry_post  = get_post( $updated_entry_id );
+
+		// When an entry transitions from publish to draft we need to hide it on the front-end
+		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
+
 		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
 
@@ -275,6 +268,10 @@ class WPCOM_Liveblog_Entry {
 		do_action( 'liveblog_delete_entry', $entry->ID, $args['post_id'] );
 
 		$entry_post = wp_delete_post( $args['entry_id'] );
+
+		// When an entry is deleted we need to hide it on the front-end
+		self::toggle_entry_visibility( $entry->ID, $entry->post_parent, 'delete' );
+
 		$entry      = self::from_post( $entry_post );
 
 		$entry->type    = 'delete';
@@ -498,6 +495,64 @@ class WPCOM_Liveblog_Entry {
 		return apply_filters( 'liveblog_entry_featured_image', $image, $entry );
 	}
 
+	/**
+	 * Add entries to a list stored in object cache of post that need to be hidden
+	 * on the front-end or other author who are maneging the back end of the liveblog.
+	 * This list will be used to hide entries when polling the API for new updates.
+	 *
+	 * @param      $post_id
+	 * @param      $liveblog_id
+	 * @param      $add
+	 */
+	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ){
+		$cached_key = 'hidden_entries_'. $liveblog_id;
+		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$hidden_entries = (array) get_transient( $cached_key );
+
+		if( 'publish' !== $status ){
+			$hidden_entries[ $post_id ] = $status;
+		} else {
+			unset( $hidden_entries[ $post_id ] );
+		}
+
+		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', MINUTE_IN_SECONDS * 5 );
+	}
+
+	/**
+	 * Return a list of hidden entries
+	 *
+	 * @param      $liveblog_id
+	 * @param bool $only_deleted
+	 *
+	 * @return array
+	 */
+	public static function get_hidden_entries( $liveblog_id, $only_deleted = true ){
+		$entries = [];
+		$cached_key = 'hidden_entries_'. $liveblog_id;
+		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+
+		foreach ( $hidden_entries as $entry_id => $status ){
+			if( $only_deleted && 'delete' !== $status ){
+				continue;
+			}
+
+			$entries[] = [
+				'id'          => $entry_id,
+				'type'        => 'delete',
+				'render'      => '',
+				'headline'    => '',
+				'content'     => '',
+				'css_classes' => '',
+				'timestamp'   => 0,
+				'authors'     => [],
+				'entry_time'  => 0,
+				'share_link'  => 0,
+				'status'      => 'delete',
+			];
+		}
+
+		return $entries;
+	}
 }
 
 WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();

@@ -78,11 +78,6 @@ body.wp-admin .liveblog-admin-wrapper .liveblog-editor-container .Select--multi 
 	display: inline-block;
 }
 
-body.wp-admin .liveblog-admin-wrapper .liveblog-entry-edit .liveblog-editor-container .Select--multi {
-	width: calc( 100% - 310px );
-	margin-left: 10px;
-}
-
 body.wp-admin .liveblog-admin-wrapper .liveblog-entry-edit .liveblog-editor-container .liveblog-editor-subTitle {
 	margin-left: 10px;
 }

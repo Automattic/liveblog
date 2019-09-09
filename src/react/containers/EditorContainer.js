@@ -280,6 +280,7 @@ class EditorContainer extends Component {
       headline,
       error,
       errorMessage,
+      status,
     } = this.state;
 
     let {
@@ -388,24 +389,29 @@ class EditorContainer extends Component {
           clearable={false}
           cache={false}
         />
-        <button
+
+        { !isEditing && <button
           disabled={ canPublish ? '' : 'disabled'}
           className="button button-secondary button-large liveblog-btn liveblog-draft-btn"
           onClick={ (event) => {
             event.preventDefault();
             this.publish('draft');
           } }>
-            Save Draft
-        </button>
+          Save Draft
+        </button> }
 
         <button
           disabled={ canPublish ? '' : 'disabled'}
           className="button button-primary button-large liveblog-btn liveblog-publish-btn"
           onClick={ (event) => {
             event.preventDefault();
-            this.publish('publish');
+            if (isEditing) {
+              this.publish(status);
+            } else {
+              this.publish('publish');
+            }
           } }>
-          {isEditing ? 'Publish' : 'Post Update'}
+          { isEditing ? 'Update' : 'Post Update'}
         </button>
 
         {
