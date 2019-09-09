@@ -413,7 +413,7 @@ class EditorContainer extends Component {
               this.publish('publish');
             }
           } }>
-          { isEditing ? 'Update' : 'Post Update'}
+          {isEditing ? 'Update' : 'Publish'}
         </button>
 
         {

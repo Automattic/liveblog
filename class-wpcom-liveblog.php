@@ -510,7 +510,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$pages     = ceil( $total / $per_page );
 			}
 
-			// append hidden entries to the response if they exist
+			/**
+			 * Append hidden entries to the response if they exist. Depending on if your making the request from that WordPress admin
+			 * or the front-end. Hidden entries will be composed of entries that have transitioned to draft for have been deleted. We
+			 * use this to toggle published entries to draft on the editor and to remove both draft and deleted entries from the front end.
+			 */
 			$hidden_entries = WPCOM_Liveblog_Entry::get_hidden_entries( self::$post_id, self::current_user_can_edit_liveblog() );
 			if ( ! empty( $hidden_entries ) ) {
 				$entries_for_json = array_merge( $entries_for_json, $hidden_entries );

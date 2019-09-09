@@ -240,6 +240,7 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
+		self::store_updated_entries( $entry_post, $entry_post->post_parent );
 
 		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
@@ -271,7 +272,6 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry is deleted we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry->ID, $entry->post_parent, 'delete' );
-		self::store_updated_entries( $entry_post, $entry->post_parent );
 		$entry = self::from_post( $entry_post );
 
 		$entry->type    = 'delete';
@@ -530,8 +530,16 @@ class WPCOM_Liveblog_Entry {
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 
+		if( empty( $hidden_entries ) ){
+			return $entries;
+		}
+
 		foreach ( $hidden_entries as $entry_id => $status ) {
 			if ( $only_deleted && 'delete' !== $status ) {
+				continue;
+			}
+
+			if( empty( $entry_id ) ){
 				continue;
 			}
 
@@ -554,7 +562,7 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Store entries that have been updated so we can pass the update to the admin and front-end
+	 * Store entries that have been updated so we can pass the update to the admin and front end
 	 *
 	 * @param $entry_post
 	 * @param $liveblog_id
@@ -563,11 +571,15 @@ class WPCOM_Liveblog_Entry {
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 
+		if( empty( $updated_entries ) ){
+			$updated_entries = [];
+		}
+
 		$entry                              = self::from_post( $entry_post );
 		$entry->type                        = 'update';
 		$updated_entries[ $entry_post->ID ] = $entry;
 
-		wp_cache_set( $cached_key, array_filter( $updated_entries ), 'liveblog', MINUTE_IN_SECONDS * 5 );
+		wp_cache_set( $cached_key, $updated_entries, 'liveblog', MINUTE_IN_SECONDS * 5 );
 	}
 
 	/**
@@ -581,6 +593,10 @@ class WPCOM_Liveblog_Entry {
 		$entries         = [];
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+
+		if( empty( $updated_entries ) ){
+			return $entries;
+		}
 
 		foreach ( $updated_entries as  $entry_id => $entry ) {
 			if ( $only_published && 'draft' === $entry ) {
