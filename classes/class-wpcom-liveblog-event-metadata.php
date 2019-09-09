@@ -121,16 +121,16 @@ class WPCOM_Liveblog_Event_Metadata {
 		$location = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] : '';
 		$format   = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
 		$name     = function( $key ) {
-			return self::METADATA_KEY . '[' . $key . ']';
+			return WPCOM_Liveblog_Event_Metadata::METADATA_KEY . '[' . $key . ']';
 		};
 
 		wp_nonce_field( self::METADATA_NONCE_FIELD . $post->ID, self::METADATA_NONCE );
 
-		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_START_TIME ) ), 'date', 'Coverage Start Date', $start ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
-		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_END_TIME ) ), 'date', 'Coverage End Date', $end ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
-		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_TITLE ) ), 'text', 'Event Title', $title ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
-		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_URL ) ), 'text', 'Event URL', $url ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
-		wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_LOCATION ) ), 'text', 'Event Location', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_START_TIME ) ), 'date', 'Coverage Start Date', $start ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_END_TIME ) ), 'date', 'Coverage End Date', $end ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_TITLE ) ), 'text', 'Event Title', $title ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_URL ) ), 'text', 'Event URL', $url ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_LOCATION ) ), 'text', 'Event Location', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 	}
 
 	/**

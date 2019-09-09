@@ -10,7 +10,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	final class WPCOM_Liveblog {
 
 		/** Constants *************************************************************/
-		const VERSION                 = '1.9.7';
+		const VERSION                 = '1.9.72';
 		const REWRITES_VERSION        = 1;
 		const MIN_WP_VERSION          = '4.4';
 		const MIN_WP_REST_API_VERSION = '4.4';
@@ -508,6 +508,22 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$flattened = self::flatten_entries( $all_entries );
 				$total     = count( $flattened );
 				$pages     = ceil( $total / $per_page );
+			}
+
+			/**
+			 * Append hidden entries to the response if they exist. Depending on if your making the request from that WordPress admin
+			 * or the front-end. Hidden entries will be composed of entries that have transitioned to draft for have been deleted. We
+			 * use this to toggle published entries to draft on the editor and to remove both draft and deleted entries from the front end.
+			 */
+			$hidden_entries = WPCOM_Liveblog_Entry::get_hidden_entries( self::$post_id, self::current_user_can_edit_liveblog() );
+			if ( ! empty( $hidden_entries ) ) {
+				$entries_for_json = array_merge( $entries_for_json, $hidden_entries );
+			}
+
+			// append updated entries to the response if they exist
+			$updated_entries = WPCOM_Liveblog_Entry::get_updated_entries( self::$post_id, ! self::current_user_can_edit_liveblog() );
+			if ( ! empty( $updated_entries ) ) {
+				$entries_for_json = array_merge( $entries_for_json, $updated_entries );
 			}
 
 			// Create the result array
