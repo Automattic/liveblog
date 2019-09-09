@@ -16,10 +16,18 @@
  * - Ordered/unordered lists
  */
 class WPCOM_Liveblog_Markdown_Parser {
+	/**
+	 * Regex rules.
+	 *
+	 * Because of how slack builds out markdown bold will always use (*) while
+	 * italic will always use (_)
+	 *
+	 * @var array
+	 */
 	public static $liner_rules = [
 		'/\[([^\[]+)\]\(([^\)]+)\)/'   => '<a href=\'\2\'>\1</a>',  // links
-		'/(\*\*|__)(.*?)\1/'           => '<strong>\2</strong>', // bold
-		'/(\*|_)(.*?)\1/'              => '<em>\2</em>', // emphasis
+		'/(\*\*|\*)(.*?)\1/'           => '<strong>\2</strong>', // bold
+		'/(\_|__)(.*?)\1/'             => '<em>\2</em>', // emphasis
 		'/\~(.*?)\~/'                  => '<del>\1</del>', // del
 		'/\:\"(.*?)\"\:/'              => '<q>\1</q>', // quote
 		'/<\/ul><ul>/'                 => '', // fix extra ul
