@@ -530,7 +530,7 @@ class WPCOM_Liveblog_Entry {
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 
-		if( empty( $hidden_entries ) ){
+		if ( empty( $hidden_entries ) ) {
 			return $entries;
 		}
 
@@ -539,7 +539,7 @@ class WPCOM_Liveblog_Entry {
 				continue;
 			}
 
-			if( empty( $entry_id ) ){
+			if ( empty( $entry_id ) ) {
 				continue;
 			}
 
@@ -571,7 +571,7 @@ class WPCOM_Liveblog_Entry {
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 
-		if( empty( $updated_entries ) ){
+		if ( empty( $updated_entries ) ) {
 			$updated_entries = [];
 		}
 
@@ -594,12 +594,12 @@ class WPCOM_Liveblog_Entry {
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
 
-		if( empty( $updated_entries ) ){
+		if ( empty( $updated_entries ) ) {
 			return $entries;
 		}
 
 		foreach ( $updated_entries as  $entry_id => $entry ) {
-			if ( $only_published && 'draft' === $entry ) {
+			if ( $only_published && 'draft' === $entry->type ) {
 				continue;
 			}
 			$entries[] = $entry;
