@@ -713,7 +713,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 *
 	 * @return int $param as an integer. 0 if $param is not a valid status
 	 */
-	public static function sanitize_staus( $param, $request, $key ) {
+	public static function sanitize_status( $param, $request, $key ) {
 		return in_array( $param, [ 'publish', 'draft' ], true );
 	}
 
