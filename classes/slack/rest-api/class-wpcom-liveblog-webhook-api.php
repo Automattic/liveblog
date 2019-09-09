@@ -169,7 +169,7 @@ class WPCOM_Liveblog_Webhook_API {
 
 		if ( $allow_edits && $is_edit && $liveblog_entry && 'draft' === $liveblog_entry->post_status ) {
 			$original_text = $body->event->message->text;
-			$entry_data = self::sanitize_entry( $original_text );
+			$entry_data    = self::sanitize_entry( $original_text );
 
 			$entry = WPCOM_Liveblog_Entry::update(
 				[
@@ -183,7 +183,7 @@ class WPCOM_Liveblog_Webhook_API {
 			);
 		} elseif ( false === $liveblog_entry && property_exists( $body->event, 'text' ) ) {
 			$original_text = $body->event->text;
-			$entry_data = self::sanitize_entry( $original_text, $liveblog, $body->event->files ?? [] );
+			$entry_data    = self::sanitize_entry( $original_text, $liveblog, $body->event->files ?? [] );
 
 			$entry = WPCOM_Liveblog_Entry::insert(
 				[
