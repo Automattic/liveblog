@@ -514,7 +514,11 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ) {
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
-		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$hidden_entries = wp_cache_get( $cached_key, 'liveblog' );
+
+		if ( empty( $hidden_entries ) || ! is_array( $hidden_entries ) ) {
+			$hidden_entries = [];
+		}
 
 		if ( 'publish' !== $status ) {
 			$hidden_entries[ $post_id ] = $status;
@@ -536,13 +540,13 @@ class WPCOM_Liveblog_Entry {
 	public static function get_hidden_entries( $liveblog_id, $only_deleted = true ) {
 		$entries        = [];
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
-		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$hidden_entries = wp_cache_get( $cached_key, 'liveblog' );
 
 		if ( empty( $hidden_entries ) ) {
 			return $entries;
 		}
 
-		foreach ( $hidden_entries as $entry_id => $status ) {
+		foreach ( (array) $hidden_entries as $entry_id => $status ) {
 			if ( $only_deleted && 'delete' !== $status ) {
 				continue;
 			}
@@ -577,9 +581,9 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function store_updated_entries( $entry_post, $liveblog_id ) {
 		$cached_key      = 'updated_entries_' . $liveblog_id;
-		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
 
-		if ( empty( $updated_entries ) ) {
+		if ( empty( $updated_entries ) || ! is_array( $updated_entries ) ) {
 			$updated_entries = [];
 		}
 
@@ -600,13 +604,13 @@ class WPCOM_Liveblog_Entry {
 	public static function get_updated_entries( $liveblog_id, $only_published = true ) {
 		$entries         = [];
 		$cached_key      = 'updated_entries_' . $liveblog_id;
-		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
 
 		if ( empty( $updated_entries ) ) {
 			return $entries;
 		}
 
-		foreach ( $updated_entries as  $entry_id => $entry ) {
+		foreach ( (array) $updated_entries as  $entry_id => $entry ) {
 			if ( $only_published && 'draft' === $entry->type ) {
 				continue;
 			}
