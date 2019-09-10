@@ -111,7 +111,7 @@ class TinyMCEEditor extends Component {
       setEnablePosting();
     }, 500));
     jQuery(document.getElementById(this.containerId)).on('keyup', debounce(() => {
-      setEnablePosting();
+      setEnablePosting(true);
     }, 500));
     setEnablePosting();
     tinymce.activeEditor.focus(); // Set focus to active editor

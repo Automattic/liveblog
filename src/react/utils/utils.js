@@ -136,6 +136,7 @@ export const getNewestEntry = (current, update, entries = false) => {
   if (update.type === 'delete' && update.id === current.id && entries) {
     return getItemOfObject(entries, 1);
   }
+
   if (current.timestamp > update.timestamp) return current;
 
   return update;

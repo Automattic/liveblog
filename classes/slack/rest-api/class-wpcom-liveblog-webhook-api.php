@@ -7,6 +7,7 @@ class WPCOM_Liveblog_Webhook_API {
 	const CACHE_GROUP     = 'slack';
 	const MESSAGE_ID_META = 'client_msg_id';
 	const ASYNC_TASK      = 'slack_process_entry';
+	const INGEST_REGEX    = '/^FOR PUB:/mi';
 
 	/**
 	 * Register Hooks
@@ -67,7 +68,7 @@ class WPCOM_Liveblog_Webhook_API {
 		}
 
 		//Only ingest entries that start with FOR PUB:
-		if ( 0 === preg_match( '/^FOR PUB:/mi', $body->event->message->text ?? '', $matches ) && 0 === preg_match( '/^FOR PUB:/mi', $body->event->text ?? '', $matches ) ) {
+		if ( 0 === preg_match( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), $body->event->message->text ?? '', $matches ) && 0 === preg_match( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), $body->event->text ?? '', $matches ) ) {
 			return new WP_Error( 'slack_not_liveblog_entry', 'The current request is not for a liveblog entry', [ 'status' => 400 ] );
 		}
 
@@ -167,7 +168,8 @@ class WPCOM_Liveblog_Webhook_API {
 		$allow_edits    = isset( $settings['enable_entry_updates'] ) && 'on' === $settings['enable_entry_updates'];
 
 		if ( $allow_edits && $is_edit && $liveblog_entry && 'draft' === $liveblog_entry->post_status ) {
-			$entry_data = self::sanitize_entry( $body->event->message->text );
+			$original_text = $body->event->message->text;
+			$entry_data    = self::sanitize_entry( $original_text );
 
 			$entry = WPCOM_Liveblog_Entry::update(
 				[
@@ -175,19 +177,20 @@ class WPCOM_Liveblog_Webhook_API {
 					'entry_id'   => $liveblog_entry->ID,
 					'headline'   => $entry_data['headline'],
 					'content'    => $entry_data['content'],
-					'author_ids' => [ $user ],
+					'author_ids' => apply_filters( 'liveblog_slack_authors', [ $user ], $original_text ),
 					'user'       => $liveblog_author,
 				]
 			);
 		} elseif ( false === $liveblog_entry && property_exists( $body->event, 'text' ) ) {
-			$entry_data = self::sanitize_entry( $body->event->text, $liveblog, $body->event->files ?? [] );
+			$original_text = $body->event->text;
+			$entry_data    = self::sanitize_entry( $original_text, $liveblog, $body->event->files ?? [] );
 
 			$entry = WPCOM_Liveblog_Entry::insert(
 				[
 					'post_id'    => $liveblog,
 					'headline'   => $entry_data['headline'],
 					'content'    => $entry_data['content'],
-					'author_ids' => [ $user ],
+					'author_ids' => apply_filters( 'liveblog_slack_authors', [ $user ], $original_text ),
 					'user'       => $liveblog_author,
 				]
 			);
@@ -212,7 +215,9 @@ class WPCOM_Liveblog_Webhook_API {
 		$headline = '';
 
 		//remove for pub
-		$content = preg_replace( '/FOR PUB:/mi', '', $content );
+		$content = preg_replace( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), '', $content );
+
+		$content = apply_filters( 'liveblog_slack_entry_content', $content );
 
 		//Parse markdown
 		$content = WPCOM_Liveblog_Markdown_Parser::render( trim( $content ) );
