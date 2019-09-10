@@ -236,7 +236,7 @@ class WPCOM_Liveblog_Entry {
 		$is_publishing = false;
 		$original_post = get_post( $args['entry_id'] );
 
-		if( 'draft' === $original_post->post_status && 'publish' === $args['status'] ){
+		if ( 'draft' === $original_post->post_status && 'publish' === $args['status'] ) {
 			$is_publishing = true;
 		}
 
@@ -255,7 +255,7 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
-		if( ! $is_publishing ){
+		if ( ! $is_publishing ) {
 			self::store_updated_entries( $entry_post, $entry_post->post_parent );
 		}
 
