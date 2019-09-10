@@ -68,7 +68,7 @@ class AppContainer extends Component {
         <UpdateButton polling={polling} click={() => mergePolling()} />
 
         <div id="liveblog-action-wrapper">
-          { isAdmin && <StatusFilter /> }
+          { isAdmin && <StatusFilter loading={loading} /> }
           { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
         </div>
 

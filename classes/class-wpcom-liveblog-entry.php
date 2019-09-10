@@ -91,7 +91,7 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public function get_timestamp() {
 		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
-		if ( 'draft' === $this->entry->post_status ) {
+		if ( 'draft' === $this->entry->post_status && '0000-00-00 00:00:00' === $this->entry->post_date_gmt ) {
 			if ( '0000-00-00 00:00:00' === $this->entry->post_modified_gmt ) {
 				return mysql2date( 'G', get_gmt_from_date( $this->entry->post_modified ) );
 			}
@@ -116,7 +116,7 @@ class WPCOM_Liveblog_Entry {
 		$entry = get_post( $post_id );
 
 		// For draft post we need to use post_modified_gmt as post_date_gtm is set to 00:00:00
-		if ( 'draft' === $entry->post_status ) {
+		if ( 'draft' === $entry->post_status && '0000-00-00 00:00:00' === $this->entry->post_date_gmt ) {
 			if ( '' === $d ) {
 				if ( '0000-00-00 00:00:00' === $entry->post_modified_gmt ) {
 					$date = mysql2date( get_option( 'date_format' ), get_gmt_from_date( $entry->post_modified ) );
@@ -163,6 +163,8 @@ class WPCOM_Liveblog_Entry {
 			'share_link'  => $share_link,
 			'status'      => self::get_status(),
 		];
+
+
 		$entry = apply_filters( 'liveblog_entry_for_json', $entry, $this );
 		return (object) $entry;
 	}
@@ -181,7 +183,13 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
+		// Remove the filter as its causing amp pages to crash
+		if ( function_exists( 'amp_activate' ) && is_amp_endpoint() ) {
+			remove_filter( 'the_content', [ 'WPCOM_Liveblog_AMP', 'append_liveblog_to_content' ], 7 );
+		}
+
 		self::$rendered_content[ $entry->ID ] = apply_filters( 'the_content', $content );
+
 		return self::$rendered_content[ $entry->ID ];
 	}
 
@@ -225,6 +233,13 @@ class WPCOM_Liveblog_Entry {
 			'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 		];
 
+		$is_publishing = false;
+		$original_post = get_post( $args['entry_id'] );
+
+		if ( 'draft' === $original_post->post_status && 'publish' === $args['status'] ) {
+			$is_publishing = true;
+		}
+
 		$updated_entry_id = wp_update_post( $post_data );
 		if ( ! $updated_entry_id ) {
 			return new WP_Error( 'entry-update', __( 'Updating post failed', 'liveblog' ) );
@@ -240,7 +255,9 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
-		self::store_updated_entries( $entry_post, $entry_post->post_parent );
+		if ( ! $is_publishing ) {
+			self::store_updated_entries( $entry_post, $entry_post->post_parent );
+		}
 
 		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
@@ -506,7 +523,11 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ) {
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
-		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$hidden_entries = wp_cache_get( $cached_key, 'liveblog' );
+
+		if ( empty( $hidden_entries ) || ! is_array( $hidden_entries ) ) {
+			$hidden_entries = [];
+		}
 
 		if ( 'publish' !== $status ) {
 			$hidden_entries[ $post_id ] = $status;
@@ -514,7 +535,7 @@ class WPCOM_Liveblog_Entry {
 			unset( $hidden_entries[ $post_id ] );
 		}
 
-		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', MINUTE_IN_SECONDS * 5 );
+		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', MINUTE_IN_SECONDS );
 	}
 
 	/**
@@ -528,13 +549,13 @@ class WPCOM_Liveblog_Entry {
 	public static function get_hidden_entries( $liveblog_id, $only_deleted = true ) {
 		$entries        = [];
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
-		$hidden_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$hidden_entries = wp_cache_get( $cached_key, 'liveblog' );
 
 		if ( empty( $hidden_entries ) ) {
 			return $entries;
 		}
 
-		foreach ( $hidden_entries as $entry_id => $status ) {
+		foreach ( (array) $hidden_entries as $entry_id => $status ) {
 			if ( $only_deleted && 'delete' !== $status ) {
 				continue;
 			}
@@ -569,17 +590,17 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function store_updated_entries( $entry_post, $liveblog_id ) {
 		$cached_key      = 'updated_entries_' . $liveblog_id;
-		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
 
-		if ( empty( $updated_entries ) ) {
+		if ( empty( $updated_entries ) || ! is_array( $updated_entries ) ) {
 			$updated_entries = [];
 		}
 
 		$entry                              = self::from_post( $entry_post );
 		$entry->type                        = 'update';
-		$updated_entries[ $entry_post->ID ] = $entry;
+		$updated_entries[ $entry_post->ID ] = $entry->for_json();
 
-		wp_cache_set( $cached_key, $updated_entries, 'liveblog', MINUTE_IN_SECONDS * 5 );
+		wp_cache_set( $cached_key, $updated_entries, 'liveblog', MINUTE_IN_SECONDS );
 	}
 
 	/**
@@ -592,18 +613,24 @@ class WPCOM_Liveblog_Entry {
 	public static function get_updated_entries( $liveblog_id, $only_published = true ) {
 		$entries         = [];
 		$cached_key      = 'updated_entries_' . $liveblog_id;
-		$updated_entries = (array) wp_cache_get( $cached_key, 'liveblog' );
+		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
 
 		if ( empty( $updated_entries ) ) {
 			return $entries;
 		}
 
-		foreach ( $updated_entries as  $entry_id => $entry ) {
-			if ( $only_published && 'draft' === $entry->type ) {
+		foreach ( (array) $updated_entries as $entry_id => $entry ) {
+			if ( $only_published && 'draft' === $entry->status ) {
 				continue;
 			}
+
+			if ( empty( $entry ) ) {
+				continue;
+			}
+
 			$entries[] = $entry;
 		}
+
 		return $entries;
 	}
 }
