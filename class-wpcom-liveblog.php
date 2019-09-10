@@ -915,6 +915,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$offset  = $per_page * ( $page - 1 );
 			$entries = array_slice( $entries, $offset, $per_page );
+
 			$entries = self::entries_for_json( $entries );
 
 			$result = [

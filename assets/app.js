@@ -86,7 +86,7 @@
 /******/ 		if (__webpack_require__.nc) {
 /******/ 			script.setAttribute("nonce", __webpack_require__.nc);
 /******/ 		}
-/******/ 		script.src = __webpack_require__.p + "" + ({}[chunkId]||chunkId) + ".bundle.js?v=" + "975508" + "";
+/******/ 		script.src = __webpack_require__.p + "" + ({}[chunkId]||chunkId) + ".bundle.js?v=" + "cae58a" + "";
 /******/ 		var timeout = setTimeout(onScriptComplete, 120000);
 /******/ 		script.onerror = script.onload = onScriptComplete;
 /******/ 		function onScriptComplete() {
@@ -1792,6 +1792,7 @@ var getNewestEntry = exports.getNewestEntry = function getNewestEntry(current, u
   if (update.type === 'delete' && update.id === current.id && entries) {
     return getItemOfObject(entries, 1);
   }
+
   if (current.timestamp > update.timestamp) return current;
 
   return update;
@@ -81544,4 +81545,4 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=app.js.map?v=975508
+//# sourceMappingURL=app.js.map?v=cae58a
