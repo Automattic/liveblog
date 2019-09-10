@@ -217,7 +217,7 @@ class WPCOM_Liveblog_Webhook_API {
 		//remove for pub
 		$content = preg_replace( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), '', $content );
 
-		$content = appply_filters( 'liveblog_slack_entry_content', $content );
+		$content = apply_filters( 'liveblog_slack_entry_content', $content );
 
 		//Parse markdown
 		$content = WPCOM_Liveblog_Markdown_Parser::render( trim( $content ) );

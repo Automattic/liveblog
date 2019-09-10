@@ -233,6 +233,13 @@ class WPCOM_Liveblog_Entry {
 			'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 		];
 
+		$is_publishing = false;
+		$original_post = get_post( $args['entry_id'] );
+
+		if( 'draft' === $original_post->post_status && 'publish' === $args['status'] ){
+			$is_publishing = true;
+		}
+
 		$updated_entry_id = wp_update_post( $post_data );
 		if ( ! $updated_entry_id ) {
 			return new WP_Error( 'entry-update', __( 'Updating post failed', 'liveblog' ) );
@@ -248,7 +255,9 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
-		self::store_updated_entries( $entry_post, $entry_post->post_parent );
+		if( ! $is_publishing ){
+			self::store_updated_entries( $entry_post, $entry_post->post_parent );
+		}
 
 		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
@@ -526,7 +535,7 @@ class WPCOM_Liveblog_Entry {
 			unset( $hidden_entries[ $post_id ] );
 		}
 
-		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', MINUTE_IN_SECONDS * 5 );
+		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', MINUTE_IN_SECONDS );
 	}
 
 	/**
@@ -589,9 +598,9 @@ class WPCOM_Liveblog_Entry {
 
 		$entry                              = self::from_post( $entry_post );
 		$entry->type                        = 'update';
-		$updated_entries[ $entry_post->ID ] = $entry;
+		$updated_entries[ $entry_post->ID ] = $entry->for_json();
 
-		wp_cache_set( $cached_key, $updated_entries, 'liveblog', MINUTE_IN_SECONDS * 5 );
+		wp_cache_set( $cached_key, $updated_entries, 'liveblog', MINUTE_IN_SECONDS );
 	}
 
 	/**
@@ -610,16 +619,18 @@ class WPCOM_Liveblog_Entry {
 			return $entries;
 		}
 
-		foreach ( (array) $updated_entries as  $entry_id => $entry ) {
-			if ( $only_published && 'draft' === $entry->type ) {
+		foreach ( (array) $updated_entries as $entry_id => $entry ) {
+			if ( $only_published && 'draft' === $entry->status ) {
 				continue;
 			}
 
 			if ( empty( $entry ) ) {
 				continue;
 			}
+
 			$entries[] = $entry;
 		}
+
 		return $entries;
 	}
 }
