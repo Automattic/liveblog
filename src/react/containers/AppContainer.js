@@ -69,7 +69,7 @@ class AppContainer extends Component {
 
         <div id="liveblog-action-wrapper">
           { isAdmin && <StatusFilter loading={loading} /> }
-          { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
+          { isAdmin && <UpdateCount entrieUpdateButtons={entries} config={config} total={total} /> }
         </div>
 
         <Entries loading={loading} entries={entries} config={config} />
@@ -103,7 +103,7 @@ const mapStateToProps = state => ({
   total: state.api.total,
   entries: Object.keys(state.api.entries)
     .map(key => state.api.entries[key]),
-  polling: Object.keys(state.polling.entries),
+  polling: Object.keys(state.polling.entries.filter(key => 'new' === state.api.entries[key].type)),
   config: state.config,
 });
 
