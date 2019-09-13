@@ -129,14 +129,20 @@ class WPCOM_Liveblog_Metadata {
 
 		wp_nonce_field( self::METADATA_NONCE_FIELD . $post->ID, self::METADATA_NONCE );
 
+		do_action( 'liveblog_before_metadata', $post );
+
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_SLACK_CHANNEL ) ), 'text', 'Slack Channel ID', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+
+		echo '<hr>';
+		echo '<p><b>Event Metadata</b></p>';
+
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_START_TIME ) ), 'date', 'Coverage Start Date', $start ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_END_TIME ) ), 'date', 'Coverage End Date', $end ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_TITLE ) ), 'text', 'Event Title', $title ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_URL ) ), 'text', 'Event URL', $url ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_LOCATION ) ), 'text', 'Event Location', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
-		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_SLACK_CHANNEL ) ), 'text', 'Slack Channel ID', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 
-		do_action( 'liveblog_after_metadata' );
+		do_action( 'liveblog_after_metadata', $post );
 	}
 
 	/**
