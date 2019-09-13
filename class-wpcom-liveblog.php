@@ -123,9 +123,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-event-metadata.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-helpers.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php';
+			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-metadata.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
