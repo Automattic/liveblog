@@ -232,7 +232,6 @@ class WPCOM_Liveblog_Entry_Key_Events {
 				'key_button'           => __( 'Save', 'liveblog' ),
 				'templates'            => array_keys( self::$available_templates ),
 				'formats'              => array_keys( self::$available_formats ),
-				'slack_channel'        => get_post_meta( $post_id, WPCOM_Liveblog_Metadata::METADATA_SLACK_CHANNEL, true ),
 			]
 		);
 

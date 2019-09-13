@@ -1,4 +1,4 @@
-<?php 
+<?php
 	$current_key_template = $template_variables['current_key_template'] ?? '';
 	$current_key_format   = $template_variables['current_key_format'] ?? '';
 	$current_key_limit    = $template_variables['current_key_limit'] ?? '';
@@ -9,7 +9,6 @@
 	$key_button           = $template_variables['key_button'] ?? '';
 	$templates            = $template_variables['templates'] ?? [];
 	$formats              = $template_variables['formats'] ?? [];
-	$slack_channel        = $template_variables['slack_channel'] ?? [];
 ?>
 <hr/>
 <p>
@@ -47,7 +46,3 @@ selected="selected" <?php endif; ?> value="<?php echo esc_attr( $format ); ?>">
 </p>
 <p class="howto"><?php echo esc_html( $key_description ); ?></p>
 <p>
-<p>
-	<label for="liveblog-slack-channel">Slack Channel </label>
-	<input type="text" id="liveblog-slack-channel" name="liveblog-slack-channel" class="widefat" value="<?php echo esc_attr( $slack_channel ); ?>">
-</p>
