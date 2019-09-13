@@ -90,7 +90,7 @@ class WPCOM_Liveblog_AMP {
 	 * Add default social share options
 	 */
 	public static function add_social_share_options() {
-		$social_array = [ 'twitter', 'pinterest', 'email', 'gplus' ];
+		$social_array = [ 'twitter', 'pinterest', 'email' ];
 
 		/**
 		 * Filter Liveblog AMP Facebook share app id
