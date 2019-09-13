@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Event_Metadata
+ * Class WPCOM_Liveblog_Metadata
  *
- * Adds Support for Event LiveBlogPosting Metadata
+ * Adds Support for LiveBlogPosting Metadata
  */
-class WPCOM_Liveblog_Event_Metadata {
+class WPCOM_Liveblog_Metadata {
 	const METABOX_KEY             = 'liveblog_event_metdata_metabox';
 	const METADATA_KEY            = 'liveblog_event_metadata';
 	const METADATA_NONCE          = 'liveblog_event_metadata_nonce';
@@ -15,6 +15,7 @@ class WPCOM_Liveblog_Event_Metadata {
 	const METADATA_EVENT_TITLE    = 'event_title';
 	const METADATA_EVENT_URL      = 'event_url';
 	const METADATA_EVENT_LOCATION = 'event_location';
+	const METADATA_SLACK_CHANNEL  = 'event_location';
 
 	/**
 	 * Called by WPCOM_Liveblog::load(),
@@ -92,6 +93,7 @@ class WPCOM_Liveblog_Event_Metadata {
 				self::METADATA_EVENT_TITLE,
 				self::METADATA_EVENT_URL,
 				self::METADATA_EVENT_LOCATION,
+				self::METADATA_SLACK_CHANNEL,
 			];
 
 			$values = [];
@@ -119,9 +121,10 @@ class WPCOM_Liveblog_Event_Metadata {
 		$url      = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] : '';
 		$title    = isset( $meta[ self::METADATA_EVENT_TITLE ] ) ? $meta[ self::METADATA_EVENT_TITLE ] : '';
 		$location = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] : '';
+		$slack    = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
 		$format   = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
 		$name     = function( $key ) {
-			return WPCOM_Liveblog_Event_Metadata::METADATA_KEY . '[' . $key . ']';
+			return WPCOM_Liveblog_Metadata::METADATA_KEY . '[' . $key . ']';
 		};
 
 		wp_nonce_field( self::METADATA_NONCE_FIELD . $post->ID, self::METADATA_NONCE );
@@ -131,6 +134,9 @@ class WPCOM_Liveblog_Event_Metadata {
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_TITLE ) ), 'text', 'Event Title', $title ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_URL ) ), 'text', 'Event URL', $url ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_EVENT_LOCATION ) ), 'text', 'Event Location', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_SLACK_CHANNEL ) ), 'text', 'Slack Channel ID', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+
+		do_action( 'liveblog_after_metadata' );
 	}
 
 	/**
@@ -140,7 +146,7 @@ class WPCOM_Liveblog_Event_Metadata {
 	 * @param  \WP_Post $post     WP_Post object.
 	 * @return array              An array of metadata.
 	 */
-	public static function liveblog_append_event_metadata( $metadata, $post ) {
+	public static function liveblog_append_metadata( $metadata, $post ) {
 		$meta = get_post_meta( $post->ID, self::METADATA_KEY, true );
 
 		if ( ! $meta ) {

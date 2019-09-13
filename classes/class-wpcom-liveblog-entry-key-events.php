@@ -18,7 +18,6 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	const META_KEY_TEMPLATE      = '_liveblog_key_entry_template';
 	const META_KEY_FORMAT        = '_liveblog_key_entry_format';
 	const META_KEY_LIMIT         = '_liveblog_key_entry_limit';
-	const META_KEY_SLACK_CHANNEL = '_liveblog_slack_channel';
 
 	/**
 	 * Template to render entries
@@ -207,14 +206,6 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			if ( $limit ) {
 				update_post_meta( $post_id, self::META_KEY_LIMIT, $limit );
 			}
-
-			// Save slack channel
-			$slack_channel = filter_var( $response['liveblog-slack-channel'], FILTER_SANITIZE_STRING );
-			if ( ! empty( $slack_channel ) ) {
-				update_post_meta( $post_id, self::META_KEY_SLACK_CHANNEL, $slack_channel );
-			} else {
-				delete_post_meta( $post_id, self::META_KEY_SLACK_CHANNEL );
-			}
 		}
 	}
 
@@ -241,7 +232,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 				'key_button'           => __( 'Save', 'liveblog' ),
 				'templates'            => array_keys( self::$available_templates ),
 				'formats'              => array_keys( self::$available_formats ),
-				'slack_channel'        => get_post_meta( $post_id, self::META_KEY_SLACK_CHANNEL, true ),
+				'slack_channel'        => get_post_meta( $post_id, WPCOM_Liveblog_Metadata::METADATA_SLACK_CHANNEL, true ),
 			]
 		);
 
