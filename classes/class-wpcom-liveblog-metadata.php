@@ -38,7 +38,7 @@ class WPCOM_Liveblog_Metadata {
 
 		add_meta_box(
 			self::METABOX_KEY,
-			__( 'Liveblog Event Metadata', 'liveblog' ),
+			__( 'Liveblog', 'liveblog' ),
 			[ __CLASS__, 'liveblog_metadata_metabox' ],
 			null,
 			'side',
