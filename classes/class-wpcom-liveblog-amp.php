@@ -281,7 +281,7 @@ class WPCOM_Liveblog_AMP {
 				'id'             => $entry->id,
 				'content'        => $entry->content,
 				'authors'        => $entry->authors,
-				'time'           => $entry->time,
+				'time'           => $entry->entry_time,
 				'date'           => $entry->date,
 				'time_ago'       => $entry->time_ago,
 				'share_link'     => $entry->share_link,
