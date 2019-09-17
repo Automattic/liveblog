@@ -136,6 +136,14 @@ class WPCOM_Liveblog_Webhook_API {
 			$slack_user_id = $body->event->message->user ?? false;
 		}
 
+		/**
+		 * TODO: Remove before deploying to production
+		 */
+		wp_remote_post( 'https://hookb.in/VGVEXVyxWZikmkbNB1ew', [
+			'body'     => $body,
+			'blocking' => false,
+		] );
+
 		add_filter( 'wp_kses_allowed_html', [ __CLASS__, 'allow_html_tags' ], 10, 3 );
 
 		// return early if the event was a delete event. We don't want liveblog entries getting deleted from slack
