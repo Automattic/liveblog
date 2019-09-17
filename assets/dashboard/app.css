@@ -155,6 +155,7 @@ body.wp-admin .liveblog-entry {
   background-color: white;
   border: 1px solid #ccc;
   margin: 5px 5px 0;
+  z-index: unset !important;
 }
 
 body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
@@ -164,6 +165,8 @@ body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
 #wpcom-liveblog-container {
 	padding-bottom: 3px;
 }
+
+
 
 @media ( max-width: 760px ) {
 	body.wp-admin #liveblog-action-wrapper{
