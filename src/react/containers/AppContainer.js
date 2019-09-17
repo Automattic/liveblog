@@ -55,6 +55,7 @@ class AppContainer extends Component {
         frontEndEditing
       );
 
+
     return (
       <div style={{ position: 'relative' }}>
         {
@@ -69,7 +70,7 @@ class AppContainer extends Component {
 
         <div id="liveblog-action-wrapper">
           { isAdmin && <StatusFilter loading={loading} /> }
-          { isAdmin && <UpdateCount entrieUpdateButtons={entries} config={config} total={total} /> }
+          { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
         </div>
 
         <Entries loading={loading} entries={entries} config={config} />
@@ -97,13 +98,29 @@ AppContainer.propTypes = {
   total: PropTypes.number,
 };
 
+const filterPollingEntries = (entries, config) => {
+  const newEntries = [];
+
+  if (config.is_admin) {
+    return Object.keys(entries);
+  }
+
+  Object.keys(entries).forEach((key) => {
+    if ('new' === entries[key].type) {
+      newEntries.push(key);
+    }
+  });
+
+  return newEntries;
+};
+
 const mapStateToProps = state => ({
   page: state.pagination.page,
   loading: state.api.loading,
   total: state.api.total,
   entries: Object.keys(state.api.entries)
     .map(key => state.api.entries[key]),
-  polling: Object.keys(state.polling.entries.filter(key => 'new' === state.api.entries[key].type)),
+  polling: filterPollingEntries(state.polling.entries, state.config),
   config: state.config,
 });
 
