@@ -281,7 +281,6 @@ class EditorContainer extends Component {
       headline,
       error,
       errorMessage,
-      status,
     } = this.state;
 
     let {
@@ -407,11 +406,7 @@ class EditorContainer extends Component {
           className="button button-primary button-large liveblog-btn liveblog-publish-btn"
           onClick={ (event) => {
             event.preventDefault();
-            if (isEditing) {
-              this.publish(status);
-            } else {
-              this.publish('publish');
-            }
+            this.publish('publish');
           } }>
           {isEditing ? 'Update' : 'Publish'}
         </button>
