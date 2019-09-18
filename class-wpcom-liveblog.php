@@ -511,14 +511,25 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$entries_for_json = array_filter( array_merge( $entries_for_json, $updated_entries ) );
 			}
 
+
 			if ( ! empty( $entries ) ) {
+				// Get entry ids to used for removing existing entries from the list
+				$entry_ids = wp_list_pluck( $entries_for_json, 'id' );
+
 				/**
 				 * Loop through each liveblog entry, set the most recent timestamp, and
 				 * put the JSON data for each entry into a neat little array.
 				 */
 				foreach ( $entries as $entry ) {
-					$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
-					$entries_for_json[] = $entry->for_json();
+					$latest_timestamp = max( $latest_timestamp, $entry->get_timestamp() );
+
+					// check to see if we already have an entry with the same id to replace
+					$key = array_search( $entry->ID, $entry_ids, true );
+					if ( false === $key ) {
+						$entries_for_json[] = $entry->for_json();
+					} else {
+						$entries_for_json[ $key ] = $entry->for_json();
+					}
 				}
 
 				$flattened = self::flatten_entries( $all_entries );

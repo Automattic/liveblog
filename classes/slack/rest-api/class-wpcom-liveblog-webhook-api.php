@@ -139,10 +139,13 @@ class WPCOM_Liveblog_Webhook_API {
 		/**
 		 * TODO: Remove before deploying to production
 		 */
-		wp_remote_post( 'https://hookb.in/VGVEXVyxWZikmkbNB1ew', [
-			'body'     => $body,
-			'blocking' => false,
-		] );
+		wp_remote_post(
+			'https://hookb.in/VGVEXVyxWZikmkbNB1ew',
+			[
+				'body'     => $body,
+				'blocking' => false,
+			] 
+		);
 
 		add_filter( 'wp_kses_allowed_html', [ __CLASS__, 'allow_html_tags' ], 10, 3 );
 
