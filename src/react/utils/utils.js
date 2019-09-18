@@ -78,6 +78,7 @@ export const eventsApplyUpdate = (currentEntries, newEntries) =>
 export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries) =>
   newEntries.reduce((accumulator, entry) => {
     const id = `id_${entry.id}`;
+    let sort = true;
 
     if (entry.type === 'new' && renderNewEntries) {
       if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
@@ -100,7 +101,15 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
 
     if (entry.type === 'delete') {
       delete accumulator[id];
+      sort = false;
     }
+
+    // sort entries by timestamp to persist order
+    if (sort) {
+      Object.values(accumulator).sort((a, b) => a.timestamp > b.timestamp);
+      accumulator = { ...accumulator };
+    }
+
 
     return accumulator;
   }, { ...currentEntries });
