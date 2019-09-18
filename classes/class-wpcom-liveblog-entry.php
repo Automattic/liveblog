@@ -535,7 +535,7 @@ class WPCOM_Liveblog_Entry {
 			unset( $hidden_entries[ $post_id ] );
 		}
 
-		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', MINUTE_IN_SECONDS );
+		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', 30 );
 	}
 
 	/**
@@ -600,7 +600,7 @@ class WPCOM_Liveblog_Entry {
 		$entry->type                        = 'update';
 		$updated_entries[ $entry_post->ID ] = $entry->for_json();
 
-		wp_cache_set( $cached_key, $updated_entries, 'liveblog', MINUTE_IN_SECONDS );
+		wp_cache_set( $cached_key, $updated_entries, 'liveblog', 30 );
 	}
 
 	/**
