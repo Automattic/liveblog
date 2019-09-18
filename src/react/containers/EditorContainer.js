@@ -409,7 +409,7 @@ class EditorContainer extends Component {
             event.preventDefault();
             this.publish('publish');
           } }>
-          {isEditing && 'draft' === status ? 'Update' : 'Publish'}
+          {isEditing && 'publish' === status ? 'Update' : 'Publish'}
         </button>
 
         {
