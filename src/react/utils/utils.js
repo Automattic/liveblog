@@ -9,6 +9,18 @@ export const getFirstOfObject = object => object[Object.keys(object)[0]];
 export const getItemOfObject = (object, key) => object[Object.keys(object)[key]];
 
 /**
+ * Sort entries based on their timestamp
+ *
+ * @param entries
+ * @return {*}
+ */
+export const sortEntriesByTimestamp = (entries) => {
+  Object.values(entries).sort((a, b) => a.timestamp > b.timestamp);
+  entries = { ...entries };
+  return entries;
+};
+
+/**
  * Apply updated entries to current entries.
  * @param {Object} currentEntries
  * @param {Array} newEntries
@@ -39,6 +51,9 @@ export const applyUpdate = (currentEntries, newEntries) =>
       delete accumulator[id];
     }
 
+    // sort entries by timestamp to persist order
+    accumulator = sortEntriesByTimestamp(accumulator);
+
     return accumulator;
   }, { ...currentEntries });
 
@@ -66,6 +81,9 @@ export const eventsApplyUpdate = (currentEntries, newEntries) =>
       delete accumulator[id];
     }
 
+    // sort entries by timestamp to persist order
+    accumulator = sortEntriesByTimestamp(accumulator);
+
     return accumulator;
   }, { ...currentEntries });
 
@@ -78,7 +96,6 @@ export const eventsApplyUpdate = (currentEntries, newEntries) =>
 export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries) =>
   newEntries.reduce((accumulator, entry) => {
     const id = `id_${entry.id}`;
-    let sort = true;
 
     if (entry.type === 'new' && renderNewEntries) {
       if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
@@ -101,15 +118,10 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
 
     if (entry.type === 'delete') {
       delete accumulator[id];
-      sort = false;
     }
 
     // sort entries by timestamp to persist order
-    if (sort) {
-      Object.values(accumulator).sort((a, b) => a.timestamp > b.timestamp);
-      accumulator = { ...accumulator };
-    }
-
+    accumulator = sortEntriesByTimestamp(accumulator);
 
     return accumulator;
   }, { ...currentEntries });
