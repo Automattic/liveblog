@@ -255,9 +255,7 @@ class WPCOM_Liveblog_Entry {
 
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
-		if ( ! $is_publishing ) {
-			self::store_updated_entries( $entry_post, $entry_post->post_parent );
-		}
+		self::store_updated_entries( $entry_post, $entry_post->post_parent );
 
 		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
@@ -532,6 +530,7 @@ class WPCOM_Liveblog_Entry {
 		if ( 'publish' !== $status ) {
 			$hidden_entries[ $post_id ] = $status;
 		} else {
+			// remove entry from cache when entry is published
 			unset( $hidden_entries[ $post_id ] );
 		}
 
