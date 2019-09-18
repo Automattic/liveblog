@@ -281,6 +281,7 @@ class EditorContainer extends Component {
       headline,
       error,
       errorMessage,
+      status,
     } = this.state;
 
     let {
@@ -408,7 +409,7 @@ class EditorContainer extends Component {
             event.preventDefault();
             this.publish('publish');
           } }>
-          {isEditing ? 'Update' : 'Publish'}
+          {isEditing && 'draft' === status ? 'Update' : 'Publish'}
         </button>
 
         {
