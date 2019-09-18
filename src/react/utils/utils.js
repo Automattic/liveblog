@@ -52,7 +52,11 @@ export const applyUpdate = (currentEntries, newEntries) =>
     }
 
     // sort entries by timestamp to persist order
+    console.log(accumulator);
+
     accumulator = sortEntriesByTimestamp(accumulator);
+
+    console.log(accumulator);
 
     return accumulator;
   }, { ...currentEntries });

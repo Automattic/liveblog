@@ -511,10 +511,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$entries_for_json = array_filter( array_merge( $entries_for_json, $updated_entries ) );
 			}
 
-
 			if ( ! empty( $entries ) ) {
 				// Get entry ids to used for removing existing entries from the list
-				$entry_ids = wp_list_pluck( $entries_for_json, 'id' );
+				$entry_ids = array_map( 'absint', wp_list_pluck( $entries_for_json, 'id' ) );
 
 				/**
 				 * Loop through each liveblog entry, set the most recent timestamp, and
@@ -524,7 +523,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$latest_timestamp = max( $latest_timestamp, $entry->get_timestamp() );
 
 					// check to see if we already have an entry with the same id to replace
-					$key = array_search( $entry->ID, $entry_ids, true );
+					$key = array_search( (int) $entry->get_id(), $entry_ids, true );
+
 					if ( false === $key ) {
 						$entries_for_json[] = $entry->for_json();
 					} else {
