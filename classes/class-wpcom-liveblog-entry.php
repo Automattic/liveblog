@@ -610,8 +610,8 @@ class WPCOM_Liveblog_Entry {
 	 * @return array
 	 */
 	public static function get_updated_entries( $liveblog_id, $only_published = true ) {
-		$entries    = [];
-		$cached_key = 'updated_entries_' . $liveblog_id;
+		$entries         = [];
+		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
 
 		if ( empty( $updated_entries ) ) {

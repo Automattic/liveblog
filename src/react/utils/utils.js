@@ -15,9 +15,13 @@ export const getItemOfObject = (object, key) => object[Object.keys(object)[key]]
  * @return {*}
  */
 export const sortEntriesByTimestamp = (entries) => {
-  Object.values(entries).sort((a, b) => a.timestamp > b.timestamp);
-  entries = { ...entries };
-  return entries;
+  const sortedEntries = Object.values(entries).sort((a, b) => b.timestamp - a.timestamp);
+  const newEntries = {};
+  sortedEntries.forEach((entry) => {
+    const id = `id_${entry.id}`;
+    newEntries[id] = entry;
+  });
+  return newEntries;
 };
 
 /**
@@ -52,11 +56,7 @@ export const applyUpdate = (currentEntries, newEntries) =>
     }
 
     // sort entries by timestamp to persist order
-    console.log(accumulator);
-
     accumulator = sortEntriesByTimestamp(accumulator);
-
-    console.log(accumulator);
 
     return accumulator;
   }, { ...currentEntries });
@@ -125,7 +125,7 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
     }
 
     // sort entries by timestamp to persist order
-    accumulator = sortEntriesByTimestamp(accumulator);
+    accumulator = { ...sortEntriesByTimestamp(accumulator) };
 
     return accumulator;
   }, { ...currentEntries });
