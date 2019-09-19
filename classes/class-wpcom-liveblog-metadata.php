@@ -15,7 +15,10 @@ class WPCOM_Liveblog_Metadata {
 	const METADATA_EVENT_TITLE    = 'event_title';
 	const METADATA_EVENT_URL      = 'event_url';
 	const METADATA_EVENT_LOCATION = 'event_location';
-	const METADATA_SLACK_CHANNEL  = 'event_location';
+	const METADATA_SLACK_CHANNEL  = 'slack_channel';
+	const METADATA_TEMPLATE       = '_liveblog_key_entry_template';
+	const METADATA_FORMAT         = '_liveblog_key_entry_format';
+	const METADATA_LIMIT          = '_liveblog_key_entry_limit';
 
 	/**
 	 * Called by WPCOM_Liveblog::load(),
@@ -94,6 +97,9 @@ class WPCOM_Liveblog_Metadata {
 				self::METADATA_EVENT_URL,
 				self::METADATA_EVENT_LOCATION,
 				self::METADATA_SLACK_CHANNEL,
+				self::METADATA_TEMPLATE,
+				self::METADATA_FORMAT,
+				self::METADATA_LIMIT,
 			];
 
 			$values = [];
@@ -122,6 +128,8 @@ class WPCOM_Liveblog_Metadata {
 		$title    = isset( $meta[ self::METADATA_EVENT_TITLE ] ) ? $meta[ self::METADATA_EVENT_TITLE ] : '';
 		$location = isset( $meta[ self::METADATA_EVENT_LOCATION ] ) ? $meta[ self::METADATA_EVENT_LOCATION ] : '';
 		$slack    = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
+		$limit    = isset( $meta[ self::METADATA_LIMIT ] ) ? $meta[ self::METADATA_LIMIT ] : '';
+
 		$format   = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
 		$name     = function( $key ) {
 			return WPCOM_Liveblog_Metadata::METADATA_KEY . '[' . $key . ']';
@@ -131,7 +139,10 @@ class WPCOM_Liveblog_Metadata {
 
 		do_action( 'liveblog_before_metadata', $post );
 
-		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_SLACK_CHANNEL ) ), 'text', 'Slack Channel ID', $location ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo '<hr>';
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_LIMIT ) ), 'text', 'Limit', $limit ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+
+		echo wp_kses( sprintf( $format, esc_attr( $name( self::METADATA_SLACK_CHANNEL ) ), 'text', 'Slack Channel ID', $slack ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
 
 		echo '<hr>';
 		echo '<p><b>Event Metadata</b></p>';
