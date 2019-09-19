@@ -165,6 +165,8 @@ body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
 	padding-bottom: 3px;
 }
 
+
+
 @media ( max-width: 760px ) {
 	body.wp-admin #liveblog-action-wrapper{
 		display: block;

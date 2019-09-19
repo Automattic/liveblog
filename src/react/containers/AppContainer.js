@@ -55,6 +55,7 @@ class AppContainer extends Component {
         frontEndEditing
       );
 
+
     return (
       <div style={{ position: 'relative' }}>
         {
@@ -97,13 +98,29 @@ AppContainer.propTypes = {
   total: PropTypes.number,
 };
 
+const filterPollingEntries = (entries, config) => {
+  const newEntries = [];
+
+  if (config.is_admin) {
+    return Object.keys(entries);
+  }
+
+  Object.keys(entries).forEach((key) => {
+    if ('new' === entries[key].type) {
+      newEntries.push(key);
+    }
+  });
+
+  return newEntries;
+};
+
 const mapStateToProps = state => ({
   page: state.pagination.page,
   loading: state.api.loading,
   total: state.api.total,
   entries: Object.keys(state.api.entries)
     .map(key => state.api.entries[key]),
-  polling: Object.keys(state.polling.entries),
+  polling: filterPollingEntries(state.polling.entries, state.config),
   config: state.config,
 });
 

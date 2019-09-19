@@ -101,13 +101,19 @@ export const api = (state = initialState, action) => {
         error: true,
       };
 
-    case 'UPDATE_ENTRY_SUCCESS':
+    case 'UPDATE_ENTRY_SUCCESS': {
+      const entries = { ...state.entries };
+      const entry = { ...action.payload.entries[0] };
+      const id = `id_${entry.id}`;
+      entries[id] = entry;
+
       return {
         ...state,
         error: false,
+        entries,
         nonce: action.payload.nonce,
       };
-
+    }
     case 'UPDATE_ENTRY_FAILED':
       return {
         ...state,
