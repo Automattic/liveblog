@@ -8,9 +8,9 @@ import * as apiActions from '../actions/apiActions';
 
 const StatusFilter = ({ loading, setStatus, getEntries }) => {
   const statuses = [
-    { value: 'any', label: 'All Entries' },
-    { value: 'draft', label: 'Draft Entries' },
-    { value: 'publish', label: 'Published Entries' },
+    { value: 'any', label: 'All' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'publish', label: 'Published' },
   ];
 
   const [filter, setState] = useState('any');

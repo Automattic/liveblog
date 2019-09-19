@@ -5,7 +5,7 @@
 
 /**
  * Holds methods for WP_CLI command related to live blog migration
- * Class LivePress_Migration_CLI
+ * Class Liveblog_Migration_WP_CLI
  */
 class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
@@ -39,11 +39,11 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp livepress convert --id=12345
-	 *     wp livepress convert --id=12345 --dry-run
-	 *     wp livepress convert --id=12345 --dry-run=false
-	 *     wp livepress convert --id=12345 --dry-run=false --delete=false
-	 *     wp livepress convert --id=12345 --dry-run=false --delete=true
+	 *     wp liveblog convert --id=12345
+	 *     wp liveblog convert --id=12345 --dry-run
+	 *     wp liveblog convert --id=12345 --dry-run=false
+	 *     wp liveblog convert --id=12345 --dry-run=false --delete=false
+	 *     wp liveblog convert --id=12345 --dry-run=false --delete=true
 	 *
 	 * @synposis --id [--dry-run] [--delete]
 	 *

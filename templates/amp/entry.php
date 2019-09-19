@@ -62,7 +62,7 @@
 				<a href="<?php echo esc_url( $share_link ); ?>">View in feed</a>
 			<?php endif; ?>
 
-			<?php if ( count( $social ) > 1 ) : ?>
+			<?php if ( $social && count( $social ) > 1 ) : ?>
 				<?php foreach ( $social as $platform ) : ?>
 				<amp-social-share type="<?php echo esc_attr( $platform ); ?>"
 					width="45"
