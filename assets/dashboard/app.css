@@ -155,7 +155,6 @@ body.wp-admin .liveblog-entry {
   background-color: white;
   border: 1px solid #ccc;
   margin: 5px 5px 0;
-  z-index: unset !important;
 }
 
 body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
