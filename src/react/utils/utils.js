@@ -243,3 +243,21 @@ export const getScrollToId = (entries, key) => {
 
   return `id_${entries[0].id}`;
 };
+
+/**
+ * Filter to only new entries
+ *
+ * @param entries
+ * @param config
+ */
+export const filterNewPollingEntries = (entries) => {
+  const newEntries = [];
+
+  Object.keys(entries).forEach((key) => {
+    if ('new' === entries[key].type) {
+      newEntries.push(entries[key]);
+    }
+  });
+
+  return newEntries;
+};

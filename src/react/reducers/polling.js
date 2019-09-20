@@ -1,6 +1,7 @@
 import {
   applyUpdate,
   getNewestEntry,
+  filterNewPollingEntries,
 } from '../utils/utils';
 
 export const initialState = {
@@ -12,8 +13,12 @@ export const initialState = {
 
 export const polling = (state = initialState, action) => {
   switch (action.type) {
-    case 'POLLING_SUCCESS':
-      return {
+    case 'POLLING_SUCCESS': {
+      console.log(action.payload.entries);
+      const newEntries = filterNewPollingEntries(action.payload.entries, { is_admin: false });
+      console.log(newEntries);
+
+      const newState = {
         ...state,
         error: false,
         entries: action.renderNewEntries
@@ -24,13 +29,15 @@ export const polling = (state = initialState, action) => {
           ),
         newestEntry: getNewestEntry(
           state.newestEntry,
-          action.payload.entries[action.payload.entries.length - 1],
+          newEntries[newEntries.length - 1],
         ),
         pages: action.payload.pages
           ? action.payload.pages
           : state.pages,
       };
 
+      return newState;
+    }
     case 'POLLING_FAILED':
       return {
         ...state,
