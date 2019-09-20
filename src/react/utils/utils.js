@@ -112,12 +112,19 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
       }
     }
 
-    if (entry.status === 'draft' && Object.prototype.hasOwnProperty.call(accumulator, id) && entry.timestamp > accumulator[id].timestamp) {
+    if (entry.status === 'draft' && Object.prototype.hasOwnProperty.call(accumulator, id)) {
       accumulator[id] = entry;
     }
 
-    if (entry.type === 'update' && Object.prototype.hasOwnProperty.call(accumulator, id)) {
-      accumulator[id] = entry;
+    if (entry.type === 'update') {
+      if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
+        accumulator[id] = entry;
+      } else {
+        accumulator = {
+          ...accumulator,
+          [id]: entry,
+        };
+      }
     }
 
     if (entry.type === 'delete') {
