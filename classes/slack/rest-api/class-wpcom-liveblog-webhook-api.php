@@ -82,7 +82,7 @@ class WPCOM_Liveblog_Webhook_API {
 		$event = wp_cache_get( $key, self::CACHE_GROUP );
 		if ( false === $event ) {
 			do_action( self::ASYNC_TASK, $body );
-			wp_cache_set( $key, 'true', self::CACHE_GROUP, MINUTE_IN_SECONDS * 3 ); //phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.LowCacheTime
+			wp_cache_set( $key, 'true', self::CACHE_GROUP, MINUTE_IN_SECONDS ); //phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.LowCacheTime
 		}
 
 		return rest_ensure_response( [ 'success' => true ] );

@@ -306,6 +306,7 @@ class EditorContainer extends Component {
     if (window.liveblog_settings.author_required && window.liveblog_settings.author_required === '1' && !authors.length) {
       canPublish = false;
     }
+
     return (
       <div className="liveblog-editor-container">
         {!isEditing && <h1 className="liveblog-editor-title">Add New Entry</h1>}
@@ -406,13 +407,9 @@ class EditorContainer extends Component {
           className="button button-primary button-large liveblog-btn liveblog-publish-btn"
           onClick={ (event) => {
             event.preventDefault();
-            if (isEditing) {
-              this.publish(status);
-            } else {
-              this.publish('publish');
-            }
+            this.publish('publish');
           } }>
-          {isEditing ? 'Update' : 'Publish'}
+          {isEditing && 'publish' === status ? 'Update' : 'Publish'}
         </button>
 
         {
