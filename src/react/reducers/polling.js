@@ -14,9 +14,7 @@ export const initialState = {
 export const polling = (state = initialState, action) => {
   switch (action.type) {
     case 'POLLING_SUCCESS': {
-      console.log(action.payload.entries);
       const newEntries = filterNewPollingEntries(action.payload.entries, { is_admin: false });
-      console.log(newEntries);
 
       const newState = {
         ...state,
