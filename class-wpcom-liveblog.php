@@ -1054,6 +1054,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$use_rest_api = 1;
 				}
 
+				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard/app.css', __FILE__ ), [], self::VERSION, false );
+
 				wp_localize_script(
 					'liveblog-admin',
 					'liveblog_admin_settings',
