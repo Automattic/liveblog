@@ -28,9 +28,10 @@ class WPCOM_Liveblog_Metadata {
 	 */
 	public static function load() {
 		add_action( 'add_meta_boxes', [ __CLASS__, 'add_meta_box' ] );
-		add_action( 'save_post', [ __CLASS__, 'save_post' ], 10, 3 );
+		add_action( 'save_post', [ __CLASS__, 'save_post' ] );
 		add_action( 'liveblog_metadata', [ __CLASS__, 'liveblog_event_metadata' ] );
 		add_action( 'liveblog_metadata', [ __CLASS__, 'liveblog_slack_metadata' ] );
+		add_action( 'liveblog_metadata', [ __CLASS__, 'liveblog_state' ], 12 );
 	}
 
 	/**
@@ -80,8 +81,13 @@ class WPCOM_Liveblog_Metadata {
 			return false;
 		};
 
+		// save state (archive, enabled)
+		$new_state = filter_input( INPUT_POST, 'state', FILTER_SANITIZE_STRING );
+		WPCOM_Liveblog::set_liveblog_state( $post_id, $new_state );
+
 		// Save meta data.
 		$metadata = isset( $_POST[ self::METADATA_KEY ] ) ? wp_unslash( $_POST[ self::METADATA_KEY ] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
 		return self::save_post_meta( $metadata, $post_id );
 	}
 
@@ -143,6 +149,52 @@ class WPCOM_Liveblog_Metadata {
 		do_action( 'liveblog_metadata', $post );
 	}
 
+	/**
+	 * Liveblog metadata: state
+	 *
+	 * @param  \WP_Post $post The post object.
+	 * @return void
+	 */
+	public static function liveblog_state( $post ) {
+		$current_state = WPCOM_Liveblog::get_liveblog_state( $post->ID );
+
+		$template_variables['buttons']       = [
+			'enable'  => [
+				'value'       => 'enable',
+				'text'        => __( 'Enable', 'liveblog' ),
+				'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.', 'liveblog' ),
+				// translators: 1: post url
+				'active-text' => __( 'There is an <strong>enabled</strong> liveblog on this post.', 'liveblog' ),
+				'primary'     => true,
+				'disabled'    => false,
+			],
+			'archive' => [
+				'value'       => 'archive',
+				'text'        => __( 'Archive', 'liveblog' ),
+				'description' => __( 'Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden.', 'liveblog' ),
+				// translators: 1: archive url
+				'active-text' => __( 'There is an <strong>archived</strong> liveblog on this post.', 'liveblog' ),
+				'primary'     => false,
+				'disabled'    => false,
+			],
+		];
+		if ( $current_state ) {
+			$template_variables['active_text']                           = $template_variables['buttons'][ $current_state ]['active-text'];
+			$template_variables['buttons'][ $current_state ]['disabled'] = true;
+		} else {
+			$template_variables['active_text']                    = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
+			$template_variables['buttons']['archive']['disabled'] = true;
+		}
+
+		echo WPCOM_Liveblog::get_template_part( 'meta-box.php', $template_variables );
+	}
+
+	/**
+	 * Liveblog metadata: event data
+	 *
+	 * @param  \WP_Post $post The post object.
+	 * @return void
+	 */
 	public static function liveblog_event_metadata( $post ) {
 		$meta     = get_post_meta( $post->ID, self::METADATA_KEY, true );
 		$start    = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : '';
@@ -161,6 +213,12 @@ class WPCOM_Liveblog_Metadata {
 		self::print_text_field( self::METADATA_EVENT_LOCATION, 'text', 'Event Location', $location );
 	}
 
+	/**
+	 * Liveblog metadata: slack channel
+	 *
+	 * @param  \WP_Post $post The post object.
+	 * @return void
+	 */
 	public static function liveblog_slack_metadata( $post ) {
 		$meta     = get_post_meta( $post->ID, self::METADATA_KEY, true );
 		$slack    = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
