@@ -1,11 +1,8 @@
-<?php 
+<?php
 	$active_text  = $template_variables['active_text'] ?? '';
 	$buttons      = $template_variables['buttons'] ?? [];
-	$update_text  = $template_variables['update_text'] ?? '';
-	$extra_fields = $template_variables['extra_fields'] ?? [];
 ?>
-<p class="error"></p>
-<p class="success"><?php echo esc_html( $update_text ); ?></p>
+<hr>
 <h2><?php echo wp_kses_post( $active_text ); ?></h2>
 <ul>
 <?php
@@ -19,11 +16,7 @@ foreach ( $buttons as $button ) :
 	<button class="button <?php echo $button['primary'] ? 'button-primary' : ''; ?>" <?php echo $button['disabled'] ? 'disabled="disabled"' : ''; ?> value="<?php echo esc_attr( $button['value'] ); ?>">
 		<?php echo esc_html( $button['text'] ); ?>
 	</button>
-	<?php echo wp_kses_post( $button['description'] ); ?>
+	<p><?php echo wp_kses_post( $button['description'] ); ?></p>
 </li>
 <?php endforeach; ?>
 </ul>
-<?php
-foreach ( $extra_fields as $fields ) :
-	echo wp_kses( $fields, WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
-endforeach;
