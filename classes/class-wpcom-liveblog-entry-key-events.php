@@ -67,7 +67,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Hook into the liveblog_admin_settings_update action
 		// to save the key event template.
-		add_action( 'save_post', [ __CLASS__, 'save_template_option' ], 10, 3 );
+		add_action( 'save_liveblog_metadata', [ __CLASS__, 'save_template_option' ] );
 	}
 
 	/**
@@ -164,10 +164,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Update event metadata on save_post.
 	 *
-	 * @param  int  $post_id Post ID.
-	 * @return bool          Boolean true if successful update, false on failure.
+	 * @param  WP_Post $post    Current Post.
+	 * @return bool             Boolean true if successful update, false on failure.
 	 */
-	public static function save_template_option( $post_id ) {
+	public static function save_template_option( $post ) {
+		$post_id = $post->ID;
 
 		$template_name = filter_input( INPUT_POST, 'liveblog-key-template-name', FILTER_SANITIZE_STRING );
 
