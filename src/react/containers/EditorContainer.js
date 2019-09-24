@@ -185,7 +185,7 @@ class EditorContainer extends Component {
   getUsers(text, callback) {
     const { config } = this.props;
     getAuthors(text, config)
-      .timeout(10000)
+      .timeout(20000)
       .map(res => res.response)
       .subscribe(res => callback(null, {
         options: res,
