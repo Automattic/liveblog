@@ -63,7 +63,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Hook into the liveblog_admin_add_settings filter
 		// to add the key event admin options.
-		add_action( 'liveblog_metadata', [ __CLASS__, 'add_admin_options' ], 12 );
+		add_action( 'liveblog_metabox', [ __CLASS__, 'add_admin_options' ], 12 );
 
 		// Hook into the liveblog_admin_settings_update action
 		// to save the key event template.

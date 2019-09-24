@@ -29,9 +29,9 @@ class WPCOM_Liveblog_Metadata {
 	public static function load() {
 		add_action( 'add_meta_boxes', [ __CLASS__, 'add_meta_box' ] );
 		add_action( 'save_post', [ __CLASS__, 'save_post' ] );
-		add_action( 'liveblog_metadata', [ __CLASS__, 'liveblog_event_metadata' ] );
-		add_action( 'liveblog_metadata', [ __CLASS__, 'liveblog_slack_metadata' ] );
-		add_action( 'liveblog_metadata', [ __CLASS__, 'liveblog_state' ], 12 );
+		add_action( 'liveblog_metabox', [ __CLASS__, 'liveblog_event_metadata' ] );
+		add_action( 'liveblog_metabox', [ __CLASS__, 'liveblog_slack_metadata' ] );
+		add_action( 'liveblog_metabox', [ __CLASS__, 'liveblog_state' ], 12 );
 	}
 
 	/**
@@ -148,7 +148,7 @@ class WPCOM_Liveblog_Metadata {
 	public static function liveblog_metadata_metabox( $post ) {
 		wp_nonce_field( self::METADATA_NONCE_FIELD . $post->ID, self::METADATA_NONCE );
 
-		do_action( 'liveblog_metadata', $post->ID );
+		do_action( 'liveblog_metabox', $post->ID );
 	}
 
 	/**
