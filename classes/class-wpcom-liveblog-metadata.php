@@ -160,6 +160,7 @@ class WPCOM_Liveblog_Metadata {
 	public static function liveblog_state( $post ) {
 		$current_state = WPCOM_Liveblog::get_liveblog_state( $post->ID );
 
+		$template_variables            = [];
 		$template_variables['buttons'] = [
 			'enable'  => [
 				'value'       => 'enable',
