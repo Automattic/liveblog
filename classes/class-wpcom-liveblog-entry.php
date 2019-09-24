@@ -233,12 +233,7 @@ class WPCOM_Liveblog_Entry {
 			'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 		];
 
-		$is_publishing = false;
 		$original_post = get_post( $args['entry_id'] );
-
-		if ( 'draft' === $original_post->post_status && 'publish' === $args['status'] ) {
-			$is_publishing = true;
-		}
 
 		$updated_entry_id = wp_update_post( $post_data );
 		if ( ! $updated_entry_id ) {
