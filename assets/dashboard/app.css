@@ -157,6 +157,27 @@ body.wp-admin .liveblog-entry {
   margin: 5px 5px 0;
 }
 
+
+body.wp-admin .liveblog-entry .liveblog-meta-avatars {
+	float: left;
+	clear: left;
+	width: 75px;
+	text-align: center;
+	position: relative;
+	z-index: 1;
+	margin: 0;
+	padding-top: 2px;
+	padding-bottom: 0;
+}
+
+body.wp-admin .liveblog-entry .liveblog-meta-avatars img{
+	display: block;
+	margin: 0 auto;
+	padding: 0;
+	width: 60px;
+	height: 60px;
+}
+
 body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
   display: none;
 }
@@ -174,6 +195,11 @@ body.wp-admin.liveblog.wp-core-ui .mce-tooltip {
 
 	body.wp-admin #liveblog-action-wrapper .liveblog-update-count {
 		text-align: left;
+	}
+
+	body.wp-admin .liveblog-entry .liveblog-meta-avatars,
+	body.wp-admin .liveblog-entry .liveblog-meta-avatars img{
+		display: none;
 	}
 
 }

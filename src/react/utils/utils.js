@@ -112,12 +112,19 @@ export const pollingApplyUpdate = (currentEntries, newEntries, renderNewEntries)
       }
     }
 
-    if (entry.status === 'draft' && Object.prototype.hasOwnProperty.call(accumulator, id) && entry.timestamp > accumulator[id].timestamp) {
+    if (entry.status === 'draft' && Object.prototype.hasOwnProperty.call(accumulator, id)) {
       accumulator[id] = entry;
     }
 
-    if (entry.type === 'update' && Object.prototype.hasOwnProperty.call(accumulator, id)) {
-      accumulator[id] = entry;
+    if (entry.type === 'update') {
+      if (Object.prototype.hasOwnProperty.call(accumulator, id)) {
+        accumulator[id] = entry;
+      } else {
+        accumulator = {
+          ...accumulator,
+          [id]: entry,
+        };
+      }
     }
 
     if (entry.type === 'delete') {
@@ -235,4 +242,22 @@ export const getScrollToId = (entries, key) => {
   }
 
   return `id_${entries[0].id}`;
+};
+
+/**
+ * Filter to only new entries
+ *
+ * @param entries
+ * @param config
+ */
+export const filterNewPollingEntries = (entries) => {
+  const newEntries = [];
+
+  Object.keys(entries).forEach((key) => {
+    if ('new' === entries[key].type) {
+      newEntries.push(entries[key]);
+    }
+  });
+
+  return newEntries;
 };
