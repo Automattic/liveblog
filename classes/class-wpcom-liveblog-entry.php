@@ -618,7 +618,7 @@ class WPCOM_Liveblog_Entry {
 			return $entries;
 		}
 
-		foreach ( (array) $updated_entries as $entry_id => $entry ) {
+		foreach ( (array) $updated_entries as $entry_id => $entry ) { //  phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UnusedVariable
 			if ( $only_published && 'draft' === $entry->status ) {
 				continue;
 			}
