@@ -29,7 +29,7 @@ class WPCOM_Liveblog_Export_Authors {
 		$output_stream = fopen( 'php://output', 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
 
 		foreach ( $output as $row ) {
-			fputcsv( $output_stream, array_values( $row ) ); // phpcs:ignore WordPress.VIP.FileSystemWritesDisallow.file_ops_fputcsv
+			fputcsv( $output_stream, array_values( $row ) ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv
 		}
 
 		fclose( $output_stream ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
