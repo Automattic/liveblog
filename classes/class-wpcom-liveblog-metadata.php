@@ -85,7 +85,7 @@ class WPCOM_Liveblog_Metadata {
 		$new_state = filter_input( INPUT_POST, 'state', FILTER_SANITIZE_STRING );
 		WPCOM_Liveblog::set_liveblog_state( $post_id, $new_state );
 
-		do_action( 'save_liveblog_metadata', $post );
+		do_action( 'save_liveblog_metadata', $post_id );
 
 		// Save meta data.
 		$metadata = isset( $_POST[ self::METADATA_KEY ] ) ? wp_unslash( $_POST[ self::METADATA_KEY ] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized

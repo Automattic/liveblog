@@ -164,12 +164,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Update event metadata on save_post.
 	 *
-	 * @param  WP_Post $post    Current Post.
+	 * @param  int  $post_id Post ID.
 	 * @return bool             Boolean true if successful update, false on failure.
 	 */
-	public static function save_template_option( $post ) {
-		$post_id = $post->ID;
-
+	public static function save_template_option( $post_id ) {
 		$template_name = filter_input( INPUT_POST, 'liveblog-key-template-name', FILTER_SANITIZE_STRING );
 
 		if ( $template_name ) {
