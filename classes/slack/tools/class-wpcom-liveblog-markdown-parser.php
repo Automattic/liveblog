@@ -34,9 +34,9 @@ class WPCOM_Liveblog_Markdown_Parser {
 	];
 
 	public static $block_rules = [
-		'/(#+)(.*)/'       => 'header', // headers
-		'/\n&gt;(.*)/'     => 'blockquote', // blockquotes
-		'/\n([^\n]+)\n/'   => 'paragraph', // add paragraphs
+		'/(#+)(.*)/'     => 'header', // headers
+		'/\n&gt;(.*)/'   => 'blockquote', // blockquotes
+		'/\n([^\n]+)\n/' => 'paragraph', // add paragraphs
 	];
 
 	private static function paragraph( $line ) {

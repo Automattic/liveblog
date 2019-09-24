@@ -1,6 +1,6 @@
 <?php
-	$active_text  = $template_variables['active_text'] ?? '';
-	$buttons      = $template_variables['buttons'] ?? [];
+	$active_text = $template_variables['active_text'] ?? '';
+	$buttons     = $template_variables['buttons'] ?? [];
 ?>
 <hr>
 <h2><?php echo wp_kses_post( $active_text ); ?></h2>

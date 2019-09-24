@@ -13,11 +13,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Set the meta_key and meta_value
 	 */
-	const META_KEY               = 'liveblog_key_entry';
-	const META_VALUE             = 'true';
-	const META_KEY_TEMPLATE      = '_liveblog_key_entry_template';
-	const META_KEY_FORMAT        = '_liveblog_key_entry_format';
-	const META_KEY_LIMIT         = '_liveblog_key_entry_limit';
+	const META_KEY          = 'liveblog_key_entry';
+	const META_VALUE        = 'true';
+	const META_KEY_TEMPLATE = '_liveblog_key_entry_template';
+	const META_KEY_FORMAT   = '_liveblog_key_entry_format';
+	const META_KEY_LIMIT    = '_liveblog_key_entry_limit';
 
 	/**
 	 * Template to render entries

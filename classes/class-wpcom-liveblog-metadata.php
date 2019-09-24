@@ -20,7 +20,7 @@ class WPCOM_Liveblog_Metadata {
 	const METADATA_FORMAT         = '_liveblog_key_entry_format';
 	const METADATA_LIMIT          = '_liveblog_key_entry_limit';
 
-	public static $text_format   = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
+	public static $text_format = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
 
 
 	/**
@@ -160,7 +160,7 @@ class WPCOM_Liveblog_Metadata {
 	public static function liveblog_state( $post ) {
 		$current_state = WPCOM_Liveblog::get_liveblog_state( $post->ID );
 
-		$template_variables['buttons']       = [
+		$template_variables['buttons'] = [
 			'enable'  => [
 				'value'       => 'enable',
 				'text'        => __( 'Enable', 'liveblog' ),
@@ -222,8 +222,8 @@ class WPCOM_Liveblog_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_slack_metadata( $post ) {
-		$meta     = get_post_meta( $post->ID, self::METADATA_KEY, true );
-		$slack    = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
+		$meta  = get_post_meta( $post->ID, self::METADATA_KEY, true );
+		$slack = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
 
 		echo '<hr>';
 		self::print_text_field( self::METADATA_SLACK_CHANNEL, 'text', 'Slack Channel ID', $slack );
