@@ -148,17 +148,17 @@ class WPCOM_Liveblog_Metadata {
 	public static function liveblog_metadata_metabox( $post ) {
 		wp_nonce_field( self::METADATA_NONCE_FIELD . $post->ID, self::METADATA_NONCE );
 
-		do_action( 'liveblog_metadata', $post );
+		do_action( 'liveblog_metadata', $post->ID );
 	}
 
 	/**
 	 * Liveblog metadata: state
 	 *
-	 * @param  \WP_Post $post The post object.
+	 * @param  $post_id
 	 * @return void
 	 */
-	public static function liveblog_state( $post ) {
-		$current_state = WPCOM_Liveblog::get_liveblog_state( $post->ID );
+	public static function liveblog_state( $post_id ) {
+		$current_state = WPCOM_Liveblog::get_liveblog_state( $post_id );
 
 		$template_variables            = [];
 		$template_variables['buttons'] = [
@@ -198,8 +198,8 @@ class WPCOM_Liveblog_Metadata {
 	 * @param  \WP_Post $post The post object.
 	 * @return void
 	 */
-	public static function liveblog_event_metadata( $post ) {
-		$meta     = get_post_meta( $post->ID, self::METADATA_KEY, true );
+	public static function liveblog_event_metadata( $post_id ) {
+		$meta     = get_post_meta( $post_id, self::METADATA_KEY, true );
 		$start    = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : '';
 		$end      = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : '';
 		$url      = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] : '';
@@ -222,8 +222,8 @@ class WPCOM_Liveblog_Metadata {
 	 * @param  \WP_Post $post The post object.
 	 * @return void
 	 */
-	public static function liveblog_slack_metadata( $post ) {
-		$meta  = get_post_meta( $post->ID, self::METADATA_KEY, true );
+	public static function liveblog_slack_metadata( $post_id ) {
+		$meta  = get_post_meta( $post_id, self::METADATA_KEY, true );
 		$slack = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
 
 		echo '<hr>';

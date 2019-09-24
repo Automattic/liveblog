@@ -216,12 +216,12 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @param $post_id
 	 * @return array
 	 */
-	public static function add_admin_options( $post ) {
+	public static function add_admin_options( $post_id ) {
 
 		$template_variables = [
-			'current_key_template' => get_post_meta( $post->ID, self::META_KEY_TEMPLATE, true ),
-			'current_key_format'   => get_post_meta( $post->ID, self::META_KEY_FORMAT, true ),
-			'current_key_limit'    => get_post_meta( $post->ID, self::META_KEY_LIMIT, true ),
+			'current_key_template' => get_post_meta( $post_id, self::META_KEY_TEMPLATE, true ),
+			'current_key_format'   => get_post_meta( $post_id, self::META_KEY_FORMAT, true ),
+			'current_key_limit'    => get_post_meta( $post_id, self::META_KEY_LIMIT, true ),
 			'key_name'             => __( 'Template:', 'liveblog' ),
 			'key_format_name'      => __( 'Format:', 'liveblog' ),
 			'key_description'      => __( 'Set template for key events shortcode, select a format and restrict most recent shown.', 'liveblog' ),
