@@ -233,8 +233,6 @@ class WPCOM_Liveblog_Entry {
 			'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 		];
 
-		$original_post = get_post( $args['entry_id'] );
-
 		$updated_entry_id = wp_update_post( $post_data );
 		if ( ! $updated_entry_id ) {
 			return new WP_Error( 'entry-update', __( 'Updating post failed', 'liveblog' ) );
