@@ -231,7 +231,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			'formats'              => array_keys( self::$available_formats ),
 		];
 
-		echo WPCOM_Liveblog::get_template_part( 'liveblog-key-admin.php', $template_variables );
+		echo WPCOM_Liveblog::get_template_part( 'liveblog-key-admin.php', $template_variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

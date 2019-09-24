@@ -189,7 +189,7 @@ class WPCOM_Liveblog_Metadata {
 			$template_variables['buttons']['archive']['disabled'] = true;
 		}
 
-		echo WPCOM_Liveblog::get_template_part( 'meta-box.php', $template_variables );
+		echo WPCOM_Liveblog::get_template_part( 'meta-box.php', $template_variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
