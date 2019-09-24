@@ -30,15 +30,11 @@ class WPCOM_Liveblog_Markdown_Parser {
 		'/(\_|__)(.*?)\1/'             => '<em>\2</em>', // emphasis
 		'/\~(.*?)\~/'                  => '<del>\1</del>', // del
 		'/\:\"(.*?)\"\:/'              => '<q>\1</q>', // quote
-		'/<\/ul><ul>/'                 => '', // fix extra ul
-		'/<\/ol><ol>/'                 => '', // fix extra ol
 		'/<\/blockquote><blockquote>/' => "\n",  // fix extra blockquote
 	];
 
 	public static $block_rules = [
 		'/(#+)(.*)/'       => 'header', // headers
-		'/\n\*(.*)/'       => 'ul_list', // ul lists
-		'/\n[0-9]+\.(.*)/' => 'ol_list', // ol lists
 		'/\n&gt;(.*)/'     => 'blockquote', // blockquotes
 		'/\n([^\n]+)\n/'   => 'paragraph', // add paragraphs
 	];
@@ -50,15 +46,11 @@ class WPCOM_Liveblog_Markdown_Parser {
 		}
 		return sprintf( "\n<p>%s</p>\n", $trimmed );
 	}
-	private static function ul_list( $item ) {
-		return sprintf( "\n<ul>\n\t<li>%s</li>\n</ul>", trim( $item ) );
-	}
-	private static function ol_list( $item ) {
-		return sprintf( "\n<ol>\n\t<li>%s</li>\n</ol>", trim( $item ) );
-	}
+
 	private static function blockquote( $item ) {
 		return sprintf( "\n<blockquote>%s</blockquote>", trim( $item ) );
 	}
+
 	private static function header( $chars, $header ) {
 		$level = strlen( $chars );
 		return sprintf( '<h%d>%s</h%d>', $level, trim( $header ), $level );

@@ -2,7 +2,7 @@
 
 class WPCOM_Liveblog_Webhook_API {
 
-	const EVENT_ENDPOINT  = '/v1/slack';
+	const EVENT_ENDPOINT  = 'v1/slack';
 	const CACHE_KEY       = 'liveblog';
 	const CACHE_GROUP     = 'slack';
 	const MESSAGE_ID_META = 'client_msg_id';
