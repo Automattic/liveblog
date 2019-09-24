@@ -1848,10 +1848,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'@type' => 'WebPage',
 					'@id'   => $url,
 				],
-				'publisher'        => [
-					'@type' => 'Organization',
-					'name'  => get_bloginfo( 'name' ),
-				],
 				'headline'         => get_the_title(),
 				'url'              => $url,
 				'datePublished'    => get_the_date( 'c' ),
@@ -1873,10 +1869,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				];
 			}
 
+			$publisher_data = [
+				'@type' => 'Organization',
+				'name'  => get_bloginfo( 'name' ),
+			];
+
 			$logo = apply_filters( 'liveblog_metadata_publisher_logo', [] );
 			if ( $logo ) {
-				$liveblog_metadata['publisher']['logo']          = $logo;
-				$liveblog_metadata['publisher']['logo']['@type'] = 'ImageObject';
+				$publisher_data['logo']          = $logo;
+				$publisher_data['logo']['@type'] = 'ImageObject';
 			}
 
 			$liveblog_metadata = WPCOM_Liveblog_Metadata::liveblog_append_metadata( $liveblog_metadata, $post );
@@ -1893,6 +1894,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'datePublished'    => date( 'c', $entry->entry_time ),
 					'dateModified'     => date( 'c', $entry->timestamp ),
 					'image'            => WPCOM_Liveblog_Entry::get_entry_featured_image_src( $entry ),
+					'publisher'        => $publisher_data,
 					'articleBody'      => [
 						'@type' => 'Text',
 					],
