@@ -6,7 +6,6 @@ import configureStore from './store';
 import AppContainer from './containers/AppContainer';
 
 import '../styles/core.scss';
-import '../styles/dashboard.scss';
 
 Polyfills();
 
