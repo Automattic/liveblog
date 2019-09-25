@@ -74,7 +74,7 @@ class AppContainer extends Component {
         </div>
 
         <Entries loading={loading} entries={entries} config={config} />
-        <PaginationContainer />
+        <PaginationContainer entries={entries} />
         {this.eventsContainer && <EventsContainer container={this.eventsContainer} title={this.eventsContainer.getAttribute('data-title')} />}
         { isAdmin && <UpdateCount entries={entries} config={config} total={total} /> }
       </div>
