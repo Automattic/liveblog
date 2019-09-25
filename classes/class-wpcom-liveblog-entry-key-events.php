@@ -67,7 +67,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 		// Hook into the liveblog_admin_settings_update action
 		// to save the key event template.
-		add_action( 'save_liveblog_metadata', [ __CLASS__, 'save_template_option' ] );
+		add_action( 'save_liveblog_metabox', [ __CLASS__, 'save_template_option' ] );
 	}
 
 	/**
