@@ -1030,6 +1030,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function add_post_class( $classes, $class, $entry_id ) {
 			$entry = get_post( $entry_id );
+			if ( ! is_object( $entry ) ) {
+				return $classes;
+			}
 
 			// add classes to individual updates, but not the parent liveblog
 			if ( WPCOM_Liveblog_CPT::$cpt_slug === $entry->post_type && 0 !== $entry->post_parent ) {
