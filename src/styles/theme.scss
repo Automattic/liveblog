@@ -16,14 +16,6 @@
   border-top: 2px solid $color-grey-x-dark;
 }
 
-.liveblog-entry-edit {
-  margin-left: 60px;
-
-  @include mq($until: medium) {
-    margin-left: 0;
-  }
-}
-
 .liveblog-entry-content {
   padding-top: 10px;
   padding-left: 60px;
