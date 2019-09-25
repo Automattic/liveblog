@@ -7,7 +7,7 @@
  */
 class WPCOM_Liveblog_Metadata {
 	const METABOX_KEY             = 'liveblog_event_metdata_metabox';
-	const METADATA_KEY            = 'liveblog_event_metadata';
+	const EVENT_METADATA_KEY      = 'liveblog_event_metadata';
 	const METADATA_NONCE          = 'liveblog_event_metadata_nonce';
 	const METADATA_NONCE_FIELD    = 'liveblog_event_metadata_nonce_';
 	const METADATA_START_TIME     = 'start_time';
@@ -16,9 +16,6 @@ class WPCOM_Liveblog_Metadata {
 	const METADATA_EVENT_URL      = 'event_url';
 	const METADATA_EVENT_LOCATION = 'event_location';
 	const METADATA_SLACK_CHANNEL  = 'slack_channel';
-	const METADATA_TEMPLATE       = '_liveblog_key_entry_template';
-	const METADATA_FORMAT         = '_liveblog_key_entry_format';
-	const METADATA_LIMIT          = '_liveblog_key_entry_limit';
 
 	public static $text_format = '<p><label for="%1$s">%3$s</label><input type="%2$s" id="%1$s" class="widefat" name="%1$s" value="%4$s"/></p>';
 
@@ -32,6 +29,8 @@ class WPCOM_Liveblog_Metadata {
 		add_action( 'liveblog_metabox', [ __CLASS__, 'liveblog_event_metadata' ] );
 		add_action( 'liveblog_metabox', [ __CLASS__, 'liveblog_slack_metadata' ] );
 		add_action( 'liveblog_metabox', [ __CLASS__, 'liveblog_state' ], 12 );
+		add_action( 'save_liveblog_metabox', [ __CLASS__, 'save_event_metadata' ] );
+		add_action( 'save_liveblog_metabox', [ __CLASS__, 'save_slack_metadata' ] );
 	}
 
 	/**
@@ -85,46 +84,52 @@ class WPCOM_Liveblog_Metadata {
 		$new_state = filter_input( INPUT_POST, 'state', FILTER_SANITIZE_STRING );
 		WPCOM_Liveblog::set_liveblog_state( $post_id, $new_state );
 
-		do_action( 'save_liveblog_metadata', $post_id );
-
-		// Save meta data.
-		$metadata = isset( $_POST[ self::METADATA_KEY ] ) ? wp_unslash( $_POST[ self::METADATA_KEY ] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
-		return self::save_post_meta( $metadata, $post_id );
+		do_action( 'save_liveblog_metabox', $post_id );
 	}
 
 	/**
 	 * Save event metadata.
 	 *
-	 * @param  array $metadata An array of event metadata.
 	 * @param  int   $post_id  Post ID.
 	 * @return bool            Boolean true if successful update, false on failure.
 	 */
-	protected static function save_post_meta( $metadata, $post_id ) {
-		// Save the Liveblog Metadata
-		if ( isset( $metadata ) && is_array( $metadata ) ) {
-			$fields = [
-				self::METADATA_START_TIME,
-				self::METADATA_END_TIME,
-				self::METADATA_EVENT_TITLE,
-				self::METADATA_EVENT_URL,
-				self::METADATA_EVENT_LOCATION,
-				self::METADATA_SLACK_CHANNEL,
-				self::METADATA_TEMPLATE,
-				self::METADATA_FORMAT,
-				self::METADATA_LIMIT,
-			];
+	public static function save_event_metadata( $post_id ) {
+		$fields = [
+			self::METADATA_START_TIME,
+			self::METADATA_END_TIME,
+			self::METADATA_EVENT_TITLE,
+			self::METADATA_EVENT_URL,
+			self::METADATA_EVENT_LOCATION,
+		];
 
-			$values = [];
-			foreach ( $fields as $field ) {
-				$values[ $field ] = isset( $metadata[ $field ] )
-				? sanitize_text_field( wp_unslash( $metadata[ $field ] ) )
-				: '';
-			}
-			return update_post_meta( $post_id, self::METADATA_KEY, $values );
+		$values = [];
+		foreach ( $fields as $meta_key ) {
+			$values[ $meta_key ] = filter_input( INPUT_POST, $meta_key, FILTER_SANITIZE_STRING );
+		}
+
+		if ( $values ) {
+			return update_post_meta( $post_id, self::EVENT_METADATA_KEY, $values );
+		} else {
+			return delete_post_meta( $post_id, self::EVENT_METADATA_KEY );
 		}
 
 		return false;
+	}
+
+	/**
+	 * Save slack channel metadata.
+	 *
+	 * @param  int   $post_id  Post ID.
+	 * @return bool            Boolean true if successful update, false on failure.
+	 */
+	public static function save_slack_metadata( $post_id ) {
+		$slack_channel = filter_input( INPUT_POST, self::METADATA_SLACK_CHANNEL, FILTER_SANITIZE_STRING );
+
+		if ( $slack_channel ) {
+			return update_post_meta( $post_id, self::METADATA_SLACK_CHANNEL, $slack_channel );
+		} else {
+			return delete_post_meta( $post_id, self::METADATA_SLACK_CHANNEL );
+		}
 	}
 
 	/**
@@ -199,7 +204,8 @@ class WPCOM_Liveblog_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_event_metadata( $post_id ) {
-		$meta     = get_post_meta( $post_id, self::METADATA_KEY, true );
+		$meta     = get_post_meta( $post_id, self::EVENT_METADATA_KEY, true );
+
 		$start    = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : '';
 		$end      = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : '';
 		$url      = isset( $meta[ self::METADATA_EVENT_URL ] ) ? $meta[ self::METADATA_EVENT_URL ] : '';
@@ -223,8 +229,7 @@ class WPCOM_Liveblog_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_slack_metadata( $post_id ) {
-		$meta  = get_post_meta( $post_id, self::METADATA_KEY, true );
-		$slack = isset( $meta[ self::METADATA_SLACK_CHANNEL ] ) ? $meta[ self::METADATA_SLACK_CHANNEL ] : '';
+		$slack  = get_post_meta( $post_id, self::METADATA_SLACK_CHANNEL, true );
 
 		echo '<hr>';
 		self::print_text_field( self::METADATA_SLACK_CHANNEL, 'text', 'Slack Channel ID', $slack );
@@ -238,7 +243,7 @@ class WPCOM_Liveblog_Metadata {
 	 * @return array              An array of metadata.
 	 */
 	public static function liveblog_append_metadata( $metadata, $post ) {
-		$meta = get_post_meta( $post->ID, self::METADATA_KEY, true );
+		$meta = get_post_meta( $post->ID, self::EVENT_METADATA_KEY, true );
 
 		if ( ! $meta ) {
 			return $metadata;

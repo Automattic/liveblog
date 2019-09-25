@@ -8,9 +8,12 @@ import * as userActions from '../actions/userActions';
 
 class PaginationContainer extends Component {
   render() {
-    const { page, pages, getEntriesPaginated, paginationType, isLoading, autoLoad } = this.props;
+    const { page, pages, getEntriesPaginated, paginationType, isLoading, autoLoad, entries } = this.props;
 
-    if (paginationType === 'loadMore') {
+      if (!entries.length > 0) return null;
+
+
+      if (paginationType === 'loadMore') {
       return (
         <span>
           <ScrollTrigger
@@ -138,6 +141,7 @@ PaginationContainer.propTypes = {
   paginationType: PropTypes.string,
   autoLoad: PropTypes.string,
   isLoading: PropTypes.bool,
+  entries: PropTypes.array,
 };
 
 const mapStateToProps = state => ({
