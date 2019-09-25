@@ -54,13 +54,13 @@
   background: darken($color-primary, 10%);
 }
 
-.liveblog-btn-status{
+.liveblog-btn-status {
   margin-right: .5rem;
   background: $color-blue;
   color: #fff;
 }
 
-.liveblog-btn-status.publish{
+.liveblog-btn-status.publish {
   background: $color-green;
 }
 
@@ -70,7 +70,7 @@
   border: none;
 }
 
-.liveblog-btn-edit{
+.liveblog-btn-edit {
   background: $color-grey-mid-dark;
   color: #fff;
 }
