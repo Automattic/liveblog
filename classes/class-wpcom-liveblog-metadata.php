@@ -232,7 +232,8 @@ class WPCOM_Liveblog_Metadata {
 		$slack  = get_post_meta( $post_id, self::METADATA_SLACK_CHANNEL, true );
 
 		echo '<hr>';
-		self::print_text_field( self::METADATA_SLACK_CHANNEL, 'text', 'Slack Channel ID', $slack );
+		echo '<p><b>Slack</b></p>';
+		self::print_text_field( self::METADATA_SLACK_CHANNEL, 'text', 'Channel ID', $slack );
 	}
 
 	/**
