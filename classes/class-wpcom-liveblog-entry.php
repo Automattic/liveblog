@@ -626,7 +626,7 @@ class WPCOM_Liveblog_Entry {
 
 			if ( ! empty( $only_status ) && $only_status === $entry->status ) {
 				$entries[] = $entry;
-			} else {
+			} elseif ( empty( $only_status ) ) {
 				$entries[] = $entry;
 			}
 		}
