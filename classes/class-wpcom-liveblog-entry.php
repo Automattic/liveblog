@@ -609,6 +609,7 @@ class WPCOM_Liveblog_Entry {
 		$entries         = [];
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
+		$only_status     = apply_filters( 'liveblog_updated_entry_status', '' );
 
 		if ( empty( $updated_entries ) ) {
 			return $entries;
@@ -623,7 +624,11 @@ class WPCOM_Liveblog_Entry {
 				continue;
 			}
 
-			$entries[] = $entry;
+			if ( ! empty( $only_status ) && $only_status === $entry->status ) {
+				$entries[] = $entry;
+			} else {
+				$entries[] = $entry;
+			}
 		}
 
 		return $entries;

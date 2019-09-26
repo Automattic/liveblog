@@ -204,7 +204,7 @@ class WPCOM_Liveblog_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_event_metadata( $post_id ) {
-		$meta     = get_post_meta( $post_id, self::EVENT_METADATA_KEY, true );
+		$meta = get_post_meta( $post_id, self::EVENT_METADATA_KEY, true );
 
 		$start    = isset( $meta[ self::METADATA_START_TIME ] ) ? $meta[ self::METADATA_START_TIME ] : '';
 		$end      = isset( $meta[ self::METADATA_END_TIME ] ) ? $meta[ self::METADATA_END_TIME ] : '';
@@ -229,7 +229,7 @@ class WPCOM_Liveblog_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_slack_metadata( $post_id ) {
-		$slack  = get_post_meta( $post_id, self::METADATA_SLACK_CHANNEL, true );
+		$slack = get_post_meta( $post_id, self::METADATA_SLACK_CHANNEL, true );
 
 		echo '<hr>';
 		echo '<p><b>Slack</b></p>';
