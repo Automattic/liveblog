@@ -121,7 +121,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-helpers.php';
 			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php';
