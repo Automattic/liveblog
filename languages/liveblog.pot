@@ -12,52 +12,6 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:281
-msgctxt "taxonomy general name"
-msgid "Hashtags"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:282
-msgctxt "taxonomy singular name"
-msgid "Hashtag"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:283
-msgid "Search Hashtags"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:284
-msgid "All Hashtags"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:285
-msgid "Parent Hashtag"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:286
-msgid "Parent Hashtag:"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:287
-msgid "Edit Hashtag"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:288
-msgid "Update Hashtag"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:289
-msgid "Add New Hashtag"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:290
-msgid "New Hashtag"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:291
-msgid "Hashtags"
-msgstr ""
-
 #: classes/class-wpcom-liveblog-entry-key-events-widget.php:33
 msgid ""
 "A list of key events displayed when the user is viewing a Liveblog post."
