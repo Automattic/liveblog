@@ -221,14 +221,6 @@ class EditorContainer extends Component {
     });
   }
 
-  filterEmojiSuggestions(suggestions, filter) {
-    this.setState({
-      suggestions: suggestions.filter(item =>
-        item.key.toString().substring(0, filter.length) === filter,
-      ),
-    });
-  }
-
   handleOnSearch(trigger, text) {
     const { config } = this.props;
 
@@ -241,9 +233,6 @@ class EditorContainer extends Component {
         break;
       case '/':
         this.filterCommandSuggestions(config.autocomplete[0].data, text);
-        break;
-      case ':':
-        this.filterEmojiSuggestions(config.autocomplete[1].data, text);
         break;
       default:
         this.setState({ suggestions: [] });

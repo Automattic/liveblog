@@ -27,7 +27,6 @@ import keyBindingFunc from './keyBindings/keyBindingFunc';
 import addAutocomplete from './modifiers/addAutocomplete';
 import addAtomicBlock from './modifiers/addAtomicBlock';
 import moveBlock from './modifiers/moveBlock';
-import skipOverEntity from './modifiers/skipOverEntity';
 import addNewLine from './modifiers/addNewLine';
 
 import blockRenderer from './blocks/blockRenderer';
@@ -72,16 +71,6 @@ class EditorWrapper extends Component {
 
     // Wait until the state has been updated.
     setTimeout(() => {
-      // Fix for selection getting 'stuck' in emoji as you have to pass through each character.
-      const entity = hasEntityAtSelection(editorState);
-      if (entity) {
-        if (entity.getType() === ':') {
-          onChange(
-            skipOverEntity(editorState, entity),
-          );
-        }
-      }
-
       // Check for any triggers.
       const autocompleteState = this.getAutocompleteState();
       // Prevent any bugs from happing when two commands are inputted next to each other.
