@@ -37,11 +37,9 @@
     font-weight: bold;
     font-size: 13px;
     font-family: sans-serif;
-    .liveblog-btn {
-      margin-right: .5rem;
-      &::last-child {
-        margin-right: 0;
-      }
+    margin-right: .5rem;
+    &::last-child {
+      margin-right: 0;
     }
   }
 }
