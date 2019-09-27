@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import 'draft-js/dist/Draft.css';
 
 import {
-  Editor,
   RichUtils,
 } from 'draft-js';
 
@@ -22,16 +21,11 @@ import {
 import upArrowBinding from './keyBindings/upArrow';
 import downArrowBinding from './keyBindings/downArrow';
 import returnBinding from './keyBindings/returnBinding';
-import keyBindingFunc from './keyBindings/keyBindingFunc';
 
 import addAutocomplete from './modifiers/addAutocomplete';
 import addAtomicBlock from './modifiers/addAtomicBlock';
 import moveBlock from './modifiers/moveBlock';
 import addNewLine from './modifiers/addNewLine';
-
-import blockRenderer from './blocks/blockRenderer';
-import Toolbar from './Toolbar';
-import Suggestions from './Suggestions';
 
 class EditorWrapper extends Component {
   constructor(props) {
@@ -301,17 +295,8 @@ class EditorWrapper extends Component {
   }
 
   render() {
-    const { autocompleteState } = this.state;
-
     const {
       editorState,
-      onChange,
-      suggestions,
-      onSearch,
-      readOnly,
-      setReadOnly,
-      handleImageUpload,
-      defaultImageSize,
       editorContainer,
       clearAuthors,
       clearHeadline,

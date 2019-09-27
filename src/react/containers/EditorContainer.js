@@ -123,8 +123,6 @@ class EditorContainer extends Component {
     const content = this.getContent();
     const authorIds = authors ? authors.map(author => author.id) : [];
     const headline = this.state.headline;
-    const htmlregex = /<(img|picture|video|audio|canvas|svg|iframe|embed) ?.*>/;
-
 
     if (isEditing) {
       updateEntry({

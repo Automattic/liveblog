@@ -43,9 +43,6 @@ class AppContainer extends Component {
   }
 
   render() {
-    const { page, loading, entries, polling, mergePolling, config, total } = this.props;
-    const paginationTypeLoadMore = config.paginationType === 'loadMore';
-    const canEdit = config.is_liveblog_editable === '1';
     const { loading, entries, polling, mergePolling, config, total } = this.props;
     const isAdmin = config.is_admin;
 
