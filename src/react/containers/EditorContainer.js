@@ -15,7 +15,7 @@ import { EditorState, ContentState } from 'draft-js';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 
-import { getAuthors, getHashtags, uploadImage } from '../services/api';
+import { getAuthors, uploadImage } from '../services/api';
 
 import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
@@ -203,16 +203,6 @@ class EditorContainer extends Component {
       }));
   }
 
-  getHashtags(text) {
-    const { config } = this.props;
-    getHashtags(text, config)
-      .timeout(10000)
-      .map(res => res.response)
-      .subscribe(res => this.setState({
-        suggestions: res.map(hashtag => hashtag),
-      }));
-  }
-
   filterCommandSuggestions(suggestions, filter) {
     this.setState({
       suggestions: suggestions.filter(item =>
@@ -227,9 +217,6 @@ class EditorContainer extends Component {
     switch (trigger) {
       case '@':
         this.getAuthors(text);
-        break;
-      case '#':
-        this.getHashtags(text);
         break;
       case '/':
         this.filterCommandSuggestions(config.autocomplete[0].data, text);
