@@ -29,15 +29,19 @@
 
 .liveblog-entry-tools {
   margin-top: 1rem;
-  margin-left: 1rem;
-}
+  margin-left: 7.5px;
+  margin-bottom: 10px;
+  clear: both;
 
-.liveblog-entry-tools .liveblog-btn {
-  margin-right: .5rem;
-}
-
-.liveblog-entry-tools .liveblog-btn:last-child {
-  margin-right: 0;
+  .liveblog-btn {
+    font-weight: bold;
+    font-size: 13px;
+    font-family: sans-serif;
+    margin-right: .5rem;
+    &::last-child {
+      margin-right: 0;
+    }
+  }
 }
 
 .liveblog-entry .type-key {
