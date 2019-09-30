@@ -139,7 +139,9 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 				if ( $new_entry_id ) {
 					WP_CLI::line( 'Inserted live blog comment ID ' . $lb_comment->comment_ID . ' as post ID ' . $new_entry_id );
 
-					$coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
+					if ( $authors ) {
+						$coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
+					}
 
 					if ( $livepress_id ) {
 						update_post_meta( $new_entry_id, 'livepress_id', $livepress_id );
