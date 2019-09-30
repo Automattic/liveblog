@@ -94,6 +94,11 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 		}
 		$comment_ids_to_skip_string = join( ', ', $comment_ids_to_skip );
 
+		// avoid generate NOT IN (), which is invalid SQL
+		if ( ! $comment_ids_to_skip_string ) {
+			$comment_ids_to_skip_string = '-1';
+		}
+
 		$live_blog_comments = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT comment_ID, comment_content, comment_date, comment_date_gmt
