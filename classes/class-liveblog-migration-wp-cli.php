@@ -145,7 +145,8 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 					WP_CLI::line( 'Inserted live blog comment ID ' . $lb_comment->comment_ID . ' as post ID ' . $new_entry_id );
 
 					if ( $authors ) {
-						$coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
+						$result = $coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
+						WP_CLI::line( 'Added authors for comment ' . $lb_comment->comment_ID . ' (post ' . $new_entry_id .') are ' . join( ',', $authors ) );
 					}
 
 					if ( $livepress_id ) {
@@ -163,6 +164,10 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 					}
 				} else {
 					WP_CLI::error( 'Failed to create post for liveblog comment ID ' . $lb_comment->comment_ID );
+				}
+			} else {
+				if ( $authors ) {
+					WP_CLI::line( 'Authors for comment ' . $lb_comment->comment_ID . ' are ' . join( ',', $authors ) );
 				}
 			}
 
