@@ -21,7 +21,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_status='publish'",
+				"SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_parent=0 AND post_status='publish'",
 				self::$cpt_slug
 			)
 		);
