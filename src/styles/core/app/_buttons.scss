@@ -12,7 +12,6 @@
   box-sizing: border-box; /* 2 */
   display: inline-block;
   vertical-align: middle;
-  font: inherit;
   line-height: normal; /* 3 */
   text-align: center;
   text-decoration: none;
@@ -30,7 +29,6 @@
 }
 
 .liveblog-btn-small {
-  font-size: .8rem;
   padding: .5rem 1rem;
 }
 
@@ -55,7 +53,6 @@
 }
 
 .liveblog-btn-status {
-  margin-right: .5rem;
   background: $color-blue;
   color: #fff;
 }

@@ -56,7 +56,7 @@
 		</header>
 
 		<div class="liveblog-entry-content">
-			<?php echo wp_kses_post( $this->get( 'content' ) ); ?>
+			<?php echo $this->get( 'content' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 			<?php if ( $single ) : ?>
 				<a href="<?php echo esc_url( $share_link ); ?>">View in feed</a>
