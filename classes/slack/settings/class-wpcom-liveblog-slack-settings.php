@@ -11,11 +11,11 @@ class WPCOM_Liveblog_Slack_Settings {
 	const SETTINGS = [
 		'signing_secret'        => [
 			'label' => 'Signing Secret',
-			'type'  => 'password',
+			'type'  => 'text',
 		],
 		'oauth_access_token'    => [
 			'label' => 'OAuth Access Token',
-			'type'  => 'password',
+			'type'  => 'text',
 		],
 		'enable_event_endpoint' => [
 			'label'       => 'Enable Event Endpoint',
