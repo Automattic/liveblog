@@ -186,7 +186,7 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
-		// Remove the filter as its causing amp pages to crash
+		// Remove the filter as it's causing amp pages to crash
 		if ( function_exists( 'amp_activate' ) && is_amp_endpoint() ) {
 			remove_filter( 'the_content', [ 'WPCOM_Liveblog_AMP', 'append_liveblog_to_content' ], 7 );
 		}
