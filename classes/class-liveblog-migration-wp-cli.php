@@ -176,6 +176,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 		if ( ! $dry_run ) {
 			WP_CLI::success( 'Converted live blog ID ' . $liveblog_id );
+			wp_cache_flush();
 		}
 	}
 
@@ -224,7 +225,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 				]
 			);
 
-			if ( 0 === $blog_count % 100 ) {
+			if ( 0 === $blog_count % 5 ) {
 				WP_CLI::line( 'sleeping' );
 				$this->stop_the_insanity();
 				sleep( 5 );
