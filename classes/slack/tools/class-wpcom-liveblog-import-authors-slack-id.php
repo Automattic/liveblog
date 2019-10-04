@@ -123,12 +123,15 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 					$file = get_attached_file( self::$file_id );
 					set_time_limit( 0 );
 					$users = self::import( $file );
-					printf( '<p>%s users were assigned a Slack ID!</p>', count( $users ) );
-					echo '<ol>';
-					foreach ( $users as $user ) {
-						printf( '<li>%s</li>', wp_kses_post( $user ) );
+					$user_count = $users ? count( $users ) : 0;
+					printf( '<p>%s users were assigned a Slack ID!</p>', $user_count );
+					if ( $user_count ) {
+						echo '<ol>';
+						foreach ( $users as $user ) {
+							printf( '<li>%s</li>', wp_kses_post( $user ) );
+						}
+						echo '</ol>';
 					}
-					echo '</ol>';
 					break;
 			}
 			?>
