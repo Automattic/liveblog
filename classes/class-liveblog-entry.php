@@ -180,8 +180,8 @@ class Liveblog_Entry {
 
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
-				$Liveblog_entry_embed = new Liveblog_Entry_Embed();
-				$content                    = $Liveblog_entry_embed->autoembed( $content, $entry );
+				$liveblog_entry_embed = new Liveblog_Entry_Embed();
+				$content              = $liveblog_entry_embed->autoembed( $content, $entry );
 			}
 			$content = do_shortcode( $content );
 		}
