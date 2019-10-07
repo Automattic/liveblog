@@ -146,7 +146,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 					if ( $authors ) {
 						$result = $coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
-						WP_CLI::line( 'Added authors for comment ' . $lb_comment->comment_ID . ' (post ' . $new_entry_id .') are ' . join( ',', $authors ) );
+						WP_CLI::line( 'Added authors for comment ' . $lb_comment->comment_ID . ' (post ' . $new_entry_id . ') are ' . join( ',', $authors ) );
 					}
 
 					if ( $livepress_id ) {
