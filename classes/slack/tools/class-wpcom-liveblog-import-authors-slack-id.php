@@ -63,8 +63,8 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 	 * @return array
 	 */
 	public static function import( $file ) {
-		$rows     = [];
-		$row      = 1;
+		$rows = [];
+		$row  = 1;
 
 		$csv_content = array_map( 'str_getcsv', file( $file ) );
 
@@ -118,7 +118,7 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 					self::handle_upload();
 					$file = get_attached_file( self::$file_id );
 					set_time_limit( 0 );
-					$users = self::import( $file );
+					$users      = self::import( $file );
 					$user_count = $users ? count( $users ) : 0;
 					printf( '<p>%s users were assigned a Slack ID!</p>', $user_count );
 					if ( $user_count ) {

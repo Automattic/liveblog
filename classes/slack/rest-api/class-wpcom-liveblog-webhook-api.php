@@ -379,7 +379,9 @@ class WPCOM_Liveblog_Webhook_API {
 	}
 
 	/**
-	 * Return liveblog by channel id
+	 * Return liveblog by channel id. By default this will only look for liveblogs with the post status
+	 * of publish or private. Draft, password and scheduled post statuses can be added by using the
+	 * `liveblog_slack_channel_id_lookup_statuses` filter.
 	 *
 	 * @param $channel_id
 	 *
@@ -393,10 +395,18 @@ class WPCOM_Liveblog_Webhook_API {
 			return $channel;
 		}
 
+		/**
+		 * Filter the post statuses that will be used to do a liveblog lookup by channel id;
+		 *
+		 * @param array The post statuses that will be passed to WP_Query
+		 * @param string $channel_id The Channel id used to lookup a liveblog
+		 */
+		$post_status = apply_filters( 'liveblog_slack_channel_id_lookup_statuses', [ 'publish', 'private' ], $channel_id );
+
 		$channel = new WP_Query(
 			[
 				'posts_per_page' => 1,
-				'post_status'    => 'publish',
+				'post_status'    => $post_status,
 				'fields'         => 'ids',
 				'post_type'      => 'fte_liveblog',
 				'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
