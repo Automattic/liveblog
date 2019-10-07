@@ -150,7 +150,7 @@ class TinyMCEEditor extends Component {
   }
 
   render() {
-    return <textarea className="liveblog-editor-textarea" id={this.containerId} />;
+    return <textarea className="liveblog-editor-textarea wp-editor-area" id={this.containerId} />;
   }
 }
 
