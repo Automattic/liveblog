@@ -23,7 +23,7 @@ class Liveblog_CPT {
 		add_action( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
 		add_filter( 'parse_query', [ __CLASS__, 'hierarchical_posts_filter' ] );
 
-		self::$cpt_slug = apply_filters( 'Liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
+		self::$cpt_slug = apply_filters( 'liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
 
 		return register_post_type(
 			self::$cpt_slug,
