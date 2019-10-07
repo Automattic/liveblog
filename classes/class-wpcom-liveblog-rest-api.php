@@ -712,6 +712,13 @@ class WPCOM_Liveblog_Rest_Api {
 			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
 			if ( in_array( $status, $allowed_status, true ) ) {
 				$args['post_status'] = $status;
+
+				add_filter(
+					'liveblog_updated_entry_status',
+					function ( $entry_status ) use ( $status ) {
+						return $status;
+					}
+				);
 			} else {
 				$args['post_status'] = $allowed_status;
 			}

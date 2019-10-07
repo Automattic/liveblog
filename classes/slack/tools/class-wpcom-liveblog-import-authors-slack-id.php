@@ -56,48 +56,44 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 
 	/**
 	 * Open CSV and import the slack ids
+	 * format: user_id, user_type, user_name, email, slack_id
 	 *
 	 * @param $file
 	 *
 	 * @return array
 	 */
 	public static function import( $file ) {
-		$rows     = [];
-		$row      = 1;
-		$csv_file = file( $file );
+		$rows = [];
+		$row  = 1;
 
-		if ( false !== $csv_file ) {
-			$csv_content = str_getcsv( $csv_file[0], "\r" );
-			$csv_content = array_map( 'str_getcsv', $csv_content );
+		$csv_content = array_map( 'str_getcsv', file( $file ) );
 
-			foreach ( $csv_content as  $data ) {
-				//Skip header
-				if ( 1 === $row ) {
-					$row ++;
-					continue;
-				}
-
-				$user_id   = (int) $data[0];
-				$user_type = $data[1];
-				$user_name = $data[2];
-				$slack_id  = $data[4];
-
-				// Skip user if slack id column is empty
-				if ( empty( $slack_id ) ) {
-					continue;
-				}
-
-				if ( 'Contributor' === $user_type && 'guest-author' === get_post_type( $user_id ) ) {
-					update_post_meta( $user_id, 'cap-' . WPCOM_Liveblog_Author_Settings::SETTING_META, $slack_id );
-					$rows[] = sprintf( '<a href="%s">%s (%s)</a>', esc_url( get_edit_post_link( $user_id ) ), esc_html( $user_name ), esc_html( $slack_id ) );
-				} elseif ( get_user_by( 'ID', $user_id ) ) {
-					update_user_meta( $user_id, WPCOM_Liveblog_Author_Settings::SETTING_META, $slack_id ); //phpcs:ignore WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta
-					$rows[] = sprintf( '<a href="%s">%s (%s)</a>', esc_url( get_edit_user_link( $user_id ) ), esc_html( $user_name ), esc_html( $slack_id ) );
-				}
+		foreach ( $csv_content as $data ) {
+			// Skip header
+			if ( 1 === $row++ ) {
+				continue;
 			}
 
-			return $rows;
+			$user_id   = (int) $data[0];
+			$user_type = $data[1];
+			$user_name = $data[2];
+			$slack_id  = $data[4];
+
+			// Skip user if slack id column is empty
+			if ( empty( $slack_id ) ) {
+				continue;
+			}
+
+			if ( 'Contributor' === $user_type && 'guest-author' === get_post_type( $user_id ) ) {
+				update_post_meta( $user_id, 'cap-' . WPCOM_Liveblog_Author_Settings::SETTING_META, $slack_id );
+				$rows[] = sprintf( '<a href="%s">%s (%s)</a>', esc_url( get_edit_post_link( $user_id ) ), esc_html( $user_name ), esc_html( $slack_id ) );
+			} elseif ( get_user_by( 'ID', $user_id ) ) {
+				update_user_meta( $user_id, WPCOM_Liveblog_Author_Settings::SETTING_META, $slack_id ); //phpcs:ignore WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta
+				$rows[] = sprintf( '<a href="%s">%s (%s)</a>', esc_url( get_edit_user_link( $user_id ) ), esc_html( $user_name ), esc_html( $slack_id ) );
+			}
 		}
+
+		return $rows;
 	}
 
 	/**
@@ -122,13 +118,16 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 					self::handle_upload();
 					$file = get_attached_file( self::$file_id );
 					set_time_limit( 0 );
-					$users = self::import( $file );
-					printf( '<p>%s users were assigned a Slack ID!</p>', count( $users ) );
-					echo '<ol>';
-					foreach ( $users as $user ) {
-						printf( '<li>%s</li>', wp_kses_post( $user ) );
+					$users      = self::import( $file );
+					$user_count = $users ? count( $users ) : 0;
+					printf( '<p>%s users were assigned a Slack ID!</p>', $user_count );
+					if ( $user_count ) {
+						echo '<ol>';
+						foreach ( $users as $user ) {
+							printf( '<li>%s</li>', wp_kses_post( $user ) );
+						}
+						echo '</ol>';
 					}
-					echo '</ol>';
 					break;
 			}
 			?>

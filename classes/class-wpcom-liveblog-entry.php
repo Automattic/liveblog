@@ -186,7 +186,7 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
-		// Remove the filter as its causing amp pages to crash
+		// Remove the filter as it's causing amp pages to crash
 		if ( function_exists( 'amp_activate' ) && is_amp_endpoint() ) {
 			remove_filter( 'the_content', [ 'WPCOM_Liveblog_AMP', 'append_liveblog_to_content' ], 7 );
 		}
@@ -609,6 +609,7 @@ class WPCOM_Liveblog_Entry {
 		$entries         = [];
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
+		$selected_status = apply_filters( 'liveblog_updated_entry_status', '' );
 
 		if ( empty( $updated_entries ) ) {
 			return $entries;
@@ -623,7 +624,11 @@ class WPCOM_Liveblog_Entry {
 				continue;
 			}
 
-			$entries[] = $entry;
+			if ( ! empty( $selected_status ) && $selected_status === $entry->status ) {
+				$entries[] = $entry;
+			} elseif ( empty( $selected_status ) ) {
+				$entries[] = $entry;
+			}
 		}
 
 		return $entries;
