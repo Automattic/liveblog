@@ -112,38 +112,38 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Include the necessary files
 		 */
 		private static function includes() {
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cpt.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-key-events-widget.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-helpers.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-lazyloader.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-metadata.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-socketio-loader.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp.php';
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-amp-template.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-cpt.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-query.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-key-events.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-key-events-widget.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-extend.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-extend-feature.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-extend-feature-commands.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-extend-feature-authors.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-helpers.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-lazyloader.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-metadata.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio-loader.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-embed.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-entry-embed-sdks.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-amp.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-amp-template.php';
 
-			require dirname( __FILE__ ) . '/classes/slack/async/class-wp-async-task.php';
-			require dirname( __FILE__ ) . '/classes/slack/async/class-wpcom-liveblog-slack-process-entry-async-task.php';
-			require dirname( __FILE__ ) . '/classes/slack/settings/class-wpcom-liveblog-slack-settings.php';
-			require dirname( __FILE__ ) . '/classes/slack/settings/class-wpcom-liveblog-author-settings.php';
-			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-wpcom-liveblog-webhook-api.php';
-			require dirname( __FILE__ ) . '/classes/slack/rest-api/class-wpcom-liveblog-slash-command-api.php';
-			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-export-authors.php';
-			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-import-authors-slack-id.php';
-			require dirname( __FILE__ ) . '/classes/slack/tools/class-wpcom-liveblog-markdown-parser.php';
-			require dirname( __FILE__ ) . '/classes/slack/class-wpcom-liveblog-slack.php';
+			require dirname( __FILE__ ) . '/slack/async/class-wp-async-task.php';
+			require dirname( __FILE__ ) . '/slack/async/class-wpcom-liveblog-slack-process-entry-async-task.php';
+			require dirname( __FILE__ ) . '/slack/settings/class-wpcom-liveblog-slack-settings.php';
+			require dirname( __FILE__ ) . '/slack/settings/class-wpcom-liveblog-author-settings.php';
+			require dirname( __FILE__ ) . '/slack/rest-api/class-wpcom-liveblog-webhook-api.php';
+			require dirname( __FILE__ ) . '/slack/rest-api/class-wpcom-liveblog-slash-command-api.php';
+			require dirname( __FILE__ ) . '/slack/tools/class-wpcom-liveblog-export-authors.php';
+			require dirname( __FILE__ ) . '/slack/tools/class-wpcom-liveblog-import-authors-slack-id.php';
+			require dirname( __FILE__ ) . '/slack/tools/class-wpcom-liveblog-markdown-parser.php';
+			require dirname( __FILE__ ) . '/slack/class-wpcom-liveblog-slack.php';
 
 
 			if ( self::use_rest_api() ) {
-				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-rest-api.php';
+				require dirname( __FILE__ ) . '/class-wpcom-liveblog-rest-api.php';
 			}
 
 			// Manually include ms.php theme-side in multisite environments because
@@ -153,11 +153,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
-				require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-wp-cli.php';
-				require dirname( __FILE__ ) . '/classes/class-liveblog-migration-wp-cli.php';
+				require dirname( __FILE__ ) . '/class-wpcom-liveblog-wp-cli.php';
+				require dirname( __FILE__ ) . '/class-liveblog-migration-wp-cli.php';
 			}
 
-			require dirname( __FILE__ ) . '/classes/class-wpcom-liveblog-cron.php';
+			require dirname( __FILE__ ) . '/class-wpcom-liveblog-cron.php';
 		}
 
 		/**
