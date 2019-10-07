@@ -587,3 +587,14 @@ In order to publish to liveblog from slack a slack app will need to be created. 
 1. In WordPress, go Live Blog > Slack Settings
 1. Paste into the OAuth Access Token field.
 1. Click Save Settings
+
+**User profile updates**
+1. Go to https://mydomain.slack.com/admin
+1. Click the cloud icon ("Download a CSV member list")
+1. In WordPress, go to Slack Settings
+1. Click Export Users
+1. Using a text editor or spreadsheet, edit author-export-yyyy-mm-dd.csv. Add the Slack userids found in slack-mydomain-members.csv. Skip the `WP User` rows, filling in only the `Contributor` rows
+1. In WordPress, go to Tools > Import
+1. Under "Liveblog Slack Author IDs," click "Run Importer"
+1. Click "Choose File" and select author-export-yyyy-mm-dd.csv
+1. Click "Upload file and import"
