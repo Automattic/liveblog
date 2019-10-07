@@ -10,7 +10,7 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 		wp_delete_comment( 1, true );
-		$this->entry_query = new WPCOM_Liveblog_Entry_Query( 5, 'baba' );
+		$this->entry_query = new Liveblog_Entry_Query( 5, 'baba' );
 	}
 
 	public function test_get_latest_should_return_null_if_no_comments() {
@@ -61,24 +61,24 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	public function test_remove_replaced_entries_should_remove_entries_replacing_other_entries() {
 		$entries = [];
 
-		$entries[0] = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1 ] );
+		$entries[0] = new Liveblog_Entry( (object) [ 'comment_ID' => 1 ] );
 
-		$entries[1]           = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1000 ] );
+		$entries[1]           = new Liveblog_Entry( (object) [ 'comment_ID' => 1000 ] );
 		$entries[1]->replaces = 1;
 
-		$filtered_entries = WPCOM_Liveblog_Entry_Query::remove_replaced_entries( $entries );
+		$filtered_entries = Liveblog_Entry_Query::remove_replaced_entries( $entries );
 		$this->assertEquals( [ 1 ], $this->get_ids_from_entries( $filtered_entries ) );
 	}
 
 	public function test_remove_replaced_entries_should_not_remove_entries_replacing_non_existing_entries() {
 		$entries = [];
 
-		$entries[0] = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1 ] );
+		$entries[0] = new Liveblog_Entry( (object) [ 'comment_ID' => 1 ] );
 
-		$entries[1]           = new WPCOM_Liveblog_Entry( (object) [ 'comment_ID' => 1000 ] );
+		$entries[1]           = new Liveblog_Entry( (object) [ 'comment_ID' => 1000 ] );
 		$entries[1]->replaces = 999;
 
-		$filtered_entries = WPCOM_Liveblog_Entry_Query::remove_replaced_entries( $entries );
+		$filtered_entries = Liveblog_Entry_Query::remove_replaced_entries( $entries );
 		$this->assertEquals( [ 1, 1000 ], $this->get_ids_from_entries( $filtered_entries ) );
 	}
 

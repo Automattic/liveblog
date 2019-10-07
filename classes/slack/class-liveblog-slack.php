@@ -1,7 +1,7 @@
 <?php
 
 
-class WPCOM_Liveblog_Slack {
+class Liveblog_Slack {
 
 	const REFRESH_INTERVAL = 5;
 
@@ -10,13 +10,13 @@ class WPCOM_Liveblog_Slack {
 	 */
 	public static function init() {
 
-		new WPCOM_Liveblog_Slack_Process_Entry_Async_Task();
+		new Liveblog_Slack_Process_Entry_Async_Task();
 
-		WPCOM_Liveblog_Slack_Settings::hooks();
-		WPCOM_Liveblog_Author_Settings::hooks();
-		WPCOM_Liveblog_Webhook_API::hooks();
-		WPCOM_Liveblog_Slash_Command_API::hooks();
-		WPCOM_Liveblog_Import_Authors_Slack_ID::hooks();
+		Liveblog_Slack_Settings::hooks();
+		Liveblog_Author_Settings::hooks();
+		Liveblog_Webhook_API::hooks();
+		Liveblog_Slash_Command_API::hooks();
+		Liveblog_Import_Authors_Slack_ID::hooks();
 
 		if ( 'production' !== VIP_GO_ENV ) {
 			add_filter( 'restricted_site_access_is_restricted', [ __CLASS__, 'whitelist_slack_endpoint' ], 10, 2 );
@@ -56,6 +56,6 @@ class WPCOM_Liveblog_Slack {
 	}
 }
 
-add_action( 'init', [ __NAMESPACE__ . 'WPCOM_Liveblog_Slack', 'init' ] );
+add_action( 'init', [ __NAMESPACE__ . 'Liveblog_Slack', 'init' ] );
 
-add_action( 'wp_async_slack_process_entry', [ 'WPCOM_Liveblog_Webhook_API', 'process_event' ] );
+add_action( 'wp_async_slack_process_entry', [ 'Liveblog_Webhook_API', 'process_event' ] );

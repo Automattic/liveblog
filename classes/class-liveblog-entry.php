@@ -3,7 +3,7 @@
 /**
  * Represents a liveblog entry
  */
-class WPCOM_Liveblog_Entry {
+class Liveblog_Entry {
 
 	const DEFAULT_AVATAR_SIZE = 30;
 
@@ -56,7 +56,7 @@ class WPCOM_Liveblog_Entry {
 
 
 	public static function from_post( $post ) {
-		$entry = new WPCOM_Liveblog_Entry( $post );
+		$entry = new Liveblog_Entry( $post );
 		return $entry;
 	}
 
@@ -180,15 +180,15 @@ class WPCOM_Liveblog_Entry {
 
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
-				$wpcom_liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
-				$content                    = $wpcom_liveblog_entry_embed->autoembed( $content, $entry );
+				$Liveblog_entry_embed = new Liveblog_Entry_Embed();
+				$content                    = $Liveblog_entry_embed->autoembed( $content, $entry );
 			}
 			$content = do_shortcode( $content );
 		}
 
 		// Remove the filter as its causing amp pages to crash
 		if ( function_exists( 'amp_activate' ) && is_amp_endpoint() ) {
-			remove_filter( 'the_content', [ 'WPCOM_Liveblog_AMP', 'append_liveblog_to_content' ], 7 );
+			remove_filter( 'the_content', [ 'Liveblog_AMP', 'append_liveblog_to_content' ], 7 );
 		}
 
 		self::$rendered_content[ $entry->ID ] = apply_filters( 'the_content', $content );
@@ -200,7 +200,7 @@ class WPCOM_Liveblog_Entry {
 	 * Inserts a new entry
 	 *
 	 * @param array $args The entry properties: content, post_id, user (current user object)
-	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
+	 * @return Liveblog_Entry|WP_Error The newly inserted entry
 	 */
 	public static function insert( $args ) {
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
@@ -219,7 +219,7 @@ class WPCOM_Liveblog_Entry {
 	 * Updates an exsting entry
 	 *
 	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id
-	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 * @return Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function update( $args ) {
 
@@ -265,7 +265,7 @@ class WPCOM_Liveblog_Entry {
 	 * Inserts a new entry, which replaces the original entry.
 	 *
 	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object)
-	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 * @return Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
 	 */
 	public static function delete( $args ) {
 		if ( ! $args['entry_id'] ) {
@@ -296,7 +296,7 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
-		$args['content'] = WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
+		$args['content'] = Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
 
 		$entry = self::update( $args );
 		return $entry;
@@ -313,7 +313,7 @@ class WPCOM_Liveblog_Entry {
 				'post_parent'  => $args['post_id'],
 				'post_content' => $args['content'],
 				'post_title'   => $args['headline'],
-				'post_type'    => WPCOM_Liveblog_CPT::$cpt_slug,
+				'post_type'    => Liveblog_CPT::$cpt_slug,
 				'post_status'  => empty( $args['status'] ) ? self::$default_post_status : $args['status'],
 			]
 		);
@@ -404,7 +404,7 @@ class WPCOM_Liveblog_Entry {
 				);
 
 			}
-		} elseif ( empty( $args['author_id'] ) && WPCOM_Liveblog::is_author_required() ) {
+		} elseif ( empty( $args['author_id'] ) && Liveblog::is_author_required() ) {
 			return false;
 		}
 
@@ -436,7 +436,7 @@ class WPCOM_Liveblog_Entry {
 			'id'     => $user->ID,
 			'key'    => strtolower( $user->user_nicename ),
 			'name'   => $user->display_name,
-			'avatar' => WPCOM_Liveblog::get_avatar( $user->ID, $avatar_size ),
+			'avatar' => Liveblog::get_avatar( $user->ID, $avatar_size ),
 		];
 	}
 
@@ -481,8 +481,8 @@ class WPCOM_Liveblog_Entry {
 	 * @return string        Image src.
 	 */
 	public static function get_entry_first_image( $entry ) {
-		$entry_id      = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_id() : $entry->id;
-		$entry_content = ( $entry instanceof WPCOM_Liveblog_Entry ) ? $entry->get_content() : $entry->content;
+		$entry_id      = ( $entry instanceof Liveblog_Entry ) ? $entry->get_id() : $entry->id;
+		$entry_content = ( $entry instanceof Liveblog_Entry ) ? $entry->get_content() : $entry->content;
 		$key           = 'liveblog_entry_' . $entry_id . 'first_image';
 		$cached        = wp_cache_get( $key, 'liveblog' );
 
@@ -630,4 +630,4 @@ class WPCOM_Liveblog_Entry {
 	}
 }
 
-WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();
+Liveblog_Entry::generate_allowed_tags_for_entry();

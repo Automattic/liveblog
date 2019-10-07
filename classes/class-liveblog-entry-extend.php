@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Extend
+ * Class Liveblog_Entry_Extend
  *
  * This extends the entry box with an
  * autocomplete system.
  */
-class WPCOM_Liveblog_Entry_Extend {
+class Liveblog_Entry_Extend {
 
 	/**
 	 * Autocomplete settings
@@ -23,7 +23,7 @@ class WPCOM_Liveblog_Entry_Extend {
 	protected static $features = 'commands, authors';
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by Liveblog::load(),
 	 * it attaches the new command.
 	 */
 	public static function load() {
@@ -54,7 +54,7 @@ class WPCOM_Liveblog_Entry_Extend {
 		foreach ( self::$features as $name ) {
 
 			// Grab the class from what we expect the classname to be.
-			// WPCOM_Liveblog_Entry_Extend_Feature_{{ $name }}
+			// Liveblog_Entry_Extend_Feature_{{ $name }}
 			$class   = __CLASS__ . '_Feature_' . ucfirst( $name );
 			$feature = new $class();
 

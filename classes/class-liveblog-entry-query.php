@@ -3,7 +3,7 @@
 /**
  * Responsible for querying the Liveblog entries.
  */
-class WPCOM_Liveblog_Entry_Query {
+class Liveblog_Entry_Query {
 
 	public function __construct( $post_id, $key ) {
 		$this->post_id = $post_id;
@@ -14,15 +14,15 @@ class WPCOM_Liveblog_Entry_Query {
 	 * Query the database for specific liveblog entries
 	 *
 	 * @param array $args the same args for the core `get_posts()`.
-	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
+	 * @return array array of `Liveblog_Entry` objects with the found entries
 	 */
 	public function get( $args = [] ) {
 		$defaults = [
-			'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
+			'post_type'      => Liveblog_CPT::$cpt_slug,
 			'post_parent'    => $this->post_id,
 			'orderby'        => 'post_date_gmt',
 			'order'          => 'DESC',
-			'posts_per_page' => WPCOM_Liveblog::MAX_LAZY_LOAD_ENTRY_COUNT,
+			'posts_per_page' => Liveblog::MAX_LAZY_LOAD_ENTRY_COUNT,
 		];
 
 		$args = apply_filters( 'liveblog_query_args', wp_parse_args( $args, $defaults ) );
@@ -93,7 +93,7 @@ class WPCOM_Liveblog_Entry_Query {
 			return null;
 		}
 
-		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) ) {
+		if ( ! is_a( $latest, 'Liveblog_Entry' ) ) {
 			return null;
 		}
 
@@ -108,7 +108,7 @@ class WPCOM_Liveblog_Entry_Query {
 			return null;
 		}
 
-		if ( ! is_a( $latest, 'WPCOM_Liveblog_Entry' ) ) {
+		if ( ! is_a( $latest, 'Liveblog_Entry' ) ) {
 			return null;
 		}
 
@@ -172,7 +172,7 @@ class WPCOM_Liveblog_Entry_Query {
 			return null;
 		}
 
-		return array_map( [ 'WPCOM_Liveblog_Entry', 'from_post' ], $entries );
+		return array_map( [ 'Liveblog_Entry', 'from_post' ], $entries );
 	}
 
 	public static function assoc_array_by_id( $entries ) {
@@ -191,7 +191,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param int $max_timestamp Maximum timestamp for the Liveblog entries.
 	 * @param int $min_timestamp Minimum timestamp for the Liveblog entries.
 	 *
-	 * @return WPCOM_Liveblog_Entry[]
+	 * @return Liveblog_Entry[]
 	 */
 	public function get_for_lazyloading( $max_timestamp, $min_timestamp ) {
 

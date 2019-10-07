@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_AMP_Template
+ * Class Liveblog_AMP_Template
  *
  * Simple Class for working with Templates.
  */
-class WPCOM_Liveblog_AMP_Template {
+class Liveblog_AMP_Template {
 
 	/**
 	 * Theme Template Path
@@ -94,6 +94,6 @@ class WPCOM_Liveblog_AMP_Template {
 	 * @return void
 	 */
 	public function load_part( $name, $variables = [] ) {
-		echo WPCOM_Liveblog_AMP::get_template( $name, $variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo Liveblog_AMP::get_template( $name, $variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

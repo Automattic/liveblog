@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Extend_Feature_Authors
+ * Class Liveblog_Entry_Extend_Feature_Authors
  *
  * The base class for autocomplete features.
  */
-class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_Extend_Feature {
+class Liveblog_Entry_Extend_Feature_Authors extends Liveblog_Entry_Extend_Feature {
 
 	/**
 	 * The class prefix.
@@ -29,7 +29,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	protected $authors = [];
 
 	/**
-	 * Called by WPCOM_Liveblog_Entry_Extend::load()
+	 * Called by Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
 	 *
@@ -80,8 +80,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_authors';
 
-		if ( WPCOM_Liveblog::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( apply_filters( 'liveblog_endpoint_url', WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors' ) );
+		if ( Liveblog::use_rest_api() ) {
+			$endpoint_url = trailingslashit( trailingslashit( apply_filters( 'liveblog_endpoint_url', Liveblog_Rest_Api::build_endpoint_base() ) . 'authors' ) );
 		}
 
 		// Add our config to the front end autocomplete
@@ -261,7 +261,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'id'     => $author->ID,
 			'key'    => strtolower( $author->user_nicename ),
 			'name'   => $author->display_name,
-			'avatar' => WPCOM_Liveblog::get_avatar( $author->ID, 20 ),
+			'avatar' => Liveblog::get_avatar( $author->ID, 20 ),
 		];
 	}
 }

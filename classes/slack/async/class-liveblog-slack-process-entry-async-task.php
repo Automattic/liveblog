@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Slack_Process_Entry_Async_Task extends WP_Async_Task {
+class Liveblog_Slack_Process_Entry_Async_Task extends WP_Async_Task {
 
 	protected $action = 'slack_process_entry';
 

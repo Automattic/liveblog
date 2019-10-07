@@ -18,7 +18,7 @@ add_action(
 	function() {
 
 		// No need to use an Ajax URL if we're using the REST API.
-		if ( WPCOM_Liveblog::use_rest_api() ) {
+		if ( Liveblog::use_rest_api() ) {
 			return;
 		}
 

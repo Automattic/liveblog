@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Key_Events
+ * Class Liveblog_Entry_Key_Events
  *
  * Adds the /key command which attaches meta data to that
  * liveblog entry. This meta data is then used by the
  * shortcode [liveblog_key_events] to build a list of
  * key events.
  */
-class WPCOM_Liveblog_Entry_Key_Events {
+class Liveblog_Entry_Key_Events {
 
 	/**
 	 * Set the meta_key and meta_value
@@ -37,7 +37,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	];
 
 	/**
-	 * Called by WPCOM_Liveblog::load(), it attaches the
+	 * Called by Liveblog::load(), it attaches the
 	 * new command and shortcode.
 	 */
 	public static function load() {
@@ -231,7 +231,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			'formats'              => array_keys( self::$available_formats ),
 		];
 
-		echo WPCOM_Liveblog::get_template_part( 'liveblog-key-admin.php', $template_variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo Liveblog::get_template_part( 'liveblog-key-admin.php', $template_variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -364,7 +364,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		}
 
 		// Build the entry query.
-		$entry_query = new WPCOM_Liveblog_Entry_Query( $post->ID, WPCOM_Liveblog::KEY );
+		$entry_query = new Liveblog_Entry_Query( $post->ID, Liveblog::KEY );
 
 		// Execute the entry query with the previously defined args.
 		$entries = (array) $entry_query->get_all( $args );
@@ -373,10 +373,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		$template = self::get_current_template( $post->ID );
 
 		// Only run the shortcode on an archived or enabled post.
-		if ( WPCOM_Liveblog::get_liveblog_state( $post->ID ) ) {
+		if ( Liveblog::get_liveblog_state( $post->ID ) ) {
 
 			// Render the actual template.
-			return WPCOM_Liveblog::get_template_part(
+			return Liveblog::get_template_part(
 				'liveblog-key-events.php',
 				[
 					'entries'  => $entries,
@@ -395,7 +395,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * @return array
 	 */
 	public static function all() {
-		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::KEY );
+		$query      = new Liveblog_Entry_Query( Liveblog::$post_id, Liveblog::KEY );
 		$key_events = $query->get(
 			[
 				'meta_query' => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query

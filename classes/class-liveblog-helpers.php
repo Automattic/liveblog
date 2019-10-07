@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Helpers
+ * Class Liveblog_Helpers
  *
  * Hooks and constants
  */
-class WPCOM_Liveblog_Helpers {
+class Liveblog_Helpers {
 	public static $meta_box_allowed_tags = [
 		'p'      => [],
 		'select' => [

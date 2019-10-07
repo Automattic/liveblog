@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Key_Events_Widget
+ * Class Liveblog_Entry_Key_Events_Widget
  *
  * Class to create a widget that displays a list of key events.
  * This widget is just a wrapper for the shortcode
  * [liveblog_key_events].
  */
-class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
+class Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 
 	/**
-	 * Called by WPCOM_Liveblog::load(), it attaches the
+	 * Called by Liveblog::load(), it attaches the
 	 * widget.
 	 */
 	public static function load() {
@@ -49,7 +49,7 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
-		$shortcode_output = WPCOM_Liveblog_Entry_Key_Events::shortcode( [ 'title' => false ] );
+		$shortcode_output = Liveblog_Entry_Key_Events::shortcode( [ 'title' => false ] );
 
 		if ( is_null( $shortcode_output ) ) {
 			// Don't display the widget if there are no key events to show.

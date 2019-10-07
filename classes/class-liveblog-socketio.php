@@ -8,7 +8,7 @@
  * PHP sends messages to a Socket.io server via a Redis
  * server using socket.io-php-emitter.
  */
-class WPCOM_Liveblog_Socketio {
+class Liveblog_Socketio {
 
 	/**
 	 * @var SocketIO\Emitter
@@ -82,7 +82,7 @@ class WPCOM_Liveblog_Socketio {
 	public static function show_redis_error() {
 		$message = __( 'Liveblog was unable to connect to the Redis server. Please check your configuration.', 'liveblog' );
 
-		WPCOM_Liveblog_Socketio_Loader::show_error_message( $message );
+		Liveblog_Socketio_Loader::show_error_message( $message );
 	}
 
 	/**
@@ -110,7 +110,7 @@ class WPCOM_Liveblog_Socketio {
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
-		if ( ! WPCOM_Liveblog_Socketio_Loader::is_enabled() ) {
+		if ( ! Liveblog_Socketio_Loader::is_enabled() ) {
 			return;
 		}
 
@@ -120,8 +120,8 @@ class WPCOM_Liveblog_Socketio {
 		wp_enqueue_script(
 			$handle,
 			plugins_url( 'js/liveblog-socket.io.js', dirname( __FILE__ ) ),
-			[ 'jquery', 'socket.io', WPCOM_Liveblog::KEY ],
-			WPCOM_Liveblog::VERSION,
+			[ 'jquery', 'socket.io', Liveblog::KEY ],
+			Liveblog::VERSION,
 			true
 		);
 
@@ -152,7 +152,7 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function get_post_key( $post_id = null ) {
 		if ( is_null( $post_id ) ) {
-			$post_id = WPCOM_Liveblog::get_post_id();
+			$post_id = Liveblog::get_post_id();
 		}
 
 		$post_key = wp_hash( $post_id . get_post_status( $post_id ), 'liveblog-socket' );
