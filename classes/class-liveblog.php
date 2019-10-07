@@ -1419,7 +1419,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 			} elseif ( self::$custom_template_path && file_exists( self::$custom_template_path . '/' . $template_name ) ) {
 				include self::$custom_template_path . '/' . $template_name; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.NotAbsolutePath
 			} else {
-				include dirname( __FILE__ ) . '/templates/' . $template_name;
+				include dirname( __DIR__ ) . '/templates/' . $template_name;
 			}
 			return ob_get_clean();
 		}
