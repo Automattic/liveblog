@@ -531,7 +531,7 @@ In order to publish to liveblog from slack a slack app will need to be created. 
 
 1. Navigate to https://api.slack.com/apps
 1. Click "Create New App" button
-1. Give your app a name and select WorkSpace
+1. Give your app a name and select a WorkSpace
 1. Click "Create App"
 
 #### Configure Slack App features and functionality
@@ -556,7 +556,7 @@ In order to publish to liveblog from slack a slack app will need to be created. 
 1. Click "Save Changes"   
 
 **Permissions**
-1. Click on "Slash Commands" and enable events
+1. Click on "Slash Commands"
 1. Click create "Create New Command"
 	1. Enter `/start-liveblog` as the command
 	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/start/` as the request URL
@@ -572,6 +572,6 @@ In order to publish to liveblog from slack a slack app will need to be created. 
 1. Click on "Install App to WorkSpace" 
 
 **WordPress Token and Secret**
-1. Navigate to the Basic Information section. Scroll down and copy the `Signing Secret` and paste it into the Signing Secrete field in the WordPress liveblog slack settings section.
-1.  Navigate to the OAuth & Permissions section and copy `OAuth Access Token` and paste it into the OAuth Access Token field in the WordPress liveblog slack settings section.
+1. Navigate to the Basic Information section. Scroll down and copy the `Signing Secret` and paste it into the Signing Secrete field in the WordPress liveblog slack settings section
+1.  Navigate to the OAuth & Permissions section and copy `OAuth Access Token` and paste it into the OAuth Access Token field in the WordPress liveblog slack settings section
 
