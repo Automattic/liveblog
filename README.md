@@ -522,3 +522,56 @@ Check out the [related code on GitHub.](https://github.com/Automattic/liveblog/b
 In case the /liveblog directory in the root of your theme is not what would suit your needs, you can take advantage of the `liveblog_template_path` filter and pass in a custom absolute path without trailing slash which would then be used for template look-up.
 
 [Check out the related code.](https://github.com/Automattic/liveblog/blob/master/liveblog.php#L262,L268)
+
+## Slack Integration 
+
+In order to publish to liveblog from slack a slack app will need to be created. This does require you to have access to the api.slack.com.
+
+### Creating a Slack app
+
+1. Navigate to https://api.slack.com/apps
+1. Click "Create New App" button
+1. Give your app a name and select WorkSpace
+1. Click "Create App"
+
+#### Configure Slack App features and functionality
+
+**Event Subscription**
+1. Click on "Event Subscription" and enable events
+1. Add request URL that all events will be sent to `https://mydomain.com/wp-json/liveblog/v1/slack/`. If the domain is not validating go to slack setting and enable the event endpoint.
+1. Add the following Workspace Events
+   - `channel_history_changed`
+   - `message.channels`
+1. Click "Save Changes"   
+
+**Permissions**
+1. Click on "Permissions"
+1. Add the following Permission Scopes
+   - `channels:history`
+   - `channels:write`
+   - `groups:history`
+   - `mpim:history`
+   - `files:read`
+   - `users:read`
+1. Click "Save Changes"   
+
+**Permissions**
+1. Click on "Slash Commands" and enable events
+1. Click create "Create New Command"
+	1. Enter `/start-liveblog` as the command
+	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/start/` as the request URL
+	1. Enter `Start the liveblog for the current channel` as the short description
+1. Click "Save"   
+1. Click create "Create New Command"
+	1. Enter `/end-liveblog` as the command
+	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/end/` as the request URL
+	1. Enter `End liveblog for the current channel` as the short description
+1. Click "Save" 
+
+**Install your app to your workspace**
+1. Click on "Install App to WorkSpace" 
+
+**WordPress Token and Secret**
+1. Navigate to the Basic Information section. Scroll down and copy the `Signing Secret` and paste it into the Signing Secrete field in the WordPress liveblog slack settings section.
+1.  Navigate to the OAuth & Permissions section and copy `OAuth Access Token` and paste it into the OAuth Access Token field in the WordPress liveblog slack settings section.
+
