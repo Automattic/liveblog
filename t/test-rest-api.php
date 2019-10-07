@@ -70,7 +70,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		//If the endpoint is empty
 		Liveblog_Rest_Api::$endpoint_base = null;
-		$api_namespace                          = 'liveblog/v1';
+		$api_namespace                    = 'liveblog/v1';
 
 		//Non Pretty Permalink Structure
 		$base = Liveblog_Rest_Api::build_endpoint_base();
