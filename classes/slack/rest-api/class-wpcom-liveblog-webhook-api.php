@@ -103,7 +103,7 @@ class WPCOM_Liveblog_Webhook_API {
 		$sig_basestring          = "{$version[0]}:$headers_slack_timestamp:$raw_body";
 		$settings                = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
 
-		$hash_signature = hash_hmac( 'sha256', $sig_basestring, $settings['signing_secret'] );
+		$hash_signature = hash_hmac( 'sha256', $sig_basestring, $settings['signing_secret'] ?? '' );
 
 		//Make sure we're getting a request from slack
 		if ( empty( $headers_slack_signature ) || empty( $headers_slack_timestamp ) ) {
