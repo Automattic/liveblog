@@ -97,7 +97,7 @@ class WPCOM_Liveblog_Slash_Command_API {
 		$channel_id = $body['channel_id'] ?? false;
 
 		if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
-			return new WP_Error( 'slack_liveblog_missing', 'Liveblog plugin is not installed or enabled on this site', [ 'status' => 400 ] );
+			return new WP_Error( 'slack_liveblog_missing', 'Liveblog plugin is not installed or enabled on this site', [ 'status' => 200 ] );
 		}
 
 		//Validate slack request
@@ -109,7 +109,7 @@ class WPCOM_Liveblog_Slash_Command_API {
 		//verify channel
 		$liveblog = WPCOM_Liveblog_Webhook_API::get_liveblog_by_channel_id( $channel_id );
 		if ( ! $liveblog ) {
-			return new WP_Error( 'slack_missing_channel', "Liveblog with channel $channel_id not found", [ 'status' => 400 ] );
+			return new WP_Error( 'slack_missing_channel', "Liveblog with channel $channel_id not found", [ 'status' => 200 ] );
 		}
 
 		return $liveblog;
