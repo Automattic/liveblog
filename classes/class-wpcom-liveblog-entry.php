@@ -255,7 +255,8 @@ class WPCOM_Liveblog_Entry {
 		// Add update to cache if its not a new draft
 		if ( ! empty( $is_new_draft ) && 'publish' === $args['status'] ) {
 			delete_post_meta( $entry_post->ID, '_new_draft' );
-		} elseif ( is_empty( $is_new_draft ) ) {
+			self::store_updated_entries( $entry_post, $entry_post->post_parent, true );
+		} else {
 			self::store_updated_entries( $entry_post, $entry_post->post_parent );
 		}
 
@@ -594,8 +595,9 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * @param $entry_post
 	 * @param $liveblog_id
+	 * @param $remove
 	 */
-	public static function store_updated_entries( $entry_post, $liveblog_id ) {
+	public static function store_updated_entries( $entry_post, $liveblog_id, $remove = false ) {
 		$cached_key      = 'updated_entries_' . $liveblog_id;
 		$updated_entries = wp_cache_get( $cached_key, 'liveblog' );
 
@@ -603,9 +605,14 @@ class WPCOM_Liveblog_Entry {
 			$updated_entries = [];
 		}
 
-		$entry                              = self::from_post( $entry_post );
-		$entry->type                        = 'update';
-		$updated_entries[ $entry_post->ID ] = $entry->for_json();
+		if ( $remove ) {
+			unset( $updated_entries[ $entry_post->ID ] );
+		} else {
+			$entry                              = self::from_post( $entry_post );
+			$entry->type                        = 'update';
+			$updated_entries[ $entry_post->ID ] = $entry->for_json();
+		}
+
 
 		wp_cache_set( $cached_key, $updated_entries, 'liveblog', 30 ); // phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.LowCacheTime
 	}

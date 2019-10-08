@@ -40,7 +40,7 @@ class AppContainer extends Component {
     if (!isNaN(hashId)) {
       setTimeout(() => {
         scrollToEntry(`id_${hashId}`);
-      }, 500);
+      }, 1000);
     }
   }
 
