@@ -248,7 +248,7 @@ class WPCOM_Liveblog_Entry {
 		do_action( 'liveblog_update_entry', $args['entry_id'], $args['post_id'] );
 
 		$entry_post   = get_post( $updated_entry_id );
-		$is_new_draft = update_post_meta( $entry_post->ID, '_new_draft', true );
+		$is_new_draft = get_post_meta( $entry_post->ID, '_new_draft', true );
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
 
