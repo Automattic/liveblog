@@ -247,11 +247,17 @@ class WPCOM_Liveblog_Entry {
 		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
 		do_action( 'liveblog_update_entry', $args['entry_id'], $args['post_id'] );
 
-		$entry_post = get_post( $updated_entry_id );
-
+		$entry_post   = get_post( $updated_entry_id );
+		$is_new_draft = update_post_meta( $entry_post->ID, '_new_draft', true );
 		// When an entry transitions from publish to draft we need to hide it on the front-end
 		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
-		self::store_updated_entries( $entry_post, $entry_post->post_parent );
+
+		// Add update to cache if its not a new draft
+		if ( ! empty( $is_new_draft ) && 'publish' === $args['status'] ) {
+			delete_post_meta( $entry_post->ID, '_new_draft' );
+		} elseif ( is_empty( $is_new_draft ) ) {
+			self::store_updated_entries( $entry_post, $entry_post->post_parent );
+		}
 
 		$entry       = self::from_post( $entry_post );
 		$entry->type = 'update';
@@ -330,6 +336,12 @@ class WPCOM_Liveblog_Entry {
 		if ( ! $entry ) {
 			return new WP_Error( 'get-entry', __( 'Error retrieving entry', 'liveblog' ) );
 		}
+
+		// Store meta for newly created drafts
+		if ( 'draft' === $entry->post_status ) {
+			update_post_meta( $entry->ID, '_new_draft', current_time( 'timestamp' ) );
+		}
+
 		return $entry;
 	}
 
