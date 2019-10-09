@@ -255,7 +255,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			if ( apply_filters( 'liveblog_add_post_filtering_dropdown', true ) ) {
+			if ( apply_filters( 'liveblog_show_post_filtering_dropdown', true ) ) {
 				add_action( 'restrict_manage_posts', [ __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ] );
 				add_action( 'pre_get_posts', [ __CLASS__, 'handle_query_vars_for_post_filtering' ] );
 			}
