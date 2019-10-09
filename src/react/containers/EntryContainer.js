@@ -40,6 +40,8 @@ class EntryContainer extends Component {
       const { id, content, authors, headline } = entry;
       const authorIds = authors.map(author => author.id);
 
+      this.setState({ updating: true });
+
       updateEntry({
         id,
         content,
@@ -60,6 +62,7 @@ class EntryContainer extends Component {
     };
     this.state = {
       showPopup: false,
+      updating: false,
     };
   }
 
@@ -77,12 +80,16 @@ class EntryContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { activateScrolling } = this.props.entry;
+    const { activateScrolling, status } = this.props.entry;
     if (activateScrolling && activateScrolling !== prevProps.entry.activateScrolling) {
       this.scrollIntoView();
     }
     if (this.props.entry.render !== prevProps.entry.render) {
       triggerOembedLoad(this.node);
+    }
+
+    if (status !== prevProps.entry.status) {
+      this.setState({ updating: false });
     }
   }
 
@@ -110,7 +117,7 @@ class EntryContainer extends Component {
             event.preventDefault();
             this.updateStatus(newStatus);
           } } key={entry.entry_time}>
-          {statusLabel}
+          {statusLabel}{this.state.updating ? '...' : ''}
         </button>
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
