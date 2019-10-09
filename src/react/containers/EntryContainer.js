@@ -119,7 +119,7 @@ class EntryContainer extends Component {
             this.updateStatus(newStatus);
           } } key={entry.entry_time}
           disabled={this.state.updating}>
-          {statusLabel}{this.state.updating ? '...' : ''}
+          {statusLabel}{this.state.updating ? '…' : ''}
         </button>
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
