@@ -258,8 +258,9 @@ class WPCOM_Liveblog_Webhook_API {
 					$link         = sprintf( '<iframe src="%s" width="640" height="360"></iframe>', esc_url( $link ) );
 				}
 
-				$embed = new \WP_oEmbed();
-				if ( ! empty( $match[1] ) && ! $embed->get_provider( $match[1] ) && ! $is_shortcode ) {
+				$embed     = new \WP_oEmbed();
+				$is_oembed = $embed->get_provider( $match[1] );
+				if ( ! empty( $match[1] ) && ! $is_oembed && ! $is_shortcode ) {
 					// Convert giphy urls to images
 					if ( false !== strpos( $link, 'giphy.com' ) ) {
 						$link = sprintf( '<img src="%s"/>', esc_url( $match[1] ) );
@@ -267,6 +268,9 @@ class WPCOM_Liveblog_Webhook_API {
 						// Return clean url so that markdown links will work
 						$link = $match[1];
 					}
+				} elseif ( $is_oembed ) {
+					// append new line to oembeds so that you can have back to back embed links
+					$link = $match[1] . PHP_EOL;
 				}
 
 				return $link;
