@@ -21,7 +21,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_status='publish'",
+				"SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_parent=0 AND post_status='publish'",
 				self::$cpt_slug
 			)
 		);
@@ -94,6 +94,11 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 		}
 		$comment_ids_to_skip_string = join( ', ', $comment_ids_to_skip );
 
+		// avoid generate NOT IN (), which is invalid SQL
+		if ( ! $comment_ids_to_skip_string ) {
+			$comment_ids_to_skip_string = '-1';
+		}
+
 		$live_blog_comments = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT comment_ID, comment_content, comment_date, comment_date_gmt
@@ -139,7 +144,10 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 				if ( $new_entry_id ) {
 					WP_CLI::line( 'Inserted live blog comment ID ' . $lb_comment->comment_ID . ' as post ID ' . $new_entry_id );
 
-					$coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
+					if ( $authors ) {
+						$result = $coauthors_plus->add_coauthors( $new_entry_id, $authors, false, 'id' );
+						WP_CLI::line( 'Added authors for comment ' . $lb_comment->comment_ID . ' (post ' . $new_entry_id . ') are ' . join( ',', $authors ) );
+					}
 
 					if ( $livepress_id ) {
 						update_post_meta( $new_entry_id, 'livepress_id', $livepress_id );
@@ -157,6 +165,10 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 				} else {
 					WP_CLI::error( 'Failed to create post for liveblog comment ID ' . $lb_comment->comment_ID );
 				}
+			} else {
+				if ( $authors ) {
+					WP_CLI::line( 'Authors for comment ' . $lb_comment->comment_ID . ' are ' . join( ',', $authors ) );
+				}
 			}
 
 			$post_count++;
@@ -164,6 +176,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 
 		if ( ! $dry_run ) {
 			WP_CLI::success( 'Converted live blog ID ' . $liveblog_id );
+			wp_cache_flush();
 		}
 	}
 
@@ -212,7 +225,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 				]
 			);
 
-			if ( 0 === $blog_count % 100 ) {
+			if ( 0 === $blog_count % 5 ) {
 				WP_CLI::line( 'sleeping' );
 				$this->stop_the_insanity();
 				sleep( 5 );

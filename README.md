@@ -190,40 +190,39 @@ When a `:emoji:` is inserted into an entry it is converted into:
 #### Extending the Admin Meta Box
 If you need to extend the Admin Meta Box there are a few filters and actions to make this easier. As an example, let's add a section with a text input and a button to save. To start we need to add the fields:
 
-**Filter**
+**Action**
 ``` php
-add_filter( 'liveblog_admin_add_settings', array( __CLASS__, 'add_admin_options' ), 10, 2 );
+add_action( 'liveblog_metabox', array( __CLASS__, 'specify_shoe_size' ) );
+add_action( 'save_liveblog_metabox', [ __CLASS__, 'save_shoe_size_' ] );
 
-public static function add_admin_options( $extra_fields, $post_id ) {
-  $args = array(
-    'new_label'  => __( 'My new field', 'liveblog' ),
-    'new_button' => __( 'Save', 'liveblog' ),
-  );
+public static function specify_shoe_size( $post_id ) {
+		$shoe_size = get_post_meta( $post_id, '_shoe_size', true );
 
-  $extra_fields[] = WPCOM_Liveblog::get_template_part( 'template.php', $args );
-  return $extra_fields;
+		echo '<hr>';
+		echo '<p><b>Shoe size</b></p>';
+		echo '<input type="text" value="' . esc_attr( $shoe_size ) . '">';
+}
+
+public static function save_shoe_size( $post_id ) {
+	$shoe_size = filter_input( INPUT_POST, '_shoe_size', FILTER_SANITIZE_STRING );
+
+	if ( $slack_channel ) {
+		return update_post_meta( $post_id, '_shoe_size', $shoe_size );
+	} else {
+		return delete_post_meta( $post_id, '_shoe_size' );
+	}
 }
 ```
-**Template**
-``` php
-<hr/>
-<p>
-  <label for="liveblog-new-input"><?php echo esc_html( $new_label ); ?></label>
-  <input name="liveblog-new-input" type="text" value="" />
-  <button type="button" class="button button-primary" value="liveblog-new-input-save"><?php echo esc_html( $new_button ); ?></button>
-</p>
-```
-Next we catch when the user has clicked our new save button `liveblog-new-input-save`:
 
-``` php
-add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
+### transition_post_status actions
+Modify your existing transition_post_status actions to skip child posts:
 
-public static function save_template_option( $response, $post_id ) {
-  if ( 'liveblog-new-input-save' == $response['state'] && ! empty( $response['liveblog-new-input-save'] ) ) {
-      //handle your logic here
-  }
-}
+```php
+		if ( 0 !== $post->post_parent ) {
+			return;
+		}
 ```
+
 
 ### Hooking into Entries
 There is five useful filters to alter entries at current stages:
@@ -522,3 +521,79 @@ Check out the [related code on GitHub.](https://github.com/Automattic/liveblog/b
 In case the /liveblog directory in the root of your theme is not what would suit your needs, you can take advantage of the `liveblog_template_path` filter and pass in a custom absolute path without trailing slash which would then be used for template look-up.
 
 [Check out the related code.](https://github.com/Automattic/liveblog/blob/master/liveblog.php#L262,L268)
+
+## Slack Integration
+
+In order to publish to liveblog from slack a slack app will need to be created. This requires you to have access to  api.slack.com.
+
+### Creating a Slack app
+
+1. Navigate to https://api.slack.com/apps
+1. Click "Create New App" button
+1. Give your app a name and select a WorkSpace
+1. Click "Create App"
+
+#### Configure Slack App features and functionality
+
+**Signing Secret**
+1. Click on "Basic Information"
+1. Beside `Signing Secret`, click show.
+1. Copy the signing secret.
+1. In WordPress, go Live Blog > Slack Settings
+1. Paste into the Signing Secret field.
+1. Click Save Settings
+
+**Event Subscription**
+1. Click on "Event Subscription"
+1. Click the "on" switch
+1. Add request URL that all events will be sent to `https://mydomain.com/wp-json/liveblog/v1/slack/`. If the domain is not validating go to slack setting and enable the event endpoint.
+1. Add the following Workspace Events
+   - `channel_history_changed`
+   - `message.channels`
+1. Click "Save Changes"
+
+**Permissions**
+1. Click on "OAuth & Permissions"
+1. Add the following Permission Scopes
+   - `channels:history`  (maybe be already present)
+   - `channels:write`
+   - `groups:history` (maybe be already present)
+   - `mpim:history` (maybe be already present)
+   - `files:read`
+   - `users:read`
+1. Click "Save Changes"
+
+**Slash commands**
+1. Click on "Slash Commands"
+1. Click create "Create New Command"
+	1. Enter `/start-liveblog` as the command
+	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/start/` as the request URL
+	1. Enter `Start liveblog for the current channel` as the short description
+1. Click "Save"
+1. Click create "Create New Command"
+	1. Enter `/end-liveblog` as the command
+	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/end/` as the request URL
+	1. Enter `End liveblog for the current channel` as the short description
+1. Click "Save"
+
+**Install application**
+1. Click on "Install App"
+1. Click on "Install App to Workspace"
+1. Click "Allow"
+
+**OAuth Token**
+1. Beside OAuth Access Token, click "Copy"
+1. In WordPress, go Live Blog > Slack Settings
+1. Paste into the OAuth Access Token field.
+1. Click Save Settings
+
+**User profile updates**
+1. Go to https://mydomain.slack.com/admin
+1. Click the cloud icon ("Download a CSV member list")
+1. In WordPress, go to Slack Settings
+1. Click Export Users
+1. Using a text editor or spreadsheet, edit author-export-yyyy-mm-dd.csv. Add the Slack userids found in slack-mydomain-members.csv. Skip the `WP User` rows, filling in only the `Contributor` rows
+1. In WordPress, go to Tools > Import
+1. Under "Liveblog Slack Author IDs," click "Run Importer"
+1. Click "Choose File" and select author-export-yyyy-mm-dd.csv
+1. Click "Upload file and import"

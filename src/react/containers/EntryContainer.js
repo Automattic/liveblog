@@ -40,6 +40,8 @@ class EntryContainer extends Component {
       const { id, content, authors, headline } = entry;
       const authorIds = authors.map(author => author.id);
 
+      this.setState({ updating: true });
+
       updateEntry({
         id,
         content,
@@ -60,6 +62,7 @@ class EntryContainer extends Component {
     };
     this.state = {
       showPopup: false,
+      updating: false,
     };
   }
 
@@ -77,12 +80,16 @@ class EntryContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { activateScrolling } = this.props.entry;
+    const { activateScrolling, status } = this.props.entry;
     if (activateScrolling && activateScrolling !== prevProps.entry.activateScrolling) {
       this.scrollIntoView();
     }
     if (this.props.entry.render !== prevProps.entry.render) {
       triggerOembedLoad(this.node);
+    }
+
+    if (status !== prevProps.entry.status) {
+      this.setState({ updating: false });
     }
   }
 
@@ -101,6 +108,7 @@ class EntryContainer extends Component {
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-edit"
           onClick={this.edit}
+          disabled={this.state.updating}
         >
           Edit
         </button>
@@ -109,12 +117,14 @@ class EntryContainer extends Component {
           onClick={ (event) => {
             event.preventDefault();
             this.updateStatus(newStatus);
-          } } key={entry.entry_time}>
-          {statusLabel}
+          } } key={entry.entry_time}
+          disabled={this.state.updating}>
+          {statusLabel}{this.state.updating ? '…' : ''}
         </button>
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
-          onClick={this.togglePopup.bind(this)}>
+          onClick={this.togglePopup.bind(this)}
+          disabled={this.state.updating}>
           Delete
         </button>
       </footer>
@@ -183,7 +193,7 @@ class EntryContainer extends Component {
               </div>
             }
             <a className="liveblog-meta-time" href={entry.share_link}>
-              <abbr title={formattedTime(entry.entry_time, config.timezone_string, 'c')} className="liveblog-timestamp">{formattedTime(entry.entry_time, config.timezone_string, config.time_format)}</abbr>
+              <abbr data-entry-time={formattedTime(entry.entry_time, config.timezone_string, 'c')} className="liveblog-timestamp">{formattedTime(entry.entry_time, config.timezone_string, config.time_format)}</abbr>
             </a>
             { entry.headline &&
               <h2 className="liveblog-entry-header">
