@@ -1374,7 +1374,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 				return $content;
 			}
 
-			$liveblog_output = '<div id="wpcom-liveblog-container" class="' . get_the_ID() . '"></div>';
+			$liveblog_output = '<div id="liveblog-container" class="' . get_the_ID() . '"></div>';
 			$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, get_the_ID() );
 
 			return $content . wp_kses_post( $liveblog_output );
@@ -1400,7 +1400,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 
 			?>
 			<div class="liveblog-admin-wrapper">
-				<div id="wpcom-liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div>
+				<div id="liveblog-container" class="<?php echo esc_attr( $post_id ); ?>"></div>
 			</div>
 			<?php
 		}
