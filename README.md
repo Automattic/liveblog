@@ -190,40 +190,39 @@ When a `:emoji:` is inserted into an entry it is converted into:
 #### Extending the Admin Meta Box
 If you need to extend the Admin Meta Box there are a few filters and actions to make this easier. As an example, let's add a section with a text input and a button to save. To start we need to add the fields:
 
-**Filter**
+**Action**
 ``` php
-add_filter( 'liveblog_admin_add_settings', array( __CLASS__, 'add_admin_options' ), 10, 2 );
+add_action( 'liveblog_metabox', array( __CLASS__, 'specify_shoe_size' ) );
+add_action( 'save_liveblog_metabox', [ __CLASS__, 'save_shoe_size_' ] );
 
-public static function add_admin_options( $extra_fields, $post_id ) {
-  $args = array(
-    'new_label'  => __( 'My new field', 'liveblog' ),
-    'new_button' => __( 'Save', 'liveblog' ),
-  );
+public static function specify_shoe_size( $post_id ) {
+		$shoe_size = get_post_meta( $post_id, '_shoe_size', true );
 
-  $extra_fields[] = WPCOM_Liveblog::get_template_part( 'template.php', $args );
-  return $extra_fields;
+		echo '<hr>';
+		echo '<p><b>Shoe size</b></p>';
+		echo '<input type="text" value="' . esc_attr( $shoe_size ) . '">';
+}
+
+public static function save_shoe_size( $post_id ) {
+	$shoe_size = filter_input( INPUT_POST, '_shoe_size', FILTER_SANITIZE_STRING );
+
+	if ( $slack_channel ) {
+		return update_post_meta( $post_id, '_shoe_size', $shoe_size );
+	} else {
+		return delete_post_meta( $post_id, '_shoe_size' );
+	}
 }
 ```
-**Template**
-``` php
-<hr/>
-<p>
-  <label for="liveblog-new-input"><?php echo esc_html( $new_label ); ?></label>
-  <input name="liveblog-new-input" type="text" value="" />
-  <button type="button" class="button button-primary" value="liveblog-new-input-save"><?php echo esc_html( $new_button ); ?></button>
-</p>
-```
-Next we catch when the user has clicked our new save button `liveblog-new-input-save`:
 
-``` php
-add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
+### transition_post_status actions
+Modify your existing transition_post_status actions to skip child posts:
 
-public static function save_template_option( $response, $post_id ) {
-  if ( 'liveblog-new-input-save' == $response['state'] && ! empty( $response['liveblog-new-input-save'] ) ) {
-      //handle your logic here
-  }
-}
+```php
+		if ( 0 !== $post->post_parent ) {
+			return;
+		}
 ```
+
 
 ### Hooking into Entries
 There is five useful filters to alter entries at current stages:
@@ -523,7 +522,7 @@ In case the /liveblog directory in the root of your theme is not what would suit
 
 [Check out the related code.](https://github.com/Automattic/liveblog/blob/master/liveblog.php#L262,L268)
 
-## Slack Integration 
+## Slack Integration
 
 In order to publish to liveblog from slack a slack app will need to be created. This requires you to have access to  api.slack.com.
 
@@ -551,7 +550,7 @@ In order to publish to liveblog from slack a slack app will need to be created. 
 1. Add the following Workspace Events
    - `channel_history_changed`
    - `message.channels`
-1. Click "Save Changes"   
+1. Click "Save Changes"
 
 **Permissions**
 1. Click on "OAuth & Permissions"
@@ -562,7 +561,7 @@ In order to publish to liveblog from slack a slack app will need to be created. 
    - `mpim:history` (maybe be already present)
    - `files:read`
    - `users:read`
-1. Click "Save Changes"   
+1. Click "Save Changes"
 
 **Slash commands**
 1. Click on "Slash Commands"
@@ -570,16 +569,16 @@ In order to publish to liveblog from slack a slack app will need to be created. 
 	1. Enter `/start-liveblog` as the command
 	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/start/` as the request URL
 	1. Enter `Start liveblog for the current channel` as the short description
-1. Click "Save"   
+1. Click "Save"
 1. Click create "Create New Command"
 	1. Enter `/end-liveblog` as the command
 	1. Enter `https://mydomain.com/wp-json/liveblog/v1/slack/end/` as the request URL
 	1. Enter `End liveblog for the current channel` as the short description
-1. Click "Save" 
+1. Click "Save"
 
 **Install application**
 1. Click on "Install App"
-1. Click on "Install App to Workspace" 
+1. Click on "Install App to Workspace"
 1. Click "Allow"
 
 **OAuth Token**
