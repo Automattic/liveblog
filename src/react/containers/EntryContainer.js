@@ -108,6 +108,7 @@ class EntryContainer extends Component {
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-edit"
           onClick={this.edit}
+          disabled={this.state.updating}
         >
           Edit
         </button>
@@ -116,12 +117,14 @@ class EntryContainer extends Component {
           onClick={ (event) => {
             event.preventDefault();
             this.updateStatus(newStatus);
-          } } key={entry.entry_time}>
+          } } key={entry.entry_time}
+          disabled={this.state.updating}>
           {statusLabel}{this.state.updating ? '...' : ''}
         </button>
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
-          onClick={this.togglePopup.bind(this)}>
+          onClick={this.togglePopup.bind(this)}
+          disabled={this.state.updating}>
           Delete
         </button>
       </footer>
