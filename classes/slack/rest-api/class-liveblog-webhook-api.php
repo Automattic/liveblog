@@ -408,7 +408,7 @@ class Liveblog_Webhook_API {
 				'posts_per_page' => 1,
 				'post_status'    => $post_status,
 				'fields'         => 'ids',
-				'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
+				'post_type'      => Liveblog_CPT::$cpt_slug,
 				'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
 						'key'     => Liveblog_Metadata::METADATA_SLACK_CHANNEL,

@@ -252,7 +252,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 		 * @return bool
 		 */
 		public static function exclude_post_sitemap( $skip, $post ) {
-			if ( WPCOM_Liveblog_CPT::$cpt_slug === $post->post_type && 0 !== $post->post_parent ) {
+			if ( Liveblog_CPT::$cpt_slug === $post->post_type && 0 !== $post->post_parent ) {
 				$skip = true;
 			}
 
@@ -2012,7 +2012,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 	}
 
 	Liveblog::load();
-	add_action( 'after_setup_theme', [ 'WPCOM_Liveblog', 'hooks' ] );
+	add_action( 'after_setup_theme', [ 'Liveblog', 'hooks' ] );
 
 	/** Plupload Helpers ******************************************************/
 	if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {
