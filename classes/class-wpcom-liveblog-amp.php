@@ -279,7 +279,7 @@ class WPCOM_Liveblog_AMP {
 			[
 				'single'         => true,
 				'id'             => $entry->id,
-				'content'        => $entry->content,
+				'content'        => apply_filters( 'the_content', $entry->content ),
 				'authors'        => $entry->authors,
 				'time'           => $entry->entry_time,
 				'date'           => $entry->date,
@@ -360,6 +360,7 @@ class WPCOM_Liveblog_AMP {
 		$permalink = amp_get_permalink( $post_id );
 
 		foreach ( $entries as $key => $entry ) {
+			$entries[ $key ]->content        = apply_filters( 'the_content', $entries[ $key ]->content );
 			$entries[ $key ]->time_ago       = self::get_entry_time_ago( $entry );
 			$entries[ $key ]->date           = self::get_entry_date( $entry );
 			$entries[ $key ]->update_time    = $entry->timestamp;
