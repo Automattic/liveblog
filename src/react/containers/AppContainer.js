@@ -17,6 +17,7 @@ import UpdateButton from '../components/UpdateButton';
 import UpdateCount from '../components/UpdateCount';
 import StatusFilter from '../components/StatusFilter';
 import Editor from '../components/Editor';
+import { triggerOembedLoad } from '../utils/utils';
 
 class AppContainer extends Component {
   constructor() {
@@ -29,11 +30,9 @@ class AppContainer extends Component {
     loadConfig(window.liveblog_settings);
     getEntries(1, window.location.hash);
     startPolling();
-    if (this.eventsContainer) getEvents();
-    // fire an event to let the WordPress theme know the live blog entries are present
-    setTimeout(() => {
-      jQuery(document).trigger('liveblog-loaded');
-    }, 1000);
+    if (this.eventsContainer) {
+      getEvents();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -42,6 +41,8 @@ class AppContainer extends Component {
     if (!loading && prevProps.loading) {
       const hashId = window.location.hash.split('#')[1];
       scrollToEntry(`id_${hashId}`);
+      jQuery(document).trigger('liveblog-loaded');
+      triggerOembedLoad(false, true);
     }
   }
 
