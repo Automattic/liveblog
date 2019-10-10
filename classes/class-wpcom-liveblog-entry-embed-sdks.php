@@ -25,11 +25,12 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		self::$sdks = apply_filters( 'liveblog_embed_sdks', self::$sdks );
 
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue' ] );
+		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'admin_enqueue' ] );
 		add_filter( 'script_loader_tag', [ __CLASS__, 'add_async_attribute' ], 10, 2 );
 	}
 
 	/**
-	 * Loop through provider SDKs and enqueue them
+	 * Enqueue scripts on frontend
 	 *
 	 * @return void
 	 */
@@ -38,6 +39,28 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 			return;
 		}
 
+		self::enqueue_scripts();
+	}
+
+	/**
+	 * Enqueue scripts on admin backend for LB post types
+	 *
+	 * @return void
+	 */
+	public static function admin_enqueue() {
+		if ( WPCOM_Liveblog_CPT::$cpt_slug !== get_post_type() ) {
+			return;
+		}
+
+		self::enqueue_scripts();
+	}
+
+	/**
+	 * Loop through provider SDKs and enqueue them
+	 *
+	 * @return void
+	 */
+	public static function enqueue_scripts() {
 		foreach ( self::$sdks as $name => $url ) {
 			wp_enqueue_script( $name, esc_url( $url ), [], WPCOM_Liveblog::VERSION, false );
 		}
