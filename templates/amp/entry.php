@@ -8,7 +8,7 @@
 	$update_time    = $this->get( 'update_time' );
 	$share_link_amp = $this->get( 'share_link_amp' );
 
-	/* This filter is defined in class-wpcom-liveblog-amp.php */
+	/* This filter is defined in class-liveblog-amp.php */
 	$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
 ?>
 

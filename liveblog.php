@@ -9,4 +9,4 @@
  * Text Domain: liveblog
  */
 
-require_once __DIR__ . '/class-wpcom-liveblog.php';
+require_once __DIR__ . '/classes/class-liveblog.php';

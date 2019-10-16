@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import 'draft-js/dist/Draft.css';
 
 import {
-  Editor,
   RichUtils,
 } from 'draft-js';
 
@@ -22,17 +21,11 @@ import {
 import upArrowBinding from './keyBindings/upArrow';
 import downArrowBinding from './keyBindings/downArrow';
 import returnBinding from './keyBindings/returnBinding';
-import keyBindingFunc from './keyBindings/keyBindingFunc';
 
 import addAutocomplete from './modifiers/addAutocomplete';
 import addAtomicBlock from './modifiers/addAtomicBlock';
 import moveBlock from './modifiers/moveBlock';
-import skipOverEntity from './modifiers/skipOverEntity';
 import addNewLine from './modifiers/addNewLine';
-
-import blockRenderer from './blocks/blockRenderer';
-import Toolbar from './Toolbar';
-import Suggestions from './Suggestions';
 
 class EditorWrapper extends Component {
   constructor(props) {
@@ -72,16 +65,6 @@ class EditorWrapper extends Component {
 
     // Wait until the state has been updated.
     setTimeout(() => {
-      // Fix for selection getting 'stuck' in emoji as you have to pass through each character.
-      const entity = hasEntityAtSelection(editorState);
-      if (entity) {
-        if (entity.getType() === ':') {
-          onChange(
-            skipOverEntity(editorState, entity),
-          );
-        }
-      }
-
       // Check for any triggers.
       const autocompleteState = this.getAutocompleteState();
       // Prevent any bugs from happing when two commands are inputted next to each other.
@@ -312,18 +295,8 @@ class EditorWrapper extends Component {
   }
 
   render() {
-    const { autocompleteState } = this.state;
-
     const {
       editorState,
-      onChange,
-      suggestions,
-      onSearch,
-      readOnly,
-      setReadOnly,
-      handleImageUpload,
-      defaultImageSize,
-      useTinyMCE,
       editorContainer,
       clearAuthors,
       clearHeadline,
@@ -334,69 +307,16 @@ class EditorWrapper extends Component {
     } = this.props;
 
     // Admin liveblogging uses TinyMCE.
-    if (useTinyMCE === '1') {
-      return <TinyMCEEditor
-        editorState={editorState}
-        editorContainer={editorContainer}
-        clearAuthors={clearAuthors}
-        clearHeadline={clearHeadline}
-        rawText={rawText}
-        setEnablePosting={setEnablePosting}
-        setError={setError}
-        errorData={errorData}
-      />;
-    }
-
-    return (
-      <div className="liveblog-editor-inner-container" onDrop={(event) => {
-        // Fix for Draft Bug not always correctly handling handleDrop
-        if (!event.target.isContentEditable) event.preventDefault();
-      }}>
-        <Toolbar
-          editor={this.editor}
-          editorState={editorState}
-          onChange={onChange}
-          handleImageUpload={handleImageUpload}
-          setReadOnly={setReadOnly}
-          readOnly={readOnly}
-          defaultImageSize={defaultImageSize}
-        />
-        <div style={{ position: 'relative' }} >
-          <Editor
-            editorState={editorState}
-            onChange={this.updateEditorState.bind(this)}
-            blockRendererFn={block => blockRenderer(block, editorState, onChange)}
-            ref={node => this.editor = node}
-            onDownArrow={this.onDownArrow.bind(this)}
-            onUpArrow={this.onUpArrow.bind(this)}
-            onEscape={this.onEscape.bind(this)}
-            handleReturn={this.handleReturn.bind(this)}
-            handleDroppedFiles={this.handleDroppedFiles.bind(this)}
-            handleDrop={this.handleDrop.bind(this)}
-            handleKeyCommand={this.handleKeyCommand.bind(this)}
-            keyBindingFn={event => keyBindingFunc(event, editorState, onChange)}
-            spellCheck={true}
-            readOnly={readOnly}
-          />
-          <Suggestions
-            turnIntoEntity={index => this.turnSuggestionIntoEntity(index)}
-            autocompleteState={autocompleteState}
-            suggestions={suggestions}
-            renderTemplate={item => this.renderTemplate(item)}
-            onSearch={(trigger, text) => onSearch(trigger, text)}
-            setSuggestionIndex={i =>
-              this.setState({
-                autocompleteState: {
-                  ...autocompleteState,
-                  selectedIndex: i,
-                },
-              })
-            }
-            ref={node => this.suggestions = node}
-          />
-        </div>
-      </div>
-    );
+    return <TinyMCEEditor
+      editorState={editorState}
+      editorContainer={editorContainer}
+      clearAuthors={clearAuthors}
+      clearHeadline={clearHeadline}
+      rawText={rawText}
+      setEnablePosting={setEnablePosting}
+      setError={setError}
+      errorData={errorData}
+    />;
   }
 }
 
@@ -411,8 +331,6 @@ EditorWrapper.propTypes = {
   readOnly: PropTypes.bool,
   setReadOnly: PropTypes.func,
   defaultImageSize: PropTypes.string,
-  backend: PropTypes.string,
-  useTinyMCE: PropTypes.string,
   editorContainer: PropTypes.object,
   clearAuthors: PropTypes.func,
   clearHeadline: PropTypes.func,

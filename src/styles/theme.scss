@@ -52,8 +52,12 @@
   height: 30px;
 }
 
-.liveblog-hash {
-  color: $color-primary;
+.liveblog-entry-tools {
+  margin-left: 60px;
+
+  @include mq($until: medium) {
+    margin-left: 0;
+  }
 }
 
 /**

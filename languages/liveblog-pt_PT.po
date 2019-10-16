@@ -15,52 +15,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: pt_PT\n"
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:281
-msgctxt "taxonomy general name"
-msgid "Hashtags"
-msgstr "Etiquetas"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:282
-msgctxt "taxonomy singular name"
-msgid "Hashtag"
-msgstr "Etiqueta"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:283
-msgid "Search Hashtags"
-msgstr "Pesquisar etiquetas"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:284
-msgid "All Hashtags"
-msgstr "Todas as etiquetas"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:285
-msgid "Parent Hashtag"
-msgstr "Etiqueta superior"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:286
-msgid "Parent Hashtag:"
-msgstr "Etiqueta superior:"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:287
-msgid "Edit Hashtag"
-msgstr "Editar etiqueta"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:288
-msgid "Update Hashtag"
-msgstr "Atualizar etiqueta"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:289
-msgid "Add New Hashtag"
-msgstr "Adicionar nova etiqueta"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:290
-msgid "New Hashtag"
-msgstr "Nova etiqueta"
-
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:291
-msgid "Hashtags"
-msgstr "Etiquetas"
-
 #: classes/class-wpcom-liveblog-entry-key-events-widget.php:33
 msgid ""
 "A list of key events displayed when the user is viewing a Liveblog post."
