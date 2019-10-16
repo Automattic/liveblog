@@ -210,12 +210,13 @@ class Liveblog_Webhook_API {
 
 		$headline = '';
 
-		//remove for pub
+		// Remove "for pub"
 		$content = preg_replace( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), '', $content );
 
+		// Appy user filters
 		$content = apply_filters( 'liveblog_slack_entry_content', $content );
 
-		//Parse markdown
+		// Parse markdown
 		$content = Liveblog_Markdown_Parser::render( trim( $content ) );
 
 		$content = preg_replace_callback(

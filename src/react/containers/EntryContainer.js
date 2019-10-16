@@ -76,7 +76,9 @@ class EntryContainer extends Component {
   componentDidMount() {
     const { activateScrolling } = this.props.entry;
     triggerOembedLoad(this.node);
-    if (activateScrolling) this.scrollIntoView();
+    if (activateScrolling) {
+      this.scrollIntoView();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -87,7 +89,6 @@ class EntryContainer extends Component {
     if (this.props.entry.render !== prevProps.entry.render) {
       triggerOembedLoad(this.node);
     }
-
     if (status !== prevProps.entry.status) {
       this.setState({ updating: false });
     }

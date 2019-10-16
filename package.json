@@ -70,6 +70,7 @@
 		"lint-styles": "./node_modules/.bin/stylelint --fix \"src/styles/**/*.scss\"",
 		"test": "./node_modules/.bin/jest",
 		"build": "NODE_ENV=production webpack -p",
+		"build-dev": "NODE_ENV=development webpack",
 		"watch": "NODE_ENV=development webpack --watch"
 	},
 	"jest": {

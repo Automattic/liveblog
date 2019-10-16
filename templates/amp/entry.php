@@ -1,7 +1,7 @@
 <?php
 	$id             = $this->get( 'id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	$entry_time     = $this->get( 'time' );
-	$content        = $this->get( 'content' );
+	$content        = apply_filters( 'the_content', $this->get( 'content' ) );
 	$social         = $this->get( 'social' );
 	$single         = $this->get( 'single' );
 	$share_link     = $this->get( 'share_link' );
