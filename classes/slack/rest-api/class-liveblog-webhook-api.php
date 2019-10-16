@@ -213,6 +213,9 @@ class Liveblog_Webhook_API {
 		// Remove "for pub"
 		$content = preg_replace( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), '', $content );
 
+		// Replace emoji names with characters
+		$content = Liveblog_Emoji_Parser::convert( $content );
+
 		// Appy user filters
 		$content = apply_filters( 'liveblog_slack_entry_content', $content );
 
