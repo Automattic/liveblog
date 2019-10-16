@@ -215,30 +215,6 @@ class WPCOM_Liveblog_Rest_Api {
 		);
 
 		/*
-		 * Get a list of hashtags matching a search term.
-		 * Used to autocomplete previously used #hashtags
-		 *
-		 * /hashtags/<term>
-		 *
-		 * TODO: The regex pattern will allow no slash between 'hashtags' and the search term.
-		 *       Look into requiring the slash
-		 *
-		 */
-		register_rest_route(
-			self::$api_namespace,
-			'/hashtags([/]*)(?P<term>.*)',
-			[
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => [ __CLASS__, 'get_hashtag_terms' ],
-				'args'     => [
-					'term' => [
-						'required' => false,
-					],
-				],
-			]
-		);
-
-		/*
 		 * Save and retrieve Liveblog post state and meta-data
 		 *
 		 * /<post_id>/post_state
@@ -527,25 +503,6 @@ class WPCOM_Liveblog_Rest_Api {
 		$authors          = $liveblog_authors->get_authors( $term );
 
 		return $authors;
-	}
-
-	/**
-	 * Get a list of hashtags matching a search term
-	 *
-	 * @param WP_REST_Request $request A REST request object
-	 *
-	 * @return array An array of matching hastags
-	 */
-	public static function get_hashtag_terms( WP_REST_Request $request ) {
-
-		// Get required parameters from the request
-		$term = $request->get_param( 'term' );
-
-		// Get a list of authors
-		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
-		$hashtags          = $liveblog_hashtags->get_hashtag_terms( $term );
-
-		return $hashtags;
 	}
 
 	/**

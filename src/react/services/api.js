@@ -199,17 +199,7 @@ export function deleteEvent(entry, config, nonce = false) {
 
 export function getAuthors(term, config) {
   const settings = {
-    url: `${config.autocomplete[3].url}${term}`,
-    method: 'GET',
-    crossDomain: config.cross_domain,
-  };
-
-  return secureAjax(settings);
-}
-
-export function getHashtags(term, config) {
-  const settings = {
-    url: `${config.autocomplete[2].url}${term}`,
+    url: `${config.autocomplete[1].url}${term}`,
     method: 'GET',
     crossDomain: config.cross_domain,
   };
