@@ -82,11 +82,16 @@ class EntryContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { activateScrolling, status } = this.props.entry;
+    const { activateScrolling, status, id } = this.props.entry;
+    const isEditing = this.props.user.entries[id] && this.props.user.entries[id].isEditing;
+    const wasEditing = prevProps.user.entries[id] && prevProps.user.entries[id].isEditing;
+    const contentChanged = this.props.entry.render !== prevProps.entry.render;
+
     if (activateScrolling && activateScrolling !== prevProps.entry.activateScrolling) {
       this.scrollIntoView();
     }
-    if (this.props.entry.render !== prevProps.entry.render) {
+
+    if (contentChanged || (isEditing !== wasEditing && !isEditing)) {
       triggerOembedLoad(this.node);
     }
     if (status !== prevProps.entry.status) {
