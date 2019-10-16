@@ -1662,7 +1662,7 @@ class Liveblog_Emoji_Parser {
 			"/:([a-z_]+):/",
 			function( $matches ) {
 				if ( isset( self::$map[ $matches[1] ] ) ) {
-					return convert_code_points( self::$map[ $matches[1] ] );
+					return self::convert_code_points( self::$map[ $matches[1] ] );
 				} else {
 					return $matches[0];
 				}
