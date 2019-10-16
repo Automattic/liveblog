@@ -1080,7 +1080,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 					$use_rest_api = 1;
 				}
 
-				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard.css', __FILE__ ), [], self::VERSION, false );
+				wp_enqueue_style( self::KEY . '-dash', plugins_url( 'assets/dashboard.css', __DIR__ ), [], self::VERSION, false );
 
 				wp_localize_script(
 					'liveblog-admin',
@@ -1108,11 +1108,11 @@ if ( ! class_exists( 'Liveblog' ) ) :
 				return;
 			}
 
-			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ), [], self::VERSION );
-			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __FILE__ ), [], self::VERSION );
+			wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __DIR__ ), [], self::VERSION );
+			wp_enqueue_style( self::KEY . '_theme', plugins_url( 'assets/theme.css', __DIR__ ), [], self::VERSION );
 
 			// Load Client Scripts
-			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __FILE__ ), [], self::VERSION, true );
+			wp_enqueue_script( self::KEY, plugins_url( 'assets/app.js', __DIR__ ), [], self::VERSION, true );
 
 			if ( self::is_liveblog_editable() ) {
 				self::add_default_plupload_settings();
