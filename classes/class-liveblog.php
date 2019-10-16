@@ -142,6 +142,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 			require dirname( __FILE__ ) . '/slack/tools/class-liveblog-export-authors.php';
 			require dirname( __FILE__ ) . '/slack/tools/class-liveblog-import-authors-slack-id.php';
 			require dirname( __FILE__ ) . '/slack/tools/class-liveblog-markdown-parser.php';
+			require dirname( __FILE__ ) . '/slack/tools/class-liveblog-emoji-parser.php';
 			require dirname( __FILE__ ) . '/slack/class-liveblog-slack.php';
 
 
