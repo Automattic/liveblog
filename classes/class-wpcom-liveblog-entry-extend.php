@@ -20,7 +20,7 @@ class WPCOM_Liveblog_Entry_Extend {
 	 *
 	 * @var array
 	 */
-	protected static $features = 'commands, emojis, hashtags, authors';
+	protected static $features = 'commands, authors';
 
 	/**
 	 * Called by WPCOM_Liveblog::load(),

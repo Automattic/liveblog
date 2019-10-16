@@ -39,7 +39,7 @@ If you'd like to check out the code and contribute, [join us on github](https://
 
 ### Overview
 
-The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` with an autocomplete system to help speed up the process. These extensions are filtered on save, for example a hashtag `#football` would be saved as `<span class="liveblog-hash term-football">football</span>` allowing easy styling. The container of the entry will also receive the same class `term-football`.
+The entry system supports `/commands` and `@authors` with an autocomplete system to help speed up the process. These extensions are filtered on save.
 
 The command system has one inbuilt command:
 
@@ -262,30 +262,30 @@ add_filter( 'liveblog_entry_for_json', array( __CLASS__, 'filter' ), 10, 2 );
 public static function filter( $entry, $object ) {}
 ```
 
-### Altering hashtags, commands, authors and emoji
-It is possible to set your own symbol and / or change the class prefix for `#hashtags`, `/commands`, `@authors` and `:emoji:`. These are handled by filters:
+### Altering commands and authors
+It is possible to set your own symbol and / or change the class prefix for `/commands` and `@authors`. These are handled by filters:
 
 ``` php
 add_filter( 'liveblog_{type}_prefixes', array( __CLASS__, 'filter' ) );
 add_filter( 'liveblog_{type}_class', array( __CLASS__, 'filter' ) );
 ```
-Let’s say you decide to use `!` instead of `#` for `#hashtags`, therefore you expect them to be `!hashtag`:
+Let’s say you decide to use `!` instead of `@` for `@authors`, therefore you expect them to be `!author`:
 
 ``` php
-add_filter( 'liveblog_hashtags_prefixes', array( __CLASS__, 'filter' ) );
+add_filter( 'liveblog_authors_prefixes', array( __CLASS__, 'filter' ) );
 
 public static function filter( $prefixes ) {
   $prefixes = array( '!', '\x{21}' );
   return $prefixes;
 }
 ```
-Currently hashtags use the class prefix `term-`, you can change that to whatever you need - in this case let’s change to `hashtag-`:
+Currently hashtags use the class prefix `author-`, you can change that to whatever you need - in this case let’s change to `person-`:
 
 ``` php
-add_filter( 'liveblog_hashtags_class', array( __CLASS__, 'filter' ) );
+add_filter( 'liveblog_author_class', array( __CLASS__, 'filter' ) );
 
 public static function filter( $class_prefix ) {
-  $class_prefix = 'hashtag-';
+  $class_prefix = 'person-';
   return $class_prefix;
 }
 ```

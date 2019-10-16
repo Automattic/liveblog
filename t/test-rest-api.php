@@ -342,33 +342,6 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test getting list of hashtags from a string
-	 */
-	public function test_get_hashtags() {
-
-		// Get a list of hashtags
-		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
-
-		// Create a temporary hashtag
-		$this->factory->term->create(
-			[
-				'name'     => 'coolhashtag',
-				'taxonomy' => 'hashtags',
-				'slug'     => 'coolhashtag',
-			]
-		);
-
-		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag
-		$hashtags_is_empty  = $liveblog_hashtags->get_hashtag_terms( 'fakehashtag' ); // Non-existent hashtag
-
-		$this->assertInternalType( 'array', $hashtags_not_empty );
-		$this->assertInternalType( 'array', $hashtags_is_empty );
-		$this->assertNotEmpty( $hashtags_not_empty );
-		$this->assertEmpty( $hashtags_is_empty );
-
-	}
-
-	/**
 	 * Test updating the state of a post for Liveblog
 	 */
 	public function test_update_post_state() {
@@ -545,39 +518,6 @@ class Test_REST_API extends WP_UnitTestCase {
 		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
-		$response = $this->server->dispatch( $request );
-
-		// Assert successful response
-		$this->assertEquals( 200, $response->get_status() );
-
-		// The array should contain 2 authors
-		$this->assertCount( 2, $response->get_data() );
-
-	}
-
-	/**
-	 * Integration test
-	 * Test accessing the get hashtags endpoint
-	 */
-	public function test_endpoint_get_hashtags() {
-
-		// Create 2 hashtags
-		$this->factory->term->create(
-			[
-				'name'     => 'coolhashtag',
-				'taxonomy' => 'hashtags',
-				'slug'     => 'coolhashtag',
-			]
-		);
-		$this->factory->term->create(
-			[
-				'name'     => 'coolhashtag2',
-				'taxonomy' => 'hashtags',
-				'slug'     => 'coolhashtag2',
-			]
-		);
-
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response
