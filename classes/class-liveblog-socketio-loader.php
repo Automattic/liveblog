@@ -8,9 +8,9 @@
  * Liveblog plugin supports PHP 5.2 and Socket.io
  * support requires PHP >= 5.3 (because of socket.io-php-emitter).
  * So we need to check the PHP version before requiring
- * WPCOM_Liveblog_Socketio class.
+ * Liveblog_Socketio class.
  */
-class WPCOM_Liveblog_Socketio_Loader {
+class Liveblog_Socketio_Loader {
 
 	/**
 	 * Minimum PHP version required to run socket.io-php-emitter.
@@ -30,8 +30,8 @@ class WPCOM_Liveblog_Socketio_Loader {
 			} elseif ( ! self::socketio_emitter_exists() ) {
 				self::add_socketio_emitter_required_error();
 			} else {
-				require dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php';
-				WPCOM_Liveblog_Socketio::load();
+				require dirname( __FILE__ ) . '/class-liveblog-socketio.php';
+				Liveblog_Socketio::load();
 			}
 		}
 	}
@@ -74,7 +74,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	public static function show_error_message( $message ) {
 		if ( current_user_can( 'manage_options' ) ) {
 			echo wp_kses_post(
-				WPCOM_Liveblog::get_template_part(
+				Liveblog::get_template_part(
 					'liveblog-socketio-error.php',
 					[ 'message' => $message ]
 				)
@@ -138,11 +138,11 @@ class WPCOM_Liveblog_Socketio_Loader {
 		$redis_client_connected = false;
 
 		// It is necessary to check if the class exists since if running PHP <= 5.2 we don't include it
-		if ( class_exists( 'WPCOM_Liveblog_Socketio' ) && WPCOM_Liveblog_Socketio::is_connected() ) {
+		if ( class_exists( 'Liveblog_Socketio' ) && Liveblog_Socketio::is_connected() ) {
 			$redis_client_connected = true;
 		}
 
-		return WPCOM_Liveblog::is_viewing_liveblog_post()
+		return Liveblog::is_viewing_liveblog_post()
 				&& self::is_socketio_constant_enabled()
 				&& ! self::is_php_too_old_for_socketio()
 				&& self::socketio_emitter_exists()

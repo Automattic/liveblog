@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Lazyloader
+ * Class Liveblog_Lazyloader
  *
  * Handles lazyloading of Liveblog entries.
  */
-class WPCOM_Liveblog_Lazyloader {
+class Liveblog_Lazyloader {
 
 	/**
 	 * @var bool
@@ -38,7 +38,7 @@ class WPCOM_Liveblog_Lazyloader {
 			self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', true );
 
 			// Disable lazy loading on archived liveblogs
-			if ( 'enable' !== WPCOM_Liveblog::get_liveblog_state() ) {
+			if ( 'enable' !== Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
 			}
 		}
@@ -96,7 +96,7 @@ class WPCOM_Liveblog_Lazyloader {
 	}
 
 	/**
-	 * Called by WPCOM_Liveblog::load(), defers loading to when Liveblog has been initialized.
+	 * Called by Liveblog::load(), defers loading to when Liveblog has been initialized.
 	 *
 	 * @return void
 	 */
@@ -139,7 +139,7 @@ class WPCOM_Liveblog_Lazyloader {
 	 */
 	public static function admin_notices() {
 		echo wp_kses_post(
-			WPCOM_Liveblog::get_template_part(
+			Liveblog::get_template_part(
 				'lazyload-notice.php',
 				[
 					'plugin' => 'Lazyload Liveblog Entries',

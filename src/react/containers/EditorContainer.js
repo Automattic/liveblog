@@ -100,10 +100,7 @@ class EditorContainer extends Component {
 
   getContent() {
     const { editorState } = this.state;
-    if (this.props.useTinyMCE === '1') {
-      return editorState.rawText;
-    }
-    return convertToHTML(editorState.getCurrentContent());
+    return editorState.rawText;
   }
 
   syncRawTextToEditorState() {
@@ -121,22 +118,11 @@ class EditorContainer extends Component {
   }
 
   publish(status) {
-    const { updateEntry, entry, createEntry, isEditing, useTinyMCE } = this.props;
+    const { updateEntry, entry, createEntry, isEditing } = this.props;
     const { editorState, authors } = this.state;
     const content = this.getContent();
     const authorIds = authors ? authors.map(author => author.id) : [];
     const headline = this.state.headline;
-    const htmlregex = /<(img|picture|video|audio|canvas|svg|iframe|embed) ?.*>/;
-
-    // We don't want an editor publishing empty entries
-    // So we must check if there is any text within the editor
-    // If we fail to find text then we should check for a valid
-    // list of html elements, mainly visual for example images.
-    if (!editorState.getCurrentContent().getPlainText().trim() && useTinyMCE !== '1') {
-      if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
-        return;
-      }
-    }
 
     if (isEditing) {
       updateEntry({
@@ -264,7 +250,7 @@ class EditorContainer extends Component {
       canPublish,
     } = this.state;
 
-    const { isEditing, config, useTinyMCE } = this.props;
+    const { isEditing, config } = this.props;
 
     const errorData = {
       error: this.props.api.error || false,
@@ -290,28 +276,6 @@ class EditorContainer extends Component {
           onChange={this.onHeadlineChange.bind(this)}
           headline={headline}
         />
-        { (useTinyMCE !== '1') &&
-          <div className="liveblog-editor-tabs">
-            <button
-              className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
-              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'editor' }); } }
-            >
-              Visual
-            </button>
-            <button
-              className={`liveblog-editor-tab ${mode === 'raw' ? 'is-active' : ''}`}
-              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'raw' }); } }
-            >
-                Text
-            </button>
-            <button
-              className={`liveblog-editor-tab ${mode === 'preview' ? 'is-active' : ''}`}
-              onClick={(e) => { e.preventDefault(); this.setState({ mode: 'preview' }); } }
-            >
-                Preview
-            </button>
-          </div>
-        }
         {
           mode === 'preview' &&
           <PreviewContainer
@@ -333,7 +297,6 @@ class EditorContainer extends Component {
             readOnly={readOnly}
             setReadOnly={this.setReadOnly.bind(this)}
             defaultImageSize={config.default_image_size}
-            useTinyMCE={useTinyMCE}
             clearAuthors={this.clearAuthors}
             clearHeadline={this.clearHeadline}
             rawText={this.state.rawText}

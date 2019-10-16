@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Extend_Feature_Commands
+ * Class Liveblog_Entry_Extend_Feature_Commands
  *
  * The base class for autocomplete features.
  */
-class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_Extend_Feature {
+class Liveblog_Entry_Extend_Feature_Commands extends Liveblog_Entry_Extend_Feature {
 
 	/**
 	 * The static class prefix base.
@@ -43,7 +43,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	protected $filters = [];
 
 	/**
-	 * Called by WPCOM_Liveblog_Entry_Extend::load()
+	 * Called by Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
 	 * @codeCoverageIgnore
@@ -199,7 +199,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		$entry = get_post( $entry_id );
 
 		// Check if the post is a live blog.
-		if ( get_post_type( $entry_id ) === WPCOM_Liveblog_CPT::$cpt_slug ) {
+		if ( get_post_type( $entry_id ) === Liveblog_CPT::$cpt_slug ) {
 
 			// Grab all the prefixed classes applied.
 			preg_match_all( '/(?<!\w)' . $this->class_prefix_local . '\w+/', $entry->post_content, $types );

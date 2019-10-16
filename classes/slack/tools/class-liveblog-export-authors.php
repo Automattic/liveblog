@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Export_Authors {
+class Liveblog_Export_Authors {
 
 	/**
 	 * Generate CSV to download of all the WordPress users and contributors
@@ -62,7 +62,7 @@ class WPCOM_Liveblog_Export_Authors {
 						'User Type'  => 'WP User',
 						'User Name'  => $user->display_name,
 						'User Email' => $user->user_email,
-						'Slack ID'   => get_user_meta( $user->ID, WPCOM_Liveblog_Author_Settings::SETTING_META, true ), //phpcs:ignore WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta
+						'Slack ID'   => get_user_meta( $user->ID, Liveblog_Author_Settings::SETTING_META, true ), //phpcs:ignore WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta
 					];
 				}
 			} else {
@@ -102,7 +102,7 @@ class WPCOM_Liveblog_Export_Authors {
 						'User Type'  => 'Contributor',
 						'User Name'  => $contributor->post_title,
 						'User Email' => get_post_meta( $contributor->ID, 'cap-user_email', true ),
-						'Slack ID'   => get_post_meta( $contributor->ID, 'cap-' . WPCOM_Liveblog_Author_Settings::SETTING_META, true ),
+						'Slack ID'   => get_post_meta( $contributor->ID, 'cap-' . Liveblog_Author_Settings::SETTING_META, true ),
 					];
 				}
 			} else {

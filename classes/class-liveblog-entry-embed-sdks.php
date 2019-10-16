@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Embed_SDKs
+ * Class Liveblog_Entry_Embed_SDKs
  *
  * As we're render posts in React it requires some SDKs to pulled in on page load
  */
-class WPCOM_Liveblog_Entry_Embed_SDKs {
+class Liveblog_Entry_Embed_SDKs {
 
 	/**
 	 * @var A list of provider SDKs
@@ -18,7 +18,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	];
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by Liveblog::load(),
 	 * acts as a constructor
 	 */
 	public static function load() {
@@ -35,7 +35,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * @return void
 	 */
 	public static function enqueue() {
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
+		if ( ! Liveblog::is_viewing_liveblog_post() ) {
 			return;
 		}
 
@@ -62,7 +62,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 */
 	public static function enqueue_scripts() {
 		foreach ( self::$sdks as $name => $url ) {
-			wp_enqueue_script( $name, esc_url( $url ), [], WPCOM_Liveblog::VERSION, false );
+			wp_enqueue_script( $name, esc_url( $url ), [], Liveblog::VERSION, false );
 		}
 	}
 

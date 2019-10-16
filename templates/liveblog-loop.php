@@ -20,7 +20,7 @@
 
 	<?php endforeach; ?>
 
-	<?php if ( WPCOM_Liveblog_Lazyloader::is_enabled() ) : ?>
+	<?php if ( Liveblog_Lazyloader::is_enabled() ) : ?>
 
 		<button class="liveblog-load-more" data-set-index="0"><?php esc_html_e( 'Load more entries&hellip;', 'liveblog' ); ?></button>
 
@@ -31,7 +31,7 @@
 		</a>
 	</div>
 
-	<?php if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) : ?>
+	<?php if ( Liveblog_Socketio_Loader::is_enabled() ) : ?>
 		<div id="liveblog-socketio-error-container" class="liveblog-fixed-bar">
 			<p id="liveblog-socketio-error"></p>
 		</div>

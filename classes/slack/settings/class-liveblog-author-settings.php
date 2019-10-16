@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Author_Settings {
+class Liveblog_Author_Settings {
 
 	const SETTING_META       = 'slack_user_id';
 	const SETTING_META_NONCE = 'slack_user';

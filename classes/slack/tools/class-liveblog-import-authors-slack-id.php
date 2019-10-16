@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Import_Authors_Slack_ID {
+class Liveblog_Import_Authors_Slack_ID {
 
 	/**
 	 * @var int file ID
@@ -85,10 +85,10 @@ class WPCOM_Liveblog_Import_Authors_Slack_ID {
 			}
 
 			if ( 'Contributor' === $user_type && 'guest-author' === get_post_type( $user_id ) ) {
-				update_post_meta( $user_id, 'cap-' . WPCOM_Liveblog_Author_Settings::SETTING_META, $slack_id );
+				update_post_meta( $user_id, 'cap-' . Liveblog_Author_Settings::SETTING_META, $slack_id );
 				$rows[] = sprintf( '<a href="%s">%s (%s)</a>', esc_url( get_edit_post_link( $user_id ) ), esc_html( $user_name ), esc_html( $slack_id ) );
 			} elseif ( get_user_by( 'ID', $user_id ) ) {
-				update_user_meta( $user_id, WPCOM_Liveblog_Author_Settings::SETTING_META, $slack_id ); //phpcs:ignore WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta
+				update_user_meta( $user_id, Liveblog_Author_Settings::SETTING_META, $slack_id ); //phpcs:ignore WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta
 				$rows[] = sprintf( '<a href="%s">%s (%s)</a>', esc_url( get_edit_user_link( $user_id ) ), esc_html( $user_name ), esc_html( $slack_id ) );
 			}
 		}

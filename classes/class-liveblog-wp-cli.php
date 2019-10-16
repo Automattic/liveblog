@@ -1,6 +1,6 @@
 <?php
 // phpcs:ignore WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli
-class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
+class Liveblog_WP_CLI extends WP_CLI_Command {
 
 	public function readme_for_github() {
 		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
@@ -53,7 +53,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$post_id = $post->ID;
 
 			// get all entries that have been edited in the liveblog
-			//$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
+			//$entries_query = new Liveblog_Entry_Query( $post_id, Liveblog::KEY );
 			$edit_entries = [];
 
 			// find correct posst_ids to replace incorrect meta_values
@@ -244,4 +244,4 @@ HELP
 	}
 }
 
-WP_CLI::add_command( 'liveblog', 'WPCOM_Liveblog_WP_CLI' );
+WP_CLI::add_command( 'liveblog', 'Liveblog_WP_CLI' );

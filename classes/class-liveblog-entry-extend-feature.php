@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Extend_Feature
+ * Class Liveblog_Entry_Extend_Feature
  *
  * The base class for autocomplete features.
  */
-abstract class WPCOM_Liveblog_Entry_Extend_Feature {
+abstract class Liveblog_Entry_Extend_Feature {
 
 	/**
 	 * The regex.
@@ -29,7 +29,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	protected $prefixes = [];
 
 	/**
-	 * Called by WPCOM_Liveblog_Entry_Extend::load()
+	 * Called by Liveblog_Entry_Extend::load()
 	 *
 	 * @return void
 	 */

@@ -100,7 +100,7 @@ class EntryContainer extends Component {
     const statusLabel = 'publish' === status ? 'Unpublish' : 'Publish';
     const newStatus = 'publish' === status ? 'draft' : 'publish';
 
-    if (!config.is_admin && (config.is_liveblog_editable !== '1' || config.backend_liveblogging === '1')) {
+    if (!config.is_admin) {
       return false;
     }
 
@@ -206,7 +206,7 @@ class EntryContainer extends Component {
             this.isEditing()
               ? (
                 <div className="liveblog-entry-edit">
-                  <Editor entry={entry} isEditing={true} useTinyMCE={config.use_tinymce} />
+                  <Editor entry={entry} isEditing={true} />
                 </div>
               )
               : (

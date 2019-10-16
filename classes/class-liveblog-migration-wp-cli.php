@@ -237,7 +237,7 @@ class Liveblog_Migration_WP_CLI extends WPCOM_VIP_CLI_Command {
 add_action(
 	'init',
 	function() {
-		Liveblog_Migration_WP_CLI::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', WPCOM_Liveblog_CPT::DEFAULT_CPT_SLUG );
+		Liveblog_Migration_WP_CLI::$cpt_slug = apply_filters( 'liveblog_cpt_slug', Liveblog_CPT::DEFAULT_CPT_SLUG );
 	}
 );
 WP_CLI::add_command( 'liveblog', 'Liveblog_Migration_WP_CLI' );

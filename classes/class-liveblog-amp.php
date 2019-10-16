@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_AMP
+ * Class Liveblog_AMP
  *
  * Adds AMP support for Liveblog
  */
-class WPCOM_Liveblog_AMP {
+class Liveblog_AMP {
 
 	/**
 	 * AMP adds the following query string to requests when polling.
@@ -13,7 +13,7 @@ class WPCOM_Liveblog_AMP {
 	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by Liveblog::load(),
 	 */
 	public static function load() {
 
@@ -39,15 +39,15 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		// If we're not on a liveblog, then bail.
-		if ( ! WPCOM_Liveblog::is_liveblog_post() ) {
+		if ( ! Liveblog::is_liveblog_post() ) {
 			return;
 		}
 
 		// Remove the standard Liveblog markup which just a <div> for React to render.
-		remove_filter( 'the_content', [ 'WPCOM_Liveblog', 'add_liveblog_to_content' ], 20 );
+		remove_filter( 'the_content', [ 'Liveblog', 'add_liveblog_to_content' ], 20 );
 
 		// Remove standard Liveblog scripts as custom JS is not required for AMP.
-		remove_action( 'wp_enqueue_scripts', [ 'WPCOM_Liveblog', 'enqueue_scripts' ] );
+		remove_action( 'wp_enqueue_scripts', [ 'Liveblog', 'enqueue_scripts' ] );
 
 		// Add Liveblog to Schema.
 		add_filter( 'amp_post_template_metadata', [ __CLASS__, 'append_liveblog_to_metadata' ], 10, 2 );
@@ -125,7 +125,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', [], WPCOM_Liveblog::VERSION );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', [], Liveblog::VERSION );
 	}
 
 
@@ -138,11 +138,11 @@ class WPCOM_Liveblog_AMP {
 		global $post;
 
 		// If we are not viewing a liveblog post then exist the filter.
-		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+		if ( Liveblog::is_liveblog_post( $post->ID ) === false ) {
 			return;
 		}
 
-		$request = WPCOM_Liveblog::get_request_data();
+		$request = Liveblog::get_request_data();
 
 		// If no entry id set then not on single entry.
 		if ( false === $request->id ) {
@@ -150,7 +150,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$entry       = self::get_entry( $request->id, $post->ID );
-		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
+		$title       = Liveblog_Entry::get_entry_title( $entry );
 		$description = wp_strip_all_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
@@ -200,11 +200,11 @@ class WPCOM_Liveblog_AMP {
 	public static function append_liveblog_to_metadata( $metadata, $post ) {
 
 		// Only append metadata to Liveblogs.
-		if ( false !== WPCOM_Liveblog::is_liveblog_post( $post->ID ) ) {
+		if ( false !== Liveblog::is_liveblog_post( $post->ID ) ) {
 			/**
 			 * This filter is documented in liveblog.php
 			 */
-			$metadata = WPCOM_Liveblog::get_liveblog_metadata( $metadata, $post );
+			$metadata = Liveblog::get_liveblog_metadata( $metadata, $post );
 		}
 
 		return $metadata;
@@ -219,11 +219,11 @@ class WPCOM_Liveblog_AMP {
 	public static function append_liveblog_to_content( $content ) {
 		global $post;
 
-		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+		if ( Liveblog::is_liveblog_post( $post->ID ) === false ) {
 			return $content;
 		}
 
-		$request = WPCOM_Liveblog::get_request_data();
+		$request = Liveblog::get_request_data();
 
 		// If AMP Polling request don't restrict content so it knows there is updates are available.
 		if ( self::is_amp_polling() ) {
@@ -231,11 +231,11 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		if ( $request->id ) {
-			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
+			$entries  = Liveblog::get_entries_paged( false, false, $request->id );
 			$request  = self::set_request_last_from_entries( $entries, $request );
 			$content .= self::build_single_entry( $entries, $request, $post->post_id );
 		} else {
-			$entries  = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
+			$entries  = Liveblog::get_entries_paged( $request->page, $request->last );
 			$request  = self::set_request_last_from_entries( $entries, $request );
 			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
 		}
@@ -305,7 +305,7 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function get_entry( $id, $post_id, $entries = false ) {
 		if ( false === $entries ) {
-			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $id );
+			$entries = Liveblog::get_entries_paged( false, false, $id );
 		}
 
 		$entries['entries'] = self::filter_entries( $entries['entries'], $post_id );
@@ -338,8 +338,8 @@ class WPCOM_Liveblog_AMP {
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post_id ),
 				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => [
-					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
-					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
+					'entries_per_page' => Liveblog_Lazyloader::get_number_of_entries(),
+					'refresh_interval' => Liveblog::get_refresh_interval(),
 					'social'           => self::add_social_share_options(),
 				],
 			]
@@ -464,7 +464,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return string            Rendered Template
 	 */
 	public static function get_template( $name, $variables = [] ) {
-		$template = new WPCOM_Liveblog_AMP_Template();
+		$template = new Liveblog_AMP_Template();
 		return $template->render( $name, $variables );
 	}
 

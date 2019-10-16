@@ -6,7 +6,7 @@
 /**
  * Register and handle the "Live Blog" Custom Post Type
  */
-class WPCOM_Liveblog_CPT {
+class Liveblog_CPT {
 
 	const DEFAULT_CPT_SLUG = 'liveblog';
 
@@ -23,7 +23,7 @@ class WPCOM_Liveblog_CPT {
 		add_action( 'pre_get_posts', [ __CLASS__, 'filter_children_from_query' ] );
 		add_filter( 'parse_query', [ __CLASS__, 'hierarchical_posts_filter' ] );
 
-		self::$cpt_slug = apply_filters( 'wpcom_liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
+		self::$cpt_slug = apply_filters( 'liveblog_cpt_slug', self::DEFAULT_CPT_SLUG );
 
 		return register_post_type(
 			self::$cpt_slug,
@@ -120,4 +120,4 @@ class WPCOM_Liveblog_CPT {
 	}
 }
 
-add_action( 'init', [ 'WPCOM_Liveblog_CPT', 'register_post_type' ] );
+add_action( 'init', [ 'Liveblog_CPT', 'register_post_type' ] );

@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Entry_Embed
+ * Class Liveblog_Entry_Embed
  *
  */
-class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
+class Liveblog_Entry_Embed extends WP_Embed {
 
 	public function __construct() {
 		return; //nothing happens during __construct for now

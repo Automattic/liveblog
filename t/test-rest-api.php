@@ -26,15 +26,15 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * test_does_the_non_pretty_endpoint_build_correctly
-	 * @package WPCOM_Liveblog_Rest_Api
+	 * @package Liveblog_Rest_Api
 	 * @version 1.0
 	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::load()
+	 * @covers \Liveblog_Rest_Api::load()
 	 */
 	public function test_does_the_class_load_correctly() {
 
-		WPCOM_Liveblog_Rest_Api::load();
-		$base = WPCOM_Liveblog_Rest_Api::$endpoint_base;
+		Liveblog_Rest_Api::load();
+		$base = Liveblog_Rest_Api::$endpoint_base;
 
 		$this->assertNotNull( $base );
 		$this->assertTrue( is_string( $base ) );
@@ -50,10 +50,10 @@ class Test_REST_API extends WP_UnitTestCase {
 			$test_array = array_merge( $test_array, $value );
 		}
 
-		$this->assertArrayHasKey( 'WPCOM_Liveblog_Rest_Api::register_routes', $test_array );
+		$this->assertArrayHasKey( 'Liveblog_Rest_Api::register_routes', $test_array );
 
 		//Lets test the existing endpoint base. Should return the same one as above.
-		$existing_endpoint_base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		$existing_endpoint_base = Liveblog_Rest_Api::build_endpoint_base();
 		$this->assertSame( $base, $existing_endpoint_base );
 
 	}
@@ -61,19 +61,19 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * test_does_the_non_pretty_endpoint_build_correctly
-	 * @package WPCOM_Liveblog_Rest_Api
+	 * @package Liveblog_Rest_Api
 	 * @version 1.0
 	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 * @covers \Liveblog_Rest_Api::build_endpoint_base()
 	 */
 	public function test_does_the_non_pretty_endpoint_build_correctly() {
 
 		//If the endpoint is empty
-		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
-		$api_namespace                          = 'liveblog/v1';
+		Liveblog_Rest_Api::$endpoint_base = null;
+		$api_namespace                    = 'liveblog/v1';
 
 		//Non Pretty Permalink Structure
-		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		$base = Liveblog_Rest_Api::build_endpoint_base();
 
 		//Assert we have a return
 		$this->assertNotNull( $base );
@@ -87,15 +87,15 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	/**
 	 * test_does_the_pretty_endpoint_build_correctly
-	 * @package WPCOM_Liveblog_Rest_Api
+	 * @package Liveblog_Rest_Api
 	 * @version 1.0
 	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 * @covers \Liveblog_Rest_Api::build_endpoint_base()
 	 */
 	public function test_does_the_pretty_endpoint_build_correctly() {
 
 		//Empty the base so we can generate one,
-		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
+		Liveblog_Rest_Api::$endpoint_base = null;
 
 		//Lets define the known API namespace.
 		$api_namespace = 'liveblog/v1';
@@ -104,7 +104,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 
 		//Now lest fire the method again and see what we get as the method should now detect the new permalink structure and return the pretty endpoint.
-		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		$base = Liveblog_Rest_Api::build_endpoint_base();
 
 		//Lets make sure something is returned
 		$this->assertNotNull( $base );
@@ -126,7 +126,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$start_time = strtotime( '-1 hour' );
 		$end_time   = strtotime( '+1 hour' );
 
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+		$entries = Liveblog::get_entries_by_time( $start_time, $end_time );
 
 		$this->assertArrayHasKey( 'entries', $entries );
 		$this->assertArrayHasKey( 'latest_timestamp', $entries );
@@ -144,7 +144,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$start_time = strtotime( '-1 hour' );
 		$end_time   = strtotime( '+1 hour' );
 
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+		$entries = Liveblog::get_entries_by_time( $start_time, $end_time );
 
 		$this->assertNotEmpty( $entries['entries'] );
 		$this->assertNotNull( $entries['latest_timestamp'] );
@@ -162,7 +162,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$start_time = strtotime( '-2 hour' );
 		$end_time   = strtotime( '-1 hour' );
 
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+		$entries = Liveblog::get_entries_by_time( $start_time, $end_time );
 
 		$this->assertEmpty( $entries['entries'] );
 		$this->assertNull( $entries['latest_timestamp'] );
@@ -176,7 +176,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$new_entry = $this->setup_entry_test_state();
 
-		$entry = WPCOM_Liveblog::get_single_entry( $new_entry[0]->get_id() );
+		$entry = Liveblog::get_single_entry( $new_entry[0]->get_id() );
 
 		$this->assertNotEmpty( $entry['entries'] );
 		$this->assertInternalType( 'int', $entry['index'] );
@@ -192,7 +192,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$this->setup_entry_test_state();
 
-		$entry = WPCOM_Liveblog::get_single_entry( 1010 );
+		$entry = Liveblog::get_single_entry( 1010 );
 
 		$this->assertEmpty( $entry['entries'] );
 
@@ -210,7 +210,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$max_timestamp = strtotime( '+1 day' );
 		$min_timestamp = 0;
 
-		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+		$entries = Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
 
 		$this->assertNotEmpty( $entries['entries'] );
 		$this->assertInternalType( 'int', $entries['index'] );
@@ -228,7 +228,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$max_timestamp = strtotime( '-1 day' );
 		$min_timestamp = 0;
 
-		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+		$entries = Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
 
 		$this->assertEmpty( $entries['entries'] );
 		$this->assertInternalType( 'int', $entries['index'] );
@@ -242,7 +242,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		$user  = $this->factory->user->create_and_get();
 		$args  = [ 'user' => $user ];
-		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
+		$entry = Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
 
 		$this->assertInternalType( 'array', $entry );
 		$this->assertNotEmpty( $entry['entries'] );
@@ -260,7 +260,7 @@ class Test_REST_API extends WP_UnitTestCase {
 			'entry_id' => $new_entry[0]->get_id(),
 			'content'  => 'Updated Test Liveblog entry',
 		];
-		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
+		$entry     = Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
 
 		$this->assertInternalType( 'array', $entry );
 		$this->assertNotEmpty( $entry['entries'] );
@@ -277,13 +277,13 @@ class Test_REST_API extends WP_UnitTestCase {
 		$new_entry = $this->setup_entry_test_state();
 
 		$this->assertInternalType( 'array', $new_entry );
-		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $new_entry[0] );
+		$this->assertInstanceOf( 'Liveblog_Entry', $new_entry[0] );
 
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete it
 		$args = [ 'entry_id' => $new_entry_id ];
-		WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
+		Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
 
 		// Check that it was sent to the trash
 		$deleted_entry = get_comment( $new_entry_id );
@@ -303,7 +303,7 @@ class Test_REST_API extends WP_UnitTestCase {
 
 		// Then delete the key
 		$args  = [ 'entry_id' => $new_entry_id ];
-		$entry = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
+		$entry = Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
 
 		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error
 		$this->assertNotInstanceOf( 'WP_Error', $entry );
@@ -316,7 +316,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	public function test_preview_entry() {
 
 		// Get entry preview
-		$preview = WPCOM_Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
+		$preview = Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
 
 		$this->assertInternalType( 'array', $preview );
 		$this->assertNotEmpty( $preview['html'] );
@@ -329,7 +329,7 @@ class Test_REST_API extends WP_UnitTestCase {
 	public function test_get_authors() {
 
 		// Get a list of authors
-		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
+		$liveblog_authors = new Liveblog_Entry_Extend_Feature_Authors();
 
 		$authors_not_empty = $liveblog_authors->get_authors( 'adm' ); // Should return admin
 		$authors_is_empty  = $liveblog_authors->get_authors( 'fakeauthor' ); // Non-existent user
@@ -359,7 +359,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		];
 
 		// Save post state and return the metabox markup
-		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
+		$meta_box = Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
 
 		// TODO: Possibly test for something more specific
 		$this->assertInternalType( 'string', $meta_box );
@@ -663,8 +663,8 @@ class Test_REST_API extends WP_UnitTestCase {
 	}
 
 	private function set_liveblog_vars() {
-		WPCOM_Liveblog::$is_rest_api_call = true;
-		WPCOM_Liveblog::$post_id          = 1;
+		Liveblog::$is_rest_api_call = true;
+		Liveblog::$post_id          = 1;
 	}
 
 	private function insert_entries( $number_of_entries = 1, $args = [] ) {
@@ -674,7 +674,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$args['user'] = $user;
 
 		for ( $i = 0; $i < $number_of_entries; $i++ ) {
-			$entries[] = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
+			$entries[] = Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		}
 
 		return $entries;
@@ -713,7 +713,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		// Make the new post a liveblog
 		$state        = 'enable';
 		$request_vars = [ 'state' => $state ];
-		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
+		Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		return $post_id;
 	}

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Metadata
+ * Class Liveblog_Metadata
  *
  * Adds Support for LiveBlogPosting Metadata
  */
-class WPCOM_Liveblog_Metadata {
+class Liveblog_Metadata {
 	const METABOX_KEY             = 'liveblog_event_metdata_metabox';
 	const EVENT_METADATA_KEY      = 'liveblog_event_metadata';
 	const METADATA_NONCE          = 'liveblog_event_metadata_nonce';
@@ -21,7 +21,7 @@ class WPCOM_Liveblog_Metadata {
 
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by Liveblog::load(),
 	 */
 	public static function load() {
 		add_action( 'add_meta_boxes', [ __CLASS__, 'add_meta_box' ] );
@@ -40,7 +40,7 @@ class WPCOM_Liveblog_Metadata {
 	 */
 	public static function add_meta_box( $post_type ) {
 		// Bail if not supported
-		if ( ! post_type_supports( $post_type, WPCOM_Liveblog::KEY ) ) {
+		if ( ! post_type_supports( $post_type, Liveblog::KEY ) ) {
 			return;
 		}
 
@@ -82,7 +82,7 @@ class WPCOM_Liveblog_Metadata {
 
 		// save state (archive, enabled)
 		$new_state = filter_input( INPUT_POST, 'state', FILTER_SANITIZE_STRING );
-		WPCOM_Liveblog::set_liveblog_state( $post_id, $new_state );
+		Liveblog::set_liveblog_state( $post_id, $new_state );
 
 		do_action( 'save_liveblog_metabox', $post_id );
 	}
@@ -141,7 +141,7 @@ class WPCOM_Liveblog_Metadata {
 	 * @param  string $value value for field
 	 */
 	public static function print_text_field( $field_id, $field_type, $label, $value ) {
-		echo wp_kses( sprintf( self::$text_format, esc_attr( $field_id ), esc_attr( $field_type ), esc_html( $label ), esc_attr( $value ) ), WPCOM_Liveblog_Helpers::$meta_box_allowed_tags );
+		echo wp_kses( sprintf( self::$text_format, esc_attr( $field_id ), esc_attr( $field_type ), esc_html( $label ), esc_attr( $value ) ), Liveblog_Helpers::$meta_box_allowed_tags );
 	}
 
 	/**
@@ -163,7 +163,7 @@ class WPCOM_Liveblog_Metadata {
 	 * @return void
 	 */
 	public static function liveblog_state( $post_id ) {
-		$current_state = WPCOM_Liveblog::get_liveblog_state( $post_id );
+		$current_state = Liveblog::get_liveblog_state( $post_id );
 
 		$template_variables            = [];
 		$template_variables['buttons'] = [
@@ -194,7 +194,7 @@ class WPCOM_Liveblog_Metadata {
 			$template_variables['buttons']['archive']['disabled'] = true;
 		}
 
-		echo WPCOM_Liveblog::get_template_part( 'meta-box.php', $template_variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo Liveblog::get_template_part( 'meta-box.php', $template_variables ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

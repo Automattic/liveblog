@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Slash_Command_API {
+class Liveblog_Slash_Command_API {
 	const START_ENDPOINT = '/v1/slack/start';
 	const END_ENDPOINT   = '/v1/slack/end';
 
@@ -51,11 +51,11 @@ class WPCOM_Liveblog_Slash_Command_API {
 			return $liveblog;
 		}
 
-		$settings                          = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
+		$settings                          = get_option( Liveblog_Slack_Settings::OPTION_NAME, [] );
 		$settings['enable_event_endpoint'] = 'on';
-		update_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, $settings, 'no' );
+		update_option( Liveblog_Slack_Settings::OPTION_NAME, $settings, 'no' );
 
-		\WPCOM_Liveblog::set_liveblog_state( $liveblog, 'enable' );
+		\Liveblog::set_liveblog_state( $liveblog, 'enable' );
 
 		return rest_ensure_response( [ 'text' => sprintf( '%s has been started!', get_the_title( $liveblog ) ) ] );
 	}
@@ -74,11 +74,11 @@ class WPCOM_Liveblog_Slash_Command_API {
 			return $liveblog;
 		}
 
-		$settings = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
+		$settings = get_option( Liveblog_Slack_Settings::OPTION_NAME, [] );
 		unset( $settings['enable_event_endpoint'] );
-		update_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, $settings );
+		update_option( Liveblog_Slack_Settings::OPTION_NAME, $settings );
 
-		\WPCOM_Liveblog::set_liveblog_state( $liveblog, 'archive' );
+		\Liveblog::set_liveblog_state( $liveblog, 'archive' );
 
 		return rest_ensure_response( [ 'text' => sprintf( '%s has been ended!', get_the_title( $liveblog ) ) ] );
 	}
@@ -96,18 +96,18 @@ class WPCOM_Liveblog_Slash_Command_API {
 		parse_str( $raw_body, $body );
 		$channel_id = $body['channel_id'] ?? false;
 
-		if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
+		if ( ! class_exists( 'Liveblog' ) ) {
 			return new WP_Error( 'slack_liveblog_missing', 'Liveblog plugin is not installed or enabled on this site', [ 'status' => 200 ] );
 		}
 
 		//Validate slack request
-		$validate = WPCOM_Liveblog_Webhook_API::validate_request( $request );
+		$validate = Liveblog_Webhook_API::validate_request( $request );
 		if ( is_wp_error( $validate ) ) {
 			return $validate;
 		}
 
 		//verify channel
-		$liveblog = WPCOM_Liveblog_Webhook_API::get_liveblog_by_channel_id( $channel_id );
+		$liveblog = Liveblog_Webhook_API::get_liveblog_by_channel_id( $channel_id );
 		if ( ! $liveblog ) {
 			return new WP_Error( 'slack_missing_channel', "Liveblog with channel $channel_id not found", [ 'status' => 200 ] );
 		}

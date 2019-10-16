@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Class WPCOM_Liveblog_Rest_Api
+ * Class Liveblog_Rest_Api
  *
  * This class integrates with the REST API framework added in WordPress 4.4
- * It registers endpoints matching the legacy functionality in the WPCOM_Liveblog ajax methods
+ * It registers endpoints matching the legacy functionality in the Liveblog ajax methods
  *
  */
 
-class WPCOM_Liveblog_Rest_Api {
+class Liveblog_Rest_Api {
 
 	private static $api_version;
 	private static $api_namespace;
@@ -95,7 +95,7 @@ class WPCOM_Liveblog_Rest_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ __CLASS__, 'crud_entry' ],
-				'permission_callback' => [ 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ],
+				'permission_callback' => [ 'Liveblog', 'current_user_can_edit_liveblog' ],
 				'args'                => [
 					'crud_action' => [
 						'required'          => true,
@@ -226,7 +226,7 @@ class WPCOM_Liveblog_Rest_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ __CLASS__, 'update_post_state' ],
-				'permission_callback' => [ 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ],
+				'permission_callback' => [ 'Liveblog', 'current_user_can_edit_liveblog' ],
 				'args'                => [
 					'post_id'         => [
 						'required' => true,
@@ -367,10 +367,10 @@ class WPCOM_Liveblog_Rest_Api {
 		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		// Get liveblog entries within the start and end boundaries
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
+		$entries = Liveblog::get_entries_by_time( $start_timestamp, $end_timestamp );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entries;
 	}
@@ -401,10 +401,10 @@ class WPCOM_Liveblog_Rest_Api {
 		self::set_liveblog_vars( $args['post_id'] );
 
 		// Attempt to perform the requested action
-		$entry = WPCOM_Liveblog::do_crud_entry( $crud_action, $args );
+		$entry = Liveblog::do_crud_entry( $crud_action, $args );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entry;
 	}
@@ -429,10 +429,10 @@ class WPCOM_Liveblog_Rest_Api {
 		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
 		// Get liveblog entries too be lazyloaded
-		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+		$entries = Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entries;
 	}
@@ -453,10 +453,10 @@ class WPCOM_Liveblog_Rest_Api {
 		self::set_liveblog_vars( $post_id );
 
 		// Get liveblog entry
-		$entries = WPCOM_Liveblog::get_single_entry( $entry_id );
+		$entries = Liveblog::get_single_entry( $entry_id );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entries;
 	}
@@ -478,10 +478,10 @@ class WPCOM_Liveblog_Rest_Api {
 		self::set_liveblog_vars( $post_id );
 
 		// Get entry preview
-		$preview = WPCOM_Liveblog::format_preview_entry( $entry_content );
+		$preview = Liveblog::format_preview_entry( $entry_content );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $preview;
 	}
@@ -499,7 +499,7 @@ class WPCOM_Liveblog_Rest_Api {
 		$term = $request->get_param( 'term' );
 
 		// Get a list of authors
-		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
+		$liveblog_authors = new Liveblog_Entry_Extend_Feature_Authors();
 		$authors          = $liveblog_authors->get_authors( $term );
 
 		return $authors;
@@ -529,10 +529,10 @@ class WPCOM_Liveblog_Rest_Api {
 		self::set_liveblog_vars( $post_id );
 
 		// Save post state
-		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
+		$meta_box = Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $meta_box;
 
@@ -557,10 +557,10 @@ class WPCOM_Liveblog_Rest_Api {
 		add_filter( 'liveblog_all_entries_bypass_cache', [ __CLASS__, 'bypass_cache' ] );
 		add_filter( 'liveblog_query_args', [ __CLASS__, 'maybe_allow_draft_post' ] );
 
-		$entries = WPCOM_Liveblog::get_entries_paged( $page, $last_known_entry );
+		$entries = Liveblog::get_entries_paged( $page, $last_known_entry );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entries;
 	}
@@ -580,11 +580,11 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$key_events = WPCOM_Liveblog_Entry_Key_Events::all();
-		$key_events = WPCOM_Liveblog::entries_for_json( $key_events );
+		$key_events = Liveblog_Entry_Key_Events::all();
+		$key_events = Liveblog::entries_for_json( $key_events );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $key_events;
 	}
@@ -601,10 +601,10 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$entries = WPCOM_Liveblog::get_entries_paged( false, $last_known_entry, $id, true );
+		$entries = Liveblog::get_entries_paged( false, $last_known_entry, $id, true );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entries;
 	}
@@ -625,22 +625,22 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$entries = WPCOM_Liveblog::get_entries_paged( false, $last_known_entry, $id );
+		$entries = Liveblog::get_entries_paged( false, $last_known_entry, $id );
 
 		// Possibly do not cache the response
-		WPCOM_Liveblog::prevent_caching_if_needed();
+		Liveblog::prevent_caching_if_needed();
 
 		return $entries;
 	}
 
 	/**
-	 * Set a few static variables in the WPCOM_Liveblog class needed for some callbacks to work
+	 * Set a few static variables in the Liveblog class needed for some callbacks to work
 	 *
 	 * @param int $post_id The post ID for the current request
 	 */
 	private static function set_liveblog_vars( $post_id ) {
-		WPCOM_Liveblog::$is_rest_api_call = true;
-		WPCOM_Liveblog::$post_id          = $post_id;
+		Liveblog::$is_rest_api_call = true;
+		Liveblog::$post_id          = $post_id;
 	}
 
 	/**
@@ -649,7 +649,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return bool true if $param is one of insert|update|delete|delete_key. false otherwise
 	 */
 	public static function validate_crud_action( $param, $request, $key ) {
-		return WPCOM_Liveblog::is_valid_crud_action( $param );
+		return Liveblog::is_valid_crud_action( $param );
 	}
 
 	/**
@@ -708,7 +708,7 @@ class WPCOM_Liveblog_Rest_Api {
 		}
 		$allowed_status = [ 'draft', 'publish' ];
 
-		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+		if ( wp_verify_nonce( $nonce, 'wp_rest' ) && Liveblog::current_user_can_edit_liveblog() ) {
 			$status = filter_input( INPUT_GET, 'filter-status', FILTER_SANITIZE_STRING );
 			if ( in_array( $status, $allowed_status, true ) ) {
 				$args['post_status'] = $status;
@@ -735,7 +735,7 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return bool
 	 */
 	public static function bypass_cache( $enabled ) {
-		if ( WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+		if ( Liveblog::current_user_can_edit_liveblog() ) {
 			return true;
 		}
 

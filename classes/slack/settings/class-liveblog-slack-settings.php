@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Slack_Settings {
+class Liveblog_Slack_Settings {
 
 	const SETTINGS_PAGE_TITLE      = 'Slack Settings';
 	const SETTINGS_SECTION_TITLE   = 'Settings';
@@ -98,7 +98,7 @@ class WPCOM_Liveblog_Slack_Settings {
 		}
 
 		if ( ! empty( $args['description'] ) ) {
-			echo wp_kses_post( str_replace( '%slack-event-endpoint%', sprintf( '<i>%s</i>', home_url( '/wp-json/liveblog/' . WPCOM_Liveblog_Webhook_API::EVENT_ENDPOINT ) ), $args['description'] ) );
+			echo wp_kses_post( str_replace( '%slack-event-endpoint%', sprintf( '<i>%s</i>', home_url( '/wp-json/liveblog/' . Liveblog_Webhook_API::EVENT_ENDPOINT ) ), $args['description'] ) );
 		}
 	}
 
@@ -115,7 +115,7 @@ class WPCOM_Liveblog_Slack_Settings {
 	 */
 	public static function settings_page() {
 		add_submenu_page(
-			'edit.php?post_type=' . WPCOM_Liveblog_CPT::$cpt_slug,
+			'edit.php?post_type=' . Liveblog_CPT::$cpt_slug,
 			self::SETTINGS_PAGE_TITLE,
 			self::SETTINGS_PAGE_TITLE,
 			self::SETTINGS_PAGE_CAPABILITY,
@@ -149,7 +149,7 @@ class WPCOM_Liveblog_Slack_Settings {
 	 */
 	public static function export_users() {
 		if ( ! empty( $_GET['page'] ) && self::OPTION_NAME === $_GET['page'] && isset( $_GET['export'] ) && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), self::NONCE_ACTION ) ) { //phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected
-			$user_export = new WPCOM_Liveblog_Export_Authors();
+			$user_export = new Liveblog_Export_Authors();
 			$user_export->download();
 		}
 	}

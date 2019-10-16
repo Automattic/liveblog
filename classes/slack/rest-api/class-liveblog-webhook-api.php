@@ -1,6 +1,6 @@
 <?php
 
-class WPCOM_Liveblog_Webhook_API {
+class Liveblog_Webhook_API {
 
 	const EVENT_ENDPOINT  = 'v1/slack';
 	const CACHE_KEY       = 'liveblog';
@@ -41,7 +41,7 @@ class WPCOM_Liveblog_Webhook_API {
 	public static function request( WP_REST_Request $request ) {
 		$raw_body = $request->get_body();
 		$body     = json_decode( $raw_body );
-		$settings = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
+		$settings = get_option( Liveblog_Slack_Settings::OPTION_NAME, [] );
 
 		if ( empty( $settings['enable_event_endpoint'] ) || 'on' !== $settings['enable_event_endpoint'] ) {
 			return new WP_Error( 'slack_liveblog_disabled', 'The liveblog event api endpoint is currently disabled', [ 'status' => 200 ] );
@@ -97,7 +97,7 @@ class WPCOM_Liveblog_Webhook_API {
 		$headers_slack_timestamp = $request->get_header( 'x_slack_request_timestamp' );
 		$version                 = explode( '=', sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_SLACK_SIGNATURE'] ) ) ); //phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 		$sig_basestring          = "{$version[0]}:$headers_slack_timestamp:$raw_body";
-		$settings                = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
+		$settings                = get_option( Liveblog_Slack_Settings::OPTION_NAME, [] );
 
 		$hash_signature = hash_hmac( 'sha256', $sig_basestring, $settings['signing_secret'] ?? '' );
 
@@ -125,7 +125,7 @@ class WPCOM_Liveblog_Webhook_API {
 		$body          = json_decode( wp_json_encode( $body ) );
 		$slack_user_id = $body->event->user ?? false;
 		$slack_channel = $body->event->channel ?? false;
-		$settings      = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
+		$settings      = get_option( Liveblog_Slack_Settings::OPTION_NAME, [] );
 		$is_edit       = property_exists( $body->event, 'subtype' ) && 'message_changed' === $body->event->subtype;
 
 		if ( $is_edit ) {
@@ -152,8 +152,8 @@ class WPCOM_Liveblog_Webhook_API {
 		}
 
 		/**
-		 * Both \WPCOM_Liveblog_Entry::update and \WPCOM_Liveblog_Entry::insert require the author_id parameter
-		 * and convert them to a user object that is then used by \WPCOM_Liveblog_Entry::insert_entry. This function validates
+		 * Both \Liveblog_Entry::update and \Liveblog_Entry::insert require the author_id parameter
+		 * and convert them to a user object that is then used by \Liveblog_Entry::insert_entry. This function validates
 		 * the provided args to make sure it includes user parameter is set before inserting the comment. Because not everyone writing in
 		 * slack will have a corresponding WordPress user will just user the liveblog author user id.
 		 */
@@ -167,7 +167,7 @@ class WPCOM_Liveblog_Webhook_API {
 			$original_text = $body->event->message->text;
 			$entry_data    = self::sanitize_entry( $original_text );
 
-			$entry = WPCOM_Liveblog_Entry::update(
+			$entry = Liveblog_Entry::update(
 				[
 					'post_id'    => $liveblog,
 					'entry_id'   => $liveblog_entry->ID,
@@ -181,7 +181,7 @@ class WPCOM_Liveblog_Webhook_API {
 			$original_text = $body->event->text;
 			$entry_data    = self::sanitize_entry( $original_text, $liveblog, $body->event->files ?? [] );
 
-			$entry = WPCOM_Liveblog_Entry::insert(
+			$entry = Liveblog_Entry::insert(
 				[
 					'post_id'    => $liveblog,
 					'headline'   => $entry_data['headline'],
@@ -217,7 +217,7 @@ class WPCOM_Liveblog_Webhook_API {
 		$content = apply_filters( 'liveblog_slack_entry_content', $content );
 
 		// Parse markdown
-		$content = WPCOM_Liveblog_Markdown_Parser::render( trim( $content ) );
+		$content = Liveblog_Markdown_Parser::render( trim( $content ) );
 
 		$content = preg_replace_callback(
 			'/<\s*(http.*?)>/mi',
@@ -331,7 +331,7 @@ class WPCOM_Liveblog_Webhook_API {
 				'number'     => 1,
 				'meta_query' => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
-						'key'     => WPCOM_Liveblog_Author_Settings::SETTING_META,
+						'key'     => Liveblog_Author_Settings::SETTING_META,
 						'value'   => $slack_id,
 						'compare' => '=',
 					],
@@ -348,7 +348,7 @@ class WPCOM_Liveblog_Webhook_API {
 					'post_type'      => 'guest-author',
 					'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						[
-							'key'     => 'cap-' . WPCOM_Liveblog_Author_Settings::SETTING_META,
+							'key'     => 'cap-' . Liveblog_Author_Settings::SETTING_META,
 							'value'   => $slack_id,
 							'compare' => '=',
 						],
@@ -409,10 +409,10 @@ class WPCOM_Liveblog_Webhook_API {
 				'posts_per_page' => 1,
 				'post_status'    => $post_status,
 				'fields'         => 'ids',
-				'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
+				'post_type'      => Liveblog_CPT::$cpt_slug,
 				'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
-						'key'     => WPCOM_Liveblog_Metadata::METADATA_SLACK_CHANNEL,
+						'key'     => Liveblog_Metadata::METADATA_SLACK_CHANNEL,
 						'value'   => $channel_id,
 						'compare' => '=',
 					],
@@ -438,13 +438,13 @@ class WPCOM_Liveblog_Webhook_API {
 	 * @return bool|mixed
 	 */
 	public static function get_entry_by_message_id( $message_id ) {
-		remove_filter( 'parse_query', [ 'WPCOM_Liveblog_CPT', 'hierarchical_posts_filter' ] );
-		remove_action( 'pre_get_posts', [ 'WPCOM_Liveblog_CPT', 'filter_children_from_query' ] );
+		remove_filter( 'parse_query', [ 'Liveblog_CPT', 'hierarchical_posts_filter' ] );
+		remove_action( 'pre_get_posts', [ 'Liveblog_CPT', 'filter_children_from_query' ] );
 
 		$entry = new WP_Query(
 			[
 				'posts_per_page' => 10,
-				'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
+				'post_type'      => Liveblog_CPT::$cpt_slug,
 				'post_status'    => [ 'draft', 'publish' ],
 				'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
@@ -506,7 +506,7 @@ class WPCOM_Liveblog_Webhook_API {
 	 * @return array|bool|WP_Error
 	 */
 	public static function import_file( $file_url = '', $liveblog_id ) {
-		$settings = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
+		$settings = get_option( Liveblog_Slack_Settings::OPTION_NAME, [] );
 
 		if ( empty( $file_url ) ) {
 			return false;

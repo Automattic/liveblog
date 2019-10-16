@@ -3,19 +3,19 @@ class Test_Entry extends WP_UnitTestCase {
 
 	public function test_constructor_should_set_replace_if_there_is_replace_meta() {
 		$comment = $this->create_and_get_comment_with_replaces( 5 );
-		$entry   = new WPCOM_Liveblog_Entry( $comment );
+		$entry   = new Liveblog_Entry( $comment );
 		$this->assertEquals( 5, $entry->replaces );
 	}
 
 	public function test_constructor_should_set_replaces_to_false_if_no_replace_meta() {
 		$comment = $this->factory->comment->create_and_get();
-		$entry   = new WPCOM_Liveblog_Entry( $comment );
+		$entry   = new Liveblog_Entry( $comment );
 		$this->assertTrue( ! $entry->replaces );
 	}
 
 	public function test_insert_should_return_entry() {
 		$entry = $this->insert_entry();
-		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $entry );
+		$this->assertInstanceOf( 'Liveblog_Entry', $entry );
 	}
 
 	public function test_insert_should_return_entry_with_type_new() {
@@ -32,7 +32,7 @@ class Test_Entry extends WP_UnitTestCase {
 
 	public function test_update_should_replace_the_content_in_the_query() {
 		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::update(
+		$update_entry = Liveblog_Entry::update(
 			$this->build_entry_args(
 				[
 					'entry_id' => $entry->get_id(),
@@ -45,7 +45,7 @@ class Test_Entry extends WP_UnitTestCase {
 
 	public function test_update_should_return_entry_with_type_update() {
 		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::update(
+		$update_entry = Liveblog_Entry::update(
 			$this->build_entry_args(
 				[
 					'entry_id' => $entry->get_id(),
@@ -60,7 +60,7 @@ class Test_Entry extends WP_UnitTestCase {
 		unset( $GLOBALS['liveblog_hook_fired'] );
 		add_action( 'liveblog_update_entry', [ __CLASS__, 'set_liveblog_hook_fired' ] );
 		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::update(
+		Liveblog_Entry::update(
 			$this->build_entry_args(
 				[
 					'entry_id' => $entry->get_id(),
@@ -73,7 +73,7 @@ class Test_Entry extends WP_UnitTestCase {
 
 	public function test_update_should_update_original_entry() {
 		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::update(
+		Liveblog_Entry::update(
 			$this->build_entry_args(
 				[
 					'entry_id' => $entry->get_id(),
@@ -81,27 +81,27 @@ class Test_Entry extends WP_UnitTestCase {
 				]
 			)
 		);
-		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
+		$query = new Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertEquals( 'updated', $query->get_by_id( $entry->get_id() )->get_content() );
 	}
 
 	public function test_delete_should_replace_the_content_in_the_query() {
 		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
+		$update_entry = Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
 		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
 		$this->assertEquals( '', $update_entry->get_content() );
 	}
 
 	public function test_delete_should_return_entry_with_type_delete() {
 		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
+		$update_entry = Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
 		$this->assertEquals( 'delete', $update_entry->get_type() );
 	}
 
 	public function test_delete_should_delete_original_entry() {
 		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
-		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
+		Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
+		$query = new Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
 	}
 
@@ -128,7 +128,7 @@ class Test_Entry extends WP_UnitTestCase {
 	 * if successful.
 	 *
 	 * @author  Olly Warren, Big Bite Creative
-	 * @package WPCOM_Liveblog
+	 * @package Liveblog
 	 */
 	public function test_shortcode_excluded_from_entry() {
 
@@ -170,7 +170,7 @@ class Test_Entry extends WP_UnitTestCase {
 	}
 
 	private function insert_entry( $args = [] ) {
-		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
+		$entry = Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		return $entry;
 	}
 
