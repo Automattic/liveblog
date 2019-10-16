@@ -1146,7 +1146,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 					'liveblog_settings',
 					[
 						'permalink'                    => get_permalink(),
-						'plugin_dir'                   => plugin_dir_url( __FILE__ ),
+						'plugin_dir'                   => plugin_dir_url( __DIR__ ),
 						'post_id'                      => get_the_ID(),
 						'state'                        => self::get_liveblog_state(),
 						'is_liveblog_editable'         => self::is_liveblog_editable(),
