@@ -43,17 +43,13 @@ class WPCOM_Liveblog_Webhook_API {
 		$body     = json_decode( $raw_body );
 		$settings = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
 
-		if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
-			return new WP_Error( 'slack_liveblog_missing', 'Liveblog plugin is not installed or enabled on this site', [ 'status' => 400 ] );
-		}
-
 		if ( empty( $settings['enable_event_endpoint'] ) || 'on' !== $settings['enable_event_endpoint'] ) {
-			return new WP_Error( 'slack_liveblog_disabled', 'The liveblog event api endpoint is currently disabled', [ 'status' => 400 ] );
+			return new WP_Error( 'slack_liveblog_disabled', 'The liveblog event api endpoint is currently disabled', [ 'status' => 200 ] );
 		}
 
 		//Make sure we have a slack signing secret
 		if ( empty( $settings ) || empty( $settings['signing_secret'] ) ) {
-			return new WP_Error( 'slack_not_configured', 'Slack liveblog integration is missing the slack signing secret', [ 'status' => 400 ] );
+			return new WP_Error( 'slack_not_configured', 'Slack liveblog integration is missing the slack signing secret', [ 'status' => 200 ] );
 		}
 
 		//Validate slack request
@@ -69,7 +65,7 @@ class WPCOM_Liveblog_Webhook_API {
 
 		//Only ingest entries that start with FOR PUB:
 		if ( 0 === preg_match( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), $body->event->message->text ?? '', $matches ) && 0 === preg_match( apply_filters( 'liveblog_slack_ingest_regex', self::INGEST_REGEX ), $body->event->text ?? '', $matches ) ) {
-			return new WP_Error( 'slack_not_liveblog_entry', 'The current request is not for a liveblog entry', [ 'status' => 400 ] );
+			return new WP_Error( 'slack_not_liveblog_entry', 'The current request is not for a liveblog entry', [ 'status' => 200 ] );
 		}
 
 		/**
@@ -103,16 +99,16 @@ class WPCOM_Liveblog_Webhook_API {
 		$sig_basestring          = "{$version[0]}:$headers_slack_timestamp:$raw_body";
 		$settings                = get_option( WPCOM_Liveblog_Slack_Settings::OPTION_NAME, [] );
 
-		$hash_signature = hash_hmac( 'sha256', $sig_basestring, $settings['signing_secret'] );
+		$hash_signature = hash_hmac( 'sha256', $sig_basestring, $settings['signing_secret'] ?? '' );
 
 		//Make sure we're getting a request from slack
 		if ( empty( $headers_slack_signature ) || empty( $headers_slack_timestamp ) ) {
-			return new WP_Error( 'slack_unauthorized_request', 'Unauthorized Request', [ 'status' => 400 ] );
+			return new WP_Error( 'slack_unauthorized_request', 'Unauthorized Request', [ 'status' => 200 ] );
 		}
 
 		//Make sure we verify the request from slack
 		if ( ! hash_equals( $headers_slack_signature, "v0=$hash_signature" ) ) {
-			return new WP_Error( 'slack_verification_error', 'Request could not be verified', [ 'status' => 400 ] );
+			return new WP_Error( 'slack_verification_error', 'Request could not be verified', [ 'status' => 200 ] );
 		}
 
 		return true;
@@ -146,13 +142,13 @@ class WPCOM_Liveblog_Webhook_API {
 		//verify channel
 		$liveblog = self::get_liveblog_by_channel_id( $slack_channel );
 		if ( ! $liveblog ) {
-			return new WP_Error( 'slack_missing_channel', "Liveblog with channel $slack_channel not found", [ 'status' => 400 ] );
+			return new WP_Error( 'slack_missing_channel', "Liveblog with channel $slack_channel not found", [ 'status' => 200 ] );
 		}
 
 		//verify user
 		$user = self::get_contributor_by_slack_id( $slack_user_id );
 		if ( ! $user ) {
-			return new WP_Error( 'slack_missing_author', "Author with slack id $slack_user_id not found", [ 'status' => 400 ] );
+			return new WP_Error( 'slack_missing_author', "Author with slack id $slack_user_id not found", [ 'status' => 200 ] );
 		}
 
 		/**
@@ -262,8 +258,9 @@ class WPCOM_Liveblog_Webhook_API {
 					$link         = sprintf( '<iframe src="%s" width="640" height="360"></iframe>', esc_url( $link ) );
 				}
 
-				$embed = new \WP_oEmbed();
-				if ( ! empty( $match[1] ) && ! $embed->get_provider( $match[1] ) && ! $is_shortcode ) {
+				$embed     = new \WP_oEmbed();
+				$is_oembed = $embed->get_provider( $match[1] );
+				if ( ! empty( $match[1] ) && ! $is_oembed && ! $is_shortcode ) {
 					// Convert giphy urls to images
 					if ( false !== strpos( $link, 'giphy.com' ) ) {
 						$link = sprintf( '<img src="%s"/>', esc_url( $match[1] ) );
@@ -271,6 +268,9 @@ class WPCOM_Liveblog_Webhook_API {
 						// Return clean url so that markdown links will work
 						$link = $match[1];
 					}
+				} elseif ( $is_oembed ) {
+					// append new line to oembeds so that you can have back to back embed links
+					$link = $match[1] . PHP_EOL;
 				}
 
 				return $link;
@@ -408,7 +408,7 @@ class WPCOM_Liveblog_Webhook_API {
 				'posts_per_page' => 1,
 				'post_status'    => $post_status,
 				'fields'         => 'ids',
-				'post_type'      => 'fte_liveblog',
+				'post_type'      => WPCOM_Liveblog_CPT::$cpt_slug,
 				'meta_query'     => [ //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
 						'key'     => WPCOM_Liveblog_Metadata::METADATA_SLACK_CHANNEL,

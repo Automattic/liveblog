@@ -267,7 +267,6 @@ class WPCOM_Liveblog_AMP {
 	 * @return object          template
 	 */
 	public static function build_single_entry( $entries, $request, $post_id ) {
-
 		$entry = self::get_entry( $request->id, $post_id, $entries );
 
 		if ( false === $entry ) {
@@ -360,6 +359,7 @@ class WPCOM_Liveblog_AMP {
 		$permalink = amp_get_permalink( $post_id );
 
 		foreach ( $entries as $key => $entry ) {
+			$entries[ $key ]->content        = $entries[ $key ]->content;
 			$entries[ $key ]->time_ago       = self::get_entry_time_ago( $entry );
 			$entries[ $key ]->date           = self::get_entry_date( $entry );
 			$entries[ $key ]->update_time    = $entry->timestamp;

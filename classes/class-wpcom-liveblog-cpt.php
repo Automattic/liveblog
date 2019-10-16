@@ -89,7 +89,7 @@ class WPCOM_Liveblog_CPT {
 		$post_type = $query->get( 'post_type' );
 
 		// only applies to indexes and post format
-		if ( is_author() || is_search() || ( ( $query->is_home() || $query->is_archive() ) && ( empty( $post_type ) || in_array( $post_type, [ self::$cpt_slug ], true ) ) ) ) {
+		if ( is_author() || is_search() || is_feed() || ( ( $query->is_home() || $query->is_archive() ) && ( empty( $post_type ) || in_array( $post_type, [ self::$cpt_slug ], true ) ) ) ) {
 			$parent = $query->get( 'post_parent' );
 			if ( empty( $parent ) ) {
 				$query->set( 'post_parent', 0 );

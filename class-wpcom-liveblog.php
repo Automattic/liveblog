@@ -206,6 +206,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			// Add a body class to live blogs, admin side.
 			add_filter( 'admin_body_class', [ __CLASS__, 'add_live_body_class_admin' ] );
+
+			// don't index child posts in sitemap
+			add_filter( 'jetpack_sitemap_skip_post', [ __CLASS__, 'jetpack_sitemap_skip_post' ], 10, 2 );
 		}
 
 		/**
@@ -241,6 +244,22 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
+		 * Exclude liveblog child posts from the sitemap
+		 *
+		 * @param $skip
+		 * @param object $post A subset of WP_Post fields from a direct DB query: post_type, post_modified_gmt, comment_count, and ID
+		 *
+		 * @return bool
+		 */
+		public static function exclude_post_sitemap( $skip, $post ) {
+			if ( WPCOM_Liveblog_CPT::$cpt_slug === $post->post_type && 0 !== $post->post_parent ) {
+				$skip = true;
+			}
+
+			return $skip;
+		}
+
+		/**
 		 * Hook actions in that run on every admin page-load
 		 *
 		 * @uses add_action()
@@ -253,7 +272,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
-			if ( apply_filters( 'liveblog_add_post_filtering_dropdown', true ) ) {
+			if ( apply_filters( 'liveblog_show_post_filtering_dropdown', true ) ) {
 				add_action( 'restrict_manage_posts', [ __CLASS__, 'add_post_filtering_dropdown_to_manage_posts' ] );
 				add_action( 'pre_get_posts', [ __CLASS__, 'handle_query_vars_for_post_filtering' ] );
 			}
