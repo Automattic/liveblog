@@ -15,7 +15,6 @@ class Liveblog_Author_Settings {
 		add_action( 'edit_user_profile_update', [ __CLASS__, 'save_fields' ] );
 
 		add_filter( 'coauthors_guest_author_fields', [ __CLASS__, 'contributor_profile_fields' ], 99, 2 );
-
 	}
 
 	/**

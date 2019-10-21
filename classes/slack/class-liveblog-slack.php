@@ -1,6 +1,5 @@
 <?php
 
-
 class Liveblog_Slack {
 
 	const REFRESH_INTERVAL = 2;
@@ -56,6 +55,5 @@ class Liveblog_Slack {
 	}
 }
 
-add_action( 'init', [ __NAMESPACE__ . 'Liveblog_Slack', 'init' ] );
-
+add_action( 'init', [ 'Liveblog_Slack', 'init' ] );
 add_action( 'wp_async_slack_process_entry', [ 'Liveblog_Webhook_API', 'process_event' ] );
