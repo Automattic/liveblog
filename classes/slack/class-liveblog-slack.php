@@ -3,7 +3,7 @@
 
 class Liveblog_Slack {
 
-	const REFRESH_INTERVAL = 3;
+	const REFRESH_INTERVAL = 2;
 
 	/**
 	 * Init
