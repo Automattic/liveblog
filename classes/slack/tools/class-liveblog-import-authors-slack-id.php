@@ -120,7 +120,7 @@ class Liveblog_Import_Authors_Slack_ID {
 					set_time_limit( 0 );
 					$users      = self::import( $file );
 					$user_count = $users ? count( $users ) : 0;
-					printf( '<p>%s users were assigned a Slack ID!</p>', $user_count );
+					printf( '<p>%s users were assigned a Slack ID!</p>', esc_html( $user_count ) );
 					if ( $user_count ) {
 						echo '<ol>';
 						foreach ( $users as $user ) {

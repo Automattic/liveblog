@@ -1,5 +1,4 @@
 <?php
-
 /**
  * A very basic regex-based Markdown parser. Supports the
  * following elements (and can be extended via MarkdownParser::add_rule()):
@@ -26,19 +25,31 @@ class Liveblog_Markdown_Parser {
 	 */
 	public static $liner_rules = [
 		'/\[([^\[]+)\]\(([^\)]+)\)/'   => '<a href=\'\2\'>\1</a>',  // links
-		'/(\*\*|\*)(.*?)\1/'           => '<strong>\2</strong>', // bold
-		'/(\_|__)(.*?)\1/'             => '<em>\2</em>', // emphasis
+		'/[*]{1,2}((?:\\\\\*|[^*]|[*][^*]*+[*])+?)[*]{1,2}(?![*])/' => '<strong>\1</strong>', // bold
+		'/(?<!¯\\\)_{1,2}((?:\\\\_|[^_]|__[^_]*__)+?)_{1,2}(?!_)\b/' => '<em>\1</em>', // emphasis
 		'/\~(.*?)\~/'                  => '<del>\1</del>', // del
 		'/\:\"(.*?)\"\:/'              => '<q>\1</q>', // quote
 		'/<\/blockquote><blockquote>/' => "\n",  // fix extra blockquote
 	];
 
+	/**
+	 * Block level rules
+	 *
+	 * @var array
+	 */
 	public static $block_rules = [
 		'/(#+)(.*)/'     => 'header', // headers
 		'/\n&gt;(.*)/'   => 'blockquote', // blockquotes
 		'/\n([^\n]+)\n/' => 'paragraph', // add paragraphs
 	];
 
+	/**
+	 * Generate paragraph tag
+	 *
+	 * @param $line
+	 *
+	 * @return string
+	 */
 	private static function paragraph( $line ) {
 		$trimmed = trim( $line );
 		if ( strpos( $trimmed, '<' ) === 0 ) {
@@ -47,26 +58,49 @@ class Liveblog_Markdown_Parser {
 		return sprintf( "\n<p>%s</p>\n", $trimmed );
 	}
 
+	/**
+	 * Generate blockquote tag
+	 *
+	 * @param $item
+	 *
+	 * @return string
+	 */
 	private static function blockquote( $item ) {
 		return sprintf( "\n<blockquote>%s</blockquote>", trim( $item ) );
 	}
 
+	/**
+	 * Generate header tags
+	 *
+	 * @param $chars
+	 * @param $header
+	 *
+	 * @return string
+	 */
 	private static function header( $chars, $header ) {
 		$level = strlen( $chars );
 		return sprintf( '<h%d>%s</h%d>', $level, trim( $header ), $level );
 	}
+
 	/**
-	 * Add a rule.
+	 * Add custom rule.
+	 *
+	 * @param $regex
+	 * @param $replacement
 	 */
 	public static function add_rule( $regex, $replacement ) {
 		self::$rules[ $regex ] = $replacement;
 	}
+
 	/**
-	 * Render some Markdown into HTML.
+	 * Render some Markdown into HTML
+	 *
+	 * @param $text
+	 *
+	 * @return string
 	 */
 	public static function render( $text ) {
 		$text = "\n" . $text . "\n";
-
 		foreach ( self::$block_rules as $regex => $replacement ) {
 			$text = preg_replace_callback(
 				$regex,
@@ -77,10 +111,9 @@ class Liveblog_Markdown_Parser {
 						return call_user_func( [ __CLASS__, Liveblog_Markdown_Parser::$block_rules[ $regex ] ], $matches[1] );
 					}
 				},
-				$text 
+				$text
 			);
 		}
-
 		foreach ( self::$liner_rules as $regex => $replacement ) {
 			$text = preg_replace( $regex, $replacement, $text );
 		}
