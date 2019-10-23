@@ -15,6 +15,7 @@
  * - Ordered/unordered lists
  */
 class Liveblog_Markdown_Parser {
+
 	/**
 	 * Regex rules.
 	 *
@@ -29,7 +30,9 @@ class Liveblog_Markdown_Parser {
 		'/(?<!¯\\\)_{1,2}((?:\\\\_|[^_]|__[^_]*__)+?)_{1,2}(?!_)\b/' => '<em>\1</em>', // emphasis
 		'/\~(.*?)\~/'                  => '<del>\1</del>', // del
 		'/\:\"(.*?)\"\:/'              => '<q>\1</q>', // quote
-		'/<\/blockquote><blockquote>/' => "\n",  // fix extra blockquote
+		'/<\/ul><ul>/'                 => '',                                     // fix extra ul
+		'/<\/ol><ol>/'                 => '',                                     // fix extra ol
+		'/<\/blockquote><blockquote>/' => "\n",                    // fix extra blockquote
 	];
 
 	/**
@@ -38,9 +41,12 @@ class Liveblog_Markdown_Parser {
 	 * @var array
 	 */
 	public static $block_rules = [
-		'/(#+)(.*)/'     => 'header', // headers
-		'/\n&gt;(.*)/'   => 'blockquote', // blockquotes
-		'/\n([^\n]+)\n/' => 'paragraph', // add paragraphs
+		'/\n(#+)(.*)/'                   => 'header', // headers
+		'/\n\* (.*)/'                    => 'ul_list', // ul lists
+		'/\n[0-9]+\. (.*)/'              => 'ol_list', // ol lists
+		'/>{3}([a-z]*\n[\s\S]*?\n)>{3}/' => 'blockquote', // blockquotes
+		'/\n>(.*)/'                      => 'blockquote', // blockquotes
+		'/\n([^\n]+)\n/'                 => 'paragraph', // add paragraphs
 	];
 
 	/**
@@ -59,6 +65,28 @@ class Liveblog_Markdown_Parser {
 	}
 
 	/**
+	 * Generate unordered list tags
+	 *
+	 * @param $item
+	 *
+	 * @return string
+	 */
+	private static function ul_list( $item ) {
+		return sprintf( "\n<ul>\n\t<li>%s</li>\n</ul>", trim( $item ) );
+	}
+
+	/**
+	 * Generate ordered list tags
+	 *
+	 * @param $item
+	 *
+	 * @return string
+	 */
+	private static function ol_list( $item ) {
+		return sprintf( "\n<ol>\n\t<li>%s</li>\n</ol>", trim( $item ) );
+	}
+
+	/**
 	 * Generate blockquote tag
 	 *
 	 * @param $item
@@ -66,7 +94,7 @@ class Liveblog_Markdown_Parser {
 	 * @return string
 	 */
 	private static function blockquote( $item ) {
-		return sprintf( "\n<blockquote>%s</blockquote>", trim( $item ) );
+		return sprintf( "<blockquote>\n\n%s</blockquote>", trim( $item ) );
 	}
 
 	/**
