@@ -252,7 +252,7 @@ if ( ! class_exists( 'Liveblog' ) ) :
 		 *
 		 * @return bool
 		 */
-		public static function exclude_post_sitemap( $skip, $post ) {
+		public static function jetpack_sitemap_skip_post( $skip, $post ) {
 			if ( Liveblog_CPT::$cpt_slug === $post->post_type && 0 !== $post->post_parent ) {
 				$skip = true;
 			}
