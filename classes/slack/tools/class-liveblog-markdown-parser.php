@@ -27,12 +27,13 @@ class Liveblog_Markdown_Parser {
 	public static $liner_rules = [
 		'/\[([^\[]+)\]\(([^\)]+)\)/'   => '<a href=\'\2\'>\1</a>',  // links
 		'/[*]{1,2}((?:\\\\\*|[^*]|[*][^*]*+[*])+?)[*]{1,2}(?![*])/' => '<strong>\1</strong>', // bold
-		'/(?<!¯\\\)_{1,2}((?:\\\\_|[^_]|__[^_]*__)+?)_{1,2}(?!_)\b/' => '<em>\1</em>', // emphasis
+		'/(?<!¯.)_{1,2}((?:\\\\_|[^_]|__[^_]*__)+?)_{1,2}(?!_)\b/' => '<em>\1</em>', // emphasis
 		'/\~(.*?)\~/'                  => '<del>\1</del>', // del
 		'/\:\"(.*?)\"\:/'              => '<q>\1</q>', // quote
-		'/<\/ul><ul>/'                 => '',                                     // fix extra ul
-		'/<\/ol><ol>/'                 => '',                                     // fix extra ol
-		'/<\/blockquote><blockquote>/' => "\n",                    // fix extra blockquote
+		'/<\/ul><ul>/'                 => '', // fix extra ul
+		'/<\/ol><ol>/'                 => '', // fix extra ol
+		'/<\/blockquote><blockquote>/' => "\n", // fix extra blockquote
+		'/<em>\(ツ\)<\/em>/'            => '_(ツ)_', // fix shrug
 	];
 
 	/**
@@ -41,12 +42,14 @@ class Liveblog_Markdown_Parser {
 	 * @var array
 	 */
 	public static $block_rules = [
-		'/\n(#+)(.*)/'                   => 'header', // headers
-		'/\n\* (.*)/'                    => 'ul_list', // ul lists
-		'/\n[0-9]+\. (.*)/'              => 'ol_list', // ol lists
-		'/>{3}([a-z]*\n[\s\S]*?\n)>{3}/' => 'blockquote', // blockquotes
-		'/\n>(.*)/'                      => 'blockquote', // blockquotes
-		'/\n([^\n]+)\n/'                 => 'paragraph', // add paragraphs
+		'/\n(#+)(.*)/'                                   => 'header', // headers
+		'/\n\* (.*)/'                                    => 'ul_list', // ul lists
+		'/\n[0-9]+\. (.*)/'                              => 'ol_list', // ol lists
+		'/>{3}([a-z]*\n[\s\S]*?\n)>{3}/'                 => 'blockquote', // blockquotes
+		'/&gt;&gt;&gt;([a-z]*\n[\s\S]*?\n)&gt;&gt;&gt;/' => 'blockquote', // blockquotes
+		'/\n>(.*)/'                                      => 'blockquote', // blockquotes
+		'/\n&gt;(.*)/'                                   => 'blockquote', // blockquotes
+		'/\n([^\n]+)\n/'                                 => 'paragraph', // add paragraphs
 	];
 
 	/**
