@@ -133,7 +133,7 @@ class Liveblog_Markdown_Parser {
 			$text = preg_replace_callback(
 				$regex,
 				function ( $matches ) use ( $regex ) {
-					if ( '/(#+)(.*)/' === $regex ) {
+					if ( '/\n(#+)(.*)/' === $regex ) {
 						return call_user_func( [ __CLASS__, Liveblog_Markdown_Parser::$block_rules[ $regex ] ], $matches[1], $matches[2] );
 					} else {
 						return call_user_func( [ __CLASS__, Liveblog_Markdown_Parser::$block_rules[ $regex ] ], $matches[1] );
