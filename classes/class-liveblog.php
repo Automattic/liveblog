@@ -210,6 +210,9 @@ if ( ! class_exists( 'Liveblog' ) ) :
 
 			// don't index child posts in sitemap
 			add_filter( 'jetpack_sitemap_skip_post', [ __CLASS__, 'jetpack_sitemap_skip_post' ], 10, 2 );
+
+			// don't include child posts in search results
+			add_filter( 'jetpack_search_es_query_args', [ __CLASS__, 'jetpack_search_es_query_args' ], 10, 2 );
 		}
 
 		/**
@@ -258,6 +261,28 @@ if ( ! class_exists( 'Liveblog' ) ) :
 			}
 
 			return $skip;
+		}
+
+		/**
+		 * Exclude liveblog child posts from search results
+		 *
+		 * @param array    $args  The Elasticsearch query args
+		 * @param WP_Query $query The WP_Query object
+		 * @return array          The modified array
+		 */
+		public static function jetpack_search_es_query_args( $args, $query ) {
+			if ( is_array( $args ) ) {
+				$args['authenticated_request'] = true;
+			}
+			// Limit Jetpack Search to only posts with no parent
+			if ( is_array( $args['query']['function_score']['query']['bool']['must'] ) ) {
+				$args['query']['function_score']['query']['bool']['must'][] = [
+					'match' => [
+						'parent_post_id' => 0,
+					],
+				];
+			}
+			return $args;
 		}
 
 		/**
