@@ -48,7 +48,7 @@ class Liveblog_Entry_Embed_SDKs {
 	 * @return void
 	 */
 	public static function admin_enqueue() {
-		if ( Liveblog_CPT::$cpt_slug !== get_post_type() ) {
+		if ( get_post_type() !== Liveblog_CPT::$cpt_slug ) {
 			return;
 		}
 
