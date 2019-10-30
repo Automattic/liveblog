@@ -31,11 +31,11 @@ class Liveblog_Markdown_Parser {
 		'/\~(.*?)\~/'                    => '<del>\1</del>', // del
 		'/\:\"(.*?)\"\:/'                => '<q>\1</q>', // quote
 		'/<\/ul><ul>/'                   => '', // fix extra ul
-		'/<\/ul>\n<ul>/'                 => '/n', // fix extra ul
+		'/<\/ul>\n<ul>/'                 => "/n", // fix extra ul
 		'/<\/ol><ol>/'                   => '', // fix extra ol
 		'/<\/blockquote><blockquote>/'   => '', // fix extra blockquote
-		'/<\/blockquote>\n<blockquote>/' => '/n', // fix extra blockquote
-		'/<em>\(ツ\)<\/em>/'              => '_(ツ)_', // fix shrug
+		'/<\/blockquote>\n<blockquote>/' => "/n", // fix extra blockquote
+		'/<em>\(ツ\)<\/em>/'             => '_(ツ)_', // fix shrug
 	];
 
 	/**
