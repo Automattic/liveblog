@@ -25,15 +25,18 @@ class Liveblog_Markdown_Parser {
 	 * @var array
 	 */
 	public static $liner_rules = [
-		'/\[([^\[]+)\]\(([^\)]+)\)/'   => '<a href=\'\2\'>\1</a>',  // links
+		'/\[([^\[]+)\]\(([^\)]+)\)/'     => '<a href=\'\2\'>\1</a>',  // links
 		'/[*]{1,2}((?:\\\\\*|[^*]|[*][^*]*+[*])+?)[*]{1,2}(?![*])/' => '<strong>\1</strong>', // bold
 		'/(?<!¯.)_{1,2}((?:\\\\_|[^_]|__[^_]*__)+?)_{1,2}(?!_)\b/' => '<em>\1</em>', // emphasis
-		'/\~(.*?)\~/'                  => '<del>\1</del>', // del
-		'/\:\"(.*?)\"\:/'              => '<q>\1</q>', // quote
-		'/<\/ul><ul>/'                 => '', // fix extra ul
-		'/<\/ol><ol>/'                 => '', // fix extra ol
-		'/<\/blockquote><blockquote>/' => "\n", // fix extra blockquote
-		'/<em>\(ツ\)<\/em>/'            => '_(ツ)_', // fix shrug
+		'/\~(.*?)\~/'                    => '<del>\1</del>', // del
+		'/\:\"(.*?)\"\:/'                => '<q>\1</q>', // quote
+		'/<\/ul><ul>/'                   => '', // fix extra ul
+		'/<\/ul>\n<ul>/'                 => "\n", // fix extra ul
+		'/<\/ol><ol>/'                   => '', // fix extra ol
+		'/<\/ol>\n<ol>/'                 => "\n", // fix extra ol
+		'/<\/blockquote><blockquote>/'   => '', // fix extra blockquote
+		'/<\/blockquote>\n<blockquote>/' => "\n", // fix extra blockquote
+		'/<em>\(ツ\)<\/em>/'             => '_(ツ)_', // fix shrug
 	];
 
 	/**
@@ -42,14 +45,13 @@ class Liveblog_Markdown_Parser {
 	 * @var array
 	 */
 	public static $block_rules = [
-		'/\n(#+)(.*)/'                                   => 'header', // headers
-		'/\n\* (.*)/'                                    => 'ul_list', // ul lists
-		'/\n[0-9]+\. (.*)/'                              => 'ol_list', // ol lists
-		'/>{3}([a-z]*\n[\s\S]*?\n)>{3}/'                 => 'blockquote', // blockquotes
-		'/&gt;&gt;&gt;([a-z]*\n[\s\S]*?\n)&gt;&gt;&gt;/' => 'blockquote', // blockquotes
-		'/\n>(.*)/'                                      => 'blockquote', // blockquotes
-		'/\n&gt;(.*)/'                                   => 'blockquote', // blockquotes
-		'/\n([^\n]+)\n/'                                 => 'paragraph', // add paragraphs
+		'/\n(#+)(.*)/'                           => 'header', // headers
+		'/\n\* (.*)/'                            => 'ul_list', // ul lists
+		'/\n\• (.*)/'                            => 'ul_list', // ul lists
+		'/\n[0-9]+\. (.*)/'                      => 'ol_list', // ol lists
+		'/&gt;&gt;&gt;(.*\n[\s\S]*?\n[^\n]+)\n/' => 'blockquote', // blockquotes
+		'/\n&gt;(.*)/'                           => 'blockquote', // blockquotes
+		'/([^\n]+)\n/'                           => 'paragraph', // add paragraphs
 	];
 
 	/**
@@ -64,7 +66,7 @@ class Liveblog_Markdown_Parser {
 		if ( strpos( $trimmed, '<' ) === 0 ) {
 			return $line;
 		}
-		return sprintf( "\n<p>%s</p>\n", $trimmed );
+		return sprintf( "<p>%s</p>\n", $trimmed );
 	}
 
 	/**
@@ -97,7 +99,7 @@ class Liveblog_Markdown_Parser {
 	 * @return string
 	 */
 	private static function blockquote( $item ) {
-		return sprintf( "<blockquote>\n\n%s</blockquote>", trim( $item ) );
+		return sprintf( "<blockquote>\n\n%s\n</blockquote>\n", trim( $item ) );
 	}
 
 	/**
