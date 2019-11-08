@@ -29,7 +29,7 @@ class Liveblog_AMP_Template {
 	public $data = [];
 
 	/**
-	 * Contrustor
+	 * Constructor
 	 *
 	 * @return void
 	 */

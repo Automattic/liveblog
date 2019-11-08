@@ -102,6 +102,18 @@ class Liveblog_Entry {
 	}
 
 	/**
+	 * Get the GMT updated timestamp for the entry
+	 *
+	 * @return string
+	 */
+	public function get_updated_timestamp() {
+		if ( '0000-00-00 00:00:00' === $this->entry->post_modified_gmt ) {
+			return mysql2date( 'G', get_gmt_from_date( $this->entry->post_modified ) );
+		}
+		return mysql2date( 'G', $this->entry->post_modified_gmt );
+	}
+
+	/**
 	 * Retrieve the entry date of the current entry using gmt.
 	 * @param string      $d       Optional. The format of the date. Default user's setting.
 	 * @param int|WP_Post $post_id WP_Post or ID of the post for which to get the date.
@@ -154,17 +166,18 @@ class Liveblog_Entry {
 		$share_link  = add_query_arg( [ 'lbup' => $entry_id ], get_permalink( $this->get_post_id() ) );
 
 		$entry = [
-			'id'          => $entry_id,
-			'type'        => $this->get_type(),
-			'render'      => self::render_content( $this->get_content(), $this->entry ),
-			'headline'    => $this->get_headline(),
-			'content'     => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
-			'css_classes' => $css_classes,
-			'timestamp'   => $this->get_timestamp(),
-			'authors'     => self::get_authors( $entry_id ),
-			'entry_time'  => $this->get_entry_date_gmt( 'U', $entry_id ),
-			'share_link'  => $share_link,
-			'status'      => self::get_status(),
+			'id'                => $entry_id,
+			'type'              => $this->get_type(),
+			'render'            => self::render_content( $this->get_content(), $this->entry ),
+			'headline'          => $this->get_headline(),
+			'content'           => apply_filters( 'liveblog_before_edit_entry', $this->get_content() ),
+			'css_classes'       => $css_classes,
+			'timestamp'         => $this->get_timestamp(),
+			'updated_timestamp' => $this->get_updated_timestamp(),
+			'authors'           => self::get_authors( $entry_id ),
+			'entry_time'        => $this->get_entry_date_gmt( 'U', $entry_id ),
+			'share_link'        => $share_link,
+			'status'            => self::get_status(),
 		];
 
 
@@ -250,7 +263,7 @@ class Liveblog_Entry {
 		$entry_post   = get_post( $updated_entry_id );
 		$is_new_draft = get_post_meta( $entry_post->ID, '_new_draft', true );
 		// When an entry transitions from publish to draft we need to hide it on the front-end
-		self::toggle_entry_visibility( $entry_post->ID, $entry_post->post_parent, $args['status'] );
+		self::toggle_entry_visibility( $entry_post, $entry_post->post_parent, $args['status'] );
 
 		// Add update to cache if its not a new draft
 		if ( ! empty( $is_new_draft ) && 'publish' === $args['status'] ) {
@@ -289,7 +302,7 @@ class Liveblog_Entry {
 		$entry_post = wp_delete_post( $args['entry_id'] );
 
 		// When an entry is deleted we need to hide it on the front-end
-		self::toggle_entry_visibility( $entry->ID, $entry->post_parent, 'delete' );
+		self::toggle_entry_visibility( $entry_post, $entry->post_parent, 'delete' );
 		$entry = self::from_post( $entry_post );
 
 		$entry->type    = 'delete';
@@ -528,7 +541,7 @@ class Liveblog_Entry {
 	 * @param      $liveblog_id
 	 * @param      $add
 	 */
-	public static function toggle_entry_visibility( $post_id, $liveblog_id, $status ) {
+	public static function toggle_entry_visibility( $entry_post, $liveblog_id, $status ) {
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = wp_cache_get( $cached_key, 'liveblog' );
 
@@ -537,10 +550,12 @@ class Liveblog_Entry {
 		}
 
 		if ( 'publish' !== $status ) {
-			$hidden_entries[ $post_id ] = $status;
+			$entry                             = self::from_post( $entry_post );
+			$entry->type                       = 'delete';
+			$hidden_entries[ $entry_post->ID ] = $entry->for_json();
 		} else {
 			// remove entry from cache when entry is published
-			unset( $hidden_entries[ $post_id ] );
+			unset( $hidden_entries[ $entry_post->ID ] );
 		}
 
 		wp_cache_set( $cached_key, array_filter( $hidden_entries ), 'liveblog', 30 ); // phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.LowCacheTime
@@ -558,13 +573,12 @@ class Liveblog_Entry {
 		$entries        = [];
 		$cached_key     = 'hidden_entries_' . $liveblog_id;
 		$hidden_entries = wp_cache_get( $cached_key, 'liveblog' );
-
 		if ( empty( $hidden_entries ) ) {
 			return $entries;
 		}
 
-		foreach ( (array) $hidden_entries as $entry_id => $status ) {
-			if ( $only_deleted && 'delete' !== $status ) {
+		foreach ( (array) $hidden_entries as $entry_id => $entry ) {
+			if ( $only_deleted && 'delete' !== $entry->type ) {
 				continue;
 			}
 
@@ -572,19 +586,7 @@ class Liveblog_Entry {
 				continue;
 			}
 
-			$entries[] = [
-				'id'          => $entry_id,
-				'type'        => 'delete',
-				'render'      => '',
-				'headline'    => '',
-				'content'     => '',
-				'css_classes' => '',
-				'timestamp'   => 0,
-				'authors'     => [],
-				'entry_time'  => 0,
-				'share_link'  => 0,
-				'status'      => 'delete',
-			];
+			$entries[] = $entry;
 		}
 
 		return $entries;

@@ -7,13 +7,14 @@
 	$share_link     = $this->get( 'share_link' );
 	$update_time    = $this->get( 'update_time' );
 	$share_link_amp = $this->get( 'share_link_amp' );
+	$type           = $this->get( 'type' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
-	/* This filter is defined in class-liveblog-amp.php */
+/* This filter is defined in class-liveblog-amp.php */
 	$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
 ?>
 
-<div class="liveblog-entry" id="post<?php echo esc_attr( $update_time ); ?>"
-	data-sort-time="<?php echo esc_attr( $entry_time ); ?>">
+<div class="liveblog-entry" id="post<?php echo esc_attr( $id ); ?>"
+	data-sort-time="<?php echo esc_attr( $entry_time ); ?>" data-update-time="<?php echo esc_attr( $update_time ); ?>" <?php echo 'delete' === $type ? 'data-tombstone="true"' : ''; ?>>
 
 	<aside class="liveblog-entry-aside">
 		<a class="liveblog-meta-time" href="#" target="_blank">

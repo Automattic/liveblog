@@ -36,7 +36,7 @@ class Liveblog_Markdown_Parser {
 		'/<\/ol>\n<ol>/'                 => "\n", // fix extra ol
 		'/<\/blockquote><blockquote>/'   => '', // fix extra blockquote
 		'/<\/blockquote>\n<blockquote>/' => "\n", // fix extra blockquote
-		'/<em>\(ツ\)<\/em>/'             => '_(ツ)_', // fix shrug
+		'/<em>\(ツ\)<\/em>/'              => '_(ツ)_', // fix shrug
 	];
 
 	/**

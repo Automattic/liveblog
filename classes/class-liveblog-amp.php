@@ -235,8 +235,20 @@ class Liveblog_AMP {
 			$request  = self::set_request_last_from_entries( $entries, $request );
 			$content .= self::build_single_entry( $entries, $request, $post->post_id );
 		} else {
-			$entries  = Liveblog::get_entries_paged( $request->page, $request->last );
-			$request  = self::set_request_last_from_entries( $entries, $request );
+			$entries = Liveblog::get_entries_paged( $request->page, $request->last );
+			$request = self::set_request_last_from_entries( $entries, $request );
+			//Updated hidden entries to deleted
+
+			$hidden_entries = Liveblog_Entry::get_hidden_entries( $post->ID, false );
+			if ( $hidden_entries ) {
+				foreach ( $hidden_entries as $entry ) {
+					if ( is_null( $entry->entry_time ) ) {
+						$entry->entry_time = $entry->timestamp;
+					}
+					$entries['entries'][] = $entry;
+				}
+			}
+
 			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
 		}
 
@@ -284,9 +296,10 @@ class Liveblog_AMP {
 				'date'           => $entry->date,
 				'time_ago'       => $entry->time_ago,
 				'share_link'     => $entry->share_link,
-				'update_time'    => $entry->timestamp,
+				'update_time'    => $entry->updated_timestamp,
 				'share_link_amp' => $entry->share_link_amp,
 				'headline'       => $entry->headline,
+				'type'           => $entry->type,
 			]
 		);
 
@@ -362,7 +375,7 @@ class Liveblog_AMP {
 			$entries[ $key ]->content        = $entries[ $key ]->content;
 			$entries[ $key ]->time_ago       = self::get_entry_time_ago( $entry );
 			$entries[ $key ]->date           = self::get_entry_date( $entry );
-			$entries[ $key ]->update_time    = $entry->timestamp;
+			$entries[ $key ]->update_time    = $entry->updated_timestamp;
 			$entries[ $key ]->share_link_amp = self::build_single_entry_permalink( $permalink, $entry->id );
 		}
 
