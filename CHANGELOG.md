@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.6
+
+* Revert #597 (#639)
+* Harden check when rendering media library (#652)
+
+props [anigeluk], [GaryJones], [jeffersonrabb], [philipjohn], [rebeccahum]
+
 ## 1.9.5
 
 * Fix PHP 7.3 continue switch warning (#617)

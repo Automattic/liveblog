@@ -6,7 +6,7 @@
 * Requires at least: 4.4
 * Requires PHP: 5.6
 * Tested up to: 4.9.8
-* Stable tag: 1.9.5
+* Stable tag: 1.9.6
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
