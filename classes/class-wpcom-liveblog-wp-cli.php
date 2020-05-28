@@ -110,6 +110,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 										),
 										array( 'comment_id' => $entry_id )
 									);
+									update_meta_cache( 'comment', array( $entry_id ) );
 								}
 							}
 						}
@@ -162,6 +163,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 							array( 'comment_content' => $content ),
 							array( 'comment_id' => $entry_replace->meta_value )
 						);
+						clean_comment_cache( $entry_replace->meta_value );
 					}
 
 					//Lets update the user with what we are doing.
