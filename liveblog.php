@@ -270,7 +270,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function flush_rewrite_rules() {
 			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
 			if ( self::REWRITES_VERSION !== $rewrites_version ) {
-				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules
+				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules,WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
 		}
@@ -589,18 +589,17 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$args = array();
 
-			$crud_action = isset( $_POST['crud_action'] ) ? sanitize_text_field( wp_unslash( $_POST['crud_action'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() checks the nonce.
+			$crud_action = isset( $_POST['crud_action'] ) ? sanitize_text_field( wp_unslash( $_POST['crud_action'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() above checks the nonce.
 
 			if ( ! self::is_valid_crud_action( $crud_action ) ) {
 				// translators: 1: crud action
 				self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 			}
-
-			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // input var ok
-			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // input var ok
-			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // input var ok
-			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // input var ok
-			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false; // input var ok
+			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
+			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
+			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
+			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
+			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
 
 			$entry = self::do_crud_entry( $crud_action, $args );
 
@@ -1131,7 +1130,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.wp_is_mobile_wp_is_mobile WordPressVIPMinimum.Functions.RestrictedFunctions.wp_is_mobile_wp_is_mobile
+					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.wp_is_mobile_wp_is_mobile,WordPressVIPMinimum.Functions.RestrictedFunctions.wp_is_mobile_wp_is_mobile
 					'supported' => _device_can_upload(),
 				),
 			);
@@ -1631,11 +1630,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$status                       = absint( $status );
 			$official_message             = isset( $wp_header_to_desc[ $status ] ) ? $wp_header_to_desc[ $status ] : '';
-			$wp_header_to_desc[ $status ] = self::sanitize_http_header( $message ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
+			$wp_header_to_desc[ $status ] = self::sanitize_http_header( $message ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited,WordPress.WP.GlobalVariablesOverride.Prohibited
 
 			status_header( $status );
 
-			$wp_header_to_desc[ $status ] = $official_message; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
+			$wp_header_to_desc[ $status ] = $official_message; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited,WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
 		/**
