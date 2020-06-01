@@ -595,11 +595,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				// translators: 1: crud action
 				self::send_user_error( sprintf( __( 'Invalid entry crud_action: %s', 'liveblog' ), $crud_action ) );
 			}
-			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
-			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
-			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
-			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
-			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false; // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- the self::ajax_check_nonce() above checks the nonce.
+			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() above checks the nonce.
+			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() above checks the nonce.
+			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() above checks the nonce.
+			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() above checks the nonce.
+			$args['contributor_ids'] = isset( $_POST['contributor_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['contributor_ids'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() above checks the nonce.
 
 			$entry = self::do_crud_entry( $crud_action, $args );
 
