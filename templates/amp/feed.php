@@ -1,8 +1,8 @@
 <?php
-$post_id          = $this->get( 'post_id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+$post_id          = $this->get( 'post_id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
 $links            = $this->get( 'links' );
-$page             = $this->get( 'page' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
-$pages            = $this->get( 'pages' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+$page             = $this->get( 'page' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
+$pages            = $this->get( 'pages' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
 $last             = $this->get( 'last' );
 $settings         = $this->get( 'settings' );
 $entries_per_page = $settings['entries_per_page'];

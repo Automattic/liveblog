@@ -184,7 +184,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @uses add_filter()
 		 */
 		private static function add_filters() {
-			add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
+			add_action( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
 			add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 10, 3 );
 			add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key' ), 10, 2 );
 
@@ -270,7 +270,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function flush_rewrite_rules() {
 			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
 			if ( self::REWRITES_VERSION !== $rewrites_version ) {
-				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules
+				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
 		}
@@ -589,7 +589,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$args = array();
 
-			$crud_action = isset( $_POST['crud_action'] ) ? sanitize_text_field( wp_unslash( $_POST['crud_action'] ) ) : 0; // input var ok
+			$crud_action = isset( $_POST['crud_action'] ) ? sanitize_text_field( wp_unslash( $_POST['crud_action'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the self::ajax_check_nonce() checks the nonce.
 
 			if ( ! self::is_valid_crud_action( $crud_action ) ) {
 				// translators: 1: crud action
@@ -1131,7 +1131,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$settings = array(
 				'defaults' => $defaults,
 				'browser'  => array(
-					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.wp_is_mobile_wp_is_mobile
+					'mobile'    => ( function_exists( 'jetpack_is_mobile' ) ? jetpack_is_mobile() : wp_is_mobile() ), // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.wp_is_mobile_wp_is_mobile WordPressVIPMinimum.Functions.RestrictedFunctions.wp_is_mobile_wp_is_mobile
 					'supported' => _device_can_upload(),
 				),
 			);
@@ -1631,11 +1631,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$status                       = absint( $status );
 			$official_message             = isset( $wp_header_to_desc[ $status ] ) ? $wp_header_to_desc[ $status ] : '';
-			$wp_header_to_desc[ $status ] = self::sanitize_http_header( $message ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+			$wp_header_to_desc[ $status ] = self::sanitize_http_header( $message ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
 
 			status_header( $status );
 
-			$wp_header_to_desc[ $status ] = $official_message; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+			$wp_header_to_desc[ $status ] = $official_message; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
 		/**
