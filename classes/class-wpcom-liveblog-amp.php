@@ -332,7 +332,7 @@ class WPCOM_Liveblog_AMP {
 				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
-					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
+					'refresh_interval' => min( 15, WPCOM_Liveblog::get_refresh_interval() ),
 					'social'           => self::add_social_share_options(),
 				),
 			)
