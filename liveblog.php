@@ -174,7 +174,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_ajax_set_liveblog_state_for_post', array( __CLASS__, 'admin_ajax_set_liveblog_state_for_post' ) );
-			add_action( 'pre_get_posts', array( __CLASS__, 'add_custom_post_type_support' ) );
+			add_action( 'after_setup_theme', array( __CLASS__, 'add_custom_post_type_support' ) );
 			add_action( 'wp_head', array( __CLASS__, 'print_liveblog_metadata' ) );
 		}
 
