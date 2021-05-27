@@ -4,8 +4,11 @@
 
 * Revert #597 (#639)
 * Harden check when rendering media library (#652)
+* Clean comment cache after direct SQL queries. (#658)
+* REST API routes require a permission_callback (#669)
+* Load CPT support later to avoid fatals with early use of WP_Query (#672)
 
-props [anigeluk], [GaryJones], [jeffersonrabb], [philipjohn], [rebeccahum]
+props [anigeluk], [david-binda], [GaryJones], [jeffersonrabb], [mslinnea], [philipjohn], [rebeccahum]
 
 ## 1.9.5
 
