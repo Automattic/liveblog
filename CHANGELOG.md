@@ -205,17 +205,20 @@ Fixed problems:
 * Initial release
 
 
+[anigeluk]: https://github.com/anigeluk
 [borkweb]: https://github.com/borkweb
 [cain]: https://github.com/cain
 [cfoellmann]: https://github.com/cfoellmann
 [ChrisHardie]: https://github.com/ChrisHardie
 [david-binda]: https://github.com/david-binda
 [defries]: https://github.com/defries
+[elarequi]: http://profiles.wordpress.org/elarequi
 [GaryJones]: https://github.com/GaryJones
 [gasparappa]: https://github.com/gasparappa
 [iandunn]: https://github.com/iandunn
 [jacklenox]: https://github.com/jacklenox
 [jasonagnew]: https://github.com/jasonagnew
+[jeffersonrabb]: https://github.com/jeffersonrabb
 [joshbetz]: https://github.com/joshbetz
 [jrmd]: https://github.com/jrmd
 [justnorris]: https://github.com/justnorris
@@ -228,8 +231,9 @@ Fixed problems:
 [maevelander]: https://github.com/maevelander
 [markgoodyear]: https://github.com/markgoodyear
 [maxhartshorn]: https://github.com/maxhartshorn
-[mjangda]: https://github.com/mjangda
 [mikeselander]: https://github.com/mikeselander
+[mjangda]: https://github.com/mjangda
+[mslinnea]: https://github.com/mslinnea
 [nb]: https://github.com/nb
 [no-sws]: https://github.com/no-sws
 [paulschreiber]: https://github.com/paulschreiber
@@ -241,13 +245,11 @@ Fixed problems:
 [rogertheriault]: https://github.com/rogertheriault
 [sarahblackstock]: https://github.com/sarahblackstock
 [sathyapulse]: https://github.com/sathyapulse
+[sboisvert]: https://github.com/sboisvert
 [scottblackburn]: https://github.com/scottblackburn
 [scottsweb]: https://github.com/scottsweb
-[sboisvert]: https://github.com/sboisvert
 [tessaneedham]: https://github.com/tessaneedham
 [tfrommen]: https://github.com/tfrommen
-[travisw]: https://github.com/travisw
 [tomjn]: https://github.com/tomjn
+[travisw]: https://github.com/travisw
 [zbtirrell]: https://github.com/zbtirrell
-[cfoellmann]: https://github.com/cfoellmann
-[elarequi]: http://profiles.wordpress.org/elarequi
