@@ -18,7 +18,7 @@ jobs:
             fail-fast: false
             matrix:
                 php: ["7.4", "8.0"]
-                wordpress: [ "5.7"]
+                wordpress: ["5.7"]
                 allowed_failure: [false]
                 # https://make.wordpress.org/core/2020/11/23/wordpress-and-php-8-0/
                 exclude:
@@ -68,7 +68,6 @@ jobs:
 
             - name: NPM install
               run: npm install
-              run: npm test
 
             - name: Run lint-scripts
               run: npm run lint-scripts
