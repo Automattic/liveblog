@@ -61,15 +61,6 @@ jobs:
             - name: Install WordPress environment
               run: composer prepare ${{ matrix.wordpress }}
 
-            - name: Run integration tests (single site)
-              run: composer integration
-
-            - name: Run integration tests (multisite)
-              run: composer integration-ms
-
-            - name: Run PHPCS
-              run: composer cs
-
             - name: Install npm
               uses: actions/setup-node@v2
               with:
