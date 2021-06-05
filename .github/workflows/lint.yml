@@ -1,0 +1,30 @@
+name: Run linting
+
+on: [push]
+
+jobs:
+    test:
+        name: Run lint
+        # Ubuntu-20.x includes MySQL 8.0, which causes `caching_sha2_password` issues with PHP < 7.4
+        # https://www.php.net/manual/en/mysqli.requirements.php
+        # TODO: change to ubuntu-latest when we no longer support PHP < 7.4
+        runs-on: ubuntu-18.04
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Install node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: "14"
+
+            - name: NPM install
+              run: npm install
+
+            - name: Run lint-scripts
+              run: npm run lint-scripts
+
+            - name: Run lint-styles
+              if: ${{ always() }}
+              run: npm run lint-styles
