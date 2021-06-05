@@ -213,10 +213,10 @@ class EditorContainer extends Component {
     const { config } = this.props;
 
     const formData = new FormData();
-    formData.append('name', file.name);
-    formData.append('action', 'upload-attachment');
-    formData.append('_wpnonce', config.image_nonce);
-    formData.append('async-upload', file);
+    formData.append('name', file.name); // phpcs:ignore WordPressVIPMinimum.JS.HTMLExecutingFunctions.append -- FormData.append
+    formData.append('action', 'upload-attachment'); // phpcs:ignore WordPressVIPMinimum.JS.HTMLExecutingFunctions.append -- FormData.append
+    formData.append('_wpnonce', config.image_nonce); // phpcs:ignore WordPressVIPMinimum.JS.HTMLExecutingFunctions.append -- FormData.append
+    formData.append('async-upload', file); // phpcs:ignore WordPressVIPMinimum.JS.HTMLExecutingFunctions.append -- FormData.append
 
     return new Promise((resolve) => {
       uploadImage(formData)
