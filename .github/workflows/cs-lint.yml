@@ -1,4 +1,4 @@
-name: CS & Lint
+name: PHP CS & Lint
 
 on:
   # Run on all pushes and on all pull requests.
