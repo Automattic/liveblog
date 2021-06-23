@@ -1,4 +1,4 @@
-name: Run linting
+name: Run JS linting
 
 on:
     # Run on all pushes and on all pull requests.
