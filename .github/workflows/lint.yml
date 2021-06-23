@@ -12,7 +12,7 @@ on:
 
 jobs:
     test:
-        name: Run lint
+        name: Run JS linting
         # Ubuntu-20.x includes MySQL 8.0, which causes `caching_sha2_password` issues with PHP < 7.4
         # https://www.php.net/manual/en/mysqli.requirements.php
         # TODO: change to ubuntu-latest when we no longer support PHP < 7.4
@@ -30,9 +30,9 @@ jobs:
             - name: NPM install
               run: npm install
 
-            - name: Run lint-scripts
+            - name: Run eslint on React files
               run: npm run lint-scripts
 
-            - name: Run lint-styles
+            - name: Run styleslint on SCSS files
               if: ${{ always() }}
               run: npm run lint-styles
