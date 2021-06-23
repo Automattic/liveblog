@@ -1,6 +1,14 @@
 name: Run linting
 
-on: [push]
+on:
+    # Run on all pushes and on all pull requests.
+    # Prevent the "push" build from running when there are only irrelevant changes.
+    push:
+        paths-ignore:
+            - "**.md"
+    pull_request:
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
 
 jobs:
     test:
