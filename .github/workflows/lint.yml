@@ -32,7 +32,7 @@ jobs:
 
       - name: Run eslint on React files
         run: npm run lint-scripts
+        continue-on-error: true
 
       - name: Run styleslint on SCSS files
-        if: ${{ always() }}
         run: npm run lint-styles
