@@ -9,7 +9,9 @@
 	<file>.</file>
 	<!-- Ignoring Files and Folders:
 		https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#ignoring-files-and-folders -->
-	<exclude-pattern>/vendor/</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/nodeapp/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
 
 	<!-- How to scan -->
 	<!-- Usage instructions: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
@@ -39,7 +41,7 @@
 	<rule ref="WordPress-Docs"/>
 	<!-- For help in understanding these custom sniff properties:
 		https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
-	<config name="minimum_supported_wp_version" value="5.5"/>
+	<config name="minimum_supported_wp_version" value="4.4"/>
 
 	<!-- Rules: WordPress VIP - see
 		https://github.com/Automattic/VIP-Coding-Standards -->
@@ -48,7 +50,7 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="msm"/>
+				<element value="liveblog"/>
 			</property>
 		</properties>
 	</rule>
