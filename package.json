@@ -48,7 +48,7 @@
     "draft-js-export-html": "^1.2.0",
     "immutable": "^3.8.2",
     "js-beautify": "^1.7.5",
-    "lodash-es": "^4.17.11",
+    "lodash-es": "^4.17.14",
     "moment": "^2.20.1",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
