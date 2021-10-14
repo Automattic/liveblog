@@ -19,12 +19,12 @@ export default contentState =>
 
         if (type === 'code-block') {
           return (
-            <div>
+            <React.Fragment>
               <div
                 id={`liveblog-codeblock-identifier-${entity.getData().title.replace(/\s+/g, '-')}`}
                 dangerouslySetInnerHTML={{ __html: entity.getData().code }}
               />
-            </div>
+            </React.Fragment>
           );
         }
 
