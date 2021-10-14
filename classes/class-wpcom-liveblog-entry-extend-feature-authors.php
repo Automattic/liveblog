@@ -234,7 +234,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// The args used in the get_users query.
 		$args = array(
-			'who'    => 'authors',
+			'role__in' => array( 'author', 'editor', 'contributor' ),
 			'fields' => array( 'ID', 'user_nicename', 'display_name' ),
 			'number' => 10,
 		);

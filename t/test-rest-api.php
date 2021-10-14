@@ -331,12 +331,12 @@ class Test_REST_API extends WP_UnitTestCase {
 		// Get a list of authors
 		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
 
-		$authors_not_empty = $liveblog_authors->get_authors( 'adm' ); // Should return admin
+		$admin_is_empty = $liveblog_authors->get_authors( 'admin' ); // Should not return admin
 		$authors_is_empty  = $liveblog_authors->get_authors( 'fakeauthor' ); // Non-existent user
 
-		$this->assertInternalType( 'array', $authors_not_empty );
+		$this->assertInternalType( 'array', $admin_is_empty );
 		$this->assertInternalType( 'array', $authors_is_empty );
-		$this->assertNotEmpty( $authors_not_empty );
+		$this->assertEmpty( $admin_is_empty );
 		$this->assertEmpty( $authors_is_empty );
 
 	}
