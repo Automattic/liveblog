@@ -21,6 +21,7 @@ const webpackConfig = {
     path: path.join(__dirname, paths.out),
     filename: '[name].js',
     chunkFilename: '[name].bundle.js',
+    jsonpFunction: 'wpJsonpLiveBlog',
   },
 
   module: {
