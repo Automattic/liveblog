@@ -8,7 +8,12 @@ const Entries = ({ loading, entries }) => (
     {
       entries.length === 0 && !loading
         ? <div className="liveblog-empty-message">There are no entries on this page.</div>
-        : entries.map(entry => <EntryContainer entry={entry} key={entry.id} />)
+        : entries.map((entry) => {
+          if (entry.id) {
+            return <EntryContainer entry={entry} key={entry.id} />;
+          }
+          return false;
+        })
     }
   </div>
 );
