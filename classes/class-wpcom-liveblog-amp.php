@@ -92,7 +92,14 @@ class WPCOM_Liveblog_AMP {
 	public static function add_social_share_options() {
 		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
 
-		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
+		/**
+		 * Filter Liveblog AMP Facebook share app id
+		 *
+		 * @param mixed $app_id Facebook app id to enable Facebook sharing, default false.
+		 */
+		$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
+
+		if ( ! empty( $facebook_app_id ) ) {
 			$social_array[] = 'facebook';
 		}
 
