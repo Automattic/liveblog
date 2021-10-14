@@ -24,7 +24,7 @@ class WPCOM_Liveblog_Cron {
 	private static function configure_autoarchive_cron() {
 
 		if ( ! wp_next_scheduled( 'auto_archive_check_hook' ) ) {
-			wp_schedule_event( strtotime( 'today midnight' ), 'daily', 'auto_archive_check_hook' );
+			wp_schedule_event( strtotime( 'tomorrow midnight' ), 'daily', 'auto_archive_check_hook' );
 		}
 
 		add_action( 'auto_archive_check_hook', array( __CLASS__, 'execute_auto_archive_housekeeping' ) );
