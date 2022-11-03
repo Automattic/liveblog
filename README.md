@@ -177,7 +177,7 @@ add_action( 'init', 'liveblog_add_key_event_template' );
 
 Selecting which template or format to use for liveblog happens in the admin panel on the edit of page of the post:
 
-![Key Events Admin Options](http://share.agnew.co/Gyai+)
+<img width="961" alt="687474703a2f2f73686172652e61676e65772e636f2f477961692b" src="https://user-images.githubusercontent.com/12199101/199851010-3a893bcd-f4e6-4634-8ccc-45bd98131941.png">
 
 #### Managing Hashtags
 Hashtags are manageable in the admin area. Under Posts there will be a menu for Hashtags. Please note that the slug is used, not the name.
@@ -427,12 +427,12 @@ If for some reason the plugin is not able to use WebSockets to refresh the list 
 
 ## Screenshots
 
-![The entry form is the simplest possible](https://raw.github.com/Automattic/liveblog/master/screenshot-1.png)
-![Writers can preview before posting](https://raw.github.com/Automattic/liveblog/master/screenshot-2.png)
-![New posts are highlighted](https://raw.github.com/Automattic/liveblog/master/screenshot-4.png)
-![Adding images is a matter of just drag-and-drop](https://raw.github.com/Automattic/liveblog/master/screenshot-5.png)
-![Dragged photos are automatically inserted](https://raw.github.com/Automattic/liveblog/master/screenshot-6.png)
-![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/screenshot-8.png)
+![The entry form is the simplest possible](https://raw.github.com/Automattic/liveblog/master/.wordpress-org/screenshot-1.png)
+![Writers can preview before posting](https://raw.github.com/Automattic/liveblog/master/.wordpress-org/screenshot-2.png)
+![New posts are highlighted](https://raw.github.com/Automattic/liveblog/master/.wordpress-org/screenshot-4.png)
+![Adding images is a matter of just drag-and-drop](https://raw.github.com/Automattic/liveblog/master/.wordpress-org/screenshot-5.png)
+![Dragged photos are automatically inserted](https://raw.github.com/Automattic/liveblog/master/.wordpress-org/screenshot-6.png)
+![Typical liveblog view](https://raw.github.com/Automattic/liveblog/master/.wordpress-org/screenshot-8.png)
 
 ## In-Depth Documentation
 
