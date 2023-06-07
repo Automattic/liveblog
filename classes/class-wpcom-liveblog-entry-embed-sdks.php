@@ -14,7 +14,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
 		'twitter'   => 'https://platform.twitter.com/widgets.js',
 		'instagram' => 'https://platform.instagram.com/en_US/embeds.js',
-		'reddit'    => 'https://embed.redditmedia.com/widgets/platform.js',
+		'reddit'    => 'https://embed.reddit.com/widgets.js',
 	);
 
 	/**
