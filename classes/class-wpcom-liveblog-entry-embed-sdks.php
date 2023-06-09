@@ -13,7 +13,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	protected static $sdks = array(
 		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
 		'twitter'   => 'https://platform.twitter.com/widgets.js',
-		'instagram' => 'https://platform.instagram.com/en_US/embeds.js',
+		'instagram' => 'https://www.instagram.com/embed.js',
 		'reddit'    => 'https://embed.reddit.com/widgets.js',
 	);
 
