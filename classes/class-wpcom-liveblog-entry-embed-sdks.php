@@ -39,7 +39,11 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		}
 
 		foreach ( self::$sdks as $name => $url ) {
-			wp_enqueue_script( $name, esc_url( $url ), array(), null, false );
+			if ( 'reddit' === $name ) {
+				wp_enqueue_script( $name, esc_url( $url ), array(), null, false );
+			} else {
+				wp_enqueue_script( $name, esc_url( $url ), array(), WPCOM_Liveblog::VERSION, false );	
+			}
 		}
 	}
 
