@@ -40,7 +40,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 
 		foreach ( self::$sdks as $name => $url ) {
 			if ( 'reddit' === $name ) {
-				// Do not attach `?ver=` for reddit script due to redirects
+				// Don't attach version with reddit js script file, it will generate 404 error with reddit js
 				$version = 'reddit' === $name ? null : WPCOM_Liveblog::VERSION;
 				wp_enqueue_script( $name, esc_url( $url ), array(), $version, false );
 			} else {
