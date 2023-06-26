@@ -40,7 +40,9 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 
 		foreach ( self::$sdks as $name => $url ) {
 			if ( 'reddit' === $name ) {
-				wp_enqueue_script( $name, esc_url( $url ), array(), null, false );
+				// Do not attach `?ver=` for reddit script due to redirects
+				$version = 'reddit' === $name ? null : WPCOM_Liveblog::VERSION;
+				wp_enqueue_script( $name, esc_url( $url ), array(), $version, false );
 			} else {
 				wp_enqueue_script( $name, esc_url( $url ), array(), WPCOM_Liveblog::VERSION, false );	
 			}
