@@ -13,8 +13,8 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	protected static $sdks = array(
 		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
 		'twitter'   => 'https://platform.twitter.com/widgets.js',
-		'instagram' => 'https://platform.instagram.com/en_US/embeds.js',
-		'reddit'    => 'https://embed.redditmedia.com/widgets/platform.js',
+		'instagram' => 'https://www.instagram.com/embed.js',
+		'reddit'    => 'https://embed.reddit.com/widgets.js',
 	);
 
 	/**
@@ -39,7 +39,9 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		}
 
 		foreach ( self::$sdks as $name => $url ) {
-			wp_enqueue_script( $name, esc_url( $url ), array(), WPCOM_Liveblog::VERSION, false );
+			// Don't attach version with reddit js script file, it will generate 404 error with reddit js
+			$version = 'reddit' === $name ? null : WPCOM_Liveblog::VERSION;
+			wp_enqueue_script( $name, esc_url( $url ), array(), $version, false );
 		}
 	}
 
