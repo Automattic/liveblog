@@ -18,6 +18,7 @@ const webpackConfig = {
   },
 
   output: {
+    jsonpFunction: 'liveblogJsonp',
     path: path.join(__dirname, paths.out),
     filename: '[name].js',
     chunkFilename: '[name].bundle.js',
