@@ -180,12 +180,12 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'format_preview_entry' ),
+				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
 				'args'     => array(
 					'entry_content' => array(
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
 			)
 		);
 
