@@ -211,7 +211,6 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => false,
 					),
 				),
-				'permission_callback'  => '__return_true',
 			)
 		);
 
@@ -237,7 +236,6 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => false,
 					),
 				),
-				'permission_callback'  => '__return_true',
 			)
 		);
 

@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.9.7
-* Add a capability check to the preview endpoint, to prevent unauthenticated users from accessing it
+* Adds a capability check to the preview, authors and hashtag endpoint to prevent unauthenticated calls (#685)
 
 ## 1.9.6
 
