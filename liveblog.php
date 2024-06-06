@@ -917,6 +917,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		public static function ajax_preview_entry() {
+			self::ajax_current_user_can_edit_liveblog();
+
 			$entry_content = isset( $_REQUEST['entry_content'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['entry_content'] ) ) : ''; // input var ok
 			$entry_content = self::format_preview_entry( $entry_content );
 
