@@ -478,6 +478,99 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
+		 * Get Liveblog entries between a start and end time for a post, with
+		 * cached results.
+		 *
+		 * NOTE - get_entries_by_time() is also cached, but it uses a full list
+		 * of all entries, via WPCOM_Liveblog_Entry_Query::get_all_entries_asc().
+		 * That approach breaks down when there are more entries than can fit in
+		 * a single cache key, so this function caches just the results
+		 *
+		 * This extra caching also bypasses both the additional processing
+		 * required that happens inside $entry->for_json(), which is _always_ at least one db
+		 * query (for the comment author user coming from get_comment_class()), and
+		 * various the filters and processing performed there
+		 *
+		 * @param int $start_timestamp  The start time boundary
+		 * @param int $end_timestamp    The end time boundary
+		 *
+		 * @return An array of Liveblog entries, possibly empty.
+		 */
+		public static function get_entries_by_time_cached( $start_timestamp, $end_timestamp ) {
+			// Set some defaults
+			$latest_timestamp = null;
+			$entries_for_json = array();
+
+			$now = time();
+
+			// If end timestamp is in future, set a cache TTL until it's not
+			// Must do this to match behavior of get_entries_by_time()
+			if ( $end_timestamp > $now ) {
+				self::$cache_control_max_age = $end_timestamp - $now;
+			}
+
+			if ( empty( self::$entry_query ) ) {
+				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
+			}
+
+			$latest_timestamp = self::$entry_query->get_latest_timestamp();
+
+			// If the requested timestamp is later than the latest comment timestamp,
+			// normalize it to the latest comment timestamp to get a higher hitrate
+			if ( $end_timestamp > $latest_timestamp ) {
+				$end_timestamp = $latest_timestamp;
+			}
+
+			$cache_key = self::KEY . '_result_' . self::$post_id . '_' . $start_timestamp . '_' . $end_timestamp;
+
+			// Were they cached already?
+			$cached_result = wp_cache_get( $cache_key, 'liveblog' );
+
+			if ( false !== $cached_result ) {
+				return $cached_result;
+			}
+
+			// Get liveblog entries within the start and end boundaries
+			$entries = self::$entry_query->get_between_timestamps_with_query( $start_timestamp, $end_timestamp );
+
+			$pages    = false;
+			$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+
+			if ( ! empty( $entries ) ) {
+				$entries_count = self::$entry_query->count_entries();
+
+				/**
+				 * Loop through each liveblog entry, set the most recent timestamp, and
+				 * put the JSON data for each entry into a neat little array.
+				 */
+				foreach ( $entries as $entry ) {
+					$latest_timestamp   = max( $latest_timestamp, $entry->get_timestamp() );
+					$entries_for_json[] = $entry->for_json();
+				}
+
+				$pages = ceil( $entries_count / $per_page );
+			}
+
+			// Create the result array
+			$result = array(
+				'entries'          => $entries_for_json,
+				'latest_timestamp' => $latest_timestamp,
+				'refresh_interval' => self::get_refresh_interval(),
+				'pages'            => $pages,
+			);
+
+			if ( ! empty( $entries_for_json ) ) {
+				do_action( 'liveblog_entry_request', $result );
+			} else {
+				do_action( 'liveblog_entry_request_empty' );
+			}
+
+			wp_cache_set( $cache_key, $result, 'liveblog' );
+
+			return $result;
+		}
+
+		/**
 		 * Is a given post_id a liveblog enabled post?
 		 *
 		 * @global WP_Post $post
