@@ -45,7 +45,7 @@ export default (html, extraData) =>
         isHTMLBlock ||
         CODE_BLOCK_TAGS.includes(nodeName)
       ) {
-        return createEntity(
+        const codeBlock = createEntity(
           'code-block',
           'IMMUTABLE',
           {
@@ -56,6 +56,9 @@ export default (html, extraData) =>
             setReadOnly: extraData.setReadOnly,
           },
         );
+        /* eslint no-param-reassign: ["error", { "props": false }] */
+        node.innerHTML = '';
+        return codeBlock;
       }
     },
 
