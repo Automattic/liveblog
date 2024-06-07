@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.9.7
+* Adds a capability check to the preview, authors and hashtag endpoint to prevent unauthenticated calls (#685)
+
 ## 1.9.6
 
 * Revert #597, restoring `get_fields_for_render()` that is being used in some implementations (#639)
