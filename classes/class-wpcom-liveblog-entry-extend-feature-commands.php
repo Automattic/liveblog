@@ -240,7 +240,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 			// Run the command_after action on the
 			// content for the current type.
-			do_action( "liveblog_command_${type}_after", $content, $id, $post_id );
+			do_action( "liveblog_command_{$type}_after", $content, $id, $post_id );
 		}
 	}
 
