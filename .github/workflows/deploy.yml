@@ -11,6 +11,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install SVN (Subversion)
+        run: |
+          sudo apt-get update
+          sudo apt-get install subversion
+
       - name: Build # Remove or modify this step as needed
         run: |
           npm install
