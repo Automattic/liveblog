@@ -26,7 +26,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		$is_dryrun = ( isset( $assoc_args['dryrun'] ) ) ? true : false;
 
 		// find all liveblogs
-		WP_CLI::line( 'Finding All Live Blog Entries..' );
+		WP_CLI::log( 'Finding All Live Blog Entries..' );
 
 		$posts = new WP_Query(
 			array(
@@ -41,7 +41,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		$current_liveblog = 0;
 
 		//Feedback to the user
-		WP_CLI::line( 'Found ' . $total_liveblogs . ' Live Blogs.' );
+		WP_CLI::log( 'Found ' . $total_liveblogs . ' Live Blogs.' );
 
 		foreach ( $posts->posts as $post ) {
 
@@ -49,7 +49,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$current_liveblog ++;
 
 			//Tell the user what we are doing, but lets colour this one se we can see its a new Liveblog in the console output.
-			WP_CLI::line( WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n" ) );
+			WP_CLI::log( WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n" ) );
 
 			//Define the post ID
 			$post_id = $post->ID;
@@ -78,7 +78,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			if ( count( $edit_entries ) > 0 ) {
 
 				// SHow the User how many Edited Entries we've found.
-				WP_CLI::line( 'Found ' . count( $edit_entries ) . ' edited entries..' );
+				WP_CLI::log( 'Found ' . count( $edit_entries ) . ' edited entries..' );
 
 				foreach ( $edit_entries as $edit_entry ) {
 					$entry_id = $edit_entry->get_id();
@@ -87,7 +87,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					if ( in_array( $edit_entry->replaces, $correct_ids, true ) ) {
 
 						//The edited entry is accurate so we dont need to do anything.
-						WP_CLI::line( 'No action required.. skipping Entry ' . $entry_id );
+						WP_CLI::log( 'No action required.. skipping Entry ' . $entry_id );
 						continue;
 
 					} else {
@@ -99,7 +99,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 							if ( $correct_ids[ $i ] < $entry_id ) {
 
 								//The edited entry needs updating to reflect the correct ID's
-								WP_CLI::line( 'Correcting Entry ' . $entry_id . '...' );
+								WP_CLI::log( 'Correcting Entry ' . $entry_id . '...' );
 
 								// If this isnt a dry run we can run the database Update.
 								if ( false === $is_dryrun ) {
@@ -151,7 +151,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 				$replaced = 0;
 
 				//THe edited entry is accurate so we dont need to do anything.
-				WP_CLI::line( 'Total of ' . count( $entries_replace ) . ' need action..' );
+				WP_CLI::log( 'Total of ' . count( $entries_replace ) . ' need action..' );
 
 				foreach ( $entries_replace as $entry_replace ) {
 
@@ -167,7 +167,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					}
 
 					//Lets update the user with what we are doing.
-					WP_CLI::line( 'Replaced Content in ' . $replaced . ' Entry(ies) so far..' );
+					WP_CLI::log( 'Replaced Content in ' . $replaced . ' Entry(ies) so far..' );
 
 					$replaced++;
 				}
@@ -175,7 +175,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 			//If we have a dry run flag lets just output what we would be looking to do on a live run.
 			if ( true === $is_dryrun ) {
-				WP_CLI::line( 'Found ' . count( $edit_entries ) . ' Edited Entries on Post ID ' . $post_id );
+				WP_CLI::log( 'Found ' . count( $edit_entries ) . ' Edited Entries on Post ID ' . $post_id );
 			}
 		}
 
@@ -239,7 +239,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	}
 
 	public static function help() {
-		WP_CLI::line(
+		WP_CLI::log(
 			<<<HELP
 usage: wp liveblog readme_for_github
 	Converts the readme.txt to real markdown to be used as a README.md
