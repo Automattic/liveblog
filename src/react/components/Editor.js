@@ -1,9 +1,11 @@
-import Loadable from 'react-loadable';
+import React, { Suspense, lazy } from 'react';
 
-export default Loadable({
-  loader: () =>
-    import('../containers/EditorContainer'),
-  loading() {
-    return 'Loading';
-  },
-});
+const EditorContainer = lazy(() => import('../containers/EditorContainer'));
+
+const App = () => (
+	<Suspense fallback="Loading">
+		<EditorContainer />
+	</Suspense>
+);
+
+export default App;

@@ -1,7 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const paths = {
   entry: './src/react/index.js',
@@ -21,12 +22,12 @@ const webpackConfig = {
     path: path.join(__dirname, paths.out),
     filename: '[name].js',
     chunkFilename: '[name].bundle.js',
-    jsonpFunction: 'wpJsonpLiveBlog',
+    chunkLoadingGlobal: 'wpJsonpLiveBlog',
   },
 
   module: {
     rules: [
-      // Run Babel and lint JS
+      // Run Babel
       {
         test: /\.js$/,
         exclude: [/node_modules/],
@@ -34,22 +35,13 @@ const webpackConfig = {
           {
             loader: 'babel-loader',
           },
-          {
-            loader: 'eslint-loader',
-            options: {
-              configFile: '.eslintrc',
-              emitError: false,
-              emitWarning: true,
-            },
-          },
         ],
       },
       {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
+        use: [
+			MiniCssExtractPlugin.loader,
+			{
               loader: 'css-loader',
               options: {
                 sourceMap: false,
@@ -75,26 +67,25 @@ const webpackConfig = {
                 sourceMap: false,
               },
             },
-          ],
-        }),
+        ],
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            'css-loader',
-          ],
-        }),
+        use: [
+			MiniCssExtractPlugin.loader,
+			'css-loader',
+		],
       },
     ],
   },
 
   plugins: [
-    new ExtractTextPlugin({ // define where to save the file
+    new MiniCssExtractPlugin({ // define where to save the file
       filename: '[name].css',
-      allChunks: true,
     }),
+	new ESLintPlugin({
+		extensions: ['.js'],
+	}),
     // Global vars for checking dev environment.
     new webpack.DefinePlugin({
       __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
@@ -102,13 +93,15 @@ const webpackConfig = {
       __TEST__: JSON.stringify(process.env.NODE_ENV === 'test'),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.IgnorePlugin({resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/}),
   ],
 };
 
 // Production/Dev Specific Config
 if (process.env.NODE_ENV === 'production') {
-  webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin());
+	webpackConfig.optimization = {
+		minimize: true,
+	}
 } else {
   webpackConfig.devtool = 'sourcemap';
 }
