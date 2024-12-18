@@ -1,8 +1,8 @@
 {
   "parser": "@babel/eslint-parser",
   "extends": [
-	  "airbnb-base",
-	  "plugin:react/recommended"
+	"eslint:recommended",
+	"plugin:react/recommended"
   ],
   "plugins": [
 	"jest",
@@ -15,7 +15,8 @@
   "env": {
     "browser": true,
     "node": true,
-    "jest/globals": true
+    "jest/globals": true,
+	"es6": true
   },
   "parserOptions": {
     "ecmaFeatures": {

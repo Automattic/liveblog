@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { combineEpics } from 'redux-observable';
 import { of } from 'rxjs/observable/of';
 import { concat } from 'rxjs/observable/concat';
