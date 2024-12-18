@@ -2,7 +2,7 @@
  * RxJS ajax pretty much interchangable with axios.
  * Using RxJS ajax as it's already an observable to use with redux-observable.
  */
-import { ajax } from 'rxjs/observable/dom/ajax';
+import { ajax } from 'rxjs/ajax';
 
 import {
   getCurrentTimestamp,
