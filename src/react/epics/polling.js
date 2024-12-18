@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
-import { of } from 'rxjs/observable/of';
-import { interval } from 'rxjs/observable/interval';
-import { concat } from 'rxjs/observable/concat';
+import { of } from 'rxjs';
+import { interval } from 'rxjs';
+import { concat } from 'rxjs';
 import types from '../actions/actionTypes';
 
 import {

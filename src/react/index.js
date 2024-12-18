@@ -1,13 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import Polyfills from './polyfills/index';
+// import Polyfills from './polyfills/index';
 import configureStore from './store';
 import AppContainer from './containers/AppContainer';
 
 import '../styles/core.scss';
 
-Polyfills();
+// Polyfills();
 
 const store = configureStore();
 const container = document.getElementById('wpcom-liveblog-container');

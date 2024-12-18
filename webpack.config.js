@@ -45,20 +45,21 @@ const webpackConfig = {
               loader: 'css-loader',
               options: {
                 sourceMap: false,
-                minimize: true,
               },
             },
             {
               loader: 'postcss-loader',
               options: {
-                plugins: () => [
-                  autoprefixer({
-                    browsers: [
-                      'last 1 version',
-                      'ie >= 11',
-                    ],
-                  }),
-                ],
+				postcssOptions: {
+					plugins: () => [
+						autoprefixer({
+							browsers: [
+							'last 1 version',
+							'ie >= 11',
+							],
+						}),
+					],
+				},
               },
             },
             {
@@ -103,7 +104,7 @@ if (process.env.NODE_ENV === 'production') {
 		minimize: true,
 	}
 } else {
-  webpackConfig.devtool = 'sourcemap';
+  webpackConfig.devtool = 'eval-source-map';
 }
 
 module.exports = webpackConfig;
