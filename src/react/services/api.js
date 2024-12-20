@@ -10,17 +10,21 @@ import {
 
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
 
-export function getEntries(page, config, newestEntry) {
+export function getEntries(page, config, newestEntry, nonce = false) {
   const settings = {
     url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     method: 'GET',
     crossDomain: config.cross_domain,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);
 }
 
-export function polling(newestEntryTimestamp, config) {
+export function polling(newestEntryTimestamp, config, nonce = false) {
   let timestamp = getCurrentTimestamp();
 
   // Round out the timestamp to get a higher cache hitrate.
@@ -33,6 +37,10 @@ export function polling(newestEntryTimestamp, config) {
     url: `${config.endpoint_url}entries/${(newestEntryTimestamp + 1) || 0}/${timestamp}/`,
     method: 'GET',
     crossDomain: config.cross_domain,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);
@@ -103,21 +111,29 @@ export function deleteEntry(id, config, nonce = false) {
   return ajax(settings);
 }
 
-export function getEvents(config, newestEntry) {
+export function getEvents(config, newestEntry, nonce = false) {
   const settings = {
     url: `${config.endpoint_url}get-key-events/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
     crossDomain: config.cross_domain,
     method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);
 }
 
-export function jumpToEvent(id, config, newestEntry) {
+export function jumpToEvent(id, config, newestEntry, nonce = false) {
   const settings = {
     url: `${config.endpoint_url}jump-to-key-event/${id}/${newestEntry.id || 0}-${newestEntry.timestamp || 0}`,
     crossDomain: config.cross_domain,
     method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);
@@ -144,27 +160,35 @@ export function deleteEvent(entry, config, nonce = false) {
   return ajax(settings);
 }
 
-export function getAuthors(term, config) {
+export function getAuthors(term, config, nonce = false) {
   const settings = {
     url: `${config.autocomplete[3].url}${term}`,
     method: 'GET',
     crossDomain: config.cross_domain,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);
 }
 
-export function getHashtags(term, config) {
+export function getHashtags(term, config, nonce = false) {
   const settings = {
     url: `${config.autocomplete[2].url}${term}`,
     method: 'GET',
     crossDomain: config.cross_domain,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);
 }
 
-export function getPreview(content, config) {
+export function getPreview(content, config, nonce = false) {
   const settings = {
     url: `${config.endpoint_url}preview`,
     method: 'POST',
@@ -173,6 +197,7 @@ export function getPreview(content, config) {
     },
     headers: {
       'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
     },
     crossDomain: config.cross_domain,
   };
@@ -180,13 +205,17 @@ export function getPreview(content, config) {
   return ajax(settings);
 }
 
-export function uploadImage(formData) {
+export function uploadImage(formData, config, nonce = false) {
   const location = window.location;
 
   const settings = {
     url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
     method: 'POST',
     body: formData,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': nonce || config.nonce,
+    },
   };
 
   return ajax(settings);

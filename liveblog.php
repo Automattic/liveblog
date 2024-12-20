@@ -1542,6 +1542,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return bool
 		 */
 		public static function current_user_can_edit_liveblog() {
+			$user = wp_get_current_user();
 			$retval = current_user_can( apply_filters( 'liveblog_edit_cap', self::EDIT_CAP ) );
 			return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
 		}
