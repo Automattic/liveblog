@@ -3,7 +3,7 @@
 
 * Contributors: [automattic](http://profiles.wordpress.org/automattic), [nbachiyski](http://profiles.wordpress.org/nbachiyski), [batmoo](http://profiles.wordpress.org/batmoo), [johnjamesjacoby](http://profiles.wordpress.org/johnjamesjacoby), [philipjohn](http://profiles.wordpress.org/philipjohn)
 * Tags: liveblog
-* Requires at least: 4.4
+* Requires at least: 6.4
 * Requires PHP: 5.6
 * Tested up to: 4.9.8
 * Stable tag: 1.9.7

@@ -23,18 +23,13 @@ jobs:
 
     strategy:
       matrix:
-        wordpress: ["4.4", "5.5", "5.6", "5.7"]
-        php: ["5.6", "7.0", "7.1", "7.2", "7.3", "7.4"]
+        wordpress: ["6.4", "latest"]
+        php: ["7.4", "8.0"]
         include:
           - php: "8.0"
-            # Ignore platform requirements, so that PHPUnit 7.5 can be installed on PHP 8.0 (and above).
-            composer-options: "--ignore-platform-reqs"
             extensions: pcov
             ini-values: pcov.directory=., "pcov.exclude=\"~(vendor|tests)~\""
             coverage: pcov
-        exclude:
-          - php: "8.0"
-            wordpress: ["4.4", "5.5"]
       fail-fast: false
 
     steps:
