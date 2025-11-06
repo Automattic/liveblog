@@ -1,7 +1,7 @@
 === Liveblog ===
 Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby, philipjohn
 Tags: liveblog
-Requires at least: 4.4
+Requires at least: 6.4
 Requires PHP: 5.6
 Tested up to: 5.8
 Stable tag: 1.9.7
