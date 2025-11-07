@@ -33,6 +33,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install wordpress environment
+        run: npm install -g @wordpress/env
+
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
@@ -40,6 +43,7 @@ jobs:
           extensions: ${{ matrix.extensions }}
           ini-values: ${{ matrix.ini-values }}
           coverage: ${{ matrix.coverage }}
+          tools: composer
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
@@ -61,17 +65,16 @@ jobs:
         with:
           composer-options: "${{ matrix.composer-options }}"
 
-      - name: Start MySQL Service
-        run: sudo systemctl start mysql.service
-
-      - name: Prepare environment for integration tests
-        run: composer prepare-ci
+      - name: Setup wp-env
+        run: wp-env start
+        env:
+          WP_ENV_CORE: WordPress/WordPress#${{ matrix.wordpress == 'latest' && 'master' || matrix.wordpress }}
 
       - name: Run integration tests (single site)
         if: ${{ matrix.php != 8.0 }}
-        run: composer test
+        run: composer test-integration
       - name: Run integration tests (single site with code coverage)
         if: ${{ matrix.php == 8.0 }}
         run: composer coverage-ci
       - name: Run integration tests (multisite)
-        run: composer test-ms
+        run: composer test-integration-ms
