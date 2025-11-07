@@ -179,9 +179,9 @@ class Test_REST_API extends WP_UnitTestCase {
 		$entry = WPCOM_Liveblog::get_single_entry( $new_entry[0]->get_id() );
 
 		$this->assertNotEmpty( $entry['entries'] );
-		$this->assertInternalType( 'int', $entry['index'] );
-		$this->assertInternalType( 'int', $entry['nextTimestamp'] );
-		$this->assertInternalType( 'int', $entry['previousTimestamp'] );
+		$this->assertIsInt( $entry['index'] );
+		$this->assertIsInt( $entry['nextTimestamp'] );
+		$this->assertIsInt( $entry['previousTimestamp'] );
 
 	}
 
@@ -213,7 +213,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
 
 		$this->assertNotEmpty( $entries['entries'] );
-		$this->assertInternalType( 'int', $entries['index'] );
+		$this->assertIsInt( $entries['index'] );
 
 	}
 
@@ -231,7 +231,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
 
 		$this->assertEmpty( $entries['entries'] );
-		$this->assertInternalType( 'int', $entries['index'] );
+		$this->assertIsInt( $entries['index'] );
 
 	}
 
@@ -244,7 +244,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$args  = array( 'user' => $user );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
 
-		$this->assertInternalType( 'array', $entry );
+		$this->assertIsArray( $entry );
 		$this->assertNotEmpty( $entry['entries'] );
 		$this->assertNull( $entry['latest_timestamp'] ); // Should this always be null?
 
@@ -262,7 +262,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		);
 		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
 
-		$this->assertInternalType( 'array', $entry );
+		$this->assertIsArray( $entry );
 		$this->assertNotEmpty( $entry['entries'] );
 		$this->assertNull( $entry['latest_timestamp'] );
 
@@ -276,7 +276,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		// First create an entry
 		$new_entry = $this->setup_entry_test_state();
 
-		$this->assertInternalType( 'array', $new_entry );
+		$this->assertIsArray( $new_entry );
 		$this->assertInstanceOf( 'WPCOM_Liveblog_Entry', $new_entry[0] );
 
 		$new_entry_id = $new_entry[0]->get_id();
@@ -318,7 +318,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		// Get entry preview
 		$preview = WPCOM_Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
 
-		$this->assertInternalType( 'array', $preview );
+		$this->assertIsArray( $preview );
 		$this->assertNotEmpty( $preview['html'] );
 
 	}
@@ -334,8 +334,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		$authors_not_empty = $liveblog_authors->get_authors( 'adm' ); // Should return admin
 		$authors_is_empty  = $liveblog_authors->get_authors( 'fakeauthor' ); // Non-existent user
 
-		$this->assertInternalType( 'array', $authors_not_empty );
-		$this->assertInternalType( 'array', $authors_is_empty );
+		$this->assertIsArray( $authors_not_empty );
+		$this->assertIsArray( $authors_is_empty );
 		$this->assertNotEmpty( $authors_not_empty );
 		$this->assertEmpty( $authors_is_empty );
 
@@ -361,8 +361,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag
 		$hashtags_is_empty  = $liveblog_hashtags->get_hashtag_terms( 'fakehashtag' ); // Non-existent hashtag
 
-		$this->assertInternalType( 'array', $hashtags_not_empty );
-		$this->assertInternalType( 'array', $hashtags_is_empty );
+		$this->assertIsArray( $hashtags_not_empty );
+		$this->assertIsArray( $hashtags_is_empty );
 		$this->assertNotEmpty( $hashtags_not_empty );
 		$this->assertEmpty( $hashtags_is_empty );
 
@@ -389,7 +389,7 @@ class Test_REST_API extends WP_UnitTestCase {
 		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
 
 		// TODO: Possibly test for something more specific
-		$this->assertInternalType( 'string', $meta_box );
+		$this->assertIsString( $meta_box );
 		$this->assertNotEmpty( $meta_box );
 
 	}
