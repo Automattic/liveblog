@@ -75,7 +75,8 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	public function count( $args = array() ) {
-		return count( $this->get_all( $args ) );
+		$entries = $this->get_all( $args );
+		return is_array( $entries ) ? count( $entries ) : 0;
 	}
 
 	public function get_by_id( $id ) {
@@ -189,7 +190,7 @@ class WPCOM_Liveblog_Entry_Query {
 	public static function entries_from_comments( $comments = array() ) {
 
 		if ( empty( $comments ) ) {
-			return null;
+			return array();
 		}
 
 		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
