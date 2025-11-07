@@ -6,8 +6,8 @@ class Test_REST_API extends WP_UnitTestCase {
 
 	protected $server;
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;
@@ -16,8 +16,8 @@ class Test_REST_API extends WP_UnitTestCase {
 		do_action( 'rest_api_init' );
 	}
 
-	public function tearDown() {
-		parent::tearDown();
+	public function tear_down() {
+		parent::tear_down();
 
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;

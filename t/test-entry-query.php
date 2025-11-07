@@ -7,8 +7,8 @@ class Test_Entry_Query extends WP_UnitTestCase {
 	const JAN_2_TIMESTAMP = 1325462400;
 	const JAN_2_MYSQL     = '2012-01-02 00:00:00';
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		wp_delete_comment( 1, true );
 		$this->entry_query = new WPCOM_Liveblog_Entry_Query( 5, 'baba' );
 	}
