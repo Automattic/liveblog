@@ -6,7 +6,7 @@
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
  * Version:     1.9.7
  * Requires at least: 6.4
- * Requires PHP: 5.6
+ * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog

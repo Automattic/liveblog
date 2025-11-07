@@ -13,10 +13,7 @@ on:
 jobs:
   test:
     name: WP ${{ matrix.wordpress }} on PHP ${{ matrix.php }}
-    # Ubuntu-20.x includes MySQL 8.0, which causes `caching_sha2_password` issues with PHP < 7.4
-    # https://www.php.net/manual/en/mysqli.requirements.php
-    # TODO: change to ubuntu-latest when we no longer support PHP < 7.4
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     env:
       WP_VERSION: ${{ matrix.wordpress }}
