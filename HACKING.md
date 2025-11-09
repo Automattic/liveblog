@@ -26,7 +26,7 @@ Pretty straight-forward:
 * CSS is in `css/`.
 * JavaScript is in `js/`.
 * Translations are in `languages/`.
-* Tests are in `t/`.
+* Tests are in `tests/`.
 
 # Backend
 
