@@ -1,21 +1,35 @@
-<phpunit
-	bootstrap="t/bootstrap.php"
-	backupGlobals="false"
-	colors="true"
-	convertErrorsToExceptions="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	>
-	<testsuites>
-		<testsuite name="WP_Tests">
-			<directory prefix="test-" suffix=".php">./t/</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-		<whitelist>
-			<directory suffix=".php">.</directory>
-			<directory suffix=".php">./classes</directory>
-			<directory suffix=".php">./templates</directory>
-		</whitelist>
-	</filter>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+				 bootstrap="t/bootstrap.php"
+				 cacheResultFile=".phpunit.cache/test-results"
+				 executionOrder="depends,defects"
+				 forceCoversAnnotation="false"
+				 beStrictAboutCoversAnnotation="false"
+				 beStrictAboutOutputDuringTests="true"
+				 beStrictAboutTodoAnnotatedTests="true"
+				 convertDeprecationsToExceptions="true"
+				 colors="true"
+				 failOnRisky="true"
+				 failOnWarning="true"
+		 testdox="true"
+				 verbose="true">
+		<testsuites>
+				<testsuite name="integration">
+						<directory prefix="test-" suffix=".php">./t/</directory>
+				</testsuite>
+		</testsuites>
+
+		<coverage cacheDirectory=".phpunit.cache/code-coverage"
+							processUncoveredFiles="true">
+				<include>
+			<directory prefix="test-" suffix=".php">.</directory>
+			<directory prefix="test-" suffix=".php">./classes</directory>
+			<directory prefix="test-" suffix=".php">./templates</directory>
+				</include>
+			<report>
+				<text outputFile="php://stdout"/>
+				<clover outputFile=".phpunit.cache/clover.xml"/>
+			</report>
+		</coverage>
 </phpunit>
