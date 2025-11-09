@@ -48,15 +48,6 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      # Setup PCOV since we're using PHPUnit < 8 which has it integrated. Requires PHP 7.1.
-      # Ignore platform reqs to make it install on PHP 8.
-      # https://github.com/krakjoe/pcov-clobber
-      - name: Setup PCOV
-        if: ${{ matrix.php == 8.0 }}
-        run: |
-          composer require pcov/clobber --ignore-platform-reqs
-          vendor/bin/pcov clobber
-
       - name: Setup Problem Matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
