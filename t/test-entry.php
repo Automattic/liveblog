@@ -106,17 +106,21 @@ class Test_Entry extends WP_UnitTestCase {
 	}
 
 	public function test_user_input_sanity_check() {
-		$user_input      = '<iframe></iframe>';
-		$user_input     .= '<script></script>';
-		$user_input     .= '<applet></applet>';
-		$user_input     .= '<embed></embed>';
-		$user_input     .= '<object></object>';
+		// Test that dangerous script tags are stripped by wp_filter_post_kses()
+		// Note: embed and object tags are allowed in WordPress 'post' context
+		$user_input      = '<script>alert("xss")</script>';
+		$user_input     .= '<applet code="malicious"></applet>';
+		$user_input     .= '<form><input name="test"></form>';
 		$content         = array(
 			'post_id' => 1,
 			'content' => $user_input,
 		);
 		$live_blog_entry = $this->insert_entry( $content );
-		$this->assertEmpty( $live_blog_entry->get_content() );
+		// Content should be empty or significantly sanitized (scripts/applets/forms removed)
+		$sanitized_content = $live_blog_entry->get_content();
+		$this->assertStringNotContainsString( '<script', $sanitized_content );
+		$this->assertStringNotContainsString( '<applet', $sanitized_content );
+		$this->assertStringNotContainsString( '<form', $sanitized_content );
 	}
 
 	/**

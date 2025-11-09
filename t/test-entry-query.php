@@ -9,8 +9,29 @@ class Test_Entry_Query extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		wp_delete_comment( 1, true );
-		$this->entry_query = new WPCOM_Liveblog_Entry_Query( 5, 'baba' );
+
+		// Ensure post 5 exists for our comments
+		wp_insert_post( array(
+			'ID'           => 5,
+			'post_title'   => 'Test Post',
+			'post_status'  => 'publish',
+			'post_type'    => 'post',
+		) );
+
+		$this->entry_query = new WPCOM_Liveblog_Entry_Query( 5, 'liveblog' );
+
+		// Delete any existing liveblog comments for post 5
+		$existing_comments = get_comments( array(
+			'post_id' => 5,
+			'type'    => 'liveblog',
+			'status'  => 'all',
+		) );
+		foreach ( $existing_comments as $comment ) {
+			wp_delete_comment( $comment->comment_ID, true );
+		}
+
+		// Clear the cache to ensure tests start with a clean slate
+		wp_cache_delete( 'liveblog_entries_asc_5', 'liveblog' );
 	}
 
 	public function test_get_latest_should_return_null_if_no_comments() {
@@ -41,8 +62,11 @@ class Test_Entry_Query extends WP_UnitTestCase {
 		$entries   = $this->entry_query->get_between_timestamps( self::JAN_1_TIMESTAMP - 10, self::JAN_2_TIMESTAMP + 10 );
 		$this->assertEquals( 2, count( $entries ) );
 		$ids = $this->get_ids_from_entries( $entries );
-		$this->assertContains( $id_first, $ids );
-		$this->assertContains( $id_second, $ids );
+		// Sort both arrays for comparison since order may vary
+		sort( $ids );
+		$expected_ids = array( $id_first, $id_second );
+		sort( $expected_ids );
+		$this->assertEquals( $expected_ids, $ids );
 	}
 
 	public function test_get_between_timestamps_should_return_entries_on_the_border() {
