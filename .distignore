@@ -23,4 +23,4 @@ phpunit.xml.dist
 README.md
 webpack.config.js
 wpcom-helper.php
-yarn.lock
+package-lock.json
