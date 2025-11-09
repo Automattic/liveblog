@@ -3,7 +3,7 @@
 /.github
 /bin
 /node_modules
-/t
+/tests
 /vendor
 
 .babelrc
