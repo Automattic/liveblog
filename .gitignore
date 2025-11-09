@@ -5,6 +5,7 @@ yarn-error.log
 
 composer.lock
 vendor/
+.phpunit.cache/
 
 # Editor directories and files
 .idea

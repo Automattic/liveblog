@@ -117,8 +117,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// The args used in the get_users query.
 		$args = array(
-			'who'    => 'authors',
-			'fields' => array( 'user_nicename' ),
+			'capability' => 'edit_posts',
+			'fields'     => array( 'user_nicename' ),
 		);
 
 		// Map the authors and store them on the object
@@ -234,9 +234,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 
 		// The args used in the get_users query.
 		$args = array(
-			'who'    => 'authors',
-			'fields' => array( 'ID', 'user_nicename', 'display_name' ),
-			'number' => 10,
+			'capability' => 'edit_posts',
+			'fields'     => array( 'ID', 'user_nicename', 'display_name' ),
+			'number'     => 10,
 		);
 
 		// If there is no search term then search

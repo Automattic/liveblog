@@ -22,10 +22,10 @@
 		"automattic/vipwpcs": "^3",
 		"php-parallel-lint/php-parallel-lint": "^1.0",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
-		"phpunit/phpunit": "^4 || ^5 || ^6 || ^7",
-		"predis/predis": "~1.0.3",
+		"phpunit/phpunit": "^9.6",
+		"predis/predis": "^1.0 || ^2.0 || ^3.0",
 		"rase/socket.io-emitter": "~0.7.0",
-		"yoast/phpunit-polyfills": "^0.2.0"
+		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"config": {
 		"allow-plugins": {
@@ -38,7 +38,7 @@
 		"coverage": [
 			"@php ./vendor/bin/phpunit --coverage-html ./build/coverage-html"
 		],
-		"coverage-ci": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite WP_Tests",
+		"coverage-ci": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite integration",
 		"cs": [
 			"@php ./vendor/bin/phpcs -q"
 		],
@@ -52,8 +52,8 @@
 		"lint-ci": [
 			"@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --exclude vendor --exclude .git --checkstyle"
 		],
-		"test-integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite WP_Tests",
-		"test-integration-ms": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog /bin/bash -c 'WP_MULTISITE=1 ./vendor/bin/phpunit --testsuite WP_Tests'"
+		"test-integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite integration",
+		"test-integration-ms": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog /bin/bash -c 'WP_MULTISITE=1 ./vendor/bin/phpunit --testsuite integration'"
 	},
 	"scripts-descriptions": {
 		"coverage": "Run tests with code coverage reporting",
