@@ -506,6 +506,9 @@ class Test_REST_API extends WP_UnitTestCase {
 	 */
 	public function test_endpoint_entry_preview() {
 
+		// Create an author and set as the current user
+		$this->set_author_user();
+
 		// The POST data to preview
 		$post_vars = array( 'entry_content' => 'Test Liveblog entry with /key' );
 
@@ -528,6 +531,9 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Test accessing the get authors endpoint
 	 */
 	public function test_endpoint_get_authors() {
+
+		// Create an author and set as the current user
+		$this->set_author_user();
 
 		// Create 2 authors
 		$this->factory->user->create(
@@ -560,6 +566,9 @@ class Test_REST_API extends WP_UnitTestCase {
 	 * Test accessing the get hashtags endpoint
 	 */
 	public function test_endpoint_get_hashtags() {
+
+		// Create an author and set as the current user
+		$this->set_author_user();
 
 		// Create 2 hashtags
 		$this->factory->term->create(
