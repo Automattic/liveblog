@@ -52,7 +52,7 @@ class Toolbar extends Component {
     const startOffset = editorState.getSelection().getStartOffset();
     const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
     const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
-    let url = 'http://';
+    let url = 'https://';
 
     if (linkKey) {
       url = contentState.getEntity(linkKey).getData().url;
