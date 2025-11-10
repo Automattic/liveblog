@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
-import { of } from 'rxjs/observable/of';
-import { concat } from 'rxjs/observable/concat';
+import { of, concat } from 'rxjs';
+import { switchMap, timeout, map, catchError, mergeMap } from 'rxjs/operators';
 
 import types from '../actions/actionTypes';
 
@@ -27,29 +27,33 @@ import {
 } from '../services/api';
 
 const getEventsEpic = (action$, store) =>
-  action$.ofType(types.GET_EVENTS)
-    .switchMap(() =>
-      getEvents(store.getState().config, store.getState().api.newestEntry)
-        .timeout(10000)
-        .map(res => getEventsSuccess(res.response))
-        .catch(error => of(getEventsFailed(error))),
-    );
+  action$.ofType(types.GET_EVENTS).pipe(
+    switchMap(() =>
+      getEvents(store.getState().config, store.getState().api.newestEntry).pipe(
+        timeout(10000),
+        map(res => getEventsSuccess(res.response)),
+        catchError(error => of(getEventsFailed(error))),
+      ),
+    ),
+  );
 
 const deleteEventEpic = (action$, store) =>
-  action$.ofType(types.DELETE_EVENT)
-    .switchMap(({ payload }) =>
-      deleteEvent(payload, store.getState().config)
-        .timeout(10000)
-        .map(res => deleteEventSuccess(res.response))
-        .catch(error => of(deleteEventFailed(error))),
-    );
+  action$.ofType(types.DELETE_EVENT).pipe(
+    switchMap(({ payload }) =>
+      deleteEvent(payload, store.getState().config).pipe(
+        timeout(10000),
+        map(res => deleteEventSuccess(res.response)),
+        catchError(error => of(deleteEventFailed(error))),
+      ),
+    ),
+  );
 
 const jumpToEventEpic = (action$, store) =>
-  action$.ofType(types.JUMP_TO_EVENT)
-    .switchMap(({ payload }) =>
-      jumpToEvent(payload, store.getState().config, store.getState().api.newestEntry)
-        .timeout(10000)
-        .flatMap((res) => {
+  action$.ofType(types.JUMP_TO_EVENT).pipe(
+    switchMap(({ payload }) =>
+      jumpToEvent(payload, store.getState().config, store.getState().api.newestEntry).pipe(
+        timeout(10000),
+        mergeMap((res) => {
           if (!res.response.entries.some(x => x.id === payload)) {
             return of(getEntriesSuccess(res.response));
           }
@@ -57,9 +61,11 @@ const jumpToEventEpic = (action$, store) =>
             of(getEntriesSuccess(res.response)),
             of(scrollToEntry(`id_${payload}`)),
           );
-        })
-        .catch(error => of(getEntriesFailed(error))),
-    );
+        }),
+        catchError(error => of(getEntriesFailed(error))),
+      ),
+    ),
+  );
 
 export default combineEpics(
   getEventsEpic,

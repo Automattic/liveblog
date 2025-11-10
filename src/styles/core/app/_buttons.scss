@@ -8,59 +8,59 @@
  * 5. Make sure `input` will wrap text across multiple lines.
  */
 .liveblog-btn {
-  -webkit-appearance: none; /* 1 */
-  box-sizing: border-box; /* 2 */
-  display: inline-block;
-  vertical-align: middle;
-  font: inherit;
-  line-height: normal; /* 3 */
-  text-align: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  overflow: visible;
-  user-select: none; /* 4 */
-  white-space: normal; /* 5 */
-  transition: all .3s ease-in-out;
+	-webkit-appearance: none; /* 1 */
+	box-sizing: border-box; /* 2 */
+	display: inline-block;
+	vertical-align: middle;
+	font: inherit;
+	line-height: normal; /* 3 */
+	text-align: center;
+	text-decoration: none;
+	border: none;
+	cursor: pointer;
+	overflow: visible;
+	user-select: none; /* 4 */
+	white-space: normal; /* 5 */
+	transition: all 0.3s ease-in-out;
 
-  &:hover {
-    transition: all .3s ease-in-out;
-    text-decoration: none;
-  }
+	&:hover {
+		transition: all 0.3s ease-in-out;
+		text-decoration: none;
+	}
 }
 
 .liveblog-btn-small {
-  font-size: .8rem;
-  padding: .5rem 1rem;
+	font-size: 0.8rem;
+	padding: 0.5rem 1rem;
 }
 
 .liveblog-update-btn-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  position: sticky;
-  z-index: 5;
-  top: 50px;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	position: sticky;
+	z-index: 5;
+	top: 50px;
 }
 
 .liveblog-update-btn {
-  color: #fff;
-  background: $color-primary;
-  font-size: 16px;
-  border-radius: 50px;
+	color: #fff;
+	background: $color-primary;
+	font-size: 16px;
+	border-radius: 50px;
 }
 
 .liveblog-update-btn:hover {
-  background: darken($color-primary, 10%);
+	background: darken($color-primary, 10%);
 }
 
 .liveblog-btn-delete {
-  background: $color-warning;
-  color: #fff;
-  border: none;
+	background: $color-warning;
+	color: #fff;
+	border: none;
 }
 
 .liveblog-btn-delete:hover {
-  background: darken($color-warning, 10%);
+	background: darken($color-warning, 10%);
 }
 

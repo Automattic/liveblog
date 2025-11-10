@@ -1,4 +1,0 @@
-{
-  "presets": ["es2015","env","react"],
-  "plugins": ["transform-object-rest-spread", "transform-object-assign", "dynamic-import-webpack"]
-}

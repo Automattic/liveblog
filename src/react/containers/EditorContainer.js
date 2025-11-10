@@ -5,8 +5,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Async } from 'react-select';
-import 'react-select/dist/react-select.css';
+import { AsyncPaginate as Async } from 'react-select-async-paginate';
 import { html } from 'js-beautify';
 import { debounce } from 'lodash-es';
 
