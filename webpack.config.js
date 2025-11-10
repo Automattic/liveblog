@@ -31,6 +31,27 @@ module.exports = function (env, argv) {
 		chunkLoadingGlobal: 'wpJsonpLiveBlog',
 	};
 
+	// Configure sass-loader to suppress @import deprecation warnings
+	// We'll migrate to @use in a future PR when we can properly refactor all SCSS
+	const configureSassLoader = (rule) => {
+		if (Array.isArray(rule.use)) {
+			rule.use.forEach((loader) => {
+				if (loader && typeof loader === 'object' &&
+				    (loader.loader?.includes('sass-loader') || loader.loader?.includes('sass'))) {
+					if (!loader.options) loader.options = {};
+					if (!loader.options.sassOptions) loader.options.sassOptions = {};
+					loader.options.sassOptions.quietDeps = true;
+					loader.options.sassOptions.silenceDeprecations = ['import', 'global-builtin', 'color-functions'];
+				}
+			});
+		}
+		if (rule.oneOf) {
+			rule.oneOf.forEach(configureSassLoader);
+		}
+	};
+
+	config.module.rules.forEach(configureSassLoader);
+
 	// Add custom plugins
 	config.plugins.push(
 		// Global vars for checking dev environment
