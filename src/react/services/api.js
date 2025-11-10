@@ -190,7 +190,7 @@ export function uploadImage(formData) {
   const location = window.location;
 
   const settings = {
-    url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
+    url: `${location.protocol}//${location.host}/wp-admin/admin-ajax.php`,
     method: 'POST',
     body: formData,
   };
@@ -202,8 +202,11 @@ export function getMedia(params) {
   const location = window.location;
 
   const settings = {
-    url: `${location.protocol}//${location.hostname}/wp-json/wp/v2/media${getParams(params)}`,
+    url: `${location.protocol}//${location.host}/wp-json/wp/v2/media${getParams(params)}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': window.liveblog_settings?.nonce || '',
+    },
   };
 
   return ajax(settings);

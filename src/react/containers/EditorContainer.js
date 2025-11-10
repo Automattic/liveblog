@@ -237,13 +237,18 @@ class EditorContainer extends Component {
     formData.append('_wpnonce', config.image_nonce);
     formData.append('async-upload', file);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       uploadImage(formData)
-        .timeout(60000)
-        .map(res => res.response)
-        .subscribe((res) => {
-          const src = getImageSize(res.data.sizes, config.default_image_size);
-          resolve(src);
+        .pipe(
+          timeout(60000),
+          map(res => res.response),
+        )
+        .subscribe({
+          next: (res) => {
+            const src = getImageSize(res.data.sizes, config.default_image_size);
+            resolve(src);
+          },
+          error: err => reject(err),
         });
     });
   }
