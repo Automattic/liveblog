@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import Polyfills from './polyfills/index';
 import configureStore from './store';
@@ -14,9 +14,10 @@ const store = configureStore();
 /* eslint-disable camelcase, no-undef */
 __webpack_public_path__ = `${window.liveblog_settings.plugin_dir}assets/`;
 
-ReactDOM.render(
+const container = document.getElementById('wpcom-liveblog-container');
+const root = createRoot(container);
+root.render(
   <Provider store={store}>
     <AppContainer />
   </Provider>,
-  document.getElementById('wpcom-liveblog-container'),
 );
