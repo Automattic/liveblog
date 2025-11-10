@@ -980,8 +980,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$use_rest_api = 1;
 				}
 
-				wp_enqueue_style( self::KEY, plugins_url( 'assets/dashboard/app.css', __FILE__ ), array(), self::VERSION );
-				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/dashboard/app.js', __FILE__ ), array(), self::VERSION, false );
+				wp_enqueue_style( self::KEY, plugins_url( 'assets/app.css', __FILE__ ), array(), self::VERSION );
+				wp_enqueue_script( 'liveblog-admin', plugins_url( 'assets/app.js', __FILE__ ), array(), self::VERSION, false );
 				wp_localize_script(
 					'liveblog-admin',
 					'liveblog_admin_settings',
