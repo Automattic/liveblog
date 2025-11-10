@@ -15,9 +15,11 @@ const store = configureStore();
 __webpack_public_path__ = `${window.liveblog_settings.plugin_dir}assets/`;
 
 const container = document.getElementById('wpcom-liveblog-container');
-const root = createRoot(container);
-root.render(
-  <Provider store={store}>
-    <AppContainer />
-  </Provider>,
-);
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <Provider store={store}>
+      <AppContainer />
+    </Provider>,
+  );
+}
