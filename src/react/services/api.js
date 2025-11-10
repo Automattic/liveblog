@@ -148,6 +148,9 @@ export function getAuthors(term, config) {
   const settings = {
     url: `${config.autocomplete[3].url}${term}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': config.nonce,
+    },
     crossDomain: config.cross_domain,
   };
 
@@ -158,6 +161,9 @@ export function getHashtags(term, config) {
   const settings = {
     url: `${config.autocomplete[2].url}${term}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': config.nonce,
+    },
     crossDomain: config.cross_domain,
   };
 

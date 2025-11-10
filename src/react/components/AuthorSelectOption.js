@@ -3,24 +3,35 @@ import PropTypes from 'prop-types';
 
 class AuthorSelectOption extends Component {
   handleMouseDown(event) {
-    const { onSelect, option } = this.props;
+    const { onSelect, option, data, selectOption } = this.props;
+    const item = data || option;
     event.preventDefault();
     event.stopPropagation();
-    onSelect(option, event);
+    // react-select v5 uses selectOption instead of onSelect
+    if (selectOption) {
+      selectOption(item);
+    } else if (onSelect) {
+      onSelect(item, event);
+    }
   }
 
   handleMouseEnter(event) {
-    this.props.onFocus(this.props.option, event);
+    const { onFocus, option, data } = this.props;
+    const item = data || option;
+    if (onFocus) onFocus(item, event);
   }
 
   handleMouseMove(event) {
-    const { isFocused, onFocus, option } = this.props;
+    const { isFocused, onFocus, option, data } = this.props;
     if (isFocused) return;
-    onFocus(option, event);
+    const item = data || option;
+    if (onFocus) onFocus(item, event);
   }
 
   render() {
-    const { className, option } = this.props;
+    const { className, option, data } = this.props;
+    // react-select v5 uses 'data' prop instead of 'option'
+    const item = data || option || {};
     return (
       <div
         className={`${className} liveblog-popover-item`}
@@ -28,8 +39,8 @@ class AuthorSelectOption extends Component {
         onMouseEnter={this.handleMouseEnter.bind(this)}
         onMouseMove={this.handleMouseMove.bind(this)}
       >
-        { option.avatar && <div dangerouslySetInnerHTML={{ __html: option.avatar }} /> }
-        {option.name}
+        { item.avatar && <div dangerouslySetInnerHTML={{ __html: item.avatar }} /> }
+        {item.name}
       </div>
     );
   }
