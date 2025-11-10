@@ -1,7 +1,6 @@
 import { combineEpics } from 'redux-observable';
-import { of } from 'rxjs/observable/of';
-import { interval } from 'rxjs/observable/interval';
-import { concat } from 'rxjs/observable/concat';
+import { of, interval, concat } from 'rxjs';
+import { switchMap, takeUntil, exhaustMap, timeout, map, catchError, mergeMap } from 'rxjs/operators';
 import types from '../actions/actionTypes';
 
 import {
@@ -26,14 +25,14 @@ import {
 } from '../utils/utils';
 
 const startPollingEpic = (action$, store) =>
-  action$.ofType(types.START_POLLING)
-    .switchMap(() =>
-      interval(store.getState().config.refresh_interval * 1000)
-        .takeUntil(action$.ofType(types.CANCEL_POLLING))
-        .exhaustMap(() =>
-          pollingApi(store.getState().polling.newestEntry.timestamp, store.getState().config)
-            .timeout(10000)
-            .map(res =>
+  action$.ofType(types.START_POLLING).pipe(
+    switchMap(() =>
+      interval(store.getState().config.refresh_interval * 1000).pipe(
+        takeUntil(action$.ofType(types.CANCEL_POLLING)),
+        exhaustMap(() =>
+          pollingApi(store.getState().polling.newestEntry.timestamp, store.getState().config).pipe(
+            timeout(10000),
+            map(res =>
               pollingSuccess(
                 res.response,
                 shouldRenderNewEntries(
@@ -42,14 +41,17 @@ const startPollingEpic = (action$, store) =>
                   store.getState().polling.entries,
                 ),
               ),
-            )
-            .catch(error => of(pollingFailed(error))),
+            ),
+            catchError(error => of(pollingFailed(error))),
+          ),
         ),
-    );
+      ),
+    ),
+  );
 
 const mergePollingEpic = (action$, store) =>
-  action$.ofType(types.MERGE_POLLING)
-    .switchMap(() => {
+  action$.ofType(types.MERGE_POLLING).pipe(
+    switchMap(() => {
       const { pagination, polling, config } = store.getState();
       const entries = Object.keys(polling.entries).map(key => polling.entries[key]);
       const pages = Math.max(pagination.pages, polling.pages);
@@ -61,14 +63,16 @@ const mergePollingEpic = (action$, store) =>
         );
       }
 
-      return getEntries(1, config, polling.newestEntry)
-        .timeout(10000)
-        .flatMap(res => concat(
+      return getEntries(1, config, polling.newestEntry).pipe(
+        timeout(10000),
+        mergeMap(res => concat(
           of(getEntriesSuccess(res.response, true)),
           of(scrollToEntry(`id_${polling.newestEntry.id}`)),
-        ))
-        .catch(error => of(getEntriesFailed(error)));
-    });
+        )),
+        catchError(error => of(getEntriesFailed(error))),
+      );
+    }),
+  );
 
 export default combineEpics(
   startPollingEpic,
