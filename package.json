@@ -24,7 +24,6 @@
     "react": "^18.3.1",
     "react-ace": "^10.1.0",
     "react-dom": "^18.3.1",
-    "react-loadable": "^5.5.0",
     "react-redux": "^8.1.0",
     "react-select": "^5.8.0",
     "react-select-async-paginate": "^0.7.11",

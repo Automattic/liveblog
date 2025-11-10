@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -33,7 +33,11 @@ class AppContainer extends Component {
 
     return (
       <div style={{ position: 'relative' }}>
-        {(page === 1 && canEdit) && <Editor isEditing={false} />}
+        {(page === 1 && canEdit) && (
+          <Suspense fallback={<div>Loading editor...</div>}>
+            <Editor isEditing={false} />
+          </Suspense>
+        )}
         <UpdateButton polling={polling} click={() => mergePolling()} />
         <PaginationContainer />
         <Entries loading={loading} entries={entries} />
