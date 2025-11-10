@@ -1,82 +1,82 @@
 .liveblog-entry {
-  position: relative;
-  margin-bottom: 1rem;
+	position: relative;
+	margin-bottom: 1rem;
 }
 
 .liveblog-meta {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  text-decoration: none;
+	display: inline-flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	text-decoration: none;
 }
 
 .liveblog-meta-authors,
 .liveblog-meta-author {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
 }
 
 .liveblog-meta-time span {
-  display: block;
+	display: block;
 }
 
 .liveblog-meta-author-avatar img {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
 }
 
 .liveblog-entry-tools {
-  margin-top: 1rem;
+	margin-top: 1rem;
 }
 
 .liveblog-entry-tools .liveblog-btn:first-child {
-  margin-right: .5rem;
+	margin-right: 0.5rem;
 }
 
 .liveblog-entry .type-key {
-  display: none;
+	display: none;
 }
 
 .liveblog-emoji {
-  display: inline-block;
-  overflow: hidden;
-  max-width: 1.95ch;
-  max-height: 1em;
-  line-height: inherit;
-  margin: 0em 0em -.2ex;
+	display: inline-block;
+	overflow: hidden;
+	max-width: 1.95ch;
+	max-height: 1em;
+	line-height: inherit;
+	margin: 0 0 -0.2ex;
 }
 
 .liveblog-hash::before {
-  content: "#";
+	content: "#";
 }
 
 .fb-post.fb_iframe_widget,
 .fb-post.fb_iframe_widget > span,
 .fb-post.fb_iframe_widget iframe {
-  max-width: 100%;
+	max-width: 100%;
 }
 
 .liveblog-entry-delete-confirm {
-  background: $color-grey-x-light;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+	background: $color-grey-x-light;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
 }
 
 .liveblog-entry-delete-confirm-buttons {
-  display: flex;
+	display: flex;
 }
 
 .liveblog-entry-delete-confirm-buttons button:first-child {
-  margin-right: .5rem;
+	margin-right: 0.5rem;
 }

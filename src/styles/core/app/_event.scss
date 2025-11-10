@@ -1,19 +1,19 @@
 .liveblog-event {
-  position: relative;
-  display: inline-block;
-  width: 100%;
+	position: relative;
+	display: inline-block;
+	width: 100%;
 }
 
 .liveblog-event-meta {
-  font-size: .8rem;
-  color: $color-grey-base;
+	font-size: 0.8rem;
+	color: $color-grey-base;
 }
 
 .liveblog-event-content:hover {
-  cursor: pointer;
-  text-decoration: underline;
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 .liveblog-event .type-key {
-  display: none;
+	display: none;
 }
