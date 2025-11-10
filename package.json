@@ -7,7 +7,7 @@
   "devDependencies": {
     "@wordpress/scripts": "^30.27.0",
     "sass-module-importer": "^1.4.0",
-    "sass-mq": "^3.3.2"
+    "sass-mq": "^6.0.0"
   },
   "dependencies": {
     "brace": "^0.11.1",
