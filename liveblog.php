@@ -338,7 +338,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::$post_id = get_the_ID();
 
 			self::$custom_template_path = apply_filters( 'liveblog_template_path', self::$custom_template_path, self::$post_id );
-			if ( ! is_dir( self::$custom_template_path ) ) {
+			if ( ! is_string( self::$custom_template_path ) || ! is_dir( self::$custom_template_path ) ) {
 				self::$custom_template_path = null;
 			} else {
 				// realpath is used here to ensure we have an absolute path which is necessary to avoid APC related bugs
