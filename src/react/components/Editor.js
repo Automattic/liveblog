@@ -1,9 +1,3 @@
-import Loadable from 'react-loadable';
+import { lazy } from 'react';
 
-export default Loadable({
-  loader: () =>
-    import('../containers/EditorContainer'),
-  loading() {
-    return 'Loading';
-  },
-});
+export default lazy(() => import('../containers/EditorContainer'));

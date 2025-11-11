@@ -148,6 +148,9 @@ export function getAuthors(term, config) {
   const settings = {
     url: `${config.autocomplete[3].url}${term}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': config.nonce,
+    },
     crossDomain: config.cross_domain,
   };
 
@@ -158,6 +161,9 @@ export function getHashtags(term, config) {
   const settings = {
     url: `${config.autocomplete[2].url}${term}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': config.nonce,
+    },
     crossDomain: config.cross_domain,
   };
 
@@ -173,6 +179,7 @@ export function getPreview(content, config) {
     },
     headers: {
       'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
     },
     crossDomain: config.cross_domain,
   };
@@ -184,7 +191,7 @@ export function uploadImage(formData) {
   const location = window.location;
 
   const settings = {
-    url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
+    url: `${location.protocol}//${location.host}/wp-admin/admin-ajax.php`,
     method: 'POST',
     body: formData,
   };
@@ -196,8 +203,11 @@ export function getMedia(params) {
   const location = window.location;
 
   const settings = {
-    url: `${location.protocol}//${location.hostname}/wp-json/wp/v2/media${getParams(params)}`,
+    url: `${location.protocol}//${location.host}/wp-json/wp/v2/media${getParams(params)}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': window.liveblog_settings?.nonce || '',
+    },
   };
 
   return ajax(settings);

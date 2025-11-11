@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { AsyncPaginate as Async } from 'react-select-async-paginate';
 import { html } from 'js-beautify';
 import { debounce } from 'lodash-es';
+import { timeout, map } from 'rxjs/operators';
 
 import { EditorState, ContentState } from 'draft-js';
 
@@ -60,7 +61,8 @@ class EditorContainer extends Component {
       rawText: html(convertToHTML(editorState.getCurrentContent())),
     });
 
-    this.getUsers = debounce(this.getUsers.bind(this), props.config.author_list_debounce_time);
+    // Note: getUsers must return a Promise for react-select-async-paginate
+    // Debouncing is handled by the library itself, so we don't debounce here
   }
 
   setReadOnly(state) {
@@ -139,22 +141,38 @@ class EditorContainer extends Component {
     });
   }
 
-  getUsers(text, callback) {
+  getUsers(text) {
     const { config } = this.props;
-    getAuthors(text, config)
-      .timeout(10000)
-      .map(res => res.response)
-      .subscribe(res => callback(null, {
-        options: res,
-        complete: false,
-      }));
+
+    // Handle empty text - return empty options immediately
+    if (!text || text.trim() === '') {
+      return Promise.resolve({ options: [] });
+    }
+
+    return new Promise((resolve) => {
+      getAuthors(text, config)
+        .pipe(
+          timeout(10000),
+          map(res => res.response),
+        )
+        .subscribe({
+          next: res => resolve({ options: res || [] }),
+          error: err => {
+            // Fail gracefully with empty options on error (e.g., 401)
+            console.warn('Authors API error:', err);
+            resolve({ options: [] });
+          },
+        });
+    });
   }
 
   getAuthors(text) {
     const { config } = this.props;
     getAuthors(text, config)
-      .timeout(10000)
-      .map(res => res.response)
+      .pipe(
+        timeout(10000),
+        map(res => res.response),
+      )
       .subscribe(res => this.setState({
         suggestions: res.map(author => author),
       }));
@@ -163,8 +181,10 @@ class EditorContainer extends Component {
   getHashtags(text) {
     const { config } = this.props;
     getHashtags(text, config)
-      .timeout(10000)
-      .map(res => res.response)
+      .pipe(
+        timeout(10000),
+        map(res => res.response),
+      )
       .subscribe(res => this.setState({
         suggestions: res.map(hashtag => hashtag),
       }));
@@ -217,13 +237,18 @@ class EditorContainer extends Component {
     formData.append('_wpnonce', config.image_nonce);
     formData.append('async-upload', file);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       uploadImage(formData)
-        .timeout(60000)
-        .map(res => res.response)
-        .subscribe((res) => {
-          const src = getImageSize(res.data.sizes, config.default_image_size);
-          resolve(src);
+        .pipe(
+          timeout(60000),
+          map(res => res.response),
+        )
+        .subscribe({
+          next: (res) => {
+            const src = getImageSize(res.data.sizes, config.default_image_size);
+            resolve(src);
+          },
+          error: err => reject(err),
         });
     });
   }
@@ -299,15 +324,15 @@ class EditorContainer extends Component {
         }
         <h2 className="liveblog-editor-subTitle">Authors:</h2>
         <Async
-          multi={true}
+          isMulti={true}
           value={authors}
-          valueKey="key"
-          labelKey="name"
+          getOptionValue={(option) => option.key}
+          getOptionLabel={(option) => option.name}
           onChange={this.onSelectAuthorChange.bind(this)}
-          optionComponent={AuthorSelectOption}
-          loadOptions={this.getUsers}
-          clearable={false}
-          cache={false}
+          components={{ Option: AuthorSelectOption }}
+          loadOptions={this.getUsers.bind(this)}
+          isClearable={false}
+          cacheOptions={false}
         />
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? 'Publish Update' : 'Publish New Entry'}

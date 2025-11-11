@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -121,7 +121,9 @@ class EntryContainer extends Component {
             this.isEditing()
               ? (
                 <div className="liveblog-entry-edit">
-                  <Editor entry={entry} isEditing={true} />
+                  <Suspense fallback={<div>Loading editor...</div>}>
+                    <Editor entry={entry} isEditing={true} />
+                  </Suspense>
                 </div>
               )
               : (

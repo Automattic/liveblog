@@ -31,6 +31,9 @@ module.exports = function (env, argv) {
 		chunkLoadingGlobal: 'wpJsonpLiveBlog',
 	};
 
+	// Enable source maps for better debugging
+	config.devtool = 'source-map';
+
 	// Configure sass-loader to suppress @import deprecation warnings
 	// We'll migrate to @use in a future PR when we can properly refactor all SCSS
 	const configureSassLoader = (rule) => {

@@ -3,6 +3,7 @@
 /* eslint-disable no-return-assign */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { timeout, map } from 'rxjs/operators';
 import { getMedia } from '../../services/api';
 
 import Button from '../Button';
@@ -80,11 +81,13 @@ class Media extends Component {
     this.setState({ loading: true });
 
     getMedia(mergedParams)
-      .timeout(10000)
-      .map(res => ({
-        res: res.response,
-        pages: res.xhr.getResponseHeader('X-WP-TotalPages'),
-      }))
+      .pipe(
+        timeout(10000),
+        map(res => ({
+          res: res.response,
+          pages: res.xhr.getResponseHeader('X-WP-TotalPages'),
+        })),
+      )
       .subscribe(({ res, pages }) => {
         // If have submitted a new search we only want to show page 1.
         let result = res;

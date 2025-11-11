@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { timeout, map } from 'rxjs/operators';
 
 import { getPreview } from '../services/api';
 import Loader from '../components/Loader';
@@ -19,8 +20,10 @@ class PreviewContainer extends Component {
     const { config, getEntryContent } = this.props;
 
     getPreview(getEntryContent(), config)
-      .timeout(10000)
-      .map(res => res.response)
+      .pipe(
+        timeout(10000),
+        map(res => res.response),
+      )
       .subscribe(res => this.setState({
         entryContent: res.html,
         loading: false,

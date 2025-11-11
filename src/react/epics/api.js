@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 import { of, concat } from 'rxjs';
 import { switchMap, timeout, map, catchError, mergeMap } from 'rxjs/operators';
 
@@ -38,8 +38,9 @@ import {
   scrollToEntry,
 } from '../actions/userActions';
 
-const getEntriesEpic = (action$, store) =>
-  action$.ofType(types.GET_ENTRIES).pipe(
+const getEntriesEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.GET_ENTRIES),
     switchMap(({ page, hash }) => {
       /**
        * If there is a has in the url, we check that it is a number
@@ -51,15 +52,15 @@ const getEntriesEpic = (action$, store) =>
         if (!isNaN(id)) return of(jumpToEvent(id));
       }
 
-      return getEntries(page, store.getState().config, store.getState().api.newestEntry).pipe(
+      return getEntries(page, state$.value.config, state$.value.api.newestEntry).pipe(
         timeout(10000),
         map(res =>
           getEntriesSuccess(
             res.response,
             shouldRenderNewEntries(
-              store.getState().pagination.page,
-              store.getState().api.entries,
-              store.getState().polling.entries,
+              state$.value.pagination.page,
+              state$.value.api.entries,
+              state$.value.polling.entries,
             ),
           ),
         ),
@@ -68,19 +69,20 @@ const getEntriesEpic = (action$, store) =>
     }),
   );
 
-const getPaginatedEntriesEpic = (action$, store) =>
-  action$.ofType(types.GET_ENTRIES_PAGINATED).pipe(
+const getPaginatedEntriesEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.GET_ENTRIES_PAGINATED),
     switchMap(({ page, scrollTo }) =>
-      getEntries(page, store.getState().config, store.getState().api.newestEntry).pipe(
+      getEntries(page, state$.value.config, state$.value.api.newestEntry).pipe(
         timeout(10000),
         mergeMap(res =>
           concat(
             of(getEntriesSuccess(
               res.response,
               shouldRenderNewEntries(
-                store.getState().pagination.page,
-                store.getState().api.entries,
-                store.getState().polling.entries,
+                state$.value.pagination.page,
+                state$.value.api.entries,
+                state$.value.polling.entries,
               ),
             )),
             of(scrollToEntry(getScrollToId(res.response.entries, scrollTo))),
@@ -91,10 +93,11 @@ const getPaginatedEntriesEpic = (action$, store) =>
     ),
   );
 
-const createEntryEpic = (action$, store) =>
-  action$.ofType(types.CREATE_ENTRY).pipe(
+const createEntryEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.CREATE_ENTRY),
     switchMap(({ payload }) =>
-      createEntry(payload, store.getState().config, store.getState().api.nonce).pipe(
+      createEntry(payload, state$.value.config, state$.value.api.nonce).pipe(
         timeout(10000),
         map(res => createEntrySuccess(res.response)),
         catchError(error => of(createEntryFailed(error))),
@@ -102,10 +105,11 @@ const createEntryEpic = (action$, store) =>
     ),
   );
 
-const updateEntryEpic = (action$, store) =>
-  action$.ofType(types.UPDATE_ENTRY).pipe(
+const updateEntryEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.UPDATE_ENTRY),
     switchMap(({ payload }) =>
-      updateEntry(payload, store.getState().config, store.getState().api.nonce).pipe(
+      updateEntry(payload, state$.value.config, state$.value.api.nonce).pipe(
         timeout(10000),
         map(res => updateEntrySuccess(res.response)),
         catchError(error => of(updateEntryFailed(error))),
@@ -113,10 +117,11 @@ const updateEntryEpic = (action$, store) =>
     ),
   );
 
-const deleteEntryEpic = (action$, store) =>
-  action$.ofType(types.DELETE_ENTRY).pipe(
+const deleteEntryEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.DELETE_ENTRY),
     switchMap(({ payload }) =>
-      deleteEntry(payload, store.getState().config, store.getState().api.nonce).pipe(
+      deleteEntry(payload, state$.value.config, state$.value.api.nonce).pipe(
         timeout(10000),
         map(res => deleteEntrySuccess(res.response)),
         catchError(error => of(deleteEntryFailed(error))),
@@ -125,7 +130,8 @@ const deleteEntryEpic = (action$, store) =>
   );
 
 const getEntriesAfterChangeEpic = action$ =>
-  action$.ofType(types.CREATE_ENTRY_SUCCESS, types.UPDATE_ENTRY_SUCCESS, types.DELETE_ENTRY_SUCCESS).pipe(
+  action$.pipe(
+    ofType(types.CREATE_ENTRY_SUCCESS, types.UPDATE_ENTRY_SUCCESS, types.DELETE_ENTRY_SUCCESS),
     map(({ payload }) => pollingSuccess(payload, true)),
   );
 

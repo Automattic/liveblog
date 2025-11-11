@@ -660,6 +660,10 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
+			// Handle arrays (e.g., contributor_ids from multi-select)
+			if ( is_array( $json[ $param ] ) ) {
+				return array_map( 'html_entity_decode', $json[ $param ] );
+			}
 			return html_entity_decode( $json[ $param ] );
 		}
 		return false;

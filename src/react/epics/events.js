@@ -1,4 +1,4 @@
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 import { of, concat } from 'rxjs';
 import { switchMap, timeout, map, catchError, mergeMap } from 'rxjs/operators';
 
@@ -26,10 +26,11 @@ import {
   jumpToEvent,
 } from '../services/api';
 
-const getEventsEpic = (action$, store) =>
-  action$.ofType(types.GET_EVENTS).pipe(
+const getEventsEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.GET_EVENTS),
     switchMap(() =>
-      getEvents(store.getState().config, store.getState().api.newestEntry).pipe(
+      getEvents(state$.value.config, state$.value.api.newestEntry).pipe(
         timeout(10000),
         map(res => getEventsSuccess(res.response)),
         catchError(error => of(getEventsFailed(error))),
@@ -37,10 +38,11 @@ const getEventsEpic = (action$, store) =>
     ),
   );
 
-const deleteEventEpic = (action$, store) =>
-  action$.ofType(types.DELETE_EVENT).pipe(
+const deleteEventEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.DELETE_EVENT),
     switchMap(({ payload }) =>
-      deleteEvent(payload, store.getState().config).pipe(
+      deleteEvent(payload, state$.value.config).pipe(
         timeout(10000),
         map(res => deleteEventSuccess(res.response)),
         catchError(error => of(deleteEventFailed(error))),
@@ -48,10 +50,11 @@ const deleteEventEpic = (action$, store) =>
     ),
   );
 
-const jumpToEventEpic = (action$, store) =>
-  action$.ofType(types.JUMP_TO_EVENT).pipe(
+const jumpToEventEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.JUMP_TO_EVENT),
     switchMap(({ payload }) =>
-      jumpToEvent(payload, store.getState().config, store.getState().api.newestEntry).pipe(
+      jumpToEvent(payload, state$.value.config, state$.value.api.newestEntry).pipe(
         timeout(10000),
         mergeMap((res) => {
           if (!res.response.entries.some(x => x.id === payload)) {

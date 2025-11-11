@@ -1,4 +1,4 @@
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 import { of, interval, concat } from 'rxjs';
 import { switchMap, takeUntil, exhaustMap, timeout, map, catchError, mergeMap } from 'rxjs/operators';
 import types from '../actions/actionTypes';
@@ -24,21 +24,22 @@ import {
   shouldRenderNewEntries,
 } from '../utils/utils';
 
-const startPollingEpic = (action$, store) =>
-  action$.ofType(types.START_POLLING).pipe(
+const startPollingEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.START_POLLING),
     switchMap(() =>
-      interval(store.getState().config.refresh_interval * 1000).pipe(
-        takeUntil(action$.ofType(types.CANCEL_POLLING)),
+      interval(state$.value.config.refresh_interval * 1000).pipe(
+        takeUntil(action$.pipe(ofType(types.CANCEL_POLLING))),
         exhaustMap(() =>
-          pollingApi(store.getState().polling.newestEntry.timestamp, store.getState().config).pipe(
+          pollingApi(state$.value.polling.newestEntry.timestamp, state$.value.config).pipe(
             timeout(10000),
             map(res =>
               pollingSuccess(
                 res.response,
                 shouldRenderNewEntries(
-                  store.getState().pagination.page,
-                  store.getState().api.entries,
-                  store.getState().polling.entries,
+                  state$.value.pagination.page,
+                  state$.value.api.entries,
+                  state$.value.polling.entries,
                 ),
               ),
             ),
@@ -49,10 +50,11 @@ const startPollingEpic = (action$, store) =>
     ),
   );
 
-const mergePollingEpic = (action$, store) =>
-  action$.ofType(types.MERGE_POLLING).pipe(
+const mergePollingEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(types.MERGE_POLLING),
     switchMap(() => {
-      const { pagination, polling, config } = store.getState();
+      const { pagination, polling, config } = state$.value;
       const entries = Object.keys(polling.entries).map(key => polling.entries[key]);
       const pages = Math.max(pagination.pages, polling.pages);
 
