@@ -1,9 +1,12 @@
+@use "sass:color";
+
 /**
  * Base button styles.
  * 1. Corrects inability to style clickable `input` types in iOS.
  * 2. Normalize `box-sizing` across all elements that this component could be
  *    applied to.
- * 3. Normalize `line-height`. For `input`, it can't be changed from `normal` in Firefox 4+.
+ * 3. Normalize `line-height`. For `input`, it can't be changed from
+ *    `normal` in Firefox 4+.
  * 4. Prevent button text from being selectable.
  * 5. Make sure `input` will wrap text across multiple lines.
  */
@@ -51,7 +54,7 @@
 }
 
 .liveblog-update-btn:hover {
-	background: darken($color-primary, 10%);
+	background: color.adjust($color-primary, $lightness: -10%);
 }
 
 .liveblog-btn-delete {
@@ -61,6 +64,6 @@
 }
 
 .liveblog-btn-delete:hover {
-	background: darken($color-warning, 10%);
+	background: color.adjust($color-warning, $lightness: -10%);
 }
 
