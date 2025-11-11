@@ -179,6 +179,7 @@ export function getPreview(content, config) {
     },
     headers: {
       'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
     },
     crossDomain: config.cross_domain,
   };
