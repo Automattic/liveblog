@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .liveblog-media-search-container {
 	display: flex;
 	align-items: center;
@@ -58,7 +60,7 @@
 }
 
 .liveblog-media-grid-item:hover {
-	box-shadow: 0 0 0 2px lighten($color-accent, 20%);
+	box-shadow: 0 0 0 2px color.adjust($color-accent, $lightness: 20%);
 }
 
 .liveblog-media-loading {
