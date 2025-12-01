@@ -1,7 +1,7 @@
 // Utils
+@use "core/utils/mq";
 @import "core/utils/defaults";
 @import "core/utils/colors";
-@import "~sass-mq/mq";
 
 /**
 * Entries
@@ -19,7 +19,7 @@
 .liveblog-entry-edit {
 	margin-left: 60px;
 
-	@include mq($until: medium) {
+	@include mq.mq($until: medium) {
 		margin-left: 0;
 	}
 }
@@ -63,7 +63,7 @@
 .liveblog-entry-tools {
 	margin-left: 60px;
 
-	@include mq($until: medium) {
+	@include mq.mq($until: medium) {
 		margin-left: 0;
 	}
 }

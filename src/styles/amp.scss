@@ -1,9 +1,9 @@
 @use "sass:color";
+@use "core/utils/mq";
 
 // Utils
 @import "core/utils/defaults";
 @import "core/utils/colors";
-@import "~sass-mq/mq";
 // Core Styles
 @import "core/utils/animations";
 @import "core/app/all";
@@ -20,7 +20,7 @@
 	padding: 1em;
 	font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
 
-	@include mq($until: medium) {
+	@include mq.mq($until: medium) {
 		font-size: 14px;
 	}
 }
@@ -45,7 +45,7 @@
 .liveblog-entry-edit {
 	margin-left: 60px;
 
-	@include mq($until: medium) {
+	@include mq.mq($until: medium) {
 		margin-left: 0;
 	}
 }
@@ -102,7 +102,7 @@
 .liveblog-entry-tools {
 	margin-left: 60px;
 
-	@include mq($until: medium) {
+	@include mq.mq($until: medium) {
 		margin-left: 0;
 	}
 }

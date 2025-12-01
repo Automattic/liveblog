@@ -1,3 +1,5 @@
+@use "../utils/mq";
+
 .liveblog-editor-tabs {
 	display: flex;
 	justify-content: flex-end;
@@ -44,7 +46,7 @@
 	margin-right: 0.25rem;
 }
 
-@include mq($until: small) {
+@include mq.mq($until: small) {
 
 	.liveblog-editor-tab:first-child.is-active {
 		background: #fff;
