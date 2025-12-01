@@ -1,5 +1,5 @@
 @use "sass:color";
-@use "../utils/mq";
+@use "../utils" as *;
 
 .liveblog-block {
 	position: relative;
@@ -8,7 +8,7 @@
 }
 
 .liveblog-block.is-focused {
-	box-shadow: 0 0 0 2px color.adjust($color-accent, $lightness: 20%);
+	box-shadow: 0 0 0 2px color.adjust($raw-color-accent, $lightness: 20%);
 }
 
 .liveblog-block img {
@@ -44,9 +44,9 @@
 	align-items: center;
 	flex-basis: 100%;
 	padding: 0.4rem;
-	border-bottom: $base-border-size solid color.adjust($color-grey-x-light, $lightness: -5%);
+	border-bottom: $base-border-size solid color.adjust($raw-color-grey-x-light, $lightness: -5%);
 
-	@include mq.mq($until: large) {
+	@include mq($until: large) {
 		text-align: center;
 		flex-wrap: wrap;
 	}
@@ -54,7 +54,7 @@
 
 .liveblog-block-header > * {
 
-	@include mq.mq($until: large) {
+	@include mq($until: large) {
 		flex-basis: 100;
 	}
 }
@@ -69,7 +69,7 @@
 	flex-grow: 1;
 	font-size: 14px;
 
-	@include mq.mq($until: x-small) {
+	@include mq($until: x-small) {
 		flex-wrap: wrap;
 		justify-content: center;
 	}

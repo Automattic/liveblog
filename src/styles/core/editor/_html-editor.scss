@@ -1,3 +1,5 @@
+@use "../utils" as *;
+
 .liveblog-html-editor-container {
 	border: 1px solid $color-grey-light;
 	margin-bottom: 1rem;

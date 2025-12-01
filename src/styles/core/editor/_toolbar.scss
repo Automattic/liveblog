@@ -1,4 +1,4 @@
-@use "../utils/mq";
+@use "../utils" as *;
 
 .liveblog-toolbar {
 	background: $color-grey-x-light;
@@ -7,7 +7,7 @@
 	line-height: 0;
 }
 
-@include mq.mq($until: small) {
+@include mq($until: small) {
 
 	.liveblog-editor-toolbar-container {
 		order: 2;

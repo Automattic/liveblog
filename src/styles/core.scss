@@ -1,8 +1,5 @@
 // Utils
-@use "core/utils/mq";
-@import "core/utils/defaults";
-@import "core/utils/colors";
+@use "core/utils" as *;
 // Core Styles
-@import "core/utils/animations";
-@import "core/app/all";
-@import "core/editor/all";
+@use "core/app/all" as app;
+@use "core/editor/all" as editor;

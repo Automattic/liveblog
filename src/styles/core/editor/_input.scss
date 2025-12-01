@@ -1,5 +1,5 @@
 @use "sass:color";
-@use "../utils/mq";
+@use "../utils" as *;
 
 .liveblog-editor-input-container {
 	position: absolute;
@@ -15,7 +15,7 @@
 	border-radius: $base-border-radius;
 	box-shadow: $base-drop-shadow;
 
-	@include mq.mq($until: small) {
+	@include mq($until: small) {
 		left: -160px;
 	}
 }
@@ -32,7 +32,7 @@
 	border-left: 10px solid transparent;
 	transform: rotate(-45deg);
 
-	@include mq.mq($until: small) {
+	@include mq($until: small) {
 		left: 67%;
 	}
 }
@@ -59,7 +59,7 @@
 }
 
 .liveblog-input-enter:hover {
-	background: color.adjust($color-primary, $lightness: 5%);
+	background: color.adjust($raw-color-primary, $lightness: 5%);
 }
 
 .liveblog-input-cancel {
@@ -67,5 +67,5 @@
 }
 
 .liveblog-input-cancel:hover {
-	color: color.adjust($color-warning, $lightness: -10%);
+	color: color.adjust($raw-color-warning, $lightness: -10%);
 }
