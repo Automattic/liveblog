@@ -25,7 +25,7 @@
 		"phpunit/phpunit": "^9.6",
 		"predis/predis": "^1.0 || ^2.0 || ^3.0",
 		"rase/socket.io-emitter": "~0.7.0",
-		"yoast/phpunit-polyfills": "^2.0"
+		"yoast/wp-test-utils": "^1.2"
 	},
 	"config": {
 		"allow-plugins": {
@@ -52,8 +52,11 @@
 		"lint-ci": [
 			"@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --exclude vendor --exclude .git --checkstyle"
 		],
-		"test-integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite integration",
-		"test-integration-ms": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog /bin/bash -c 'WP_MULTISITE=1 ./vendor/bin/phpunit --testsuite integration'"
+		"test": [
+			"@test:integration"
+		],
+		"test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite integration",
+		"test:integration-ms": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog /bin/bash -c 'WP_MULTISITE=1 ./vendor/bin/phpunit --testsuite integration'"
 	},
 	"scripts-descriptions": {
 		"coverage": "Run tests with code coverage reporting",
@@ -63,7 +66,8 @@
 		"i18n": "Generate a POT file for translation",
 		"lint": "Run PHP linting",
 		"lint-ci": "Run PHP linting and send results to stdout",
-		"test-integration": "Run integration tests in wp-env",
-		"test-integration-ms": "Run integration tests in multisite mode in wp-env"
+		"test": "Run all tests",
+		"test:integration": "Run integration tests in wp-env",
+		"test:integration-ms": "Run integration tests in multisite mode in wp-env"
 	}
 }
