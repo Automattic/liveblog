@@ -1,14 +1,11 @@
 name: Run PHPUnit
 
 on:
-  # Run on all pushes and on all pull requests.
-  # Prevent the "push" build from running when there are only irrelevant changes.
-  push:
-    paths-ignore:
-      - "**.md"
   pull_request:
-  # Allow manually triggering the workflow.
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -21,9 +18,9 @@ jobs:
     strategy:
       matrix:
         wordpress: ["6.4", "latest"]
-        php: ["7.4", "8.0"]
+        php: ["7.4", "8.5"]
         include:
-          - php: "8.0"
+          - php: "8.5"
             extensions: pcov
             ini-values: pcov.directory=., "pcov.exclude=\"~(vendor|tests)~\""
             coverage: pcov
@@ -32,6 +29,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
 
       - name: Install wordpress environment
         run: npm install -g @wordpress/env
@@ -48,7 +47,7 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - name: Setup Problem Matchers for PHPUnit
+      - name: Setup problem matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Install Composer dependencies
@@ -62,10 +61,10 @@ jobs:
           WP_ENV_CORE: WordPress/WordPress#${{ matrix.wordpress == 'latest' && 'master' || matrix.wordpress }}
 
       - name: Run integration tests (single site)
-        if: ${{ matrix.php != 8.0 }}
+        if: ${{ matrix.php != 8.5 }}
         run: composer test:integration
       - name: Run integration tests (single site with code coverage)
-        if: ${{ matrix.php == 8.0 }}
+        if: ${{ matrix.php == 8.5 }}
         run: composer coverage-ci
       - name: Run integration tests (multisite)
         run: composer test:integration-ms
