@@ -13,7 +13,7 @@
 	data-sort-time="<?php echo esc_attr( $entry_time ); ?>">
 
 	<aside class="liveblog-entry-aside">
-		<a class="liveblog-meta-time" href="#" target="_blank">
+		<a class="liveblog-meta-time" href="#" target="_blank" rel="noopener noreferrer">
 			<span><?php echo esc_html( $this->get( 'time_ago' ) ); ?></span>
 			<span><?php echo esc_html( $this->get( 'date' ) ); ?> </span>
 		</a>
