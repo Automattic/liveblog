@@ -1,10 +1,12 @@
+@use "../utils/mq";
+
 .liveblog-editor-container {
 	padding: 0.8rem;
 	margin-bottom: 0.8rem;
 	background: $color-grey-mid-light;
 	border-top: 2px solid $color-grey-x-dark;
 
-	@include mq($until: x-small) {
+	@include mq.mq($until: x-small) {
 		padding: 0.8rem 0 0 0;
 		background: transparent;
 	}
@@ -66,7 +68,7 @@
 	margin-bottom: 0.6rem;
 }
 
-@include mq($until: small) {
+@include mq.mq($until: small) {
 
 	.liveblog-editor-container .public-DraftEditor-content {
 		margin-bottom: 0;

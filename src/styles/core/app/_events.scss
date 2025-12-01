@@ -1,3 +1,5 @@
+@use "../utils/mq";
+
 .liveblog-key-events {
 	position: relative;
 	overflow-y: visible;
@@ -19,7 +21,7 @@
 		margin-bottom: 10px;
 	}
 
-	@include mq($until: medium) {
+	@include mq.mq($until: medium) {
 		min-height: 130px;
 		max-width: 300px;
 	}
