@@ -5,7 +5,7 @@
   "author": "Automattic",
   "private": true,
   "devDependencies": {
-    "@wordpress/scripts": "^30.27.0",
+    "@wordpress/scripts": "^31.1.0",
     "sass-module-importer": "^1.4.0",
     "sass-mq": "^7.0.0"
   },
