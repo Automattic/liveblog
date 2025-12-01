@@ -1,13 +1,9 @@
 @use "sass:color";
-@use "core/utils/mq";
-
 // Utils
-@import "core/utils/defaults";
-@import "core/utils/colors";
+@use "core/utils" as *;
 // Core Styles
-@import "core/utils/animations";
-@import "core/app/all";
-@import "core/editor/amp-required";
+@use "core/app/all";
+@use "core/editor/amp-required";
 
 /**
 * Entries
@@ -20,7 +16,7 @@
 	padding: 1em;
 	font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
 
-	@include mq.mq($until: medium) {
+	@include mq($until: medium) {
 		font-size: 14px;
 	}
 }
@@ -45,7 +41,7 @@
 .liveblog-entry-edit {
 	margin-left: 60px;
 
-	@include mq.mq($until: medium) {
+	@include mq($until: medium) {
 		margin-left: 0;
 	}
 }
@@ -102,7 +98,7 @@
 .liveblog-entry-tools {
 	margin-left: 60px;
 
-	@include mq.mq($until: medium) {
+	@include mq($until: medium) {
 		margin-left: 0;
 	}
 }

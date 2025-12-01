@@ -1,7 +1,7 @@
-@import "./buttons";
-@import "./feed";
-@import "./events";
-@import "./event";
-@import "./pagination";
-@import "./entry";
+@forward "./buttons";
+@forward "./feed";
+@forward "./events";
+@forward "./event";
+@forward "./pagination";
+@forward "./entry";
 

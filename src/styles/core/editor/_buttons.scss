@@ -1,5 +1,5 @@
 @use "sass:color";
-@use "../utils/mq";
+@use "../utils" as *;
 
 .liveblog-editor-btn {
 	-webkit-appearance: none;
@@ -42,7 +42,7 @@
 	align-items: center;
 	flex-grow: 1;
 
-	@include mq.mq($until: x-small) {
+	@include mq($until: x-small) {
 		justify-content: center;
 		margin-top: 0.25rem;
 	}
@@ -118,7 +118,7 @@
 	margin-right: 0.35rem;
 }
 
-@include mq.mq($until: small) {
+@include mq($until: small) {
 
 	.liveblog-image-upload-btn-text {
 		display: none;

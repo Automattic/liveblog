@@ -1,4 +1,4 @@
-@use "../utils/mq";
+@use "../utils" as *;
 
 .liveblog-key-events {
 	position: relative;
@@ -21,7 +21,7 @@
 		margin-bottom: 10px;
 	}
 
-	@include mq.mq($until: medium) {
+	@include mq($until: medium) {
 		min-height: 130px;
 		max-width: 300px;
 	}
