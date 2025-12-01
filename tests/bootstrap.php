@@ -84,4 +84,17 @@ if ( $is_integration ) {
 
 	// Load the custom Spy REST Server for testing.
 	require __DIR__ . '/Integration/SpyRestServer.php';
+} else {
+	/*
+	 * Bootstrap unit tests (no WordPress).
+	 * Load the Composer autoload file and stub WordPress functions.
+	 */
+	require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+
+	// Load WordPress function stubs (in global namespace).
+	require_once __DIR__ . '/Unit/wp-stubs.php';
+
+	// Load plugin classes needed for unit tests.
+	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry.php';
+	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
 }
