@@ -53,10 +53,12 @@
 			"@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --exclude vendor --exclude .git --checkstyle"
 		],
 		"test": [
+			"@test:unit",
 			"@test:integration"
 		],
 		"test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog ./vendor/bin/phpunit --testsuite integration",
-		"test:integration-ms": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog /bin/bash -c 'WP_MULTISITE=1 ./vendor/bin/phpunit --testsuite integration'"
+		"test:integration-ms": "wp-env run tests-cli --env-cwd=wp-content/plugins/liveblog /bin/bash -c 'WP_MULTISITE=1 ./vendor/bin/phpunit --testsuite integration'",
+		"test:unit": "@php ./vendor/bin/phpunit --testsuite unit"
 	},
 	"scripts-descriptions": {
 		"coverage": "Run tests with code coverage reporting",
@@ -68,6 +70,7 @@
 		"lint-ci": "Run PHP linting and send results to stdout",
 		"test": "Run all tests",
 		"test:integration": "Run integration tests in wp-env",
-		"test:integration-ms": "Run integration tests in multisite mode in wp-env"
+		"test:integration-ms": "Run integration tests in multisite mode in wp-env",
+		"test:unit": "Run unit tests locally"
 	}
 }
