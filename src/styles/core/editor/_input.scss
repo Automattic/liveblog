@@ -59,7 +59,7 @@
 }
 
 .liveblog-input-enter:hover {
-	background: color.adjust($color-primary, $lightness: 5%);
+	background: color.adjust($raw-color-primary, $lightness: 5%);
 }
 
 .liveblog-input-cancel {
@@ -67,5 +67,5 @@
 }
 
 .liveblog-input-cancel:hover {
-	color: color.adjust($color-warning, $lightness: -10%);
+	color: color.adjust($raw-color-warning, $lightness: -10%);
 }

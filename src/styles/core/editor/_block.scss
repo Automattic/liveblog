@@ -8,7 +8,7 @@
 }
 
 .liveblog-block.is-focused {
-	box-shadow: 0 0 0 2px color.adjust($color-accent, $lightness: 20%);
+	box-shadow: 0 0 0 2px color.adjust($raw-color-accent, $lightness: 20%);
 }
 
 .liveblog-block img {
@@ -44,7 +44,7 @@
 	align-items: center;
 	flex-basis: 100%;
 	padding: 0.4rem;
-	border-bottom: $base-border-size solid color.adjust($color-grey-x-light, $lightness: -5%);
+	border-bottom: $base-border-size solid color.adjust($raw-color-grey-x-light, $lightness: -5%);
 
 	@include mq($until: large) {
 		text-align: center;

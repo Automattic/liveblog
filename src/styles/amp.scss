@@ -215,7 +215,7 @@
 	margin-bottom: 15px;
 
 	&:hover {
-		background: color.adjust($color-primary, $lightness: 10%);
+		background: color.adjust($raw-color-primary, $lightness: 10%);
 	}
 }
 

@@ -55,7 +55,7 @@
 }
 
 .liveblog-update-btn:hover {
-	background: color.adjust($color-primary, $lightness: -10%);
+	background: color.adjust($raw-color-primary, $lightness: -10%);
 }
 
 .liveblog-btn-delete {
@@ -65,6 +65,6 @@
 }
 
 .liveblog-btn-delete:hover {
-	background: color.adjust($color-warning, $lightness: -10%);
+	background: color.adjust($raw-color-warning, $lightness: -10%);
 }
 
