@@ -10,7 +10,7 @@
     "sass-mq": "^7.0.0"
   },
   "dependencies": {
-    "core-js": "^2.5.1",
+    "core-js": "^3.47.0",
     "custom-event-polyfill": "^1.0.7",
     "draft-convert": "^2.0.0",
     "draft-js": "^0.11.7",
