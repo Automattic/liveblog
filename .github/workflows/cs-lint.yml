@@ -10,6 +10,9 @@ on:
   # Allow manually triggering the workflow.
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   checkcs:
     name: "Basic CS and QA checks"
@@ -38,6 +41,8 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
 
       # Validate the composer.json file.
       # @link https://getcomposer.org/doc/03-cli.md#validate

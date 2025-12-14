@@ -1,26 +1,33 @@
-/.wordpress-org
-/.git
-/.github
-/bin
-/node_modules
-/tests
-/vendor
+# Directories
+/.git/
+/.github/
+/.wordpress-org/
+/bin/
+/features/
+/node_modules/
+/tests/
+/vendor/
 
+# Files
 .babelrc
 .distignore
 .editorconfig
 .eslintrc
+.gitattributes
 .gitignore
 .phpcs.xml.dist
 .stylelintrc
+.wp-env.json
+.wp-env.override.json
+behat.yml
 CHANGELOG.md
 composer.json
 composer.lock
 CONTRIBUTING.md
 HACKING.md
 package.json
+package-lock.json
 phpunit.xml.dist
 README.md
 webpack.config.js
 wpcom-helper.php
-package-lock.json

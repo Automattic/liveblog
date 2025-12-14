@@ -22,6 +22,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   behat:
     uses: automattic/wpvip-plugins-.github/.github/workflows/reusable-behat-test.yml@trunk
