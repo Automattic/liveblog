@@ -87,12 +87,31 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
-	 * Add default social share options
+	 * Add default social share options.
+	 *
+	 * @return array Array of social platform identifiers for AMP sharing.
 	 */
 	public static function add_social_share_options() {
-		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
+		$social_array = array( 'twitter', 'pinterest', 'email' );
 
-		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
+		/**
+		 * Filters the Facebook App ID for AMP social sharing.
+		 *
+		 * Facebook sharing requires an App ID. Return your Facebook App ID
+		 * from this filter to enable Facebook sharing on AMP liveblog entries.
+		 *
+		 * Example usage:
+		 *     add_filter( 'liveblog_amp_facebook_share_app_id', function() {
+		 *         return '123456789012345';
+		 *     } );
+		 *
+		 * @since 1.9.7
+		 *
+		 * @param string $app_id Facebook App ID. Default empty string (disabled).
+		 */
+		$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', '' );
+
+		if ( ! empty( $facebook_app_id ) ) {
 			$social_array[] = 'facebook';
 		}
 
