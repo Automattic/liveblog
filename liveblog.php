@@ -1241,7 +1241,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function get_template_part( $template_name, $template_variables = array() ) {
 			ob_start();
-			extract( $template_variables );
+			foreach ( $template_variables as $key => $value ) {
+				// Validate key is a valid PHP variable name
+				if ( is_string( $key ) && preg_match( '/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $key ) ) {
+					${$key} = $value;
+				}
+			}
 			$theme_template       = get_template_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			$child_theme_template = get_stylesheet_directory() . '/liveblog/' . ltrim( $template_name, '/' );
 			if ( file_exists( $child_theme_template ) ) {
