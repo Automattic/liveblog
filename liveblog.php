@@ -1209,6 +1209,20 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, self::$post_id );
 
+			/**
+			 * Filters whether the liveblog output should appear at the top of the post content.
+			 *
+			 * By default, the liveblog container is appended after the post content.
+			 * Return true to prepend the liveblog before the post content instead.
+			 *
+			 * @since 1.10.0
+			 *
+			 * @param bool $at_top Whether to display the liveblog at the top. Default false.
+			 */
+			if ( true === apply_filters( 'liveblog_output_at_top', false ) ) {
+				return wp_kses_post( $liveblog_output ) . $content;
+			}
+
 			return $content . wp_kses_post( $liveblog_output );
 		}
 
