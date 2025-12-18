@@ -62,6 +62,16 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
+      # Redux ecosystem must be upgraded together, blocked by redux-observable stable release (see #753)
+      - dependency-name: "redux"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-redux"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "redux-observable"
+        update-types: ["version-update:semver-major"]
+      # Draft.js ecosystem locked to immutable v3 (see #751)
+      - dependency-name: "immutable"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
     commit-message:
