@@ -28,7 +28,20 @@ class WPCOM_Liveblog_Rest_Api {
 
 	public static function build_endpoint_base() {
 
-		if ( ! empty( self::$endpoint_base ) ) {
+		/**
+		 * Filters whether to use the static cache for the REST API endpoint base URL.
+		 *
+		 * By default, the endpoint base URL is cached in a static variable for performance.
+		 * This can cause issues on multi-domain sites where the endpoint URL needs to vary
+		 * based on the current request context.
+		 *
+		 * Return false to disable the static cache and rebuild the endpoint base on each call.
+		 *
+		 * @since 1.10.0
+		 *
+		 * @param bool $cache_enabled Whether to enable static caching. Default true.
+		 */
+		if ( ! empty( self::$endpoint_base ) && apply_filters( 'liveblog_cache_endpoint_base', true ) ) {
 
 			// @codeCoverageIgnoreStart
 			return self::$endpoint_base;
