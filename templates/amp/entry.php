@@ -9,7 +9,7 @@
 	$share_link_amp = $this->get( 'share_link_amp' );
 
 	/* This filter is defined in class-wpcom-liveblog-amp.php */
-	$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', false );
+	$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', '' );
 ?>
 
 <div class="liveblog-entry" id="post<?php echo esc_attr( $update_time ); ?>"
