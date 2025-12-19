@@ -179,8 +179,11 @@ export const triggerOembedLoad = (element) => {
     });
   }
 
-  if (window.FB && element.querySelector('.fb-post')) {
-    window.FB.XFBML.parse();
+  // Parse Facebook embeds when SDK is available.
+  // Uses element parameter to scope parsing and handles both modern HTML5 format
+  // (<div class="fb-post">) and legacy XFBML format (<fb:post>) from older cached embeds.
+  if (window.FB) {
+    window.FB.XFBML.parse(element);
   }
 
   window.dispatchEvent(new CustomEvent('omembedTrigger'));
