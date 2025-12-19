@@ -1272,9 +1272,40 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function get_template_part( $template_name, $template_variables = array() ) {
 			ob_start();
+
+			$allowed_variables = array(
+				'wp_version',
+				'min_version',
+				'entries',
+				'show_archived_message',
+				'active_text',
+				'buttons',
+				'update_text',
+				'extra_fields',
+				'options',
+				'message',
+				'plugin',
+				'current_key_template',
+				'current_key_format',
+				'current_key_limit',
+				'key_name',
+				'key_format_name',
+				'key_description',
+				'key_limit',
+				'key_button',
+				'templates',
+				'formats',
+				'title',
+				'template',
+				'wrap',
+				'class',
+				'new_label',
+				'new_button',
+			);
+
 			foreach ( $template_variables as $key => $value ) {
-				// Validate key is a valid PHP variable name
-				if ( is_string( $key ) && preg_match( '/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $key ) ) {
+				// Only allow variables from the allowlist
+				if ( is_string( $key ) && in_array( $key, $allowed_variables, true ) ) {
 					${$key} = $value;
 				}
 			}
