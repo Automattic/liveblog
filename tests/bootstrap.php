@@ -54,6 +54,7 @@ if ( $is_integration ) {
 		'muplugins_loaded',
 		function (): void {
 			require dirname( __DIR__ ) . '/liveblog.php';
+			require dirname( __DIR__ ) . '/vipgo-helper.php';
 		}
 	);
 
