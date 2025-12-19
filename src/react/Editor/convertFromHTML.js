@@ -88,6 +88,10 @@ export default (html, extraData) =>
           match.replace(/:/g, '') === x.key.toString(),
         )[0];
 
+        if (!emoji) {
+          return;
+        }
+
         const entityKey = createEntity(
           ':',
           'IMMUTABLE',
