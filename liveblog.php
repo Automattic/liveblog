@@ -1305,7 +1305,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			foreach ( $template_variables as $key => $value ) {
 				// Only allow variables from the allowlist
-				if ( is_string( $key ) && in_array( $key, $allowed_variables, true ) ) {
+				if ( in_array( $key, $allowed_variables, true ) ) {
 					${$key} = $value;
 				}
 			}
