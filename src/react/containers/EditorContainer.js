@@ -54,6 +54,7 @@ class EditorContainer extends Component {
       mode: 'editor',
       readOnly: false,
       rawText: props.entry ? props.entry.content : '',
+      previewKey: 0,
     };
 
     this.onChange = editorState => this.setState({
@@ -132,7 +133,10 @@ class EditorContainer extends Component {
     );
 
     this.onChange(newEditorState);
-    this.setState({ readOnly: false });
+    this.setState(prevState => ({
+      readOnly: false,
+      previewKey: prevState.previewKey + 1,
+    }));
   }
 
   onSelectAuthorChange(value) {
@@ -260,6 +264,7 @@ class EditorContainer extends Component {
       mode,
       authors,
       readOnly,
+      previewKey,
     } = this.state;
 
     const { isEditing, config } = this.props;
@@ -290,6 +295,7 @@ class EditorContainer extends Component {
         {
           mode === 'preview' &&
           <PreviewContainer
+            key={previewKey}
             config={config}
             getEntryContent={() => this.getContent()}
           />
