@@ -7,3 +7,6 @@ composer.lock
 vendor/
 .phpunit.cache/
 
+# Local wp-env overrides
+.wp-env.override.json
+
