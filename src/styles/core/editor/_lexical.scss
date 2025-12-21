@@ -57,7 +57,7 @@
 
 // Text formatting classes (applied within editor)
 .liveblog-lexical-bold {
-	font-weight: bold;
+	font-weight: 700;
 }
 
 .liveblog-lexical-italic {
@@ -91,7 +91,7 @@
 .liveblog-lexical-h2,
 .liveblog-lexical-h3 {
 	margin: 16px 0 8px;
-	font-weight: bold;
+	font-weight: 700;
 
 	&:first-child {
 		margin-top: 0;
