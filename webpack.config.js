@@ -29,6 +29,9 @@ module.exports = function (env, argv) {
 		chunkFilename: '[name].bundle.js',
 		// Custom chunkLoadingGlobal to avoid conflicts
 		chunkLoadingGlobal: 'wpJsonpLiveBlog',
+		// Use 'auto' to determine publicPath at runtime from document.currentScript
+		// This is required for React.lazy() dynamic imports to work correctly
+		publicPath: 'auto',
 	};
 
 	// Enable source maps for better debugging

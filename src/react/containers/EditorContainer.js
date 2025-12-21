@@ -25,6 +25,10 @@ import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/in
 
 import { getImageSize } from '../Editor/utils';
 
+// Lazy load LexicalEditor only when the feature flag is enabled
+// This prevents loading Lexical bundle when not needed
+const LexicalEditor = React.lazy( () => import( '../Editor/LexicalEditor' ) );
+
 class EditorContainer extends Component {
   constructor(props) {
     super(props);
@@ -47,6 +51,9 @@ class EditorContainer extends Component {
       initialAuthors = [props.config.current_user];
     }
 
+    // Check if Lexical editor should be used (feature flag from PHP config)
+    const useLexical = props.config.use_lexical_editor || false;
+
     this.state = {
       editorState: initialEditorState,
       suggestions: [],
@@ -55,6 +62,9 @@ class EditorContainer extends Component {
       readOnly: false,
       rawText: props.entry ? props.entry.content : '',
       previewKey: 0,
+      useLexical,
+      // For Lexical editor, store the HTML content directly
+      lexicalContent: props.entry ? props.entry.content : '',
     };
 
     this.onChange = editorState => this.setState({
@@ -73,8 +83,23 @@ class EditorContainer extends Component {
   }
 
   getContent() {
-    const { editorState } = this.state;
+    const { editorState, useLexical, lexicalContent } = this.state;
+    if (useLexical) {
+      return lexicalContent;
+    }
     return convertToHTML(editorState.getCurrentContent());
+  }
+
+  /**
+   * Handle content changes from the Lexical editor.
+   *
+   * @param {string} htmlContent - The updated HTML content.
+   */
+  onLexicalChange(htmlContent) {
+    this.setState({
+      lexicalContent: htmlContent,
+      rawText: html(htmlContent),
+    });
   }
 
   syncRawTextToEditorState() {
@@ -93,7 +118,7 @@ class EditorContainer extends Component {
 
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState, authors } = this.state;
+    const { editorState, authors, useLexical, lexicalContent } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
@@ -104,7 +129,13 @@ class EditorContainer extends Component {
     // So we must check if there is any text within the editor
     // If we fail to find text then we should check for a valid
     // list of html elements, mainly visual for example images.
-    if (!editorState.getCurrentContent().getPlainText().trim()) {
+    if (useLexical) {
+      // For Lexical, check the HTML content directly
+      const textContent = lexicalContent.replace(/<[^>]*>/g, '').trim();
+      if (!textContent && htmlregex.exec(lexicalContent) === null) {
+        return;
+      }
+    } else if (!editorState.getCurrentContent().getPlainText().trim()) {
       if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
         return;
       }
@@ -127,16 +158,26 @@ class EditorContainer extends Component {
       contributors,
     });
 
-    const newEditorState = EditorState.push(
-      editorState,
-      ContentState.createFromText(''),
-    );
+    if (useLexical) {
+      // Clear Lexical editor content by incrementing previewKey to force remount
+      this.setState(prevState => ({
+        lexicalContent: '',
+        rawText: '',
+        readOnly: false,
+        previewKey: prevState.previewKey + 1,
+      }));
+    } else {
+      const newEditorState = EditorState.push(
+        editorState,
+        ContentState.createFromText(''),
+      );
 
-    this.onChange(newEditorState);
-    this.setState(prevState => ({
-      readOnly: false,
-      previewKey: prevState.previewKey + 1,
-    }));
+      this.onChange(newEditorState);
+      this.setState(prevState => ({
+        readOnly: false,
+        previewKey: prevState.previewKey + 1,
+      }));
+    }
   }
 
   onSelectAuthorChange(value) {
@@ -301,7 +342,18 @@ class EditorContainer extends Component {
           />
         }
         {
-          mode === 'editor' &&
+          mode === 'editor' && this.state.useLexical &&
+          <React.Suspense fallback={<div className="liveblog-editor-loading">Loading editor...</div>}>
+            <LexicalEditor
+              key={previewKey}
+              initialContent={this.state.lexicalContent}
+              onChange={this.onLexicalChange.bind(this)}
+              readOnly={readOnly}
+            />
+          </React.Suspense>
+        }
+        {
+          mode === 'editor' && !this.state.useLexical &&
           <Editor
             editorState={editorState}
             onChange={this.onChange}
