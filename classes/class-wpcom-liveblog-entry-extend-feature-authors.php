@@ -165,11 +165,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			return $match[0];
 		}
 
+		// Get the user object to retrieve display name.
+		$user = get_user_by( 'slug', $author );
+		$display_name = $user ? $user->display_name : $author;
+
 		// Replace the @author content with a link to
-		// the author's post listing page.
+		// the author's post listing page, using display name as anchor text.
 		return str_replace(
 			$match[1],
-			'<a href="' . get_author_posts_url( -1, $author ) . '" class="liveblog-author ' . $this->class_prefix . $author . '">' . $author . '</a>',
+			'<a href="' . get_author_posts_url( -1, $author ) . '" class="liveblog-author ' . $this->class_prefix . $author . '">' . esc_html( $display_name ) . '</a>',
 			$match[0]
 		);
 	}

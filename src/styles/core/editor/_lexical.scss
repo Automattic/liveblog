@@ -141,3 +141,75 @@
 	color: #666;
 	font-style: italic;
 }
+
+// Images
+.liveblog-lexical-image-wrapper {
+	display: inline-block;
+	max-width: 100%;
+}
+
+.liveblog-lexical-image {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 8px 0;
+	border-radius: 4px;
+}
+
+// Drag-over state for image dropping
+.liveblog-lexical-editor.is-drag-over {
+	border-color: #007cba;
+	box-shadow: 0 0 0 1px #007cba;
+}
+
+// Autocomplete Menu
+.liveblog-autocomplete-menu {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	max-height: 200px;
+	overflow-y: auto;
+	min-width: 200px;
+	max-width: 300px;
+}
+
+.liveblog-autocomplete-list {
+	list-style: none;
+	margin: 0;
+	padding: 4px 0;
+}
+
+.liveblog-autocomplete-item {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px;
+	cursor: pointer;
+	transition: background-color 0.1s ease;
+
+	&:hover,
+	&.is-selected {
+		background-color: #f0f0f0;
+	}
+}
+
+.liveblog-autocomplete-avatar {
+	display: inline-flex;
+	align-items: center;
+	margin-right: 8px;
+	flex-shrink: 0;
+
+	img {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+	}
+}
+
+.liveblog-autocomplete-text {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 14px;
+}

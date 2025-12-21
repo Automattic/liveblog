@@ -1120,21 +1120,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						 * @param int $time Author list debounce time.
 						 */
 						'author_list_debounce_time'    => apply_filters( 'liveblog_author_list_debounce_time', self::AUTHOR_LIST_DEBOUNCE_TIME ),
-
-						/**
-						 * Filters whether to use the Lexical editor for liveblog entries.
-						 *
-						 * When enabled, the liveblog entry editor uses Meta's Lexical editor
-						 * instead of the Draft.js-based editor. Lexical is the official
-						 * successor to Draft.js from the same team.
-						 *
-						 * This is an experimental feature flag for gradual rollout.
-						 *
-						 * @since 1.10.0
-						 *
-						 * @param bool $use_lexical Whether to use the Lexical editor. Default false.
-						 */
-						'use_lexical_editor'           => apply_filters( 'liveblog_use_lexical_editor', false ),
 					)
 				)
 			);
