@@ -23,7 +23,10 @@ class AppContainer extends Component {
     const { loadConfig, getEntries, getEvents, startPolling } = this.props;
     loadConfig(window.liveblog_settings);
     getEntries(1, window.location.hash);
-    startPolling();
+    // Don't poll if the liveblog is archived - there won't be new entries
+    if (window.liveblog_settings.state !== 'archive') {
+      startPolling();
+    }
     if (this.eventsContainer) getEvents();
   }
 

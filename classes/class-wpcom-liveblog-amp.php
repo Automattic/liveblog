@@ -332,14 +332,24 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
-	 * Builds entry data for single liveblog entry template on AMP
+	 * Minimum refresh interval for AMP live-list component (in milliseconds).
+	 *
+	 * @see https://amp.dev/documentation/components/amp-live-list/
+	 */
+	const AMP_MIN_REFRESH_INTERVAL = 15000;
+
+	/**
+	 * Builds entry data for liveblog entries feed template on AMP.
 	 *
 	 * @param  array  $entries liveblog entries.
 	 * @param  object $request Request Object.
 	 * @param  string $post_id post id.
-	 * @return object          template
+	 * @return string          Rendered template.
 	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
+		// AMP live-list requires a minimum poll interval of 15 seconds.
+		$refresh_interval = max( self::AMP_MIN_REFRESH_INTERVAL, WPCOM_Liveblog::get_refresh_interval() );
+
 		$rendered = self::get_template(
 			'feed',
 			array(
@@ -351,7 +361,7 @@ class WPCOM_Liveblog_AMP {
 				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
-					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
+					'refresh_interval' => $refresh_interval,
 					'social'           => self::add_social_share_options(),
 				),
 			)
