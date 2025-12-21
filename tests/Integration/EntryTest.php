@@ -255,6 +255,68 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * Test that get_comment_date_gmt returns correct Unix timestamp.
+	 *
+	 * This tests the timezone fix where mysql2date() was replaced with
+	 * DateTimeImmutable to avoid timezone conversion issues.
+	 */
+	public function test_get_comment_date_gmt_returns_correct_unix_timestamp(): void {
+		// Create a comment with a known GMT date.
+		$gmt_date = '2024-06-15 14:30:00';
+		$comment  = self::factory()->comment->create_and_get(
+			[
+				'comment_date_gmt' => $gmt_date,
+			]
+		);
+
+		$entry = new WPCOM_Liveblog_Entry( $comment );
+
+		// Get the Unix timestamp.
+		$timestamp = $entry->get_comment_date_gmt( 'U', $comment->comment_ID );
+
+		// The expected timestamp for 2024-06-15 14:30:00 UTC.
+		$expected = ( new \DateTimeImmutable( $gmt_date, new \DateTimeZone( 'UTC' ) ) )->getTimestamp();
+
+		$this->assertEquals( $expected, $timestamp );
+	}
+
+	/**
+	 * Test that get_comment_date_gmt with 'G' format returns correct timestamp.
+	 */
+	public function test_get_comment_date_gmt_with_g_format_returns_correct_timestamp(): void {
+		$gmt_date = '2024-12-25 08:00:00';
+		$comment  = self::factory()->comment->create_and_get(
+			[
+				'comment_date_gmt' => $gmt_date,
+			]
+		);
+
+		$entry     = new WPCOM_Liveblog_Entry( $comment );
+		$timestamp = $entry->get_comment_date_gmt( 'G', $comment->comment_ID );
+
+		$expected = ( new \DateTimeImmutable( $gmt_date, new \DateTimeZone( 'UTC' ) ) )->getTimestamp();
+
+		$this->assertEquals( $expected, $timestamp );
+	}
+
+	/**
+	 * Test that get_comment_date_gmt still works with other formats.
+	 */
+	public function test_get_comment_date_gmt_with_date_format_returns_formatted_string(): void {
+		$gmt_date = '2024-06-15 14:30:00';
+		$comment  = self::factory()->comment->create_and_get(
+			[
+				'comment_date_gmt' => $gmt_date,
+			]
+		);
+
+		$entry = new WPCOM_Liveblog_Entry( $comment );
+		$date  = $entry->get_comment_date_gmt( 'Y-m-d', $comment->comment_ID );
+
+		$this->assertEquals( '2024-06-15', $date );
+	}
+
+	/**
 	 * Create and get a comment with replaces meta.
 	 *
 	 * @param int   $replaces The replaces value.

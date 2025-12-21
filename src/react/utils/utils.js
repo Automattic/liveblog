@@ -141,11 +141,12 @@ export const daysAgo = (time, utcOffset) => {
 };
 
 /**
- * Returns a formated string indicating how long ago a timestamp was.
- * @param {Number} timestamp Unix Timestamp in seconds
- * @return {String} utcOffset Utc Offset from server
+ * Returns a formatted string indicating how long ago a timestamp was.
+ *
+ * @param {number} timestamp Unix timestamp in seconds (UTC).
+ * @return {string} Human-readable time difference (e.g., "5 minutes ago").
  */
-export const timeAgo = timestamp => moment.unix(timestamp).utc().fromNow();
+export const timeAgo = timestamp => moment.unix(timestamp).fromNow();
 
 /**
  * Returns a formated string from timestamp in HH MM format.
