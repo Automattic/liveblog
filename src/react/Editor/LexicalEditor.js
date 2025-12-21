@@ -333,20 +333,29 @@ function ImagePlugin( { handleImageUpload } ) {
 			( event ) => {
 				const files = event.dataTransfer?.files;
 				if ( files && files.length > 0 ) {
-					const file = files[ 0 ];
-					if ( file.type.startsWith( 'image/' ) ) {
+					// Filter to only image files
+					const imageFiles = Array.from( files ).filter( ( file ) =>
+						file.type.startsWith( 'image/' )
+					);
+
+					if ( imageFiles.length > 0 ) {
 						event.preventDefault();
 
 						if ( handleImageUpload ) {
-							handleImageUpload( file ).then( ( src ) => {
-								editor.dispatchCommand( INSERT_IMAGE_COMMAND, {
-									src,
-									alt: file.name,
-								} );
-							} ).catch( ( err ) => {
-								// eslint-disable-next-line no-console
-								console.error( 'Image upload failed:', err );
-							} );
+							// Upload all images sequentially to maintain order
+							imageFiles.reduce( ( promise, file ) => {
+								return promise.then( () =>
+									handleImageUpload( file ).then( ( src ) => {
+										editor.dispatchCommand( INSERT_IMAGE_COMMAND, {
+											src,
+											alt: file.name,
+										} );
+									} ).catch( ( err ) => {
+										// eslint-disable-next-line no-console
+										console.error( 'Image upload failed:', err );
+									} )
+								);
+							}, Promise.resolve() );
 						}
 
 						return true;
