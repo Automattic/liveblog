@@ -10,11 +10,13 @@
     "sass-mq": "^7.0.0"
   },
   "dependencies": {
-    "draft-convert": "^2.0.0",
-    "draft-js": "^0.11.7",
-    "draft-js-export-html": "^1.2.0",
-    "immutable": "^3.8.2",
+    "@lexical/html": "^0.39.0",
+    "@lexical/link": "^0.39.0",
+    "@lexical/list": "^0.39.0",
+    "@lexical/react": "^0.39.0",
+    "@lexical/rich-text": "^0.39.0",
     "js-beautify": "^1.7.5",
+    "lexical": "^0.39.0",
     "lodash-es": "^4.17.22",
     "moment": "^2.20.1",
     "prop-types": "^15.6.0",

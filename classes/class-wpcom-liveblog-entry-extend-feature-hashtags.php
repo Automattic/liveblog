@@ -133,12 +133,21 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	}
 
 	/**
+	 * The current post ID being processed.
+	 *
+	 * @var int
+	 */
+	protected $current_post_id = 0;
+
+	/**
 	 * Filters the input.
 	 *
 	 * @param mixed $entry
 	 * @return mixed
 	 */
 	public function filter( $entry ) {
+		// Store the post ID for use in the callback.
+		$this->current_post_id = isset( $entry['post_id'] ) ? (int) $entry['post_id'] : 0;
 
 		// Map over every match and apply it via the
 		// preg_replace_callback method.
@@ -169,15 +178,35 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		$hashtag = $hashtag['slug'];
 
 		// If it doesn't exist, then make it.
-		if ( ! get_term_by( 'slug', $hashtag, self::$taxonomy ) ) {
-			wp_insert_term( $hashtag, self::$taxonomy );
+		$term = get_term_by( 'slug', $hashtag, self::$taxonomy );
+		if ( ! $term ) {
+			$result = wp_insert_term( $hashtag, self::$taxonomy );
+			if ( ! is_wp_error( $result ) ) {
+				$term = get_term( $result['term_id'], self::$taxonomy );
+			}
 		}
 
-		// Replace the #hashtag content with a styled
-		// span with the hashtag as content.
+		// Assign the hashtag term to the liveblog post so it appears in archives.
+		if ( $term && $this->current_post_id ) {
+			wp_set_object_terms( $this->current_post_id, $term->term_id, self::$taxonomy, true );
+		}
+
+		// Get the term link for the hashtag.
+		$term_link = $term ? get_term_link( $term, self::$taxonomy ) : '';
+
+		// Replace the #hashtag content with a link to the hashtag archive.
+		if ( $term_link && ! is_wp_error( $term_link ) ) {
+			return str_replace(
+				$match[1],
+				'<a href="' . esc_url( $term_link ) . '" class="liveblog-hash ' . $this->class_prefix . $hashtag . '">' . esc_html( $hashtag ) . '</a>',
+				$match[0]
+			);
+		}
+
+		// Fallback to span if term link fails.
 		return str_replace(
 			$match[1],
-			'<span class="liveblog-hash ' . $this->class_prefix . $hashtag . '">' . $hashtag . '</span>',
+			'<span class="liveblog-hash ' . $this->class_prefix . $hashtag . '">' . esc_html( $hashtag ) . '</span>',
 			$match[0]
 		);
 	}
@@ -322,6 +351,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// The args to pass to the register_taxonomy function.
 		$args = array(
 			'show_ui' => true,
+			'public'  => true,
 			'labels'  => $labels,
 		);
 

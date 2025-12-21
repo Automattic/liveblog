@@ -127,10 +127,14 @@
 .liveblog-publish-btn,
 .liveblog-save-btn {
 	background: $color-primary;
+	color: #fff;
 }
 
 .liveblog-publish-btn {
 	width: 100%;
+	margin-top: 1rem;
+	padding: 0.75rem 1rem;
+	border-radius: $base-border-radius;
 }
 
 .liveblog-publish-btn:hover,

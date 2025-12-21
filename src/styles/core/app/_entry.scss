@@ -3,6 +3,12 @@
 .liveblog-entry {
 	position: relative;
 	margin-bottom: 1rem;
+
+	// Ensure images don't overflow the entry container
+	img {
+		max-width: 100%;
+		height: auto;
+	}
 }
 
 .liveblog-meta {

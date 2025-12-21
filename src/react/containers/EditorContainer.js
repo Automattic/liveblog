@@ -7,10 +7,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { AsyncPaginate as Async } from 'react-select-async-paginate';
 import { html } from 'js-beautify';
-import { debounce } from 'lodash-es';
 import { timeout, map } from 'rxjs/operators';
-
-import { EditorState, ContentState } from 'draft-js';
 
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
@@ -21,49 +18,29 @@ import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 import HTMLInput from '../components/HTMLInput';
 
-import Editor, { decorators, convertFromHTML, convertToHTML } from '../Editor/index';
-
 import { getImageSize } from '../Editor/utils';
+
+// Lazy load LexicalEditor for code splitting
+const LexicalEditor = React.lazy( () => import( '../Editor/LexicalEditor' ) );
 
 class EditorContainer extends Component {
   constructor(props) {
     super(props);
 
-    let initialEditorState;
-    let initialAuthors;
-
-    if (props.entry) {
-      initialEditorState = EditorState.createWithContent(
-        convertFromHTML(props.entry.content, {
-          setReadOnly: this.setReadOnly.bind(this),
-          handleImageUpload: this.handleImageUpload.bind(this),
-          defaultImageSize: props.config.default_image_size,
-        }),
-        decorators,
-      );
-      initialAuthors = props.entry.authors;
-    } else {
-      initialEditorState = EditorState.createEmpty(decorators);
-      initialAuthors = [props.config.current_user];
-    }
+    const initialAuthors = props.entry
+      ? props.entry.authors
+      : [props.config.current_user];
 
     this.state = {
-      editorState: initialEditorState,
       suggestions: [],
       authors: initialAuthors,
       mode: 'editor',
       readOnly: false,
       rawText: props.entry ? props.entry.content : '',
       previewKey: 0,
+      // Store the HTML content for the editor
+      editorContent: props.entry ? props.entry.content : '',
     };
-
-    this.onChange = editorState => this.setState({
-      editorState,
-      rawText: html(convertToHTML(editorState.getCurrentContent())),
-    });
-
-    // Note: getUsers must return a Promise for react-select-async-paginate
-    // Debouncing is handled by the library itself, so we don't debounce here
   }
 
   setReadOnly(state) {
@@ -73,27 +50,35 @@ class EditorContainer extends Component {
   }
 
   getContent() {
-    const { editorState } = this.state;
-    return convertToHTML(editorState.getCurrentContent());
+    return this.state.editorContent;
   }
 
-  syncRawTextToEditorState() {
+  /**
+   * Handle content changes from the Lexical editor.
+   *
+   * @param {string} htmlContent - The updated HTML content.
+   */
+  onEditorChange(htmlContent) {
     this.setState({
-      editorState:
-        EditorState.createWithContent(
-          convertFromHTML(this.state.rawText, {
-            setReadOnly: this.setReadOnly.bind(this),
-            handleImageUpload: this.handleImageUpload.bind(this),
-            defaultImageSize: this.props.config.default_image_size,
-          }),
-          decorators,
-        ),
+      editorContent: htmlContent,
+      rawText: html(htmlContent),
     });
+  }
+
+  /**
+   * Sync raw HTML text input back to editor content.
+   */
+  syncRawTextToEditorContent() {
+    this.setState(prevState => ({
+      editorContent: prevState.rawText,
+      // Increment previewKey to force LexicalEditor to remount with new content
+      previewKey: prevState.previewKey + 1,
+    }));
   }
 
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { editorState, authors } = this.state;
+    const { authors, editorContent } = this.state;
     const content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
@@ -104,10 +89,9 @@ class EditorContainer extends Component {
     // So we must check if there is any text within the editor
     // If we fail to find text then we should check for a valid
     // list of html elements, mainly visual for example images.
-    if (!editorState.getCurrentContent().getPlainText().trim()) {
-      if (htmlregex.exec(convertToHTML(editorState.getCurrentContent())) === null) {
-        return;
-      }
+    const textContent = editorContent.replace(/<[^>]*>/g, '').trim();
+    if (!textContent && htmlregex.exec(editorContent) === null) {
+      return;
     }
 
     if (isEditing) {
@@ -127,13 +111,10 @@ class EditorContainer extends Component {
       contributors,
     });
 
-    const newEditorState = EditorState.push(
-      editorState,
-      ContentState.createFromText(''),
-    );
-
-    this.onChange(newEditorState);
+    // Clear editor content by incrementing previewKey to force remount
     this.setState(prevState => ({
+      editorContent: '',
+      rawText: '',
       readOnly: false,
       previewKey: prevState.previewKey + 1,
     }));
@@ -170,7 +151,7 @@ class EditorContainer extends Component {
     });
   }
 
-  getAuthors(text) {
+  getAuthorsForAutocomplete(text) {
     const { config } = this.props;
     getAuthors(text, config)
       .pipe(
@@ -215,7 +196,7 @@ class EditorContainer extends Component {
 
     switch (trigger) {
       case '@':
-        this.getAuthors(text);
+        this.getAuthorsForAutocomplete(text);
         break;
       case '#':
         this.getHashtags(text);
@@ -259,7 +240,6 @@ class EditorContainer extends Component {
 
   render() {
     const {
-      editorState,
       suggestions,
       mode,
       authors,
@@ -302,18 +282,17 @@ class EditorContainer extends Component {
         }
         {
           mode === 'editor' &&
-          <Editor
-            editorState={editorState}
-            onChange={this.onChange}
-            suggestions={suggestions}
-            resetSuggestions={() => this.setState({ suggestions: [] })}
-            onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
-            autocompleteConfig={config.autocomplete}
-            handleImageUpload={this.handleImageUpload.bind(this)}
-            readOnly={readOnly}
-            setReadOnly={this.setReadOnly.bind(this)}
-            defaultImageSize={config.default_image_size}
-          />
+          <React.Suspense fallback={<div className="liveblog-editor-loading">Loading editor...</div>}>
+            <LexicalEditor
+              key={previewKey}
+              initialContent={this.state.editorContent}
+              onChange={this.onEditorChange.bind(this)}
+              readOnly={readOnly}
+              suggestions={suggestions}
+              onSearch={(trigger, text) => this.handleOnSearch(trigger, text)}
+              handleImageUpload={this.handleImageUpload.bind(this)}
+            />
+          </React.Suspense>
         }
         {
           mode === 'raw' &&
@@ -321,7 +300,7 @@ class EditorContainer extends Component {
             value={this.state.rawText}
             onChange={(text) => {
               this.setState({ rawText: text }, () => {
-                this.syncRawTextToEditorState();
+                this.syncRawTextToEditorContent();
               });
             }}
             height="275px"
