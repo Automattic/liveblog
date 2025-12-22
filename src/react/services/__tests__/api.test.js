@@ -1,4 +1,4 @@
-import { polling } from '../api';
+import { polling, getEntries } from '../api';
 
 // Mock rxjs/ajax
 jest.mock('rxjs/ajax', () => ({
@@ -13,6 +13,39 @@ jest.mock('../../utils/utils', () => ({
 import { getCurrentTimestamp } from '../../utils/utils';
 
 describe('api service', () => {
+  describe('getEntries', () => {
+    const baseConfig = {
+      endpoint_url: 'https://example.com/wp-json/liveblog/v1/123/',
+      latest_entry_id: '100',
+      latest_entry_timestamp: '1734567800',
+      cross_domain: false,
+    };
+
+    const newestEntry = {
+      id: '150',
+      timestamp: 1734567900,
+    };
+
+    it('should use "latest" for page 1 to avoid stale cached data', () => {
+      const result = getEntries(1, baseConfig, newestEntry);
+
+      expect(result.url).toBe('https://example.com/wp-json/liveblog/v1/123/get-entries/1/latest');
+    });
+
+    it('should use newestEntry for page 2+ for consistent pagination', () => {
+      const result = getEntries(2, baseConfig, newestEntry);
+
+      expect(result.url).toBe('https://example.com/wp-json/liveblog/v1/123/get-entries/2/150-1734567900');
+    });
+
+    it('should fall back to config values for page 2+ when newestEntry is empty', () => {
+      const emptyNewestEntry = {};
+      const result = getEntries(3, baseConfig, emptyNewestEntry);
+
+      expect(result.url).toBe('https://example.com/wp-json/liveblog/v1/123/get-entries/3/100-1734567800');
+    });
+  });
+
   describe('polling', () => {
     const baseConfig = {
       endpoint_url: 'https://example.com/wp-json/liveblog/v1/123/',
