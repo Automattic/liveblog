@@ -11,8 +11,16 @@ import {
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
 
 export function getEntries(page, config, newestEntry) {
+  // For page 1, use 'latest' to always get fresh entries.
+  // This avoids stale data when the HTML page is cached (CDN/Varnish)
+  // but entries have been added since the page was cached.
+  // For other pages, use the newestEntry as an anchor for consistent pagination.
+  const lastKnownEntry = page === 1
+    ? 'latest'
+    : `${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`;
+
   const settings = {
-    url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
+    url: `${config.endpoint_url}get-entries/${page}/${lastKnownEntry}`,
     method: 'GET',
     crossDomain: config.cross_domain,
   };
