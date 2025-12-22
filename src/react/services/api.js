@@ -21,16 +21,16 @@ export function getEntries(page, config, newestEntry) {
 }
 
 export function polling(newestEntryTimestamp, config) {
-  let timestamp = getCurrentTimestamp();
-
-  // Round out the timestamp to get a higher cache hitrate.
-  // Rather than a random scatter of timestamps,
-  // this allows multiple clients to make a request with the same timestamp.
+  // Round both timestamps to bucket boundaries for higher cache hitrate.
+  // This groups clients with similar state into the same cache cohort.
+  // Clients may receive duplicate entries, but applyUpdate() handles
+  // duplicates via entry IDs - receiving the same entry twice is safe.
   const refreshInterval = parseInt(config.refresh_interval, 10);
-  timestamp = Math.floor(timestamp / refreshInterval) * refreshInterval;
+  const startTimestamp = Math.floor((newestEntryTimestamp + 1) / refreshInterval) * refreshInterval;
+  const endTimestamp = Math.floor(getCurrentTimestamp() / refreshInterval) * refreshInterval;
 
   const settings = {
-    url: `${config.endpoint_url}entries/${(newestEntryTimestamp + 1) || 0}/${timestamp}/`,
+    url: `${config.endpoint_url}entries/${startTimestamp || 0}/${endTimestamp}/`,
     method: 'GET',
     crossDomain: config.cross_domain,
   };
