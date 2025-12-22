@@ -108,14 +108,21 @@ class WPCOM_Liveblog_Entry {
 
 
 	/**
-	 * Retrieve the comment date of the current comment using gmt.
-	 * @param string          $d          Optional. The format of the date. Default user's setting.
-	 * @param int|WP_Comment  $comment_ID WP_Comment or ID of the comment for which to get the date.
-	 *                                    Default current comment.
-	 * @return string The comment's date.
+	 * Get the comment date in GMT.
+	 *
+	 * @param string $d          Optional. PHP date format. Default empty, uses date_format option.
+	 * @param int    $comment_id Optional. Comment ID. Default 0.
+	 * @return string|int The formatted date string, or Unix timestamp if format is 'U' or 'G'.
 	 */
 	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
 		$comment = get_comment( $comment_id );
+
+		// For Unix timestamp format, use DateTimeImmutable to avoid timezone issues with mysql2date.
+		if ( 'U' === $d || 'G' === $d ) {
+			$datetime = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $comment->comment_date_gmt, new DateTimeZone( 'UTC' ) );
+			return $datetime->getTimestamp();
+		}
+
 		if ( '' === $d ) {
 			$date = mysql2date( get_option( 'date_format' ), $comment->comment_date_gmt );
 		} else {
