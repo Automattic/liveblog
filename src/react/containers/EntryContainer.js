@@ -87,7 +87,7 @@ class EntryContainer extends Component {
         <aside className="liveblog-entry-aside">
           <a className="liveblog-meta-time" href={entry.share_link} target="_blank" rel="noopener noreferrer">
             <span>{timeAgo(entry.entry_time)}</span>
-            <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format)}</span>
+            <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format, config.timezone_string)}</span>
           </a>
         </aside>
         <div className="liveblog-entry-main">
