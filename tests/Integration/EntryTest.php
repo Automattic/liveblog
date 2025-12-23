@@ -317,6 +317,99 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * Test that filter_image_attributes preserves only src and alt by default.
+	 */
+	public function test_filter_image_attributes_default(): void {
+		$content  = '<p>Text</p><img src="test.jpg" alt="Test" class="wp-image" width="100" height="50" data-id="123">';
+		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+
+		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
+		$this->assertStringContainsString( 'alt="Test"', $filtered );
+		$this->assertStringNotContainsString( 'class=', $filtered );
+		$this->assertStringNotContainsString( 'width=', $filtered );
+		$this->assertStringNotContainsString( 'height=', $filtered );
+		$this->assertStringNotContainsString( 'data-id=', $filtered );
+		$this->assertStringContainsString( '<p>Text</p>', $filtered );
+	}
+
+	/**
+	 * Test that filter_image_attributes allows additional attributes via filter.
+	 */
+	public function test_filter_image_attributes_with_filter(): void {
+		add_filter(
+			'liveblog_image_allowed_attributes',
+			function ( $attrs ) {
+				return array_merge( $attrs, [ 'class', 'width', 'height' ] );
+			}
+		);
+
+		$content  = '<img src="test.jpg" alt="Test" class="wp-image" width="100" height="50" data-id="123">';
+		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+
+		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
+		$this->assertStringContainsString( 'alt="Test"', $filtered );
+		$this->assertStringContainsString( 'class="wp-image"', $filtered );
+		$this->assertStringContainsString( 'width="100"', $filtered );
+		$this->assertStringContainsString( 'height="50"', $filtered );
+		$this->assertStringNotContainsString( 'data-id=', $filtered );
+
+		remove_all_filters( 'liveblog_image_allowed_attributes' );
+	}
+
+	/**
+	 * Test that filter_image_attributes supports wildcard patterns.
+	 */
+	public function test_filter_image_attributes_with_wildcard_pattern(): void {
+		add_filter(
+			'liveblog_image_allowed_attributes',
+			function () {
+				return [ 'src', 'alt', 'data-*' ];
+			}
+		);
+
+		$content  = '<img src="test.jpg" alt="Test" class="wp-image" data-id="123" data-size="large">';
+		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+
+		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
+		$this->assertStringContainsString( 'alt="Test"', $filtered );
+		$this->assertStringContainsString( 'data-id="123"', $filtered );
+		$this->assertStringContainsString( 'data-size="large"', $filtered );
+		$this->assertStringNotContainsString( 'class=', $filtered );
+
+		remove_all_filters( 'liveblog_image_allowed_attributes' );
+	}
+
+	/**
+	 * Test that filter_image_attributes allows all attributes with wildcard.
+	 */
+	public function test_filter_image_attributes_allow_all(): void {
+		add_filter( 'liveblog_image_allowed_attributes', fn() => [ '*' ] );
+
+		$content  = '<img src="test.jpg" alt="Test" class="wp-image" width="100" data-id="123">';
+		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+
+		// Content should be unchanged.
+		$this->assertEquals( $content, $filtered );
+
+		remove_all_filters( 'liveblog_image_allowed_attributes' );
+	}
+
+	/**
+	 * Test that filter_image_attributes handles multiple images.
+	 */
+	public function test_filter_image_attributes_multiple_images(): void {
+		$content  = '<img src="one.jpg" alt="One" class="first"><p>Text</p><img src="two.jpg" alt="Two" width="200">';
+		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+
+		$this->assertStringContainsString( 'src="one.jpg"', $filtered );
+		$this->assertStringContainsString( 'alt="One"', $filtered );
+		$this->assertStringContainsString( 'src="two.jpg"', $filtered );
+		$this->assertStringContainsString( 'alt="Two"', $filtered );
+		$this->assertStringNotContainsString( 'class=', $filtered );
+		$this->assertStringNotContainsString( 'width=', $filtered );
+	}
+
+	/**
 	 * Create and get a comment with replaces meta.
 	 *
 	 * @param int   $replaces The replaces value.

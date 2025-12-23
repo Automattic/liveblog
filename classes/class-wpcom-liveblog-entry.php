@@ -186,7 +186,99 @@ class WPCOM_Liveblog_Entry {
 			$content = do_shortcode( $content );
 		}
 
+		// Filter image attributes based on allowed list.
+		$content = self::filter_image_attributes( $content );
+
 		return apply_filters( 'comment_text', $content, $comment );
+	}
+
+	/**
+	 * Filter image attributes based on an allowed list.
+	 *
+	 * By default, only 'src' and 'alt' attributes are preserved on <img> tags.
+	 * Developers can extend this using the 'liveblog_image_allowed_attributes' filter.
+	 *
+	 * @param string $content The HTML content to filter.
+	 * @return string The filtered HTML content.
+	 *
+	 * @example
+	 * // Allow additional attributes:
+	 * add_filter( 'liveblog_image_allowed_attributes', function( $attrs ) {
+	 *     return array_merge( $attrs, [ 'class', 'width', 'height', 'loading', 'data-*' ] );
+	 * } );
+	 *
+	 * @example
+	 * // Allow all attributes:
+	 * add_filter( 'liveblog_image_allowed_attributes', fn() => [ '*' ] );
+	 */
+	public static function filter_image_attributes( $content ) {
+		// Get allowed attributes. Default to src and alt for backwards compatibility.
+		$allowed_attributes = apply_filters( 'liveblog_image_allowed_attributes', array( 'src', 'alt' ) );
+
+		// If wildcard is present, return content unchanged.
+		if ( in_array( '*', $allowed_attributes, true ) ) {
+			return $content;
+		}
+
+		// Use regex to find and process img tags.
+		return preg_replace_callback(
+			'/<img\s+([^>]*)>/i',
+			function ( $matches ) use ( $allowed_attributes ) {
+				$attrs_string = $matches[1];
+
+				// Parse attributes from the img tag.
+				$parsed_attrs = array();
+				if ( preg_match_all( '/(\w[\w-]*)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|(\S+))/', $attrs_string, $attr_matches, PREG_SET_ORDER ) ) {
+					foreach ( $attr_matches as $attr_match ) {
+						$name  = strtolower( $attr_match[1] );
+						$value = $attr_match[2] ?? $attr_match[3] ?? $attr_match[4] ?? '';
+						$parsed_attrs[ $name ] = $value;
+					}
+				}
+
+				// Filter to only allowed attributes.
+				$filtered_attrs = array();
+				foreach ( $parsed_attrs as $name => $value ) {
+					if ( self::is_attribute_allowed( $name, $allowed_attributes ) ) {
+						$filtered_attrs[ $name ] = $value;
+					}
+				}
+
+				// Rebuild the img tag.
+				$new_attrs = array();
+				foreach ( $filtered_attrs as $name => $value ) {
+					$new_attrs[] = sprintf( '%s="%s"', esc_attr( $name ), esc_attr( $value ) );
+				}
+
+				return '<img ' . implode( ' ', $new_attrs ) . '>';
+			},
+			$content
+		);
+	}
+
+	/**
+	 * Check if an attribute name is allowed based on the allowed list.
+	 * Supports exact matches and wildcard patterns like 'data-*'.
+	 *
+	 * @param string $name       The attribute name to check.
+	 * @param array  $allowed    The list of allowed attribute patterns.
+	 * @return bool Whether the attribute is allowed.
+	 */
+	private static function is_attribute_allowed( $name, $allowed ) {
+		foreach ( $allowed as $pattern ) {
+			// Exact match.
+			if ( $pattern === $name ) {
+				return true;
+			}
+			// Wildcard pattern (e.g., 'data-*').
+			if ( str_ends_with( $pattern, '*' ) ) {
+				$prefix = substr( $pattern, 0, -1 );
+				if ( str_starts_with( $name, $prefix ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
