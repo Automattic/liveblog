@@ -62,23 +62,27 @@ const INSERT_IMAGE_COMMAND = createCommand( 'INSERT_IMAGE_COMMAND' );
 
 /**
  * ImageNode - Custom Lexical node for displaying images.
+ * Preserves all attributes from the original <img> element for flexible rendering.
  */
 class ImageNode extends DecoratorNode {
 	__src;
 	__alt;
+	__attributes;
 
 	static getType() {
 		return 'image';
 	}
 
 	static clone( node ) {
-		return new ImageNode( node.__src, node.__alt, node.__key );
+		return new ImageNode( node.__src, node.__alt, node.__attributes, node.__key );
 	}
 
-	constructor( src, alt = '', key ) {
+	constructor( src, alt = '', attributes = {}, key ) {
 		super( key );
 		this.__src = src;
 		this.__alt = alt;
+		// Store all attributes, ensuring src and alt are always present
+		this.__attributes = { ...attributes, src, alt };
 	}
 
 	createDOM() {
@@ -92,8 +96,8 @@ class ImageNode extends DecoratorNode {
 	}
 
 	static importJSON( serializedNode ) {
-		const { src, alt } = serializedNode;
-		return $createImageNode( src, alt );
+		const { src, alt, attributes = {} } = serializedNode;
+		return $createImageNode( src, alt, attributes );
 	}
 
 	exportJSON() {
@@ -102,6 +106,7 @@ class ImageNode extends DecoratorNode {
 			version: 1,
 			src: this.__src,
 			alt: this.__alt,
+			attributes: this.__attributes,
 		};
 	}
 
@@ -116,12 +121,17 @@ class ImageNode extends DecoratorNode {
 
 	exportDOM() {
 		const img = document.createElement( 'img' );
-		img.setAttribute( 'src', this.__src );
-		img.setAttribute( 'alt', this.__alt );
+		// Export all stored attributes
+		Object.entries( this.__attributes ).forEach( ( [ key, value ] ) => {
+			if ( value !== null && value !== undefined && value !== '' ) {
+				img.setAttribute( key, value );
+			}
+		} );
 		return { element: img };
 	}
 
 	decorate() {
+		// Editor display uses only src and alt for simplicity
 		return (
 			<img
 				src={ this.__src }
@@ -135,16 +145,21 @@ class ImageNode extends DecoratorNode {
 function convertImageElement( domNode ) {
 	if ( domNode instanceof HTMLImageElement ) {
 		const src = domNode.getAttribute( 'src' );
-		const alt = domNode.getAttribute( 'alt' ) || '';
 		if ( src ) {
-			return { node: $createImageNode( src, alt ) };
+			// Collect all attributes from the original element
+			const attributes = {};
+			for ( const attr of domNode.attributes ) {
+				attributes[ attr.name ] = attr.value;
+			}
+			const alt = attributes.alt || '';
+			return { node: $createImageNode( src, alt, attributes ) };
 		}
 	}
 	return null;
 }
 
-function $createImageNode( src, alt = '' ) {
-	return new ImageNode( src, alt );
+function $createImageNode( src, alt = '', attributes = {} ) {
+	return new ImageNode( src, alt, attributes );
 }
 
 function $isImageNode( node ) {
