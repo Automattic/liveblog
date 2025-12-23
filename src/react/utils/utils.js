@@ -149,12 +149,58 @@ export const daysAgo = (time, utcOffset) => {
 export const timeAgo = timestamp => moment.unix(timestamp).fromNow();
 
 /**
- * Returns a formated string from timestamp in HH MM format.
- * @param {Number} timestamp
- * @return {String} utcOffset Utc Offset from server
+ * Calculate the UTC offset in minutes for a specific timestamp in a given timezone.
+ * This accounts for DST by determining the offset at the time of the entry,
+ * not the current offset.
+ *
+ * @param {Number} timestamp Unix timestamp in seconds.
+ * @param {String} timezoneString IANA timezone string (e.g., "America/New_York").
+ * @return {Number|null} Offset in minutes, or null if calculation fails.
  */
-export const formattedTime = (timestamp, utcOffset, timeFormat) => {
-  const offset = parseInt(utcOffset, 10);
+const getTimezoneOffsetForTimestamp = (timestamp, timezoneString) => {
+  if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat === 'undefined') {
+    return null;
+  }
+
+  try {
+    const date = new Date(timestamp * 1000);
+
+    // Format the date in the target timezone and UTC to calculate the difference
+    const localString = date.toLocaleString('en-US', { timeZone: timezoneString });
+    const utcString = date.toLocaleString('en-US', { timeZone: 'UTC' });
+
+    const localDate = new Date(localString);
+    const utcDate = new Date(utcString);
+
+    // Return offset in minutes
+    return (localDate - utcDate) / 60000;
+  } catch (e) {
+    // Invalid timezone string or other error
+    return null;
+  }
+};
+
+/**
+ * Returns a formatted string from timestamp.
+ *
+ * @param {Number} timestamp Unix timestamp in seconds.
+ * @param {Number} utcOffset UTC offset in minutes (fallback for legacy/missing timezone_string).
+ * @param {String} timeFormat PHP date format string.
+ * @param {String} timezoneString Optional IANA timezone string for DST-aware formatting.
+ * @return {String} Formatted date/time string.
+ */
+export const formattedTime = (timestamp, utcOffset, timeFormat, timezoneString = null) => {
+  let offset = parseInt(utcOffset, 10);
+
+  // If timezone_string is available, calculate the correct offset for this specific timestamp.
+  // This ensures DST is handled correctly for entries from different seasons.
+  if (timezoneString) {
+    const dstAwareOffset = getTimezoneOffsetForTimestamp(timestamp, timezoneString);
+    if (dstAwareOffset !== null) {
+      offset = dstAwareOffset;
+    }
+  }
+
   return moment.unix(timestamp).utcOffset(offset, false).formatUsingDateTime(timeFormat);
 };
 
