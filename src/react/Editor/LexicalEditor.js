@@ -34,7 +34,11 @@ import {
 	$getRoot,
 	$insertNodes,
 	$getSelection,
+	$setSelection,
 	$isRangeSelection,
+	$isNodeSelection,
+	$getNodeByKey,
+	$createNodeSelection,
 	$createParagraphNode,
 	FORMAT_TEXT_COMMAND,
 	SELECTION_CHANGE_COMMAND,
@@ -54,6 +58,8 @@ import {
 import { $getNearestNodeOfType } from '@lexical/utils';
 import { $setBlocksType } from '@lexical/selection';
 
+import ImageCropModal from './ImageCropModal';
+
 // ============================================================================
 // Image Node
 // ============================================================================
@@ -61,24 +67,187 @@ import { $setBlocksType } from '@lexical/selection';
 const INSERT_IMAGE_COMMAND = createCommand( 'INSERT_IMAGE_COMMAND' );
 
 /**
+ * ResizableImage - Component for displaying images with resize handles.
+ *
+ * @param {Object} props           Component props.
+ * @param {string} props.src       Image source URL.
+ * @param {string} props.alt       Image alt text.
+ * @param {number} props.width     Image width (0 = auto).
+ * @param {number} props.height    Image height (0 = auto).
+ * @param {string} props.nodeKey   Lexical node key for updates.
+ */
+function ResizableImage( { src, alt, width, height, nodeKey } ) {
+	const [ editor ] = useLexicalComposerContext();
+	const imageRef = useRef( null );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const [ isSelected, setIsSelected ] = useState( false );
+	const startSize = useRef( { width: 0, height: 0 } );
+	const startPos = useRef( { x: 0, y: 0 } );
+	const aspectRatio = useRef( 1 );
+
+	// Track selection state.
+	useEffect( () => {
+		return editor.registerCommand(
+			SELECTION_CHANGE_COMMAND,
+			() => {
+				editor.getEditorState().read( () => {
+					const selection = $getSelection();
+					if ( $isNodeSelection( selection ) ) {
+						const nodes = selection.getNodes();
+						const selected = nodes.some(
+							( node ) => $isImageNode( node ) && node.getKey() === nodeKey
+						);
+						setIsSelected( selected );
+					} else {
+						setIsSelected( false );
+					}
+				} );
+				return false;
+			},
+			COMMAND_PRIORITY_HIGH
+		);
+	}, [ editor, nodeKey ] );
+
+	// Handle click to select image.
+	const handleClick = useCallback(
+		( event ) => {
+			event.preventDefault();
+			editor.update( () => {
+				const node = $getNodeByKey( nodeKey );
+				if ( node ) {
+					const selection = $createNodeSelection();
+					selection.add( nodeKey );
+					$setSelection( selection );
+				}
+			} );
+		},
+		[ editor, nodeKey ]
+	);
+
+	// Start resize on mousedown.
+	const handleResizeStart = useCallback(
+		( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+
+			const img = imageRef.current;
+			if ( ! img ) {
+				return;
+			}
+
+			setIsResizing( true );
+			startSize.current = {
+				width: img.offsetWidth,
+				height: img.offsetHeight,
+			};
+			startPos.current = { x: event.clientX, y: event.clientY };
+			aspectRatio.current = img.offsetWidth / img.offsetHeight;
+		},
+		[]
+	);
+
+	// Handle resize drag.
+	useEffect( () => {
+		if ( ! isResizing ) {
+			return;
+		}
+
+		const handleMouseMove = ( event ) => {
+			const deltaX = event.clientX - startPos.current.x;
+			const newWidth = Math.max( 50, startSize.current.width + deltaX );
+			const newHeight = Math.round( newWidth / aspectRatio.current );
+
+			editor.update( () => {
+				const node = $getNodeByKey( nodeKey );
+				if ( node && $isImageNode( node ) ) {
+					node.setDimensions( newWidth, newHeight );
+				}
+			} );
+		};
+
+		const handleMouseUp = () => {
+			setIsResizing( false );
+		};
+
+		document.addEventListener( 'mousemove', handleMouseMove );
+		document.addEventListener( 'mouseup', handleMouseUp );
+
+		return () => {
+			document.removeEventListener( 'mousemove', handleMouseMove );
+			document.removeEventListener( 'mouseup', handleMouseUp );
+		};
+	}, [ isResizing, editor, nodeKey ] );
+
+	const style = {};
+	if ( width > 0 ) {
+		style.width = `${ width }px`;
+	}
+	if ( height > 0 ) {
+		style.height = `${ height }px`;
+	}
+
+	return (
+		<span
+			className={ `liveblog-resizable-image-container${
+				isSelected ? ' selected' : ''
+			}${ isResizing ? ' resizing' : '' }` }
+		>
+			<img
+				ref={ imageRef }
+				src={ src }
+				alt={ alt }
+				className="liveblog-lexical-image"
+				style={ style }
+				onClick={ handleClick }
+				draggable={ false }
+			/>
+			{ isSelected && (
+				<>
+					<span
+						className="liveblog-resize-handle liveblog-resize-handle-se"
+						onMouseDown={ handleResizeStart }
+					/>
+				</>
+			) }
+		</span>
+	);
+}
+
+/**
  * ImageNode - Custom Lexical node for displaying images.
  */
 class ImageNode extends DecoratorNode {
 	__src;
 	__alt;
+	__width;
+	__height;
 
 	static getType() {
 		return 'image';
 	}
 
 	static clone( node ) {
-		return new ImageNode( node.__src, node.__alt, node.__key );
+		return new ImageNode(
+			node.__src,
+			node.__alt,
+			node.__width,
+			node.__height,
+			node.__key
+		);
 	}
 
-	constructor( src, alt = '', key ) {
+	constructor( src, alt = '', width = 0, height = 0, key ) {
 		super( key );
 		this.__src = src;
 		this.__alt = alt;
+		this.__width = width;
+		this.__height = height;
+	}
+
+	setDimensions( width, height ) {
+		const writable = this.getWritable();
+		writable.__width = width;
+		writable.__height = height;
 	}
 
 	createDOM() {
@@ -92,8 +261,8 @@ class ImageNode extends DecoratorNode {
 	}
 
 	static importJSON( serializedNode ) {
-		const { src, alt } = serializedNode;
-		return $createImageNode( src, alt );
+		const { src, alt, width, height } = serializedNode;
+		return $createImageNode( src, alt, width, height );
 	}
 
 	exportJSON() {
@@ -102,6 +271,8 @@ class ImageNode extends DecoratorNode {
 			version: 1,
 			src: this.__src,
 			alt: this.__alt,
+			width: this.__width,
+			height: this.__height,
 		};
 	}
 
@@ -118,15 +289,23 @@ class ImageNode extends DecoratorNode {
 		const img = document.createElement( 'img' );
 		img.setAttribute( 'src', this.__src );
 		img.setAttribute( 'alt', this.__alt );
+		if ( this.__width > 0 ) {
+			img.setAttribute( 'width', this.__width );
+		}
+		if ( this.__height > 0 ) {
+			img.setAttribute( 'height', this.__height );
+		}
 		return { element: img };
 	}
 
 	decorate() {
 		return (
-			<img
+			<ResizableImage
 				src={ this.__src }
 				alt={ this.__alt }
-				className="liveblog-lexical-image"
+				width={ this.__width }
+				height={ this.__height }
+				nodeKey={ this.getKey() }
 			/>
 		);
 	}
@@ -136,15 +315,17 @@ function convertImageElement( domNode ) {
 	if ( domNode instanceof HTMLImageElement ) {
 		const src = domNode.getAttribute( 'src' );
 		const alt = domNode.getAttribute( 'alt' ) || '';
+		const width = parseInt( domNode.getAttribute( 'width' ), 10 ) || 0;
+		const height = parseInt( domNode.getAttribute( 'height' ), 10 ) || 0;
 		if ( src ) {
-			return { node: $createImageNode( src, alt ) };
+			return { node: $createImageNode( src, alt, width, height ) };
 		}
 	}
 	return null;
 }
 
-function $createImageNode( src, alt = '' ) {
-	return new ImageNode( src, alt );
+function $createImageNode( src, alt = '', width = 0, height = 0 ) {
+	return new ImageNode( src, alt, width, height );
 }
 
 function $isImageNode( node ) {
@@ -872,6 +1053,8 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 	const [ showLinkInput, setShowLinkInput ] = useState( false );
 	const [ linkUrl, setLinkUrl ] = useState( 'https://' );
 	const [ isUploading, setIsUploading ] = useState( false );
+	const [ showCropModal, setShowCropModal ] = useState( false );
+	const [ pendingImageFile, setPendingImageFile ] = useState( null );
 	const fileInputRef = useRef( null );
 
 	// Update selection state when selection changes
@@ -977,13 +1160,28 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 
 	const handleFileSelect = useCallback( ( event ) => {
 		const file = event.target.files?.[ 0 ];
-		if ( file && file.type.startsWith( 'image/' ) && handleImageUpload ) {
+		if ( file && file.type.startsWith( 'image/' ) ) {
+			// Show crop modal for images
+			setPendingImageFile( file );
+			setShowCropModal( true );
+			// Reset input so same file can be selected again
+			if ( fileInputRef.current ) {
+				fileInputRef.current.value = '';
+			}
+		}
+	}, [] );
+
+	const handleCropComplete = useCallback( ( croppedFile ) => {
+		setShowCropModal( false );
+		setPendingImageFile( null );
+
+		if ( handleImageUpload ) {
 			setIsUploading( true );
-			handleImageUpload( file )
+			handleImageUpload( croppedFile )
 				.then( ( src ) => {
 					editor.dispatchCommand( INSERT_IMAGE_COMMAND, {
 						src,
-						alt: file.name,
+						alt: croppedFile.name,
 					} );
 				} )
 				.catch( ( err ) => {
@@ -992,13 +1190,14 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 				} )
 				.finally( () => {
 					setIsUploading( false );
-					// Reset input so same file can be selected again
-					if ( fileInputRef.current ) {
-						fileInputRef.current.value = '';
-					}
 				} );
 		}
 	}, [ editor, handleImageUpload ] );
+
+	const handleCropCancel = useCallback( () => {
+		setShowCropModal( false );
+		setPendingImageFile( null );
+	}, [] );
 
 	return (
 		<div className="liveblog-editor-toolbar-container">
@@ -1086,6 +1285,13 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 					</>
 				) }
 			</div>
+			{ showCropModal && pendingImageFile && (
+				<ImageCropModal
+					imageFile={ pendingImageFile }
+					onCropComplete={ handleCropComplete }
+					onCancel={ handleCropCancel }
+				/>
+			) }
 		</div>
 	);
 }

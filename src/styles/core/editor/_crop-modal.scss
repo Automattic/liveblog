@@ -1,0 +1,191 @@
+/**
+ * Image crop modal styles.
+ *
+ * @package Liveblog
+ */
+
+@use "../utils" as *;
+
+// Fade in animation for overlay.
+@keyframes fadeIn {
+
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+// Scale up animation for modal.
+@keyframes modalScaleUp {
+
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+// Overlay - full screen backdrop.
+.liveblog-crop-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100000;
+	background: rgba(0, 0, 0, 0.7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: fadeIn 0.2s ease-out;
+}
+
+// Modal container.
+.liveblog-crop-modal {
+	background: #fff;
+	border-radius: $base-border-radius;
+	box-shadow: $base-drop-shadow;
+	max-width: 90vw;
+	max-height: 90vh;
+	width: 600px;
+	display: flex;
+	flex-direction: column;
+	animation: modalScaleUp 0.2s cubic-bezier(0.3, 1.2, 0.2, 1);
+	outline: none;
+
+	&:focus {
+		outline: none;
+	}
+}
+
+// Header.
+.liveblog-crop-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem;
+	border-bottom: $base-border-size solid $color-grey-mid-light;
+	flex-shrink: 0;
+}
+
+.liveblog-crop-modal-title {
+	margin: 0;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: $color-grey-dark;
+}
+
+.liveblog-crop-modal-close {
+	@include button-reset;
+
+	padding: 0.25rem;
+	color: $color-grey-base;
+	cursor: pointer;
+	background: transparent;
+	border-radius: $base-border-radius;
+	transition: color 0.15s ease, background-color 0.15s ease;
+
+	&:hover {
+		color: $color-grey-dark;
+		background-color: $color-grey-x-light;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.dashicons {
+		font-size: 20px;
+		width: 20px;
+		height: 20px;
+	}
+}
+
+// Content area.
+.liveblog-crop-modal-content {
+	padding: 1rem;
+	overflow: auto;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 0; // Allow flex shrinking.
+}
+
+.liveblog-crop-modal-image {
+	max-width: 100%;
+	max-height: 50vh;
+	display: block;
+}
+
+.liveblog-crop-modal-hint {
+	margin: 0.75rem 0 0;
+	font-size: 0.85rem;
+	color: $color-grey-base;
+	text-align: center;
+}
+
+// Footer with action buttons.
+.liveblog-crop-modal-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding: 1rem;
+	border-top: $base-border-size solid $color-grey-mid-light;
+	flex-shrink: 0;
+}
+
+// Button styles for modal.
+.liveblog-crop-modal-footer .liveblog-btn {
+	@include button-reset;
+
+	padding: 0.5rem 1rem;
+	font-size: 0.9rem;
+	border-radius: $base-border-radius;
+	transition: background-color 0.15s ease, opacity 0.15s ease;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.liveblog-crop-modal-footer .liveblog-btn-cancel {
+	background: $color-grey-x-light;
+	color: $color-grey-dark;
+
+	&:hover:not(:disabled) {
+		background: $color-grey-mid-light;
+	}
+}
+
+.liveblog-crop-modal-footer .liveblog-btn-primary {
+	background: $color-primary;
+	color: #fff;
+
+	&:hover:not(:disabled) {
+		background: $raw-color-primary;
+		filter: brightness(1.1);
+	}
+}
+
+// ReactCrop overrides to match liveblog theme.
+.liveblog-crop-react-crop {
+	max-width: 100%;
+
+	.ReactCrop__crop-selection {
+		border: 2px solid $raw-color-primary;
+	}
+
+	.ReactCrop__drag-handle {
+		background-color: $raw-color-primary;
+	}
+}

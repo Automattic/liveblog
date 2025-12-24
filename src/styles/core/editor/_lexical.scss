@@ -148,12 +148,49 @@
 	max-width: 100%;
 }
 
+.liveblog-resizable-image-container {
+	display: inline-block;
+	position: relative;
+	max-width: 100%;
+
+	&.selected {
+		outline: 2px solid #007cba;
+		outline-offset: 2px;
+	}
+
+	&.resizing {
+		user-select: none;
+	}
+}
+
 .liveblog-lexical-image {
 	max-width: 100%;
 	height: auto;
 	display: block;
 	margin: 8px 0;
 	border-radius: 4px;
+	cursor: pointer;
+}
+
+// Resize handles
+.liveblog-resize-handle {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	background: #007cba;
+	border: 2px solid #fff;
+	border-radius: 2px;
+	cursor: nwse-resize;
+	z-index: 10;
+
+	&:hover {
+		background: #005a8c;
+	}
+}
+
+.liveblog-resize-handle-se {
+	bottom: 4px;
+	right: 4px;
 }
 
 // Drag-over state for image dropping
