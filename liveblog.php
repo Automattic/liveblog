@@ -1080,6 +1080,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'timestamp'                    => time(),
 						'utc_offset'                   => get_option( 'gmt_offset' ) * 60, // in minutes
 						'timezone_string'              => wp_timezone_string(),
+						'locale'                       => get_locale(),
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => get_option( 'time_format' ),
 						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
