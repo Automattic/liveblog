@@ -856,7 +856,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 			}
 
-			$pages = ceil( count( $entries ) / $per_page );
+			$total = count( $entries );
+			$pages = ceil( $total / $per_page );
 
 			//If no page is passed but entry id is, we search for the correct page.
 			if ( false === $page && false !== $id ) {
@@ -873,6 +874,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'entries' => $entries,
 				'page'    => (int) $page,
 				'pages'   => (int) $pages,
+				'total'   => (int) $total,
 			);
 
 			if ( ! empty( $entries ) ) {
