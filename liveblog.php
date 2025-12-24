@@ -622,43 +622,43 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
-		 * Look for any new Liveblog entries, and return them via JSON
-		 * Legacy endpoint for pre 4.4 installs
+		 * Look for any new Liveblog entries, and return them via JSON.
+		 * Legacy endpoint for pre 4.4 installs.
 		 */
 		public static function ajax_entries_between() {
 			$response_args = array();
 
-			// Look for entry boundaries
+			// Look for entry boundaries.
 			list( $start_timestamp, $end_timestamp ) = self::get_timestamps_from_query();
 
-			// Bail if there is no end timestamp
+			// Bail if there is no end timestamp.
 			if ( empty( $end_timestamp ) ) {
 				self::send_user_error( __( 'A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/', 'liveblog' ) );
 			}
 
-			// Get liveblog entries within the start and end boundaries
+			// Get liveblog entries within the start and end boundaries.
 			$result_for_json = self::get_entries_by_time( $start_timestamp, $end_timestamp );
 
 			self::json_return( $result_for_json );
 		}
 
 		/**
-		 * Get Liveblog entries between a start and end time for a post
+		 * Get Liveblog entries between a start and end time for a post.
 		 *
-		 * @param int $start_timestamp  The start time boundary
-		 * @param int $end_timestamp    The end time boundary
+		 * @param int $start_timestamp The start time boundary.
+		 * @param int $end_timestamp   The end time boundary.
 		 *
-		 * @return An array of Liveblog entries, possibly empty.
+		 * @return array An array of Liveblog entries, possibly empty.
 		 */
 		public static function get_entries_by_time( $start_timestamp, $end_timestamp ) {
 
-			// Set some defaults
+			// Set some defaults.
 			$latest_timestamp = null;
 			$entries_for_json = array();
 
 			$now = time();
 
-			// If end timestamp is in future, set a cache TTL until it's not
+			// If end timestamp is in future, set a cache TTL until it's not.
 			if ( $end_timestamp > $now ) {
 				self::$cache_control_max_age = $end_timestamp - $now;
 			}
@@ -667,7 +667,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			// Get liveblog entries within the start and end boundaries
+			// Get liveblog entries within the start and end boundaries.
 			$all_entries = self::$entry_query->get_all_entries_asc();
 			$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 			$pages       = false;
@@ -686,7 +686,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$pages = ceil( count( self::flatten_entries( $all_entries ) ) / $per_page );
 			}
 
-			// Create the result array
+			// Create the result array.
 			$result = array(
 				'entries'          => $entries_for_json,
 				'latest_timestamp' => $latest_timestamp,
