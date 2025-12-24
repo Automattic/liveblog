@@ -5,7 +5,6 @@
  *
  * This class integrates with the REST API framework added in WordPress 4.4
  * It registers endpoints matching the legacy functionality in the WPCOM_Liveblog ajax methods
- *
  */
 
 class WPCOM_Liveblog_Rest_Api {
@@ -23,7 +22,6 @@ class WPCOM_Liveblog_Rest_Api {
 		self::$endpoint_base = self::build_endpoint_base();
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
-
 	}
 
 	public static function build_endpoint_base() {
@@ -60,7 +58,6 @@ class WPCOM_Liveblog_Rest_Api {
 		}
 
 		return home_url( $base );
-
 	}
 
 	/**
@@ -79,9 +76,9 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/entries/(?P<start_time>\d+)/(?P<end_time>\d+)([/]*)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_entries' ),
-				'args'     => array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_entries' ),
+				'args'                => array(
 					'post_id'    => array(
 						'required' => true,
 					),
@@ -92,7 +89,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
+				'permission_callback' => '__return_true',
 			)
 		);
 
@@ -140,9 +137,9 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/lazyload/(?P<max_time>\d+)/(?P<min_time>\d+)([/]*)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_lazyload_entries' ),
-				'args'     => array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_lazyload_entries' ),
+				'args'                => array(
 					'post_id'  => array(
 						'required' => true,
 					),
@@ -153,7 +150,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
+				'permission_callback' => '__return_true',
 			)
 		);
 
@@ -167,9 +164,9 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/entry/(?P<entry_id>\d+)([/]*)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_single_entry' ),
-				'args'     => array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_single_entry' ),
+				'args'                => array(
 					'post_id'  => array(
 						'required' => true,
 					),
@@ -177,7 +174,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
+				'permission_callback' => '__return_true',
 			)
 		);
 
@@ -191,10 +188,10 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/preview([/]*)',
 			array(
-				'methods'  => WP_REST_Server::CREATABLE,
-				'callback' => array( __CLASS__, 'format_preview_entry' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'format_preview_entry' ),
 				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
-				'args'     => array(
+				'args'                => array(
 					'entry_content' => array(
 						'required' => true,
 					),
@@ -216,10 +213,10 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/authors([/]*)(?P<term>.*)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_authors' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_authors' ),
 				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
-				'args'     => array(
+				'args'                => array(
 					'term' => array(
 						'required' => false,
 					),
@@ -241,10 +238,10 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/hashtags([/]*)(?P<term>.*)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_hashtag_terms' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_hashtag_terms' ),
 				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
-				'args'     => array(
+				'args'                => array(
 					'term' => array(
 						'required' => false,
 					),
@@ -295,9 +292,9 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/get-entries/(?P<page>\d+)/(?P<last_known_entry>[^\/]+)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_entries_paged' ),
-				'args'     => array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_entries_paged' ),
+				'args'                => array(
 					'post_id'          => array(
 						'required' => true,
 					),
@@ -308,7 +305,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
+				'permission_callback' => '__return_true',
 			)
 		);
 
@@ -322,14 +319,14 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'get_key_events' ),
-				'args'     => array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_key_events' ),
+				'args'                => array(
 					'last_known_entry' => array(
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
+				'permission_callback' => '__return_true',
 			)
 		);
 
@@ -343,9 +340,9 @@ class WPCOM_Liveblog_Rest_Api {
 			self::$api_namespace,
 			'/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( __CLASS__, 'jump_to_key_event' ),
-				'args'     => array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'jump_to_key_event' ),
+				'args'                => array(
 					'post_id'          => array(
 						'required' => true,
 					),
@@ -356,10 +353,9 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback'  => '__return_true',
+				'permission_callback' => '__return_true',
 			)
 		);
-
 	}
 
 	/**
@@ -562,7 +558,6 @@ class WPCOM_Liveblog_Rest_Api {
 		WPCOM_Liveblog::prevent_caching_if_needed();
 
 		return $meta_box;
-
 	}
 
 	/**
@@ -667,6 +662,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 	/**
 	 * Get parameter from JSON
+	 *
 	 * @param string $param
 	 * @param array  $json
 	 * @return mixed
@@ -681,5 +677,4 @@ class WPCOM_Liveblog_Rest_Api {
 		}
 		return false;
 	}
-
 }

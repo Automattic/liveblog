@@ -230,8 +230,8 @@ class WPCOM_Liveblog_Entry {
 				$parsed_attrs = array();
 				if ( preg_match_all( '/(\w[\w-]*)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|(\S+))/', $attrs_string, $attr_matches, PREG_SET_ORDER ) ) {
 					foreach ( $attr_matches as $attr_match ) {
-						$name  = strtolower( $attr_match[1] );
-						$value = $attr_match[2] ?? $attr_match[3] ?? $attr_match[4] ?? '';
+						$name                  = strtolower( $attr_match[1] );
+						$value                 = $attr_match[2] ?? $attr_match[3] ?? $attr_match[4] ?? '';
 						$parsed_attrs[ $name ] = $value;
 					}
 				}
@@ -474,7 +474,6 @@ class WPCOM_Liveblog_Entry {
 	 * If a entry_id is supplied we should update it as its the
 	 * original entry which is used for displaying author information.
 	 *
-	 *
 	 * @param array $args The new Live blog Entry.
 	 * @param int   $entry_id If set we should update the original entry
 	 * @return mixed
@@ -511,7 +510,7 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Store the contributors as comment meta.
 	 *
-	 * @param int $comment_id The comment id for the meta we should update.
+	 * @param int   $comment_id The comment id for the meta we should update.
 	 * @param array $contributors Array of ids to store as meta.
 	 */
 	private static function add_contributors( $comment_id, $contributors ) {
@@ -542,7 +541,7 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		return array_map(
-			function( $contributor ) {
+			function ( $contributor ) {
 					$user_object = self::get_userdata_with_filter( $contributor );
 					return self::get_user_data_for_json( $user_object );
 			},
@@ -585,7 +584,7 @@ class WPCOM_Liveblog_Entry {
 			return array();
 		}
 
-		$author       = [ self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) ];
+		$author       = array( self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) );
 		$contributors = self::get_contributors_for_json( $comment_id );
 
 		return array_merge( $author, $contributors );
@@ -600,7 +599,6 @@ class WPCOM_Liveblog_Entry {
 	public static function get_entry_title( $entry ) {
 		return wp_trim_words( $entry->content, 10, '…' );
 	}
-
 }
 
 WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();

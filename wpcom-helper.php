@@ -15,7 +15,7 @@ function wpcom_vip_liveblog_bump_stats_extras( $stat, $extra ) {
 // Using an endpoint can be ambiguous
 add_action(
 	'after_liveblog_init',
-	function() {
+	function () {
 
 		// No need to use an Ajax URL if we're using the REST API.
 		if ( WPCOM_Liveblog::use_rest_api() ) {
@@ -24,7 +24,7 @@ add_action(
 
 		add_filter(
 			'liveblog_endpoint_url',
-			function( $url, $post_id ) {
+			function ( $url, $post_id ) {
 				return home_url( '__liveblog_' . $post_id . '/' );
 			},
 			10,
@@ -34,7 +34,7 @@ add_action(
 
 		add_filter(
 			'liveblog_refresh_interval',
-			function( $refresh_interval ) {
+			function ( $refresh_interval ) {
 				return 3; // more frequent updates; we can handle it.
 			}
 		);
@@ -42,7 +42,7 @@ add_action(
 		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) { // input var ok
 			add_action(
 				'wp',
-				function() {
+				function () {
 					remove_action( 'template_redirect', 'redirect_canonical' );
 				}
 			);
@@ -55,7 +55,7 @@ add_action(
 // comes in
 add_action(
 	'wp_enqueue_scripts',
-	function() {
+	function () {
 		// Fail gracefully if BlackbirdPie isn't available.
 		if ( ! isset( $GLOBALS['BlackbirdPie'] ) || ! is_a( $GLOBALS['BlackbirdPie'], 'BlackbirdPie' ) ) {
 			return;
@@ -69,7 +69,7 @@ add_action(
 // Stats tracking for liveblog
 add_action(
 	'liveblog_enable_post',
-	function( $post_id ) {
+	function ( $post_id ) {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog', 'enable' );
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog-enable-by-theme', str_replace( '/', '-', get_stylesheet() ) );
 
@@ -81,7 +81,7 @@ add_action(
 
 add_action(
 	'liveblog_disable_post',
-	function( $post_id ) {
+	function ( $post_id ) {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog', 'disable' );
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog-disable-by-theme', str_replace( '/', '-', get_stylesheet() ) );
 
@@ -93,35 +93,35 @@ add_action(
 
 add_action(
 	'liveblog_entry_request_empty',
-	function() {
+	function () {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_request', 'miss' );
 	}
 );
 
 add_action(
 	'liveblog_entry_request',
-	function() {
+	function () {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_request', 'hit' );
 	}
 );
 
 add_action(
 	'liveblog_preview_entry',
-	function() {
+	function () {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'preview' );
 	}
 );
 
 add_action(
 	'liveblog_insert_entry',
-	function( $comment_id ) {
+	function ( $comment_id ) {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'insert' );
 	}
 );
 
 add_action(
 	'liveblog_update_entry',
-	function( $new_comment_id, $replaces_comment_id ) {
+	function ( $new_comment_id, $replaces_comment_id ) {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'update' );
 	},
 	10,
@@ -130,7 +130,7 @@ add_action(
 
 add_action(
 	'liveblog_delete_entry',
-	function( $comment_id ) {
+	function ( $comment_id ) {
 		wpcom_vip_liveblog_bump_stats_extras( 'liveblog_entry_action', 'delete' );
 	}
 );
@@ -146,7 +146,7 @@ add_action( 'liveblog_delete_entry', 'wpcom_invalidate_feed_cache' );
 // Helps protect against any accidents by superadmins.
 add_filter(
 	'liveblog_current_user_can_edit_liveblog',
-	function( $can_edit ) {
+	function ( $can_edit ) {
 
 		// Retain super admin access for A12s.
 		if ( is_automattician() || ( defined( 'A8C_PROXIED_REQUEST' ) && A8C_PROXIED_REQUEST ) ) { // phpcs:ignore WordPressVIPMinimum.Constants.ConstantRestrictions.ConstantRestrictions

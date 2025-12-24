@@ -30,7 +30,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 			} elseif ( ! self::socketio_emitter_exists() ) {
 				self::add_socketio_emitter_required_error();
 			} else {
-				require dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php';
+				require __DIR__ . '/class-wpcom-liveblog-socketio.php';
 				WPCOM_Liveblog_Socketio::load();
 			}
 		}
@@ -62,8 +62,8 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 * @return bool
 	 */
 	private static function socketio_emitter_exists() {
-		return file_exists( dirname( __FILE__ ) . '/../vendor/autoload.php' )
-			&& file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
+		return file_exists( __DIR__ . '/../vendor/autoload.php' )
+			&& file_exists( __DIR__ . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
 	}
 
 	/**

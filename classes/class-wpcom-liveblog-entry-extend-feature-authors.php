@@ -166,7 +166,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		}
 
 		// Get the user object to retrieve display name.
-		$user = get_user_by( 'slug', $author );
+		$user         = get_user_by( 'slug', $author );
 		$display_name = $user ? $user->display_name : $author;
 
 		// Replace the @author content with a link to
@@ -220,7 +220,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function ajax_authors() {
 
-		//Sanitize the input safely.
+		// Sanitize the input safely.
 		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
 			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
 		} else {
@@ -272,5 +272,4 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'avatar' => get_avatar( $author->ID, 20 ),
 		);
 	}
-
 }

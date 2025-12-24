@@ -896,7 +896,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 	public function load() {
 
 		// Store the path to the liveblog plugin.
-		$this->path = dirname( __FILE__ );
+		$this->path = __DIR__;
 
 		// Allow plugins, themes, etc. to change
 		// the generated emoji class.
@@ -1104,5 +1104,4 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 
 		return $classes;
 	}
-
 }

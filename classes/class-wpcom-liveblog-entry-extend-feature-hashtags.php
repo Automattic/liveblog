@@ -253,7 +253,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function ajax_terms() {
 
-		//Sanitize the input safely.
+		// Sanitize the input safely.
 		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
 			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
 		} else {
@@ -302,7 +302,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		remove_filter( 'terms_clauses', array( $this, 'remove_name_search' ), 10 );
 
 		return $terms;
-
 	}
 
 	/**
@@ -358,5 +357,4 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// Register the taxonomy.
 		register_taxonomy( self::$taxonomy, 'post', $args );
 	}
-
 }

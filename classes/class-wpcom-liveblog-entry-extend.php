@@ -128,11 +128,11 @@ class WPCOM_Liveblog_Entry_Extend {
 	 * is coming from Webkit browser's contenteditable
 	 *
 	 * $param array Liveblog entry
+	 *
 	 * @return array
-	*/
+	 */
 	public static function fix_links_wrapped_in_div( $entry ) {
 		$entry['content'] = preg_replace( '|(<div(?: [^>]*)?>\s*)(https?://[^\s<>"]+)(\s*<\/div>)|i', '<p>${2}</p>', $entry['content'] );
 		return $entry;
 	}
-
 }

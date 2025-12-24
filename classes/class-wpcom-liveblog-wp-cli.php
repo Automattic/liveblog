@@ -5,7 +5,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 
 	public function readme_for_github() {
-		$readme_path = dirname( __FILE__ ) . '/../readme.txt';
+		$readme_path = __DIR__ . '/../readme.txt';
 		$readme      = file_get_contents( $readme_path ); // @codingStandardsIgnoreLine
 		$readme      = $this->listify_meta( $readme );
 		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
@@ -18,7 +18,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	 * Fix wp_commentmeta table so archived liveblog posts comments display properly.
 	 *
 	 * @subcommand fix-archive
-	*/
+	 */
 	public function fix_archive( $args, $assoc_args ) {
 		global $wpdb;
 
@@ -36,22 +36,22 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			)
 		);
 
-		//How many live blogs do we have?
+		// How many live blogs do we have?
 		$total_liveblogs  = count( $posts->posts );
 		$current_liveblog = 0;
 
-		//Feedback to the user
+		// Feedback to the user
 		WP_CLI::log( 'Found ' . $total_liveblogs . ' Live Blogs.' );
 
 		foreach ( $posts->posts as $post ) {
 
-			//Increment the count so we get a more human readable index, inital value becomes 1 rather than 0.
-			$current_liveblog ++;
+			// Increment the count so we get a more human readable index, inital value becomes 1 rather than 0.
+			++$current_liveblog;
 
-			//Tell the user what we are doing, but lets colour this one se we can see its a new Liveblog in the console output.
+			// Tell the user what we are doing, but lets colour this one se we can see its a new Liveblog in the console output.
 			WP_CLI::log( WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n" ) );
 
-			//Define the post ID
+			// Define the post ID
 			$post_id = $post->ID;
 
 			// get all entries that have been edited in the liveblog
@@ -86,19 +86,17 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					// look for replaces property in $correct_ids
 					if ( in_array( $edit_entry->replaces, $correct_ids, true ) ) {
 
-						//The edited entry is accurate so we dont need to do anything.
+						// The edited entry is accurate so we dont need to do anything.
 						WP_CLI::log( 'No action required.. skipping Entry ' . $entry_id );
 						continue;
-
 					} else {
-
 						$correct_id_count = count( $correct_ids );
 						for ( $i = 0; $i <= $correct_id_count - 1; $i++ ) {
 
 							// replace with correct meta_value
 							if ( $correct_ids[ $i ] < $entry_id ) {
 
-								//The edited entry needs updating to reflect the correct ID's
+								// The edited entry needs updating to reflect the correct ID's
 								WP_CLI::log( 'Correcting Entry ' . $entry_id . '...' );
 
 								// If this isnt a dry run we can run the database Update.
@@ -150,11 +148,10 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 				// counter
 				$replaced = 0;
 
-				//THe edited entry is accurate so we dont need to do anything.
+				// THe edited entry is accurate so we dont need to do anything.
 				WP_CLI::log( 'Total of ' . count( $entries_replace ) . ' need action..' );
 
 				foreach ( $entries_replace as $entry_replace ) {
-
 					$content = $correct_contents[ $replaced ]->comment_content;
 
 					if ( false === $is_dryrun ) {
@@ -166,14 +163,14 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 						clean_comment_cache( $entry_replace->meta_value );
 					}
 
-					//Lets update the user with what we are doing.
+					// Lets update the user with what we are doing.
 					WP_CLI::log( 'Replaced Content in ' . $replaced . ' Entry(ies) so far..' );
 
-					$replaced++;
+					++$replaced;
 				}
 			}
 
-			//If we have a dry run flag lets just output what we would be looking to do on a live run.
+			// If we have a dry run flag lets just output what we would be looking to do on a live run.
 			if ( true === $is_dryrun ) {
 				WP_CLI::log( 'Found ' . count( $edit_entries ) . ' Edited Entries on Post ID ' . $post_id );
 			}
@@ -189,7 +186,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	private function markdownify_headings( $readme ) {
 		return preg_replace_callback(
 			'/^\s*(=+)\s*(.*?)\s*=+\s*$/m',
-			function( $matches ) {
+			function ( $matches ) {
 				return "\n" . str_repeat( '#', 4 - strlen( $matches[1] ) ) . ' ' . $matches[2] . "\n";
 			},
 			$readme
@@ -213,10 +210,10 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	private function add_contributors_wp_org_profile_links( $readme ) {
 		return preg_replace_callback(
 			'/Contributors: (.*)/',
-			function( $matches ) {
+			function ( $matches ) {
 				$links = array_filter(
 					array_map(
-						function( $username ) {
+						function ( $username ) {
 							return "[$username](http://profiles.wordpress.org/$username)";
 						},
 						preg_split( '/\s*,\s*/', $matches[1] )
@@ -240,7 +237,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 	public static function help() {
 		WP_CLI::log(
-			<<<HELP
+			<<<'HELP'
 usage: wp liveblog readme_for_github
 	Converts the readme.txt to real markdown to be used as a README.md
 HELP

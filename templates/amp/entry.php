@@ -43,14 +43,14 @@
 
 				<?php else : ?>
 
-				<?php
-				$this->load_part(
-					'author',
-					array(
-						'author' => $authors,
-					)
-				);
-				?>
+					<?php
+					$this->load_part(
+						'author',
+						array(
+							'author' => $authors,
+						)
+					);
+					?>
 
 			<?php endif; ?>
 		</header>

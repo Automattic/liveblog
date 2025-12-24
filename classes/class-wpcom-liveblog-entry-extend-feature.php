@@ -34,7 +34,6 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	 * @return void
 	 */
 	public function load() {
-		//
 	}
 
 	/**
@@ -102,5 +101,4 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	public function revert( $entry ) {
 		return $entry;
 	}
-
 }

@@ -8,7 +8,7 @@
 class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 
 	public function __construct() {
-		return; //nothing happens during __construct for now
+		return; // nothing happens during __construct for now
 	}
 
 	/**
@@ -28,14 +28,14 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 * Attempts to convert a URL into embed HTML. Starts by checking the URL against the regex of the registered embed handlers.
 	 * If none of the regex matches and it's enabled, then the URL will be given to the {@link WP_oEmbed} class.
 	 *
-	 * @param array $attr {
-	 *     Shortcode attributes. Optional.
+	 * @param array  $attr {
+	 *      Shortcode attributes. Optional.
 	 *
 	 *     @type int $width  Width of the embed in pixels.
 	 *     @type int $height Height of the embed in pixels.
 	 * }
 	 * @param string $url The URL attempting to be embedded.
-	 * @param int $comment_id The Comment ID of currently processed comment
+	 * @param int    $comment_id The Comment ID of currently processed comment
 	 * @return string|false The embed HTML on success, otherwise the original URL.
 	 *                      `->maybe_make_link()` can return false on failure.
 	 */
@@ -68,12 +68,12 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 
 		// Look for known internal handlers
 		$handlers = $this->handlers;
-		//check for handlers registered for wp_embed class using all the helper functions
+		// check for handlers registered for wp_embed class using all the helper functions
 		if ( true === isset( $GLOBALS['wp_embed'] )
 			&& is_a( $GLOBALS['wp_embed'], 'WP_Embed' )
 			&& is_array( $GLOBALS['wp_embed']->handlers )
 		) {
-			//marge those in a single array
+			// marge those in a single array
 			$handlers = array_replace_recursive( $GLOBALS['wp_embed']->handlers, $this->handlers );
 		}
 		ksort( $handlers );
@@ -265,7 +265,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 *
 	 * @uses WP_Embed::autoembed_callback()
 	 *
-	 * @param string $content The content to be searched.
+	 * @param string         $content The content to be searched.
 	 * @param int|WP_Comment $comment object or integer representing the Comment ID
 	 * @return string Potentially modified $content.
 	 */
@@ -292,5 +292,4 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 		// Put the line breaks back.
 		return str_replace( '<!-- wp-line-break -->', "\n", $content );
 	}
-
 }

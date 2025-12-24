@@ -87,7 +87,6 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 
 	/**
 	 * Returns the custom commands and allows for customizing the command set
-	 *
 	 */
 	public function custom_commands() {
 		$this->commands = apply_filters( 'liveblog_active_commands', $this->commands );
@@ -243,5 +242,4 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 			do_action( "liveblog_command_{$type}_after", $content, $id, $post_id );
 		}
 	}
-
 }
