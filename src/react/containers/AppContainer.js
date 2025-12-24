@@ -31,7 +31,7 @@ class AppContainer extends Component {
   }
 
   render() {
-    const { page, loading, entries, polling, mergePolling, config } = this.props;
+    const { page, loading, entries, polling, mergePolling, config, total } = this.props;
     const canEdit = config.is_liveblog_editable === '1';
 
     return (
@@ -42,6 +42,7 @@ class AppContainer extends Component {
           </Suspense>
         )}
         <UpdateButton polling={polling} click={() => mergePolling()} />
+        {canEdit && <div className="liveblog-updates-count">Updates: {total}</div>}
         <PaginationContainer />
         <Entries loading={loading} entries={entries} />
         <PaginationContainer />
@@ -63,6 +64,7 @@ AppContainer.propTypes = {
   polling: PropTypes.array,
   mergePolling: PropTypes.func,
   config: PropTypes.object,
+  total: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
@@ -73,6 +75,7 @@ const mapStateToProps = state => ({
     .slice(0, state.config.entries_per_page),
   polling: Object.keys(state.polling.entries),
   config: state.config,
+  total: state.pagination.total,
 });
 
 const mapDispatchToProps = dispatch =>
