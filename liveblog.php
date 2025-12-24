@@ -745,15 +745,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 			}
 			$state = get_post_meta( $post_id, self::KEY, true );
-			// backwards compatibility with older values
+			// Backwards compatibility with older values.
 			if ( 1 === $state ) {
 				$state = 'enable';
 			}
 
 			return $state;
 		}
-
-		/** Private _is_ Methods **************************************************/
 
 		/**
 		 * Is this the initial page request?
@@ -790,25 +788,27 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		private static function get_timestamps_from_query() {
 
-			// Look for timestamps and bail if none
+			// Look for timestamps and bail if none.
 			$stamps = rtrim( get_query_var( self::URL_ENDPOINT ), '/' );
 			if ( empty( $stamps ) ) {
 				return array( false, false );
 			}
 
-			// Get timestamps from the query variable
+			// Get timestamps from the query variable.
 			$timestamps = explode( '/', $stamps );
 
-			// Bail if there are not 2 timestamps
+			// Bail if there are not 2 timestamps.
 			if ( 2 !== count( $timestamps ) ) {
 				return array( false, false );
 			}
 
-			// Return integer timestamps in an array
+			// Return integer timestamps in an array.
 			return array_map( 'intval', $timestamps );
 		}
 
-		// HANDLES THE CRUD ACTIONS FOR THE COMMENTS
+		/**
+		 * Handle CRUD actions for liveblog entries.
+		 */
 		public static function ajax_crud_entry() {
 			self::ajax_current_user_can_edit_liveblog();
 			self::ajax_check_nonce();
