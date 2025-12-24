@@ -368,7 +368,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_action( 'init', array( __CLASS__, 'init' ) );
 			add_action( 'init', array( __CLASS__, 'add_rewrite_rules' ) );
 			add_action( 'permalink_structure_changed', array( __CLASS__, 'add_rewrite_rules' ) );
-			// flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules
+			// Flush the rewrite rules a lot later so that we don't interfere with other plugins using rewrite rules.
 			add_action( 'init', array( __CLASS__, 'flush_rewrite_rules' ), 1000 );
 			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
@@ -405,7 +405,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		private static function add_admin_actions() {
 
-			// Bail if not in admin area
+			// Bail if not in admin area.
 			if ( ! is_admin() ) {
 				return;
 			}
@@ -563,29 +563,32 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( ! is_string( self::$custom_template_path ) || ! is_dir( self::$custom_template_path ) ) {
 				self::$custom_template_path = null;
 			} else {
-				// realpath is used here to ensure we have an absolute path which is necessary to avoid APC related bugs
+				// Realpath is used here to ensure we have an absolute path which is necessary to avoid APC related bugs.
 				self::$custom_template_path = untrailingslashit( realpath( self::$custom_template_path ) );
 			}
 
 			self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 
 			if ( self::is_initial_page_request() ) {
-				// we need to add the liveblog after the shortcodes are run, because we already
+				// We need to add the liveblog after the shortcodes are run, because we already
 				// process shortcodes in the comment contents and if we left any (like in the original content)
-				// we wouldn't like them to be processed
+				// we wouldn't like them to be processed.
 				add_filter( 'the_content', array( __CLASS__, 'add_liveblog_to_content' ), 20 );
 			} else {
 				self::handle_ajax_request();
 			}
 		}
 
+		/**
+		 * Handle AJAX requests for liveblog entries.
+		 */
 		private static function handle_ajax_request() {
 
 			$endpoint_suffix = get_query_var( self::URL_ENDPOINT );
 
 			if ( ! $endpoint_suffix ) {
-				// we redirect, because if somebody accessed <permalink>/liveblog
-				// they probably did that in the URL bar, not via AJAX
+				// We redirect, because if somebody accessed <permalink>/liveblog
+				// they probably did that in the URL bar, not via AJAX.
 				wp_safe_redirect( get_permalink() );
 				exit();
 			}
