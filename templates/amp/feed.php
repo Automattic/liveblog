@@ -1,8 +1,14 @@
 <?php
-$post_id          = $this->get( 'post_id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+/**
+ * Template for AMP liveblog feed.
+ *
+ * @package Liveblog
+ */
+
+$post_id          = $this->get( 'post_id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $links            = $this->get( 'links' );
-$page             = $this->get( 'page' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
-$pages            = $this->get( 'pages' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+$page             = $this->get( 'page' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+$pages            = $this->get( 'pages' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $last             = $this->get( 'last' );
 $settings         = $this->get( 'settings' );
 $entries_per_page = $settings['entries_per_page'];
@@ -25,7 +31,7 @@ $social           = $settings['social'];
 		<?php else : ?>
 			on="tap:AMP.navigateTo(url='<?php echo esc_url( $links->base ); ?>')"
 		<?php endif ?>
-		class="ampstart-btn caps"><?php esc_html_e( 'You have updates' ); ?></button>
+		class="ampstart-btn caps"><?php esc_html_e( 'You have updates', 'liveblog' ); ?></button>
 	<div items>
 
 	<?php foreach ( $this->get( 'entries' ) as $entry ) : ?>

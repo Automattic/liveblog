@@ -1,31 +1,62 @@
 <?php
+/**
+ * Represents a liveblog entry.
+ *
+ * @package Liveblog
+ */
 
 /**
- * Represents a liveblog entry
+ * Represents a liveblog entry.
  */
 class WPCOM_Liveblog_Entry {
 
+	/**
+	 * Default avatar size.
+	 *
+	 * @var int
+	 */
 	const DEFAULT_AVATAR_SIZE = 30;
 
 	/**
-	 * @var string In case the current entry is an edit (replaces) of
-	 * another entry, we store the other entry's ID in this meta key.
+	 * Meta key for storing the ID of the entry this one replaces.
+	 *
+	 * @var string
 	 */
 	const REPLACES_META_KEY = 'liveblog_replaces';
 
 	/**
-	 * @var string If author editing is enabled, we stored contributors
-	 *  in this meta key.
+	 * Meta key for storing contributor IDs.
+	 *
+	 * @var string
 	 */
 	const CONTRIBUTORS_META_KEY = 'liveblog_contributors';
 
 	/**
-	 * @var string Whether or not an entry should show an author
+	 * Meta key for hiding authors on an entry.
+	 *
+	 * @var string
 	 */
 	const HIDE_AUTHORS_KEY = 'liveblog_hide_authors';
 
+	/**
+	 * The comment object.
+	 *
+	 * @var WP_Comment
+	 */
 	private $comment;
+
+	/**
+	 * The entry type (new, update, delete).
+	 *
+	 * @var string
+	 */
 	private $type = 'new';
+
+	/**
+	 * Allowed HTML tags for entry content.
+	 *
+	 * @var array
+	 */
 	private static $allowed_tags_for_entry;
 
 	/**
@@ -38,6 +69,11 @@ class WPCOM_Liveblog_Entry {
 		'liveblog_key_events' => '',
 	);
 
+	/**
+	 * Constructor.
+	 *
+	 * @param WP_Comment $comment The comment object.
+	 */
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
 		$this->replaces = get_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, true );
@@ -49,14 +85,16 @@ class WPCOM_Liveblog_Entry {
 		}
 	}
 
+	/**
+	 * Generate allowed HTML tags for entry content.
+	 *
+	 * @return void
+	 */
 	public static function generate_allowed_tags_for_entry() {
-		/**
-		 * Use html tags allowed for post as a base.
-		 */
+		// Use HTML tags allowed for post as a base.
 		self::$allowed_tags_for_entry = wp_kses_allowed_html( 'post' );
-		/**
-		 * Expand with additional tags that we want to allow.
-		*/
+
+		// Expand with additional tags that we want to allow.
 		$additional_tags           = array();
 		$additional_tags['iframe'] = array(
 			'src'             => array(),
@@ -76,31 +114,57 @@ class WPCOM_Liveblog_Entry {
 		);
 	}
 
+	/**
+	 * Create an entry from a comment.
+	 *
+	 * @param WP_Comment $comment The comment object.
+	 * @return WPCOM_Liveblog_Entry The entry object.
+	 */
 	public static function from_comment( $comment ) {
 		$entry = new WPCOM_Liveblog_Entry( $comment );
 		return $entry;
 	}
 
+	/**
+	 * Get the entry ID.
+	 *
+	 * @return int The entry ID.
+	 */
 	public function get_id() {
 		return $this->comment->comment_ID;
 	}
 
+	/**
+	 * Get the post ID.
+	 *
+	 * @return int The post ID.
+	 */
 	public function get_post_id() {
 		return $this->comment->comment_post_ID;
 	}
 
+	/**
+	 * Get the entry content.
+	 *
+	 * @return string The entry content.
+	 */
 	public function get_content() {
 		return $this->comment->comment_content;
 	}
 
+	/**
+	 * Get the entry type.
+	 *
+	 * @return string The entry type (new, update, delete).
+	 */
 	public function get_type() {
 		return $this->type;
 	}
 
 	/**
-	 * Get the GMT timestamp for the comment
+	 * Get the GMT timestamp for the comment.
 	 *
-	 * @return string
+	 * @return string The timestamp.
 	 */
 	public function get_timestamp() {
 		return mysql2date( 'G', $this->comment->comment_date_gmt );
@@ -132,6 +196,11 @@ class WPCOM_Liveblog_Entry {
 		return $date;
 	}
 
+	/**
+	 * Get entry data for JSON output.
+	 *
+	 * @return object Entry data object.
+	 */
 	public function for_json() {
 		$entry_id    = $this->replaces ? $this->replaces : $this->get_id();
 		$css_classes = implode( ' ', get_comment_class( '', $entry_id, $this->comment->comment_post_ID ) );
@@ -152,6 +221,11 @@ class WPCOM_Liveblog_Entry {
 		return (object) $entry;
 	}
 
+	/**
+	 * Get fields for rendering the entry.
+	 *
+	 * @return array Entry fields for rendering.
+	 */
 	public function get_fields_for_render() {
 		$entry_id     = $this->replaces ? $this->replaces : $this->comment->comment_ID;
 		$post_id      = $this->comment->comment_post_ID;
@@ -177,6 +251,13 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
+	/**
+	 * Render entry content.
+	 *
+	 * @param string          $content The content to render.
+	 * @param WP_Comment|bool $comment The comment object or false.
+	 * @return string Rendered content.
+	 */
 	public static function render_content( $content, $comment = false ) {
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
@@ -189,7 +270,7 @@ class WPCOM_Liveblog_Entry {
 		// Filter image attributes based on allowed list.
 		$content = self::filter_image_attributes( $content );
 
-		return apply_filters( 'comment_text', $content, $comment );
+		return apply_filters( 'comment_text', $content, $comment ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP filter.
 	}
 
 	/**
@@ -230,8 +311,8 @@ class WPCOM_Liveblog_Entry {
 				$parsed_attrs = array();
 				if ( preg_match_all( '/(\w[\w-]*)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|(\S+))/', $attrs_string, $attr_matches, PREG_SET_ORDER ) ) {
 					foreach ( $attr_matches as $attr_match ) {
-						$name  = strtolower( $attr_match[1] );
-						$value = $attr_match[2] ?? $attr_match[3] ?? $attr_match[4] ?? '';
+						$name                  = strtolower( $attr_match[1] );
+						$value                 = $attr_match[2] ?? $attr_match[3] ?? $attr_match[4] ?? '';
 						$parsed_attrs[ $name ] = $value;
 					}
 				}
@@ -282,10 +363,10 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Inserts a new entry
+	 * Inserts a new entry.
 	 *
-	 * @param array $args The entry properties: content, post_id, user (current user object)
-	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry
+	 * @param array $args The entry properties: content, post_id, user (current user object).
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry.
 	 */
 	public static function insert( $args ) {
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
@@ -307,20 +388,20 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Updates an exsting entry
+	 * Updates an existing entry.
 	 *
 	 * Inserts a new entry, which replaces the original entry.
 	 *
-	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id
-	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 * @param array $args The entry properties: entry_id (which entry to update), content, post_id.
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original.
 	 */
 	public static function update( $args ) {
 		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
-		// always use the original author for the update entry, otherwise until refresh
-		// users will see the user who editd the entry as  the author
+		// Always use the original author for the update entry, otherwise until refresh
+		// users will see the user who edited the entry as the author.
 		$args['user'] = self::user_object_from_comment_id( $args['entry_id'] );
 		if ( is_wp_error( $args['user'] ) ) {
 			return $args['user'];
@@ -352,12 +433,12 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Deletes an existing entry
+	 * Deletes an existing entry.
 	 *
 	 * Inserts a new entry, which replaces the original entry.
 	 *
-	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object)
-	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original
+	 * @param array $args The entry properties: entry_id (which entry to delete), post_id, user (current user object).
+	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original.
 	 */
 	public static function delete( $args ) {
 		if ( ! $args['entry_id'] ) {
@@ -375,6 +456,12 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
+	/**
+	 * Delete a key event from an entry.
+	 *
+	 * @param array $args The entry properties.
+	 * @return WPCOM_Liveblog_Entry|WP_Error The updated entry.
+	 */
 	public static function delete_key( $args ) {
 		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
@@ -386,6 +473,12 @@ class WPCOM_Liveblog_Entry {
 		return $entry;
 	}
 
+	/**
+	 * Insert a comment for the entry.
+	 *
+	 * @param array $args The entry arguments.
+	 * @return WP_Comment|WP_Error The comment or error.
+	 */
 	private static function insert_comment( $args ) {
 		$valid_args = self::validate_args( $args );
 		if ( is_wp_error( $valid_args ) ) {
@@ -415,17 +508,29 @@ class WPCOM_Liveblog_Entry {
 		return $comment;
 	}
 
+	/**
+	 * Validate entry arguments.
+	 *
+	 * @param array $args The entry arguments.
+	 * @return true|WP_Error True if valid, or error.
+	 */
 	private static function validate_args( $args ) {
 		$required_keys = array( 'post_id', 'user' );
 		foreach ( $required_keys as $key ) {
 			if ( ! isset( $args[ $key ] ) || ! $args[ $key ] ) {
-				// translators: 1: argument
+				// translators: 1: argument.
 				return new WP_Error( 'entry-invalid-args', sprintf( __( 'Missing entry argument: %s', 'liveblog' ), $key ) );
 			}
 		}
 		return true;
 	}
 
+	/**
+	 * Get a user object from a comment ID.
+	 *
+	 * @param int $comment_id The comment ID.
+	 * @return WP_User|WP_Error The user object or error.
+	 */
 	private static function user_object_from_comment_id( $comment_id ) {
 		$original_comment = get_comment( $comment_id );
 		if ( ! $original_comment ) {
@@ -447,22 +552,22 @@ class WPCOM_Liveblog_Entry {
 	 */
 	public static function handle_restricted_shortcodes( $args ) {
 
-		// Runs the restricted shortcode array through the filter to modify it where applicable before being applied.
+		// Runs the restricted shortcode array through the filter before being applied.
 		self::$restricted_shortcodes = apply_filters( 'liveblog_entry_restrict_shortcodes', self::$restricted_shortcodes );
 
-		// Foreach lookup key, does it exist in the content.
+		// For each lookup key, does it exist in the content.
 		if ( is_array( self::$restricted_shortcodes ) ) {
 			foreach ( self::$restricted_shortcodes as $key => $value ) {
 
-				// Regex Pattern will match all shortcode formats.
+				// Regex pattern will match all shortcode formats.
 				$pattern = get_shortcode_regex( array( $key ) );
 
-				// if there's a match we replace it with the configured replacement.
+				// If there's a match we replace it with the configured replacement.
 				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
 			}
 		}
 
-		// Return the Original entry arguments with any modifications.
+		// Return the original entry arguments with any modifications.
 		return $args;
 	}
 
@@ -471,13 +576,12 @@ class WPCOM_Liveblog_Entry {
 	 * user as a fallback, we store a meta to show that authors are hidden as
 	 * a comment must have an author.
 	 *
-	 * If a entry_id is supplied we should update it as its the
+	 * If an entry_id is supplied we should update it as it is the
 	 * original entry which is used for displaying author information.
 	 *
-	 *
-	 * @param array $args The new Live blog Entry.
-	 * @param int   $entry_id If set we should update the original entry
-	 * @return mixed
+	 * @param array    $args     The new Liveblog entry.
+	 * @param int|bool $entry_id If set we should update the original entry.
+	 * @return WP_User The user object.
 	 */
 	private static function handle_author_select( $args, $entry_id ) {
 		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
@@ -511,8 +615,9 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Store the contributors as comment meta.
 	 *
-	 * @param int $comment_id The comment id for the meta we should update.
-	 * @param array $contributors Array of ids to store as meta.
+	 * @param int   $comment_id   The comment ID for the meta we should update.
+	 * @param array $contributors Array of IDs to store as meta.
+	 * @return void
 	 */
 	private static function add_contributors( $comment_id, $contributors ) {
 		if ( ! $contributors ) {
@@ -532,7 +637,8 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Returns a list of contributor user objects.
 	 *
-	 * @param int $comment_id The comment id to retrive the metadata.
+	 * @param int $comment_id The comment ID to retrieve the metadata.
+	 * @return array The contributor data.
 	 */
 	private static function get_contributors_for_json( $comment_id ) {
 		$contributors = get_comment_meta( $comment_id, self::CONTRIBUTORS_META_KEY, true );
@@ -542,7 +648,7 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		return array_map(
-			function( $contributor ) {
+			function ( $contributor ) {
 					$user_object = self::get_userdata_with_filter( $contributor );
 					return self::get_user_data_for_json( $user_object );
 			},
@@ -550,6 +656,12 @@ class WPCOM_Liveblog_Entry {
 		);
 	}
 
+	/**
+	 * Get user data with filter applied.
+	 *
+	 * @param int $author_id The author ID.
+	 * @return WP_User|false The user data or false.
+	 */
 	public static function get_userdata_with_filter( $author_id ) {
 		return apply_filters( 'liveblog_userdata', get_userdata( $author_id ), $author_id );
 	}
@@ -557,7 +669,8 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Returns a formatted array of user data.
 	 *
-	 * @param object $user The user object
+	 * @param object $user The user object.
+	 * @return array The formatted user data.
 	 */
 	private static function get_user_data_for_json( $user ) {
 		if ( is_wp_error( $user ) || ! is_object( $user ) ) {
@@ -576,7 +689,8 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Return an array of authors, based on the original comment author and its contributors.
 	 *
-	 * @param number $comment_id The id of the comment.
+	 * @param int $comment_id The ID of the comment.
+	 * @return array The authors.
 	 */
 	public static function get_authors( $comment_id ) {
 		$hide_authors = get_comment_meta( $comment_id, self::HIDE_AUTHORS_KEY, true );
@@ -585,7 +699,7 @@ class WPCOM_Liveblog_Entry {
 			return array();
 		}
 
-		$author       = [ self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) ];
+		$author       = array( self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) );
 		$contributors = self::get_contributors_for_json( $comment_id );
 
 		return array_merge( $author, $contributors );
@@ -600,7 +714,6 @@ class WPCOM_Liveblog_Entry {
 	public static function get_entry_title( $entry ) {
 		return wp_trim_words( $entry->content, 10, '…' );
 	}
-
 }
 
 WPCOM_Liveblog_Entry::generate_allowed_tags_for_entry();

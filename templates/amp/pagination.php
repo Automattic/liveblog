@@ -1,3 +1,11 @@
+<?php
+/**
+ * Template for AMP liveblog pagination.
+ *
+ * @package Liveblog
+ */
+
+?>
 <div pagination>
 	<nav aria-label="amp live list pagination" class="liveblog-pagination">
 			<div>

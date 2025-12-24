@@ -69,4 +69,63 @@
 		</properties>
 	</rule>
 
+	<!-- Main plugin file must be named liveblog.php, not class-wpcom-liveblog.php -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>liveblog.php</exclude-pattern>
+	</rule>
+
+	<!-- Legacy class naming convention uses WPCOM_Liveblog prefix -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
+		<exclude-pattern>*/classes/*</exclude-pattern>
+		<exclude-pattern>liveblog.php</exclude-pattern>
+	</rule>
+
+	<!-- Auto-generated webpack asset files -->
+	<exclude-pattern>*/assets/*.asset.php</exclude-pattern>
+
+	<!-- Template variables are local scope, not globals -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
+		<exclude-pattern>*/templates/*</exclude-pattern>
+	</rule>
+
+	<!-- Exclusions for tests directory -->
+	<!-- PHPUnit test files use PascalCase naming convention -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Test namespaces don't need plugin prefix -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Tests interact with WordPress globals and hooks -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Test stubs may have mixed structure -->
+	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Unused parameters common in test method signatures -->
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Tests may need to override WordPress globals for setup -->
+	<rule ref="WordPress.WP.GlobalVariablesOverride.Prohibited">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Test bootstrap may need runtime configuration -->
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- eval() may be needed for mocking functions in tests -->
+	<rule ref="Squiz.PHP.Eval.Discouraged">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+
 </ruleset>

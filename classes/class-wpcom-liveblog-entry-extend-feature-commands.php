@@ -1,4 +1,9 @@
 <?php
+/**
+ * Commands feature for liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Extend_Feature_Commands
@@ -86,8 +91,9 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	}
 
 	/**
-	 * Returns the custom commands and allows for customizing the command set
+	 * Returns the custom commands and allows for customizing the command set.
 	 *
+	 * @return void
 	 */
 	public function custom_commands() {
 		$this->commands = apply_filters( 'liveblog_active_commands', $this->commands );
@@ -95,14 +101,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	/**
 	 * Gets the autocomplete config.
 	 *
-	 * @param array $config
-	 * @return array
+	 * @param array $config The existing autocomplete configuration.
+	 * @return array Updated configuration.
 	 */
 	public function get_config( $config ) {
-
-		// Add our config to the front end autocomplete
-		// config, after first allowing other plugins,
-		// themes, etc. to modify it as required
+		/*
+		 * Add our config to the front end autocomplete
+		 * config, after first allowing other plugins,
+		 * themes, etc. to modify it as required.
+		 */
 		$config[] = apply_filters(
 			'liveblog_command_config',
 			array(
@@ -123,7 +130,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	/**
 	 * Get all the available commands.
 	 *
-	 * @return array
+	 * @return array Array of commands.
 	 */
 	public function get_commands() {
 		return $this->commands;
@@ -132,8 +139,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	/**
 	 * Filters the input.
 	 *
-	 * @param mixed $entry
-	 * @return mixed
+	 * @param mixed $entry The liveblog entry.
+	 * @return mixed Filtered entry.
 	 */
 	public function filter( $entry ) {
 
@@ -152,7 +159,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// For all the filters found,
 		// apply them to the content.
 		foreach ( $this->filters as $filter ) {
-			$entry['content'] = apply_filters( $filter, $entry['content'] );
+			$entry['content'] = apply_filters( $filter, $entry['content'] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook name for liveblog_command_{type}_before filters.
 		}
 
 		return $entry;
@@ -161,17 +168,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	/**
 	 * The preg replace callback for the filter.
 	 *
-	 * @param array $match
-	 * @return string
+	 * @param array $regex_match The regex match array.
+	 * @return string Replacement string.
 	 */
-	public function preg_replace_callback( $match ) {
+	public function preg_replace_callback( $regex_match ) {
 
 		// Allow any plugins, themes, etc. to modify the match.
-		$type = apply_filters( 'liveblog_command_type', $match[2] );
+		$type = apply_filters( 'liveblog_command_type', $regex_match[2] );
 
 		// If it's not a command that's been registered then skip it.
 		if ( ! in_array( $type, $this->commands, true ) ) {
-			return $match[0];
+			return $regex_match[0];
 		}
 
 		// Append the filter to the filters array.
@@ -180,21 +187,21 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 		// Replace the content with a hidden span
 		// to show the command was matched.
 		return str_replace(
-			$match[1],
+			$regex_match[1],
 			'<span class="liveblog-command ' . $this->class_prefix_local . $type . '">' . $type . '</span>',
-			$match[0]
+			$regex_match[0]
 		);
 	}
 
 	/**
-	 * Adds type-{command} class to entry
+	 * Adds type-{command} class to entry.
 	 *
-	 * @param array  $classes
-	 * @param string $class
-	 * @param int    $comment_id
-	 * @return array
+	 * @param array  $classes    The existing classes.
+	 * @param string $css_class  The class name.
+	 * @param int    $comment_id The comment ID.
+	 * @return array Updated classes.
 	 */
-	public function add_type_class_to_entry( $classes, $class, $comment_id ) {
+	public function add_type_class_to_entry( $classes, $css_class, $comment_id ) {
 		$types   = array();
 		$comment = get_comment( $comment_id );
 
@@ -214,18 +221,18 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 	/**
 	 * Reverts the input.
 	 *
-	 * @param mixed $content
-	 * @return mixed
+	 * @param mixed $content The content to revert.
+	 * @return mixed Reverted content.
 	 */
 	public function revert( $content ) {
 		return preg_replace( '~' . $this->revert_regex . '~', '/$1', $content );
 	}
 
 	/**
-	 * Runs action after entry save
+	 * Runs action after entry save.
 	 *
-	 * @param int $id
-	 * @param int $post_id
+	 * @param int $id      The entry ID.
+	 * @param int $post_id The post ID.
 	 * @return void
 	 */
 	public function do_action_per_type( $id, $post_id ) {
@@ -243,5 +250,4 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Commands extends WPCOM_Liveblog_Entry_
 			do_action( "liveblog_command_{$type}_after", $content, $id, $post_id );
 		}
 	}
-
 }

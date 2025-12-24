@@ -1,7 +1,4 @@
 <?php
-
-declare( strict_types=1 );
-
 /**
  * Helper class from the WP-API test suite.
  *
@@ -9,6 +6,8 @@ declare( strict_types=1 );
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
+
+declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
@@ -35,7 +34,7 @@ class SpyRestServer extends WP_REST_Server {
 	 * @return mixed
 	 */
 	public function __call( $method, $args ) {
-		return call_user_func_array( [ $this, $method ], $args );
+		return call_user_func_array( array( $this, $method ), $args );
 	}
 
 	/**

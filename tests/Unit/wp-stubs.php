@@ -19,7 +19,7 @@ if ( ! function_exists( 'wp_kses_allowed_html' ) ) {
 	 * @return array Empty array for unit tests.
 	 */
 	function wp_kses_allowed_html( $context = '' ) {
-		return [];
+		return array();
 	}
 }
 
@@ -31,7 +31,7 @@ if ( ! function_exists( 'wp_parse_args' ) ) {
 	 * @param array               $defaults Default values.
 	 * @return array Merged arguments.
 	 */
-	function wp_parse_args( $args, $defaults = [] ) {
+	function wp_parse_args( $args, $defaults = array() ) {
 		if ( is_object( $args ) ) {
 			$args = get_object_vars( $args );
 		} elseif ( is_string( $args ) ) {
@@ -51,7 +51,7 @@ if ( ! function_exists( 'get_comment_meta' ) ) {
 	 * @return mixed Empty string for unit tests.
 	 */
 	function get_comment_meta( $comment_id, $key = '', $single = false ) {
-		return $single ? '' : [];
+		return $single ? '' : array();
 	}
 }
 
@@ -65,7 +65,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 	 * The real class is defined in liveblog.php but has too many
 	 * WordPress dependencies to load for unit tests.
 	 */
-	final class WPCOM_Liveblog { // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
+	final class WPCOM_Liveblog {
+ // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
 		public const KEY = 'liveblog';
 
 		/**

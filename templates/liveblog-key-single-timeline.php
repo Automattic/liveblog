@@ -1,3 +1,11 @@
+<?php
+/**
+ * Template for a single key event in the timeline.
+ *
+ * @package Liveblog
+ */
+
+?>
 <li class="<?php echo esc_attr( $css_classes ); ?>" data-timestamp="<?php echo esc_attr( $timestamp ); ?>">
 	<a class="link" href="#liveblog-entry-<?php echo esc_attr( $entry_id ); ?>" data-entry-id="<?php echo esc_attr( $entry_id ); ?>">
 		<span class="date liveblog-time-update"><?php echo esc_html( $entry_date ); ?> - <?php echo esc_html( $entry_time ); ?></span>

@@ -1,6 +1,12 @@
 <?php
-	$author     = $this->get( 'author' );
-	$avatar_url = get_avatar_url( $author['id'] );
+/**
+ * Template for AMP liveblog author.
+ *
+ * @package Liveblog
+ */
+
+$author     = $this->get( 'author' );
+$avatar_url = get_avatar_url( $author['id'] );
 ?>
 
 <div class="liveblog-meta-author">
