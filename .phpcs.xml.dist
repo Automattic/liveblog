@@ -69,6 +69,25 @@
 		</properties>
 	</rule>
 
+	<!-- Main plugin file must be named liveblog.php, not class-wpcom-liveblog.php -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>liveblog.php</exclude-pattern>
+	</rule>
+
+	<!-- Legacy class naming convention uses WPCOM_Liveblog prefix -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
+		<exclude-pattern>*/classes/*</exclude-pattern>
+		<exclude-pattern>liveblog.php</exclude-pattern>
+	</rule>
+
+	<!-- Auto-generated webpack asset files -->
+	<exclude-pattern>*/assets/*.asset.php</exclude-pattern>
+
+	<!-- Template variables are local scope, not globals -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
+		<exclude-pattern>*/templates/*</exclude-pattern>
+	</rule>
+
 	<!-- Exclusions for tests directory -->
 	<!-- PHPUnit test files use PascalCase naming convention -->
 	<rule ref="WordPress.Files.FileName">
