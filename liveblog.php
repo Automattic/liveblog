@@ -246,8 +246,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static $supported_post_types = array();
 
 		/**
-		 * @uses add_action() to hook methods into WordPress actions
-		 * @uses add_filter() to hook methods into WordPress filters
+		 * Load the plugin by setting up hooks and dependencies.
+		 *
+		 * @uses add_action() To hook methods into WordPress actions.
+		 * @uses add_filter() To hook methods into WordPress filters.
 		 */
 		public static function load() {
 			load_plugin_textdomain( 'liveblog', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
@@ -279,6 +281,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			WPCOM_Liveblog_Cron::load();
 		}
 
+		/**
+		 * Add support for custom post types to liveblog queries.
+		 *
+		 * @param WP_Query $query The query object.
+		 */
 		public static function add_custom_post_type_support( $query ) {
 			if ( ! self::is_entries_ajax_request() ) {
 				return;
@@ -288,14 +295,26 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$query->set( 'post_type', $post_types );
 		}
 
+		/**
+		 * Check if a post type supports liveblog.
+		 *
+		 * @param string $post_type The post type to check.
+		 * @return bool Whether the post type supports liveblog.
+		 */
 		public static function liveblog_post_type( $post_type ) {
 			return post_type_supports( $post_type, self::KEY );
 		}
 
+		/**
+		 * Add admin notice for old WordPress version.
+		 */
 		private static function add_old_wp_notice() {
 			add_action( 'admin_notices', array( 'WPCOM_Liveblog', 'show_old_wp_notice' ) );
 		}
 
+		/**
+		 * Display admin notice for old WordPress version.
+		 */
 		public static function show_old_wp_notice() {
 			global $wp_version;
 			$min_version = self::MIN_WP_VERSION;
@@ -404,7 +423,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		private static function add_admin_filters() {
 
-			// Bail if not in admin area
+			// Bail if not in admin area.
 			if ( ! is_admin() ) {
 				return;
 			}
@@ -413,8 +432,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_filter( 'query_vars', array( __CLASS__, 'add_query_var_for_post_filtering' ) );
 		}
 
+		/**
+		 * Register embed handlers for liveblog.
+		 */
 		private static function register_embed_handlers() {
-			// register it to run later, because the regex is pretty general and we don't want it to prevent more specific handlers from running
+			// Register it to run later, because the regex is pretty general and we don't want it to prevent more specific handlers from running.
 			wp_embed_register_handler( 'liveblog_image', '/\.(png|jpe?g|gif)(\?.*)?$/', array( 'WPCOM_Liveblog', 'image_embed_handler' ), 99 );
 		}
 
@@ -459,14 +481,20 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			do_action( 'after_liveblog_init' );
 		}
 
+		/**
+		 * Add rewrite rules for liveblog endpoints.
+		 */
 		public static function add_rewrite_rules() {
 			add_rewrite_endpoint( self::URL_ENDPOINT, EP_PERMALINK );
 		}
 
+		/**
+		 * Flush rewrite rules if version has changed.
+		 */
 		public static function flush_rewrite_rules() {
 			$rewrites_version = (int) get_option( 'liveblog_rewrites_version' );
 			if ( self::REWRITES_VERSION !== $rewrites_version ) {
-				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.VIP.RestrictedFunctions.rewrite_rules_flush_rewrite_rules
+				flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules
 				update_option( 'liveblog_rewrites_version', self::REWRITES_VERSION );
 			}
 		}
@@ -486,11 +514,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
-		 * Returns the avatar for a user
+		 * Returns the avatar for a user.
 		 *
-		 * @param $user_id author ID
-		 * @param $size size, in pixels (or named size)
-		 * @return HTML for avatar
+		 * @param int        $user_id Author ID.
+		 * @param int|string $size    Size, in pixels or named size.
+		 * @return string HTML for avatar.
 		 */
 		public static function get_avatar( $user_id, $size ) {
 			return apply_filters( 'liveblog_author_avatar', get_avatar( $user_id, $size ), $user_id, $size );
