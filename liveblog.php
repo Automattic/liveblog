@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
@@ -10,6 +9,8 @@
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
+ *
+ * @package Liveblog
  */
 
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
@@ -27,46 +28,222 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 	 */
 	final class WPCOM_Liveblog {
 
-		/** Constants *************************************************************/
-		const VERSION                 = '1.9.7';
-		const REWRITES_VERSION        = 1;
-		const MIN_WP_VERSION          = '4.4';
+		/**
+		 * Plugin version.
+		 *
+		 * @var string
+		 */
+		const VERSION = '1.9.7';
+
+		/**
+		 * Rewrites version for flushing rewrite rules.
+		 *
+		 * @var int
+		 */
+		const REWRITES_VERSION = 1;
+
+		/**
+		 * Minimum WordPress version required.
+		 *
+		 * @var string
+		 */
+		const MIN_WP_VERSION = '4.4';
+
+		/**
+		 * Minimum WordPress REST API version required.
+		 *
+		 * @var string
+		 */
 		const MIN_WP_REST_API_VERSION = '4.4';
-		const KEY                     = 'liveblog';
-		const URL_ENDPOINT            = 'liveblog';
-		const EDIT_CAP                = 'publish_posts';
-		const NONCE_KEY               = '_wpnonce'; // Using these strings since they're hard coded in the rest api. It'll still work fine for < 4.4
-		const NONCE_ACTION            = 'wp_rest';
 
-		const REFRESH_INTERVAL                = 10;   // how often should we refresh
-		const DEBUG_REFRESH_INTERVAL          = 2;   // how often we refresh in development mode
-		const FOCUS_REFRESH_INTERVAL          = 30;   // how often we refresh in when window not in focus
-		const MAX_CONSECUTIVE_RETRIES         = 100; // max number of failed tries before polling is disabled
-		const HUMAN_TIME_DIFF_UPDATE_INTERVAL = 60; // how often we change the entry human timestamps: "a minute ago"
-		const DELAY_THRESHOLD                 = 5;  // how many failed tries after which we should increase the refresh interval
-		const DELAY_MULTIPLIER                = 2; // by how much should we inscrease the refresh interval
-		const FADE_OUT_DURATION               = 5; // how much time should take fading out the background of new entries
-		const RESPONSE_CACHE_MAX_AGE          = DAY_IN_SECONDS; // `Cache-Control: max-age` value for cacheable JSON responses
-		const USE_REST_API                    = true; // Use the REST API if current version is at least MIN_WP_REST_API_VERSION. Allows for easy disabling/enabling
-		const DEFAULT_IMAGE_SIZE              = 'full'; // The default image size to use when inserting media frm the media library.
-		const AUTHOR_LIST_DEBOUNCE_TIME       = 500; // This is the time ms to debounce the async author list.
+		/**
+		 * Meta key for liveblog state.
+		 *
+		 * @var string
+		 */
+		const KEY = 'liveblog';
 
-		/** Variables *************************************************************/
+		/**
+		 * URL endpoint for liveblog.
+		 *
+		 * @var string
+		 */
+		const URL_ENDPOINT = 'liveblog';
 
-		public static $post_id                = null;
-		private static $entry_query           = null;
+		/**
+		 * Capability required to edit liveblog entries.
+		 *
+		 * @var string
+		 */
+		const EDIT_CAP = 'publish_posts';
+
+		/**
+		 * Nonce key. Using these strings since they're hard coded in the REST API.
+		 *
+		 * @var string
+		 */
+		const NONCE_KEY = '_wpnonce';
+
+		/**
+		 * Nonce action for REST API requests.
+		 *
+		 * @var string
+		 */
+		const NONCE_ACTION = 'wp_rest';
+
+		/**
+		 * How often to refresh in seconds.
+		 *
+		 * @var int
+		 */
+		const REFRESH_INTERVAL = 10;
+
+		/**
+		 * How often to refresh in development mode in seconds.
+		 *
+		 * @var int
+		 */
+		const DEBUG_REFRESH_INTERVAL = 2;
+
+		/**
+		 * How often to refresh when window not in focus in seconds.
+		 *
+		 * @var int
+		 */
+		const FOCUS_REFRESH_INTERVAL = 30;
+
+		/**
+		 * Max number of failed tries before polling is disabled.
+		 *
+		 * @var int
+		 */
+		const MAX_CONSECUTIVE_RETRIES = 100;
+
+		/**
+		 * How often we change the entry human timestamps in seconds.
+		 *
+		 * @var int
+		 */
+		const HUMAN_TIME_DIFF_UPDATE_INTERVAL = 60;
+
+		/**
+		 * How many failed tries after which we should increase the refresh interval.
+		 *
+		 * @var int
+		 */
+		const DELAY_THRESHOLD = 5;
+
+		/**
+		 * By how much to increase the refresh interval.
+		 *
+		 * @var int
+		 */
+		const DELAY_MULTIPLIER = 2;
+
+		/**
+		 * How much time fading out the background of new entries should take.
+		 *
+		 * @var int
+		 */
+		const FADE_OUT_DURATION = 5;
+
+		/**
+		 * Cache-Control max-age value for cacheable JSON responses.
+		 *
+		 * @var int
+		 */
+		const RESPONSE_CACHE_MAX_AGE = DAY_IN_SECONDS;
+
+		/**
+		 * Whether to use the REST API.
+		 *
+		 * @var bool
+		 */
+		const USE_REST_API = true;
+
+		/**
+		 * The default image size to use when inserting media from the media library.
+		 *
+		 * @var string
+		 */
+		const DEFAULT_IMAGE_SIZE = 'full';
+
+		/**
+		 * Time in ms to debounce the async author list.
+		 *
+		 * @var int
+		 */
+		const AUTHOR_LIST_DEBOUNCE_TIME = 500;
+
+		/**
+		 * Current post ID.
+		 *
+		 * @var int|null
+		 */
+		public static $post_id = null;
+
+		/**
+		 * Entry query instance.
+		 *
+		 * @var WPCOM_Liveblog_Entry_Query|null
+		 */
+		private static $entry_query = null;
+
+		/**
+		 * Flag to prevent caching response.
+		 *
+		 * @var bool
+		 */
 		private static $do_not_cache_response = false;
+
+		/**
+		 * Cache control max age value.
+		 *
+		 * @var int|null
+		 */
 		private static $cache_control_max_age = null;
-		private static $custom_template_path  = null;
 
-		public static $is_rest_api_call        = false;
-		public static $auto_archive_days       = null;
+		/**
+		 * Custom template path.
+		 *
+		 * @var string|null
+		 */
+		private static $custom_template_path = null;
+
+		/**
+		 * Flag indicating if this is a REST API call.
+		 *
+		 * @var bool
+		 */
+		public static $is_rest_api_call = false;
+
+		/**
+		 * Number of days for auto-archive.
+		 *
+		 * @var int|null
+		 */
+		public static $auto_archive_days = null;
+
+		/**
+		 * Meta key for auto-archive expiry date.
+		 *
+		 * @var string
+		 */
 		public static $auto_archive_expiry_key = 'liveblog_autoarchive_expiry_date';
-		public static $latest_timestamp        = false;
-		public static $supported_post_types    = array();
 
+		/**
+		 * Latest entry timestamp.
+		 *
+		 * @var int|false
+		 */
+		public static $latest_timestamp = false;
 
-		/** Load Methods **********************************************************/
+		/**
+		 * Supported post types for liveblog.
+		 *
+		 * @var array
+		 */
+		public static $supported_post_types = array();
 
 		/**
 		 * @uses add_action() to hook methods into WordPress actions
