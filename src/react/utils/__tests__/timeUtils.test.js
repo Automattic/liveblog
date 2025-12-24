@@ -6,14 +6,16 @@ describe('time utils', () => {
   });
 
   describe('timeAgo', () => {
-    it('should return "a few seconds ago" for recent timestamps', () => {
+    it('should return relative time for recent timestamps', () => {
       const now = Math.floor(Date.now() / 1000);
-      expect(timeAgo(now)).toBe('a few seconds ago');
+      const result = timeAgo(now);
+      // Intl.RelativeTimeFormat with numeric: 'auto' returns "now" or "0 seconds ago"
+      expect(result).toMatch(/now|0 seconds ago|second/);
     });
 
-    it('should return "a minute ago" for timestamp 60 seconds ago', () => {
+    it('should return "1 minute ago" for timestamp 60 seconds ago', () => {
       const oneMinuteAgo = Math.floor(Date.now() / 1000) - 60;
-      expect(timeAgo(oneMinuteAgo)).toBe('a minute ago');
+      expect(timeAgo(oneMinuteAgo)).toBe('1 minute ago');
     });
 
     it('should return "5 minutes ago" for timestamp 5 minutes ago', () => {
@@ -21,17 +23,55 @@ describe('time utils', () => {
       expect(timeAgo(fiveMinutesAgo)).toBe('5 minutes ago');
     });
 
-    it('should return "an hour ago" for timestamp 1 hour ago', () => {
+    it('should return "1 hour ago" for timestamp 1 hour ago', () => {
       const oneHourAgo = Math.floor(Date.now() / 1000) - 3600;
-      expect(timeAgo(oneHourAgo)).toBe('an hour ago');
+      expect(timeAgo(oneHourAgo)).toBe('1 hour ago');
     });
 
     it('should handle Unix timestamps correctly regardless of timezone', () => {
       // Unix timestamp for a known date: 2024-06-15 14:30:00 UTC
       const knownTimestamp = 1718461800;
-      // The result should be consistent - moment handles Unix timestamps as UTC
       const result = timeAgo(knownTimestamp);
-      expect(result).toContain('ago');
+      expect(result).toMatch(/ago|year|month/);
+    });
+
+    it('should format in German when de_DE locale is passed', () => {
+      const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300;
+      const result = timeAgo(fiveMinutesAgo, 'de_DE');
+      // German: "vor 5 Minuten"
+      expect(result).toBe('vor 5 Minuten');
+    });
+
+    it('should format in French when fr_FR locale is passed', () => {
+      const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300;
+      const result = timeAgo(fiveMinutesAgo, 'fr_FR');
+      // French: "il y a 5 minutes"
+      expect(result).toBe('il y a 5 minutes');
+    });
+
+    it('should handle hours in different locales', () => {
+      const twoHoursAgo = Math.floor(Date.now() / 1000) - 7200;
+      expect(timeAgo(twoHoursAgo, 'en_US')).toBe('2 hours ago');
+      expect(timeAgo(twoHoursAgo, 'de_DE')).toBe('vor 2 Stunden');
+      expect(timeAgo(twoHoursAgo, 'es_ES')).toBe('hace 2 horas');
+    });
+
+    it('should handle days in different locales', () => {
+      const threeDaysAgo = Math.floor(Date.now() / 1000) - (3 * 86400);
+      expect(timeAgo(threeDaysAgo, 'en_US')).toBe('3 days ago');
+      expect(timeAgo(threeDaysAgo, 'de_DE')).toBe('vor 3 Tagen');
+    });
+
+    it('should default to en_US when no locale is provided', () => {
+      const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300;
+      expect(timeAgo(fiveMinutesAgo)).toBe('5 minutes ago');
+    });
+
+    it('should convert WordPress locale format to BCP 47', () => {
+      // WordPress uses underscores (de_DE), Intl uses hyphens (de-DE)
+      const oneHourAgo = Math.floor(Date.now() / 1000) - 3600;
+      // This should work with underscore format
+      expect(timeAgo(oneHourAgo, 'de_DE')).toBe('vor 1 Stunde');
     });
   });
 

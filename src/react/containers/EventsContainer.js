@@ -49,7 +49,7 @@ class EventsContainer extends Component {
   }
 
   renderEvents() {
-    const { events, jumpToEvent, canEdit, utcOffset, dateFormat, title } = this.props;
+    const { events, jumpToEvent, canEdit, locale, title } = this.props;
 
     return (
       <div>
@@ -62,8 +62,7 @@ class EventsContainer extends Component {
               click={() => jumpToEvent(events[key].id)}
               onDelete={() => this.confirmDeletion(events[key])}
               canEdit={canEdit}
-              utcOffset={utcOffset}
-              dateFormat={dateFormat}
+              locale={locale}
             />,
           )}
         </ul>
@@ -94,14 +93,12 @@ EventsContainer.propTypes = {
   events: PropTypes.object,
   container: PropTypes.any,
   canEdit: PropTypes.bool,
-  utcOffset: PropTypes.string,
-  dateFormat: PropTypes.string,
+  locale: PropTypes.string,
   title: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
-  dateFormat: state.config.date_format,
-  utcOffset: state.config.utc_offset,
+  locale: state.config.locale,
   events: state.events.entries,
   canEdit: state.config.is_liveblog_editable === '1',
 });

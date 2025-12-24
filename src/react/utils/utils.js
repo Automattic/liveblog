@@ -1,5 +1,3 @@
-import moment from './extendedMoment';
-
 /* eslint-disable no-param-reassign */
 export const getLastOfObject = object =>
   object[Object.keys(object)[Object.keys(object).length - 1]];
@@ -130,23 +128,40 @@ export const getNewestEntry = (current, update, entries = false) => {
 };
 
 /**
- * Get days between two timestamps
- * @param {Object} time Moment Time
- * @param {Number} utcOffset Utc Offset from server
- * @return {Number}
- */
-export const daysAgo = (time, utcOffset) => {
-  const currentUTCTime = moment().utcOffset(utcOffset, true);
-  return currentUTCTime.diff(time, 'days');
-};
-
-/**
  * Returns a formatted string indicating how long ago a timestamp was.
+ * Uses Intl.RelativeTimeFormat for locale-aware formatting.
  *
  * @param {number} timestamp Unix timestamp in seconds (UTC).
- * @return {string} Human-readable time difference (e.g., "5 minutes ago").
+ * @param {string} locale WordPress locale (e.g., "de_DE"). Defaults to "en_US".
+ * @return {string} Human-readable time difference (e.g., "5 minutes ago", "vor 5 Minuten").
  */
-export const timeAgo = timestamp => moment.unix(timestamp).fromNow();
+export const timeAgo = (timestamp, locale = 'en_US') => {
+  const seconds = Math.floor(Date.now() / 1000) - timestamp;
+
+  // Convert WordPress locale format (de_DE) to BCP 47 format (de-DE)
+  const bcp47Locale = locale.replace('_', '-');
+
+  const rtf = new Intl.RelativeTimeFormat(bcp47Locale, { numeric: 'auto' });
+
+  // Determine the appropriate unit and value
+  const absSeconds = Math.abs(seconds);
+  if (absSeconds < 60) {
+    return rtf.format(-seconds, 'second');
+  }
+  if (absSeconds < 3600) {
+    return rtf.format(-Math.round(seconds / 60), 'minute');
+  }
+  if (absSeconds < 86400) {
+    return rtf.format(-Math.round(seconds / 3600), 'hour');
+  }
+  if (absSeconds < 2592000) { // 30 days
+    return rtf.format(-Math.round(seconds / 86400), 'day');
+  }
+  if (absSeconds < 31536000) { // 365 days
+    return rtf.format(-Math.round(seconds / 2592000), 'month');
+  }
+  return rtf.format(-Math.round(seconds / 31536000), 'year');
+};
 
 /**
  * Calculate the UTC offset in minutes for a specific timestamp in a given timezone.
@@ -158,10 +173,6 @@ export const timeAgo = timestamp => moment.unix(timestamp).fromNow();
  * @return {Number|null} Offset in minutes, or null if calculation fails.
  */
 const getTimezoneOffsetForTimestamp = (timestamp, timezoneString) => {
-  if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat === 'undefined') {
-    return null;
-  }
-
   try {
     const date = new Date(timestamp * 1000);
 
@@ -178,6 +189,105 @@ const getTimezoneOffsetForTimestamp = (timestamp, timezoneString) => {
     // Invalid timezone string or other error
     return null;
   }
+};
+
+/**
+ * Get ordinal suffix for a day number.
+ * @param {number} day - Day of month (1-31).
+ * @return {string} Ordinal suffix (st, nd, rd, th).
+ */
+const getOrdinalSuffix = (day) => {
+  if (day >= 11 && day <= 13) return 'th';
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+};
+
+/**
+ * Format a date using PHP date format string.
+ * Uses UTC methods on a pre-adjusted Date object.
+ *
+ * @param {Date} date - Date object (pre-adjusted for target timezone).
+ * @param {string} format - PHP date format string.
+ * @return {string} Formatted date string.
+ */
+const formatPhpDate = (date, format) => {
+  const pad = (num, len = 2) => String(num).padStart(len, '0');
+
+  // PHP format token handlers (using UTC methods since date is pre-adjusted)
+  const tokens = {
+    // Day
+    d: () => pad(date.getUTCDate()),
+    D: () => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getUTCDay()],
+    j: () => date.getUTCDate(),
+    l: () => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getUTCDay()],
+    N: () => date.getUTCDay() || 7,
+    S: () => getOrdinalSuffix(date.getUTCDate()),
+    w: () => date.getUTCDay(),
+    // Month
+    F: () => ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'][date.getUTCMonth()],
+    m: () => pad(date.getUTCMonth() + 1),
+    M: () => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getUTCMonth()],
+    n: () => date.getUTCMonth() + 1,
+    t: () => new Date(date.getUTCFullYear(), date.getUTCMonth() + 1, 0).getDate(),
+    // Year
+    Y: () => date.getUTCFullYear(),
+    y: () => String(date.getUTCFullYear()).slice(-2),
+    // Time
+    a: () => (date.getUTCHours() < 12 ? 'am' : 'pm'),
+    A: () => (date.getUTCHours() < 12 ? 'AM' : 'PM'),
+    g: () => date.getUTCHours() % 12 || 12,
+    G: () => date.getUTCHours(),
+    h: () => pad(date.getUTCHours() % 12 || 12),
+    H: () => pad(date.getUTCHours()),
+    i: () => pad(date.getUTCMinutes()),
+    s: () => pad(date.getUTCSeconds()),
+    // Timezone
+    O: () => {
+      const offset = -date.getTimezoneOffset();
+      const sign = offset >= 0 ? '+' : '-';
+      return `${sign}${pad(Math.floor(Math.abs(offset) / 60))}${pad(Math.abs(offset) % 60)}`;
+    },
+    P: () => {
+      const offset = -date.getTimezoneOffset();
+      const sign = offset >= 0 ? '+' : '-';
+      return `${sign}${pad(Math.floor(Math.abs(offset) / 60))}:${pad(Math.abs(offset) % 60)}`;
+    },
+    // Full formats
+    c: () => date.toISOString(),
+    U: () => Math.floor(date.getTime() / 1000),
+  };
+
+  let result = '';
+  let escaped = false;
+
+  for (let i = 0; i < format.length; i++) {
+    const char = format[i];
+
+    if (char === '\\' && !escaped) {
+      escaped = true;
+      continue;
+    }
+
+    if (escaped) {
+      result += char;
+      escaped = false;
+      continue;
+    }
+
+    if (tokens[char]) {
+      result += tokens[char]();
+    } else {
+      result += char;
+    }
+  }
+
+  return result;
 };
 
 /**
@@ -201,7 +311,12 @@ export const formattedTime = (timestamp, utcOffset, timeFormat, timezoneString =
     }
   }
 
-  return moment.unix(timestamp).utcOffset(offset, false).formatUsingDateTime(timeFormat);
+  // Create a Date adjusted to the target timezone by adding the offset
+  // We use UTC methods in formatPhpDate to avoid local timezone interference
+  const adjustedMs = (timestamp * 1000) + (offset * 60 * 1000);
+  const adjustedDate = new Date(adjustedMs);
+
+  return formatPhpDate(adjustedDate, timeFormat);
 };
 
 export const getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
