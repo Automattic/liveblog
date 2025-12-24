@@ -15,7 +15,7 @@ require_once dirname( __DIR__ ) . '/vendor/yoast/wp-test-utils/src/WPIntegration
 
 // Check for a `--testsuite integration` or `--testsuite=integration` arg when calling phpunit,
 // and use it to conditionally load up WordPress.
-$argv_local     = $GLOBALS['argv'] ?? [];
+$argv_local     = $GLOBALS['argv'] ?? array();
 $key            = (int) array_search( '--testsuite', $argv_local, true );
 $is_integration = false;
 

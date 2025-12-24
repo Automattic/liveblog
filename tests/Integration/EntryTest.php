@@ -1,12 +1,11 @@
 <?php
-
-declare( strict_types=1 );
-
 /**
  * Tests for the Liveblog Entry class.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
+
+declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
@@ -59,7 +58,7 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_insert_should_fire_liveblog_insert_entry(): void {
 		unset( $GLOBALS['liveblog_hook_fired'] );
-		add_action( 'liveblog_insert_entry', [ self::class, 'set_liveblog_hook_fired' ] );
+		add_action( 'liveblog_insert_entry', array( self::class, 'set_liveblog_hook_fired' ) );
 		$this->insert_entry();
 		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
 	}
@@ -71,10 +70,10 @@ final class EntryTest extends TestCase {
 		$entry        = $this->insert_entry();
 		$update_entry = WPCOM_Liveblog_Entry::update(
 			$this->build_entry_args(
-				[
+				array(
 					'entry_id' => $entry->get_id(),
 					'content'  => 'updated',
-				]
+				)
 			)
 		);
 		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
@@ -87,10 +86,10 @@ final class EntryTest extends TestCase {
 		$entry        = $this->insert_entry();
 		$update_entry = WPCOM_Liveblog_Entry::update(
 			$this->build_entry_args(
-				[
+				array(
 					'entry_id' => $entry->get_id(),
 					'content'  => 'updated',
-				]
+				)
 			)
 		);
 		$this->assertEquals( 'update', $update_entry->get_type() );
@@ -101,14 +100,14 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_update_should_fire_liveblog_update_entry(): void {
 		unset( $GLOBALS['liveblog_hook_fired'] );
-		add_action( 'liveblog_update_entry', [ self::class, 'set_liveblog_hook_fired' ] );
+		add_action( 'liveblog_update_entry', array( self::class, 'set_liveblog_hook_fired' ) );
 		$entry = $this->insert_entry();
 		WPCOM_Liveblog_Entry::update(
 			$this->build_entry_args(
-				[
+				array(
 					'entry_id' => $entry->get_id(),
 					'content'  => 'updated',
-				]
+				)
 			)
 		);
 		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
@@ -121,10 +120,10 @@ final class EntryTest extends TestCase {
 		$entry = $this->insert_entry();
 		WPCOM_Liveblog_Entry::update(
 			$this->build_entry_args(
-				[
+				array(
 					'entry_id' => $entry->get_id(),
 					'content'  => 'updated',
-				]
+				)
 			)
 		);
 		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
@@ -136,7 +135,7 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_delete_should_replace_the_content_in_the_query(): void {
 		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
+		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
 		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
 		$this->assertEquals( '', $update_entry->get_content() );
 	}
@@ -146,7 +145,7 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_delete_should_return_entry_with_type_delete(): void {
 		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
+		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
 		$this->assertEquals( 'delete', $update_entry->get_type() );
 	}
 
@@ -155,7 +154,7 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_delete_should_delete_original_entry(): void {
 		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( [ 'entry_id' => $entry->get_id() ] ) );
+		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
 		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
 	}
@@ -169,10 +168,10 @@ final class EntryTest extends TestCase {
 		$user_input      = '<script>alert("xss")</script>';
 		$user_input     .= '<applet code="malicious"></applet>';
 		$user_input     .= '<form><input name="test"></form>';
-		$content         = [
+		$content         = array(
 			'post_id' => 1,
 			'content' => $user_input,
-		];
+		);
 		$live_blog_entry = $this->insert_entry( $content );
 		// Content should be empty or significantly sanitized (scripts/applets/forms removed).
 		$sanitized_content = $live_blog_entry->get_content();
@@ -193,19 +192,19 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_shortcode_excluded_from_entry(): void {
 		// Insert a new entries with a shortcode body content to test each type of shortcode format.
-		$formats = [
+		$formats = array(
 			'[liveblog_key_events]',
 			'[liveblog_key_events][/liveblog_key_events]',
 			'[liveblog_key_events arg="30"]',
 			'[liveblog_key_events arg="30"][/liveblog_key_events]',
 			'[liveblog_key_events]Test Input Inbetween Tags[/liveblog_key_events]',
 			'[liveblog_key_events arg="30"]Test Input Inbetween Tags[/liveblog_key_events]',
-		];
+		);
 
 		// Loop through each format and create a new comment to check if it gets stripped before hitting the DB.
 		foreach ( $formats as $shortcode ) {
 			// Create a new entry.
-			$entry = $this->insert_entry( [ 'content' => $shortcode ] );
+			$entry = $this->insert_entry( array( 'content' => $shortcode ) );
 
 			// Lets setup a Reflection class so we can access the private object properties and check our comment body.
 			$comment = new ReflectionProperty( $entry, 'comment' );
@@ -233,7 +232,7 @@ final class EntryTest extends TestCase {
 	 * @param array $args Arguments for entry.
 	 * @return WPCOM_Liveblog_Entry
 	 */
-	private function insert_entry( array $args = [] ): WPCOM_Liveblog_Entry {
+	private function insert_entry( array $args = array() ): WPCOM_Liveblog_Entry {
 		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
 		return $entry;
 	}
@@ -244,13 +243,13 @@ final class EntryTest extends TestCase {
 	 * @param array $args Arguments to merge.
 	 * @return array
 	 */
-	private function build_entry_args( array $args = [] ): array {
+	private function build_entry_args( array $args = array() ): array {
 		$user     = self::factory()->user->create_and_get();
-		$defaults = [
+		$defaults = array(
 			'post_id' => 1,
 			'content' => 'baba',
 			'user'    => $user,
-		];
+		);
 		return array_merge( $defaults, $args );
 	}
 
@@ -264,9 +263,9 @@ final class EntryTest extends TestCase {
 		// Create a comment with a known GMT date.
 		$gmt_date = '2024-06-15 14:30:00';
 		$comment  = self::factory()->comment->create_and_get(
-			[
+			array(
 				'comment_date_gmt' => $gmt_date,
-			]
+			)
 		);
 
 		$entry = new WPCOM_Liveblog_Entry( $comment );
@@ -286,9 +285,9 @@ final class EntryTest extends TestCase {
 	public function test_get_comment_date_gmt_with_g_format_returns_correct_timestamp(): void {
 		$gmt_date = '2024-12-25 08:00:00';
 		$comment  = self::factory()->comment->create_and_get(
-			[
+			array(
 				'comment_date_gmt' => $gmt_date,
-			]
+			)
 		);
 
 		$entry     = new WPCOM_Liveblog_Entry( $comment );
@@ -305,9 +304,9 @@ final class EntryTest extends TestCase {
 	public function test_get_comment_date_gmt_with_date_format_returns_formatted_string(): void {
 		$gmt_date = '2024-06-15 14:30:00';
 		$comment  = self::factory()->comment->create_and_get(
-			[
+			array(
 				'comment_date_gmt' => $gmt_date,
-			]
+			)
 		);
 
 		$entry = new WPCOM_Liveblog_Entry( $comment );
@@ -339,7 +338,7 @@ final class EntryTest extends TestCase {
 		add_filter(
 			'liveblog_image_allowed_attributes',
 			function ( $attrs ) {
-				return array_merge( $attrs, [ 'class', 'width', 'height' ] );
+				return array_merge( $attrs, array( 'class', 'width', 'height' ) );
 			}
 		);
 
@@ -363,7 +362,7 @@ final class EntryTest extends TestCase {
 		add_filter(
 			'liveblog_image_allowed_attributes',
 			function () {
-				return [ 'src', 'alt', 'data-*' ];
+				return array( 'src', 'alt', 'data-*' );
 			}
 		);
 
@@ -383,7 +382,7 @@ final class EntryTest extends TestCase {
 	 * Test that filter_image_attributes allows all attributes with wildcard.
 	 */
 	public function test_filter_image_attributes_allow_all(): void {
-		add_filter( 'liveblog_image_allowed_attributes', fn() => [ '*' ] );
+		add_filter( 'liveblog_image_allowed_attributes', fn() => array( '*' ) );
 
 		$content  = '<img src="test.jpg" alt="Test" class="wp-image" width="100" data-id="123">';
 		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
@@ -416,7 +415,7 @@ final class EntryTest extends TestCase {
 	 * @param array $args     Arguments for comment.
 	 * @return object
 	 */
-	private function create_and_get_comment_with_replaces( int $replaces, array $args = [] ): object {
+	private function create_and_get_comment_with_replaces( int $replaces, array $args = array() ): object {
 		$comment = self::factory()->comment->create_and_get( $args );
 		add_comment_meta( $comment->comment_ID, WPCOM_Liveblog_Entry::REPLACES_META_KEY, $replaces );
 		return $comment;

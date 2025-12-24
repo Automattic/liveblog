@@ -1,12 +1,11 @@
 <?php
-
-declare( strict_types=1 );
-
 /**
  * Integration tests for the liveblog_cache_endpoint_base filter.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
+
+declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 

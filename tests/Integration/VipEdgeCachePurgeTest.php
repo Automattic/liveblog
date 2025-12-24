@@ -1,12 +1,11 @@
 <?php
-
-declare( strict_types=1 );
-
 /**
  * Integration tests for VIP edge cache purging.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
+
+declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
@@ -155,10 +154,12 @@ final class VipEdgeCachePurgeTest extends TestCase {
 			$purged_urls = &$this->purged_urls;
 
 			// Define the function in global namespace.
-			eval( 'function wpcom_vip_purge_edge_cache_for_url( $url ) {
+			eval(
+				'function wpcom_vip_purge_edge_cache_for_url( $url ) {
 				global $wpcom_vip_liveblog_test_purged_urls;
 				$wpcom_vip_liveblog_test_purged_urls[] = $url;
-			}' );
+			}' 
+			);
 		}
 
 		// Use a global to track purged URLs since we can't use $this in eval.

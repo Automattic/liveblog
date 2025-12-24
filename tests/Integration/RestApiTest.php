@@ -1,12 +1,11 @@
 <?php
-
-declare( strict_types=1 );
-
 /**
  * Tests for the Liveblog REST API.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
+
+declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
@@ -71,7 +70,7 @@ final class RestApiTest extends TestCase {
 
 		$collection = $wp_filter[ $hook_name ];
 
-		$test_array = [];
+		$test_array = array();
 
 		foreach ( $collection as $value ) {
 			$test_array = array_merge( $test_array, $value );
@@ -243,7 +242,7 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_crud_action_insert(): void {
 		$user  = self::factory()->user->create_and_get();
-		$args  = [ 'user' => $user ];
+		$args  = array( 'user' => $user );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
 
 		$this->assertIsArray( $entry );
@@ -256,10 +255,10 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_crud_action_update(): void {
 		$new_entry = $this->setup_entry_test_state();
-		$args      = [
+		$args      = array(
 			'entry_id' => $new_entry[0]->get_id(),
 			'content'  => 'Updated Test Liveblog entry',
-		];
+		);
 		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
 
 		$this->assertIsArray( $entry );
@@ -280,7 +279,7 @@ final class RestApiTest extends TestCase {
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete it.
-		$args = [ 'entry_id' => $new_entry_id ];
+		$args = array( 'entry_id' => $new_entry_id );
 		WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
 
 		// Check that it was sent to the trash.
@@ -294,11 +293,11 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_crud_action_delete_key(): void {
 		// First create an entry with a key.
-		$new_entry    = $this->setup_entry_test_state( 1, [ 'content' => 'Test Liveblog entry with /key' ] );
+		$new_entry    = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
 		$new_entry_id = $new_entry[0]->get_id();
 
 		// Then delete the key.
-		$args  = [ 'entry_id' => $new_entry_id ];
+		$args  = array( 'entry_id' => $new_entry_id );
 		$entry = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
 
 		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error.
@@ -341,11 +340,11 @@ final class RestApiTest extends TestCase {
 
 		// Create a temporary hashtag.
 		self::factory()->term->create(
-			[
+			array(
 				'name'     => 'coolhashtag',
 				'taxonomy' => 'hashtags',
 				'slug'     => 'coolhashtag',
-			]
+			)
 		);
 
 		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag.
@@ -366,12 +365,12 @@ final class RestApiTest extends TestCase {
 		$state = 'enable';
 
 		// Additional request variables used in the liveblog_admin_settings_update action.
-		$request_vars = [
+		$request_vars = array(
 			'state'                        => $state,
 			'liveblog-key-template-name'   => 'list',
 			'liveblog-key-template-format' => 'full',
 			'liveblog-key-limit'           => '5',
-		];
+		);
 
 		// Save post state and return the metabox markup.
 		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
@@ -416,7 +415,7 @@ final class RestApiTest extends TestCase {
 		self::factory()->post->create();
 
 		// The POST data to insert.
-		$post_vars = $this->build_entry_args( [ 'crud_action' => 'insert' ] );
+		$post_vars = $this->build_entry_args( array( 'crud_action' => 'insert' ) );
 
 		// Try to access the endpoint and insert an entry.
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud' );
@@ -485,7 +484,7 @@ final class RestApiTest extends TestCase {
 		$this->set_author_user();
 
 		// The POST data to preview.
-		$post_vars = [ 'entry_content' => 'Test Liveblog entry with /key' ];
+		$post_vars = array( 'entry_content' => 'Test Liveblog entry with /key' );
 
 		// Try to access the endpoint.
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/preview' );
@@ -509,17 +508,17 @@ final class RestApiTest extends TestCase {
 
 		// Create 2 authors.
 		self::factory()->user->create(
-			[
+			array(
 				'role'         => 'author',
 				'display_name' => 'Josh Smith',
-			]
+			)
 		);
 
 		self::factory()->user->create(
-			[
+			array(
 				'role'         => 'author',
 				'display_name' => 'John Doe',
-			]
+			)
 		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
@@ -541,18 +540,18 @@ final class RestApiTest extends TestCase {
 
 		// Create 2 hashtags.
 		self::factory()->term->create(
-			[
+			array(
 				'name'     => 'coolhashtag',
 				'taxonomy' => 'hashtags',
 				'slug'     => 'coolhashtag',
-			]
+			)
 		);
 		self::factory()->term->create(
-			[
+			array(
 				'name'     => 'coolhashtag2',
 				'taxonomy' => 'hashtags',
 				'slug'     => 'coolhashtag2',
-			]
+			)
 		);
 
 		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
@@ -576,12 +575,12 @@ final class RestApiTest extends TestCase {
 		$post = self::factory()->post->create_and_get();
 
 		// The POST data.
-		$post_vars = [
+		$post_vars = array(
 			'state'           => 'enable',
 			'template_name'   => 'list',
 			'template_format' => 'full',
 			'limit'           => '5',
-		];
+		);
 
 		// Try to access the endpoint.
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
@@ -604,12 +603,12 @@ final class RestApiTest extends TestCase {
 		$post = self::factory()->post->create_and_get();
 
 		// The POST data.
-		$post_vars = [
+		$post_vars = array(
 			'state'           => 'enable',
 			'template_name'   => 'list',
 			'template_format' => 'full',
 			'limit'           => '5',
-		];
+		);
 
 		// Try to access the endpoint to set the post as a liveblog.
 		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
@@ -630,10 +629,10 @@ final class RestApiTest extends TestCase {
 
 		// The POST data to insert.
 		$post_vars = $this->build_entry_args(
-			[
+			array(
 				'crud_action' => 'insert',
 				'post_id'     => $post_id,
-			]
+			)
 		);
 
 		// Try to access the endpoint and insert an entry.
@@ -684,7 +683,7 @@ final class RestApiTest extends TestCase {
 	 * @param array $args              Arguments.
 	 * @return array Array of entries.
 	 */
-	private function setup_entry_test_state( int $number_of_entries = 1, array $args = [] ): array {
+	private function setup_entry_test_state( int $number_of_entries = 1, array $args = array() ): array {
 		$entries = $this->insert_entries( $number_of_entries, $args );
 
 		$this->set_liveblog_vars();
@@ -707,8 +706,8 @@ final class RestApiTest extends TestCase {
 	 * @param array $args              Arguments.
 	 * @return array Array of entries.
 	 */
-	private function insert_entries( int $number_of_entries = 1, array $args = [] ): array {
-		$entries = [];
+	private function insert_entries( int $number_of_entries = 1, array $args = array() ): array {
+		$entries = array();
 
 		$user         = self::factory()->user->create_and_get();
 		$args['user'] = $user;
@@ -726,11 +725,11 @@ final class RestApiTest extends TestCase {
 	 * @param array $args Arguments.
 	 * @return array Merged arguments.
 	 */
-	private function build_entry_args( array $args = [] ): array {
-		$defaults = [
+	private function build_entry_args( array $args = array() ): array {
+		$defaults = array(
 			'post_id' => 1,
 			'content' => 'Test Liveblog entry',
-		];
+		);
 		return array_merge( $defaults, $args );
 	}
 
@@ -738,7 +737,7 @@ final class RestApiTest extends TestCase {
 	 * Create and author and set it as the current user.
 	 */
 	private function set_author_user(): void {
-		$author_id = self::factory()->user->create( [ 'role' => 'author' ] );
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
 
 		wp_set_current_user( $author_id );
 	}
@@ -754,7 +753,7 @@ final class RestApiTest extends TestCase {
 
 		// Make the new post a liveblog.
 		$state        = 'enable';
-		$request_vars = [ 'state' => $state ];
+		$request_vars = array( 'state' => $state );
 		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		return $post_id;

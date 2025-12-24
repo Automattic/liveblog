@@ -1,12 +1,11 @@
 <?php
-
-declare( strict_types=1 );
-
 /**
  * Unit tests for the main Liveblog class.
  *
  * @package Automattic\Liveblog\Tests\Unit
  */
+
+declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Unit;
 
