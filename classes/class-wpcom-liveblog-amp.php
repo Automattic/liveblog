@@ -23,7 +23,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		// Hook at template_redirect level as some Liveblog hooks require it.
-		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
+		add_action( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
 
 		// Add query vars to support pagination and single entries.
 		add_filter( 'query_vars', array( __CLASS__, 'add_custom_query_vars' ), 10 );
