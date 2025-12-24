@@ -1,3 +1,11 @@
+<?php
+/**
+ * Template for liveblog key events admin settings.
+ *
+ * @package Liveblog
+ */
+
+?>
 <hr/>
 <p>
 	<label for="liveblog-key-template-name"><?php echo esc_html( $key_name ); ?> </label>

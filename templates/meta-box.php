@@ -1,4 +1,10 @@
 <?php
+/**
+ * Template for liveblog meta box.
+ *
+ * @package Liveblog
+ */
+
 	$meta_box_allowed_tags = array(
 		'select' => array(
 			'id'    => array(),

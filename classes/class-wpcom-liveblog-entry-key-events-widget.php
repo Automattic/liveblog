@@ -1,4 +1,9 @@
 <?php
+/**
+ * Key Events Widget for liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Key_Events_Widget
@@ -43,8 +48,8 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	/**
 	 * Output the list of key events for the current post.
 	 *
-	 * @param array $args
-	 * @param array $instance
+	 * @param array $args     Widget arguments.
+	 * @param array $instance Widget instance data.
 	 *
 	 * @return void
 	 */

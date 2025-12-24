@@ -1,4 +1,9 @@
 <?php
+/**
+ * Authors autocomplete feature for liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Extend_Feature_Authors
@@ -37,13 +42,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function load() {
 
-		// Allow plugins, themes, etc. to change
-		// the generated author class.
+		// Allow plugins, themes, etc. to change the generated author class.
 		$this->class_prefix = apply_filters( 'liveblog_author_class', $this->class_prefix );
 
-		// This is the regex used to revert the
-		// generated author html back to the
-		// raw input format (e.g @author).
+		// This is the regex used to revert the generated author html back to
+		// the raw input format (e.g. @author).
 		$this->revert_regex = implode(
 			'',
 			array(
@@ -61,20 +64,18 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		// Allow plugins, themes, etc. to change the revert regex.
 		$this->revert_regex = apply_filters( 'liveblog_author_revert_regex', $this->revert_regex );
 
-		// We hook into the comment_class filter to
-		// be able to alter the comment content.
+		// Hook into the comment_class filter to alter the comment content.
 		add_filter( 'comment_class', array( $this, 'add_author_class_to_entry' ), 10, 3 );
 
-		// Add an ajax endpoint to find the authors
-		// which is to be used on the front end.
+		// Add an ajax endpoint to find authors for frontend autocomplete.
 		add_action( 'wp_ajax_liveblog_authors', array( $this, 'ajax_authors' ) );
 	}
 
 	/**
 	 * Gets the autocomplete config.
 	 *
-	 * @param array $config
-	 * @return array
+	 * @param array $config The existing autocomplete configuration.
+	 * @return array Updated configuration.
 	 */
 	public function get_config( $config ) {
 
@@ -84,9 +85,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors' );
 		}
 
-		// Add our config to the front end autocomplete
-		// config, after first allowing other plugins,
-		// themes, etc. to modify it as required
+		// Add config to frontend autocomplete after allowing modifications.
 		$config[] = apply_filters(
 			'liveblog_author_config',
 			array(
@@ -110,8 +109,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	/**
 	 * Filters the input.
 	 *
-	 * @param mixed $entry
-	 * @return mixed
+	 * @param array $entry The liveblog entry.
+	 * @return array Filtered entry.
 	 */
 	public function filter( $entry ) {
 
@@ -121,14 +120,11 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'fields'     => array( 'user_nicename' ),
 		);
 
-		// Map the authors and store them on the object
-		// for use in another function, we need
-		// them to be lowercased.
+		// Map authors and store them on the object for use in callback.
 		$authors       = apply_filters( 'liveblog_author_list', get_users( $args ), '' );
 		$this->authors = array_map( array( $this, 'map_authors' ), $authors );
 
-		// Map over every match and apply it via the
-		// preg_replace_callback method.
+		// Map over every match via the preg_replace_callback method.
 		$entry['content'] = preg_replace_callback(
 			$this->get_regex(),
 			array( $this, 'preg_replace_callback' ),
@@ -141,8 +137,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	/**
 	 * Maps the authors.
 	 *
-	 * @param string $author
-	 * @return string
+	 * @param object $author The author user object.
+	 * @return string Lowercased nicename.
 	 */
 	public function map_authors( $author ) {
 		return strtolower( $author->user_nicename );
@@ -151,52 +147,50 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	/**
 	 * The preg replace callback for the filter.
 	 *
-	 * @param array $match
-	 * @return string
+	 * @param array $regex_match The regex match array.
+	 * @return string Replacement string.
 	 */
-	public function preg_replace_callback( $match ) {
+	public function preg_replace_callback( $regex_match ) {
 
 		// Allow any plugins, themes, etc. to modify the match.
-		$author = apply_filters( 'liveblog_author', $match[2] );
+		$author = apply_filters( 'liveblog_author', $regex_match[2] );
 
-		// If the match isn't actually an author then we can
-		// safely say that this doesn't need to be matched.
+		// If the match isn't an author, return unchanged.
 		if ( ! in_array( $author, $this->authors, true ) ) {
-			return $match[0];
+			return $regex_match[0];
 		}
 
 		// Get the user object to retrieve display name.
 		$user         = get_user_by( 'slug', $author );
 		$display_name = $user ? $user->display_name : $author;
 
-		// Replace the @author content with a link to
-		// the author's post listing page, using display name as anchor text.
+		// Replace @author with a link to the author's post listing page.
 		return str_replace(
-			$match[1],
+			$regex_match[1],
 			'<a href="' . get_author_posts_url( -1, $author ) . '" class="liveblog-author ' . $this->class_prefix . $author . '">' . esc_html( $display_name ) . '</a>',
-			$match[0]
+			$regex_match[0]
 		);
 	}
 
 	/**
 	 * Reverts the input.
 	 *
-	 * @param mixed $content
-	 * @return mixed
+	 * @param string $content The content to revert.
+	 * @return string Reverted content.
 	 */
 	public function revert( $content ) {
 		return preg_replace( '~' . $this->revert_regex . '~', '@$1', $content );
 	}
 
 	/**
-	 * Adds author-{author} class to entry
+	 * Adds author-{author} class to entry.
 	 *
-	 * @param array  $classes
-	 * @param string $class
-	 * @param int    $comment_id
-	 * @return array
+	 * @param array  $classes    The existing classes.
+	 * @param string $css_class  The class name.
+	 * @param int    $comment_id The comment ID.
+	 * @return array Updated classes.
 	 */
-	public function add_author_class_to_entry( $classes, $class, $comment_id ) {
+	public function add_author_class_to_entry( $classes, $css_class, $comment_id ) {
 		$authors = array();
 		$comment = get_comment( $comment_id );
 
@@ -214,15 +208,17 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	}
 
 	/**
-	 * Returns an array of authors
+	 * Returns an array of authors.
 	 *
-	 * @return array
+	 * @return void Outputs JSON and exits.
 	 */
 	public function ajax_authors() {
 
 		// Sanitize the input safely.
-		if ( isset( $_GET['autocomplete'] ) ) { // input var ok
-			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // input var ok
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
+		if ( isset( $_GET['autocomplete'] ) ) {
+			$term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) );
+		// phpcs:enable
 		} else {
 			$term = '';
 		}
@@ -234,6 +230,12 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		exit;
 	}
 
+	/**
+	 * Get authors matching a search term.
+	 *
+	 * @param string $term The search term.
+	 * @return array Array of authors.
+	 */
 	public function get_authors( $term ) {
 
 		// The args used in the get_users query.
@@ -243,10 +245,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			'number'     => 10,
 		);
 
-		// If there is no search term then search
-		// for nothing to get everything.
-		// If there is a search term, then append
-		// '*' to match chars after the term.
+		// If there is a search term, append '*' to match chars after the term.
 		if ( strlen( trim( $term ) ) > 0 ) {
 			$args['search'] = $term . '*';
 		}
@@ -261,8 +260,8 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	/**
 	 * Maps the authors for ajax.
 	 *
-	 * @param string $author
-	 * @return string
+	 * @param object $author The author user object.
+	 * @return array Author data array.
 	 */
 	public function map_ajax_authors( $author ) {
 		return array(

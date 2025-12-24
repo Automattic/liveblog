@@ -1,12 +1,16 @@
 <?php
+/**
+ * Cron functionality for liveblog auto-archiving.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Cron
  *
- * This class integrates with the WP CRON API to handle Housekeeping for the plugin
+ * This class integrates with the WP CRON API to handle Housekeeping for the plugin.
  * It registers hooks to handle automated tasks across the plugin.
  */
-
 class WPCOM_Liveblog_Cron {
 
 	/**
@@ -38,7 +42,7 @@ class WPCOM_Liveblog_Cron {
 	 */
 	public static function execute_auto_archive_housekeeping() {
 
-		// If Auto Archive is enabled,
+		// If Auto Archive is enabled.
 		if ( null !== WPCOM_Liveblog::$auto_archive_days ) {
 			$posts = new WP_Query(
 				array(
@@ -52,7 +56,7 @@ class WPCOM_Liveblog_Cron {
 				$post_id = $post->ID;
 
 				// Lets grab todays day, convert it to a timestamp and look for any set auto archive date.
-				$today  = strtotime( date( 'Y-m-d H:i:s' ) );
+				$today  = strtotime( gmdate( 'Y-m-d H:i:s' ) );
 				$expiry = get_post_meta( $post_id, WPCOM_Liveblog::$auto_archive_expiry_key, true );
 
 				// if we have an expiry date lets compare them and if the

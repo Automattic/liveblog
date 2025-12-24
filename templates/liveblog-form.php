@@ -1,3 +1,11 @@
+<?php
+/**
+ * Template for liveblog entry form.
+ *
+ * @package Liveblog
+ */
+
+?>
 <div id="liveblog-messages">
 </div>
 <script type="text/template" id="liveblog-form-template">

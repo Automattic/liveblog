@@ -1,4 +1,9 @@
 <?php
+/**
+ * SDK loader for embedded content in liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Embed_SDKs
@@ -8,7 +13,9 @@
 class WPCOM_Liveblog_Entry_Embed_SDKs {
 
 	/**
-	 * @var A list of provider SDKs
+	 * A list of provider SDKs.
+	 *
+	 * @var array
 	 */
 	protected static $sdks = array(
 		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
@@ -39,18 +46,18 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 		}
 
 		foreach ( self::$sdks as $name => $url ) {
-			// Don't attach version with reddit js script file, it will generate 404 error with reddit js
+			// Don't attach version with Reddit JS script file, it will generate 404 error.
 			$version = 'reddit' === $name ? null : WPCOM_Liveblog::VERSION;
 			wp_enqueue_script( $name, esc_url( $url ), array(), $version, false );
 		}
 	}
 
 	/**
-	 * Set are scripts to use async
+	 * Set scripts to use async.
 	 *
-	 * @param type $tag
-	 * @param type $handle
-	 * @return type
+	 * @param string $tag    The script tag.
+	 * @param string $handle The script handle.
+	 * @return string Modified script tag.
 	 */
 	public static function add_async_attribute( $tag, $handle ) {
 		if ( ! in_array( $handle, array_keys( self::$sdks ), true ) ) {

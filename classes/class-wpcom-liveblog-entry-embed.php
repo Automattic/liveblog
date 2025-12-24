@@ -1,4 +1,9 @@
 <?php
+/**
+ * Embed handling for liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Embed
@@ -7,8 +12,11 @@
  */
 class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 
+	/**
+	 * Constructor. Does nothing for now.
+	 */
 	public function __construct() {
-		return; // nothing happens during __construct for now
+		// Nothing happens during __construct for now.
 	}
 
 	/**
@@ -35,7 +43,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 *     @type int $height Height of the embed in pixels.
 	 * }
 	 * @param string $url The URL attempting to be embedded.
-	 * @param int    $comment_id The Comment ID of currently processed comment
+	 * @param int    $comment The Comment ID of currently processed comment.
 	 * @return string|false The embed HTML on success, otherwise the original URL.
 	 *                      `->maybe_make_link()` can return false on failure.
 	 */
@@ -62,18 +70,18 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 
 		$this->last_attr = $attr;
 
-		// kses converts & into &amp; and we need to undo this
-		// See https://core.trac.wordpress.org/ticket/11311
+		// kses converts & into &amp; and we need to undo this.
+		// See https://core.trac.wordpress.org/ticket/11311.
 		$url = str_replace( '&amp;', '&', $url );
 
-		// Look for known internal handlers
+		// Look for known internal handlers.
 		$handlers = $this->handlers;
-		// check for handlers registered for wp_embed class using all the helper functions
+		// Check for handlers registered for wp_embed class using all the helper functions.
 		if ( true === isset( $GLOBALS['wp_embed'] )
 			&& is_a( $GLOBALS['wp_embed'], 'WP_Embed' )
 			&& is_array( $GLOBALS['wp_embed']->handlers )
 		) {
-			// marge those in a single array
+			// Merge those in a single array.
 			$handlers = array_replace_recursive( $GLOBALS['wp_embed']->handlers, $this->handlers );
 		}
 		ksort( $handlers );
@@ -91,21 +99,21 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 						 * @param string $url    The attempted embed URL.
 						 * @param array  $attr   An array of shortcode attributes.
 						 */
-						return apply_filters( 'embed_handler_html', $return, $url, $attr );
+						return apply_filters( 'embed_handler_html', $return, $url, $attr ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP hook.
 					}
 				}
 			}
 		}
 
 		$comment_id = ( ! empty( $comment->comment_ID ) ) ? $comment->comment_ID : null;
-		if ( ! empty( $this->comment_ID ) ) { // Potentially set by WPCOM_Comments_Embed::autoembed()
+		if ( ! empty( $this->comment_ID ) ) { // Potentially set by WPCOM_Comments_Embed::autoembed().
 			$comment_id = $this->comment_ID;
 		}
 
 		// Unknown URL format. Let oEmbed have a go.
 		if ( $comment_id ) {
 
-			// Check for a cached result (stored in the comment meta)
+			// Check for a cached result (stored in the comment meta).
 			$key_suffix    = md5( $url . wp_json_encode( $attr ) );
 			$cachekey      = '_oembed_' . $key_suffix;
 			$cachekey_time = '_oembed_time_' . $key_suffix;
@@ -118,7 +126,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 			 * @param array  $attr       An array of shortcode attributes.
 			 * @param int    $comment_id Comment ID.
 			 */
-			$ttl = apply_filters( 'oembed_ttl', DAY_IN_SECONDS, $url, $attr, $comment_id );
+			$ttl = apply_filters( 'oembed_ttl', DAY_IN_SECONDS, $url, $attr, $comment_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP hook.
 
 			$cache      = get_comment_meta( $comment_id, $cachekey, true );
 			$cache_time = get_comment_meta( $comment_id, $cachekey_time, true );
@@ -161,7 +169,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 					 * @param array  $attr       An array of shortcode attributes.
 					 * @param int    $comment_id Comment ID.
 					 */
-					return apply_filters( 'embed_oembed_html', $cache, $url, $attr, $comment_id );
+					return apply_filters( 'embed_oembed_html', $cache, $url, $attr, $comment_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP hook.
 				}
 			}
 
@@ -172,12 +180,12 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 			 *
 			 * @param bool $enable Whether to enable `<link>` tag discovery. Default true.
 			 */
-			$attr['discover'] = ( apply_filters( 'embed_oembed_discover', true ) );
+			$attr['discover'] = ( apply_filters( 'embed_oembed_discover', true ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP hook.
 
-			// Use oEmbed to get the HTML
+			// Use oEmbed to get the HTML.
 			$html = wp_oembed_get( $url, $attr );
 
-			// Maybe cache the result
+			// Maybe cache the result.
 			if ( $html ) {
 				update_comment_meta( $comment_id, $cachekey, $html );
 				update_comment_meta( $comment_id, $cachekey_time, time() );
@@ -185,7 +193,7 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 				update_comment_meta( $comment_id, $cachekey, '{{unknown}}' );
 			}
 
-			// If there was a result, return it
+			// If there was a result, return it.
 			if ( $html ) {
 				/**
 				 * Filter the cached oEmbed HTML.
@@ -197,11 +205,11 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 				 * @param array  $attr       An array of shortcode attributes.
 				 * @param int    $comment_id Comment ID.
 				 */
-				return apply_filters( 'embed_oembed_html', $html, $url, $attr, $comment_id );
+				return apply_filters( 'embed_oembed_html', $html, $url, $attr, $comment_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP hook.
 			}
 		}
 
-		// Still unknown
+		// Still unknown.
 		return $this->maybe_make_link( $url );
 	}
 
@@ -248,16 +256,16 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	/**
 	 * Callback function for WP_Embed::autoembed().
 	 *
-	 * @param array $match A regex match array.
+	 * @param array $regex_match A regex match array.
 	 * @return string The embed HTML on success, otherwise the original URL.
 	 */
-	public function autoembed_callback( $match ) {
+	public function autoembed_callback( $regex_match ) {
 		$oldval              = $this->linkifunknown;
 		$this->linkifunknown = false;
-		$return              = $this->shortcode( array(), $match[2] );
+		$return              = $this->shortcode( array(), $regex_match[2] );
 		$this->linkifunknown = $oldval;
 
-		return $match[1] . $return . $match[3];
+		return $regex_match[1] . $return . $regex_match[3];
 	}
 
 	/**
@@ -266,11 +274,11 @@ class WPCOM_Liveblog_Entry_Embed extends WP_Embed {
 	 * @uses WP_Embed::autoembed_callback()
 	 *
 	 * @param string         $content The content to be searched.
-	 * @param int|WP_Comment $comment object or integer representing the Comment ID
+	 * @param int|WP_Comment $comment Object or integer representing the Comment ID.
 	 * @return string Potentially modified $content.
 	 */
 	public function autoembed( $content, $comment = null ) {
-		// Save comment's ID for later use - needed for Liveblog plugin compatibility as it calls the autoembed method directly
+		// Save comment's ID for later use. Needed for Liveblog plugin compatibility as it calls the autoembed method directly.
 		if ( ! empty( $comment ) ) {
 			$comment = get_comment( $comment );
 			if ( is_a( $comment, 'WP_Comment' ) ) {

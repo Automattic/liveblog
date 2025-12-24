@@ -1,4 +1,9 @@
 <?php
+/**
+ * Key events functionality for liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Key_Events
@@ -11,16 +16,44 @@
 class WPCOM_Liveblog_Entry_Key_Events {
 
 	/**
-	 * Set the meta_key and meta_value
+	 * Meta key for key entries.
+	 *
+	 * @var string
 	 */
-	const META_KEY          = 'liveblog_key_entry';
-	const META_VALUE        = 'true';
-	const META_KEY_TEMPLATE = '_liveblog_key_entry_template';
-	const META_KEY_FORMAT   = '_liveblog_key_entry_format';
-	const META_KEY_LIMIT    = '_liveblog_key_entry_limit';
+	const META_KEY = 'liveblog_key_entry';
 
 	/**
-	 * Template to render entries
+	 * Meta value for key entries.
+	 *
+	 * @var string
+	 */
+	const META_VALUE = 'true';
+
+	/**
+	 * Meta key for template.
+	 *
+	 * @var string
+	 */
+	const META_KEY_TEMPLATE = '_liveblog_key_entry_template';
+
+	/**
+	 * Meta key for format.
+	 *
+	 * @var string
+	 */
+	const META_KEY_FORMAT = '_liveblog_key_entry_format';
+
+	/**
+	 * Meta key for limit.
+	 *
+	 * @var string
+	 */
+	const META_KEY_LIMIT = '_liveblog_key_entry_limit';
+
+	/**
+	 * Available templates to render entries.
+	 *
+	 * @var array
 	 */
 	protected static $available_templates = array(
 		'timeline' => array( 'liveblog-key-single-timeline.php', 'ul', 'liveblog-key-timeline' ),
@@ -28,7 +61,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	);
 
 	/**
-	 * Available content formats
+	 * Available content formats.
+	 *
+	 * @var array
 	 */
 	protected static $available_formats = array(
 		'first-linebreak' => array( __CLASS__, 'format_content_first_linebreak' ),
@@ -39,6 +74,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Called by WPCOM_Liveblog::load(), it attaches the
 	 * new command and shortcode.
+	 *
+	 * @return void
 	 */
 	public static function load() {
 
@@ -72,7 +109,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 	/**
 	 * Add templates for the key events on init
-	 * so theme templates can add their own
+	 * so theme templates can add their own.
+	 *
+	 * @return void
 	 */
 	public static function add_templates() {
 
@@ -89,8 +128,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * Adds the /key command and sets which function
 	 * is to handle the action.
 	 *
-	 * @param $commands
-	 * @return mixed
+	 * @param array $commands The existing commands.
+	 * @return array Modified commands.
 	 */
 	public static function add_key_command( $commands ) {
 
@@ -101,10 +140,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Check if entry is key event by checking its meta
+	 * Check if entry is key event by checking its meta.
 	 *
-	 * @param $id
-	 * @return mixed
+	 * @param int $id The entry ID.
+	 * @return bool True if key event.
 	 */
 	public static function is_key_event( $id ) {
 		if ( self::META_VALUE === get_comment_meta( $id, self::META_KEY, true ) ) {
@@ -117,18 +156,21 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 * Called when the /key command is used in an entry,
 	 * it attaches meta to set it as a key entry.
 	 *
-	 * @param $content
-	 * @param $id
-	 * @param $post_id
+	 * @param string $content The entry content.
+	 * @param int    $id      The entry ID.
+	 * @param int    $post_id The post ID.
+	 * @return void
 	 */
-	public static function add_key_action( $content, $id, $post_id ) {
+	public static function add_key_action( $content, $id, $post_id ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by liveblog_command_key_after action signature.
 		add_comment_meta( $id, self::META_KEY, self::META_VALUE );
 	}
 
 	/**
-	 * Remove key event entry
+	 * Remove key event entry.
 	 *
-	 * @param $id
+	 * @param string $content The entry content.
+	 * @param int    $id      The entry ID.
+	 * @return string Modified content.
 	 */
 	public static function remove_key_action( $content, $id ) {
 		delete_comment_meta( $id, self::META_KEY, self::META_VALUE );
@@ -136,24 +178,24 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Pass a separate template for key event shortcode
+	 * Pass a separate template for key event shortcode.
 	 *
-	 * @param $entry
-	 * @param $object
-	 * @return mixed
+	 * @param array                $entry        The entry data.
+	 * @param WPCOM_Liveblog_Entry $entry_object The entry object.
+	 * @return array Modified entry data.
 	 */
-	public static function render_key_template( $entry, $object ) {
+	public static function render_key_template( $entry, $entry_object ) {
 
-		// We need the post_id to get it's template.
-		$post_id = $object->get_post_id();
+		// We need the post_id to get its template.
+		$post_id = $entry_object->get_post_id();
 
-		// Get the entry content
-		$content = $object->get_content();
+		// Get the entry content.
+		$content = $entry_object->get_content();
 
-		// Set if key event
+		// Set if key event.
 		$entry['key_event'] = self::is_key_event( $entry['id'] );
 
-		// If key event add content
+		// If key event add content.
 		if ( $entry['key_event'] ) {
 			$entry['key_event_content'] = self::get_formatted_content( $content, $post_id );
 		}
@@ -163,10 +205,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 	/**
 	 * Handle the save of the admin options related
-	 * to the key events template box
+	 * to the key events template box.
 	 *
-	 * @param $response
-	 * @param $post_id
+	 * @param array $response The response data.
+	 * @param int   $post_id  The post ID.
+	 * @return void
 	 */
 	public static function save_template_option( $response, $post_id ) {
 
@@ -197,7 +240,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 			// Store this format on the post.
 			update_post_meta( $post_id, self::META_KEY_FORMAT, $format );
 
-			// If isn't a valid number turns it into 0, which returns all key events
+			// If isn't a valid number turns it into 0, which returns all key events.
 			$limit = absint( $response['liveblog-key-limit'] );
 			if ( isset( $limit ) ) {
 				update_post_meta( $post_id, self::META_KEY_LIMIT, $limit );
@@ -206,11 +249,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Add a input for the user to pick a template.
+	 * Add an input for the user to pick a template.
 	 *
-	 * @param $extra_fields
-	 * @param $post_id
-	 * @return array
+	 * @param array $extra_fields The existing extra fields.
+	 * @param int   $post_id      The post ID.
+	 * @return array Modified extra fields.
 	 */
 	public static function add_admin_options( $extra_fields, $post_id ) {
 
@@ -235,10 +278,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Returns the current for template for that post
+	 * Returns the current template for that post.
 	 *
-	 * @param $post_id
-	 * @return mixed
+	 * @param int $post_id The post ID.
+	 * @return array The template configuration.
 	 */
 	public static function get_current_template( $post_id ) {
 
@@ -255,10 +298,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Returns the current format of content
+	 * Returns the current format of content.
 	 *
-	 * @param $post_id
-	 * @return mixed
+	 * @param int $post_id The post ID.
+	 * @return callable|false The format callback or false.
 	 */
 	public static function get_current_format( $post_id ) {
 
@@ -277,9 +320,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Calls the function to format the content.
 	 *
-	 * @param $content
-	 * @param $post_id
-	 * @return mixed
+	 * @param string $content The content to format.
+	 * @param int    $post_id The post ID.
+	 * @return string Formatted content.
 	 */
 	public static function get_formatted_content( $content, $post_id ) {
 
@@ -294,10 +337,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Grab first sentence
+	 * Grab first sentence.
 	 *
-	 * @param $content
-	 * @return string
+	 * @param string $content The content to format.
+	 * @return string Formatted content.
 	 */
 	public static function format_content_first_sentence( $content ) {
 
@@ -312,10 +355,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 
 
 	/**
-	 * Grab first paragraph/linebreak
+	 * Grab first paragraph/linebreak.
 	 *
-	 * @param $content
-	 * @return string
+	 * @param string $content The content to format.
+	 * @return string Formatted content.
 	 */
 	public static function format_content_first_linebreak( $content ) {
 
@@ -332,10 +375,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
-	 * Builds the box to display key entries
+	 * Builds the box to display key entries.
 	 *
-	 * @param $atts
-	 * @return mixed
+	 * @param array $atts The shortcode attributes.
+	 * @return string|null The shortcode output.
 	 */
 	public static function shortcode( $atts ) {
 		global $post;
@@ -392,7 +435,7 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	/**
 	 * Get all key events.
 	 *
-	 * @return array
+	 * @return array Array of key events.
 	 */
 	public static function all() {
 		$query      = new WPCOM_Liveblog_Entry_Query( WPCOM_Liveblog::$post_id, WPCOM_Liveblog::KEY );

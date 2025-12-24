@@ -1,9 +1,14 @@
 <?php
+/**
+ * Adds AMP support for Liveblog.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_AMP
  *
- * Adds AMP support for Liveblog
+ * Adds AMP support for Liveblog.
  */
 class WPCOM_Liveblog_AMP {
 
@@ -13,7 +18,9 @@ class WPCOM_Liveblog_AMP {
 	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by WPCOM_Liveblog::load() to initialize AMP support.
+	 *
+	 * @return void
 	 */
 	public static function load() {
 
@@ -77,6 +84,7 @@ class WPCOM_Liveblog_AMP {
 	 * Add query vars to support pagination and single entries.
 	 *
 	 * @param array $query_vars Allowed Query Variables.
+	 * @return array Updated query vars.
 	 */
 	public static function add_custom_query_vars( $query_vars ) {
 		$query_vars[] = 'liveblog_page';
@@ -259,8 +267,9 @@ class WPCOM_Liveblog_AMP {
 	/**
 	 * Set the last known entry for users who don't have one yet.
 	 *
-	 * @param  array  $entries liveblog entries.
+	 * @param  array  $entries Liveblog entries.
 	 * @param  object $request Request Object.
+	 * @return object Updated request object.
 	 */
 	public static function set_request_last_from_entries( $entries, $request ) {
 		if ( false === $request->last && ! empty( $entries['entries'] ) ) {
@@ -496,7 +505,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return bool AMP polling request.
 	 */
 	public static function is_amp_polling() {
-		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only check for AMP polling status.
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
 	}
 }

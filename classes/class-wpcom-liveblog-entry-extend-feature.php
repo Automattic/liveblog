@@ -1,4 +1,9 @@
 <?php
+/**
+ * Base class for liveblog entry extend features.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Extend_Feature
@@ -39,7 +44,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Sets the prefixes.
 	 *
-	 * @param array $prefixes
+	 * @param array $prefixes The character prefixes.
 	 * @return void
 	 */
 	public function set_prefixes( $prefixes ) {
@@ -49,7 +54,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Gets the prefixes.
 	 *
-	 * @return array
+	 * @return array The character prefixes.
 	 */
 	public function get_prefixes() {
 		return $this->prefixes;
@@ -58,7 +63,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Sets the regex.
 	 *
-	 * @param string $regex
+	 * @param string $regex The regex pattern.
 	 * @return void
 	 */
 	public function set_regex( $regex ) {
@@ -68,7 +73,7 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Gets the regex.
 	 *
-	 * @return string
+	 * @return string The regex pattern.
 	 */
 	public function get_regex() {
 		return $this->regex;
@@ -77,16 +82,16 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Gets the autocomplete config.
 	 *
-	 * @param array $config
-	 * @return array
+	 * @param array $config The existing autocomplete configuration.
+	 * @return array Updated configuration.
 	 */
 	abstract public function get_config( $config );
 
 	/**
 	 * Filters the input.
 	 *
-	 * @param mixed $entry
-	 * @return mixed
+	 * @param mixed $entry The liveblog entry.
+	 * @return mixed Filtered entry.
 	 */
 	public function filter( $entry ) {
 		return $entry;
@@ -95,8 +100,8 @@ abstract class WPCOM_Liveblog_Entry_Extend_Feature {
 	/**
 	 * Reverts the input.
 	 *
-	 * @param mixed $entry
-	 * @return mixed
+	 * @param mixed $entry The liveblog entry.
+	 * @return mixed Reverted entry.
 	 */
 	public function revert( $entry ) {
 		return $entry;

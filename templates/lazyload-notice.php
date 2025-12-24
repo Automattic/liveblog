@@ -1,3 +1,11 @@
+<?php
+/**
+ * Template for lazyload plugin conflict notice.
+ *
+ * @package Liveblog
+ */
+
+?>
 <div class="error">
 <p>
 <?php

@@ -1,3 +1,11 @@
+<?php
+/**
+ * Template for a single liveblog entry.
+ *
+ * @package Liveblog
+ */
+
+?>
 <div id="liveblog-entry-<?php echo esc_attr( $entry_id ); ?>" class="<?php echo esc_attr( $css_classes ); ?>" data-timestamp="<?php echo esc_attr( $timestamp ); ?>">
 	<header class="liveblog-meta">
 		<span class="liveblog-author-avatar"><?php echo wp_kses_post( $avatar_img ); ?></span>

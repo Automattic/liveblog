@@ -1,5 +1,11 @@
 <?php
-	$id             = $this->get( 'id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+/**
+ * Template for AMP liveblog entry.
+ *
+ * @package Liveblog
+ */
+
+	$id             = $this->get( 'id' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	$entry_time     = $this->get( 'time' );
 	$content        = $this->get( 'content' );
 	$social         = $this->get( 'social' );
