@@ -132,7 +132,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		$css      = file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' );
+		$css      = file_get_contents( dirname( __DIR__ ) . '/build/amp.css' );
 		$safe_css = wp_check_invalid_utf8( $css );
 		$safe_css = _wp_specialchars( $safe_css );
 
@@ -145,7 +145,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', array(), WPCOM_Liveblog::VERSION );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'build/amp.css', array(), WPCOM_Liveblog::VERSION );
 	}
 
 
