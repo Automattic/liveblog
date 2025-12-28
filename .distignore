@@ -2,32 +2,48 @@
 /.git/
 /.github/
 /.wordpress-org/
+/.claude/
+/.idea/
+/.phpunit.cache/
+/assets/
 /bin/
 /features/
 /node_modules/
+/src/
 /tests/
 /vendor/
 
-# Files
+# Development configuration
 .babelrc
 .distignore
 .editorconfig
 .eslintrc
 .gitattributes
 .gitignore
+.nvmrc
 .phpcs.xml.dist
 .stylelintrc
+.stylelintrc.json
 .wp-env.json
 .wp-env.override.json
+
+# Build tooling
 behat.yml
-CHANGELOG.md
+webpack.config.js
+
+# Package management
 composer.json
 composer.lock
-CONTRIBUTING.md
-HACKING.md
 package.json
 package-lock.json
+
+# Documentation (not needed in plugin distribution)
+CHANGELOG.md
+CONTRIBUTING.md
+HACKING.md
+
+# Test configuration
 phpunit.xml.dist
-README.md
-webpack.config.js
+
+# WP.com specific
 wpcom-helper.php

@@ -24,7 +24,7 @@ module.exports = function (env, argv) {
 	// Custom output settings
 	config.output = {
 		...config.output,
-		path: path.join(__dirname, './assets'),
+		path: path.join(__dirname, './build'),
 		filename: '[name].js',
 		chunkFilename: '[name].bundle.js',
 		// Custom chunkLoadingGlobal to avoid conflicts
