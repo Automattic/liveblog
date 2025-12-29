@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { __ } from '@wordpress/i18n';
 
 import * as eventsActions from '../actions/eventsActions';
 
@@ -20,7 +21,7 @@ class EventsContainer extends Component {
 
     this.delete = (key) => {
       /* eslint no-alert: 0 */
-      if (window.confirm('Are you sure you want to delete this entry?')) {
+      if (window.confirm( __( 'Are you sure you want to delete this entry?', 'liveblog' ) )) {
         this.props.deleteEvent(key);
       }
     };
@@ -68,7 +69,7 @@ class EventsContainer extends Component {
         </ul>
         {this.state.showPopup ?
           <DeleteConfirmation
-            text="Are you sure you want to remove this entry as a key event?"
+            text={ __( 'Are you sure you want to remove this entry as a key event?', 'liveblog' ) }
             onConfirmDelete={() => this.deleteKeyEvent()}
             onCancel={this.togglePopup.bind(this)}
           />

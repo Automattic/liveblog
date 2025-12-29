@@ -8,6 +8,7 @@
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { __ } from '@wordpress/i18n';
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -964,7 +965,7 @@ function LinkInput( { url, onChange, onConfirm, onCancel } ) {
 				type="button"
 				className="liveblog-editor-btn liveblog-input-enter"
 				onClick={ onConfirm }
-				title="Add link"
+				title={ __( 'Add link', 'liveblog' ) }
 			>
 				<span className="dashicons dashicons-yes" />
 			</button>
@@ -972,7 +973,7 @@ function LinkInput( { url, onChange, onConfirm, onCancel } ) {
 				type="button"
 				className="liveblog-editor-btn liveblog-input-cancel"
 				onClick={ onCancel }
-				title="Cancel"
+				title={ __( 'Cancel', 'liveblog' ) }
 			>
 				<span className="dashicons dashicons-no-alt" />
 			</button>
@@ -1210,42 +1211,42 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 				<ToolbarButton
 					onClick={ formatBold }
 					icon="editor-bold"
-					title="Bold (Ctrl+B)"
+					title={ __( 'Bold (Ctrl+B)', 'liveblog' ) }
 					isActive={ selectionState.isBold }
 					disabled={ readOnly }
 				/>
 				<ToolbarButton
 					onClick={ formatItalic }
 					icon="editor-italic"
-					title="Italic (Ctrl+I)"
+					title={ __( 'Italic (Ctrl+I)', 'liveblog' ) }
 					isActive={ selectionState.isItalic }
 					disabled={ readOnly }
 				/>
 				<ToolbarButton
 					onClick={ formatUnderline }
 					icon="editor-underline"
-					title="Underline (Ctrl+U)"
+					title={ __( 'Underline (Ctrl+U)', 'liveblog' ) }
 					isActive={ selectionState.isUnderline }
 					disabled={ readOnly }
 				/>
 				<ToolbarButton
 					onClick={ formatOrderedList }
 					icon="editor-ol"
-					title="Ordered List"
+					title={ __( 'Ordered List', 'liveblog' ) }
 					isActive={ selectionState.listType === 'number' }
 					disabled={ readOnly }
 				/>
 				<ToolbarButton
 					onClick={ formatUnorderedList }
 					icon="editor-ul"
-					title="Unordered List"
+					title={ __( 'Unordered List', 'liveblog' ) }
 					isActive={ selectionState.listType === 'bullet' }
 					disabled={ readOnly }
 				/>
 				<ToolbarButton
 					onClick={ formatQuote }
 					icon="format-quote"
-					title="Blockquote"
+					title={ __( 'Blockquote', 'liveblog' ) }
 					isActive={ selectionState.isQuote }
 					disabled={ readOnly }
 				/>
@@ -1253,7 +1254,7 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 					<ToolbarButton
 						onClick={ openLinkModal }
 						icon="admin-links"
-						title="Add Link"
+						title={ __( 'Add Link', 'liveblog' ) }
 						isActive={ selectionState.isLink }
 						disabled={ readOnly }
 					/>
@@ -1269,7 +1270,7 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 				<ToolbarButton
 					onClick={ removeLink }
 					icon="editor-unlink"
-					title="Remove Link"
+					title={ __( 'Remove Link', 'liveblog' ) }
 					disabled={ readOnly || ! selectionState.isLink }
 				/>
 				{ handleImageUpload && (
@@ -1277,7 +1278,7 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 						<ToolbarButton
 							onClick={ handleImageButtonClick }
 							icon="format-image"
-							title={ isUploading ? 'Uploading...' : 'Insert Image' }
+							title={ isUploading ? __( 'Uploading…', 'liveblog' ) : __( 'Insert Image', 'liveblog' ) }
 							disabled={ readOnly || isUploading }
 						/>
 						<input
@@ -1351,7 +1352,7 @@ const LexicalEditor = ( {
 						}
 						placeholder={
 							<div className="liveblog-lexical-placeholder">
-								Start writing your liveblog entry...
+								{ __( 'Start writing your liveblog entry…', 'liveblog' ) }
 							</div>
 						}
 						ErrorBoundary={ LexicalErrorBoundary }

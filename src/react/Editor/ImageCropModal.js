@@ -6,6 +6,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { __ } from '@wordpress/i18n';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { getCroppedImage, scaleToNaturalDimensions } from './cropUtils';
@@ -127,13 +128,13 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 						id="liveblog-crop-modal-title"
 						className="liveblog-crop-modal-title"
 					>
-						Crop Image
+						{ __( 'Crop Image', 'liveblog' ) }
 					</h2>
 					<button
 						type="button"
 						className="liveblog-crop-modal-close"
 						onClick={ onCancel }
-						aria-label="Close"
+						aria-label={ __( 'Close', 'liveblog' ) }
 						disabled={ isProcessing }
 					>
 						<span className="dashicons dashicons-no-alt" />
@@ -150,13 +151,12 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 						<img
 							ref={ imageRef }
 							src={ imageSrc }
-							alt="Crop preview"
+							alt={ __( 'Crop preview', 'liveblog' ) }
 							className="liveblog-crop-modal-image"
 						/>
 					</ReactCrop>
 					<p className="liveblog-crop-modal-hint">
-						Drag to select the area you want to keep. Click Apply to
-						use the full image without cropping.
+						{ __( 'Drag to select the area you want to keep. Click Apply to use the full image without cropping.', 'liveblog' ) }
 					</p>
 				</div>
 
@@ -167,7 +167,7 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 						onClick={ onCancel }
 						disabled={ isProcessing }
 					>
-						Cancel
+						{ __( 'Cancel', 'liveblog' ) }
 					</button>
 					<button
 						type="button"
@@ -175,7 +175,7 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 						onClick={ handleApplyCrop }
 						disabled={ isProcessing }
 					>
-						{ isProcessing ? 'Processing...' : 'Apply' }
+						{ isProcessing ? __( 'Processing…', 'liveblog' ) : __( 'Apply', 'liveblog' ) }
 					</button>
 				</div>
 			</div>

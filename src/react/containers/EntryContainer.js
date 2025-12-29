@@ -3,6 +3,7 @@ import React, { Component, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { __ } from '@wordpress/i18n';
 import * as apiActions from '../actions/apiActions';
 import * as userActions from '../actions/userActions';
 import { triggerOembedLoad, timeAgo, formattedTime } from '../utils/utils';
@@ -60,16 +61,16 @@ class EntryContainer extends Component {
         {
           this.isEditing()
             ? <button className="liveblog-btn liveblog-btn-small" onClick={this.close}>
-              Close Editor
+              { __( 'Close Editor', 'liveblog' ) }
             </button>
             : <button className="liveblog-btn liveblog-btn-small" onClick={this.edit}>
-              Edit
+              { __( 'Edit', 'liveblog' ) }
             </button>
         }
         <button
           className="liveblog-btn liveblog-btn-small liveblog-btn-delete"
           onClick={this.togglePopup.bind(this)}>
-          Delete
+          { __( 'Delete', 'liveblog' ) }
         </button>
       </footer>
     );
@@ -93,7 +94,7 @@ class EntryContainer extends Component {
         <div className="liveblog-entry-main">
           {this.state.showPopup ?
             <DeleteConfirmation
-              text="Are you sure you want to delete this entry?"
+              text={ __( 'Are you sure you want to delete this entry?', 'liveblog' ) }
               onConfirmDelete={this.delete}
               onCancel={this.togglePopup.bind(this)}
             />
@@ -121,7 +122,7 @@ class EntryContainer extends Component {
             this.isEditing()
               ? (
                 <div className="liveblog-entry-edit">
-                  <Suspense fallback={<div>Loading editor...</div>}>
+                  <Suspense fallback={<div>{ __( 'Loading editor…', 'liveblog' ) }</div>}>
                     <Editor entry={entry} isEditing={true} />
                   </Suspense>
                 </div>
