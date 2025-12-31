@@ -77,6 +77,19 @@ class EditorContainer extends Component {
     }));
   }
 
+  /**
+   * Handle keyboard shortcuts.
+   *
+   * @param {KeyboardEvent} event - The keyboard event.
+   */
+  handleKeyDown(event) {
+    // Ctrl+Enter (Windows/Linux) or Cmd+Enter (Mac) to publish
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      this.publish();
+    }
+  }
+
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
     const { authors, editorContent } = this.state;
@@ -251,7 +264,7 @@ class EditorContainer extends Component {
     const { isEditing, config } = this.props;
 
     return (
-      <div className="liveblog-editor-container">
+      <div className="liveblog-editor-container" onKeyDown={this.handleKeyDown.bind(this)}>
         {!isEditing && <h1 className="liveblog-editor-title">{ __( 'Add New Entry', 'liveblog' ) }</h1>}
         <div className="liveblog-editor-tabs">
           <button
