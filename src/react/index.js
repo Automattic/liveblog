@@ -1,6 +1,6 @@
 /* eslint-disable camelcase, no-undef */
 // Set webpack public path BEFORE any imports that might trigger dynamic chunk loading
-__webpack_public_path__ = `${window.liveblog_settings.plugin_dir}assets/`;
+__webpack_public_path__ = `${window.liveblog_settings.plugin_dir}build/`;
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';

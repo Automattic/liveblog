@@ -19,6 +19,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 
 import { HeadingNode, QuoteNode, $isQuoteNode, $createQuoteNode } from '@lexical/rich-text';
 import { ListNode, ListItemNode } from '@lexical/list';
@@ -1359,6 +1360,7 @@ const LexicalEditor = ( {
 					/>
 				</div>
 				<HistoryPlugin />
+				<AutoFocusPlugin />
 				<LinkPlugin />
 				<ListPlugin />
 				<ImagePlugin handleImageUpload={ handleImageUpload } />
