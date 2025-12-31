@@ -38,9 +38,20 @@
 }
 
 .liveblog-popover-item.is-focused {
-	background: $color-grey-x-light;
+	background: #e3f2fd; // Light blue for better focus visibility
 }
 
 .liveblog-popover-item-figure {
 	margin-right: 0.4rem;
+}
+
+// Hint option (e.g., "Type to search for more...")
+.liveblog-popover-hint {
+	color: #767676; // WCAG AA compliant
+	font-style: italic;
+	font-size: 0.75rem;
+	cursor: default;
+	border-top: 1px solid #eee;
+	margin-top: 0.2rem;
+	padding-top: 0.5rem;
 }

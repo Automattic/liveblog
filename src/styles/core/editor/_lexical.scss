@@ -38,7 +38,7 @@
 	padding: 12px;
 	min-height: 150px;
 	outline: none;
-	font-size: 14px;
+	font-size: 16px; // 16px minimum prevents iOS zoom on focus
 	line-height: 1.6;
 
 	&:focus {
@@ -50,9 +50,9 @@
 	position: absolute;
 	top: 12px;
 	left: 12px;
-	color: #999;
+	color: #767676; // WCAG AA compliant on white (4.54:1)
 	pointer-events: none;
-	font-size: 14px;
+	font-size: 16px; // Match editable area
 }
 
 // Text formatting classes (applied within editor)
