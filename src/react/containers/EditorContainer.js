@@ -142,20 +142,33 @@ class EditorContainer extends Component {
 
   getUsers(text) {
     const { config } = this.props;
-
-    // Handle empty text - return empty options immediately
-    if (!text || text.trim() === '') {
-      return Promise.resolve({ options: [] });
-    }
+    const searchTerm = text || '';
+    const isDefaultLoad = searchTerm.trim() === '';
 
     return new Promise((resolve) => {
-      getAuthors(text, config)
+      getAuthors(searchTerm, config)
         .pipe(
           timeout(10000),
           map(res => res.response),
         )
         .subscribe({
-          next: res => resolve({ options: res || [] }),
+          next: res => {
+            let options = res || [];
+
+            // Limit default results and add hint if there are more
+            if (isDefaultLoad && options.length > 10) {
+              options = options.slice(0, 10);
+              options.push({
+                id: '__hint__',
+                key: '__hint__',
+                name: __( 'Type to search for more authors…', 'liveblog' ),
+                isDisabled: true,
+                isHint: true,
+              });
+            }
+
+            resolve({ options });
+          },
           error: err => {
             // Fail gracefully with empty options on error (e.g., 401)
             console.warn('Authors API error:', err);
@@ -323,6 +336,8 @@ class EditorContainer extends Component {
         }
         <h2 className="liveblog-editor-subTitle">{ __( 'Authors:', 'liveblog' ) }</h2>
         <Async
+          classNamePrefix="liveblog-select"
+          aria-label={__( 'Entry authors', 'liveblog' )}
           isMulti={true}
           value={authors}
           getOptionValue={(option) => option.key}
@@ -330,8 +345,13 @@ class EditorContainer extends Component {
           onChange={this.onSelectAuthorChange.bind(this)}
           components={{ Option: AuthorSelectOption }}
           loadOptions={this.getUsers.bind(this)}
+          defaultOptions={true}
           isClearable={false}
           cacheOptions={false}
+          isOptionDisabled={(option) => option.isDisabled}
+          noOptionsMessage={({ inputValue }) =>
+            inputValue ? __( 'No authors matched', 'liveblog' ) : __( 'Loading authors…', 'liveblog' )
+          }
         />
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? __( 'Publish Update', 'liveblog' ) : __( 'Publish New Entry', 'liveblog' )}

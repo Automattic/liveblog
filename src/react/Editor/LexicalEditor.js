@@ -1349,7 +1349,10 @@ const LexicalEditor = ( {
 				<div className="liveblog-lexical-editor-inner">
 					<RichTextPlugin
 						contentEditable={
-							<ContentEditable className="liveblog-lexical-content-editable" />
+							<ContentEditable
+								className="liveblog-lexical-content-editable"
+								aria-label={ __( 'Liveblog entry content', 'liveblog' ) }
+							/>
 						}
 						placeholder={
 							<div className="liveblog-lexical-placeholder">

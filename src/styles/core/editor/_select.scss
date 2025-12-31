@@ -1,57 +1,124 @@
-@use "../utils" as *;
+// React-select v5 styles for Liveblog
+// Uses classNamePrefix="liveblog-select"
 
-.Select:not(:last-child) {
-	margin-bottom: 1rem;
+.liveblog-select__control {
+	border-radius: 4px;
+	border-color: #bbb;
+	min-height: 38px;
+
+	&:hover {
+		border-color: #999;
+	}
+
+	&--is-focused {
+		border-color: #007cba;
+		box-shadow: 0 0 0 1px #007cba;
+
+		&:hover {
+			border-color: #007cba;
+		}
+	}
 }
 
-.Select.is-focused:not(.is-open) > .Select-control {
-	border-color: $color-grey-light;
-	box-shadow: none;
+// Placeholder text - WCAG AA compliant (4.54:1 on white)
+.liveblog-select__placeholder {
+	color: #767676;
+	font-size: 16px; // 16px minimum prevents iOS zoom on focus
 }
 
-.Select-control {
-	border-radius: $base-border-radius;
-	border-color: $color-grey-light;
+// Selected author tags
+.liveblog-select__multi-value {
+	background: #e0e0e0;
+	border-radius: 3px;
 }
 
-.Select-control:hover {
-	box-shadow: none;
-	border-radius: $base-border-radius;
-	border-color: $color-grey-light;
+.liveblog-select__multi-value__label {
+	color: #333;
+	padding: 3px 6px;
+	font-size: 0.9em;
 }
 
-.Select--multi .Select-value {
-	border-color: $color-grey-mid;
-	background: $color-grey-mid-light;
-	color: $color-grey-dark;
+.liveblog-select__multi-value__remove {
+	cursor: pointer;
+	padding: 0 4px;
+	display: flex;
+	align-items: center;
+
+	// SVG icon inherits color
+	svg {
+		fill: #666;
+		width: 14px;
+		height: 14px;
+	}
+
+	&:hover {
+		background: #c00;
+
+		svg {
+			fill: #fff;
+		}
+	}
 }
 
-.Select-value-label {
-	color: $color-grey-dark;
-	line-height: 1;
+// Input field - 16px minimum prevents iOS zoom on focus
+.liveblog-select__input-container {
+	color: #333;
+	font-size: 16px;
 }
 
-.Select--multi .Select-value-icon {
-	padding: 0;
-	padding-left: 5px;
-	padding-right: 5px;
-	vertical-align: middle;
-	color: $color-grey-dark;
-	border-color: $color-grey-mid;
-	background: transparent;
-	transition: color 0.2s ease-in-out;
+.liveblog-select__single-value {
+	font-size: 16px;
 }
 
-.Select--multi .Select-value-icon:hover {
-	background: transparent;
-	color: $color-warning;
-	transition: color 0.2s ease-in-out;
+// Dropdown menu
+.liveblog-select__menu {
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	z-index: 100;
 }
 
-.Select-menu-outer {
-	width: calc(100% - 1px);
+// "No options" / "Type to search" message - WCAG AA compliant
+.liveblog-select__menu-notice {
+	color: #767676;
+	padding: 8px 12px;
+	text-align: center;
 }
 
-.Select-option .is-selected .is-focused {
-	background-color: $color-grey-x-light;
+// Individual option styling (fallback, custom component used)
+.liveblog-select__option {
+	cursor: pointer;
+	padding: 8px 12px;
+
+	&--is-focused {
+		background: #e3f2fd;
+	}
+
+	&--is-selected {
+		background: #007cba;
+		color: #fff;
+	}
+}
+
+// Clear indicator (if enabled in future)
+.liveblog-select__clear-indicator {
+	color: #999;
+	cursor: pointer;
+
+	&:hover {
+		color: #c00;
+	}
+}
+
+// Dropdown indicator
+.liveblog-select__dropdown-indicator {
+	color: #767676;
+
+	&:hover {
+		color: #333;
+	}
+}
+
+// Loading indicator
+.liveblog-select__loading-indicator {
+	color: #007cba;
 }
