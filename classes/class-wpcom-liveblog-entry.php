@@ -451,6 +451,21 @@ class WPCOM_Liveblog_Entry {
 		}
 		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
+
+		// Delete any orphaned update entries that reference this entry.
+		// These would otherwise cause issues during lazy-loading.
+		$orphaned_updates = get_comments(
+			array(
+				'post_id'         => $args['post_id'],
+				'meta_key'        => self::REPLACES_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'      => $args['entry_id'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'comment__not_in' => array( $comment->comment_ID ), // Exclude the delete entry we just created.
+			)
+		);
+		foreach ( $orphaned_updates as $orphaned ) {
+			wp_delete_comment( $orphaned->comment_ID, true );
+		}
+
 		wp_delete_comment( $args['entry_id'] );
 		$entry = self::from_comment( $comment );
 		return $entry;
