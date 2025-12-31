@@ -383,7 +383,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @uses add_filter()
 		 */
 		private static function add_filters() {
-			add_filter( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
+			add_action( 'template_redirect', array( __CLASS__, 'handle_request' ), 9 );
 			add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 10, 3 );
 			add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key' ), 10, 2 );
 
@@ -552,7 +552,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function handle_request() { // phpcs:ignore WordPressVIPMinimum.Hooks.AlwaysReturnInFilter -- This is hooked to an action, not a filter.
+		public static function handle_request() {
 
 			if ( ! self::is_viewing_liveblog_post() ) {
 				return;
