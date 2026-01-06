@@ -1,10 +1,10 @@
 === Liveblog ===
-Contributors: automattic, nbachiyski, batmoo, johnjamesjacoby, philipjohn
+Contributors: automattic, garyj, nbachiyski, batmoo, johnjamesjacoby, philipjohn
 Tags: liveblog
 Requires at least: 6.4
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 1.9.7
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
