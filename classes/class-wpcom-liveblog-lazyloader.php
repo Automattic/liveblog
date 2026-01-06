@@ -1,4 +1,9 @@
 <?php
+/**
+ * Lazyloader for liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Lazyloader
@@ -8,16 +13,22 @@
 class WPCOM_Liveblog_Lazyloader {
 
 	/**
+	 * Whether lazyloading is enabled.
+	 *
 	 * @var bool
 	 */
 	private static $enabled;
 
 	/**
+	 * Number of default entries to display.
+	 *
 	 * @var int
 	 */
 	private static $number_of_default_entries;
 
 	/**
+	 * Number of entries to load.
+	 *
 	 * @var int
 	 */
 	private static $number_of_entries;
@@ -37,7 +48,7 @@ class WPCOM_Liveblog_Lazyloader {
 			 */
 			self::$enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', true );
 
-			// Disable lazy loading on archived liveblogs
+			// Disable lazy loading on archived liveblogs.
 			if ( 'enable' !== WPCOM_Liveblog::get_liveblog_state() ) {
 				self::$enabled = false;
 			}

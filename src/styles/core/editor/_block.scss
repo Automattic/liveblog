@@ -1,87 +1,91 @@
+@use "sass:color";
+@use "../utils" as *;
+
 .liveblog-block {
-  position: relative;
-  border: $base-border-size solid $color-grey-light;
-  cursor: move;
+	position: relative;
+	border: $base-border-size solid $color-grey-light;
+	cursor: move;
 }
 
 .liveblog-block.is-focused {
-  box-shadow: 0 0 0 2px lighten($color-accent, 20%);
+	box-shadow: 0 0 0 2px color.adjust($raw-color-accent, $lightness: 20%);
 }
 
 .liveblog-block img {
-  display: block;
+	display: block;
 }
 
 .liveblog-block.is-editing {
-  cursor: auto;
-  box-shadow: $base-drop-shadow;
+	cursor: auto;
+	box-shadow: $base-drop-shadow;
 }
 
 .liveblog-editor-container
 .public-DraftEditor-content[contenteditable="false"]
 .liveblog-block {
-  cursor: auto;
+	cursor: auto;
 }
 
 .liveblog-editor-container
 .public-DraftEditor-content[contenteditable="false"]
 .liveblog-block:not(.is-editing)::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, .9);
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(255, 255, 255, 0.9);
 }
 
 .liveblog-block-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-basis: 100%;
-  padding: .4rem;
-  border-bottom: $base-border-size solid darken($color-grey-x-light, 5%);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-basis: 100%;
+	padding: 0.4rem;
+	border-bottom: $base-border-size solid color.adjust($raw-color-grey-x-light, $lightness: -5%);
 
-  @include mq($until: large) {
-    text-align: center;
-    flex-wrap: wrap;
-  }
+	@include mq($until: large) {
+		text-align: center;
+		flex-wrap: wrap;
+	}
 }
 
 .liveblog-block-header > * {
-  @include mq($until: large) {
-    flex-basis: 100;
-  }
+
+	@include mq($until: large) {
+		flex-basis: 100;
+	}
 }
 
 .liveblog-block-header .liveblog-editor-delete {
-  padding: 0;
+	padding: 0;
 }
 
 .liveblog-block-title-container {
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-  font-size: 14px;
+	display: flex;
+	align-items: center;
+	flex-grow: 1;
+	font-size: 14px;
 
-  @include mq($until: x-small) {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+	@include mq($until: x-small) {
+		flex-wrap: wrap;
+		justify-content: center;
+	}
 }
 
 .liveblog-block-title {
-  font-weight: 600;
-  margin: 0 .25rem 0 .5rem;
-  color: $color-grey-dark;
+	font-weight: 600;
+	margin: 0 0.25rem 0 0.5rem;
+	color: $color-grey-dark;
 }
 
 .liveblog-block-select-container select {
-  border: none;
-  background: $color-grey-x-light;
-  border-radius: 0;
-  font-size: 13px;
-  padding: .25rem;
-  max-width: 100px;
+	border: none;
+	background: $color-grey-x-light;
+	border-radius: 0;
+	font-size: 13px;
+	padding: 0.25rem;
+	max-width: 100px;
 }

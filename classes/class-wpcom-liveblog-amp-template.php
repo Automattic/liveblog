@@ -1,4 +1,9 @@
 <?php
+/**
+ * Simple class for working with AMP templates.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_AMP_Template
@@ -41,15 +46,15 @@ class WPCOM_Liveblog_AMP_Template {
 	/**
 	 * Get a template variable.
 	 *
-	 * @param  string $name    Name if variable.
-	 * @param  mixed  $default  Default value.
+	 * @param  string $name          Name if variable.
+	 * @param  mixed  $default_value Default value.
 	 * @return mixed          value
 	 */
-	public function get( $name, $default = false ) {
+	public function get( $name, $default_value = false ) {
 		if ( isset( $this->data[ $name ] ) ) {
 			return $this->data[ $name ];
 		}
-		return $default;
+		return $default_value;
 	}
 
 	/**

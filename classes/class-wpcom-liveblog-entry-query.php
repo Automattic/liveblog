@@ -1,4 +1,9 @@
 <?php
+/**
+ * Responsible for querying the Liveblog entries.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Responsible for querying the Liveblog entries.
@@ -7,16 +12,22 @@
  */
 class WPCOM_Liveblog_Entry_Query {
 
+	/**
+	 * Constructor.
+	 *
+	 * @param int    $post_id The post ID.
+	 * @param string $key     The comment type key.
+	 */
 	public function __construct( $post_id, $key ) {
 		$this->post_id = $post_id;
 		$this->key     = $key;
 	}
 
 	/**
-	 * Query the database for specific liveblog entries
+	 * Query the database for specific liveblog entries.
 	 *
-	 * @param array $args the same args for the core `get_comments()`.
-	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
+	 * @param array $args The same args for the core `get_comments()`.
+	 * @return array Array of `WPCOM_Liveblog_Entry` objects with the found entries.
 	 */
 	public function get( $args = array() ) {
 		$defaults = array(
@@ -34,10 +45,10 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Query the database for all edited liveblog entries associated with $post_id
+	 * Query the database for all edited liveblog entries associated with $post_id.
 	 *
-	 * @param array $args the same args for the core `get_comments()`.
-	 * @return array array of `WPCOM_Liveblog_Entry` objects with the found entries
+	 * @param array $args The same args for the core `get_comments()`.
+	 * @return array Array of `WPCOM_Liveblog_Entry` objects with the found entries.
 	 */
 	public function get_all_edits( $args = array() ) {
 		$defaults = array(
@@ -52,10 +63,12 @@ class WPCOM_Liveblog_Entry_Query {
 
 		return self::entries_from_comments( $comments );
 	}
+
 	/**
-	 * Get all of the liveblog entries
+	 * Get all of the liveblog entries.
 	 *
-	 * @param array $args the same args for the core `get_comments()`
+	 * @param array $args The same args for the core `get_comments()`.
+	 * @return array Array of entries.
 	 */
 	public function get_all( $args = array() ) {
 		// Due to liveblog lazy loading, duplicate entries may be displayed
@@ -74,12 +87,26 @@ class WPCOM_Liveblog_Entry_Query {
 		return self::remove_replaced_entries( $this->get( $args ), $number );
 	}
 
+	/**
+	 * Count all entries.
+	 *
+	 * @param array $args The same args for the core `get_comments()`.
+	 * @return int Number of entries.
+	 */
 	public function count( $args = array() ) {
-		return count( $this->get_all( $args ) );
+		$entries = $this->get_all( $args );
+		return is_array( $entries ) ? count( $entries ) : 0;
 	}
 
+	/**
+	 * Get an entry by ID.
+	 *
+	 * @param int $id The entry ID.
+	 * @return WPCOM_Liveblog_Entry|null The entry or null if not found.
+	 */
 	public function get_by_id( $id ) {
 		$comment = get_comment( $id );
+
 		/*
 		 * When running tests, WP_Comment's comment_ID and comment_post_ID return strings. However, post_id
 		 * returns a string (test_update_should_update_original_entry) or
@@ -93,6 +120,11 @@ class WPCOM_Liveblog_Entry_Query {
 		return $entries[0];
 	}
 
+	/**
+	 * Get the latest entry.
+	 *
+	 * @return WPCOM_Liveblog_Entry|null The latest entry or null if none found.
+	 */
 	public function get_latest() {
 
 		$entries = $this->get( array( 'number' => 1 ) );
@@ -124,6 +156,11 @@ class WPCOM_Liveblog_Entry_Query {
 		return $latest->get_id();
 	}
 
+	/**
+	 * Get the latest entry timestamp.
+	 *
+	 * @return int|null The latest timestamp or null if none found.
+	 */
 	public function get_latest_timestamp() {
 
 		$latest = $this->get_latest();
@@ -142,10 +179,10 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Get entries between two timestamps from a list of entries supplied.
 	 *
-	 * @param array $entries
-	 * @param int   $start_timestamp
-	 * @param int   $end_timestamp
-	 * @return array
+	 * @param array $entries         The entries to filter.
+	 * @param int   $start_timestamp The start timestamp.
+	 * @param int   $end_timestamp   The end timestamp.
+	 * @return array Filtered entries.
 	 */
 	public function find_between_timestamps( $entries, $start_timestamp, $end_timestamp ) {
 		$entries_between = array();
@@ -162,19 +199,29 @@ class WPCOM_Liveblog_Entry_Query {
 	/**
 	 * Get entries between two timestamps from all entries.
 	 *
-	 * @param int $start_timestamp
-	 * @param int $end_timestamp
-	 * @return array
+	 * @param int $start_timestamp The start timestamp.
+	 * @param int $end_timestamp   The end timestamp.
+	 * @return array Filtered entries.
 	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
 		$all_entries = $this->get_all_entries_asc();
 		return $this->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 	}
 
+	/**
+	 * Check if there are any entries.
+	 *
+	 * @return bool True if entries exist.
+	 */
 	public function has_any() {
 		return (bool) $this->get();
 	}
 
+	/**
+	 * Get all entries in ascending order.
+	 *
+	 * @return array Entries in ascending order.
+	 */
 	public function get_all_entries_asc() {
 		$cached_entries_asc_key = $this->key . '_entries_asc_' . $this->post_id;
 		$cached_entries_asc     = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
@@ -186,15 +233,28 @@ class WPCOM_Liveblog_Entry_Query {
 		return $all_entries_asc;
 	}
 
+	/**
+	 * Convert comments to entry objects.
+	 *
+	 * @param array $comments The comments to convert.
+	 * @return array Array of WPCOM_Liveblog_Entry objects.
+	 */
 	public static function entries_from_comments( $comments = array() ) {
 
 		if ( empty( $comments ) ) {
-			return null;
+			return array();
 		}
 
 		return array_map( array( 'WPCOM_Liveblog_Entry', 'from_comment' ), $comments );
 	}
 
+	/**
+	 * Remove replaced entries from the list.
+	 *
+	 * @param array $entries The entries to filter.
+	 * @param int   $number  Maximum number of entries to return.
+	 * @return array Filtered entries.
+	 */
 	public static function remove_replaced_entries( $entries = array(), $number = 0 ) {
 		if ( empty( $entries ) ) {
 			return $entries;
@@ -217,6 +277,12 @@ class WPCOM_Liveblog_Entry_Query {
 		return $entries_by_id;
 	}
 
+	/**
+	 * Create an associative array of entries keyed by ID.
+	 *
+	 * @param array $entries The entries to convert.
+	 * @return array Associative array of entries.
+	 */
 	public static function assoc_array_by_id( $entries ) {
 		$result = array();
 

@@ -6,7 +6,7 @@ import rootReducer from '../reducers';
 import rootEpic from '../epics';
 
 function configureStore(initialState) {
-  const epicMiddleware = createEpicMiddleware(rootEpic);
+  const epicMiddleware = createEpicMiddleware();
 
   const enhancers = composeWithDevTools(
     applyMiddleware(
@@ -20,6 +20,8 @@ function configureStore(initialState) {
     initialState,
     enhancers,
   );
+
+  epicMiddleware.run(rootEpic);
 
   return store;
 }

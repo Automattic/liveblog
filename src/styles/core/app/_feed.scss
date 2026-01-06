@@ -1,15 +1,21 @@
+.liveblog-updates-count {
+	font-size: 0.875rem;
+	color: #666;
+	margin: 0 0 0.5rem;
+}
+
 .liveblog-feed {
-  min-height: 200px;
-  position: relative;
+	min-height: 200px;
+	position: relative;
 }
 
 .liveblog-feed.is-loading::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, .7);
+	content: "";
+	position: absolute;
+	z-index: 0;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(255, 255, 255, 0.7);
 }

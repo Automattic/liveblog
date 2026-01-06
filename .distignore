@@ -1,26 +1,49 @@
-/.wordpress-org
-/.git
-/.github
-/bin
-/node_modules
-/t
-/vendor
+# Directories
+/.git/
+/.github/
+/.wordpress-org/
+/.claude/
+/.idea/
+/.phpunit.cache/
+/assets/
+/bin/
+/features/
+/node_modules/
+/src/
+/tests/
+/vendor/
 
+# Development configuration
 .babelrc
 .distignore
 .editorconfig
 .eslintrc
+.gitattributes
 .gitignore
+.nvmrc
 .phpcs.xml.dist
 .stylelintrc
-CHANGELOG.md
+.stylelintrc.json
+.wp-env.json
+.wp-env.override.json
+
+# Build tooling
+behat.yml
+webpack.config.js
+
+# Package management
 composer.json
 composer.lock
+package.json
+package-lock.json
+
+# Documentation (not needed in plugin distribution)
+CHANGELOG.md
 CONTRIBUTING.md
 HACKING.md
-package.json
+
+# Test configuration
 phpunit.xml.dist
-README.md
-webpack.config.js
+
+# WP.com specific
 wpcom-helper.php
-yarn.lock

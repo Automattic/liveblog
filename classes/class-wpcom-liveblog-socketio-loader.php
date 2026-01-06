@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class used to decide whether to load or not Socket.io support.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class used to decide whether to load or not
@@ -30,7 +35,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 			} elseif ( ! self::socketio_emitter_exists() ) {
 				self::add_socketio_emitter_required_error();
 			} else {
-				require dirname( __FILE__ ) . '/class-wpcom-liveblog-socketio.php';
+				require __DIR__ . '/class-wpcom-liveblog-socketio.php';
 				WPCOM_Liveblog_Socketio::load();
 			}
 		}
@@ -62,14 +67,14 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 * @return bool
 	 */
 	private static function socketio_emitter_exists() {
-		return file_exists( dirname( __FILE__ ) . '/../vendor/autoload.php' )
-			&& file_exists( dirname( __FILE__ ) . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
+		return file_exists( __DIR__ . '/../vendor/autoload.php' )
+			&& file_exists( __DIR__ . '/../vendor/rase/socket.io-emitter/src/Emitter.php' );
 	}
 
 	/**
 	 * Load error message template with a particular message.
 	 *
-	 * @param string $message
+	 * @param string $message The error message to display.
 	 */
 	public static function show_error_message( $message ) {
 		if ( current_user_can( 'manage_options' ) ) {
@@ -118,7 +123,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	 */
 	public static function show_old_php_for_socketio_error() {
 		$message = sprintf(
-			// translators: 1: current PHP version, 2: minimum required PHP version
+			// translators: 1: current PHP version, 2: minimum required PHP version.
 			__( 'Your current PHP is version %1$s, which is too old to run the Liveblog plugin with WebSocket support enabled. The minimum required version is %2$s. Please, either update PHP or disable WebSocket support by removing or setting to false the constant LIVEBLOG_USE_SOCKETIO in wp-config.php.', 'liveblog' ),
 			PHP_VERSION,
 			self::SOCKETIO_MIN_PHP_VERSION
@@ -137,7 +142,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	public static function is_enabled() {
 		$redis_client_connected = false;
 
-		// It is necessary to check if the class exists since if running PHP <= 5.2 we don't include it
+		// It is necessary to check if the class exists since if running PHP <= 5.2 we don't include it.
 		if ( class_exists( 'WPCOM_Liveblog_Socketio' ) && WPCOM_Liveblog_Socketio::is_connected() ) {
 			$redis_client_connected = true;
 		}

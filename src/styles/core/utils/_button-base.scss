@@ -1,0 +1,25 @@
+/**
+ * Base button reset mixin.
+ * Normalizes button styling across browsers.
+ *
+ * 1. Corrects inability to style clickable `input` types in iOS.
+ * 2. Normalize `box-sizing` across all elements that this component could be applied to.
+ * 3. Normalize `line-height`. For `input`, it can't be changed from `normal` in Firefox 4+.
+ * 4. Prevent button text from being selectable.
+ * 5. Make sure `input` will wrap text across multiple lines.
+ */
+@mixin button-reset {
+	-webkit-appearance: none; /* 1 */
+	box-sizing: border-box; /* 2 */
+	display: inline-block;
+	vertical-align: middle;
+	font: inherit;
+	line-height: normal; /* 3 */
+	text-align: center;
+	text-decoration: none;
+	border: none;
+	cursor: pointer;
+	overflow: visible;
+	user-select: none; /* 4 */
+	white-space: normal; /* 5 */
+}

@@ -1,15 +1,41 @@
-// Main colors
-$color-primary: #21759b;
-$color-secondary: #2196f3;
-$color-accent: #2196f3;
-$color-warning: #bc0b0b;
+// CSS Custom Properties - enables runtime theming
+:root {
+	// Main colors
+	--liveblog-color-primary: #21759b;
+	--liveblog-color-accent: #2196f3;
+	--liveblog-color-warning: #bc0b0b;
 
-// Grey colors
-$color-grey-x-light: #f7f7f7;
-$color-grey-light: #bbb;
-$color-grey-mid-light: #eee;
-$color-grey-mid: #d1d1d1;
-$color-grey-base: #666;
-$color-grey-mid-dark: #777;
-$color-grey-dark: #333;
-$color-grey-x-dark: #111;
+	// Grey scale
+	--liveblog-color-grey-x-light: #f7f7f7;
+	--liveblog-color-grey-light: #bbb;
+	--liveblog-color-grey-mid-light: #eee;
+	--liveblog-color-grey-mid: #d1d1d1;
+	--liveblog-color-grey-base: #666;
+	--liveblog-color-grey-mid-dark: #777;
+	--liveblog-color-grey-dark: #333;
+	--liveblog-color-grey-x-dark: #111;
+}
+
+// Sass variables using CSS custom properties
+$color-primary: var(--liveblog-color-primary);
+$color-secondary: var(--liveblog-color-accent); // Alias for accent
+$color-accent: var(--liveblog-color-accent);
+$color-warning: var(--liveblog-color-warning);
+
+$color-grey-x-light: var(--liveblog-color-grey-x-light);
+$color-grey-light: var(--liveblog-color-grey-light);
+$color-grey-mid-light: var(--liveblog-color-grey-mid-light);
+$color-grey-mid: var(--liveblog-color-grey-mid);
+$color-grey-base: var(--liveblog-color-grey-base);
+$color-grey-mid-dark: var(--liveblog-color-grey-mid-dark);
+$color-grey-dark: var(--liveblog-color-grey-dark);
+$color-grey-x-dark: var(--liveblog-color-grey-x-dark);
+
+// Raw color values for Sass color functions (color.adjust, etc.)
+// Use these when you need to manipulate colors at compile time
+$raw-color-primary: #21759b;
+$raw-color-accent: #2196f3;
+$raw-color-warning: #bc0b0b;
+$raw-color-grey-x-light: #f7f7f7;
+$raw-color-grey-light: #bbb;
+$raw-color-grey-dark: #333;

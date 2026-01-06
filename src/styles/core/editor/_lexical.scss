@@ -1,0 +1,252 @@
+// Lexical Editor Styles
+// Production implementation for Liveblog
+
+.liveblog-lexical-editor {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #fff;
+	margin-bottom: 1rem;
+
+	// Use existing toolbar styles from _buttons.scss
+	.liveblog-editor-toolbar-container {
+		border-bottom: 1px solid #ddd;
+	}
+
+	.liveblog-toolbar {
+		padding: 0.5rem;
+		background: #f5f5f5;
+	}
+
+	// Active state for toolbar buttons
+	.liveblog-editor-btn.is-active {
+		background: #e0e0e0;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+	}
+
+	.liveblog-editor-btn[disabled] {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+}
+
+.liveblog-lexical-editor-inner {
+	position: relative;
+	min-height: 150px;
+}
+
+.liveblog-lexical-content-editable {
+	padding: 12px;
+	min-height: 150px;
+	outline: none;
+	font-size: 16px; // 16px minimum prevents iOS zoom on focus
+	line-height: 1.6;
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.liveblog-lexical-placeholder {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	color: #767676; // WCAG AA compliant on white (4.54:1)
+	pointer-events: none;
+	font-size: 16px; // Match editable area
+}
+
+// Text formatting classes (applied within editor)
+.liveblog-lexical-bold {
+	font-weight: 700;
+}
+
+.liveblog-lexical-italic {
+	font-style: italic;
+}
+
+.liveblog-lexical-underline {
+	text-decoration: underline;
+}
+
+.liveblog-lexical-strikethrough {
+	text-decoration: line-through;
+}
+
+.liveblog-lexical-link {
+	color: #007cba;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+// Block elements
+.liveblog-lexical-paragraph {
+	margin: 0 0 8px;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.liveblog-lexical-h1,
+.liveblog-lexical-h2,
+.liveblog-lexical-h3 {
+	margin: 16px 0 8px;
+	font-weight: 700;
+
+	&:first-child {
+		margin-top: 0;
+	}
+}
+
+.liveblog-lexical-h1 {
+	font-size: 24px;
+}
+
+.liveblog-lexical-h2 {
+	font-size: 20px;
+}
+
+.liveblog-lexical-h3 {
+	font-size: 16px;
+}
+
+// Lists
+.liveblog-lexical-ul,
+.liveblog-lexical-ol {
+	margin: 8px 0;
+	padding-left: 24px;
+}
+
+.liveblog-lexical-ul {
+	list-style-type: disc;
+}
+
+.liveblog-lexical-ol {
+	list-style-type: decimal;
+}
+
+.liveblog-lexical-li {
+	margin: 4px 0;
+}
+
+.liveblog-lexical-li-nested {
+	margin-left: 16px;
+}
+
+// Blockquote
+.liveblog-lexical-quote {
+	margin: 8px 0;
+	padding: 8px 16px;
+	border-left: 4px solid #ddd;
+	color: #666;
+	font-style: italic;
+}
+
+// Images
+.liveblog-lexical-image-wrapper {
+	display: inline-block;
+	max-width: 100%;
+}
+
+.liveblog-resizable-image-container {
+	display: inline-block;
+	position: relative;
+	max-width: 100%;
+
+	&.selected {
+		outline: 2px solid #007cba;
+		outline-offset: 2px;
+	}
+
+	&.resizing {
+		user-select: none;
+	}
+}
+
+.liveblog-lexical-image {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 8px 0;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+// Resize handles
+.liveblog-resize-handle {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	background: #007cba;
+	border: 2px solid #fff;
+	border-radius: 2px;
+	cursor: nwse-resize;
+	z-index: 10;
+
+	&:hover {
+		background: #005a8c;
+	}
+}
+
+.liveblog-resize-handle-se {
+	bottom: 4px;
+	right: 4px;
+}
+
+// Drag-over state for image dropping
+.liveblog-lexical-editor.is-drag-over {
+	border-color: #007cba;
+	box-shadow: 0 0 0 1px #007cba;
+}
+
+// Autocomplete Menu
+.liveblog-autocomplete-menu {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	max-height: 200px;
+	overflow-y: auto;
+	min-width: 200px;
+	max-width: 300px;
+}
+
+.liveblog-autocomplete-list {
+	list-style: none;
+	margin: 0;
+	padding: 4px 0;
+}
+
+.liveblog-autocomplete-item {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px;
+	cursor: pointer;
+	transition: background-color 0.1s ease;
+
+	&:hover,
+	&.is-selected {
+		background-color: #f0f0f0;
+	}
+}
+
+.liveblog-autocomplete-avatar {
+	display: inline-flex;
+	align-items: center;
+	margin-right: 8px;
+	flex-shrink: 0;
+
+	img {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+	}
+}
+
+.liveblog-autocomplete-text {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 14px;
+}

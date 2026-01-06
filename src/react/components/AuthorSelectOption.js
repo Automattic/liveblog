@@ -1,46 +1,42 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-class AuthorSelectOption extends Component {
-  handleMouseDown(event) {
-    const { onSelect, option } = this.props;
-    event.preventDefault();
-    event.stopPropagation();
-    onSelect(option, event);
-  }
-
-  handleMouseEnter(event) {
-    this.props.onFocus(this.props.option, event);
-  }
-
-  handleMouseMove(event) {
-    const { isFocused, onFocus, option } = this.props;
-    if (isFocused) return;
-    onFocus(option, event);
-  }
-
-  render() {
-    const { className, option } = this.props;
+/**
+ * Custom Option component for react-select author picker.
+ * Must spread innerProps and use innerRef for keyboard navigation to work.
+ */
+const AuthorSelectOption = ({ innerRef, innerProps, data, isFocused, isSelected, isDisabled }) => {
+  // Render hint option differently
+  if (data.isHint) {
     return (
       <div
-        className={`${className} liveblog-popover-item`}
-        onMouseDown={this.handleMouseDown.bind(this)}
-        onMouseEnter={this.handleMouseEnter.bind(this)}
-        onMouseMove={this.handleMouseMove.bind(this)}
+        ref={innerRef}
+        className="liveblog-popover-item liveblog-popover-hint"
       >
-        { option.avatar && <div dangerouslySetInnerHTML={{ __html: option.avatar }} /> }
-        {option.name}
+        {data.name}
       </div>
     );
   }
-}
+
+  return (
+    <div
+      ref={innerRef}
+      {...innerProps}
+      className={`liveblog-popover-item ${isFocused ? 'is-focused' : ''} ${isSelected ? 'is-selected' : ''} ${isDisabled ? 'is-disabled' : ''}`}
+    >
+      {data.avatar && <div dangerouslySetInnerHTML={{ __html: data.avatar }} />}
+      {data.name}
+    </div>
+  );
+};
 
 AuthorSelectOption.propTypes = {
-  onSelect: PropTypes.func,
-  option: PropTypes.object,
-  onFocus: PropTypes.func,
+  innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+  innerProps: PropTypes.object,
+  data: PropTypes.object,
   isFocused: PropTypes.bool,
-  className: PropTypes.string,
+  isSelected: PropTypes.bool,
+  isDisabled: PropTypes.bool,
 };
 
 export default AuthorSelectOption;

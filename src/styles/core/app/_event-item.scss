@@ -1,0 +1,21 @@
+@use "../utils" as *;
+
+.liveblog-event {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+
+.liveblog-event-meta {
+	font-size: 0.8rem;
+	color: $color-grey-base;
+}
+
+.liveblog-event-content:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.liveblog-event .type-key {
+	display: none;
+}

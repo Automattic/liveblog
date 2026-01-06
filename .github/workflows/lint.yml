@@ -10,29 +10,36 @@ on:
   # Allow manually triggering the workflow.
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Run JS linting
-    # Ubuntu-20.x includes MySQL 8.0, which causes `caching_sha2_password` issues with PHP < 7.4
-    # https://www.php.net/manual/en/mysqli.requirements.php
-    # TODO: change to ubuntu-latest when we no longer support PHP < 7.4
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
 
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-          node-version: "14"
+          node-version: "20"
 
       - name: NPM install
         run: npm install
 
       - name: Run eslint on React files
-        run: npm run lint-scripts
+        run: npm run lint:js
         continue-on-error: true
 
-      - name: Run styleslint on SCSS files
-        run: npm run lint-styles
+      - name: Run stylelint on SCSS files
+        run: npm run lint:css

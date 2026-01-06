@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { __ } from '@wordpress/i18n';
 
 import * as eventsActions from '../actions/eventsActions';
 
@@ -20,7 +21,7 @@ class EventsContainer extends Component {
 
     this.delete = (key) => {
       /* eslint no-alert: 0 */
-      if (window.confirm('Are you sure you want to delete this entry?')) {
+      if (window.confirm( __( 'Are you sure you want to delete this entry?', 'liveblog' ) )) {
         this.props.deleteEvent(key);
       }
     };
@@ -49,7 +50,7 @@ class EventsContainer extends Component {
   }
 
   renderEvents() {
-    const { events, jumpToEvent, canEdit, utcOffset, dateFormat, title } = this.props;
+    const { events, jumpToEvent, canEdit, locale, title } = this.props;
 
     return (
       <div>
@@ -62,14 +63,13 @@ class EventsContainer extends Component {
               click={() => jumpToEvent(events[key].id)}
               onDelete={() => this.confirmDeletion(events[key])}
               canEdit={canEdit}
-              utcOffset={utcOffset}
-              dateFormat={dateFormat}
+              locale={locale}
             />,
           )}
         </ul>
         {this.state.showPopup ?
           <DeleteConfirmation
-            text="Are you sure you want to remove this entry as a key event?"
+            text={ __( 'Are you sure you want to remove this entry as a key event?', 'liveblog' ) }
             onConfirmDelete={() => this.deleteKeyEvent()}
             onCancel={this.togglePopup.bind(this)}
           />
@@ -94,14 +94,12 @@ EventsContainer.propTypes = {
   events: PropTypes.object,
   container: PropTypes.any,
   canEdit: PropTypes.bool,
-  utcOffset: PropTypes.string,
-  dateFormat: PropTypes.string,
+  locale: PropTypes.string,
   title: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
-  dateFormat: state.config.date_format,
-  utcOffset: state.config.utc_offset,
+  locale: state.config.locale,
   events: state.events.entries,
   canEdit: state.config.is_liveblog_editable === '1',
 });

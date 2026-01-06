@@ -1,22 +1,23 @@
+/* eslint-disable camelcase, no-undef */
+// Set webpack public path BEFORE any imports that might trigger dynamic chunk loading
+__webpack_public_path__ = `${window.liveblog_settings.plugin_dir}build/`;
+
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import Polyfills from './polyfills/index';
 import configureStore from './store';
 import AppContainer from './containers/AppContainer';
 
 import '../styles/core.scss';
 
-Polyfills();
-
 const store = configureStore();
 
-/* eslint-disable camelcase, no-undef */
-__webpack_public_path__ = `${window.liveblog_settings.plugin_dir}assets/`;
-
-ReactDOM.render(
-  <Provider store={store}>
-    <AppContainer />
-  </Provider>,
-  document.getElementById('wpcom-liveblog-container'),
-);
+const container = document.getElementById('wpcom-liveblog-container');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <Provider store={store}>
+      <AppContainer />
+    </Provider>,
+  );
+}

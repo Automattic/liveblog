@@ -1,4 +1,9 @@
 <?php
+/**
+ * Extends the entry box with autocomplete.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_Entry_Extend
@@ -33,10 +38,10 @@ class WPCOM_Liveblog_Entry_Extend {
 		add_filter( 'liveblog_before_update_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
 		add_filter( 'liveblog_before_preview_entry', array( __CLASS__, 'fix_links_wrapped_in_div' ), 1 );
 
-		// Allow the features to be seperated in multiple ways: via spaces,
+		// Allow the features to be separated in multiple ways: via spaces,
 		// pipes or commas. This line explodes via spaces and pipes then
 		// proceeds to explode it via commas. This allows for the tidy:
-		// feature_one, feature_two, feature_three
+		// feature_one, feature_two, feature_three.
 		self::$features = explode( ',', preg_replace( '~[ |]+~', ',', self::$features ) );
 		self::$features = array_filter( self::$features, 'strlen' );
 
@@ -53,8 +58,8 @@ class WPCOM_Liveblog_Entry_Extend {
 		// We loop every feature and set them up individually.
 		foreach ( self::$features as $name ) {
 
-			// Grab the class from what we expect the classname to be.
-			// WPCOM_Liveblog_Entry_Extend_Feature_{{ $name }}
+			// Grab the class from what we expect the classname to be:
+			// WPCOM_Liveblog_Entry_Extend_Feature_{{ $name }}.
 			$class   = __CLASS__ . '_Feature_' . ucfirst( $name );
 			$feature = new $class();
 
@@ -104,10 +109,10 @@ class WPCOM_Liveblog_Entry_Extend {
 	}
 
 	/**
-	 * Strips out unneeded spans
+	 * Strips out unneeded spans.
 	 *
-	 * @param $entry
-	 * @return mixed
+	 * @param array $entry The liveblog entry.
+	 * @return array
 	 */
 	public static function strip_input( $entry ) {
 		// Replace all escaped spaces with normal spaces to
@@ -122,17 +127,16 @@ class WPCOM_Liveblog_Entry_Extend {
 	}
 
 	/**
-	 * Replaces div wrapping oembedable links with p for core to pick those up
+	 * Replaces div wrapping oembedable links with p for core to pick those up.
 	 *
 	 * The div wrapping links which would otherwise would be on their own line
-	 * is coming from Webkit browser's contenteditable
+	 * is coming from Webkit browser's contenteditable.
 	 *
-	 * $param array Liveblog entry
+	 * @param array $entry The liveblog entry.
 	 * @return array
-	*/
+	 */
 	public static function fix_links_wrapped_in_div( $entry ) {
 		$entry['content'] = preg_replace( '|(<div(?: [^>]*)?>\s*)(https?://[^\s<>"]+)(\s*<\/div>)|i', '<p>${2}</p>', $entry['content'] );
 		return $entry;
 	}
-
 }

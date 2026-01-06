@@ -1,0 +1,10 @@
+@use "../utils" as *;
+@use "theme-shared";
+
+/**
+ * Theme-specific entry styles
+ * Additional styles on top of shared base
+ */
+.liveblog-entry-content {
+	padding-left: 60px;
+}

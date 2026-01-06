@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -23,18 +23,26 @@ class AppContainer extends Component {
     const { loadConfig, getEntries, getEvents, startPolling } = this.props;
     loadConfig(window.liveblog_settings);
     getEntries(1, window.location.hash);
-    startPolling();
+    // Don't poll if the liveblog is archived - there won't be new entries
+    if (window.liveblog_settings.state !== 'archive') {
+      startPolling();
+    }
     if (this.eventsContainer) getEvents();
   }
 
   render() {
-    const { page, loading, entries, polling, mergePolling, config } = this.props;
+    const { page, loading, entries, polling, mergePolling, config, total } = this.props;
     const canEdit = config.is_liveblog_editable === '1';
 
     return (
       <div style={{ position: 'relative' }}>
-        {(page === 1 && canEdit) && <Editor isEditing={false} />}
+        {(page === 1 && canEdit) && (
+          <Suspense fallback={<div>Loading editor...</div>}>
+            <Editor isEditing={false} />
+          </Suspense>
+        )}
         <UpdateButton polling={polling} click={() => mergePolling()} />
+        {canEdit && <div className="liveblog-updates-count">Updates: {total}</div>}
         <PaginationContainer />
         <Entries loading={loading} entries={entries} />
         <PaginationContainer />
@@ -56,6 +64,7 @@ AppContainer.propTypes = {
   polling: PropTypes.array,
   mergePolling: PropTypes.func,
   config: PropTypes.object,
+  total: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
@@ -66,6 +75,7 @@ const mapStateToProps = state => ({
     .slice(0, state.config.entries_per_page),
   polling: Object.keys(state.polling.entries),
   config: state.config,
+  total: state.pagination.total,
 });
 
 const mapDispatchToProps = dispatch =>

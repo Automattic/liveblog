@@ -1,0 +1,75 @@
+name: Run PHPUnit
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: WP ${{ matrix.wordpress }} on PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+
+    env:
+      WP_VERSION: ${{ matrix.wordpress }}
+
+    strategy:
+      matrix:
+        include:
+          # Check lowest supported WP version, with the lowest supported PHP.
+          - wordpress: '6.4'
+            php: '7.4'
+          # Check latest WP with the latest PHP.
+          - wordpress: 'master'
+            php: 'latest'
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install wordpress environment
+        run: npm install -g @wordpress/env
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ matrix.extensions }}
+          ini-values: ${{ matrix.ini-values }}
+          coverage: ${{ matrix.coverage }}
+          tools: composer
+
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # 3.1.1
+        with:
+          composer-options: "${{ matrix.composer-options }}"
+
+      - name: Setup wp-env
+        run: wp-env start
+        env:
+          WP_ENV_CORE: WordPress/WordPress#${{ matrix.wordpress == 'latest' && 'master' || matrix.wordpress }}
+
+      - name: Run integration tests (single site)
+        if: ${{ matrix.php != 8.5 }}
+        run: composer test:integration
+      - name: Run integration tests (single site with code coverage)
+        if: ${{ matrix.php == 8.5 }}
+        run: composer coverage-ci
+      - name: Run integration tests (multisite)
+        run: composer test:integration-ms

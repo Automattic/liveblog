@@ -1,9 +1,14 @@
 <?php
+/**
+ * Adds AMP support for Liveblog.
+ *
+ * @package Liveblog
+ */
 
 /**
  * Class WPCOM_Liveblog_AMP
  *
- * Adds AMP support for Liveblog
+ * Adds AMP support for Liveblog.
  */
 class WPCOM_Liveblog_AMP {
 
@@ -13,7 +18,9 @@ class WPCOM_Liveblog_AMP {
 	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by WPCOM_Liveblog::load() to initialize AMP support.
+	 *
+	 * @return void
 	 */
 	public static function load() {
 
@@ -23,7 +30,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		// Hook at template_redirect level as some Liveblog hooks require it.
-		add_filter( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
+		add_action( 'template_redirect', array( __CLASS__, 'setup' ), 10 );
 
 		// Add query vars to support pagination and single entries.
 		add_filter( 'query_vars', array( __CLASS__, 'add_custom_query_vars' ), 10 );
@@ -77,6 +84,7 @@ class WPCOM_Liveblog_AMP {
 	 * Add query vars to support pagination and single entries.
 	 *
 	 * @param array $query_vars Allowed Query Variables.
+	 * @return array Updated query vars.
 	 */
 	public static function add_custom_query_vars( $query_vars ) {
 		$query_vars[] = 'liveblog_page';
@@ -87,12 +95,31 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
-	 * Add default social share options
+	 * Add default social share options.
+	 *
+	 * @return array Array of social platform identifiers for AMP sharing.
 	 */
 	public static function add_social_share_options() {
-		$social_array = array( 'twitter', 'pinterest', 'email', 'gplus' );
+		$social_array = array( 'twitter', 'pinterest', 'email' );
 
-		if ( defined( 'LIVEBLOG_AMP_FACEBOOK_SHARE' ) ) {
+		/**
+		 * Filters the Facebook App ID for AMP social sharing.
+		 *
+		 * Facebook sharing requires an App ID. Return your Facebook App ID
+		 * from this filter to enable Facebook sharing on AMP liveblog entries.
+		 *
+		 * Example usage:
+		 *     add_filter( 'liveblog_amp_facebook_share_app_id', function() {
+		 *         return '123456789012345';
+		 *     } );
+		 *
+		 * @since 1.9.7
+		 *
+		 * @param string $app_id Facebook App ID. Default empty string (disabled).
+		 */
+		$facebook_app_id = apply_filters( 'liveblog_amp_facebook_share_app_id', '' );
+
+		if ( ! empty( $facebook_app_id ) ) {
 			$social_array[] = 'facebook';
 		}
 
@@ -105,7 +132,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function print_styles() {
-		$css      = file_get_contents( dirname( __DIR__ ) . '/assets/amp.css' );
+		$css      = file_get_contents( dirname( __DIR__ ) . '/build/amp.css' );
 		$safe_css = wp_check_invalid_utf8( $css );
 		$safe_css = _wp_specialchars( $safe_css );
 
@@ -118,7 +145,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'assets/amp.css', array(), WPCOM_Liveblog::VERSION );
+		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'build/amp.css', array(), WPCOM_Liveblog::VERSION );
 	}
 
 
@@ -240,8 +267,9 @@ class WPCOM_Liveblog_AMP {
 	/**
 	 * Set the last known entry for users who don't have one yet.
 	 *
-	 * @param  array  $entries liveblog entries.
+	 * @param  array  $entries Liveblog entries.
 	 * @param  object $request Request Object.
+	 * @return object Updated request object.
 	 */
 	public static function set_request_last_from_entries( $entries, $request ) {
 		if ( false === $request->last && ! empty( $entries['entries'] ) ) {
@@ -313,14 +341,24 @@ class WPCOM_Liveblog_AMP {
 	}
 
 	/**
-	 * Builds entry data for single liveblog entry template on AMP
+	 * Minimum refresh interval for AMP live-list component (in milliseconds).
+	 *
+	 * @see https://amp.dev/documentation/components/amp-live-list/
+	 */
+	const AMP_MIN_REFRESH_INTERVAL = 15000;
+
+	/**
+	 * Builds entry data for liveblog entries feed template on AMP.
 	 *
 	 * @param  array  $entries liveblog entries.
 	 * @param  object $request Request Object.
 	 * @param  string $post_id post id.
-	 * @return object          template
+	 * @return string          Rendered template.
 	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
+		// AMP live-list requires a minimum poll interval of 15 seconds.
+		$refresh_interval = max( self::AMP_MIN_REFRESH_INTERVAL, WPCOM_Liveblog::get_refresh_interval() );
+
 		$rendered = self::get_template(
 			'feed',
 			array(
@@ -332,7 +370,7 @@ class WPCOM_Liveblog_AMP {
 				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => array(
 					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
-					'refresh_interval' => WPCOM_Liveblog::get_refresh_interval(),
+					'refresh_interval' => $refresh_interval,
 					'social'           => self::add_social_share_options(),
 				),
 			)
@@ -368,7 +406,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return string        Time Ago
 	 */
 	public static function get_entry_time_ago( $entry ) {
-		return human_time_diff( $entry->entry_time, current_time( 'timestamp', true ) ) . ' ago';
+		return human_time_diff( $entry->entry_time, time() ) . ' ago';
 	}
 
 	/**
@@ -467,7 +505,7 @@ class WPCOM_Liveblog_AMP {
 	 * @return bool AMP polling request.
 	 */
 	public static function is_amp_polling() {
-		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] ); // phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only check for AMP polling status.
+		return isset( $_GET[ self::AMP_UPDATE_QUERY_VAR ] );
 	}
 }

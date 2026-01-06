@@ -2,7 +2,7 @@
  * RxJS ajax pretty much interchangable with axios.
  * Using RxJS ajax as it's already an observable to use with redux-observable.
  */
-import { ajax } from 'rxjs/observable/dom/ajax';
+import { ajax } from 'rxjs/ajax';
 
 import {
   getCurrentTimestamp,
@@ -11,8 +11,16 @@ import {
 const getParams = x => `?${Object.keys(x).map(p => `&${p}=${x[p]}`).join('')}`;
 
 export function getEntries(page, config, newestEntry) {
+  // For page 1, use 'latest' to always get fresh entries.
+  // This avoids stale data when the HTML page is cached (CDN/Varnish)
+  // but entries have been added since the page was cached.
+  // For other pages, use the newestEntry as an anchor for consistent pagination.
+  const lastKnownEntry = page === 1
+    ? 'latest'
+    : `${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`;
+
   const settings = {
-    url: `${config.endpoint_url}get-entries/${page}/${newestEntry.id || config.latest_entry_id}-${newestEntry.timestamp || config.latest_entry_timestamp}`,
+    url: `${config.endpoint_url}get-entries/${page}/${lastKnownEntry}`,
     method: 'GET',
     crossDomain: config.cross_domain,
   };
@@ -21,16 +29,16 @@ export function getEntries(page, config, newestEntry) {
 }
 
 export function polling(newestEntryTimestamp, config) {
-  let timestamp = getCurrentTimestamp();
-
-  // Round out the timestamp to get a higher cache hitrate.
-  // Rather than a random scatter of timestamps,
-  // this allows multiple clients to make a request with the same timestamp.
+  // Round both timestamps to bucket boundaries for higher cache hitrate.
+  // This groups clients with similar state into the same cache cohort.
+  // Clients may receive duplicate entries, but applyUpdate() handles
+  // duplicates via entry IDs - receiving the same entry twice is safe.
   const refreshInterval = parseInt(config.refresh_interval, 10);
-  timestamp = Math.floor(timestamp / refreshInterval) * refreshInterval;
+  const startTimestamp = Math.floor((newestEntryTimestamp + 1) / refreshInterval) * refreshInterval;
+  const endTimestamp = Math.floor(getCurrentTimestamp() / refreshInterval) * refreshInterval;
 
   const settings = {
-    url: `${config.endpoint_url}entries/${(newestEntryTimestamp + 1) || 0}/${timestamp}/`,
+    url: `${config.endpoint_url}entries/${startTimestamp || 0}/${endTimestamp}/`,
     method: 'GET',
     crossDomain: config.cross_domain,
   };
@@ -148,6 +156,9 @@ export function getAuthors(term, config) {
   const settings = {
     url: `${config.autocomplete[3].url}${term}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': config.nonce,
+    },
     crossDomain: config.cross_domain,
   };
 
@@ -158,6 +169,9 @@ export function getHashtags(term, config) {
   const settings = {
     url: `${config.autocomplete[2].url}${term}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': config.nonce,
+    },
     crossDomain: config.cross_domain,
   };
 
@@ -173,6 +187,7 @@ export function getPreview(content, config) {
     },
     headers: {
       'Content-Type': 'application/json',
+      'X-WP-Nonce': config.nonce,
     },
     crossDomain: config.cross_domain,
   };
@@ -184,7 +199,7 @@ export function uploadImage(formData) {
   const location = window.location;
 
   const settings = {
-    url: `${location.protocol}//${location.hostname}/wp-admin/admin-ajax.php`,
+    url: `${location.protocol}//${location.host}/wp-admin/admin-ajax.php`,
     method: 'POST',
     body: formData,
   };
@@ -196,8 +211,11 @@ export function getMedia(params) {
   const location = window.location;
 
   const settings = {
-    url: `${location.protocol}//${location.hostname}/wp-json/wp/v2/media${getParams(params)}`,
+    url: `${location.protocol}//${location.host}/wp-json/wp/v2/media${getParams(params)}`,
     method: 'GET',
+    headers: {
+      'X-WP-Nonce': window.liveblog_settings?.nonce || '',
+    },
   };
 
   return ajax(settings);

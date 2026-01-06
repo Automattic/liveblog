@@ -1,0 +1,105 @@
+@use "sass:color";
+@use "../utils" as *;
+@use "theme-shared";
+
+/**
+ * AMP-specific entry styles
+ * Additional styles on top of shared base
+ */
+.liveblog-entry {
+	display: flex;
+	padding: 1em;
+	font-family: $font-family-base;
+
+	@include mq($until: medium) {
+		font-size: 14px;
+	}
+}
+
+.liveblog-entry-main .liveblog-entry-content p {
+	margin: 16px 0;
+}
+
+.liveblog-entry a,
+.liveblog-entry a:visited {
+	color: $color-grey-dark;
+}
+
+.liveblog-entry-main {
+	flex-grow: 1;
+}
+
+.liveblog-entry-aside {
+	flex-basis: 70px;
+	min-width: 70px;
+	margin-right: 10px;
+}
+
+.liveblog-meta-time {
+	text-decoration: none;
+}
+
+.entry-content .liveblog-meta-time,
+.entry-content .liveblog-meta-time:hover,
+.entry-content .liveblog-meta-time:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+/**
+ * AMP-specific pagination styles
+ */
+.liveblog-pagination-pages {
+	font-family: $font-family-base;
+}
+
+.liveblog-pagination-btn,
+.ampstart-btn {
+	background-color: $color-grey-x-dark;
+	border: 0;
+	border-radius: 2px;
+	box-shadow: none;
+	color: #fff;
+	font-family: $font-family-base;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 14px;
+	line-height: 1;
+	padding: 0.5rem 1rem;
+
+	&:hover {
+		color: #fff;
+		background: $color-grey-dark;
+	}
+
+	&:visited {
+		color: #fff;
+	}
+}
+
+.ampstart-btn {
+	color: #fff;
+	background: $color-primary;
+	font-size: 16px;
+	border-radius: 50px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 15px;
+
+	&:hover {
+		background: color.adjust($raw-color-primary, $lightness: 10%);
+	}
+}
+
+.live-list .ampstart-btn {
+	display: none;
+}
+
+/**
+ * AMP-specific embed styles
+ */
+.liveblog-entry amp-youtube,
+.liveblog-entry amp-instagram,
+.liveblog-entry amp-vine {
+	margin: 0 0 1.5em;
+}
