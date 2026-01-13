@@ -28,9 +28,12 @@ class EditorContainer extends Component {
   constructor(props) {
     super(props);
 
+    // Default to no authors for new entries (authorless/anonymous style).
+    // Users can add authors when attribution is relevant.
+    // For editing, preserve the existing authors.
     const initialAuthors = props.entry
       ? props.entry.authors
-      : [props.config.current_user];
+      : [];
 
     this.state = {
       suggestions: [],
@@ -279,6 +282,27 @@ class EditorContainer extends Component {
     return (
       <div className="liveblog-editor-container" onKeyDown={this.handleKeyDown.bind(this)}>
         {!isEditing && <h1 className="liveblog-editor-title">{ __( 'Add New Entry', 'liveblog' ) }</h1>}
+        <div className="liveblog-editor-authors">
+          <h2 className="liveblog-editor-subTitle">{ __( 'Authors:', 'liveblog' ) }</h2>
+          <Async
+            classNamePrefix="liveblog-select"
+            aria-label={__( 'Entry authors', 'liveblog' )}
+            isMulti={true}
+            value={authors}
+            getOptionValue={(option) => option.key}
+            getOptionLabel={(option) => option.name}
+            onChange={this.onSelectAuthorChange.bind(this)}
+            components={{ Option: AuthorSelectOption }}
+            loadOptions={this.getUsers.bind(this)}
+            defaultOptions={true}
+            isClearable={true}
+            cacheOptions={false}
+            isOptionDisabled={(option) => option.isDisabled}
+            noOptionsMessage={({ inputValue }) =>
+              inputValue ? __( 'No authors matched', 'liveblog' ) : __( 'Loading authors…', 'liveblog' )
+            }
+          />
+        </div>
         <div className="liveblog-editor-tabs">
           <button
             className={`liveblog-editor-tab ${mode === 'editor' ? 'is-active' : ''}`}
@@ -334,25 +358,6 @@ class EditorContainer extends Component {
             width="100%"
           />
         }
-        <h2 className="liveblog-editor-subTitle">{ __( 'Authors:', 'liveblog' ) }</h2>
-        <Async
-          classNamePrefix="liveblog-select"
-          aria-label={__( 'Entry authors', 'liveblog' )}
-          isMulti={true}
-          value={authors}
-          getOptionValue={(option) => option.key}
-          getOptionLabel={(option) => option.name}
-          onChange={this.onSelectAuthorChange.bind(this)}
-          components={{ Option: AuthorSelectOption }}
-          loadOptions={this.getUsers.bind(this)}
-          defaultOptions={true}
-          isClearable={false}
-          cacheOptions={false}
-          isOptionDisabled={(option) => option.isDisabled}
-          noOptionsMessage={({ inputValue }) =>
-            inputValue ? __( 'No authors matched', 'liveblog' ) : __( 'Loading authors…', 'liveblog' )
-          }
-        />
         <button className="liveblog-btn liveblog-publish-btn" onClick={this.publish.bind(this)}>
           {isEditing ? __( 'Publish Update', 'liveblog' ) : __( 'Publish New Entry', 'liveblog' )}
         </button>

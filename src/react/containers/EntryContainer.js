@@ -85,12 +85,22 @@ class EntryContainer extends Component {
         ref={node => this.node = node}
         className={`liveblog-entry ${entry.key_event ? 'is-key-event' : ''} ${entry.css_classes}`}
       >
-        <aside className="liveblog-entry-aside">
+        <header className="liveblog-entry-header">
           <a className="liveblog-meta-time" href={entry.share_link} target="_blank" rel="noopener noreferrer">
-            <span>{timeAgo(entry.entry_time, config.locale)}</span>
-            <span>{formattedTime(entry.entry_time, config.utc_offset, config.date_format, config.timezone_string)}</span>
+            <time dateTime={new Date(entry.entry_time * 1000).toISOString()}>
+              {formattedTime(entry.entry_time, config.utc_offset, config.time_format, config.timezone_string)}
+            </time>
           </a>
-        </aside>
+          {config.is_liveblog_editable === '1' && (
+            <div className="liveblog-entry-actions">
+              {this.isEditing()
+                ? <button className="liveblog-btn-edit" onClick={this.close}>{ __( 'Close', 'liveblog' ) }</button>
+                : <button className="liveblog-btn-edit" onClick={this.edit}>{ __( 'Edit', 'liveblog' ) }</button>
+              }
+              <button className="liveblog-btn-delete" onClick={this.togglePopup.bind(this)}>{ __( 'Delete', 'liveblog' ) }</button>
+            </div>
+          )}
+        </header>
         <div className="liveblog-entry-main">
           {this.state.showPopup ?
             <DeleteConfirmation
@@ -101,7 +111,7 @@ class EntryContainer extends Component {
             : null
           }
           {
-            (entry.authors && entry.authors.length > 0) &&
+            (entry.authors && entry.authors.length > 0) && !this.isEditing() &&
             <header className="liveblog-meta-authors">
               {
                 entry.authors.map(author => (
@@ -134,7 +144,6 @@ class EntryContainer extends Component {
                 />
               )
           }
-          {this.entryActions()}
         </div>
       </article>
     );
