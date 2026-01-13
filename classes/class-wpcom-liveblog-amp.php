@@ -145,7 +145,10 @@ class WPCOM_Liveblog_AMP {
 	 * @return void
 	 */
 	public static function enqueue_styles() {
-		wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'build/amp.css', array(), WPCOM_Liveblog::VERSION );
+		/** This filter is documented in liveblog.php */
+		if ( apply_filters( 'liveblog_load_default_styles', true ) ) {
+			wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'build/amp.css', array(), WPCOM_Liveblog::VERSION );
+		}
 	}
 
 

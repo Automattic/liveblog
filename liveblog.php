@@ -1278,7 +1278,21 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$dependencies = isset( $asset_file['dependencies'] ) ? $asset_file['dependencies'] : array();
 			$version      = isset( $asset_file['version'] ) ? $asset_file['version'] : self::VERSION;
 
-			wp_enqueue_style( self::KEY, plugins_url( 'build/app.css', __FILE__ ), array(), $version );
+			/**
+			 * Filter whether to load Liveblog's default frontend styles.
+			 *
+			 * Themes can use this filter to disable the plugin's default CSS
+			 * and provide their own styling for better theme integration.
+			 *
+			 * This filter applies to frontend and AMP styles only, not admin styles.
+			 *
+			 * @since 1.11.0
+			 *
+			 * @param bool $load_styles Whether to load default styles. Default true.
+			 */
+			if ( apply_filters( 'liveblog_load_default_styles', true ) ) {
+				wp_enqueue_style( self::KEY, plugins_url( 'build/app.css', __FILE__ ), array(), $version );
+			}
 
 			// Load client scripts.
 			wp_enqueue_script( self::KEY, plugins_url( 'build/app.js', __FILE__ ), $dependencies, $version, true );
