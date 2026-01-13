@@ -5,65 +5,54 @@
  * These styles apply to both the main theme and AMP templates
  */
 
-// Entry styles
+// Entry card styles
 .liveblog-entry {
 	background: $color-grey-x-light;
-	border-top: 2px solid $color-grey-mid-light;
-	border-bottom: 2px solid $color-grey-mid-light;
+	border-top: 3px solid $color-primary;
+	padding: 1rem 1.25rem 1.25rem;
+	margin-bottom: 1.75rem;
 }
 
 .liveblog-entry.is-key-event {
-	border-top: 2px solid $color-grey-x-dark;
+	border-top-color: $color-warning;
 }
 
 .liveblog-entry-edit {
-	margin-left: 60px;
-
-	@include mq($until: medium) {
-		margin-left: 0;
-	}
+	margin-top: 1rem;
 }
 
-.liveblog-entry-content {
-	padding-top: 10px;
+// Entry content area
+.liveblog-entry-content,
+.liveblog-entry-text {
+	padding-top: 0;
+	line-height: 1.6;
+	color: $color-grey-dark;
+
+	p:first-child {
+		margin-top: 0;
+	}
+
+	p:last-child {
+		margin-bottom: 0;
+	}
 }
 
 .liveblog-meta {
 	color: $color-grey-base;
 }
 
-.liveblog-meta-time {
-	flex-basis: 60px;
-}
-
-.liveblog-meta-time span {
-	font-size: 10px;
-	line-height: 12px;
-}
-
-.liveblog-meta-time span:first-child {
-	font-weight: 600;
-	color: $color-grey-dark;
-	margin-bottom: 5px;
-}
-
-.liveblog-meta-author-name {
-	font-size: 13px;
-	margin-left: 8px;
-}
-
-.liveblog-meta-author-avatar {
-	border-radius: 50%;
-	overflow: hidden;
-	width: 30px;
-	height: 30px;
-}
-
+// Entry tools (footer only)
 .liveblog-entry-tools {
-	margin-left: 60px;
+	margin-top: 1rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid $color-grey-mid-light;
+	list-style: none;
+	padding-left: 0;
+	margin-left: 0;
 
-	@include mq($until: medium) {
-		margin-left: 0;
+	li {
+		display: flex;
+		gap: 0.5rem;
 	}
 }
 

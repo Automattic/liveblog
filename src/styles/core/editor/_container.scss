@@ -68,6 +68,12 @@
 	margin-bottom: 0.6rem;
 }
 
+.liveblog-editor-authors {
+	position: relative;
+	z-index: 100;
+	margin-bottom: 1rem;
+}
+
 @include mq($until: small) {
 
 	.liveblog-editor-container .public-DraftEditor-content {

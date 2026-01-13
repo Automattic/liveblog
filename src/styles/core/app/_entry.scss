@@ -11,11 +11,61 @@
 	}
 }
 
-.liveblog-meta {
-	display: inline-flex;
-	flex-wrap: nowrap;
+// Entry header with time and actions
+.liveblog-entry-header {
+	display: flex;
+	justify-content: space-between;
 	align-items: flex-start;
+	margin: -1rem -1.25rem 0.75rem; // Pull up into padding
+	padding: 0 1.25rem 0 0; // Right padding for buttons
+}
+
+// Entry actions (Edit/Delete buttons) in header
+.liveblog-entry-header .liveblog-entry-actions {
+	display: flex;
+	gap: 0.5rem;
+	padding-top: 0.5rem;
+}
+
+.liveblog-btn-edit,
+.liveblog-btn-delete {
+	padding: 0.25rem 0.5rem;
+	font-size: 0.75rem;
+	font-weight: 500;
+	border: 1px solid $color-grey-mid;
+	border-radius: 0.25rem;
+	background: transparent;
+	color: $color-grey-dark;
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+
+	&:hover {
+		background: $color-grey-mid-light;
+	}
+}
+
+.liveblog-btn-delete {
+	color: $color-warning;
+	border-color: $color-warning;
+
+	&:hover {
+		background: rgba(188, 11, 11, 0.1);
+	}
+}
+
+// Entry main content area
+.liveblog-entry-main {
+	flex: 1;
+	min-width: 0; // Prevent overflow
+}
+
+.liveblog-meta {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.75rem;
 	text-decoration: none;
+	margin-bottom: 0.75rem;
 }
 
 .liveblog-meta-authors,
@@ -23,16 +73,61 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
 }
 
-.liveblog-meta-time span {
-	display: block;
+// Time styling with coloured background
+.liveblog-meta-time {
+	display: inline-block;
+	text-decoration: none;
+	background: $color-primary;
+	color: #fff;
+	padding: 0.25rem 0.625rem;
+	font-size: 0.875rem;
+	font-weight: 700;
+	white-space: nowrap;
+
+	time {
+		display: block;
+	}
+
+	&:hover {
+		text-decoration: none;
+		opacity: 0.9;
+	}
 }
 
-.liveblog-meta-author-avatar img {
-	width: 30px;
-	height: 30px;
-	border-radius: 50%;
+// Key events use warning colour for time
+.liveblog-entry.is-key-event .liveblog-meta-time {
+	background: $color-warning;
+}
+
+// Author avatar and name styling
+.liveblog-meta-author-avatar {
+	flex-shrink: 0;
+
+	img {
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		display: block;
+	}
+}
+
+.liveblog-meta-author-name {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: $color-grey-dark;
+
+	a {
+		color: inherit;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 }
 
 .liveblog-entry-tools {

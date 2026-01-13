@@ -5,6 +5,27 @@
  * Theme-specific entry styles
  * Additional styles on top of shared base
  */
-.liveblog-entry-content {
-	padding-left: 60px;
+
+// Container for all entries
+#liveblog-entries {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+// New entry highlight animation
+.liveblog-entry.is-new {
+	animation: liveblog-highlight 3s ease-out;
+}
+
+@keyframes liveblog-highlight {
+	0% {
+		background-color: rgba(33, 150, 243, 0.15);
+		border-color: $color-accent;
+	}
+
+	100% {
+		background-color: $color-grey-x-light;
+		border-color: $color-grey-mid-light;
+	}
 }
