@@ -1331,7 +1331,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'timezone_string'              => wp_timezone_string(),
 						'locale'                       => get_locale(),
 						'date_format'                  => get_option( 'date_format' ),
-						'time_format'                  => get_option( 'time_format' ),
+						'time_format'                  => apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) ),
 						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
@@ -1553,6 +1553,24 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'class',
 				'new_label',
 				'new_button',
+				// Entry template variables.
+				'entry_id',
+				'post_id',
+				'css_classes',
+				'content',
+				'original_content',
+				'avatar_size',
+				'avatar_img',
+				'author_link',
+				'authors',
+				'entry_date',
+				'entry_time',
+				'entry_timestamp',
+				'timestamp',
+				'share_link',
+				'key_event',
+				'is_liveblog_editable',
+				'allowed_tags_for_entry',
 			);
 
 			foreach ( $template_variables as $key => $value ) {

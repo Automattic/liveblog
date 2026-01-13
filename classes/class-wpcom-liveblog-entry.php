@@ -232,7 +232,10 @@ class WPCOM_Liveblog_Entry {
 		$avatar_size  = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
 		$comment_text = get_comment_text( $entry_id );
 		$css_classes  = implode( ' ', get_comment_class( '', $entry_id, $post_id ) );
-		$entry        = array(
+		$time_format  = apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) );
+		$share_link   = get_permalink( $post_id ) . '#liveblog-entry-' . $entry_id;
+
+		$entry = array(
 			'entry_id'               => $entry_id,
 			'post_id'                => $post_id,
 			'css_classes'            => $css_classes,
@@ -241,14 +244,27 @@ class WPCOM_Liveblog_Entry {
 			'avatar_size'            => $avatar_size,
 			'avatar_img'             => WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $avatar_size ),
 			'author_link'            => get_comment_author_link( $entry_id ),
+			'authors'                => self::get_authors( $entry_id ),
 			'entry_date'             => get_comment_date( get_option( 'date_format' ), $entry_id ),
-			'entry_time'             => get_comment_date( get_option( 'time_format' ), $entry_id ),
+			'entry_time'             => get_comment_date( $time_format, $entry_id ),
+			'entry_timestamp'        => $this->get_comment_date_gmt( 'c', $entry_id ),
 			'timestamp'              => $this->get_timestamp(),
+			'share_link'             => $share_link,
+			'key_event'              => WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry_id ),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
 		);
 
 		return $entry;
+	}
+
+	/**
+	 * Render the entry using the PHP template.
+	 *
+	 * @return string The rendered HTML.
+	 */
+	public function render() {
+		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', $this->get_fields_for_render() );
 	}
 
 	/**
@@ -371,11 +387,20 @@ class WPCOM_Liveblog_Entry {
 	public static function insert( $args ) {
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
-		$args['user'] = self::handle_author_select( $args, false );
+		// Set the author if provided, otherwise use current user as fallback.
+		// Comments require an author, but we can hide it via meta.
+		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
+			$args['user'] = self::get_userdata_with_filter( $args['author_id'] );
+		}
 
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
+		}
+
+		// Set hide_authors meta if no author was explicitly provided.
+		if ( ! isset( $args['author_id'] ) || ! $args['author_id'] ) {
+			update_comment_meta( $comment->comment_ID, self::HIDE_AUTHORS_KEY, true );
 		}
 
 		if ( isset( $args['contributor_ids'] ) ) {
