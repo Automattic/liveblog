@@ -1644,6 +1644,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'primary'     => false,
 					'disabled'    => false,
 				),
+				'disable' => array(
+					'value'       => 'disable',
+					'text'        => __( 'Disable', 'liveblog' ),
+					'description' => __( 'Removes liveblog from this post. Existing entries are kept as comments.', 'liveblog' ),
+					'active-text' => '',
+					'primary'     => false,
+					'disabled'    => false,
+				),
 			);
 			if ( $current_state ) {
 				$active_text                           = $buttons[ $current_state ]['active-text'];
@@ -1651,6 +1659,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			} else {
 				$active_text                    = __( 'This is a normal WordPress post, without a liveblog.', 'liveblog' );
 				$buttons['archive']['disabled'] = true;
+				$buttons['disable']['disabled'] = true;
 			}
 			$update_text  = __( 'Settings have been successfully updated.', 'liveblog' );
 			$extra_fields = array();
