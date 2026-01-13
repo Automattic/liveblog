@@ -35,7 +35,6 @@
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
-    "plugin-zip": "wp-scripts plugin-zip",
     "lint:js": "wp-scripts lint-js ./src",
     "lint:css": "wp-scripts lint-style \"src/**/*.scss\"",
     "test": "wp-scripts test-unit-js"
