@@ -37,7 +37,7 @@ jQuery( function( $ ) {
 				$( '.inside', $meta_box ).empty().append( response );
 
 				if ( status === 'success') {
-					$( 'p.success', $meta_box ).show(0).delay( 1000 ).hide(0);
+					$( 'p.success', $meta_box ).show(0).delay( 5000 ).hide(0);
 					return;
 				}
 			},
