@@ -19,6 +19,7 @@ module.exports = function (env, argv) {
 	config.entry = {
 		app: path.join(__dirname, './src/react/index.js'),
 		amp: path.join(__dirname, './src/react/amp.js'),
+		dashboard: path.join(__dirname, './src/dashboard/index.js'),
 	};
 
 	// Custom output settings

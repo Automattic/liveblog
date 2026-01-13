@@ -1237,8 +1237,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$dependencies = isset( $asset_file['dependencies'] ) ? $asset_file['dependencies'] : array();
 				$version      = isset( $asset_file['version'] ) ? $asset_file['version'] : self::VERSION;
 
-				wp_enqueue_style( self::KEY, plugins_url( 'build/app.css', __FILE__ ), array(), $version );
-				wp_enqueue_script( 'liveblog-admin', plugins_url( 'build/app.js', __FILE__ ), $dependencies, $version, false );
+				wp_enqueue_style( self::KEY, plugins_url( 'build/dashboard.css', __FILE__ ), array(), $version );
+				wp_enqueue_script( 'liveblog-admin', plugins_url( 'build/dashboard.js', __FILE__ ), $dependencies, $version, false );
 				wp_localize_script(
 					'liveblog-admin',
 					'liveblog_admin_settings',
