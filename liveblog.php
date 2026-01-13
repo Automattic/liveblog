@@ -1613,14 +1613,22 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return string The metabox markup.
 		 */
 		public static function get_meta_box( $post ) {
-			$current_state = self::get_liveblog_state( $post->ID );
-			$buttons       = array(
+			$current_state  = self::get_liveblog_state( $post->ID );
+			$is_published   = 'publish' === $post->post_status;
+			$permalink_link = $is_published
+				? sprintf( ' <a href="%s">%s</a>', esc_url( get_permalink( $post ) ), __( 'Visit the liveblog &rarr;', 'liveblog' ) )
+				: '';
+
+			$buttons = array(
 				'enable'  => array(
 					'value'       => 'enable',
 					'text'        => __( 'Enable', 'liveblog' ),
 					'description' => __( 'Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates.', 'liveblog' ),
-					// translators: 1: post url.
-					'active-text' => sprintf( __( 'There is an <strong>enabled</strong> liveblog on this post. <a href="%s">Visit the liveblog &rarr;</a>', 'liveblog' ), get_permalink( $post ) ),
+					'active-text' => sprintf(
+						/* translators: %s: optional link to view the liveblog */
+						__( 'There is an <strong>enabled</strong> liveblog on this post.%s', 'liveblog' ),
+						$permalink_link
+					),
 					'primary'     => true,
 					'disabled'    => false,
 				),
@@ -1628,8 +1636,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'value'       => 'archive',
 					'text'        => __( 'Archive', 'liveblog' ),
 					'description' => __( 'Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden.', 'liveblog' ),
-					// translators: 1: archive url.
-					'active-text' => sprintf( __( 'There is an <strong>archived</strong> liveblog on this post. <a href="%s">Visit the liveblog archive &rarr;</a>', 'liveblog' ), get_permalink( $post ) ),
+					'active-text' => sprintf(
+						/* translators: %s: optional link to view the liveblog archive */
+						__( 'There is an <strong>archived</strong> liveblog on this post.%s', 'liveblog' ),
+						$permalink_link
+					),
 					'primary'     => false,
 					'disabled'    => false,
 				),
