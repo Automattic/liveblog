@@ -347,8 +347,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Grab the first sentence of the content.
 		$content = preg_replace( '/(.*?[?!.](?=\s|$)).*/', '\\1', $content );
 
-		// Strip it of all non-accepted tags.
-		$content = wp_strip_all_tags( $content, '<strong></strong><em></em><span></span><img>' );
+		// Strip all HTML tags for plain text title.
+		$content = wp_strip_all_tags( $content );
 
 		return $content;
 	}
@@ -368,8 +368,8 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Explode the content by the linebreaks.
 		$content = explode( '<br />', $content );
 
-		// Strip it of all non-accepted tags.
-		$content = wp_strip_all_tags( $content[0], '<strong></strong><em></em><span></span><img>' );
+		// Strip all HTML tags for plain text title.
+		$content = wp_strip_all_tags( $content[0] );
 
 		return $content;
 	}
