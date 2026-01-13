@@ -65,7 +65,7 @@ class WPCOM_Liveblog_Lazyloader {
 	private static function get_number_of_default_entries() {
 
 		if ( ! isset( self::$number_of_default_entries ) ) {
-			self::$number_of_default_entries = 5;
+			self::$number_of_default_entries = 20;
 
 			/**
 			 * Filters the number of initially displayed Liveblog entries.
@@ -89,7 +89,7 @@ class WPCOM_Liveblog_Lazyloader {
 	public static function get_number_of_entries() {
 
 		if ( ! isset( self::$number_of_entries ) ) {
-			self::$number_of_entries = 5;
+			self::$number_of_entries = 20;
 
 			/**
 			 * Filters the number of Liveblog entries used for lazyloading.
