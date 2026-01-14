@@ -2,22 +2,22 @@
 # This file is distributed under the same license as the Liveblog plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Liveblog 1.10.0\n"
+"Project-Id-Version: Liveblog 1.11.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/liveblog\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-04T16:01:38+00:00\n"
+"POT-Creation-Date: 2026-01-14T07:51:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: liveblog\n"
 
 #. Plugin Name of the plugin
 #: liveblog.php
-#: liveblog.php:1579
-#: liveblog.php:1795
+#: liveblog.php:1593
+#: liveblog.php:1829
 msgid "Liveblog"
 msgstr ""
 
@@ -185,151 +185,163 @@ msgid "Unknown liveblog action"
 msgstr ""
 
 #: liveblog.php:1248
-#: liveblog.php:1341
+#: liveblog.php:1355
 msgid "Error {error-code}: {error-message}"
 msgstr ""
 
 #: liveblog.php:1249
-#: liveblog.php:1342
+#: liveblog.php:1356
 msgid "Error: {error-message}"
 msgstr ""
 
-#: liveblog.php:1339
+#: liveblog.php:1353
 msgid "Do you really want to delete this entry? There is no way back."
 msgstr ""
 
-#: liveblog.php:1340
+#: liveblog.php:1354
 msgid "Do you want to delete this key entry?"
 msgstr ""
 
-#: liveblog.php:1343
+#: liveblog.php:1357
 msgid "Liveblog: {number} new update"
 msgstr ""
 
-#: liveblog.php:1344
+#: liveblog.php:1358
 msgid "Liveblog: {number} new updates"
 msgstr ""
 
-#: liveblog.php:1345
+#: liveblog.php:1359
 msgid "Provide URL for link:"
 msgstr ""
 
-#: liveblog.php:1348
+#: liveblog.php:1362
 msgid "term-"
 msgstr ""
 
-#: liveblog.php:1349
+#: liveblog.php:1363
 msgid "type-alert"
 msgstr ""
 
-#: liveblog.php:1350
+#: liveblog.php:1364
 msgid "type-key"
 msgstr ""
 
-#: liveblog.php:1367
+#: liveblog.php:1381
 msgid "Loading preview…"
 msgstr ""
 
-#: liveblog.php:1368
+#: liveblog.php:1382
 msgid "New Entry"
 msgstr ""
 
-#: liveblog.php:1369
+#: liveblog.php:1383
 #: build/994.bundle.js:1
 #: src/react/containers/EditorContainer.js:357
 #: build/994.bundle.js:504
 msgid "Publish Update"
 msgstr ""
 
-#: liveblog.php:1370
+#: liveblog.php:1384
 msgid "Edit Entry"
 msgstr ""
 
-#: liveblog.php:1371
+#: liveblog.php:1385
 msgid "Update"
 msgstr ""
 
-#: liveblog.php:1394
+#: liveblog.php:1408
 msgid "Allowed Files"
 msgstr ""
 
-#: liveblog.php:1620
+#: liveblog.php:1633
+msgid "Visit the liveblog &rarr;"
+msgstr ""
+
+#: liveblog.php:1639
 msgid "Enable"
 msgstr ""
 
-#: liveblog.php:1621
+#: liveblog.php:1640
 msgid "Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates."
 msgstr ""
 
-#. translators: 1: post url.
-#: liveblog.php:1623
+#. translators: %s: optional link to view the liveblog
+#: liveblog.php:1643
 #, php-format
-msgid "There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog &rarr;</a>"
+msgid "There is an <strong>enabled</strong> liveblog on this post.%s"
 msgstr ""
 
-#: liveblog.php:1629
+#: liveblog.php:1651
 msgid "Archive"
 msgstr ""
 
-#: liveblog.php:1630
+#: liveblog.php:1652
 msgid "Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden."
 msgstr ""
 
-#. translators: 1: archive url.
-#: liveblog.php:1632
+#. translators: %s: optional link to view the liveblog archive
+#: liveblog.php:1655
 #, php-format
-msgid "There is an <strong>archived</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog archive &rarr;</a>"
+msgid "There is an <strong>archived</strong> liveblog on this post.%s"
 msgstr ""
 
-#: liveblog.php:1641
+#: liveblog.php:1663
+msgid "Disable"
+msgstr ""
+
+#: liveblog.php:1664
+msgid "Removes liveblog from this post. Existing entries are kept as comments."
+msgstr ""
+
+#: liveblog.php:1674
 msgid "This is a normal WordPress post, without a liveblog."
 msgstr ""
 
-#: liveblog.php:1644
+#: liveblog.php:1678
 msgid "Settings have been successfully updated."
 msgstr ""
 
 #. translators: 1: post ID.
-#: liveblog.php:1670
+#: liveblog.php:1704
 #, php-format
 msgid "The post is a revision: %s"
 msgstr ""
 
 #. translators: 1: post ID.
-#: liveblog.php:1674
+#: liveblog.php:1708
 #, php-format
 msgid "Non-existing post ID: %s"
 msgstr ""
 
-#: liveblog.php:1797
+#: liveblog.php:1831
 msgid "Liveblog (archived)"
 msgstr ""
 
-#: liveblog.php:1828
+#: liveblog.php:1862
 msgid "Filter liveblogs"
 msgstr ""
 
-#: liveblog.php:1829
+#: liveblog.php:1863
 msgid "Any liveblogs"
 msgstr ""
 
-#: liveblog.php:1830
+#: liveblog.php:1864
 msgid "Enabled liveblogs"
 msgstr ""
 
-#: liveblog.php:1831
+#: liveblog.php:1865
 msgid "Archived liveblogs"
 msgstr ""
 
-#: liveblog.php:1832
+#: liveblog.php:1866
 msgid "No liveblogs"
 msgstr ""
 
-#: liveblog.php:1905
+#: liveblog.php:1939
 msgid "Cheatin', uh?"
 msgstr ""
 
-#: liveblog.php:1917
+#: liveblog.php:1951
 msgid "Sorry, we could not authenticate you."
 msgstr ""
 

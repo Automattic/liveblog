@@ -1,0 +1,25 @@
+#liveblog span.disabled {
+	color: #a7aaad;
+}
+
+#liveblog button {
+	margin-right: 4px;
+}
+
+#liveblog p.error {
+	display: none;
+	background-color: #fcf0f1;
+	border: 1px solid #d63638;
+	border-left-width: 4px;
+	padding: 12px;
+	margin: 12px 0;
+}
+
+#liveblog p.success {
+	display: none;
+	background-color: #edfaef;
+	border: 1px solid #00a32a;
+	border-left-width: 4px;
+	padding: 12px;
+	margin: 12px 0;
+}

@@ -1,0 +1,74 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/champions-league-final-live/",
+	"preferredVersions": {
+		"php": "8.2",
+		"wp": "latest"
+	},
+	"phpExtensionBundles": [
+		"kitchen-sink"
+	],
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "liveblog"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"permalink_structure": "/%postname%/"
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Flush rewrite rules */ require_once 'wordpress/wp-load.php'; flush_rewrite_rules(); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Create the liveblog post */ require_once 'wordpress/wp-load.php'; $post_id = wp_insert_post( array( 'post_title' => 'Champions League Final: Live Updates', 'post_name' => 'champions-league-final-live', 'post_content' => 'Follow our live coverage of tonight\\'s Champions League Final. Our team is reporting live from the stadium with real-time updates, key moments, and expert analysis throughout the match.', 'post_status' => 'publish', 'post_author' => 1, 'post_date' => date( 'Y-m-d H:i:s' ), ) ); update_post_meta( $post_id, 'liveblog', 1 ); update_option( 'liveblog_demo_post_id', $post_id ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Create reporter users */ require_once 'wordpress/wp-load.php'; $reporter1 = wp_create_user( 'alex_reporter', 'password', 'alex@example.com' ); if ( ! is_wp_error( $reporter1 ) ) { $user = new WP_User( $reporter1 ); $user->set_role( 'editor' ); update_user_meta( $reporter1, 'first_name', 'Alex' ); update_user_meta( $reporter1, 'last_name', 'Martinez' ); wp_update_user( array( 'ID' => $reporter1, 'display_name' => 'Alex Martinez' ) ); } $reporter2 = wp_create_user( 'sam_analyst', 'password', 'sam@example.com' ); if ( ! is_wp_error( $reporter2 ) ) { $user = new WP_User( $reporter2 ); $user->set_role( 'editor' ); update_user_meta( $reporter2, 'first_name', 'Sam' ); update_user_meta( $reporter2, 'last_name', 'Chen' ); wp_update_user( array( 'ID' => $reporter2, 'display_name' => 'Sam Chen' ) ); } ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Create liveblog entries - Entry 1: Match start (Key Event) */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter1 = get_user_by( 'login', 'alex_reporter' ); $entry_time = strtotime( '-45 minutes' ); $comment_id = wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => '<strong>KICK OFF!</strong> The referee blows the whistle and we are underway in the Champions League Final! The atmosphere here is absolutely electric. #UCLFinal #ChampionsLeague', 'comment_type' => 'liveblog', 'user_id' => $reporter1->ID, 'comment_author' => $reporter1->display_name, 'comment_author_email' => $reporter1->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); update_comment_meta( $comment_id, 'is_liveblog_key_entry', 1 ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Entry 2: Early action */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter2 = get_user_by( 'login', 'sam_analyst' ); $entry_time = strtotime( '-38 minutes' ); wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => 'Early pressure from the home side. They\\'re pressing high and forcing turnovers in dangerous areas. The away team struggling to get out of their own half in these opening minutes.', 'comment_type' => 'liveblog', 'user_id' => $reporter2->ID, 'comment_author' => $reporter2->display_name, 'comment_author_email' => $reporter2->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Entry 3: First goal (Key Event) */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter1 = get_user_by( 'login', 'alex_reporter' ); $entry_time = strtotime( '-30 minutes' ); $comment_id = wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => '<strong>GOAL! 1-0!</strong> What a strike! A thunderous shot from outside the box flies into the top corner. The goalkeeper had no chance! The stadium erupts! #UCLFinal #Goal', 'comment_type' => 'liveblog', 'user_id' => $reporter1->ID, 'comment_author' => $reporter1->display_name, 'comment_author_email' => $reporter1->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); update_comment_meta( $comment_id, 'is_liveblog_key_entry', 1 ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Entry 4: Analysis */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter2 = get_user_by( 'login', 'sam_analyst' ); $entry_time = strtotime( '-25 minutes' ); wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => '<em>Tactical insight:</em> The away team is now forced to push forward, which could leave them vulnerable on the counter. Watch for those quick transitions - that\\'s where the danger will come from.', 'comment_type' => 'liveblog', 'user_id' => $reporter2->ID, 'comment_author' => $reporter2->display_name, 'comment_author_email' => $reporter2->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Entry 5: Yellow card */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter1 = get_user_by( 'login', 'alex_reporter' ); $entry_time = strtotime( '-18 minutes' ); wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => 'Yellow card shown for a reckless challenge in midfield. Tempers are flaring now - this final is living up to the hype! The referee is going to have his hands full tonight. #UCLFinal', 'comment_type' => 'liveblog', 'user_id' => $reporter1->ID, 'comment_author' => $reporter1->display_name, 'comment_author_email' => $reporter1->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Entry 6: Half time (Key Event) */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter1 = get_user_by( 'login', 'alex_reporter' ); $entry_time = strtotime( '-10 minutes' ); $comment_id = wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => '<strong>HALF TIME: 1-0</strong> An enthralling first half comes to an end. One goal separates the teams, but it could easily have been more. Stay with us for the second half - this one is far from over! #UCLFinal #HalfTime', 'comment_type' => 'liveblog', 'user_id' => $reporter1->ID, 'comment_author' => $reporter1->display_name, 'comment_author_email' => $reporter1->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); update_comment_meta( $comment_id, 'is_liveblog_key_entry', 1 ); ?>"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php /* Entry 7: Latest update */ require_once 'wordpress/wp-load.php'; $post_id = get_option( 'liveblog_demo_post_id' ); $reporter2 = get_user_by( 'login', 'sam_analyst' ); $entry_time = strtotime( '-2 minutes' ); wp_insert_comment( array( 'comment_post_ID' => $post_id, 'comment_content' => 'The players are back on the pitch and ready for the second half. We\\'re hearing there might be a tactical change - keep refreshing for the latest updates as they happen!', 'comment_type' => 'liveblog', 'user_id' => $reporter2->ID, 'comment_author' => $reporter2->display_name, 'comment_author_email' => $reporter2->user_email, 'comment_approved' => 'liveblog', 'comment_date' => date( 'Y-m-d H:i:s', $entry_time ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', $entry_time ), ) ); delete_option( 'liveblog_demo_post_id' ); ?>"
+		},
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		}
+	]
+}
