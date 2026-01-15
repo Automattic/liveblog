@@ -74,6 +74,27 @@
 	margin-bottom: 1rem;
 }
 
+.liveblog-editor-key-event {
+	margin-bottom: 1rem;
+
+	label {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: $color-grey-dark;
+		cursor: pointer;
+	}
+
+	input[type="checkbox"] {
+		width: 1rem;
+		height: 1rem;
+		margin: 0;
+		cursor: pointer;
+	}
+}
+
 @include mq($until: small) {
 
 	.liveblog-editor-container .public-DraftEditor-content {
