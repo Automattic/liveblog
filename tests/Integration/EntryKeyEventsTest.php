@@ -49,8 +49,8 @@ final class EntryKeyEventsTest extends TestCase {
 	public function test_render_key_template_sets_key_event_true_for_plain_key_command(): void {
 		$entry = $this->insert_entry( array( 'content' => 'Breaking news! /key' ) );
 
-		$entry_data   = array( 'id' => $entry->get_id() );
-		$result       = WPCOM_Liveblog_Entry_Key_Events::render_key_template( $entry_data, $entry );
+		$entry_data = array( 'id' => $entry->get_id() );
+		$result     = WPCOM_Liveblog_Entry_Key_Events::render_key_template( $entry_data, $entry );
 
 		$this->assertTrue( $result['key_event'] );
 	}
