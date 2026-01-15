@@ -35,16 +35,79 @@ class EditorContainer extends Component {
       ? props.entry.authors
       : [];
 
+    // Get entry content for editing, stripping /key command since checkbox handles it
+    const rawEntryContent = props.entry ? props.entry.content : '';
+    const entryContent = this.stripKeyCommand(rawEntryContent);
+
+    // Check if entry is a key event:
+    // 1. First check the key_event property from PHP (based on meta)
+    // 2. Fall back to checking if /key exists in content (for old entries without meta)
+    const hasKeyEventMeta = props.entry ? props.entry.key_event : false;
+    const hasKeyInContent = this.hasKeyCommand(rawEntryContent);
+    const isKeyEvent = hasKeyEventMeta || hasKeyInContent;
+
     this.state = {
       suggestions: [],
       authors: initialAuthors,
       mode: 'editor',
       readOnly: false,
-      rawText: props.entry ? props.entry.content : '',
+      rawText: entryContent,
       previewKey: 0,
-      // Store the HTML content for the editor
-      editorContent: props.entry ? props.entry.content : '',
+      // Store the HTML content for the editor (with /key stripped)
+      editorContent: entryContent,
+      // Key event checkbox state - synced with key_event meta or /key in content
+      isKeyEvent: isKeyEvent,
+      // Track if entry was originally a key event (for save logic)
+      wasOriginallyKeyEvent: isKeyEvent,
     };
+  }
+
+  /**
+   * Check if content contains the /key command in any form.
+   *
+   * @param {string} content - The content to check.
+   * @returns {boolean} True if /key command is present.
+   */
+  hasKeyCommand(content) {
+    if (!content) return false;
+    // Check for /key at start of content or after non-word character
+    const hasPlainKey = /(^|[^\w])\/key([^\w]|$)/i.test(content);
+    // Check for transformed span version
+    const hasSpanKey = /<span[^>]*class="liveblog-command[^"]*type-key"[^>]*>/i.test(content);
+    return hasPlainKey || hasSpanKey;
+  }
+
+  /**
+   * Strip /key command from content for display in editor.
+   * The checkbox handles key event status, so we hide the command.
+   *
+   * @param {string} content - The content to process.
+   * @returns {string} Content with /key command removed.
+   */
+  stripKeyCommand(content) {
+    if (!content) return '';
+
+    let processed = content;
+
+    // Remove /key when it's inside a paragraph (with optional br): <p>/key</p> or <p>/key<br></p>
+    processed = processed.replace(/<p[^>]*>\s*\/key\s*(<br\s*\/?>)?\s*<\/p>\s*/gi, '');
+
+    // Remove transformed span version (entire span element with optional trailing whitespace/br)
+    processed = processed.replace(/<span[^>]*class="liveblog-command[^"]*type-key"[^>]*>[^<]*<\/span>[\s\n]*/gi, '');
+
+    // Remove /key at the start of content (with optional trailing whitespace/br)
+    processed = processed.replace(/^\/key[\s\n]*(<br\s*\/?>[\s\n]*)*/i, '');
+
+    // Remove /key after HTML tags (e.g., after <p> or >)
+    processed = processed.replace(/(>)\s*\/key[\s\n]*(<br\s*\/?>[\s\n]*)*/gi, '$1');
+
+    // Clean up empty paragraphs (including those with just <br>)
+    processed = processed.replace(/<p[^>]*>\s*(<br\s*\/?>)?\s*<\/p>\s*/gi, '');
+
+    // Clean up leading <br> tags
+    processed = processed.replace(/^[\s\n]*(<br\s*\/?>[\s\n]*)+/gi, '');
+
+    return processed.trim();
   }
 
   setReadOnly(state) {
@@ -93,10 +156,49 @@ class EditorContainer extends Component {
     }
   }
 
+  /**
+   * Process content to add or remove /key command based on checkbox state.
+   *
+   * Logic:
+   * - If checkbox is checked: ensure /key is in content (add if missing)
+   * - If checkbox is unchecked AND entry was originally a key event: strip /key
+   * - If checkbox is unchecked AND entry was NOT originally a key event: preserve /key
+   *   (user manually typed it for backward compatibility)
+   *
+   * @param {string} content - The entry content.
+   * @param {boolean} isKeyEvent - Whether the key event checkbox is checked.
+   * @returns {string} The processed content.
+   */
+  processKeyEventContent(content, isKeyEvent) {
+    const hasKey = this.hasKeyCommand(content);
+    const { wasOriginallyKeyEvent } = this.state;
+
+    if (isKeyEvent) {
+      // Checkbox is checked - ensure /key is in content
+      if (hasKey) {
+        // Already has /key (manually typed), keep as-is
+        return content;
+      }
+      // Add /key at the beginning
+      return '/key ' + content;
+    }
+
+    // Checkbox is unchecked
+    // Only strip /key if the entry WAS originally a key event
+    // (meaning we stripped /key on load and user explicitly unchecked)
+    // If entry was NOT originally a key event, preserve any /key user typed
+    if (hasKey && wasOriginallyKeyEvent) {
+      return this.stripKeyCommand(content);
+    }
+
+    // Return content as-is (preserves manually typed /key)
+    return content;
+  }
+
   publish() {
     const { updateEntry, entry, entryEditClose, createEntry, isEditing } = this.props;
-    const { authors, editorContent } = this.state;
-    const content = this.getContent();
+    const { authors, editorContent, isKeyEvent } = this.state;
+    let content = this.getContent();
     const authorIds = authors.map(author => author.id);
     const author = authorIds.length > 0 ? authorIds[0] : false;
     const contributors = authorIds.length > 1 ? authorIds.slice(1, authorIds.length) : false;
@@ -110,6 +212,9 @@ class EditorContainer extends Component {
     if (!textContent && htmlregex.exec(editorContent) === null) {
       return;
     }
+
+    // Process /key command based on checkbox state
+    content = this.processKeyEventContent(content, isKeyEvent);
 
     if (isEditing) {
       updateEntry({
@@ -134,6 +239,7 @@ class EditorContainer extends Component {
       rawText: '',
       readOnly: false,
       previewKey: prevState.previewKey + 1,
+      isKeyEvent: false,
     }));
   }
 
@@ -275,6 +381,7 @@ class EditorContainer extends Component {
       authors,
       readOnly,
       previewKey,
+      isKeyEvent,
     } = this.state;
 
     const { isEditing, config } = this.props;
@@ -302,6 +409,16 @@ class EditorContainer extends Component {
               inputValue ? __( 'No authors matched', 'liveblog' ) : __( 'Loading authors…', 'liveblog' )
             }
           />
+        </div>
+        <div className="liveblog-editor-key-event">
+          <label>
+            <input
+              type="checkbox"
+              checked={isKeyEvent}
+              onChange={(e) => this.setState({ isKeyEvent: e.target.checked })}
+            />
+            { __( 'Key Event', 'liveblog' ) }
+          </label>
         </div>
         <div className="liveblog-editor-tabs">
           <button

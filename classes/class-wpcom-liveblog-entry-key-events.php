@@ -98,6 +98,9 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Add the liveblog_key_events shortcode.
 		add_shortcode( 'liveblog_key_events', array( __CLASS__, 'shortcode' ) );
 
+		// Hook into entry updates to sync key event meta with /key command.
+		add_action( 'liveblog_update_entry', array( __CLASS__, 'sync_key_event_meta' ), 10, 2 );
+
 		// Hook into the after action for the key
 		// command to run the key command.
 		add_action( 'liveblog_command_key_after', array( __CLASS__, 'add_key_action' ), 10, 3 );
@@ -178,6 +181,55 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
+	 * Sync key event meta with /key command on entry update.
+	 *
+	 * When an entry is updated, check if it contains the /key command
+	 * and add or remove the key event meta accordingly.
+	 *
+	 * The /key command can appear in two forms:
+	 * 1. Plain text: /key (when newly typed)
+	 * 2. Transformed: <span class="liveblog-command type-key">key</span> (after processing)
+	 *
+	 * @param int $id      The entry ID.
+	 * @param int $post_id The post ID.
+	 * @return void
+	 */
+	public static function sync_key_event_meta( $id, $post_id ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by liveblog_update_entry action signature.
+		$content = get_comment_text( $id );
+
+		// Check for plain /key command (at start or after non-word char).
+		$has_plain_key = preg_match( '/(^|[^\w])\/key([^\w]|$)/', $content );
+
+		// Check for transformed span version (flexible matching for class attribute).
+		$has_span_key = preg_match( '/<span[^>]*class="[^"]*type-key[^"]*"[^>]*>/i', $content );
+
+		$has_key_cmd = $has_plain_key || $has_span_key;
+
+		// Get the original entry ID that this update replaces.
+		// The entry system uses the original ID for display, so we need to update meta there.
+		$original_id = get_comment_meta( $id, WPCOM_Liveblog_Entry::REPLACES_META_KEY, true );
+
+		// If no original ID yet (meta added after this hook), use the entry_id from the args.
+		// We need to check both the new comment and the original entry.
+		$ids_to_check = array( $id );
+		if ( $original_id ) {
+			$ids_to_check[] = $original_id;
+		}
+
+		foreach ( $ids_to_check as $check_id ) {
+			$is_key = self::is_key_event( $check_id );
+
+			if ( $has_key_cmd && ! $is_key ) {
+				// Content has /key but meta is missing - add it.
+				add_comment_meta( $check_id, self::META_KEY, self::META_VALUE );
+			} elseif ( ! $has_key_cmd && $is_key ) {
+				// Content doesn't have /key but meta exists - remove it.
+				delete_comment_meta( $check_id, self::META_KEY, self::META_VALUE );
+			}
+		}
+	}
+
+	/**
 	 * Pass a separate template for key event shortcode.
 	 *
 	 * @param array                $entry        The entry data.
@@ -192,8 +244,15 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// Get the entry content.
 		$content = $entry_object->get_content();
 
-		// Set if key event.
-		$entry['key_event'] = self::is_key_event( $entry['id'] );
+		// Detect key event from content (more reliable than meta for updates).
+		// Check for plain /key command.
+		$has_plain_key = preg_match( '/(^|[^\w])\/key([^\w]|$)/', $content );
+
+		// Check for transformed span version.
+		$has_span_key = preg_match( '/<span[^>]*class="[^"]*type-key[^"]*"[^>]*>/i', $content );
+
+		// Set if key event based on content detection.
+		$entry['key_event'] = ( $has_plain_key || $has_span_key ) ? true : false;
 
 		// If key event add content.
 		if ( $entry['key_event'] ) {
