@@ -88,6 +88,20 @@
 		<exclude-pattern>*/templates/*</exclude-pattern>
 	</rule>
 
+	<!-- Exclusions for PSR-4 autoloaded classes in src/php/ -->
+	<!-- PSR-4 requires ClassName.php format, not class-classname.php -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>*/src/php/*</exclude-pattern>
+	</rule>
+	<!-- PSR-4 namespaced classes use standard namespace conventions -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound">
+		<exclude-pattern>*/src/php/*</exclude-pattern>
+	</rule>
+	<!-- PHP 8.1 enums can use $this in methods (false positive) -->
+	<rule ref="PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext">
+		<exclude-pattern>*/src/php/*</exclude-pattern>
+	</rule>
+
 	<!-- Exclusions for tests directory -->
 	<!-- PHPUnit test files use PascalCase naming convention -->
 	<rule ref="WordPress.Files.FileName">

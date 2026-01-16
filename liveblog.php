@@ -325,6 +325,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Include the necessary files
 		 */
 		private static function includes() {
+			// Load Composer autoloader for PSR-4 namespaced classes.
+			if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+				require_once __DIR__ . '/vendor/autoload.php';
+			}
+
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-query.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-key-events.php';
