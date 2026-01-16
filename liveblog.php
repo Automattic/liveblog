@@ -2184,21 +2184,61 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			foreach ( $entries['entries'] as $entry ) {
+				// Process content for schema output.
+				$content = $entry->content;
+
+				// Strip /key command (plain and span versions) from content.
+				$content = preg_replace( '/<span[^>]*class="[^"]*type-key[^"]*"[^>]*>[^<]*<\/span>\s*/i', '', $content );
+				$content = preg_replace( '/(^|[>\s])\/key\s*/i', '$1', $content );
+
+				// Replace HTML tags with spaces to preserve word boundaries, then strip.
+				$article_body = preg_replace( '/<[^>]+>/', ' ', $content );
+				$article_body = html_entity_decode( $article_body, ENT_QUOTES, 'UTF-8' );
+				$article_body = preg_replace( '/\s+/', ' ', $article_body ); // Collapse multiple spaces.
+				$article_body = trim( $article_body );
+
+				// Skip entries with no meaningful content.
+				if ( empty( $article_body ) ) {
+					continue;
+				}
+
+				// Generate headline from cleaned content.
+				$headline = wp_trim_words( $article_body, 10, '…' );
+
 				$blog_item = array(
 					'@type'            => 'BlogPosting',
-					'headline'         => WPCOM_Liveblog_Entry::get_entry_title( $entry ),
+					'headline'         => $headline,
 					'url'              => $entry->share_link,
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => gmdate( 'c', $entry->entry_time ),
 					'dateModified'     => gmdate( 'c', $entry->timestamp ),
-					'author'           => array(
-						'@type' => 'Person',
-						'name'  => $entry->authors[0]['name'],
-					),
-					'articleBody'      => array(
-						'@type' => 'Text',
-					),
+					'articleBody'      => $article_body,
 				);
+
+				// Add authors if available.
+				// Google recommends listing all authors separately.
+				if ( ! empty( $entry->authors ) ) {
+					$authors = array();
+					foreach ( $entry->authors as $author ) {
+						if ( ! empty( $author['name'] ) ) {
+							$author_data = array(
+								'@type' => 'Person',
+								'name'  => $author['name'],
+							);
+							// Add author URL if available for better disambiguation.
+							if ( ! empty( $author['link'] ) ) {
+								$author_data['url'] = $author['link'];
+							}
+							$authors[] = $author_data;
+						}
+					}
+					// Use single object for one author, array for multiple.
+					if ( count( $authors ) === 1 ) {
+						$blog_item['author'] = $authors[0];
+					} elseif ( count( $authors ) > 1 ) {
+						$blog_item['author'] = $authors;
+					}
+				}
 
 				if ( isset( $metadata['publisher'] ) ) {
 					$blog_item['publisher'] = $metadata['publisher'];
@@ -2207,7 +2247,22 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
 			}
 
-			$metadata['@type']          = 'LiveBlogPosting';
+			$metadata['@context']      = 'https://schema.org';
+			$metadata['@type']         = 'LiveBlogPosting';
+			$metadata['headline']      = get_the_title( $post );
+			$metadata['url']           = get_permalink( $post );
+			$metadata['datePublished'] = get_post_datetime( $post, 'date', 'gmt' )->format( 'c' );
+			$metadata['dateModified']  = get_post_datetime( $post, 'modified', 'gmt' )->format( 'c' );
+
+			// Add coverage times for LiveBlogPosting (helps with Google's "LIVE" badge).
+			$metadata['coverageStartTime'] = $metadata['datePublished'];
+
+			// Add coverageEndTime only if the liveblog is archived.
+			$liveblog_state = self::get_liveblog_state( $post->ID );
+			if ( 'archive' === $liveblog_state ) {
+				$metadata['coverageEndTime'] = $metadata['dateModified'];
+			}
+
 			$metadata['liveBlogUpdate'] = $blog_updates;
 
 			/**
