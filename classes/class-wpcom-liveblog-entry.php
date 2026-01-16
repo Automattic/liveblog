@@ -5,6 +5,10 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Domain\ValueObject\Author;
+use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
+use Automattic\Liveblog\Domain\ValueObject\EntryType;
+
 /**
  * Represents a liveblog entry.
  */
@@ -48,9 +52,9 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * The entry type (new, update, delete).
 	 *
-	 * @var string
+	 * @var EntryType
 	 */
-	private $type = 'new';
+	private EntryType $type;
 
 	/**
 	 * Allowed HTML tags for entry content.
@@ -77,12 +81,10 @@ class WPCOM_Liveblog_Entry {
 	public function __construct( $comment ) {
 		$this->comment  = $comment;
 		$this->replaces = get_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, true );
-		if ( $this->replaces && $this->get_content() ) {
-			$this->type = 'update';
-		}
-		if ( $this->replaces && ! $this->get_content() ) {
-			$this->type = 'delete';
-		}
+		$this->type     = EntryType::from_replaces_and_content(
+			$this->replaces ? (int) $this->replaces : null,
+			$comment->comment_content ?? ''
+		);
 	}
 
 	/**
@@ -157,7 +159,16 @@ class WPCOM_Liveblog_Entry {
 	 *
 	 * @return string The entry type (new, update, delete).
 	 */
-	public function get_type() {
+	public function get_type(): string {
+		return $this->type->value;
+	}
+
+	/**
+	 * Get the entry type as an enum.
+	 *
+	 * @return EntryType The entry type enum.
+	 */
+	public function entry_type(): EntryType {
 		return $this->type;
 	}
 
@@ -743,6 +754,40 @@ class WPCOM_Liveblog_Entry {
 		$contributors = self::get_contributors_for_json( $comment_id );
 
 		return array_merge( $author, $contributors );
+	}
+
+	/**
+	 * Return an AuthorCollection for the entry.
+	 *
+	 * @param int $comment_id The ID of the comment.
+	 * @return AuthorCollection The authors collection.
+	 */
+	public static function get_author_collection( $comment_id ): AuthorCollection {
+		$hide_authors = get_comment_meta( $comment_id, self::HIDE_AUTHORS_KEY, true );
+
+		if ( $hide_authors ) {
+			return AuthorCollection::empty();
+		}
+
+		$comment = get_comment( $comment_id );
+		if ( ! $comment ) {
+			return AuthorCollection::empty();
+		}
+
+		$authors = array();
+
+		// Primary author from the comment.
+		$authors[] = Author::from_comment( $comment );
+
+		// Contributors from meta.
+		$contributor_ids = get_comment_meta( $comment_id, self::CONTRIBUTORS_META_KEY, true );
+		if ( is_array( $contributor_ids ) ) {
+			foreach ( $contributor_ids as $contributor_id ) {
+				$authors[] = Author::from_user_id( (int) $contributor_id );
+			}
+		}
+
+		return AuthorCollection::from_authors( ...$authors );
 	}
 
 	/**
