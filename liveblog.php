@@ -2209,14 +2209,18 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					'mainEntityOfPage' => $entry->share_link,
 					'datePublished'    => gmdate( 'c', $entry->entry_time ),
 					'dateModified'     => gmdate( 'c', $entry->timestamp ),
-					'author'           => array(
-						'@type' => 'Person',
-						'name'  => $entry->authors[0]['name'],
-					),
 					'articleBody'      => array(
 						'@type' => 'Text',
 					),
 				);
+
+				// Add author if available (entries can be authorless).
+				if ( ! empty( $entry->authors[0]['name'] ) ) {
+					$blog_item['author'] = array(
+						'@type' => 'Person',
+						'name'  => $entry->authors[0]['name'],
+					);
+				}
 
 				if ( isset( $metadata['publisher'] ) ) {
 					$blog_item['publisher'] = $metadata['publisher'];
