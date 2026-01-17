@@ -182,7 +182,7 @@ final class CommentEntryRepositoryTest extends TestCase {
 	 * Test update modifies comment.
 	 */
 	public function test_update_modifies_comment(): void {
-		$comment                   = $this->create_mock_comment( 123 );
+		$comment                  = $this->create_mock_comment( 123 );
 		$comment->comment_post_ID = 42;
 
 		Functions\expect( 'get_comment' )
@@ -236,7 +236,7 @@ final class CommentEntryRepositoryTest extends TestCase {
 	 * Test delete removes comment.
 	 */
 	public function test_delete_removes_comment(): void {
-		$comment                   = $this->create_mock_comment( 123 );
+		$comment                  = $this->create_mock_comment( 123 );
 		$comment->comment_post_ID = 42;
 
 		Functions\expect( 'get_comment' )
