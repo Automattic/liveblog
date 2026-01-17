@@ -41,19 +41,8 @@ if ( ! function_exists( 'wp_parse_args' ) ) {
 	}
 }
 
-if ( ! function_exists( 'get_comment_meta' ) ) {
-	/**
-	 * Stub for get_comment_meta.
-	 *
-	 * @param int    $comment_id Comment ID.
-	 * @param string $key        Meta key.
-	 * @param bool   $single     Return single value.
-	 * @return mixed Empty string for unit tests.
-	 */
-	function get_comment_meta( $comment_id, $key = '', $single = false ) {
-		return $single ? '' : array();
-	}
-}
+// NOTE: get_comment_meta is NOT stubbed here - use Brain\Monkey Functions\expect() in tests
+// that need to mock it. This allows Patchwork to intercept the function.
 
 // phpcs:enable
 
