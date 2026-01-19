@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Unit\Infrastructure\Repository;
 
+use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 use Brain\Monkey\Functions;
@@ -447,6 +448,217 @@ final class CommentEntryRepositoryTest extends TestCase {
 	}
 
 	/**
+	 * Test get_entry returns Entry entity when found.
+	 */
+	public function test_get_entry_returns_entry(): void {
+		$comment = $this->create_full_mock_comment( 123, 42, 'Test content' );
+
+		Functions\expect( 'get_comment' )
+			->once()
+			->with( 123 )
+			->andReturn( $comment );
+
+		// Mock meta calls for hydration.
+		Functions\expect( 'get_comment_meta' )
+			->with( 123, CommentEntryRepository::REPLACES_META_KEY, true )
+			->andReturn( '' );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 123, CommentEntryRepository::HIDE_AUTHORS_KEY, true )
+			->andReturn( '' );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 123, CommentEntryRepository::CONTRIBUTORS_META_KEY, true )
+			->andReturn( array() );
+
+		// Mock sanitize_title for Author::from_comment.
+		Functions\expect( 'sanitize_title' )
+			->andReturnUsing( fn( $title ) => strtolower( str_replace( ' ', '-', $title ) ) );
+
+		$result = $this->repository->get_entry( EntryId::from_int( 123 ) );
+
+		$this->assertInstanceOf( Entry::class, $result );
+		$this->assertSame( 123, $result->id()->to_int() );
+		$this->assertSame( 42, $result->post_id() );
+		$this->assertSame( 'Test content', $result->content()->raw() );
+		$this->assertTrue( $result->is_new() );
+	}
+
+	/**
+	 * Test get_entry returns null when not found.
+	 */
+	public function test_get_entry_returns_null_when_not_found(): void {
+		Functions\expect( 'get_comment' )
+			->once()
+			->with( 999 )
+			->andReturn( null );
+
+		$result = $this->repository->get_entry( EntryId::from_int( 999 ) );
+
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * Test get_entry correctly hydrates update entry type.
+	 */
+	public function test_get_entry_hydrates_update_type(): void {
+		$comment = $this->create_full_mock_comment( 124, 42, 'Updated content' );
+
+		Functions\expect( 'get_comment' )
+			->once()
+			->with( 124 )
+			->andReturn( $comment );
+
+		// Entry replaces another entry - makes it an update.
+		Functions\expect( 'get_comment_meta' )
+			->with( 124, CommentEntryRepository::REPLACES_META_KEY, true )
+			->andReturn( 123 );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 124, CommentEntryRepository::HIDE_AUTHORS_KEY, true )
+			->andReturn( '' );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 124, CommentEntryRepository::CONTRIBUTORS_META_KEY, true )
+			->andReturn( array() );
+
+		Functions\expect( 'sanitize_title' )
+			->andReturnUsing( fn( $title ) => strtolower( str_replace( ' ', '-', $title ) ) );
+
+		$result = $this->repository->get_entry( EntryId::from_int( 124 ) );
+
+		$this->assertTrue( $result->is_update() );
+		$this->assertSame( 123, $result->replaces()->to_int() );
+	}
+
+	/**
+	 * Test get_entry correctly hydrates delete entry type.
+	 */
+	public function test_get_entry_hydrates_delete_type(): void {
+		$comment = $this->create_full_mock_comment( 125, 42, '' );
+
+		Functions\expect( 'get_comment' )
+			->once()
+			->with( 125 )
+			->andReturn( $comment );
+
+		// Entry replaces another entry with empty content - makes it a delete.
+		Functions\expect( 'get_comment_meta' )
+			->with( 125, CommentEntryRepository::REPLACES_META_KEY, true )
+			->andReturn( 123 );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 125, CommentEntryRepository::HIDE_AUTHORS_KEY, true )
+			->andReturn( '' );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 125, CommentEntryRepository::CONTRIBUTORS_META_KEY, true )
+			->andReturn( array() );
+
+		Functions\expect( 'sanitize_title' )
+			->andReturnUsing( fn( $title ) => strtolower( str_replace( ' ', '-', $title ) ) );
+
+		$result = $this->repository->get_entry( EntryId::from_int( 125 ) );
+
+		$this->assertTrue( $result->is_delete() );
+	}
+
+	/**
+	 * Test get_entry returns empty authors when hidden.
+	 */
+	public function test_get_entry_hides_authors_when_flag_set(): void {
+		$comment = $this->create_full_mock_comment( 123, 42, 'Test content' );
+
+		Functions\expect( 'get_comment' )
+			->once()
+			->with( 123 )
+			->andReturn( $comment );
+
+		// Use a callback to return different values based on meta key.
+		Functions\expect( 'get_comment_meta' )
+			->andReturnUsing(
+				function ( $comment_id, $meta_key, $single ) {
+					if ( CommentEntryRepository::HIDE_AUTHORS_KEY === $meta_key ) {
+						return 1; // Authors are hidden.
+					}
+					return '';
+				}
+			);
+
+		$result = $this->repository->get_entry( EntryId::from_int( 123 ) );
+
+		$this->assertTrue( $result->authors()->is_empty() );
+		$this->assertFalse( $result->has_authors() );
+	}
+
+	/**
+	 * Test get_entries returns array of Entry entities.
+	 */
+	public function test_get_entries_returns_entries(): void {
+		$comments = array(
+			$this->create_full_mock_comment( 1, 42, 'First entry' ),
+			$this->create_full_mock_comment( 2, 42, 'Second entry' ),
+		);
+
+		Functions\expect( 'get_comments' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return 42 === $args['post_id']
+							&& 'liveblog' === $args['type']
+							&& 'liveblog' === $args['status'];
+					}
+				)
+			)
+			->andReturn( $comments );
+
+		// Mock meta calls for both entries.
+		Functions\expect( 'get_comment_meta' )
+			->with( 1, CommentEntryRepository::REPLACES_META_KEY, true )
+			->andReturn( '' );
+		Functions\expect( 'get_comment_meta' )
+			->with( 1, CommentEntryRepository::HIDE_AUTHORS_KEY, true )
+			->andReturn( '' );
+		Functions\expect( 'get_comment_meta' )
+			->with( 1, CommentEntryRepository::CONTRIBUTORS_META_KEY, true )
+			->andReturn( array() );
+
+		Functions\expect( 'get_comment_meta' )
+			->with( 2, CommentEntryRepository::REPLACES_META_KEY, true )
+			->andReturn( '' );
+		Functions\expect( 'get_comment_meta' )
+			->with( 2, CommentEntryRepository::HIDE_AUTHORS_KEY, true )
+			->andReturn( '' );
+		Functions\expect( 'get_comment_meta' )
+			->with( 2, CommentEntryRepository::CONTRIBUTORS_META_KEY, true )
+			->andReturn( array() );
+
+		Functions\expect( 'sanitize_title' )
+			->andReturnUsing( fn( $title ) => strtolower( str_replace( ' ', '-', $title ) ) );
+
+		$result = $this->repository->get_entries( 42 );
+
+		$this->assertCount( 2, $result );
+		$this->assertContainsOnlyInstancesOf( Entry::class, $result );
+		$this->assertSame( 'First entry', $result[0]->content()->raw() );
+		$this->assertSame( 'Second entry', $result[1]->content()->raw() );
+	}
+
+	/**
+	 * Test get_entries returns empty array when no entries.
+	 */
+	public function test_get_entries_returns_empty_array(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( array() );
+
+		$result = $this->repository->get_entries( 42 );
+
+		$this->assertSame( array(), $result );
+	}
+
+	/**
 	 * Test find_referencing_entries queries correctly.
 	 */
 	public function test_find_referencing_entries(): void {
@@ -485,6 +697,28 @@ final class CommentEntryRepositoryTest extends TestCase {
 	private function create_mock_comment( int $id ): WP_Comment {
 		$comment             = Mockery::mock( WP_Comment::class );
 		$comment->comment_ID = $id;
+
+		return $comment;
+	}
+
+	/**
+	 * Create a full mock WP_Comment with all fields for hydration.
+	 *
+	 * @param int    $id      Comment ID.
+	 * @param int    $post_id Post ID.
+	 * @param string $content Content.
+	 * @return WP_Comment
+	 */
+	private function create_full_mock_comment( int $id, int $post_id, string $content ): WP_Comment {
+		$comment                       = Mockery::mock( WP_Comment::class );
+		$comment->comment_ID           = $id;
+		$comment->comment_post_ID      = $post_id;
+		$comment->comment_content      = $content;
+		$comment->comment_date_gmt     = '2024-01-15 10:30:00';
+		$comment->comment_author       = 'Test Author';
+		$comment->comment_author_email = 'test@example.com';
+		$comment->comment_author_url   = 'https://example.com';
+		$comment->user_id              = 1;
 
 		return $comment;
 	}

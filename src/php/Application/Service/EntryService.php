@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Service;
 
+use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use InvalidArgumentException;
@@ -39,6 +40,27 @@ final class EntryService {
 	 */
 	public function __construct( EntryRepositoryInterface $repository ) {
 		$this->repository = $repository;
+	}
+
+	/**
+	 * Get an entry by ID.
+	 *
+	 * @param EntryId $entry_id Entry ID.
+	 * @return Entry|null The entry, or null if not found.
+	 */
+	public function get( EntryId $entry_id ): ?Entry {
+		return $this->repository->get_entry( $entry_id );
+	}
+
+	/**
+	 * Get entries for a liveblog post.
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $args    Optional query arguments.
+	 * @return Entry[] Array of entries.
+	 */
+	public function get_for_post( int $post_id, array $args = array() ): array {
+		return $this->repository->get_entries( $post_id, $args );
 	}
 
 	/**

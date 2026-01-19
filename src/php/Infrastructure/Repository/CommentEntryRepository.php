@@ -9,8 +9,14 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure\Repository;
 
+use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
+use Automattic\Liveblog\Domain\ValueObject\Author;
+use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
+use Automattic\Liveblog\Domain\ValueObject\EntryContent;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
+use DateTimeImmutable;
+use DateTimeZone;
 use RuntimeException;
 use WP_Comment;
 
@@ -58,7 +64,39 @@ final class CommentEntryRepository implements EntryRepositoryInterface {
 	private const CACHE_GROUP = 'liveblog';
 
 	/**
-	 * Find an entry by its ID.
+	 * Get an Entry entity by its ID.
+	 *
+	 * @param EntryId $id Entry ID.
+	 * @return Entry|null The entry or null if not found.
+	 */
+	public function get_entry( EntryId $id ): ?Entry {
+		$comment = $this->find_by_id( $id );
+
+		if ( ! $comment ) {
+			return null;
+		}
+
+		return $this->hydrate_entry( $comment );
+	}
+
+	/**
+	 * Get Entry entities by post ID.
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $args    Optional query arguments.
+	 * @return Entry[] Array of entries.
+	 */
+	public function get_entries( int $post_id, array $args = array() ): array {
+		$comments = $this->find_by_post_id( $post_id, $args );
+
+		return array_map(
+			fn( WP_Comment $comment ): Entry => $this->hydrate_entry( $comment ),
+			$comments
+		);
+	}
+
+	/**
+	 * Find raw comment data by entry ID.
 	 *
 	 * @param EntryId $id Entry ID.
 	 * @return WP_Comment|null The entry data or null if not found.
@@ -74,7 +112,7 @@ final class CommentEntryRepository implements EntryRepositoryInterface {
 	}
 
 	/**
-	 * Find entries by post ID.
+	 * Find raw comment data by post ID.
 	 *
 	 * @param int   $post_id Post ID.
 	 * @param array $args    Optional query arguments.
@@ -352,5 +390,69 @@ final class CommentEntryRepository implements EntryRepositoryInterface {
 	 */
 	private function sanitize_content( string $content ): string {
 		return wp_filter_post_kses( $content );
+	}
+
+	/**
+	 * Hydrate an Entry entity from a WP_Comment.
+	 *
+	 * @param WP_Comment $comment The comment to hydrate from.
+	 * @return Entry The hydrated entry.
+	 */
+	private function hydrate_entry( WP_Comment $comment ): Entry {
+		$entry_id = EntryId::from_int( (int) $comment->comment_ID );
+
+		// Get replaces ID from meta.
+		$replaces = $this->get_replaces_id( $entry_id );
+
+		// Build authors collection.
+		$authors = $this->build_author_collection( $comment, $entry_id );
+
+		// Parse the creation timestamp.
+		$created_at = DateTimeImmutable::createFromFormat(
+			'Y-m-d H:i:s',
+			$comment->comment_date_gmt,
+			new DateTimeZone( 'UTC' )
+		);
+
+		// Fallback if date parsing fails.
+		if ( false === $created_at ) {
+			$created_at = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
+		}
+
+		return Entry::create(
+			$entry_id,
+			(int) $comment->comment_post_ID,
+			EntryContent::from_raw( $comment->comment_content ),
+			$authors,
+			$replaces,
+			$created_at
+		);
+	}
+
+	/**
+	 * Build an AuthorCollection for an entry.
+	 *
+	 * @param WP_Comment $comment  The comment.
+	 * @param EntryId    $entry_id The entry ID.
+	 * @return AuthorCollection The authors.
+	 */
+	private function build_author_collection( WP_Comment $comment, EntryId $entry_id ): AuthorCollection {
+		// Check if authors are hidden.
+		if ( $this->is_authors_hidden( $entry_id ) ) {
+			return AuthorCollection::empty();
+		}
+
+		$authors = array();
+
+		// Primary author from the comment.
+		$authors[] = Author::from_comment( $comment );
+
+		// Contributors from meta.
+		$contributor_ids = $this->get_contributors( $entry_id );
+		foreach ( $contributor_ids as $contributor_id ) {
+			$authors[] = Author::from_user_id( $contributor_id );
+		}
+
+		return AuthorCollection::from_authors( ...$authors );
 	}
 }

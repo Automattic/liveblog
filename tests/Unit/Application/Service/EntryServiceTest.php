@@ -10,8 +10,14 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Unit\Application\Service;
 
 use Automattic\Liveblog\Application\Service\EntryService;
+use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
+use Automattic\Liveblog\Domain\ValueObject\Author;
+use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
+use Automattic\Liveblog\Domain\ValueObject\EntryContent;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
+use DateTimeImmutable;
+use DateTimeZone;
 use InvalidArgumentException;
 use Mockery;
 use WP_Comment;
@@ -47,6 +53,82 @@ final class EntryServiceTest extends TestCase {
 
 		$this->repository = Mockery::mock( EntryRepositoryInterface::class );
 		$this->service    = new EntryService( $this->repository );
+	}
+
+	/**
+	 * Test get returns entry from repository.
+	 */
+	public function test_get_returns_entry(): void {
+		$entry_id = EntryId::from_int( 100 );
+		$entry    = $this->create_entry( 100, 42, 'Test content' );
+
+		$this->repository
+			->shouldReceive( 'get_entry' )
+			->once()
+			->with( Mockery::on( fn( $id ) => $id->to_int() === 100 ) )
+			->andReturn( $entry );
+
+		$result = $this->service->get( $entry_id );
+
+		$this->assertSame( $entry, $result );
+		$this->assertSame( 100, $result->id()->to_int() );
+	}
+
+	/**
+	 * Test get returns null when entry not found.
+	 */
+	public function test_get_returns_null_when_not_found(): void {
+		$entry_id = EntryId::from_int( 999 );
+
+		$this->repository
+			->shouldReceive( 'get_entry' )
+			->once()
+			->andReturn( null );
+
+		$result = $this->service->get( $entry_id );
+
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * Test get_for_post returns entries from repository.
+	 */
+	public function test_get_for_post_returns_entries(): void {
+		$entries = array(
+			$this->create_entry( 1, 42, 'First entry' ),
+			$this->create_entry( 2, 42, 'Second entry' ),
+		);
+
+		$this->repository
+			->shouldReceive( 'get_entries' )
+			->once()
+			->with( 42, array() )
+			->andReturn( $entries );
+
+		$result = $this->service->get_for_post( 42 );
+
+		$this->assertSame( $entries, $result );
+		$this->assertCount( 2, $result );
+	}
+
+	/**
+	 * Test get_for_post passes query args.
+	 */
+	public function test_get_for_post_passes_args(): void {
+		$args = array(
+			'orderby' => 'date',
+			'order'   => 'ASC',
+		);
+
+		$this->repository
+			->shouldReceive( 'get_entries' )
+			->once()
+			->with( 42, $args )
+			->andReturn( array() );
+
+		$result = $this->service->get_for_post( 42, $args );
+
+		$this->assertSame( array(), $result );
 	}
 
 	/**
@@ -455,5 +537,31 @@ final class EntryServiceTest extends TestCase {
 		$comment->comment_ID = $id;
 
 		return $comment;
+	}
+
+	/**
+	 * Create an Entry entity for testing.
+	 *
+	 * @param int    $id      Entry ID.
+	 * @param int    $post_id Post ID.
+	 * @param string $content Content.
+	 * @return Entry
+	 */
+	private function create_entry( int $id, int $post_id, string $content ): Entry {
+		return Entry::create(
+			EntryId::from_int( $id ),
+			$post_id,
+			EntryContent::from_raw( $content ),
+			AuthorCollection::from_authors(
+				Author::from_array(
+					array(
+						'id'   => 1,
+						'name' => 'Test Author',
+					)
+				)
+			),
+			null,
+			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
+		);
 	}
 }
