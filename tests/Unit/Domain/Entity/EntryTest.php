@@ -14,6 +14,7 @@ use Automattic\Liveblog\Domain\ValueObject\Author;
 use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
 use Automattic\Liveblog\Domain\ValueObject\EntryContent;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
+use Brain\Monkey\Functions;
 use DateTimeImmutable;
 use DateTimeZone;
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
@@ -263,6 +264,58 @@ final class EntryTest extends TestCase {
 		$this->assertSame( $authors, $entry->authors() );
 		$this->assertSame( $replaces, $entry->replaces() );
 		$this->assertSame( $created_at, $entry->created_at() );
+	}
+
+	/**
+	 * Test to_array serialization.
+	 */
+	public function test_to_array(): void {
+		Functions\expect( 'get_avatar' )
+			->once()
+			->andReturn( '<img />' );
+
+		$id         = EntryId::from_int( 123 );
+		$post_id    = 456;
+		$content    = EntryContent::from_raw( 'Test content' );
+		$authors    = AuthorCollection::from_authors(
+			Author::from_array(
+				array(
+					'id'   => 1,
+					'name' => 'Test Author',
+					'key'  => 'test-author',
+				)
+			)
+		);
+		$replaces   = EntryId::from_int( 100 );
+		$created_at = new DateTimeImmutable( '2024-01-15 10:30:00', new DateTimeZone( 'UTC' ) );
+
+		$entry = Entry::create( $id, $post_id, $content, $authors, $replaces, $created_at );
+		$array = $entry->to_array();
+
+		$this->assertSame( 123, $array['id'] );
+		$this->assertSame( 456, $array['post_id'] );
+		$this->assertSame( 'update', $array['type'] );
+		$this->assertSame( 'Test content', $array['content'] );
+		$this->assertSame( 100, $array['replaces'] );
+		$this->assertSame( $created_at->getTimestamp(), $array['timestamp'] );
+		$this->assertSame( '2024-01-15T10:30:00+00:00', $array['created_at'] );
+		$this->assertIsArray( $array['authors'] );
+		$this->assertCount( 1, $array['authors'] );
+	}
+
+	/**
+	 * Test to_array with null replaces.
+	 */
+	public function test_to_array_null_replaces(): void {
+		Functions\expect( 'get_avatar' )
+			->once()
+			->andReturn( '<img />' );
+
+		$entry = $this->create_entry();
+		$array = $entry->to_array();
+
+		$this->assertNull( $array['replaces'] );
+		$this->assertSame( 'new', $array['type'] );
 	}
 
 	/**
