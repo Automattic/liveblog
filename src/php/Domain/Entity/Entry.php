@@ -292,4 +292,35 @@ final class Entry {
 			$this->created_at
 		);
 	}
+
+	/**
+	 * Serialize the entry to an array.
+	 *
+	 * Returns the pure domain data without any presentation concerns.
+	 * Use EntryPresenter for WordPress-specific formatting.
+	 *
+	 * @param int $avatar_size Avatar size for author serialization.
+	 * @return array{
+	 *     id: int,
+	 *     post_id: int,
+	 *     type: string,
+	 *     content: string,
+	 *     authors: array,
+	 *     replaces: int|null,
+	 *     timestamp: int,
+	 *     created_at: string
+	 * }
+	 */
+	public function to_array( int $avatar_size = 30 ): array {
+		return array(
+			'id'         => $this->id->to_int(),
+			'post_id'    => $this->post_id,
+			'type'       => $this->type->value,
+			'content'    => $this->content->raw(),
+			'authors'    => $this->authors->to_array( $avatar_size ),
+			'replaces'   => $this->replaces ? $this->replaces->to_int() : null,
+			'timestamp'  => $this->timestamp(),
+			'created_at' => $this->created_at->format( 'c' ),
+		);
+	}
 }
