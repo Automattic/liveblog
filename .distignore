@@ -7,6 +7,7 @@
 /.phpunit.cache/
 /assets/
 /bin/
+/docs/
 /features/
 /node_modules/
 /src/
@@ -20,6 +21,7 @@
 .eslintrc
 .gitattributes
 .gitignore
+.npmrc
 .nvmrc
 .phpcs.xml.dist
 .stylelintrc
@@ -41,6 +43,7 @@ package-lock.json
 CHANGELOG.md
 CONTRIBUTING.md
 HACKING.md
+TESTING_CHECKLIST.md
 
 # Test configuration
 phpunit.xml.dist
