@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Domain\Repository;
 
+use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use WP_Comment;
 
@@ -22,7 +23,33 @@ use WP_Comment;
 interface EntryRepositoryInterface {
 
 	/**
-	 * Find an entry by its ID.
+	 * Get an Entry entity by its ID.
+	 *
+	 * This is the preferred method for retrieving entries as it returns
+	 * a fully hydrated domain entity.
+	 *
+	 * @param EntryId $id Entry ID.
+	 * @return Entry|null The entry or null if not found.
+	 */
+	public function get_entry( EntryId $id ): ?Entry;
+
+	/**
+	 * Get Entry entities by post ID.
+	 *
+	 * This is the preferred method for retrieving multiple entries as it
+	 * returns fully hydrated domain entities.
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $args    Optional query arguments.
+	 * @return Entry[] Array of entries.
+	 */
+	public function get_entries( int $post_id, array $args = array() ): array;
+
+	/**
+	 * Find raw comment data by entry ID.
+	 *
+	 * Lower-level method that returns the underlying WP_Comment.
+	 * Prefer get_entry() for most use cases.
 	 *
 	 * @param EntryId $id Entry ID.
 	 * @return WP_Comment|null The entry data or null if not found.
@@ -30,7 +57,10 @@ interface EntryRepositoryInterface {
 	public function find_by_id( EntryId $id ): ?WP_Comment;
 
 	/**
-	 * Find entries by post ID.
+	 * Find raw comment data by post ID.
+	 *
+	 * Lower-level method that returns underlying WP_Comments.
+	 * Prefer get_entries() for most use cases.
 	 *
 	 * @param int   $post_id Post ID.
 	 * @param array $args    Optional query arguments.
