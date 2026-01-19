@@ -7,7 +7,9 @@
 
 use Automattic\Liveblog\Domain\ValueObject\Author;
 use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
+use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use Automattic\Liveblog\Domain\ValueObject\EntryType;
+use Automattic\Liveblog\Infrastructure\ServiceContainer;
 
 /**
  * Represents a liveblog entry.
@@ -398,29 +400,45 @@ class WPCOM_Liveblog_Entry {
 	public static function insert( $args ) {
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
+		// Validate required arguments.
+		if ( empty( $args['post_id'] ) ) {
+			return new WP_Error( 'entry-invalid-args', __( 'Missing entry argument: post_id', 'liveblog' ) );
+		}
+
 		// Set the author if provided, otherwise use current user as fallback.
 		// Comments require an author, but we can hide it via meta.
 		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
 			$args['user'] = self::get_userdata_with_filter( $args['author_id'] );
 		}
 
-		$comment = self::insert_comment( $args );
-		if ( is_wp_error( $comment ) ) {
-			return $comment;
+		if ( empty( $args['user'] ) ) {
+			return new WP_Error( 'entry-invalid-args', __( 'Missing entry argument: user', 'liveblog' ) );
 		}
 
-		// Set hide_authors meta if no author was explicitly provided.
-		if ( ! isset( $args['author_id'] ) || ! $args['author_id'] ) {
-			update_comment_meta( $comment->comment_ID, self::HIDE_AUTHORS_KEY, true );
+		// Determine if we should hide the author.
+		$hide_author = ! isset( $args['author_id'] ) || ! $args['author_id'];
+
+		// Normalize contributor_ids - can be false, empty array, or array of IDs.
+		$contributor_ids = ! empty( $args['contributor_ids'] ) ? $args['contributor_ids'] : null;
+
+		try {
+			$entry_id = ServiceContainer::instance()->entry_service()->create(
+				(int) $args['post_id'],
+				$args['content'] ?? '',
+				$args['user'],
+				$hide_author,
+				$contributor_ids
+			);
+		} catch ( \InvalidArgumentException $e ) {
+			return new WP_Error( 'entry-invalid-args', $e->getMessage() );
+		} catch ( \RuntimeException $e ) {
+			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
 		}
 
-		if ( isset( $args['contributor_ids'] ) ) {
-			self::add_contributors( $comment->comment_ID, $args['contributor_ids'] );
-		}
+		do_action( 'liveblog_insert_entry', $entry_id->to_int(), $args['post_id'] );
 
-		do_action( 'liveblog_insert_entry', $comment->comment_ID, $args['post_id'] );
-		$entry = self::from_comment( $comment );
-		return $entry;
+		$comment = get_comment( $entry_id->to_int() );
+		return self::from_comment( $comment );
 	}
 
 	/**
@@ -432,8 +450,12 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original.
 	 */
 	public static function update( $args ) {
-		if ( ! $args['entry_id'] ) {
+		if ( empty( $args['entry_id'] ) ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
+		}
+
+		if ( empty( $args['post_id'] ) ) {
+			return new WP_Error( 'entry-invalid-args', __( 'Missing entry argument: post_id', 'liveblog' ) );
 		}
 
 		// Always use the original author for the update entry, otherwise until refresh
@@ -443,29 +465,33 @@ class WPCOM_Liveblog_Entry {
 			return $args['user'];
 		}
 
+		// Handle author selection - may update the original entry's author.
 		$args['user'] = self::handle_author_select( $args, $args['entry_id'] );
 
+		// Add contributors to the original entry.
 		if ( isset( $args['contributor_ids'] ) ) {
 			self::add_contributors( $args['entry_id'], $args['contributor_ids'] );
 		}
 
 		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
-		$comment = self::insert_comment( $args );
-		if ( is_wp_error( $comment ) ) {
-			return $comment;
+		try {
+			$new_entry_id = ServiceContainer::instance()->entry_service()->update(
+				(int) $args['post_id'],
+				EntryId::from_int( (int) $args['entry_id'] ),
+				$args['content'] ?? '',
+				$args['user']
+			);
+		} catch ( \InvalidArgumentException $e ) {
+			return new WP_Error( 'entry-invalid-args', $e->getMessage() );
+		} catch ( \RuntimeException $e ) {
+			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
 		}
 
-		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
-		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
-		wp_update_comment(
-			array(
-				'comment_ID'      => $args['entry_id'],
-				'comment_content' => wp_filter_post_kses( $args['content'] ),
-			)
-		);
-		$entry = self::from_comment( $comment );
-		return $entry;
+		do_action( 'liveblog_update_entry', $new_entry_id->to_int(), $args['post_id'] );
+
+		$comment = get_comment( $new_entry_id->to_int() );
+		return self::from_comment( $comment );
 	}
 
 	/**
@@ -477,34 +503,34 @@ class WPCOM_Liveblog_Entry {
 	 * @return WPCOM_Liveblog_Entry|WP_Error The newly inserted entry, which replaces the original.
 	 */
 	public static function delete( $args ) {
-		if ( ! $args['entry_id'] ) {
+		if ( empty( $args['entry_id'] ) ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
-		$args['content'] = '';
-		$comment         = self::insert_comment( $args );
-		if ( is_wp_error( $comment ) ) {
-			return $comment;
-		}
-		do_action( 'liveblog_delete_entry', $comment->comment_ID, $args['post_id'] );
-		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
 
-		// Delete any orphaned update entries that reference this entry.
-		// These would otherwise cause issues during lazy-loading.
-		$orphaned_updates = get_comments(
-			array(
-				'post_id'         => $args['post_id'],
-				'meta_key'        => self::REPLACES_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value'      => $args['entry_id'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-				'comment__not_in' => array( $comment->comment_ID ), // Exclude the delete entry we just created.
-			)
-		);
-		foreach ( $orphaned_updates as $orphaned ) {
-			wp_delete_comment( $orphaned->comment_ID, true );
+		if ( empty( $args['post_id'] ) ) {
+			return new WP_Error( 'entry-invalid-args', __( 'Missing entry argument: post_id', 'liveblog' ) );
 		}
 
-		wp_delete_comment( $args['entry_id'] );
-		$entry = self::from_comment( $comment );
-		return $entry;
+		if ( empty( $args['user'] ) ) {
+			return new WP_Error( 'entry-invalid-args', __( 'Missing entry argument: user', 'liveblog' ) );
+		}
+
+		try {
+			$delete_marker_id = ServiceContainer::instance()->entry_service()->delete(
+				(int) $args['post_id'],
+				EntryId::from_int( (int) $args['entry_id'] ),
+				$args['user']
+			);
+		} catch ( \InvalidArgumentException $e ) {
+			return new WP_Error( 'entry-invalid-args', $e->getMessage() );
+		} catch ( \RuntimeException $e ) {
+			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
+		}
+
+		do_action( 'liveblog_delete_entry', $delete_marker_id->to_int(), $args['post_id'] );
+
+		$comment = get_comment( $delete_marker_id->to_int() );
+		return self::from_comment( $comment );
 	}
 
 	/**
