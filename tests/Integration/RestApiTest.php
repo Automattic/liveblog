@@ -241,9 +241,10 @@ final class RestApiTest extends TestCase {
 	 * Test the insert CRUD action.
 	 */
 	public function test_crud_action_insert(): void {
-		$user  = self::factory()->user->create_and_get();
-		$args  = array( 'user' => $user );
-		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args( $args ) );
+		$user = self::factory()->user->create_and_get();
+		wp_set_current_user( $user->ID );
+
+		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args() );
 
 		$this->assertIsArray( $entry );
 		$this->assertNotEmpty( $entry['entries'] );
@@ -709,7 +710,8 @@ final class RestApiTest extends TestCase {
 	private function insert_entries( int $number_of_entries = 1, array $args = array() ): array {
 		$entries = array();
 
-		$user         = self::factory()->user->create_and_get();
+		$user = self::factory()->user->create_and_get();
+		wp_set_current_user( $user->ID );
 		$args['user'] = $user;
 
 		for ( $i = 0; $i < $number_of_entries; $i++ ) {
