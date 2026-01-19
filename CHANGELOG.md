@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.11.0] - 2026-01-14
+
+### Added
+
+* feat: add Disable button to liveblog metabox by @GaryJones in https://github.com/Automattic/liveblog/pull/809 (fixes #807)
+* feat: add filter to disable default Liveblog styles by @GaryJones in https://github.com/Automattic/liveblog/pull/810
+
+### Fixed
+
+* fix: restore metabox JavaScript and rename dashboard to admin by @GaryJones in https://github.com/Automattic/liveblog/pull/805 (fixes #804)
+* fix: prevent 404 errors from metabox links on unpublished posts by @GaryJones in https://github.com/Automattic/liveblog/pull/808 (fixes #806)
+* fix: strip all HTML from key event titles by @cnaples79 in https://github.com/Automattic/liveblog/pull/785 (fixes #464)
+
 ## [1.10.0] - 2026-01-06
 
 ### Added
@@ -262,6 +275,7 @@ Fixed problems:
 * Initial release
 
 
+[1.11.0]: https://github.com/Automattic/liveblog/compare/1.10.0...1.11.0
 [1.10.0]: https://github.com/Automattic/liveblog/compare/1.9.7...1.10.0
 [1.9.7]: https://github.com/Automattic/liveblog/compare/1.9.6...1.9.7
 [1.9.6]: https://github.com/Automattic/liveblog/compare/1.9.5...1.9.6
@@ -292,6 +306,7 @@ Fixed problems:
 [cain]: https://github.com/cain
 [cfoellmann]: https://github.com/cfoellmann
 [ChrisHardie]: https://github.com/ChrisHardie
+[cnaples79]: https://github.com/cnaples79
 [david-binda]: https://github.com/david-binda
 [defries]: https://github.com/defries
 [elarequi]: http://profiles.wordpress.org/elarequi

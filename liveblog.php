@@ -3,7 +3,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.10.0
+ * Version:     1.11.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
@@ -33,7 +33,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 *
 		 * @var string
 		 */
-		const VERSION = '1.10.0';
+		const VERSION = '1.11.0';
 
 		/**
 		 * Rewrites version for flushing rewrite rules.
