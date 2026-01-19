@@ -125,7 +125,7 @@ final class Entry {
 		DateTimeImmutable $created_at
 	): self {
 		$type = EntryType::from_replaces_and_content(
-			$replaces?->to_int(),
+			$replaces ? $replaces->to_int() : null,
 			$content->raw()
 		);
 

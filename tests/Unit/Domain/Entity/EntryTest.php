@@ -103,7 +103,7 @@ final class EntryTest extends TestCase {
 	 * Test is_update helper.
 	 */
 	public function test_is_update(): void {
-		$entry = $this->create_entry( replaces: EntryId::from_int( 100 ) );
+		$entry = $this->create_entry( null, null, null, null, EntryId::from_int( 100 ) );
 
 		$this->assertFalse( $entry->is_new() );
 		$this->assertTrue( $entry->is_update() );
@@ -115,8 +115,11 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_is_delete(): void {
 		$entry = $this->create_entry(
-			content: EntryContent::empty(),
-			replaces: EntryId::from_int( 100 )
+			null,
+			null,
+			EntryContent::empty(),
+			null,
+			EntryId::from_int( 100 )
 		);
 
 		$this->assertFalse( $entry->is_new() );
@@ -128,7 +131,7 @@ final class EntryTest extends TestCase {
 	 * Test display_id returns own ID for new entries.
 	 */
 	public function test_display_id_for_new_entry(): void {
-		$entry = $this->create_entry( id: EntryId::from_int( 123 ) );
+		$entry = $this->create_entry( EntryId::from_int( 123 ) );
 
 		$this->assertSame( 123, $entry->display_id()->to_int() );
 	}
@@ -138,8 +141,11 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_display_id_for_update_entry(): void {
 		$entry = $this->create_entry(
-			id: EntryId::from_int( 124 ),
-			replaces: EntryId::from_int( 123 )
+			EntryId::from_int( 124 ),
+			null,
+			null,
+			null,
+			EntryId::from_int( 123 )
 		);
 
 		$this->assertSame( 123, $entry->display_id()->to_int() );
@@ -150,7 +156,7 @@ final class EntryTest extends TestCase {
 	 */
 	public function test_timestamp(): void {
 		$created_at = new DateTimeImmutable( '2024-01-15 10:30:00', new DateTimeZone( 'UTC' ) );
-		$entry      = $this->create_entry( created_at: $created_at );
+		$entry      = $this->create_entry( null, null, null, null, null, $created_at );
 
 		$this->assertSame( $created_at->getTimestamp(), $entry->timestamp() );
 	}
@@ -164,10 +170,10 @@ final class EntryTest extends TestCase {
 				array(
 					'id'   => 1,
 					'name' => 'Test',
-				) 
+				)
 			)
 		);
-		$entry   = $this->create_entry( authors: $authors );
+		$entry   = $this->create_entry( null, null, null, $authors );
 
 		$this->assertTrue( $entry->has_authors() );
 	}
@@ -176,7 +182,7 @@ final class EntryTest extends TestCase {
 	 * Test has_authors returns false when no authors.
 	 */
 	public function test_has_authors_false(): void {
-		$entry = $this->create_entry( authors: AuthorCollection::empty() );
+		$entry = $this->create_entry( null, null, null, AuthorCollection::empty() );
 
 		$this->assertFalse( $entry->has_authors() );
 	}
@@ -202,7 +208,7 @@ final class EntryTest extends TestCase {
 			)
 		);
 
-		$original = $this->create_entry( authors: $original_authors );
+		$original = $this->create_entry( null, null, null, $original_authors );
 		$modified = $original->with_authors( $new_authors );
 
 		// Original unchanged.
@@ -224,7 +230,7 @@ final class EntryTest extends TestCase {
 		$original_content = EntryContent::from_raw( 'Original content' );
 		$new_content      = EntryContent::from_raw( 'New content' );
 
-		$original = $this->create_entry( content: $original_content );
+		$original = $this->create_entry( null, null, $original_content );
 		$modified = $original->with_content( $new_content );
 
 		// Original unchanged.
