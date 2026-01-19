@@ -551,58 +551,6 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Insert a comment for the entry.
-	 *
-	 * @param array $args The entry arguments.
-	 * @return WP_Comment|WP_Error The comment or error.
-	 */
-	private static function insert_comment( $args ) {
-		$valid_args = self::validate_args( $args );
-		if ( is_wp_error( $valid_args ) ) {
-			return $valid_args;
-		}
-		$new_comment_id = wp_insert_comment(
-			array(
-				'comment_post_ID'      => $args['post_id'],
-				'comment_content'      => wp_filter_post_kses( $args['content'] ),
-				'comment_approved'     => 'liveblog',
-				'comment_type'         => 'liveblog',
-				'user_id'              => $args['user']->ID,
-
-				'comment_author'       => $args['user']->display_name,
-				'comment_author_email' => $args['user']->user_email,
-				'comment_author_url'   => $args['user']->user_url,
-			)
-		);
-		wp_cache_delete( 'liveblog_entries_asc_' . $args['post_id'], 'liveblog' );
-		if ( empty( $new_comment_id ) || is_wp_error( $new_comment_id ) ) {
-			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
-		}
-		$comment = get_comment( $new_comment_id );
-		if ( ! $comment ) {
-			return new WP_Error( 'get-comment', __( 'Error retrieving comment', 'liveblog' ) );
-		}
-		return $comment;
-	}
-
-	/**
-	 * Validate entry arguments.
-	 *
-	 * @param array $args The entry arguments.
-	 * @return true|WP_Error True if valid, or error.
-	 */
-	private static function validate_args( $args ) {
-		$required_keys = array( 'post_id', 'user' );
-		foreach ( $required_keys as $key ) {
-			if ( ! isset( $args[ $key ] ) || ! $args[ $key ] ) {
-				// translators: 1: argument.
-				return new WP_Error( 'entry-invalid-args', sprintf( __( 'Missing entry argument: %s', 'liveblog' ), $key ) );
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * Get a user object from a comment ID.
 	 *
 	 * @param int $comment_id The comment ID.
@@ -712,28 +660,6 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Returns a list of contributor user objects.
-	 *
-	 * @param int $comment_id The comment ID to retrieve the metadata.
-	 * @return array The contributor data.
-	 */
-	private static function get_contributors_for_json( $comment_id ) {
-		$contributors = get_comment_meta( $comment_id, self::CONTRIBUTORS_META_KEY, true );
-
-		if ( ! $contributors ) {
-			return array();
-		}
-
-		return array_map(
-			function ( $contributor ) {
-					$user_object = self::get_userdata_with_filter( $contributor );
-					return self::get_user_data_for_json( $user_object );
-			},
-			$contributors
-		);
-	}
-
-	/**
 	 * Get user data with filter applied.
 	 *
 	 * @param int $author_id The author ID.
@@ -744,42 +670,14 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Returns a formatted array of user data.
-	 *
-	 * @param object $user The user object.
-	 * @return array The formatted user data.
-	 */
-	private static function get_user_data_for_json( $user ) {
-		if ( is_wp_error( $user ) || ! is_object( $user ) ) {
-			return array();
-		}
-
-		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
-		return array(
-			'id'     => $user->ID,
-			'key'    => strtolower( $user->user_nicename ),
-			'name'   => $user->display_name,
-			'avatar' => WPCOM_Liveblog::get_avatar( $user->ID, $avatar_size ),
-		);
-	}
-
-	/**
 	 * Return an array of authors, based on the original comment author and its contributors.
 	 *
 	 * @param int $comment_id The ID of the comment.
 	 * @return array The authors.
 	 */
 	public static function get_authors( $comment_id ) {
-		$hide_authors = get_comment_meta( $comment_id, self::HIDE_AUTHORS_KEY, true );
-
-		if ( $hide_authors ) {
-			return array();
-		}
-
-		$author       = array( self::get_user_data_for_json( self::user_object_from_comment_id( $comment_id ) ) );
-		$contributors = self::get_contributors_for_json( $comment_id );
-
-		return array_merge( $author, $contributors );
+		$avatar_size = apply_filters( 'liveblog_entry_avatar_size', self::DEFAULT_AVATAR_SIZE );
+		return self::get_author_collection( $comment_id )->to_array( $avatar_size );
 	}
 
 	/**

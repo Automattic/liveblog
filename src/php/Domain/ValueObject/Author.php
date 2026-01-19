@@ -280,7 +280,7 @@ final class Author {
 	/**
 	 * Convert to array for backwards compatibility.
 	 *
-	 * Matches the format used by WPCOM_Liveblog_Entry::get_user_data_for_json().
+	 * Matches the format used by the legacy liveblog entry author arrays.
 	 *
 	 * @param int $avatar_size Avatar size in pixels.
 	 * @return array
