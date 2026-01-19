@@ -9,7 +9,9 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Presenter;
 
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Domain\Entity\Entry;
+use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use WPCOM_Liveblog;
 use WPCOM_Liveblog_Entry;
 use WPCOM_Liveblog_Entry_Key_Events;
@@ -50,24 +52,41 @@ final class EntryPresenter {
 	private ?WP_Comment $comment;
 
 	/**
+	 * Content renderer for transforming raw content to HTML.
+	 *
+	 * @var ContentRendererInterface
+	 */
+	private ContentRendererInterface $renderer;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param Entry           $entry   The entry to present.
-	 * @param WP_Comment|null $comment Optional comment for additional WordPress data.
+	 * @param Entry                         $entry    The entry to present.
+	 * @param WP_Comment|null               $comment  Optional comment for additional WordPress data.
+	 * @param ContentRendererInterface|null $renderer Optional content renderer (defaults to WordPress renderer).
 	 */
-	public function __construct( Entry $entry, ?WP_Comment $comment = null ) {
-		$this->entry   = $entry;
-		$this->comment = $comment ?? get_comment( $entry->id()->to_int() );
+	public function __construct(
+		Entry $entry,
+		?WP_Comment $comment = null,
+		?ContentRendererInterface $renderer = null
+	) {
+		$this->entry    = $entry;
+		$this->comment  = $comment;
+		$this->renderer = $renderer ?? new WordPressContentRenderer();
 	}
 
 	/**
 	 * Create a presenter from an Entry.
 	 *
+	 * Fetches the comment automatically and uses the default WordPress renderer.
+	 *
 	 * @param Entry $entry The entry to present.
 	 * @return self
 	 */
 	public static function from_entry( Entry $entry ): self {
-		return new self( $entry );
+		$comment = get_comment( $entry->id()->to_int() );
+
+		return new self( $entry, $comment instanceof WP_Comment ? $comment : null );
 	}
 
 	/**
@@ -186,9 +205,10 @@ final class EntryPresenter {
 	 * @return string
 	 */
 	private function get_rendered_content(): string {
-		$content = $this->entry->content()->raw();
-
-		return WPCOM_Liveblog_Entry::render_content( $content, $this->comment );
+		return $this->renderer->render(
+			$this->entry->content()->raw(),
+			$this->comment
+		);
 	}
 
 	/**
@@ -231,7 +251,7 @@ final class EntryPresenter {
 	 * @return string
 	 */
 	private function get_time_format(): string {
-		return apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) );
+		return (string) apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) );
 	}
 
 	/**
