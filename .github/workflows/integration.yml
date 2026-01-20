@@ -25,7 +25,7 @@ jobs:
         include:
           # Check lowest supported WP version, with the lowest supported PHP.
           - wordpress: '6.4'
-            php: '7.4'
+            php: '8.2'
           # Check latest WP with the latest PHP.
           - wordpress: 'master'
             php: 'latest'
