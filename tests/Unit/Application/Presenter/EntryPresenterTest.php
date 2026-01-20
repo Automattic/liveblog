@@ -5,59 +5,9 @@
  * @package Automattic\Liveblog\Tests\Unit\Application\Presenter
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound
-// Mock classes for unit testing - must be in global namespace.
-namespace {
-	if ( ! class_exists( 'WPCOM_Liveblog_Entry_Key_Events' ) ) {
-		/**
-		 * Mock WPCOM_Liveblog_Entry_Key_Events for unit tests.
-		 */
-		class WPCOM_Liveblog_Entry_Key_Events {
-			/**
-			 * Check if entry is a key event.
-			 *
-			 * @param int $entry_id Entry ID.
-			 * @return bool
-			 */
-			public static function is_key_event( $entry_id ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-				return false;
-			}
-		}
-	}
+declare( strict_types=1 );
 
-	if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
-		/**
-		 * Mock WPCOM_Liveblog for unit tests.
-		 */
-		class WPCOM_Liveblog {
-			/**
-			 * Check if liveblog is editable.
-			 *
-			 * @return bool
-			 */
-			public static function is_liveblog_editable(): bool {
-				return true;
-			}
-		}
-	}
-
-	if ( ! class_exists( 'WPCOM_Liveblog_Entry' ) ) {
-		/**
-		 * Mock WPCOM_Liveblog_Entry for unit tests.
-		 */
-		class WPCOM_Liveblog_Entry {
-			/**
-			 * Allowed tags for entry content.
-			 *
-			 * @var array
-			 */
-			public static $allowed_tags_for_entry = array( 'p' => array(), 'a' => array( 'href' => array() ) );
-		}
-	}
-}
-// phpcs:enable
-
-namespace Automattic\Liveblog\Tests\Unit\Application\Presenter {
+namespace Automattic\Liveblog\Tests\Unit\Application\Presenter;
 
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
@@ -326,4 +276,3 @@ final class EntryPresenterTest extends TestCase {
 		);
 	}
 }
-} // End namespace

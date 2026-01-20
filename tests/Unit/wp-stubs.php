@@ -54,8 +54,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 	 * The real class is defined in liveblog.php but has too many
 	 * WordPress dependencies to load for unit tests.
 	 */
-	final class WPCOM_Liveblog {
- // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
+	final class WPCOM_Liveblog { // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
+
 		public const KEY = 'liveblog';
 
 		/**
@@ -66,6 +66,44 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 		 */
 		public static function sanitize_http_header( string $header ): string {
 			return (string) preg_replace( '/[\r\n\0]/', '', $header );
+		}
+
+		/**
+		 * Check if liveblog is editable.
+		 *
+		 * @return bool Always true in unit tests.
+		 */
+		public static function is_liveblog_editable(): bool {
+			return true;
+		}
+
+		/**
+		 * Get avatar HTML.
+		 *
+		 * @param mixed $id_or_email User ID or email.
+		 * @param int   $size        Avatar size.
+		 * @return string Avatar HTML.
+		 */
+		public static function get_avatar( $id_or_email, int $size = 30 ): string {
+			return '<img src="avatar.jpg" width="' . $size . '" height="' . $size . '" />';
+		}
+	}
+}
+
+if ( ! class_exists( 'WPCOM_Liveblog_Entry_Key_Events' ) ) {
+	/**
+	 * Minimal WPCOM_Liveblog_Entry_Key_Events stub for unit testing.
+	 */
+	final class WPCOM_Liveblog_Entry_Key_Events { // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
+
+		/**
+		 * Check if entry is a key event.
+		 *
+		 * @param int $entry_id Entry ID.
+		 * @return bool Always false in unit tests.
+		 */
+		public static function is_key_event( int $entry_id ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+			return false;
 		}
 	}
 }
