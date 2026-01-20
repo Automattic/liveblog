@@ -44,7 +44,9 @@ if ( ! function_exists( 'wp_parse_args' ) ) {
 // NOTE: get_comment_meta is NOT stubbed here - use Brain\Monkey Functions\expect() in tests
 // that need to mock it. This allows Patchwork to intercept the function.
 
-// phpcs:enable
+// phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
+// phpcs:disable Generic.Classes.DuplicateClassName.Found
+// phpcs:disable PEAR.NamingConventions.ValidClassName.Invalid
 
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 	/**
@@ -54,7 +56,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 	 * The real class is defined in liveblog.php but has too many
 	 * WordPress dependencies to load for unit tests.
 	 */
-	final class WPCOM_Liveblog { // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
+	final class WPCOM_Liveblog {
 
 		public const KEY = 'liveblog';
 
@@ -94,7 +96,7 @@ if ( ! class_exists( 'WPCOM_Liveblog_Entry_Key_Events' ) ) {
 	/**
 	 * Minimal WPCOM_Liveblog_Entry_Key_Events stub for unit testing.
 	 */
-	final class WPCOM_Liveblog_Entry_Key_Events { // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
+	final class WPCOM_Liveblog_Entry_Key_Events {
 
 		/**
 		 * Check if entry is a key event.
@@ -107,3 +109,5 @@ if ( ! class_exists( 'WPCOM_Liveblog_Entry_Key_Events' ) ) {
 		}
 	}
 }
+
+// phpcs:enable

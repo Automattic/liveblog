@@ -32,6 +32,6 @@ final class WordPressContentRenderer implements ContentRendererInterface {
 	 * @return string The rendered HTML.
 	 */
 	public function render( string $content, ?WP_Comment $comment = null ): string {
-		return WPCOM_Liveblog_Entry::render_content( $content, $comment ?: false );
+		return WPCOM_Liveblog_Entry::render_content( $content, null !== $comment ? $comment : false );
 	}
 }
