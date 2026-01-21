@@ -10,17 +10,13 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Filter\CommandFilter;
-use Automattic\Liveblog\Tests\Traits\ContainerAwareTrait;
-use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
  * Command Filter test case.
  *
  * @covers \Automattic\Liveblog\Application\Filter\CommandFilter
  */
-final class ExtendFeatureCommandsTest extends TestCase {
-
-	use ContainerAwareTrait;
+final class ExtendFeatureCommandsTest extends IntegrationTestCase {
 
 	/**
 	 * Tests the returned config includes the test filter injection and returns an array.

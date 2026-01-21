@@ -10,17 +10,13 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Filter\AuthorFilter;
-use Automattic\Liveblog\Tests\Traits\ContainerAwareTrait;
-use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
  * Author Filter test case.
  *
  * @covers \Automattic\Liveblog\Application\Filter\AuthorFilter
  */
-final class ExtendFeatureAuthorsTest extends TestCase {
-
-	use ContainerAwareTrait;
+final class ExtendFeatureAuthorsTest extends IntegrationTestCase {
 
 	/**
 	 * Tests the returned config includes the test filter injection and returns an array.

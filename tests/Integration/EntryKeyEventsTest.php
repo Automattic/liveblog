@@ -10,8 +10,6 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Service\KeyEventService;
-use Automattic\Liveblog\Tests\Traits\ContainerAwareTrait;
-use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
  * Key Event Service test case.
@@ -20,9 +18,7 @@ use Yoast\WPTestUtils\WPIntegration\TestCase;
  *
  * @covers \Automattic\Liveblog\Application\Service\KeyEventService
  */
-final class EntryKeyEventsTest extends TestCase {
-
-	use ContainerAwareTrait;
+final class EntryKeyEventsTest extends IntegrationTestCase {
 
 	/**
 	 * Test post ID.
