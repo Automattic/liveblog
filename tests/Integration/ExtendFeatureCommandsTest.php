@@ -10,7 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Filter\CommandFilter;
-use Automattic\Liveblog\Infrastructure\ServiceContainer;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
@@ -28,7 +28,7 @@ final class ExtendFeatureCommandsTest extends TestCase {
 	public function test_get_autocomplete_config_filter_executes(): void {
 		add_filter( 'liveblog_command_config', array( $this, 'example_test_filter' ), 1, 10 );
 
-		$filter = ServiceContainer::instance()->command_filter();
+		$filter = Container::instance()->command_filter();
 		$config = $filter->get_autocomplete_config();
 
 		$this->assertIsArray( $config );

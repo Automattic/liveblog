@@ -13,7 +13,7 @@ use Automattic\Liveblog\Application\Config\AllowedTagsConfiguration;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
-use Automattic\Liveblog\Infrastructure\ServiceContainer;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 use WPCOM_Liveblog;
 use WP_Comment;
 
@@ -309,6 +309,6 @@ final class EntryPresenter {
 	 * @return bool
 	 */
 	private function is_key_event( int $entry_id ): bool {
-		return ServiceContainer::instance()->key_event_service()->is_key_event( $entry_id );
+		return Container::instance()->key_event_service()->is_key_event( $entry_id );
 	}
 }

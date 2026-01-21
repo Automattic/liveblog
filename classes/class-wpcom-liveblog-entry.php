@@ -9,7 +9,7 @@ use Automattic\Liveblog\Domain\ValueObject\Author;
 use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use Automattic\Liveblog\Domain\ValueObject\EntryType;
-use Automattic\Liveblog\Infrastructure\ServiceContainer;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 
 /**
  * Represents a liveblog entry.
@@ -278,7 +278,7 @@ class WPCOM_Liveblog_Entry {
 			'entry_timestamp'        => $this->get_comment_date_gmt( 'c', $entry_id ),
 			'timestamp'              => $this->get_timestamp(),
 			'share_link'             => $share_link,
-			'key_event'              => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_service()->is_key_event( $entry_id ),
+			'key_event'              => \Automattic\Liveblog\Infrastructure\DI\Container::instance()->key_event_service()->is_key_event( $entry_id ),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
 		);
@@ -437,7 +437,7 @@ class WPCOM_Liveblog_Entry {
 		$contributor_ids = ! empty( $args['contributor_ids'] ) ? $args['contributor_ids'] : null;
 
 		try {
-			$entry_id = ServiceContainer::instance()->entry_service()->create(
+			$entry_id = Container::instance()->entry_service()->create(
 				(int) $args['post_id'],
 				$args['content'] ?? '',
 				$args['user'],
@@ -491,7 +491,7 @@ class WPCOM_Liveblog_Entry {
 		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
 		try {
-			$new_entry_id = ServiceContainer::instance()->entry_service()->update(
+			$new_entry_id = Container::instance()->entry_service()->update(
 				(int) $args['post_id'],
 				EntryId::from_int( (int) $args['entry_id'] ),
 				$args['content'] ?? '',
@@ -531,7 +531,7 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		try {
-			$delete_marker_id = ServiceContainer::instance()->entry_service()->delete(
+			$delete_marker_id = Container::instance()->entry_service()->delete(
 				(int) $args['post_id'],
 				EntryId::from_int( (int) $args['entry_id'] ),
 				$args['user']
@@ -559,7 +559,7 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
-		$args['content'] = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_service()->remove_key_action( $args['content'], $args['entry_id'] );
+		$args['content'] = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->key_event_service()->remove_key_action( $args['content'], $args['entry_id'] );
 
 		$entry = self::update( $args );
 		return $entry;

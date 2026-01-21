@@ -13,6 +13,13 @@
  * @package Liveblog
  */
 
+// Define plugin constants.
+define( 'LIVEBLOG_FILE', __FILE__ );
+define( 'LIVEBLOG_VERSION', '1.10.0' );
+
+// Load helper functions for third-party developers.
+require_once __DIR__ . '/src/php/functions.php';
+
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 	/**
@@ -277,7 +284,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			// Activate the WP CRON Hooks.
-			\Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->auto_archive_cron_handler()->register();
+			\Automattic\Liveblog\Infrastructure\DI\Container::instance()->auto_archive_cron_handler()->register();
 		}
 
 		/**
@@ -382,7 +389,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key' ), 10, 2 );
 
 			// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post.
-			$shortcode_filter = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->shortcode_filter();
+			$shortcode_filter = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->shortcode_filter();
 			add_filter( 'liveblog_before_insert_entry', array( $shortcode_filter, 'filter' ), 10, 1 );
 			add_filter( 'liveblog_before_update_entry', array( $shortcode_filter, 'filter' ), 10, 1 );
 
@@ -401,7 +408,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * the input sanitizer hooks. Handles commands, emojis, hashtags, and authors.
 		 */
 		private static function init_content_filters(): void {
-			$container = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+			$container = \Automattic\Liveblog\Infrastructure\DI\Container::instance();
 
 			// Register all content filters with the registry.
 			$registry = $container->content_filter_registry();
@@ -444,7 +451,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Sets up the key event configuration, shortcode, and all related hooks.
 		 */
 		private static function init_key_events(): void {
-			$container = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+			$container = \Automattic\Liveblog\Infrastructure\DI\Container::instance();
 
 			$configuration     = $container->key_event_configuration();
 			$key_event_service = $container->key_event_service();
@@ -550,7 +557,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * display count and per-page limits for lazy loading requests.
 		 */
 		private static function init_lazyload(): void {
-			$container     = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+			$container     = \Automattic\Liveblog\Infrastructure\DI\Container::instance();
 			$configuration = $container->lazyload_configuration();
 
 			// Initialize on template_redirect when liveblog state is available.
@@ -832,7 +839,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$all_entries = self::$entry_query->get_all_entries_asc();
 			$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 			$pages       = false;
-			$per_page    = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page();
+			$per_page    = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page();
 
 			if ( ! empty( $entries ) ) {
 				/**
@@ -1033,7 +1040,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$args['user'] = wp_get_current_user();
 
 			// Use DDD services directly for CRUD operations.
-			$container     = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+			$container     = \Automattic\Liveblog\Infrastructure\DI\Container::instance();
 			$entry_service = $container->entry_service();
 			$repository    = $container->entry_repository();
 
@@ -1175,7 +1182,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			// Update contributors.
 			if ( isset( $args['contributor_ids'] ) ) {
-				$repository = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->entry_repository();
+				$repository = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->entry_repository();
 				$repository->set_contributors(
 					\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( $entry_id ),
 					! empty( $args['contributor_ids'] ) ? $args['contributor_ids'] : array()
@@ -1303,7 +1310,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entries_for_json = array();
 
 			if ( ! empty( $entries ) ) {
-				$entries = array_slice( $entries, 0, \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page() );
+				$entries = array_slice( $entries, 0, \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page() );
 
 				// Populate an array containing the JSON data for all Liveblog entries.
 				foreach ( $entries as $entry ) {
@@ -1354,7 +1361,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			$per_page = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page();
+			$per_page = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page();
 
 			$entries = self::$entry_query->get_all_entries_asc();
 			$entries = self::flatten_entries( $entries );
@@ -1439,7 +1446,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			// Check if we're dealing with domain Entry objects.
 			$first = reset( $entries );
 			if ( $first instanceof \Automattic\Liveblog\Domain\Entity\Entry ) {
-				$query_service = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->entry_query_service();
+				$query_service = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->entry_query_service();
 				return $query_service->flatten_entries( $entries );
 			}
 
@@ -1497,7 +1504,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entry_content = $entry_content['content'];
 
 			// Use DDD content processor for rendering.
-			$content_processor = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->content_processor();
+			$content_processor = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->content_processor();
 			$entry_content     = $content_processor->render( $entry_content );
 
 			do_action( 'liveblog_preview_entry', $entry_content );
@@ -1652,7 +1659,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'locale'                       => get_locale(),
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) ),
-						'entries_per_page'             => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page(),
+						'entries_per_page'             => \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
 						'focus_refresh_interval'       => self::FOCUS_REFRESH_INTERVAL,
@@ -1665,8 +1672,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'endpoint_url'                 => self::get_entries_endpoint_url(),
 						'cross_domain'                 => false,
 
-						'features'                     => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->content_filter_registry()->get_enabled_features(),
-						'autocomplete'                 => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->content_filter_registry()->get_autocomplete_config(),
+						'features'                     => \Automattic\Liveblog\Infrastructure\DI\Container::instance()->content_filter_registry()->get_enabled_features(),
+						'autocomplete'                 => \Automattic\Liveblog\Infrastructure\DI\Container::instance()->content_filter_registry()->get_autocomplete_config(),
 						'command_class'                => apply_filters( 'liveblog_command_class', \Automattic\Liveblog\Application\Filter\CommandFilter::DEFAULT_CLASS_PREFIX ),
 
 						// Internationalization strings.

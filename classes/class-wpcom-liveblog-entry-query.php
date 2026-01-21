@@ -7,7 +7,7 @@
 
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Domain\Entity\Entry;
-use Automattic\Liveblog\Infrastructure\ServiceContainer;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 
 /**
  * Responsible for querying the Liveblog entries.
@@ -15,7 +15,7 @@ use Automattic\Liveblog\Infrastructure\ServiceContainer;
  * Much of the work is currently done by WordPress's comments API.
  *
  * Note: This class is being migrated to DDD services. New code should prefer
- * using EntryQueryService directly via ServiceContainer, or use the new
+ * using EntryQueryService directly via Container, or use the new
  * get_domain_entries() method that returns domain Entry objects.
  */
 class WPCOM_Liveblog_Entry_Query {
@@ -73,7 +73,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @return Entry[] Array of domain Entry objects.
 	 */
 	public function get_domain_entries( array $args = array() ): array {
-		$query_service = ServiceContainer::instance()->entry_query_service();
+		$query_service = Container::instance()->entry_query_service();
 
 		$limit = 0;
 		if ( isset( $args['number'] ) ) {
@@ -91,7 +91,7 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @return Entry|null The entry or null if not found.
 	 */
 	public function get_domain_entry_by_id( int $id ): ?Entry {
-		$repository = ServiceContainer::instance()->entry_repository();
+		$repository = Container::instance()->entry_repository();
 		$entry      = $repository->get_entry(
 			\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( $id )
 		);

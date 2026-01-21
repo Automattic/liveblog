@@ -528,7 +528,7 @@ class WPCOM_Liveblog_Rest_Api {
 		$term = $request->get_param( 'term' );
 
 		// Use DDD author filter for autocomplete.
-		$author_filter = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->author_filter();
+		$author_filter = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->author_filter();
 		return $author_filter->get_authors( $term );
 	}
 
@@ -543,7 +543,7 @@ class WPCOM_Liveblog_Rest_Api {
 		$term = $request->get_param( 'term' );
 
 		// Use DDD hashtag filter for autocomplete.
-		$hashtag_filter = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->hashtag_filter();
+		$hashtag_filter = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->hashtag_filter();
 		return $hashtag_filter->get_hashtag_terms( $term );
 	}
 
@@ -618,7 +618,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$key_event_service = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_service();
+		$key_event_service = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->key_event_service();
 		$key_events        = $key_event_service->get_key_events( (int) $post_id );
 		$key_events        = WPCOM_Liveblog::entries_for_json( $key_events );
 

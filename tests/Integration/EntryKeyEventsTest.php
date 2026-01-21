@@ -10,7 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Service\KeyEventService;
-use Automattic\Liveblog\Infrastructure\ServiceContainer;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 use WPCOM_Liveblog_Entry;
 
@@ -43,7 +43,7 @@ final class EntryKeyEventsTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->post_id = self::factory()->post->create();
-		$this->service = ServiceContainer::instance()->key_event_service();
+		$this->service = Container::instance()->key_event_service();
 	}
 
 	/**
@@ -51,7 +51,7 @@ final class EntryKeyEventsTest extends TestCase {
 	 */
 	protected function tearDown(): void {
 		wp_delete_post( $this->post_id, true );
-		ServiceContainer::reset();
+		Container::reset();
 		parent::tearDown();
 	}
 

@@ -1,13 +1,13 @@
 <?php
 /**
- * Service container for dependency injection.
+ * Dependency injection container.
  *
- * @package Automattic\Liveblog\Infrastructure
+ * @package Automattic\Liveblog\Infrastructure\DI
  */
 
 declare( strict_types=1 );
 
-namespace Automattic\Liveblog\Infrastructure;
+namespace Automattic\Liveblog\Infrastructure\DI;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
@@ -31,17 +31,17 @@ use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 
 /**
- * Simple service container for wiring up dependencies.
+ * Dependency injection container for wiring up services.
  *
  * This acts as the composition root for the application, creating and
  * providing access to service instances. Services are lazily instantiated
  * and cached for the lifetime of the request.
  *
  * Usage:
- *   $container = ServiceContainer::instance();
+ *   $container = Container::instance();
  *   $service   = $container->entry_service();
  */
-final class ServiceContainer {
+final class Container {
 
 	/**
 	 * Singleton instance.
@@ -49,6 +49,13 @@ final class ServiceContainer {
 	 * @var self|null
 	 */
 	private static ?self $instance = null;
+
+	/**
+	 * Custom factory overrides for testing.
+	 *
+	 * @var array<string, callable>
+	 */
+	private array $overrides = array();
 
 	/**
 	 * Cached entry repository instance.
@@ -204,11 +211,41 @@ final class ServiceContainer {
 	}
 
 	/**
+	 * Override a service registration for testing.
+	 *
+	 * @param string   $id      Service identifier (method name without parentheses).
+	 * @param callable $factory Factory callable that returns the service instance.
+	 * @return void
+	 */
+	public function set( string $id, callable $factory ): void {
+		$this->overrides[ $id ] = $factory;
+		// Clear cached instance if it exists.
+		$property = $this->get_property_name( $id );
+		if ( property_exists( $this, $property ) ) {
+			$this->$property = null;
+		}
+	}
+
+	/**
+	 * Get property name from service ID.
+	 *
+	 * @param string $id Service identifier.
+	 * @return string Property name.
+	 */
+	private function get_property_name( string $id ): string {
+		return $id;
+	}
+
+	/**
 	 * Get the entry repository.
 	 *
 	 * @return EntryRepositoryInterface
 	 */
 	public function entry_repository(): EntryRepositoryInterface {
+		if ( isset( $this->overrides['entry_repository'] ) ) {
+			return ( $this->overrides['entry_repository'] )();
+		}
+
 		if ( null === $this->entry_repository ) {
 			$this->entry_repository = new CommentEntryRepository();
 		}
@@ -222,6 +259,10 @@ final class ServiceContainer {
 	 * @return EntryService
 	 */
 	public function entry_service(): EntryService {
+		if ( isset( $this->overrides['entry_service'] ) ) {
+			return ( $this->overrides['entry_service'] )();
+		}
+
 		if ( null === $this->entry_service ) {
 			$this->entry_service = new EntryService( $this->entry_repository() );
 		}
@@ -235,6 +276,10 @@ final class ServiceContainer {
 	 * @return ContentProcessor
 	 */
 	public function content_processor(): ContentProcessor {
+		if ( isset( $this->overrides['content_processor'] ) ) {
+			return ( $this->overrides['content_processor'] )();
+		}
+
 		if ( null === $this->content_processor ) {
 			$this->content_processor = new ContentProcessor();
 		}
@@ -248,6 +293,10 @@ final class ServiceContainer {
 	 * @return ContentRendererInterface
 	 */
 	public function content_renderer(): ContentRendererInterface {
+		if ( isset( $this->overrides['content_renderer'] ) ) {
+			return ( $this->overrides['content_renderer'] )();
+		}
+
 		if ( null === $this->content_renderer ) {
 			$this->content_renderer = new WordPressContentRenderer( $this->content_processor() );
 		}
@@ -261,6 +310,10 @@ final class ServiceContainer {
 	 * @return ShortcodeFilter
 	 */
 	public function shortcode_filter(): ShortcodeFilter {
+		if ( isset( $this->overrides['shortcode_filter'] ) ) {
+			return ( $this->overrides['shortcode_filter'] )();
+		}
+
 		if ( null === $this->shortcode_filter ) {
 			$this->shortcode_filter = new ShortcodeFilter();
 		}
@@ -274,6 +327,10 @@ final class ServiceContainer {
 	 * @return EntryQueryService
 	 */
 	public function entry_query_service(): EntryQueryService {
+		if ( isset( $this->overrides['entry_query_service'] ) ) {
+			return ( $this->overrides['entry_query_service'] )();
+		}
+
 		if ( null === $this->entry_query_service ) {
 			$this->entry_query_service = new EntryQueryService( $this->entry_repository() );
 		}
@@ -287,6 +344,10 @@ final class ServiceContainer {
 	 * @return ContentFilterRegistry
 	 */
 	public function content_filter_registry(): ContentFilterRegistry {
+		if ( isset( $this->overrides['content_filter_registry'] ) ) {
+			return ( $this->overrides['content_filter_registry'] )();
+		}
+
 		if ( null === $this->content_filter_registry ) {
 			$this->content_filter_registry = new ContentFilterRegistry();
 		}
@@ -300,6 +361,10 @@ final class ServiceContainer {
 	 * @return InputSanitizer
 	 */
 	public function input_sanitizer(): InputSanitizer {
+		if ( isset( $this->overrides['input_sanitizer'] ) ) {
+			return ( $this->overrides['input_sanitizer'] )();
+		}
+
 		if ( null === $this->input_sanitizer ) {
 			$this->input_sanitizer = new InputSanitizer();
 		}
@@ -313,6 +378,10 @@ final class ServiceContainer {
 	 * @return CommandFilter
 	 */
 	public function command_filter(): CommandFilter {
+		if ( isset( $this->overrides['command_filter'] ) ) {
+			return ( $this->overrides['command_filter'] )();
+		}
+
 		if ( null === $this->command_filter ) {
 			$this->command_filter = new CommandFilter();
 		}
@@ -326,6 +395,10 @@ final class ServiceContainer {
 	 * @return EmojiFilter
 	 */
 	public function emoji_filter(): EmojiFilter {
+		if ( isset( $this->overrides['emoji_filter'] ) ) {
+			return ( $this->overrides['emoji_filter'] )();
+		}
+
 		if ( null === $this->emoji_filter ) {
 			$this->emoji_filter = new EmojiFilter();
 		}
@@ -339,6 +412,10 @@ final class ServiceContainer {
 	 * @return HashtagFilter
 	 */
 	public function hashtag_filter(): HashtagFilter {
+		if ( isset( $this->overrides['hashtag_filter'] ) ) {
+			return ( $this->overrides['hashtag_filter'] )();
+		}
+
 		if ( null === $this->hashtag_filter ) {
 			$this->hashtag_filter = new HashtagFilter();
 		}
@@ -352,6 +429,10 @@ final class ServiceContainer {
 	 * @return AuthorFilter
 	 */
 	public function author_filter(): AuthorFilter {
+		if ( isset( $this->overrides['author_filter'] ) ) {
+			return ( $this->overrides['author_filter'] )();
+		}
+
 		if ( null === $this->author_filter ) {
 			$this->author_filter = new AuthorFilter();
 		}
@@ -365,6 +446,10 @@ final class ServiceContainer {
 	 * @return KeyEventService
 	 */
 	public function key_event_service(): KeyEventService {
+		if ( isset( $this->overrides['key_event_service'] ) ) {
+			return ( $this->overrides['key_event_service'] )();
+		}
+
 		if ( null === $this->key_event_service ) {
 			$this->key_event_service = new KeyEventService(
 				$this->entry_repository(),
@@ -381,6 +466,10 @@ final class ServiceContainer {
 	 * @return KeyEventConfiguration
 	 */
 	public function key_event_configuration(): KeyEventConfiguration {
+		if ( isset( $this->overrides['key_event_configuration'] ) ) {
+			return ( $this->overrides['key_event_configuration'] )();
+		}
+
 		if ( null === $this->key_event_configuration ) {
 			$this->key_event_configuration = new KeyEventConfiguration();
 		}
@@ -394,6 +483,10 @@ final class ServiceContainer {
 	 * @return KeyEventShortcodeHandler
 	 */
 	public function key_event_shortcode_handler(): KeyEventShortcodeHandler {
+		if ( isset( $this->overrides['key_event_shortcode_handler'] ) ) {
+			return ( $this->overrides['key_event_shortcode_handler'] )();
+		}
+
 		if ( null === $this->key_event_shortcode_handler ) {
 			$this->key_event_shortcode_handler = new KeyEventShortcodeHandler(
 				$this->key_event_service(),
@@ -410,6 +503,10 @@ final class ServiceContainer {
 	 * @return LazyloadConfiguration
 	 */
 	public function lazyload_configuration(): LazyloadConfiguration {
+		if ( isset( $this->overrides['lazyload_configuration'] ) ) {
+			return ( $this->overrides['lazyload_configuration'] )();
+		}
+
 		if ( null === $this->lazyload_configuration ) {
 			$this->lazyload_configuration = new LazyloadConfiguration();
 		}
@@ -423,6 +520,10 @@ final class ServiceContainer {
 	 * @return AutoArchiveService
 	 */
 	public function auto_archive_service(): AutoArchiveService {
+		if ( isset( $this->overrides['auto_archive_service'] ) ) {
+			return ( $this->overrides['auto_archive_service'] )();
+		}
+
 		if ( null === $this->auto_archive_service ) {
 			$auto_archive_days          = \WPCOM_Liveblog::$auto_archive_days;
 			$this->auto_archive_service = new AutoArchiveService( $auto_archive_days );
@@ -437,6 +538,10 @@ final class ServiceContainer {
 	 * @return AutoArchiveCronHandler
 	 */
 	public function auto_archive_cron_handler(): AutoArchiveCronHandler {
+		if ( isset( $this->overrides['auto_archive_cron_handler'] ) ) {
+			return ( $this->overrides['auto_archive_cron_handler'] )();
+		}
+
 		if ( null === $this->auto_archive_cron_handler ) {
 			$this->auto_archive_cron_handler = new AutoArchiveCronHandler(
 				$this->auto_archive_service()
@@ -449,6 +554,7 @@ final class ServiceContainer {
 	/**
 	 * Set a custom entry repository (for testing or alternative implementations).
 	 *
+	 * @deprecated Use set('entry_repository', fn() => $repository) instead.
 	 * @param EntryRepositoryInterface $repository Repository instance.
 	 * @return self
 	 */
@@ -463,6 +569,7 @@ final class ServiceContainer {
 	/**
 	 * Set a custom entry service (for testing).
 	 *
+	 * @deprecated Use set('entry_service', fn() => $service) instead.
 	 * @param EntryService $service Service instance.
 	 * @return self
 	 */
