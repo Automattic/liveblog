@@ -9,12 +9,12 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Presenter;
 
+use Automattic\Liveblog\Application\Config\AllowedTagsConfiguration;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
+use Automattic\Liveblog\Infrastructure\ServiceContainer;
 use WPCOM_Liveblog;
-use WPCOM_Liveblog_Entry;
-use WPCOM_Liveblog_Entry_Key_Events;
 use WP_Comment;
 
 /**
@@ -154,7 +154,7 @@ final class EntryPresenter {
 			'share_link'             => $this->get_share_link( $entry_id, 'liveblog-entry-' ),
 			'key_event'              => $this->is_key_event( $entry_id ),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
-			'allowed_tags_for_entry' => WPCOM_Liveblog_Entry::$allowed_tags_for_entry,
+			'allowed_tags_for_entry' => AllowedTagsConfiguration::get(),
 		);
 	}
 
@@ -299,7 +299,7 @@ final class EntryPresenter {
 	 * @return string
 	 */
 	private function get_entry_time( string $format ): string {
-		return get_comment_date( $format, $this->get_display_id() );
+		return (string) get_comment_date( $format, $this->get_display_id() );
 	}
 
 	/**
@@ -309,6 +309,6 @@ final class EntryPresenter {
 	 * @return bool
 	 */
 	private function is_key_event( int $entry_id ): bool {
-		return WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry_id );
+		return ServiceContainer::instance()->key_event_service()->is_key_event( $entry_id );
 	}
 }

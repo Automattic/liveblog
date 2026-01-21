@@ -13,6 +13,14 @@ use Automattic\Liveblog\Infrastructure\ServiceContainer;
 
 /**
  * Represents a liveblog entry.
+ *
+ * @deprecated 1.10.0 This class is being migrated to DDD architecture.
+ *             New code should use:
+ *             - Automattic\Liveblog\Domain\Entity\Entry for entry entities
+ *             - Automattic\Liveblog\Application\Service\EntryService for CRUD operations
+ *             - Automattic\Liveblog\Application\Presenter\EntryPresenter for JSON formatting
+ *             - Automattic\Liveblog\Application\Service\ContentProcessor for content rendering
+ *             The class will be removed in a future major version.
  */
 class WPCOM_Liveblog_Entry {
 
@@ -57,6 +65,13 @@ class WPCOM_Liveblog_Entry {
 	 * @var EntryType
 	 */
 	private EntryType $type;
+
+	/**
+	 * The ID of the entry this one replaces (for updates/deletes).
+	 *
+	 * @var string|int|false
+	 */
+	public $replaces;
 
 	/**
 	 * Allowed HTML tags for entry content.
@@ -263,7 +278,7 @@ class WPCOM_Liveblog_Entry {
 			'entry_timestamp'        => $this->get_comment_date_gmt( 'c', $entry_id ),
 			'timestamp'              => $this->get_timestamp(),
 			'share_link'             => $share_link,
-			'key_event'              => WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry_id ),
+			'key_event'              => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_service()->is_key_event( $entry_id ),
 			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
 			'allowed_tags_for_entry' => self::$allowed_tags_for_entry,
 		);
@@ -544,7 +559,7 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
-		$args['content'] = WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
+		$args['content'] = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_service()->remove_key_action( $args['content'], $args['entry_id'] );
 
 		$entry = self::update( $args );
 		return $entry;

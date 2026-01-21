@@ -525,15 +525,11 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return array An array of authors on the site.
 	 */
 	public static function get_authors( WP_REST_Request $request ) {
-
-		// Get required parameters from the request.
 		$term = $request->get_param( 'term' );
 
-		// Get a list of authors.
-		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
-		$authors          = $liveblog_authors->get_authors( $term );
-
-		return $authors;
+		// Use DDD author filter for autocomplete.
+		$author_filter = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->author_filter();
+		return $author_filter->get_authors( $term );
 	}
 
 	/**
@@ -544,15 +540,11 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return array An array of matching hashtags.
 	 */
 	public static function get_hashtag_terms( WP_REST_Request $request ) {
-
-		// Get required parameters from the request.
 		$term = $request->get_param( 'term' );
 
-		// Get a list of hashtags.
-		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
-		$hashtags          = $liveblog_hashtags->get_hashtag_terms( $term );
-
-		return $hashtags;
+		// Use DDD hashtag filter for autocomplete.
+		$hashtag_filter = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->hashtag_filter();
+		return $hashtag_filter->get_hashtag_terms( $term );
 	}
 
 	/**
@@ -626,8 +618,9 @@ class WPCOM_Liveblog_Rest_Api {
 
 		self::set_liveblog_vars( $post_id );
 
-		$key_events = WPCOM_Liveblog_Entry_Key_Events::all();
-		$key_events = WPCOM_Liveblog::entries_for_json( $key_events );
+		$key_event_service = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_service();
+		$key_events        = $key_event_service->get_key_events( (int) $post_id );
+		$key_events        = WPCOM_Liveblog::entries_for_json( $key_events );
 
 		// Possibly do not cache the response.
 		WPCOM_Liveblog::prevent_caching_if_needed();

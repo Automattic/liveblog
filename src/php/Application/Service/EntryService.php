@@ -34,12 +34,39 @@ final class EntryService {
 	private EntryRepositoryInterface $repository;
 
 	/**
+	 * Key event service.
+	 *
+	 * @var KeyEventService|null
+	 */
+	private ?KeyEventService $key_event_service = null;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param EntryRepositoryInterface $repository Entry repository.
+	 * @param EntryRepositoryInterface $repository        Entry repository.
+	 * @param KeyEventService|null     $key_event_service Optional key event service.
 	 */
-	public function __construct( EntryRepositoryInterface $repository ) {
-		$this->repository = $repository;
+	public function __construct( EntryRepositoryInterface $repository, ?KeyEventService $key_event_service = null ) {
+		$this->repository        = $repository;
+		$this->key_event_service = $key_event_service;
+	}
+
+	/**
+	 * Get the key event service.
+	 *
+	 * Uses lazy loading to avoid circular dependencies.
+	 *
+	 * @return KeyEventService
+	 */
+	private function get_key_event_service(): KeyEventService {
+		if ( null === $this->key_event_service ) {
+			$this->key_event_service = new KeyEventService(
+				$this->repository,
+				new EntryQueryService( $this->repository )
+			);
+		}
+
+		return $this->key_event_service;
 	}
 
 	/**
@@ -272,6 +299,32 @@ final class EntryService {
 	 */
 	public function is_authors_hidden( EntryId $entry_id ): bool {
 		return $this->repository->is_authors_hidden( $entry_id );
+	}
+
+	/**
+	 * Delete a key event from an entry.
+	 *
+	 * Removes the key event meta and strips the /key command from content,
+	 * then updates the entry.
+	 *
+	 * @param int     $post_id  Post ID for the liveblog.
+	 * @param EntryId $entry_id ID of the entry.
+	 * @param string  $content  Current content (with /key to be stripped).
+	 * @param WP_User $author   Author of the update.
+	 * @return EntryId The updated entry's ID.
+	 * @throws InvalidArgumentException If entry not found or post ID is invalid.
+	 */
+	public function delete_key(
+		int $post_id,
+		EntryId $entry_id,
+		string $content,
+		WP_User $author
+	): EntryId {
+		// Remove the key event meta and strip /key from content.
+		$updated_content = $this->get_key_event_service()->remove_key_action( $content, $entry_id->to_int() );
+
+		// Update the entry with the new content.
+		return $this->update( $post_id, $entry_id, $updated_content, $author );
 	}
 
 	/**

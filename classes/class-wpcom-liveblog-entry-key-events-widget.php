@@ -54,7 +54,8 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
-		$shortcode_output = WPCOM_Liveblog_Entry_Key_Events::shortcode( array( 'title' => false ) );
+		$shortcode_handler = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->key_event_shortcode_handler();
+		$shortcode_output  = $shortcode_handler->render( array( 'title' => false ) );
 
 		if ( is_null( $shortcode_output ) ) {
 			// Don't display the widget if there are no key events to show.

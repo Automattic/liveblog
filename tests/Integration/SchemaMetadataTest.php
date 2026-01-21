@@ -33,6 +33,15 @@ final class SchemaMetadataTest extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
+		// Reset static properties to ensure clean state.
+		WPCOM_Liveblog::$is_rest_api_call     = false;
+		WPCOM_Liveblog::$supported_post_types = array( 'post' );
+
+		// Reset private static properties using reflection.
+		$entry_query = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
+		$entry_query->setAccessible( true );
+		$entry_query->setValue( null, null );
+
 		// Create a post and enable liveblog.
 		$this->post_id = self::factory()->post->create(
 			array(
@@ -58,6 +67,10 @@ final class SchemaMetadataTest extends TestCase {
 	 * Tear down test fixtures.
 	 */
 	public function tear_down(): void {
+		// Reset static properties.
+		WPCOM_Liveblog::$is_rest_api_call     = false;
+		WPCOM_Liveblog::$supported_post_types = array( 'post' );
+
 		// Reset the static post_id on WPCOM_Liveblog.
 		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'post_id' );
 		$reflection->setAccessible( true );

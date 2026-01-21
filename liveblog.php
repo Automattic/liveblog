@@ -265,10 +265,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::add_admin_filters();
 			self::register_embed_handlers();
 
-			WPCOM_Liveblog_Entry_Key_Events::load();
 			WPCOM_Liveblog_Entry_Key_Events_Widget::load();
-			WPCOM_Liveblog_Entry_Extend::load();
-			WPCOM_Liveblog_Lazyloader::load();
+			self::init_key_events();
+			self::init_lazyload();
 			WPCOM_Liveblog_Socketio_Loader::load();
 			WPCOM_Liveblog_Entry_Embed_SDKs::load();
 			WPCOM_Liveblog_AMP::load();
@@ -278,7 +277,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			// Activate the WP CRON Hooks.
-			WPCOM_Liveblog_Cron::load();
+			\Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->auto_archive_cron_handler()->register();
 		}
 
 		/**
@@ -332,15 +331,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-query.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-key-events.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-key-events-widget.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature-commands.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature-emojis.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature-authors.php';
-			require __DIR__ . '/classes/class-wpcom-liveblog-lazyloader.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-socketio-loader.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-embed.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
@@ -360,8 +351,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				require __DIR__ . '/classes/class-wpcom-liveblog-wp-cli.php';
 			}
-
-			require __DIR__ . '/classes/class-wpcom-liveblog-cron.php';
 		}
 
 		/**
@@ -393,13 +382,179 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key' ), 10, 2 );
 
 			// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post.
-			// Called from the WPCOM_Liveblog_Entry Class.
-			add_filter( 'liveblog_before_insert_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
-			add_filter( 'liveblog_before_update_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
+			$shortcode_filter = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->shortcode_filter();
+			add_filter( 'liveblog_before_insert_entry', array( $shortcode_filter, 'filter' ), 10, 1 );
+			add_filter( 'liveblog_before_update_entry', array( $shortcode_filter, 'filter' ), 10, 1 );
 
 			// We need to check the Liveblog autoarchive date on each time a new entry is added or updated to
 			// ensure we extend the date out correctly to the next archive point based on the configured offset.
 			add_filter( 'liveblog_before_insert_entry', array( __CLASS__, 'update_autoarchive_expiry' ), 10, 1 );
+
+			// Initialise DDD content filters (InputSanitizer and ContentFilterRegistry).
+			self::init_content_filters();
+		}
+
+		/**
+		 * Initialise the DDD-based content filter system.
+		 *
+		 * Registers all content filters with the ContentFilterRegistry and sets up
+		 * the input sanitizer hooks. Handles commands, emojis, hashtags, and authors.
+		 */
+		private static function init_content_filters(): void {
+			$container = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+
+			// Register all content filters with the registry.
+			$registry = $container->content_filter_registry();
+			$registry->register( $container->command_filter() );
+			$registry->register( $container->emoji_filter() );
+			$registry->register( $container->hashtag_filter() );
+			$registry->register( $container->author_filter() );
+
+			// Initialise the registry (sets up prefixes, regex, loads filters).
+			$registry->initialise( 'commands, emojis, hashtags, authors' );
+
+			// Add input sanitizer hooks (runs before content filters).
+			$input_sanitizer = $container->input_sanitizer();
+			add_filter( 'liveblog_before_insert_entry', array( $input_sanitizer, 'sanitize' ), 1 );
+			add_filter( 'liveblog_before_update_entry', array( $input_sanitizer, 'sanitize' ), 1 );
+			add_filter( 'liveblog_before_insert_entry', array( $input_sanitizer, 'fix_links_wrapped_in_div' ), 1 );
+			add_filter( 'liveblog_before_update_entry', array( $input_sanitizer, 'fix_links_wrapped_in_div' ), 1 );
+			add_filter( 'liveblog_before_preview_entry', array( $input_sanitizer, 'fix_links_wrapped_in_div' ), 1 );
+
+			// Add content filter hooks (processes commands, emojis, hashtags, authors).
+			add_filter( 'liveblog_before_insert_entry', array( $registry, 'apply_filters' ), 10 );
+			add_filter( 'liveblog_before_update_entry', array( $registry, 'apply_filters' ), 10 );
+			add_filter( 'liveblog_before_preview_entry', array( $registry, 'apply_filters' ), 10 );
+
+			// Add revert filter hook (for edit mode).
+			add_filter( 'liveblog_before_edit_entry', array( $registry, 'revert_all' ), 10 );
+
+			// Allow emoji image attributes (class, width, height, data-emoji) to pass through.
+			add_filter(
+				'liveblog_image_allowed_attributes',
+				function ( $attrs ) {
+					return array_merge( $attrs, array( 'class', 'width', 'height', 'data-emoji' ) );
+				}
+			);
+		}
+
+		/**
+		 * Initialise the DDD-based key events system.
+		 *
+		 * Sets up the key event configuration, shortcode, and all related hooks.
+		 */
+		private static function init_key_events(): void {
+			$container = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+
+			$configuration     = $container->key_event_configuration();
+			$key_event_service = $container->key_event_service();
+			$shortcode_handler = $container->key_event_shortcode_handler();
+
+			// Initialize key event configuration (sets up templates/formats).
+			add_action( 'init', array( $configuration, 'initialize' ), 11 );
+
+			// Register the /key command.
+			add_filter(
+				'liveblog_active_commands',
+				function ( $commands ) {
+					$commands[] = 'key';
+					return $commands;
+				}
+			);
+
+			// Enrich entry JSON with key event data.
+			add_filter(
+				'liveblog_entry_for_json',
+				function ( $entry, $entry_object ) use ( $key_event_service, $configuration ) {
+					// Support both legacy WPCOM_Liveblog_Entry and domain Entry objects.
+					if ( $entry_object instanceof \Automattic\Liveblog\Domain\Entity\Entry ) {
+						$post_id = $entry_object->post_id();
+						return $key_event_service->enrich_entry_for_json( $entry, $entry_object, $post_id );
+					}
+
+					// Handle legacy WPCOM_Liveblog_Entry.
+					$post_id = $entry_object->get_post_id();
+					$content = $entry_object->get_content();
+
+					// Detect key event from content (more reliable than meta for updates).
+					$is_key_event       = $key_event_service->content_has_key_command( $content );
+					$entry['key_event'] = $is_key_event;
+
+					if ( $is_key_event ) {
+						$entry['key_event_content'] = $configuration->format_content( $content, $post_id );
+					}
+
+					return $entry;
+				},
+				10,
+				2
+			);
+
+			// Handle /key command action (add meta when command is used).
+			add_action(
+				'liveblog_command_key_after',
+				function ( $content, $entry_id, $post_id ) use ( $key_event_service ) {
+					$key_event_service->handle_key_command( $content, $entry_id, $post_id );
+				},
+				10,
+				3
+			);
+
+			// Sync key event meta when entry is updated.
+			add_action(
+				'liveblog_update_entry',
+				array( $key_event_service, 'sync_key_event_meta' ),
+				10,
+				2
+			);
+
+			// Add admin options for key event settings.
+			add_filter(
+				'liveblog_admin_add_settings',
+				function ( $extra_fields, $post_id ) use ( $shortcode_handler ) {
+					$extra_fields[] = $shortcode_handler->get_admin_options( $post_id );
+					return $extra_fields;
+				},
+				10,
+				2
+			);
+
+			// Save admin options.
+			add_action(
+				'liveblog_admin_settings_update',
+				function ( $response, $post_id ) use ( $shortcode_handler ) {
+					$shortcode_handler->save_admin_options( $response, $post_id );
+				},
+				10,
+				2
+			);
+
+			// Register the shortcode.
+			$shortcode_handler->register();
+
+			// Hook configuration for content formatting.
+			add_filter(
+				'liveblog_key_event_content',
+				function ( $content, $post_id ) use ( $configuration ) {
+					return $configuration->format_content( $content, $post_id );
+				},
+				10,
+				2
+			);
+		}
+
+		/**
+		 * Initialise the DDD-based lazyload configuration.
+		 *
+		 * Sets up lazy loading configuration for entries including initial
+		 * display count and per-page limits for lazy loading requests.
+		 */
+		private static function init_lazyload(): void {
+			$container     = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+			$configuration = $container->lazyload_configuration();
+
+			// Initialize on template_redirect when liveblog state is available.
+			add_action( 'template_redirect', array( $configuration, 'initialize' ) );
 		}
 
 		/**
@@ -677,7 +832,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$all_entries = self::$entry_query->get_all_entries_asc();
 			$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 			$pages       = false;
-			$per_page    = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+			$per_page    = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page();
 
 			if ( ! empty( $entries ) ) {
 				/**
@@ -875,20 +1030,157 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return mixed The result of the crud method.
 		 */
 		public static function do_crud_entry( $crud_action, $args ) {
-
 			$args['user'] = wp_get_current_user();
-			$entry        = call_user_func( array( 'WPCOM_Liveblog_Entry', $crud_action ), $args );
-			if ( ! is_wp_error( $entry ) ) {
+
+			// Use DDD services directly for CRUD operations.
+			$container     = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance();
+			$entry_service = $container->entry_service();
+			$repository    = $container->entry_repository();
+
+			try {
+				$entry_id = self::execute_crud_action( $crud_action, $args, $entry_service );
+
+				// Get the entry and present it for JSON.
+				$entry     = $repository->get_entry( $entry_id );
+				$presenter = \Automattic\Liveblog\Application\Presenter\EntryPresenter::from_entry( $entry );
+
 				// Do not send latest_timestamp. If we send it the client won't get
 				// older entries. Since we send only the new one, we don't know if there
 				// weren't any entries in between.
-				$entry = array(
-					'entries'          => array( $entry->for_json() ),
+				return array(
+					'entries'          => array( $presenter->for_json() ),
 					'latest_timestamp' => null,
 				);
+			} catch ( \InvalidArgumentException $e ) {
+				return new \WP_Error( 'entry-invalid-args', $e->getMessage() );
+			} catch ( \RuntimeException $e ) {
+				return new \WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
+			}
+		}
+
+		/**
+		 * Execute the CRUD action using the entry service.
+		 *
+		 * @param string                                                $crud_action   The CRUD action to perform.
+		 * @param array                                                 $args          Arguments for the action.
+		 * @param \Automattic\Liveblog\Application\Service\EntryService $entry_service The entry service.
+		 * @return \Automattic\Liveblog\Domain\ValueObject\EntryId The resulting entry ID.
+		 * @throws \InvalidArgumentException If arguments are invalid.
+		 */
+		private static function execute_crud_action( $crud_action, $args, $entry_service ) { // phpcs:ignore Squiz.Commenting.FunctionCommentThrowTag.WrongNumber -- Also throws RuntimeException from service.
+			$post_id = (int) $args['post_id'];
+			$user    = $args['user'];
+
+			switch ( $crud_action ) {
+				case 'insert':
+					// Apply filter before insert.
+					$args = apply_filters( 'liveblog_before_insert_entry', $args );
+
+					// Set the author if provided, otherwise use current user.
+					if ( isset( $args['author_id'] ) && $args['author_id'] ) {
+						$user = apply_filters( 'liveblog_userdata', get_userdata( $args['author_id'] ), $args['author_id'] );
+					}
+
+					$hide_author     = ! isset( $args['author_id'] ) || ! $args['author_id'];
+					$contributor_ids = ! empty( $args['contributor_ids'] ) ? $args['contributor_ids'] : null;
+
+					$entry_id = $entry_service->create(
+						$post_id,
+						$args['content'] ?? '',
+						$user,
+						$hide_author,
+						$contributor_ids
+					);
+
+					do_action( 'liveblog_insert_entry', $entry_id->to_int(), $post_id );
+					return $entry_id;
+
+				case 'update':
+					// Handle author selection and contributors on the original entry.
+					self::handle_entry_update_metadata( $args );
+
+					// Apply filter before update.
+					$args = apply_filters( 'liveblog_before_update_entry', $args );
+
+					// Get original author for the update.
+					$original_comment = get_comment( $args['entry_id'] );
+					$user             = get_userdata( $original_comment->user_id );
+
+					$entry_id = $entry_service->update(
+						$post_id,
+						\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( (int) $args['entry_id'] ),
+						$args['content'] ?? '',
+						$user
+					);
+
+					do_action( 'liveblog_update_entry', $entry_id->to_int(), $post_id );
+					return $entry_id;
+
+				case 'delete':
+					$entry_id = $entry_service->delete(
+						$post_id,
+						\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( (int) $args['entry_id'] ),
+						$user
+					);
+
+					do_action( 'liveblog_delete_entry', $entry_id->to_int(), $post_id );
+					return $entry_id;
+
+				case 'delete_key':
+					// Get the original author.
+					$original_comment = get_comment( $args['entry_id'] );
+					$user             = get_userdata( $original_comment->user_id );
+
+					$entry_id = $entry_service->delete_key(
+						$post_id,
+						\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( (int) $args['entry_id'] ),
+						$args['content'] ?? '',
+						$user
+					);
+
+					return $entry_id;
+
+				default:
+					throw new \InvalidArgumentException( 'Invalid CRUD action: ' . esc_html( $crud_action ) );
+			}
+		}
+
+		/**
+		 * Handle metadata updates for entry updates (author, contributors).
+		 *
+		 * @param array $args The update arguments.
+		 * @return void
+		 */
+		private static function handle_entry_update_metadata( $args ) {
+			$entry_id = (int) $args['entry_id'];
+
+			// Update author if provided.
+			if ( isset( $args['author_id'] ) && $args['author_id'] ) {
+				$user = apply_filters( 'liveblog_userdata', get_userdata( $args['author_id'] ), $args['author_id'] );
+				if ( $user ) {
+					wp_update_comment(
+						array(
+							'comment_ID'           => $entry_id,
+							'user_id'              => $user->ID,
+							'comment_author'       => $user->display_name,
+							'comment_author_email' => $user->user_email,
+							'comment_author_url'   => $user->user_url,
+						)
+					);
+					update_comment_meta( $entry_id, \Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository::HIDE_AUTHORS_KEY, false );
+				}
+			} else {
+				update_comment_meta( $entry_id, \Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository::HIDE_AUTHORS_KEY, true );
 			}
 
-			return $entry;
+			// Update contributors.
+			if ( isset( $args['contributor_ids'] ) ) {
+				$repository = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->entry_repository();
+				$repository->set_contributors(
+					\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( $entry_id ),
+					! empty( $args['contributor_ids'] ) ? $args['contributor_ids'] : array()
+				);
+			}
 		}
 
 		/**
@@ -1011,7 +1303,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entries_for_json = array();
 
 			if ( ! empty( $entries ) ) {
-				$entries = array_slice( $entries, 0, WPCOM_Liveblog_Lazyloader::get_number_of_entries() );
+				$entries = array_slice( $entries, 0, \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page() );
 
 				// Populate an array containing the JSON data for all Liveblog entries.
 				foreach ( $entries as $entry ) {
@@ -1062,7 +1354,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+			$per_page = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page();
 
 			$entries = self::$entry_query->get_all_entries_asc();
 			$entries = self::flatten_entries( $entries );
@@ -1110,13 +1402,22 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		/**
 		 * Convert array of entries to their json response.
 		 *
+		 * Supports both legacy WPCOM_Liveblog_Entry and domain Entry objects.
+		 *
 		 * @param array $entries Array of entry objects.
 		 * @return array Array of entries formatted for JSON.
 		 */
 		public static function entries_for_json( $entries ) {
 			$entries_for_json = array();
 			foreach ( $entries as $entry ) {
-				$entries_for_json[] = $entry->for_json();
+				// Support domain Entry objects via EntryPresenter.
+				if ( $entry instanceof \Automattic\Liveblog\Domain\Entity\Entry ) {
+					$presenter          = \Automattic\Liveblog\Application\Presenter\EntryPresenter::from_entry( $entry );
+					$entries_for_json[] = $presenter->for_json();
+				} else {
+					// Legacy WPCOM_Liveblog_Entry object.
+					$entries_for_json[] = $entry->for_json();
+				}
 			}
 			return $entries_for_json;
 		}
@@ -1125,6 +1426,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		/**
 		 * Flattens entries by running updates and deletes to get actual list of entries.
 		 *
+		 * Supports both legacy WPCOM_Liveblog_Entry and domain Entry objects.
+		 *
 		 * @param array $entries Array of entry objects.
 		 * @return array Flattened array of entries.
 		 */
@@ -1132,6 +1435,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			if ( empty( $entries ) || ! is_array( $entries ) ) {
 				return array();
 			}
+
+			// Check if we're dealing with domain Entry objects.
+			$first = reset( $entries );
+			if ( $first instanceof \Automattic\Liveblog\Domain\Entity\Entry ) {
+				$query_service = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->entry_query_service();
+				return $query_service->flatten_entries( $entries );
+			}
+
+			// Legacy WPCOM_Liveblog_Entry handling.
 			$flatten = array();
 			foreach ( $entries as $entry ) {
 				$type = $entry->get_type();
@@ -1183,7 +1495,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entry_content = stripslashes( wp_filter_post_kses( $entry_content ) );
 			$entry_content = apply_filters( 'liveblog_before_preview_entry', array( 'content' => $entry_content ) );
 			$entry_content = $entry_content['content'];
-			$entry_content = WPCOM_Liveblog_Entry::render_content( $entry_content );
+
+			// Use DDD content processor for rendering.
+			$content_processor = \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->content_processor();
+			$entry_content     = $content_processor->render( $entry_content );
 
 			do_action( 'liveblog_preview_entry', $entry_content );
 
@@ -1337,7 +1652,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'locale'                       => get_locale(),
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) ),
-						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
+						'entries_per_page'             => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
 						'focus_refresh_interval'       => self::FOCUS_REFRESH_INTERVAL,
@@ -1350,9 +1665,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'endpoint_url'                 => self::get_entries_endpoint_url(),
 						'cross_domain'                 => false,
 
-						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
-						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
-						'command_class'                => apply_filters( 'liveblog_command_class', WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ),
+						'features'                     => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->content_filter_registry()->get_enabled_features(),
+						'autocomplete'                 => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->content_filter_registry()->get_autocomplete_config(),
+						'command_class'                => apply_filters( 'liveblog_command_class', \Automattic\Liveblog\Application\Filter\CommandFilter::DEFAULT_CLASS_PREFIX ),
 
 						// Internationalization strings.
 						'delete_confirmation'          => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
@@ -2094,6 +2409,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return void
 		 */
 		public static function prevent_caching_if_needed() {
+			// Avoid errors in test environments or when output has started.
+			if ( headers_sent() ) {
+				return;
+			}
+
 			if ( self::$do_not_cache_response ) {
 				nocache_headers();
 			} elseif ( self::$cache_control_max_age ) {

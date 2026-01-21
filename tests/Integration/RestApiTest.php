@@ -9,12 +9,12 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Filter\AuthorFilter;
+use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 use WP_REST_Request;
 use WPCOM_Liveblog;
 use WPCOM_Liveblog_Entry;
-use WPCOM_Liveblog_Entry_Extend_Feature_Authors;
-use WPCOM_Liveblog_Entry_Extend_Feature_Hashtags;
 use WPCOM_Liveblog_Rest_Api;
 
 /**
@@ -37,6 +37,23 @@ final class RestApiTest extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
+		// Reset static properties to ensure clean state.
+		WPCOM_Liveblog::$is_rest_api_call = false;
+		WPCOM_Liveblog::$post_id          = null;
+
+		// Reset private static properties using reflection.
+		$cache_control = new \ReflectionProperty( WPCOM_Liveblog::class, 'cache_control_max_age' );
+		$cache_control->setAccessible( true );
+		$cache_control->setValue( null, null );
+
+		$do_not_cache = new \ReflectionProperty( WPCOM_Liveblog::class, 'do_not_cache_response' );
+		$do_not_cache->setAccessible( true );
+		$do_not_cache->setValue( null, false );
+
+		$entry_query = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
+		$entry_query->setAccessible( true );
+		$entry_query->setValue( null, null );
+
 		global $wp_rest_server;
 		$wp_rest_server = new SpyRestServer();
 		$this->server   = $wp_rest_server;
@@ -47,10 +64,27 @@ final class RestApiTest extends TestCase {
 	 * Tear down after each test.
 	 */
 	public function tear_down(): void {
-		parent::tear_down();
-
 		global $wp_rest_server;
 		$wp_rest_server = null;
+
+		// Reset static properties to prevent state leakage.
+		WPCOM_Liveblog::$is_rest_api_call = false;
+		WPCOM_Liveblog::$post_id          = null;
+
+		// Reset private static properties using reflection.
+		$cache_control = new \ReflectionProperty( WPCOM_Liveblog::class, 'cache_control_max_age' );
+		$cache_control->setAccessible( true );
+		$cache_control->setValue( null, null );
+
+		$do_not_cache = new \ReflectionProperty( WPCOM_Liveblog::class, 'do_not_cache_response' );
+		$do_not_cache->setAccessible( true );
+		$do_not_cache->setValue( null, false );
+
+		$entry_query = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
+		$entry_query->setAccessible( true );
+		$entry_query->setValue( null, null );
+
+		parent::tear_down();
 	}
 
 	/**
@@ -321,10 +355,10 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_get_authors(): void {
 		// Get a list of authors.
-		$liveblog_authors = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
+		$author_filter = new AuthorFilter();
 
-		$authors_not_empty = $liveblog_authors->get_authors( 'adm' ); // Should return admin.
-		$authors_is_empty  = $liveblog_authors->get_authors( 'fakeauthor' ); // Non-existent user.
+		$authors_not_empty = $author_filter->get_authors( 'adm' ); // Should return admin.
+		$authors_is_empty  = $author_filter->get_authors( 'fakeauthor' ); // Non-existent user.
 
 		$this->assertIsArray( $authors_not_empty );
 		$this->assertIsArray( $authors_is_empty );
@@ -337,7 +371,7 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_get_hashtags(): void {
 		// Get a list of hashtags.
-		$liveblog_hashtags = new WPCOM_Liveblog_Entry_Extend_Feature_Hashtags();
+		$hashtag_filter = new HashtagFilter();
 
 		// Create a temporary hashtag.
 		self::factory()->term->create(
@@ -348,8 +382,8 @@ final class RestApiTest extends TestCase {
 			)
 		);
 
-		$hashtags_not_empty = $liveblog_hashtags->get_hashtag_terms( 'cool' ); // Should return coolhashtag.
-		$hashtags_is_empty  = $liveblog_hashtags->get_hashtag_terms( 'fakehashtag' ); // Non-existent hashtag.
+		$hashtags_not_empty = $hashtag_filter->get_hashtag_terms( 'cool' ); // Should return coolhashtag.
+		$hashtags_is_empty  = $hashtag_filter->get_hashtag_terms( 'fakehashtag' ); // Non-existent hashtag.
 
 		$this->assertIsArray( $hashtags_not_empty );
 		$this->assertIsArray( $hashtags_is_empty );

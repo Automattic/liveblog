@@ -22,7 +22,7 @@ if ( $show_archived_message ) : ?>
 
 	<?php endforeach; ?>
 
-	<?php if ( WPCOM_Liveblog_Lazyloader::is_enabled() ) : ?>
+	<?php if ( \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->is_enabled() ) : ?>
 
 		<button class="liveblog-load-more" data-set-index="0"><?php esc_html_e( 'Load more entries&hellip;', 'liveblog' ); ?></button>
 

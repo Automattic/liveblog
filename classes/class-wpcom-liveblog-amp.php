@@ -372,7 +372,7 @@ class WPCOM_Liveblog_AMP {
 				'links'    => self::get_pagination_links( $request, $entries['pages'], $post_id ),
 				'last'     => get_query_var( 'liveblog_last', false ),
 				'settings' => array(
-					'entries_per_page' => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
+					'entries_per_page' => \Automattic\Liveblog\Infrastructure\ServiceContainer::instance()->lazyload_configuration()->get_entries_per_page(),
 					'refresh_interval' => $refresh_interval,
 					'social'           => self::add_social_share_options(),
 				),

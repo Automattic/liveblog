@@ -22,6 +22,17 @@ use WPCOM_Liveblog;
 final class FilterSupportedPostTypesTest extends TestCase {
 
 	/**
+	 * Set up before each test.
+	 */
+	public function set_up(): void {
+		parent::set_up();
+
+		// Reset static properties that might be left over from other tests.
+		WPCOM_Liveblog::$is_rest_api_call = false;
+		WPCOM_Liveblog::$post_id          = null;
+	}
+
+	/**
 	 * Tear down after each test.
 	 */
 	public function tear_down(): void {
@@ -30,6 +41,10 @@ final class FilterSupportedPostTypesTest extends TestCase {
 
 		// Reset supported post types to default.
 		WPCOM_Liveblog::$supported_post_types = array( 'post' );
+
+		// Reset static properties.
+		WPCOM_Liveblog::$is_rest_api_call = false;
+		WPCOM_Liveblog::$post_id          = null;
 
 		parent::tear_down();
 	}

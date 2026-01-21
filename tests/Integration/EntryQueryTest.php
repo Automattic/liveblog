@@ -228,9 +228,9 @@ final class EntryQueryTest extends TestCase {
 	 */
 	private function create_comment( array $args = array() ): int {
 		$defaults = array(
-			'comment_post_ID'  => $this->entry_query->post_id,
-			'comment_approved' => $this->entry_query->key,
-			'comment_type'     => $this->entry_query->key,
+			'comment_post_ID'  => $this->entry_query->get_post_id(),
+			'comment_approved' => $this->entry_query->get_key(),
+			'comment_type'     => $this->entry_query->get_key(),
 		);
 		$args     = array_merge( $defaults, $args );
 		return self::factory()->comment->create( $args );

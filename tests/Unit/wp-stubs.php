@@ -89,23 +89,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 		public static function get_avatar( $id_or_email, int $size = 30 ): string {
 			return '<img src="avatar.jpg" width="' . $size . '" height="' . $size . '" />';
 		}
-	}
-}
-
-if ( ! class_exists( 'WPCOM_Liveblog_Entry_Key_Events' ) ) {
-	/**
-	 * Minimal WPCOM_Liveblog_Entry_Key_Events stub for unit testing.
-	 */
-	final class WPCOM_Liveblog_Entry_Key_Events {
 
 		/**
-		 * Check if entry is a key event.
+		 * Get liveblog state.
 		 *
-		 * @param int $entry_id Entry ID.
-		 * @return bool Always false in unit tests.
+		 * @return string|false Liveblog state.
 		 */
-		public static function is_key_event( int $entry_id ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-			return false;
+		public static function get_liveblog_state() {
+			// Can be overridden in tests via Mockery alias or patchwork.
+			return 'enable';
 		}
 	}
 }

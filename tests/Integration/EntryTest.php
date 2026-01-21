@@ -319,6 +319,9 @@ final class EntryTest extends TestCase {
 	 * Test that filter_image_attributes preserves only src and alt by default.
 	 */
 	public function test_filter_image_attributes_default(): void {
+		// Remove any filters added by the plugin (e.g., emoji image attribute filter).
+		remove_all_filters( 'liveblog_image_allowed_attributes' );
+
 		$content  = '<p>Text</p><img src="test.jpg" alt="Test" class="wp-image" width="100" height="50" data-id="123">';
 		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
 
@@ -397,6 +400,9 @@ final class EntryTest extends TestCase {
 	 * Test that filter_image_attributes handles multiple images.
 	 */
 	public function test_filter_image_attributes_multiple_images(): void {
+		// Remove any filters added by the plugin (e.g., emoji image attribute filter).
+		remove_all_filters( 'liveblog_image_allowed_attributes' );
+
 		$content  = '<img src="one.jpg" alt="One" class="first"><p>Text</p><img src="two.jpg" alt="Two" width="200">';
 		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
 

@@ -9,8 +9,25 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure;
 
+use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
+use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
+use Automattic\Liveblog\Application\Filter\AuthorFilter;
+use Automattic\Liveblog\Application\Filter\CommandFilter;
+use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
+use Automattic\Liveblog\Application\Filter\EmojiFilter;
+use Automattic\Liveblog\Application\Filter\HashtagFilter;
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
+use Automattic\Liveblog\Application\Service\AutoArchiveService;
+use Automattic\Liveblog\Application\Service\ContentProcessor;
+use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\EntryService;
+use Automattic\Liveblog\Application\Service\InputSanitizer;
+use Automattic\Liveblog\Application\Service\KeyEventService;
+use Automattic\Liveblog\Application\Service\KeyEventShortcodeHandler;
+use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
+use Automattic\Liveblog\Infrastructure\Cron\AutoArchiveCronHandler;
+use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 
 /**
@@ -46,6 +63,118 @@ final class ServiceContainer {
 	 * @var EntryService|null
 	 */
 	private ?EntryService $entry_service = null;
+
+	/**
+	 * Cached content processor instance.
+	 *
+	 * @var ContentProcessor|null
+	 */
+	private ?ContentProcessor $content_processor = null;
+
+	/**
+	 * Cached content renderer instance.
+	 *
+	 * @var ContentRendererInterface|null
+	 */
+	private ?ContentRendererInterface $content_renderer = null;
+
+	/**
+	 * Cached shortcode filter instance.
+	 *
+	 * @var ShortcodeFilter|null
+	 */
+	private ?ShortcodeFilter $shortcode_filter = null;
+
+	/**
+	 * Cached entry query service instance.
+	 *
+	 * @var EntryQueryService|null
+	 */
+	private ?EntryQueryService $entry_query_service = null;
+
+	/**
+	 * Cached content filter registry instance.
+	 *
+	 * @var ContentFilterRegistry|null
+	 */
+	private ?ContentFilterRegistry $content_filter_registry = null;
+
+	/**
+	 * Cached input sanitizer instance.
+	 *
+	 * @var InputSanitizer|null
+	 */
+	private ?InputSanitizer $input_sanitizer = null;
+
+	/**
+	 * Cached command filter instance.
+	 *
+	 * @var CommandFilter|null
+	 */
+	private ?CommandFilter $command_filter = null;
+
+	/**
+	 * Cached emoji filter instance.
+	 *
+	 * @var EmojiFilter|null
+	 */
+	private ?EmojiFilter $emoji_filter = null;
+
+	/**
+	 * Cached hashtag filter instance.
+	 *
+	 * @var HashtagFilter|null
+	 */
+	private ?HashtagFilter $hashtag_filter = null;
+
+	/**
+	 * Cached author filter instance.
+	 *
+	 * @var AuthorFilter|null
+	 */
+	private ?AuthorFilter $author_filter = null;
+
+	/**
+	 * Cached key event service instance.
+	 *
+	 * @var KeyEventService|null
+	 */
+	private ?KeyEventService $key_event_service = null;
+
+	/**
+	 * Cached key event configuration instance.
+	 *
+	 * @var KeyEventConfiguration|null
+	 */
+	private ?KeyEventConfiguration $key_event_configuration = null;
+
+	/**
+	 * Cached key event shortcode handler instance.
+	 *
+	 * @var KeyEventShortcodeHandler|null
+	 */
+	private ?KeyEventShortcodeHandler $key_event_shortcode_handler = null;
+
+	/**
+	 * Cached lazyload configuration instance.
+	 *
+	 * @var LazyloadConfiguration|null
+	 */
+	private ?LazyloadConfiguration $lazyload_configuration = null;
+
+	/**
+	 * Cached auto-archive service instance.
+	 *
+	 * @var AutoArchiveService|null
+	 */
+	private ?AutoArchiveService $auto_archive_service = null;
+
+	/**
+	 * Cached auto-archive cron handler instance.
+	 *
+	 * @var AutoArchiveCronHandler|null
+	 */
+	private ?AutoArchiveCronHandler $auto_archive_cron_handler = null;
 
 	/**
 	 * Private constructor to enforce singleton.
@@ -98,6 +227,223 @@ final class ServiceContainer {
 		}
 
 		return $this->entry_service;
+	}
+
+	/**
+	 * Get the content processor.
+	 *
+	 * @return ContentProcessor
+	 */
+	public function content_processor(): ContentProcessor {
+		if ( null === $this->content_processor ) {
+			$this->content_processor = new ContentProcessor();
+		}
+
+		return $this->content_processor;
+	}
+
+	/**
+	 * Get the content renderer.
+	 *
+	 * @return ContentRendererInterface
+	 */
+	public function content_renderer(): ContentRendererInterface {
+		if ( null === $this->content_renderer ) {
+			$this->content_renderer = new WordPressContentRenderer( $this->content_processor() );
+		}
+
+		return $this->content_renderer;
+	}
+
+	/**
+	 * Get the shortcode filter.
+	 *
+	 * @return ShortcodeFilter
+	 */
+	public function shortcode_filter(): ShortcodeFilter {
+		if ( null === $this->shortcode_filter ) {
+			$this->shortcode_filter = new ShortcodeFilter();
+		}
+
+		return $this->shortcode_filter;
+	}
+
+	/**
+	 * Get the entry query service.
+	 *
+	 * @return EntryQueryService
+	 */
+	public function entry_query_service(): EntryQueryService {
+		if ( null === $this->entry_query_service ) {
+			$this->entry_query_service = new EntryQueryService( $this->entry_repository() );
+		}
+
+		return $this->entry_query_service;
+	}
+
+	/**
+	 * Get the content filter registry.
+	 *
+	 * @return ContentFilterRegistry
+	 */
+	public function content_filter_registry(): ContentFilterRegistry {
+		if ( null === $this->content_filter_registry ) {
+			$this->content_filter_registry = new ContentFilterRegistry();
+		}
+
+		return $this->content_filter_registry;
+	}
+
+	/**
+	 * Get the input sanitizer.
+	 *
+	 * @return InputSanitizer
+	 */
+	public function input_sanitizer(): InputSanitizer {
+		if ( null === $this->input_sanitizer ) {
+			$this->input_sanitizer = new InputSanitizer();
+		}
+
+		return $this->input_sanitizer;
+	}
+
+	/**
+	 * Get the command filter.
+	 *
+	 * @return CommandFilter
+	 */
+	public function command_filter(): CommandFilter {
+		if ( null === $this->command_filter ) {
+			$this->command_filter = new CommandFilter();
+		}
+
+		return $this->command_filter;
+	}
+
+	/**
+	 * Get the emoji filter.
+	 *
+	 * @return EmojiFilter
+	 */
+	public function emoji_filter(): EmojiFilter {
+		if ( null === $this->emoji_filter ) {
+			$this->emoji_filter = new EmojiFilter();
+		}
+
+		return $this->emoji_filter;
+	}
+
+	/**
+	 * Get the hashtag filter.
+	 *
+	 * @return HashtagFilter
+	 */
+	public function hashtag_filter(): HashtagFilter {
+		if ( null === $this->hashtag_filter ) {
+			$this->hashtag_filter = new HashtagFilter();
+		}
+
+		return $this->hashtag_filter;
+	}
+
+	/**
+	 * Get the author filter.
+	 *
+	 * @return AuthorFilter
+	 */
+	public function author_filter(): AuthorFilter {
+		if ( null === $this->author_filter ) {
+			$this->author_filter = new AuthorFilter();
+		}
+
+		return $this->author_filter;
+	}
+
+	/**
+	 * Get the key event service.
+	 *
+	 * @return KeyEventService
+	 */
+	public function key_event_service(): KeyEventService {
+		if ( null === $this->key_event_service ) {
+			$this->key_event_service = new KeyEventService(
+				$this->entry_repository(),
+				$this->entry_query_service()
+			);
+		}
+
+		return $this->key_event_service;
+	}
+
+	/**
+	 * Get the key event configuration.
+	 *
+	 * @return KeyEventConfiguration
+	 */
+	public function key_event_configuration(): KeyEventConfiguration {
+		if ( null === $this->key_event_configuration ) {
+			$this->key_event_configuration = new KeyEventConfiguration();
+		}
+
+		return $this->key_event_configuration;
+	}
+
+	/**
+	 * Get the key event shortcode handler.
+	 *
+	 * @return KeyEventShortcodeHandler
+	 */
+	public function key_event_shortcode_handler(): KeyEventShortcodeHandler {
+		if ( null === $this->key_event_shortcode_handler ) {
+			$this->key_event_shortcode_handler = new KeyEventShortcodeHandler(
+				$this->key_event_service(),
+				$this->key_event_configuration()
+			);
+		}
+
+		return $this->key_event_shortcode_handler;
+	}
+
+	/**
+	 * Get the lazyload configuration.
+	 *
+	 * @return LazyloadConfiguration
+	 */
+	public function lazyload_configuration(): LazyloadConfiguration {
+		if ( null === $this->lazyload_configuration ) {
+			$this->lazyload_configuration = new LazyloadConfiguration();
+		}
+
+		return $this->lazyload_configuration;
+	}
+
+	/**
+	 * Get the auto-archive service.
+	 *
+	 * @return AutoArchiveService
+	 */
+	public function auto_archive_service(): AutoArchiveService {
+		if ( null === $this->auto_archive_service ) {
+			$auto_archive_days          = \WPCOM_Liveblog::$auto_archive_days;
+			$this->auto_archive_service = new AutoArchiveService( $auto_archive_days );
+		}
+
+		return $this->auto_archive_service;
+	}
+
+	/**
+	 * Get the auto-archive cron handler.
+	 *
+	 * @return AutoArchiveCronHandler
+	 */
+	public function auto_archive_cron_handler(): AutoArchiveCronHandler {
+		if ( null === $this->auto_archive_cron_handler ) {
+			$this->auto_archive_cron_handler = new AutoArchiveCronHandler(
+				$this->auto_archive_service()
+			);
+		}
+
+		return $this->auto_archive_cron_handler;
 	}
 
 	/**

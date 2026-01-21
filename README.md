@@ -109,7 +109,7 @@ An example of a template file is:
 ```php
 <div class="<?php echo esc_attr( $css_classes ); ?>" >
 	<a href="#liveblog-entry-<?php echo esc_attr( $entry_id ); ?>">
-		<?php echo WPCOM_Liveblog_Entry_Key_Events::get_formatted_content( $content, $post_id ); ?>
+		<?php echo wp_kses_post( apply_filters( 'liveblog_key_event_content', $content, $post_id ) ); ?>
 	</a>
 </div>
 ```
@@ -333,18 +333,19 @@ $restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output f
 ### Auto Archiving of Live Blog Posts
 This feature was added at the request of the community and solves the issues where Editors will forget to archive old Live Blog's leaving them live indefinitely.
 
-Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the date of the latest liveblog entry + the number of days configured.
+Auto archive works by setting an expiry to the Post Meta for live blog posts. This expiry is calculated using the date of the latest liveblog entry + the number of days configured. A daily cron job runs at midnight to check all liveblogs and archive any that have passed their expiry date.
 
-Once the expiry date is met the live blog post will be auto archived. It is however possible to re-enable an auto archived Live Blog Post,
-simply click the enable button in the post Liveblog meta box and the expiry will be extended by the number of days configured from the latest liveblog entry date. The auto archiving feature will then re-archive the post at the new expiry date.
+**Key behaviour:**
+- Each time a new entry is added, the expiry date is automatically extended. This means active liveblogs stay active - only truly dormant liveblogs get archived.
+- Once the expiry date is met the live blog post will be auto archived.
+- It is possible to re-enable an auto archived Live Blog Post by clicking the enable button in the post Liveblog meta box. The expiry will be extended by the configured number of days from the latest entry date.
 
-In order to configure the number of days to autoarchive after, a filter has been implemented. By default the value is NULL and as such disables the feature. To enable it simply apply a value to the filter e.g:
+In order to configure the number of days to auto-archive after, a filter has been implemented. By default the value is NULL and as such disables the feature. To enable it simply apply a value to the filter e.g:
 
-```
+```php
 add_filter( 'liveblog_auto_archive_days', function( $auto_archive_days ) {
-  $auto_archive_days = 50;
-  return $auto_archive_days;
-}, 10, 1 );
+  return 7; // Archive after 7 days of inactivity
+} );
 ```
 
 ### WebSocket support

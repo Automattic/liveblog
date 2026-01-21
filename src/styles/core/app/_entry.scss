@@ -145,10 +145,10 @@
 .liveblog-emoji {
 	display: inline-block;
 	overflow: hidden;
-	max-width: 1.95ch;
-	max-height: 1em;
-	line-height: inherit;
-	margin: 0 0 -0.2ex;
+	width: 1.2em;
+	height: 1.2em;
+	vertical-align: text-bottom;
+	margin: 0 0.1em;
 }
 
 .liveblog-hash::before {

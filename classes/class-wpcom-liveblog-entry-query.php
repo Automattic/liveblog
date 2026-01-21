@@ -5,12 +5,34 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Application\Service\EntryQueryService;
+use Automattic\Liveblog\Domain\Entity\Entry;
+use Automattic\Liveblog\Infrastructure\ServiceContainer;
+
 /**
  * Responsible for querying the Liveblog entries.
  *
  * Much of the work is currently done by WordPress's comments API.
+ *
+ * Note: This class is being migrated to DDD services. New code should prefer
+ * using EntryQueryService directly via ServiceContainer, or use the new
+ * get_domain_entries() method that returns domain Entry objects.
  */
 class WPCOM_Liveblog_Entry_Query {
+
+	/**
+	 * Post ID.
+	 *
+	 * @var int
+	 */
+	private int $post_id;
+
+	/**
+	 * Comment type key.
+	 *
+	 * @var string
+	 */
+	private string $key;
 
 	/**
 	 * Constructor.
@@ -19,8 +41,71 @@ class WPCOM_Liveblog_Entry_Query {
 	 * @param string $key     The comment type key.
 	 */
 	public function __construct( $post_id, $key ) {
-		$this->post_id = $post_id;
+		$this->post_id = (int) $post_id;
 		$this->key     = $key;
+	}
+
+	/**
+	 * Get the post ID.
+	 *
+	 * @return int The post ID.
+	 */
+	public function get_post_id(): int {
+		return $this->post_id;
+	}
+
+	/**
+	 * Get the comment type key.
+	 *
+	 * @return string The comment type key.
+	 */
+	public function get_key(): string {
+		return $this->key;
+	}
+
+	/**
+	 * Get all entries as domain Entry objects.
+	 *
+	 * This is the preferred method for new code. Returns domain Entry objects
+	 * which can be used with EntryPresenter for formatting.
+	 *
+	 * @param array $args Optional query arguments.
+	 * @return Entry[] Array of domain Entry objects.
+	 */
+	public function get_domain_entries( array $args = array() ): array {
+		$query_service = ServiceContainer::instance()->entry_query_service();
+
+		$limit = 0;
+		if ( isset( $args['number'] ) ) {
+			$limit = (int) $args['number'];
+			unset( $args['number'] );
+		}
+
+		return $query_service->get_all( $this->post_id, $limit, $args );
+	}
+
+	/**
+	 * Get a single entry as a domain Entry object.
+	 *
+	 * @param int $id The entry ID.
+	 * @return Entry|null The entry or null if not found.
+	 */
+	public function get_domain_entry_by_id( int $id ): ?Entry {
+		$repository = ServiceContainer::instance()->entry_repository();
+		$entry      = $repository->get_entry(
+			\Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( $id )
+		);
+
+		if ( ! $entry ) {
+			return null;
+		}
+
+		// Verify this entry belongs to this post.
+		if ( $entry->post_id() !== $this->post_id ) {
+			return null;
+		}
+
+		return $entry;
 	}
 
 	/**

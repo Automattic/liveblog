@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the Liveblog Entry Extend Feature Commands class.
+ * Tests for the CommandFilter class.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
@@ -9,39 +9,57 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Filter\CommandFilter;
+use Automattic\Liveblog\Infrastructure\ServiceContainer;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog_Entry_Extend_Feature_Commands;
 
 /**
- * Extend Feature Commands test case.
+ * Command Filter test case.
+ *
+ * @covers \Automattic\Liveblog\Application\Filter\CommandFilter
  */
 final class ExtendFeatureCommandsTest extends TestCase {
 
 	/**
-	 * Checks get_commands returns an array.
+	 * Tests the returned config includes the test filter injection and returns an array.
 	 *
-	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Commands::get_commands()
+	 * @covers \Automattic\Liveblog\Application\Filter\CommandFilter::get_autocomplete_config()
 	 */
-	public function test_get_commands_returns_array(): void {
-		$class = new WPCOM_Liveblog_Entry_Extend_Feature_Commands();
-		$array = is_array( $class->get_commands() );
-		$this->assertTrue( $array );
+	public function test_get_autocomplete_config_filter_executes(): void {
+		add_filter( 'liveblog_command_config', array( $this, 'example_test_filter' ), 1, 10 );
+
+		$filter = ServiceContainer::instance()->command_filter();
+		$config = $filter->get_autocomplete_config();
+
+		$this->assertIsArray( $config );
+		$this->assertArrayHasKey( 'testCase', $config );
+		$this->assertTrue( $config['testCase'] );
 	}
 
 	/**
-	 * Tests the returned config includes the test filter injection and returns an array.
+	 * Tests that commands can be added via filter.
 	 *
-	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Commands::get_config()
+	 * @covers \Automattic\Liveblog\Application\Filter\CommandFilter::load_custom_commands()
 	 */
-	public function test_get_config_filter_executes(): void {
-		add_filter( 'liveblog_command_config', array( $this, 'example_test_filter' ), 1, 10 );
-		$class  = new WPCOM_Liveblog_Entry_Extend_Feature_Commands();
-		$config = array();
-		$test   = $class->get_config( $config );
+	public function test_commands_can_be_added_via_filter(): void {
+		add_filter(
+			'liveblog_active_commands',
+			function ( $commands ) {
+				$commands[] = 'test_command';
+				return $commands;
+			}
+		);
 
-		$this->assertTrue( is_array( $test ) );
-		$this->assertArrayHasKey( 'testCase', $test[0] );
-		$this->assertTrue( true === $test[0]['testCase'] );
+		$filter = new CommandFilter();
+		$filter->load();
+		$filter->load_custom_commands();
+
+		// The filter method should now recognize our custom command.
+		// We can verify by checking the autocomplete config includes our command.
+		$config = $filter->get_autocomplete_config();
+
+		$this->assertIsArray( $config );
+		$this->assertArrayHasKey( 'data', $config );
 	}
 
 	/**

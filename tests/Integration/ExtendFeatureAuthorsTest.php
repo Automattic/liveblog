@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the Liveblog Entry Extend Feature Authors class.
+ * Tests for the AuthorFilter class.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
@@ -9,28 +9,50 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Filter\AuthorFilter;
+use Automattic\Liveblog\Infrastructure\ServiceContainer;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog_Entry_Extend_Feature_Authors;
 
 /**
- * Extend Feature Authors test case.
+ * Author Filter test case.
+ *
+ * @covers \Automattic\Liveblog\Application\Filter\AuthorFilter
  */
 final class ExtendFeatureAuthorsTest extends TestCase {
 
 	/**
 	 * Tests the returned config includes the test filter injection and returns an array.
 	 *
-	 * @covers WPCOM_Liveblog_Entry_Extend_Feature_Authors::get_config()
+	 * @covers \Automattic\Liveblog\Application\Filter\AuthorFilter::get_autocomplete_config()
 	 */
-	public function test_get_config_filter_executes(): void {
+	public function test_get_autocomplete_config_filter_executes(): void {
 		add_filter( 'liveblog_author_config', array( $this, 'example_test_filter' ), 1, 10 );
-		$class  = new WPCOM_Liveblog_Entry_Extend_Feature_Authors();
-		$config = array();
-		$test   = $class->get_config( $config );
 
-		$this->assertTrue( is_array( $test ) );
-		$this->assertArrayHasKey( 'testCase', $test[0] );
-		$this->assertTrue( true === $test[0]['testCase'] );
+		$filter = ServiceContainer::instance()->author_filter();
+		$config = $filter->get_autocomplete_config();
+
+		$this->assertIsArray( $config );
+		$this->assertArrayHasKey( 'testCase', $config );
+		$this->assertTrue( $config['testCase'] );
+	}
+
+	/**
+	 * Tests that the filter name is correct.
+	 */
+	public function test_filter_name(): void {
+		$filter = new AuthorFilter();
+
+		$this->assertSame( 'authors', $filter->get_name() );
+	}
+
+	/**
+	 * Tests that the default prefix is @.
+	 */
+	public function test_default_prefix(): void {
+		$filter   = new AuthorFilter();
+		$prefixes = $filter->get_prefixes();
+
+		$this->assertContains( '@', $prefixes );
 	}
 
 	/**
