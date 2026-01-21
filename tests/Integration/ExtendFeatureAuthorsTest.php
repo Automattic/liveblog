@@ -26,7 +26,8 @@ final class ExtendFeatureAuthorsTest extends IntegrationTestCase {
 	public function test_get_autocomplete_config_filter_executes(): void {
 		add_filter( 'liveblog_author_config', array( $this, 'example_test_filter' ), 1, 10 );
 
-		$filter = $this->container()->author_filter();
+		// Create filter directly - stateless, no container needed.
+		$filter = new AuthorFilter();
 		$config = $filter->get_autocomplete_config();
 
 		$this->assertIsArray( $config );

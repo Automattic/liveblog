@@ -22,7 +22,7 @@ if ( $show_archived_message ) : ?>
 
 	<?php endforeach; ?>
 
-	<?php if ( \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->is_enabled() ) : ?>
+	<?php if ( ( new \Automattic\Liveblog\Application\Config\LazyloadConfiguration() )->is_enabled() ) : ?>
 
 		<button class="liveblog-load-more" data-set-index="0"><?php esc_html_e( 'Load more entries&hellip;', 'liveblog' ); ?></button>
 

@@ -26,7 +26,8 @@ final class ExtendFeatureCommandsTest extends IntegrationTestCase {
 	public function test_get_autocomplete_config_filter_executes(): void {
 		add_filter( 'liveblog_command_config', array( $this, 'example_test_filter' ), 1, 10 );
 
-		$filter = $this->container()->command_filter();
+		// Create filter directly - stateless, no container needed.
+		$filter = new CommandFilter();
 		$config = $filter->get_autocomplete_config();
 
 		$this->assertIsArray( $config );

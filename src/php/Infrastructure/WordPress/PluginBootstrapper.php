@@ -9,6 +9,13 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure\WordPress;
 
+use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
+use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
+use Automattic\Liveblog\Application\Filter\AuthorFilter;
+use Automattic\Liveblog\Application\Filter\CommandFilter;
+use Automattic\Liveblog\Application\Filter\EmojiFilter;
+use Automattic\Liveblog\Application\Filter\HashtagFilter;
+use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Infrastructure\DI\Container;
 
@@ -58,7 +65,8 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_shortcode_filter(): void {
-		$shortcode_filter = $this->container->shortcode_filter();
+		// Create directly - stateless filter with no dependencies.
+		$shortcode_filter = new ShortcodeFilter();
 		add_filter( 'liveblog_before_insert_entry', array( $shortcode_filter, 'filter' ), 10, 1 );
 		add_filter( 'liveblog_before_update_entry', array( $shortcode_filter, 'filter' ), 10, 1 );
 	}
@@ -73,11 +81,12 @@ final class PluginBootstrapper {
 	 */
 	private function init_content_filters(): void {
 		// Register all content filters with the registry.
+		// Filters are created directly here - they're stateless with no dependencies.
 		$registry = $this->container->content_filter_registry();
-		$registry->register( $this->container->command_filter() );
-		$registry->register( $this->container->emoji_filter() );
-		$registry->register( $this->container->hashtag_filter() );
-		$registry->register( $this->container->author_filter() );
+		$registry->register( new CommandFilter() );
+		$registry->register( new EmojiFilter() );
+		$registry->register( new HashtagFilter() );
+		$registry->register( new AuthorFilter() );
 
 		// Initialise the registry (sets up prefixes, regex, loads filters).
 		$registry->initialise( 'commands, emojis, hashtags, authors' );
@@ -115,7 +124,8 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_key_events(): void {
-		$configuration     = $this->container->key_event_configuration();
+		// Create configuration directly - it just reads options, no dependencies.
+		$configuration     = new KeyEventConfiguration();
 		$key_event_service = $this->container->key_event_service();
 		$shortcode_handler = $this->container->key_event_shortcode_handler();
 
@@ -221,7 +231,8 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_lazyload(): void {
-		$configuration = $this->container->lazyload_configuration();
+		// Create configuration directly - it just reads options, no dependencies.
+		$configuration = new LazyloadConfiguration();
 
 		// Initialize on template_redirect when liveblog state is available.
 		add_action( 'template_redirect', array( $configuration, 'initialize' ) );

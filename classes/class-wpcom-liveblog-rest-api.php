@@ -527,8 +527,8 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_authors( WP_REST_Request $request ) {
 		$term = $request->get_param( 'term' );
 
-		// Use DDD author filter for autocomplete.
-		$author_filter = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->author_filter();
+		// Use DDD author filter for autocomplete - stateless, create directly.
+		$author_filter = new \Automattic\Liveblog\Application\Filter\AuthorFilter();
 		return $author_filter->get_authors( $term );
 	}
 
@@ -542,8 +542,8 @@ class WPCOM_Liveblog_Rest_Api {
 	public static function get_hashtag_terms( WP_REST_Request $request ) {
 		$term = $request->get_param( 'term' );
 
-		// Use DDD hashtag filter for autocomplete.
-		$hashtag_filter = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->hashtag_filter();
+		// Use DDD hashtag filter for autocomplete - stateless, create directly.
+		$hashtag_filter = new \Automattic\Liveblog\Application\Filter\HashtagFilter();
 		return $hashtag_filter->get_hashtag_terms( $term );
 	}
 

@@ -10,12 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Infrastructure\DI;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
-use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
-use Automattic\Liveblog\Application\Filter\AuthorFilter;
-use Automattic\Liveblog\Application\Filter\CommandFilter;
 use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
-use Automattic\Liveblog\Application\Filter\EmojiFilter;
-use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\AutoArchiveService;
 use Automattic\Liveblog\Application\Service\ContentProcessor;
@@ -24,7 +19,6 @@ use Automattic\Liveblog\Application\Service\EntryService;
 use Automattic\Liveblog\Application\Service\InputSanitizer;
 use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Application\Service\KeyEventShortcodeHandler;
-use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
 use Automattic\Liveblog\Infrastructure\Cron\AutoArchiveCronHandler;
 use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
@@ -86,13 +80,6 @@ final class Container {
 	private ?ContentRendererInterface $content_renderer = null;
 
 	/**
-	 * Cached shortcode filter instance.
-	 *
-	 * @var ShortcodeFilter|null
-	 */
-	private ?ShortcodeFilter $shortcode_filter = null;
-
-	/**
 	 * Cached entry query service instance.
 	 *
 	 * @var EntryQueryService|null
@@ -114,34 +101,6 @@ final class Container {
 	private ?InputSanitizer $input_sanitizer = null;
 
 	/**
-	 * Cached command filter instance.
-	 *
-	 * @var CommandFilter|null
-	 */
-	private ?CommandFilter $command_filter = null;
-
-	/**
-	 * Cached emoji filter instance.
-	 *
-	 * @var EmojiFilter|null
-	 */
-	private ?EmojiFilter $emoji_filter = null;
-
-	/**
-	 * Cached hashtag filter instance.
-	 *
-	 * @var HashtagFilter|null
-	 */
-	private ?HashtagFilter $hashtag_filter = null;
-
-	/**
-	 * Cached author filter instance.
-	 *
-	 * @var AuthorFilter|null
-	 */
-	private ?AuthorFilter $author_filter = null;
-
-	/**
 	 * Cached key event service instance.
 	 *
 	 * @var KeyEventService|null
@@ -149,25 +108,11 @@ final class Container {
 	private ?KeyEventService $key_event_service = null;
 
 	/**
-	 * Cached key event configuration instance.
-	 *
-	 * @var KeyEventConfiguration|null
-	 */
-	private ?KeyEventConfiguration $key_event_configuration = null;
-
-	/**
 	 * Cached key event shortcode handler instance.
 	 *
 	 * @var KeyEventShortcodeHandler|null
 	 */
 	private ?KeyEventShortcodeHandler $key_event_shortcode_handler = null;
-
-	/**
-	 * Cached lazyload configuration instance.
-	 *
-	 * @var LazyloadConfiguration|null
-	 */
-	private ?LazyloadConfiguration $lazyload_configuration = null;
 
 	/**
 	 * Cached auto-archive service instance.
@@ -305,23 +250,6 @@ final class Container {
 	}
 
 	/**
-	 * Get the shortcode filter.
-	 *
-	 * @return ShortcodeFilter
-	 */
-	public function shortcode_filter(): ShortcodeFilter {
-		if ( isset( $this->overrides['shortcode_filter'] ) ) {
-			return ( $this->overrides['shortcode_filter'] )();
-		}
-
-		if ( null === $this->shortcode_filter ) {
-			$this->shortcode_filter = new ShortcodeFilter();
-		}
-
-		return $this->shortcode_filter;
-	}
-
-	/**
 	 * Get the entry query service.
 	 *
 	 * @return EntryQueryService
@@ -373,74 +301,6 @@ final class Container {
 	}
 
 	/**
-	 * Get the command filter.
-	 *
-	 * @return CommandFilter
-	 */
-	public function command_filter(): CommandFilter {
-		if ( isset( $this->overrides['command_filter'] ) ) {
-			return ( $this->overrides['command_filter'] )();
-		}
-
-		if ( null === $this->command_filter ) {
-			$this->command_filter = new CommandFilter();
-		}
-
-		return $this->command_filter;
-	}
-
-	/**
-	 * Get the emoji filter.
-	 *
-	 * @return EmojiFilter
-	 */
-	public function emoji_filter(): EmojiFilter {
-		if ( isset( $this->overrides['emoji_filter'] ) ) {
-			return ( $this->overrides['emoji_filter'] )();
-		}
-
-		if ( null === $this->emoji_filter ) {
-			$this->emoji_filter = new EmojiFilter();
-		}
-
-		return $this->emoji_filter;
-	}
-
-	/**
-	 * Get the hashtag filter.
-	 *
-	 * @return HashtagFilter
-	 */
-	public function hashtag_filter(): HashtagFilter {
-		if ( isset( $this->overrides['hashtag_filter'] ) ) {
-			return ( $this->overrides['hashtag_filter'] )();
-		}
-
-		if ( null === $this->hashtag_filter ) {
-			$this->hashtag_filter = new HashtagFilter();
-		}
-
-		return $this->hashtag_filter;
-	}
-
-	/**
-	 * Get the author filter.
-	 *
-	 * @return AuthorFilter
-	 */
-	public function author_filter(): AuthorFilter {
-		if ( isset( $this->overrides['author_filter'] ) ) {
-			return ( $this->overrides['author_filter'] )();
-		}
-
-		if ( null === $this->author_filter ) {
-			$this->author_filter = new AuthorFilter();
-		}
-
-		return $this->author_filter;
-	}
-
-	/**
 	 * Get the key event service.
 	 *
 	 * @return KeyEventService
@@ -461,23 +321,6 @@ final class Container {
 	}
 
 	/**
-	 * Get the key event configuration.
-	 *
-	 * @return KeyEventConfiguration
-	 */
-	public function key_event_configuration(): KeyEventConfiguration {
-		if ( isset( $this->overrides['key_event_configuration'] ) ) {
-			return ( $this->overrides['key_event_configuration'] )();
-		}
-
-		if ( null === $this->key_event_configuration ) {
-			$this->key_event_configuration = new KeyEventConfiguration();
-		}
-
-		return $this->key_event_configuration;
-	}
-
-	/**
 	 * Get the key event shortcode handler.
 	 *
 	 * @return KeyEventShortcodeHandler
@@ -490,28 +333,11 @@ final class Container {
 		if ( null === $this->key_event_shortcode_handler ) {
 			$this->key_event_shortcode_handler = new KeyEventShortcodeHandler(
 				$this->key_event_service(),
-				$this->key_event_configuration()
+				new KeyEventConfiguration()
 			);
 		}
 
 		return $this->key_event_shortcode_handler;
-	}
-
-	/**
-	 * Get the lazyload configuration.
-	 *
-	 * @return LazyloadConfiguration
-	 */
-	public function lazyload_configuration(): LazyloadConfiguration {
-		if ( isset( $this->overrides['lazyload_configuration'] ) ) {
-			return ( $this->overrides['lazyload_configuration'] )();
-		}
-
-		if ( null === $this->lazyload_configuration ) {
-			$this->lazyload_configuration = new LazyloadConfiguration();
-		}
-
-		return $this->lazyload_configuration;
 	}
 
 	/**
