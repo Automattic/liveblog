@@ -668,7 +668,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$all_entries = self::$entry_query->get_all_entries_asc();
 			$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
 			$pages       = false;
-			$per_page    = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page();
+			$per_page    = ( new \Automattic\Liveblog\Application\Config\LazyloadConfiguration() )->get_entries_per_page();
 
 			if ( ! empty( $entries ) ) {
 				/**
@@ -1139,7 +1139,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$entries_for_json = array();
 
 			if ( ! empty( $entries ) ) {
-				$entries = array_slice( $entries, 0, \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page() );
+				$entries = array_slice( $entries, 0, ( new \Automattic\Liveblog\Application\Config\LazyloadConfiguration() )->get_entries_per_page() );
 
 				// Populate an array containing the JSON data for all Liveblog entries.
 				foreach ( $entries as $entry ) {
@@ -1190,7 +1190,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
 			}
 
-			$per_page = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page();
+			$per_page = ( new \Automattic\Liveblog\Application\Config\LazyloadConfiguration() )->get_entries_per_page();
 
 			$entries = self::$entry_query->get_all_entries_asc();
 			$entries = self::flatten_entries( $entries );
@@ -1488,7 +1488,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'locale'                       => get_locale(),
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => apply_filters( 'liveblog_timestamp_format', get_option( 'time_format' ) ),
-						'entries_per_page'             => \Automattic\Liveblog\Infrastructure\DI\Container::instance()->lazyload_configuration()->get_entries_per_page(),
+						'entries_per_page'             => ( new \Automattic\Liveblog\Application\Config\LazyloadConfiguration() )->get_entries_per_page(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
 						'focus_refresh_interval'       => self::FOCUS_REFRESH_INTERVAL,
