@@ -10,7 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Filter\CommandFilter;
-use Automattic\Liveblog\Infrastructure\DI\Container;
+use Automattic\Liveblog\Tests\Traits\ContainerAwareTrait;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
@@ -20,6 +20,8 @@ use Yoast\WPTestUtils\WPIntegration\TestCase;
  */
 final class ExtendFeatureCommandsTest extends TestCase {
 
+	use ContainerAwareTrait;
+
 	/**
 	 * Tests the returned config includes the test filter injection and returns an array.
 	 *
@@ -28,7 +30,7 @@ final class ExtendFeatureCommandsTest extends TestCase {
 	public function test_get_autocomplete_config_filter_executes(): void {
 		add_filter( 'liveblog_command_config', array( $this, 'example_test_filter' ), 1, 10 );
 
-		$filter = Container::instance()->command_filter();
+		$filter = $this->container()->command_filter();
 		$config = $filter->get_autocomplete_config();
 
 		$this->assertIsArray( $config );

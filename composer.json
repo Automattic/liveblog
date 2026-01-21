@@ -32,6 +32,11 @@
 			"Automattic\\Liveblog\\": "src/php/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"Automattic\\Liveblog\\Tests\\": "tests/"
+		}
+	},
 	"config": {
 		"allow-plugins": {
 			"composer/installers": true,
