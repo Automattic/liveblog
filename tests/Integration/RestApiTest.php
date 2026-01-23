@@ -9,18 +9,18 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Filter\AuthorFilter;
 use Automattic\Liveblog\Application\Filter\HashtagFilter;
-use Yoast\WPTestUtils\WPIntegration\TestCase;
+use Automattic\Liveblog\Domain\Entity\Entry;
+use Automattic\Liveblog\Infrastructure\DI\Container;
+use Automattic\Liveblog\Infrastructure\WordPress\RestApiController;
 use WP_REST_Request;
-use WPCOM_Liveblog;
-use WPCOM_Liveblog_Entry;
-use WPCOM_Liveblog_Rest_Api;
 
 /**
  * REST API test case.
  */
-final class RestApiTest extends TestCase {
+final class RestApiTest extends IntegrationTestCase {
 
 	private const ENDPOINT_BASE = '/liveblog/v1';
 
@@ -37,23 +37,6 @@ final class RestApiTest extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		// Reset static properties to ensure clean state.
-		WPCOM_Liveblog::$is_rest_api_call = false;
-		WPCOM_Liveblog::$post_id          = null;
-
-		// Reset private static properties using reflection.
-		$cache_control = new \ReflectionProperty( WPCOM_Liveblog::class, 'cache_control_max_age' );
-		$cache_control->setAccessible( true );
-		$cache_control->setValue( null, null );
-
-		$do_not_cache = new \ReflectionProperty( WPCOM_Liveblog::class, 'do_not_cache_response' );
-		$do_not_cache->setAccessible( true );
-		$do_not_cache->setValue( null, false );
-
-		$entry_query = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
-		$entry_query->setAccessible( true );
-		$entry_query->setValue( null, null );
-
 		global $wp_rest_server;
 		$wp_rest_server = new SpyRestServer();
 		$this->server   = $wp_rest_server;
@@ -67,68 +50,63 @@ final class RestApiTest extends TestCase {
 		global $wp_rest_server;
 		$wp_rest_server = null;
 
-		// Reset static properties to prevent state leakage.
-		WPCOM_Liveblog::$is_rest_api_call = false;
-		WPCOM_Liveblog::$post_id          = null;
-
-		// Reset private static properties using reflection.
-		$cache_control = new \ReflectionProperty( WPCOM_Liveblog::class, 'cache_control_max_age' );
-		$cache_control->setAccessible( true );
-		$cache_control->setValue( null, null );
-
-		$do_not_cache = new \ReflectionProperty( WPCOM_Liveblog::class, 'do_not_cache_response' );
-		$do_not_cache->setAccessible( true );
-		$do_not_cache->setValue( null, false );
-
-		$entry_query = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
-		$entry_query->setAccessible( true );
-		$entry_query->setValue( null, null );
-
 		parent::tear_down();
 	}
 
 	/**
 	 * Test does the class load correctly.
 	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::load()
+	 * @covers \Automattic\Liveblog\Infrastructure\WordPress\RestApiController::init()
 	 */
 	public function test_does_the_class_load_correctly(): void {
-		WPCOM_Liveblog_Rest_Api::load();
-		$base = WPCOM_Liveblog_Rest_Api::$endpoint_base;
+		// Reset the static endpoint base.
+		$reflection = new \ReflectionProperty( RestApiController::class, 'static_endpoint_base' );
+		$reflection->setAccessible( true );
+		$reflection->setValue( null, '' );
+
+		$base = RestApiController::build_endpoint_base();
 
 		$this->assertNotNull( $base );
 		$this->assertTrue( is_string( $base ) );
 
+		// Verify register_routes hook is registered (should be registered via PluginBootstrapper).
 		$hook_name = 'rest_api_init';
 		global $wp_filter;
 
-		$collection = $wp_filter[ $hook_name ];
+		$collection = $wp_filter[ $hook_name ] ?? array();
 
-		$test_array = array();
-
-		foreach ( $collection as $value ) {
-			$test_array = array_merge( $test_array, $value );
+		$hook_registered = false;
+		foreach ( $collection as $priority => $callbacks ) {
+			foreach ( $callbacks as $callback ) {
+				if ( is_array( $callback['function'] ) && $callback['function'][1] === 'register_routes' ) {
+					$hook_registered = true;
+					break 2;
+				}
+			}
 		}
 
-		$this->assertArrayHasKey( 'WPCOM_Liveblog_Rest_Api::register_routes', $test_array );
+		$this->assertTrue( $hook_registered, 'register_routes should be hooked to rest_api_init' );
 
-		// Lets test the existing endpoint base. Should return the same one as above.
-		$existing_endpoint_base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		// Test the existing endpoint base. Should return the same one as above.
+		$existing_endpoint_base = RestApiController::build_endpoint_base();
 		$this->assertSame( $base, $existing_endpoint_base );
 	}
 
 	/**
 	 * Test does the non pretty endpoint build correctly.
 	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 * @covers \Automattic\Liveblog\Infrastructure\WordPress\RestApiController::build_endpoint_base()
 	 */
 	public function test_does_the_non_pretty_endpoint_build_correctly(): void {
-		// If the endpoint is empty.
-		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
-		$api_namespace                          = 'liveblog/v1';
+		// Reset the static endpoint base.
+		$reflection = new \ReflectionProperty( RestApiController::class, 'static_endpoint_base' );
+		$reflection->setAccessible( true );
+		$reflection->setValue( null, '' );
 
-		// Non Pretty Permalink Structure.
-		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		$api_namespace = 'liveblog/v1';
+
+		// Non Pretty Permalink Structure (default).
+		$base = RestApiController::build_endpoint_base();
 
 		// Assert we have a return.
 		$this->assertNotNull( $base );
@@ -142,25 +120,27 @@ final class RestApiTest extends TestCase {
 	/**
 	 * Test does the pretty endpoint build correctly.
 	 *
-	 * @covers \WPCOM_Liveblog_Rest_Api::build_endpoint_base()
+	 * @covers \Automattic\Liveblog\Infrastructure\WordPress\RestApiController::build_endpoint_base()
 	 */
 	public function test_does_the_pretty_endpoint_build_correctly(): void {
-		// Empty the base so we can generate one.
-		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
+		// Reset the static endpoint base.
+		$reflection = new \ReflectionProperty( RestApiController::class, 'static_endpoint_base' );
+		$reflection->setAccessible( true );
+		$reflection->setValue( null, '' );
 
-		// Lets define the known API namespace.
+		// Define the known API namespace.
 		$api_namespace = 'liveblog/v1';
 
-		// Lets set a pretty URL Permalink Structure.
+		// Set a pretty URL Permalink Structure.
 		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 
-		// Now lest fire the method again and see what we get as the method should now detect the new permalink structure and return the pretty endpoint.
-		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
+		// Build endpoint - should detect the new permalink structure and return the pretty endpoint.
+		$base = RestApiController::build_endpoint_base();
 
-		// Lets make sure something is returned.
+		// Make sure something is returned.
 		$this->assertNotNull( $base );
 
-		// Now assert the return matches the expected return.
+		// Assert the return matches the expected return.
 		$expected = home_url( '/' . rest_get_url_prefix() . '/' . $api_namespace . '/' );
 
 		$this->assertSame( $expected, $base );
@@ -175,7 +155,8 @@ final class RestApiTest extends TestCase {
 		$start_time = strtotime( '-1 hour' );
 		$end_time   = strtotime( '+1 hour' );
 
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+		$request_router = Container::instance()->request_router();
+		$entries        = $request_router->get_entries_between( 1, $start_time, $end_time );
 
 		$this->assertArrayHasKey( 'entries', $entries );
 		$this->assertArrayHasKey( 'latest_timestamp', $entries );
@@ -191,7 +172,8 @@ final class RestApiTest extends TestCase {
 		$start_time = strtotime( '-1 hour' );
 		$end_time   = strtotime( '+1 hour' );
 
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+		$request_router = Container::instance()->request_router();
+		$entries        = $request_router->get_entries_between( 1, $start_time, $end_time );
 
 		$this->assertNotEmpty( $entries['entries'] );
 		$this->assertNotNull( $entries['latest_timestamp'] );
@@ -207,7 +189,8 @@ final class RestApiTest extends TestCase {
 		$start_time = strtotime( '-2 hour' );
 		$end_time   = strtotime( '-1 hour' );
 
-		$entries = WPCOM_Liveblog::get_entries_by_time( $start_time, $end_time );
+		$request_router = Container::instance()->request_router();
+		$entries        = $request_router->get_entries_between( 1, $start_time, $end_time );
 
 		$this->assertEmpty( $entries['entries'] );
 		$this->assertNull( $entries['latest_timestamp'] );
@@ -219,7 +202,8 @@ final class RestApiTest extends TestCase {
 	public function test_get_single_entry_not_empty(): void {
 		$new_entry = $this->setup_entry_test_state();
 
-		$entry = WPCOM_Liveblog::get_single_entry( $new_entry[0]->get_id() );
+		$request_router = Container::instance()->request_router();
+		$entry          = $request_router->get_single_entry( 1, $new_entry[0]->id()->to_int() );
 
 		$this->assertNotEmpty( $entry['entries'] );
 		$this->assertIsInt( $entry['index'] );
@@ -233,7 +217,8 @@ final class RestApiTest extends TestCase {
 	public function test_get_single_entry_is_empty(): void {
 		$this->setup_entry_test_state();
 
-		$entry = WPCOM_Liveblog::get_single_entry( 1010 );
+		$request_router = Container::instance()->request_router();
+		$entry          = $request_router->get_single_entry( 1, 1010 );
 
 		$this->assertEmpty( $entry['entries'] );
 	}
@@ -249,7 +234,8 @@ final class RestApiTest extends TestCase {
 		$max_timestamp = strtotime( '+1 day' );
 		$min_timestamp = 0;
 
-		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+		$request_router = Container::instance()->request_router();
+		$entries        = $request_router->get_lazyload_entries( 1, $max_timestamp, $min_timestamp );
 
 		$this->assertNotEmpty( $entries['entries'] );
 		$this->assertIsInt( $entries['index'] );
@@ -265,7 +251,8 @@ final class RestApiTest extends TestCase {
 		$max_timestamp = strtotime( '-1 day' );
 		$min_timestamp = 0;
 
-		$entries = WPCOM_Liveblog::get_lazyload_entries( $max_timestamp, $min_timestamp );
+		$request_router = Container::instance()->request_router();
+		$entries        = $request_router->get_lazyload_entries( 1, $max_timestamp, $min_timestamp );
 
 		$this->assertEmpty( $entries['entries'] );
 		$this->assertIsInt( $entries['index'] );
@@ -278,7 +265,8 @@ final class RestApiTest extends TestCase {
 		$user = self::factory()->user->create_and_get();
 		wp_set_current_user( $user->ID );
 
-		$entry = WPCOM_Liveblog::do_crud_entry( 'insert', $this->build_entry_args() );
+		$entry_operations = Container::instance()->entry_operations();
+		$entry            = $entry_operations->do_crud( 'insert', $this->build_entry_args(), $user );
 
 		$this->assertIsArray( $entry );
 		$this->assertNotEmpty( $entry['entries'] );
@@ -290,11 +278,14 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_crud_action_update(): void {
 		$new_entry = $this->setup_entry_test_state();
+		$user      = wp_get_current_user();
 		$args      = array(
-			'entry_id' => $new_entry[0]->get_id(),
+			'entry_id' => $new_entry[0]->id()->to_int(),
 			'content'  => 'Updated Test Liveblog entry',
 		);
-		$entry     = WPCOM_Liveblog::do_crud_entry( 'update', $this->build_entry_args( $args ) );
+
+		$entry_operations = Container::instance()->entry_operations();
+		$entry            = $entry_operations->do_crud( 'update', $this->build_entry_args( $args ), $user );
 
 		$this->assertIsArray( $entry );
 		$this->assertNotEmpty( $entry['entries'] );
@@ -309,13 +300,15 @@ final class RestApiTest extends TestCase {
 		$new_entry = $this->setup_entry_test_state();
 
 		$this->assertIsArray( $new_entry );
-		$this->assertInstanceOf( WPCOM_Liveblog_Entry::class, $new_entry[0] );
+		$this->assertInstanceOf( Entry::class, $new_entry[0] );
 
-		$new_entry_id = $new_entry[0]->get_id();
+		$new_entry_id = $new_entry[0]->id()->to_int();
+		$user         = wp_get_current_user();
 
 		// Then delete it.
-		$args = array( 'entry_id' => $new_entry_id );
-		WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( $args ) );
+		$args             = array( 'entry_id' => $new_entry_id );
+		$entry_operations = Container::instance()->entry_operations();
+		$entry_operations->do_crud( 'delete', $this->build_entry_args( $args ), $user );
 
 		// Check that it was sent to the trash.
 		$deleted_entry = get_comment( $new_entry_id );
@@ -329,11 +322,13 @@ final class RestApiTest extends TestCase {
 	public function test_crud_action_delete_key(): void {
 		// First create an entry with a key.
 		$new_entry    = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
-		$new_entry_id = $new_entry[0]->get_id();
+		$new_entry_id = $new_entry[0]->id()->to_int();
+		$user         = wp_get_current_user();
 
 		// Then delete the key.
-		$args  = array( 'entry_id' => $new_entry_id );
-		$entry = WPCOM_Liveblog::do_crud_entry( 'delete_key', $this->build_entry_args( $args ) );
+		$args             = array( 'entry_id' => $new_entry_id );
+		$entry_operations = Container::instance()->entry_operations();
+		$entry            = $entry_operations->do_crud( 'delete_key', $this->build_entry_args( $args ), $user );
 
 		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error.
 		$this->assertNotInstanceOf( 'WP_Error', $entry );
@@ -344,7 +339,8 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_preview_entry(): void {
 		// Get entry preview.
-		$preview = WPCOM_Liveblog::format_preview_entry( 'Test Liveblog entry with /key' );
+		$entry_operations = Container::instance()->entry_operations();
+		$preview          = $entry_operations->format_preview( 'Test Liveblog entry with /key' );
 
 		$this->assertIsArray( $preview );
 		$this->assertNotEmpty( $preview['html'] );
@@ -408,7 +404,8 @@ final class RestApiTest extends TestCase {
 		);
 
 		// Save post state and return the metabox markup.
-		$meta_box = WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post->ID, $state, $request_vars );
+		$admin_controller = Container::instance()->admin_controller();
+		$meta_box         = $admin_controller->set_liveblog_state( $post->ID, $state, $request_vars );
 
 		// TODO: Possibly test for something more specific.
 		$this->assertIsString( $meta_box );
@@ -499,7 +496,7 @@ final class RestApiTest extends TestCase {
 		$new_entries = $this->insert_entries();
 
 		// Try to access the endpoint.
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id() );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->id()->to_int() );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -719,27 +716,15 @@ final class RestApiTest extends TestCase {
 	 * @return array Array of entries.
 	 */
 	private function setup_entry_test_state( int $number_of_entries = 1, array $args = array() ): array {
-		$entries = $this->insert_entries( $number_of_entries, $args );
-
-		$this->set_liveblog_vars();
-
-		return $entries;
+		return $this->insert_entries( $number_of_entries, $args );
 	}
 
 	/**
-	 * Set liveblog vars.
-	 */
-	private function set_liveblog_vars(): void {
-		WPCOM_Liveblog::$is_rest_api_call = true;
-		WPCOM_Liveblog::$post_id          = 1;
-	}
-
-	/**
-	 * Insert entries.
+	 * Insert entries using domain services.
 	 *
 	 * @param int   $number_of_entries Number of entries to create.
 	 * @param array $args              Arguments.
-	 * @return array Array of entries.
+	 * @return Entry[] Array of Entry objects.
 	 */
 	private function insert_entries( int $number_of_entries = 1, array $args = array() ): array {
 		$entries = array();
@@ -748,8 +733,19 @@ final class RestApiTest extends TestCase {
 		wp_set_current_user( $user->ID );
 		$args['user'] = $user;
 
+		$container     = $this->container();
+		$entry_service = $container->entry_service();
+		$repository    = $container->entry_repository();
+
+		$merged_args = $this->build_entry_args( $args );
+
 		for ( $i = 0; $i < $number_of_entries; $i++ ) {
-			$entries[] = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
+			$entry_id  = $entry_service->create(
+				(int) $merged_args['post_id'],
+				$merged_args['content'] ?? 'Test Liveblog entry',
+				$args['user']
+			);
+			$entries[] = $repository->get_entry( $entry_id );
 		}
 
 		return $entries;
@@ -788,9 +784,10 @@ final class RestApiTest extends TestCase {
 		$post_id = self::factory()->post->create();
 
 		// Make the new post a liveblog.
-		$state        = 'enable';
-		$request_vars = array( 'state' => $state );
-		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
+		$state            = 'enable';
+		$request_vars     = array( 'state' => $state );
+		$admin_controller = Container::instance()->admin_controller();
+		$admin_controller->set_liveblog_state( $post_id, $state, $request_vars );
 
 		return $post_id;
 	}
