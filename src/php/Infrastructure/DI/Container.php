@@ -14,6 +14,7 @@ use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
 use Automattic\Liveblog\Application\Presenter\MetadataPresenter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
+use Automattic\Liveblog\Application\Renderer\EmbedHandlerInterface;
 use Automattic\Liveblog\Application\Service\AutoArchiveService;
 use Automattic\Liveblog\Application\Service\ContentProcessor;
 use Automattic\Liveblog\Application\Service\EntryOperations;
@@ -29,6 +30,7 @@ use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 use Automattic\Liveblog\Infrastructure\WordPress\AdminController;
 use Automattic\Liveblog\Infrastructure\WordPress\AmpIntegration;
 use Automattic\Liveblog\Infrastructure\WordPress\AssetManager;
+use Automattic\Liveblog\Infrastructure\WordPress\CommentEmbed;
 use Automattic\Liveblog\Infrastructure\WordPress\RequestRouter;
 use Automattic\Liveblog\Infrastructure\WordPress\RestApiController;
 use Automattic\Liveblog\Infrastructure\WordPress\TemplateRenderer;
@@ -73,6 +75,13 @@ final class Container {
 	 * @var EntryService|null
 	 */
 	private ?EntryService $entry_service = null;
+
+	/**
+	 * Cached embed handler instance.
+	 *
+	 * @var EmbedHandlerInterface|null
+	 */
+	private ?EmbedHandlerInterface $embed_handler = null;
 
 	/**
 	 * Cached content processor instance.
@@ -281,6 +290,23 @@ final class Container {
 	}
 
 	/**
+	 * Get the embed handler.
+	 *
+	 * @return EmbedHandlerInterface
+	 */
+	public function embed_handler(): EmbedHandlerInterface {
+		if ( isset( $this->overrides['embed_handler'] ) ) {
+			return ( $this->overrides['embed_handler'] )();
+		}
+
+		if ( null === $this->embed_handler ) {
+			$this->embed_handler = new CommentEmbed();
+		}
+
+		return $this->embed_handler;
+	}
+
+	/**
 	 * Get the content processor.
 	 *
 	 * @return ContentProcessor
@@ -291,7 +317,9 @@ final class Container {
 		}
 
 		if ( null === $this->content_processor ) {
-			$this->content_processor = new ContentProcessor();
+			$this->content_processor = new ContentProcessor(
+				$this->embed_handler()
+			);
 		}
 
 		return $this->content_processor;

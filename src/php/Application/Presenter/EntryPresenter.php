@@ -15,7 +15,6 @@ use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\DI\Container;
-use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use WP_Comment;
 
 /**
@@ -72,7 +71,7 @@ final class EntryPresenter {
 	 * @param Entry                         $entry             The entry to present.
 	 * @param KeyEventService               $key_event_service Service for key event operations.
 	 * @param WP_Comment|null               $comment           Optional comment for additional WordPress data.
-	 * @param ContentRendererInterface|null $renderer          Optional content renderer (defaults to WordPress renderer).
+	 * @param ContentRendererInterface|null $renderer          Optional content renderer (defaults to container renderer).
 	 */
 	public function __construct(
 		Entry $entry,
@@ -83,7 +82,7 @@ final class EntryPresenter {
 		$this->entry             = $entry;
 		$this->key_event_service = $key_event_service;
 		$this->comment           = $comment;
-		$this->renderer          = $renderer ?? new WordPressContentRenderer();
+		$this->renderer          = $renderer ?? Container::instance()->content_renderer();
 	}
 
 	/**

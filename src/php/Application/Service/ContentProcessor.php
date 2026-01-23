@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Service;
 
-use WPCOM_Liveblog_Entry_Embed;
+use Automattic\Liveblog\Application\Renderer\EmbedHandlerInterface;
 use WP_Comment;
 
 /**
@@ -20,6 +20,22 @@ use WP_Comment;
  * and WordPress content filters.
  */
 final class ContentProcessor {
+
+	/**
+	 * Embed handler for processing URLs.
+	 *
+	 * @var EmbedHandlerInterface
+	 */
+	private EmbedHandlerInterface $embed_handler;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param EmbedHandlerInterface $embed_handler Embed handler for URL processing.
+	 */
+	public function __construct( EmbedHandlerInterface $embed_handler ) {
+		$this->embed_handler = $embed_handler;
+	}
 
 	/**
 	 * Render content to HTML.
@@ -39,8 +55,7 @@ final class ContentProcessor {
 		 */
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
 			if ( get_option( 'embed_autourls' ) ) {
-				$liveblog_entry_embed = new WPCOM_Liveblog_Entry_Embed();
-				$content              = $liveblog_entry_embed->autoembed( $content, $comment );
+				$content = $this->embed_handler->autoembed( $content, $comment );
 			}
 			$content = do_shortcode( $content );
 		}

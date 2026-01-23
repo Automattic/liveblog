@@ -31,10 +31,10 @@ final class WordPressContentRenderer implements ContentRendererInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @param ContentProcessor|null $content_processor Optional content processor instance.
+	 * @param ContentProcessor $content_processor Content processor instance.
 	 */
-	public function __construct( ?ContentProcessor $content_processor = null ) {
-		$this->content_processor = $content_processor ?? new ContentProcessor();
+	public function __construct( ContentProcessor $content_processor ) {
+		$this->content_processor = $content_processor;
 	}
 
 	/**
