@@ -10,10 +10,13 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Infrastructure\DI;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
+use Automattic\Liveblog\Application\Presenter\MetadataPresenter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\AutoArchiveService;
 use Automattic\Liveblog\Application\Service\ContentProcessor;
+use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\EntryService;
 use Automattic\Liveblog\Application\Service\InputSanitizer;
@@ -23,6 +26,11 @@ use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
 use Automattic\Liveblog\Infrastructure\Cron\AutoArchiveCronHandler;
 use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
+use Automattic\Liveblog\Infrastructure\WordPress\AdminController;
+use Automattic\Liveblog\Infrastructure\WordPress\AssetManager;
+use Automattic\Liveblog\Infrastructure\WordPress\RequestRouter;
+use Automattic\Liveblog\Infrastructure\WordPress\RestApiController;
+use Automattic\Liveblog\Infrastructure\WordPress\TemplateRenderer;
 
 /**
  * Dependency injection container for wiring up services.
@@ -127,6 +135,55 @@ final class Container {
 	 * @var AutoArchiveCronHandler|null
 	 */
 	private ?AutoArchiveCronHandler $auto_archive_cron_handler = null;
+
+	/**
+	 * Cached entry operations instance.
+	 *
+	 * @var EntryOperations|null
+	 */
+	private ?EntryOperations $entry_operations = null;
+
+	/**
+	 * Cached REST API controller instance.
+	 *
+	 * @var RestApiController|null
+	 */
+	private ?RestApiController $rest_api_controller = null;
+
+	/**
+	 * Cached asset manager instance.
+	 *
+	 * @var AssetManager|null
+	 */
+	private ?AssetManager $asset_manager = null;
+
+	/**
+	 * Cached template renderer instance.
+	 *
+	 * @var TemplateRenderer|null
+	 */
+	private ?TemplateRenderer $template_renderer = null;
+
+	/**
+	 * Cached admin controller instance.
+	 *
+	 * @var AdminController|null
+	 */
+	private ?AdminController $admin_controller = null;
+
+	/**
+	 * Cached metadata presenter instance.
+	 *
+	 * @var MetadataPresenter|null
+	 */
+	private ?MetadataPresenter $metadata_presenter = null;
+
+	/**
+	 * Cached request router instance.
+	 *
+	 * @var RequestRouter|null
+	 */
+	private ?RequestRouter $request_router = null;
 
 	/**
 	 * Private constructor to enforce singleton.
@@ -351,7 +408,7 @@ final class Container {
 		}
 
 		if ( null === $this->auto_archive_service ) {
-			$auto_archive_days          = \WPCOM_Liveblog::$auto_archive_days;
+			$auto_archive_days          = LiveblogConfiguration::get_auto_archive_days();
 			$this->auto_archive_service = new AutoArchiveService( $auto_archive_days );
 		}
 
@@ -375,6 +432,151 @@ final class Container {
 		}
 
 		return $this->auto_archive_cron_handler;
+	}
+
+	/**
+	 * Get the entry operations service.
+	 *
+	 * @return EntryOperations
+	 */
+	public function entry_operations(): EntryOperations {
+		if ( isset( $this->overrides['entry_operations'] ) ) {
+			return ( $this->overrides['entry_operations'] )();
+		}
+
+		if ( null === $this->entry_operations ) {
+			$this->entry_operations = new EntryOperations(
+				$this->entry_service(),
+				$this->key_event_service(),
+				$this->entry_repository(),
+				$this->content_processor()
+			);
+		}
+
+		return $this->entry_operations;
+	}
+
+	/**
+	 * Get the REST API controller.
+	 *
+	 * @return RestApiController
+	 */
+	public function rest_api_controller(): RestApiController {
+		if ( isset( $this->overrides['rest_api_controller'] ) ) {
+			return ( $this->overrides['rest_api_controller'] )();
+		}
+
+		if ( null === $this->rest_api_controller ) {
+			$this->rest_api_controller = new RestApiController(
+				$this->entry_query_service(),
+				$this->entry_operations(),
+				$this->key_event_service(),
+				$this->request_router(),
+				$this->admin_controller()
+			);
+		}
+
+		return $this->rest_api_controller;
+	}
+
+	/**
+	 * Get the asset manager.
+	 *
+	 * @return AssetManager
+	 */
+	public function asset_manager(): AssetManager {
+		if ( isset( $this->overrides['asset_manager'] ) ) {
+			return ( $this->overrides['asset_manager'] )();
+		}
+
+		if ( null === $this->asset_manager ) {
+			$this->asset_manager = new AssetManager(
+				$this->entry_query_service(),
+				$this->content_filter_registry(),
+				defined( 'LIVEBLOG_FILE' ) ? LIVEBLOG_FILE : ''
+			);
+		}
+
+		return $this->asset_manager;
+	}
+
+	/**
+	 * Get the template renderer.
+	 *
+	 * @return TemplateRenderer
+	 */
+	public function template_renderer(): TemplateRenderer {
+		if ( isset( $this->overrides['template_renderer'] ) ) {
+			return ( $this->overrides['template_renderer'] )();
+		}
+
+		if ( null === $this->template_renderer ) {
+			$this->template_renderer = new TemplateRenderer(
+				defined( 'LIVEBLOG_FILE' ) ? LIVEBLOG_FILE : ''
+			);
+		}
+
+		return $this->template_renderer;
+	}
+
+	/**
+	 * Get the admin controller.
+	 *
+	 * @return AdminController
+	 */
+	public function admin_controller(): AdminController {
+		if ( isset( $this->overrides['admin_controller'] ) ) {
+			return ( $this->overrides['admin_controller'] )();
+		}
+
+		if ( null === $this->admin_controller ) {
+			$this->admin_controller = new AdminController(
+				$this->template_renderer()
+			);
+		}
+
+		return $this->admin_controller;
+	}
+
+	/**
+	 * Get the metadata presenter.
+	 *
+	 * @return MetadataPresenter
+	 */
+	public function metadata_presenter(): MetadataPresenter {
+		if ( isset( $this->overrides['metadata_presenter'] ) ) {
+			return ( $this->overrides['metadata_presenter'] )();
+		}
+
+		if ( null === $this->metadata_presenter ) {
+			$this->metadata_presenter = new MetadataPresenter(
+				$this->entry_query_service(),
+				$this->key_event_service()
+			);
+		}
+
+		return $this->metadata_presenter;
+	}
+
+	/**
+	 * Get the request router.
+	 *
+	 * @return RequestRouter
+	 */
+	public function request_router(): RequestRouter {
+		if ( isset( $this->overrides['request_router'] ) ) {
+			return ( $this->overrides['request_router'] )();
+		}
+
+		if ( null === $this->request_router ) {
+			$this->request_router = new RequestRouter(
+				$this->entry_query_service(),
+				$this->entry_operations(),
+				$this->key_event_service()
+			);
+		}
+
+		return $this->request_router;
 	}
 
 	/**

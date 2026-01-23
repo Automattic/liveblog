@@ -77,8 +77,25 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			$post_id = $post->ID;
 
 			// Get all entries that have been edited in the liveblog.
-			$entries_query = new WPCOM_Liveblog_Entry_Query( $post_id, WPCOM_Liveblog::KEY );
-			$edit_entries  = $entries_query->get_all_edits( array( 'post_id' => $post_id ) );
+			// Query for comments with liveblog_replaces meta (these are edited entries).
+			$edit_comments = get_comments(
+				array(
+					'post_id'  => $post_id,
+					'orderby'  => 'comment_date_gmt',
+					'order'    => 'ASC',
+					'meta_key' => 'liveblog_replaces', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding edited entries.
+					'status'   => 'liveblog',
+				)
+			);
+			$edit_entries  = array_map(
+				function ( $comment ) {
+					return (object) array(
+						'id'       => (int) $comment->comment_ID,
+						'replaces' => (int) get_comment_meta( $comment->comment_ID, 'liveblog_replaces', true ),
+					);
+				},
+				$edit_comments
+			);
 
 			// Find correct comment_ids to replace incorrect meta_values.
 			$correct_ids_array = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- WP-CLI bulk repair operation.
@@ -103,7 +120,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 				WP_CLI::log( 'Found ' . count( $edit_entries ) . ' edited entries..' );
 
 				foreach ( $edit_entries as $edit_entry ) {
-					$entry_id = $edit_entry->get_id();
+					$entry_id = $edit_entry->id;
 
 					// Look for replaces property in $correct_ids.
 					if ( in_array( $edit_entry->replaces, $correct_ids, true ) ) {

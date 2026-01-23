@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Filter;
 
-use WPCOM_Liveblog;
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 
 /**
  * Filters entry content for command patterns (/command).
@@ -300,7 +300,7 @@ final class CommandFilter implements ContentFilterInterface {
 		$types   = array();
 		$comment = get_comment( $comment_id );
 
-		if ( ! $comment || WPCOM_Liveblog::KEY !== $comment->comment_type ) {
+		if ( ! $comment || LiveblogConfiguration::KEY !== $comment->comment_type ) {
 			return $classes;
 		}
 

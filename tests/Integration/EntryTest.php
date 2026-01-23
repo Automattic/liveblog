@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the Liveblog Entry class.
+ * Tests for liveblog entry operations using domain services.
  *
  * @package Automattic\Liveblog\Tests\Integration
  */
@@ -9,154 +9,138 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
-use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog_Entry;
-use WPCOM_Liveblog_Entry_Query;
-use ReflectionProperty;
+use Automattic\Liveblog\Application\Service\ContentProcessor;
+use Automattic\Liveblog\Application\Service\EntryService;
+use Automattic\Liveblog\Application\Service\ShortcodeFilter;
+use Automattic\Liveblog\Domain\Entity\Entry;
+use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
+use Automattic\Liveblog\Domain\ValueObject\EntryType;
 
 /**
  * Entry test case.
  */
-final class EntryTest extends TestCase {
+final class EntryTest extends IntegrationTestCase {
 
 	/**
-	 * Test that constructor sets replaces if there is replace meta.
+	 * Entry service.
+	 *
+	 * @var EntryService
 	 */
-	public function test_constructor_should_set_replace_if_there_is_replace_meta(): void {
-		$comment = $this->create_and_get_comment_with_replaces( 5 );
-		$entry   = new WPCOM_Liveblog_Entry( $comment );
-		$this->assertEquals( 5, $entry->replaces );
+	private EntryService $entry_service;
+
+	/**
+	 * Entry repository.
+	 *
+	 * @var EntryRepositoryInterface
+	 */
+	private EntryRepositoryInterface $repository;
+
+	/**
+	 * Content processor.
+	 *
+	 * @var ContentProcessor
+	 */
+	private ContentProcessor $content_processor;
+
+	/**
+	 * Set up test fixtures.
+	 */
+	public function set_up(): void {
+		parent::set_up();
+		$container               = $this->container();
+		$this->entry_service     = $container->entry_service();
+		$this->repository        = $container->entry_repository();
+		$this->content_processor = $container->content_processor();
 	}
 
 	/**
-	 * Test that constructor sets replaces to false if no replace meta.
-	 */
-	public function test_constructor_should_set_replaces_to_false_if_no_replace_meta(): void {
-		$comment = self::factory()->comment->create_and_get();
-		$entry   = new WPCOM_Liveblog_Entry( $comment );
-		$this->assertTrue( ! $entry->replaces );
-	}
-
-	/**
-	 * Test that insert returns an entry.
-	 */
-	public function test_insert_should_return_entry(): void {
-		$entry = $this->insert_entry();
-		$this->assertInstanceOf( WPCOM_Liveblog_Entry::class, $entry );
-	}
-
-	/**
-	 * Test that insert returns entry with type new.
+	 * Test that entry is created with type 'new'.
 	 */
 	public function test_insert_should_return_entry_with_type_new(): void {
 		$entry = $this->insert_entry();
-		$this->assertEquals( 'new', $entry->get_type() );
+		$this->assertTrue( $entry->type()->is_new() );
+		$this->assertSame( 'new', $entry->type()->value );
 	}
 
 	/**
-	 * Test that insert fires liveblog_insert_entry hook.
+	 * Test that update replaces the original entry.
 	 */
-	public function test_insert_should_fire_liveblog_insert_entry(): void {
-		unset( $GLOBALS['liveblog_hook_fired'] );
-		add_action( 'liveblog_insert_entry', array( self::class, 'set_liveblog_hook_fired' ) );
-		$this->insert_entry();
-		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
-	}
-
-	/**
-	 * Test that update replaces the content in the query.
-	 */
-	public function test_update_should_replace_the_content_in_the_query(): void {
-		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::update(
-			$this->build_entry_args(
-				array(
-					'entry_id' => $entry->get_id(),
-					'content'  => 'updated',
-				)
-			)
+	public function test_update_should_replace_the_original_entry(): void {
+		$entry     = $this->insert_entry();
+		$update_id = $this->entry_service->update(
+			1,
+			$entry->id(),
+			'updated content',
+			$this->create_user()
 		);
-		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
+		$updated = $this->repository->get_entry( $update_id );
+		$this->assertNotNull( $updated->replaces() );
+		$this->assertSame( $entry->id()->to_int(), $updated->replaces()->to_int() );
 	}
 
 	/**
 	 * Test that update returns entry with type update.
 	 */
 	public function test_update_should_return_entry_with_type_update(): void {
-		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::update(
-			$this->build_entry_args(
-				array(
-					'entry_id' => $entry->get_id(),
-					'content'  => 'updated',
-				)
-			)
+		$entry     = $this->insert_entry();
+		$update_id = $this->entry_service->update(
+			1,
+			$entry->id(),
+			'updated content',
+			$this->create_user()
 		);
-		$this->assertEquals( 'update', $update_entry->get_type() );
+		$updated = $this->repository->get_entry( $update_id );
+		$this->assertTrue( $updated->type()->is_update() );
+		$this->assertSame( 'update', $updated->type()->value );
 	}
 
 	/**
-	 * Test that update fires liveblog_update_entry hook.
-	 */
-	public function test_update_should_fire_liveblog_update_entry(): void {
-		unset( $GLOBALS['liveblog_hook_fired'] );
-		add_action( 'liveblog_update_entry', array( self::class, 'set_liveblog_hook_fired' ) );
-		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::update(
-			$this->build_entry_args(
-				array(
-					'entry_id' => $entry->get_id(),
-					'content'  => 'updated',
-				)
-			)
-		);
-		$this->assertTrue( isset( $GLOBALS['liveblog_hook_fired'] ) );
-	}
-
-	/**
-	 * Test that update updates the original entry.
+	 * Test that update updates the original entry content.
 	 */
 	public function test_update_should_update_original_entry(): void {
 		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::update(
-			$this->build_entry_args(
-				array(
-					'entry_id' => $entry->get_id(),
-					'content'  => 'updated',
-				)
-			)
-		);
-		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
-		$this->assertEquals( 'updated', $query->get_by_id( $entry->get_id() )->get_content() );
+		$this->entry_service->update( 1, $entry->id(), 'updated', $this->create_user() );
+		$updated = $this->repository->get_entry( $entry->id() );
+		$this->assertSame( 'updated', $updated->content()->raw() );
 	}
 
 	/**
-	 * Test that delete replaces the content in the query.
+	 * Test that delete replaces the original entry.
 	 */
-	public function test_delete_should_replace_the_content_in_the_query(): void {
-		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
-		$this->assertEquals( $entry->get_id(), $update_entry->replaces );
-		$this->assertEquals( '', $update_entry->get_content() );
+	public function test_delete_should_replace_the_original_entry(): void {
+		$entry     = $this->insert_entry();
+		$delete_id = $this->entry_service->delete( 1, $entry->id(), $this->create_user() );
+		$deleted   = $this->repository->get_entry( $delete_id );
+		$this->assertNotNull( $deleted->replaces() );
+		$this->assertSame( $entry->id()->to_int(), $deleted->replaces()->to_int() );
+		$this->assertSame( '', $deleted->content()->raw() );
 	}
 
 	/**
 	 * Test that delete returns entry with type delete.
 	 */
 	public function test_delete_should_return_entry_with_type_delete(): void {
-		$entry        = $this->insert_entry();
-		$update_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
-		$this->assertEquals( 'delete', $update_entry->get_type() );
+		$entry     = $this->insert_entry();
+		$delete_id = $this->entry_service->delete( 1, $entry->id(), $this->create_user() );
+		$deleted   = $this->repository->get_entry( $delete_id );
+		$this->assertTrue( $deleted->type()->is_delete() );
+		$this->assertSame( 'delete', $deleted->type()->value );
 	}
 
 	/**
-	 * Test that delete deletes the original entry.
+	 * Test that delete removes entry from query results.
 	 */
 	public function test_delete_should_delete_original_entry(): void {
 		$entry = $this->insert_entry();
-		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
-		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
-		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
+		$this->entry_service->delete( 1, $entry->id(), $this->create_user() );
+		$query_service = $this->container()->entry_query_service();
+		// After delete, the entry should be filtered out of the get_all results.
+		$entries = $query_service->get_all( 1 );
+		$ids     = array_map(
+			fn( Entry $e ) => $e->id()->to_int(),
+			$entries
+		);
+		$this->assertNotContains( $entry->id()->to_int(), $ids );
 	}
 
 	/**
@@ -165,34 +149,26 @@ final class EntryTest extends TestCase {
 	public function test_user_input_sanity_check(): void {
 		// Test that dangerous script tags are stripped by wp_filter_post_kses()
 		// Note: embed and object tags are allowed in WordPress 'post' context.
-		$user_input      = '<script>alert("xss")</script>';
-		$user_input     .= '<applet code="malicious"></applet>';
-		$user_input     .= '<form><input name="test"></form>';
-		$content         = array(
-			'post_id' => 1,
-			'content' => $user_input,
-		);
-		$live_blog_entry = $this->insert_entry( $content );
+		$user_input  = '<script>alert("xss")</script>';
+		$user_input .= '<applet code="malicious"></applet>';
+		$user_input .= '<form><input name="test"></form>';
+		$entry       = $this->insert_entry( array( 'content' => $user_input ) );
 		// Content should be empty or significantly sanitized (scripts/applets/forms removed).
-		$sanitized_content = $live_blog_entry->get_content();
+		$sanitized_content = $entry->content()->raw();
 		$this->assertStringNotContainsString( '<script', $sanitized_content );
 		$this->assertStringNotContainsString( '<applet', $sanitized_content );
 		$this->assertStringNotContainsString( '<form', $sanitized_content );
 	}
 
 	/**
-	 * Test that shortcodes are excluded from entry.
+	 * Test that shortcode filter strips restricted shortcodes.
 	 *
-	 * Test to ensure that all [shortcode] formats are stripped.
-	 * Uses the default exclusion [liveblog_key_events] which should
-	 * be replaced with "We Are Blogging Live! Check Out The Key Events in The Sidebar"
-	 * if successful.
-	 *
-	 * @author  Olly Warren, Big Bite Creative
+	 * This tests the ShortcodeFilter service directly.
+	 * In production, this filter is applied via WordPress hooks.
 	 */
-	public function test_shortcode_excluded_from_entry(): void {
-		// Insert a new entries with a shortcode body content to test each type of shortcode format.
-		$formats = array(
+	public function test_shortcode_filter_strips_restricted_shortcodes(): void {
+		$shortcode_filter = new ShortcodeFilter();
+		$formats          = array(
 			'[liveblog_key_events]',
 			'[liveblog_key_events][/liveblog_key_events]',
 			'[liveblog_key_events arg="30"]',
@@ -201,118 +177,35 @@ final class EntryTest extends TestCase {
 			'[liveblog_key_events arg="30"]Test Input Inbetween Tags[/liveblog_key_events]',
 		);
 
-		// Loop through each format and create a new comment to check if it gets stripped before hitting the DB.
 		foreach ( $formats as $shortcode ) {
-			// Create a new entry.
-			$entry = $this->insert_entry( array( 'content' => $shortcode ) );
-
-			// Lets setup a Reflection class so we can access the private object properties and check our comment body.
-			$comment = new ReflectionProperty( $entry, 'comment' );
-			$comment->setAccessible( true );
-			$comment_content = $comment->getValue( $entry );
-
-			// Define a check variable and see if the returned object content has been set as the default string replacement.
-			$check = '' === $comment_content->comment_content;
-
-			// Assert we have a match. If we do then the shortcode was successfully stripped.
-			$this->assertTrue( $check );
+			$args     = array( 'content' => $shortcode );
+			$filtered = $shortcode_filter->filter( $args );
+			$this->assertSame( '', $filtered['content'] );
 		}
 	}
 
 	/**
-	 * Set liveblog hook fired global.
-	 */
-	public static function set_liveblog_hook_fired(): void {
-		$GLOBALS['liveblog_hook_fired'] = true;
-	}
-
-	/**
-	 * Insert a liveblog entry.
+	 * Insert a liveblog entry using domain service.
 	 *
 	 * @param array $args Arguments for entry.
-	 * @return WPCOM_Liveblog_Entry
+	 * @return Entry The created entry.
 	 */
-	private function insert_entry( array $args = array() ): WPCOM_Liveblog_Entry {
-		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
-		return $entry;
+	private function insert_entry( array $args = array() ): Entry {
+		$user    = $args['user'] ?? $this->create_user();
+		$post_id = $args['post_id'] ?? 1;
+		$content = $args['content'] ?? 'baba';
+
+		$entry_id = $this->entry_service->create( $post_id, $content, $user );
+		return $this->repository->get_entry( $entry_id );
 	}
 
 	/**
-	 * Build entry args.
+	 * Create a test user.
 	 *
-	 * @param array $args Arguments to merge.
-	 * @return array
+	 * @return \WP_User
 	 */
-	private function build_entry_args( array $args = array() ): array {
-		$user     = self::factory()->user->create_and_get();
-		$defaults = array(
-			'post_id' => 1,
-			'content' => 'baba',
-			'user'    => $user,
-		);
-		return array_merge( $defaults, $args );
-	}
-
-	/**
-	 * Test that get_comment_date_gmt returns correct Unix timestamp.
-	 *
-	 * This tests the timezone fix where mysql2date() was replaced with
-	 * DateTimeImmutable to avoid timezone conversion issues.
-	 */
-	public function test_get_comment_date_gmt_returns_correct_unix_timestamp(): void {
-		// Create a comment with a known GMT date.
-		$gmt_date = '2024-06-15 14:30:00';
-		$comment  = self::factory()->comment->create_and_get(
-			array(
-				'comment_date_gmt' => $gmt_date,
-			)
-		);
-
-		$entry = new WPCOM_Liveblog_Entry( $comment );
-
-		// Get the Unix timestamp.
-		$timestamp = $entry->get_comment_date_gmt( 'U', $comment->comment_ID );
-
-		// The expected timestamp for 2024-06-15 14:30:00 UTC.
-		$expected = ( new \DateTimeImmutable( $gmt_date, new \DateTimeZone( 'UTC' ) ) )->getTimestamp();
-
-		$this->assertEquals( $expected, $timestamp );
-	}
-
-	/**
-	 * Test that get_comment_date_gmt with 'G' format returns correct timestamp.
-	 */
-	public function test_get_comment_date_gmt_with_g_format_returns_correct_timestamp(): void {
-		$gmt_date = '2024-12-25 08:00:00';
-		$comment  = self::factory()->comment->create_and_get(
-			array(
-				'comment_date_gmt' => $gmt_date,
-			)
-		);
-
-		$entry     = new WPCOM_Liveblog_Entry( $comment );
-		$timestamp = $entry->get_comment_date_gmt( 'G', $comment->comment_ID );
-
-		$expected = ( new \DateTimeImmutable( $gmt_date, new \DateTimeZone( 'UTC' ) ) )->getTimestamp();
-
-		$this->assertEquals( $expected, $timestamp );
-	}
-
-	/**
-	 * Test that get_comment_date_gmt still works with other formats.
-	 */
-	public function test_get_comment_date_gmt_with_date_format_returns_formatted_string(): void {
-		$gmt_date = '2024-06-15 14:30:00';
-		$comment  = self::factory()->comment->create_and_get(
-			array(
-				'comment_date_gmt' => $gmt_date,
-			)
-		);
-
-		$entry = new WPCOM_Liveblog_Entry( $comment );
-		$date  = $entry->get_comment_date_gmt( 'Y-m-d', $comment->comment_ID );
-
-		$this->assertEquals( '2024-06-15', $date );
+	private function create_user(): \WP_User {
+		return self::factory()->user->create_and_get();
 	}
 
 	/**
@@ -323,7 +216,7 @@ final class EntryTest extends TestCase {
 		remove_all_filters( 'liveblog_image_allowed_attributes' );
 
 		$content  = '<p>Text</p><img src="test.jpg" alt="Test" class="wp-image" width="100" height="50" data-id="123">';
-		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+		$filtered = $this->content_processor->filter_image_attributes( $content );
 
 		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
 		$this->assertStringContainsString( 'alt="Test"', $filtered );
@@ -346,7 +239,7 @@ final class EntryTest extends TestCase {
 		);
 
 		$content  = '<img src="test.jpg" alt="Test" class="wp-image" width="100" height="50" data-id="123">';
-		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+		$filtered = $this->content_processor->filter_image_attributes( $content );
 
 		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
 		$this->assertStringContainsString( 'alt="Test"', $filtered );
@@ -370,7 +263,7 @@ final class EntryTest extends TestCase {
 		);
 
 		$content  = '<img src="test.jpg" alt="Test" class="wp-image" data-id="123" data-size="large">';
-		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+		$filtered = $this->content_processor->filter_image_attributes( $content );
 
 		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
 		$this->assertStringContainsString( 'alt="Test"', $filtered );
@@ -388,10 +281,10 @@ final class EntryTest extends TestCase {
 		add_filter( 'liveblog_image_allowed_attributes', fn() => array( '*' ) );
 
 		$content  = '<img src="test.jpg" alt="Test" class="wp-image" width="100" data-id="123">';
-		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+		$filtered = $this->content_processor->filter_image_attributes( $content );
 
 		// Content should be unchanged.
-		$this->assertEquals( $content, $filtered );
+		$this->assertSame( $content, $filtered );
 
 		remove_all_filters( 'liveblog_image_allowed_attributes' );
 	}
@@ -404,7 +297,7 @@ final class EntryTest extends TestCase {
 		remove_all_filters( 'liveblog_image_allowed_attributes' );
 
 		$content  = '<img src="one.jpg" alt="One" class="first"><p>Text</p><img src="two.jpg" alt="Two" width="200">';
-		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( $content );
+		$filtered = $this->content_processor->filter_image_attributes( $content );
 
 		$this->assertStringContainsString( 'src="one.jpg"', $filtered );
 		$this->assertStringContainsString( 'alt="One"', $filtered );
@@ -415,15 +308,28 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
-	 * Create and get a comment with replaces meta.
-	 *
-	 * @param int   $replaces The replaces value.
-	 * @param array $args     Arguments for comment.
-	 * @return object
+	 * Test entry replaces property is set from meta.
 	 */
-	private function create_and_get_comment_with_replaces( int $replaces, array $args = array() ): object {
-		$comment = self::factory()->comment->create_and_get( $args );
-		add_comment_meta( $comment->comment_ID, WPCOM_Liveblog_Entry::REPLACES_META_KEY, $replaces );
-		return $comment;
+	public function test_entry_replaces_is_set_from_meta(): void {
+		// Create original entry.
+		$original = $this->insert_entry();
+		// Update creates a new entry that replaces the original.
+		$update_id = $this->entry_service->update(
+			1,
+			$original->id(),
+			'updated content',
+			$this->create_user()
+		);
+		$updated = $this->repository->get_entry( $update_id );
+		$this->assertNotNull( $updated->replaces() );
+		$this->assertSame( $original->id()->to_int(), $updated->replaces()->to_int() );
+	}
+
+	/**
+	 * Test entry replaces is null for new entries.
+	 */
+	public function test_entry_replaces_is_null_for_new_entries(): void {
+		$entry = $this->insert_entry();
+		$this->assertNull( $entry->replaces() );
 	}
 }

@@ -5,6 +5,11 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\DI\Container;
+
 /**
  * Class WPCOM_Liveblog_AMP
  *
@@ -18,7 +23,7 @@ class WPCOM_Liveblog_AMP {
 	const AMP_UPDATE_QUERY_VAR = 'amp_latest_update_time';
 
 	/**
-	 * Called by WPCOM_Liveblog::load() to initialize AMP support.
+	 * Called by PluginBootstrapper::init_legacy_classes() to initialize AMP support.
 	 *
 	 * @return void
 	 */
@@ -46,15 +51,16 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		// If we're not on a liveblog, then bail.
-		if ( ! WPCOM_Liveblog::is_liveblog_post() ) {
+		$liveblog_post = LiveblogPost::from_id( get_the_ID() );
+		if ( null === $liveblog_post || ! $liveblog_post->is_liveblog() ) {
 			return;
 		}
 
 		// Remove the standard Liveblog markup which just a <div> for React to render.
-		remove_filter( 'the_content', array( 'WPCOM_Liveblog', 'add_liveblog_to_content' ), 20 );
+		remove_filter( 'the_content', array( Container::instance()->template_renderer(), 'filter_the_content' ) );
 
 		// Remove standard Liveblog scripts as custom JS is not required for AMP.
-		remove_action( 'wp_enqueue_scripts', array( 'WPCOM_Liveblog', 'enqueue_scripts' ) );
+		remove_action( 'wp_enqueue_scripts', array( Container::instance()->asset_manager(), 'maybe_enqueue_frontend_scripts' ) );
 
 		// Add Liveblog to Schema.
 		add_filter( 'amp_post_template_metadata', array( __CLASS__, 'append_liveblog_to_metadata' ), 10, 2 );
@@ -147,7 +153,7 @@ class WPCOM_Liveblog_AMP {
 	public static function enqueue_styles() {
 		/** This filter is documented in liveblog.php */
 		if ( apply_filters( 'liveblog_load_default_styles', true ) ) {
-			wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'build/amp.css', array(), WPCOM_Liveblog::VERSION );
+			wp_enqueue_style( 'liveblog', plugin_dir_url( __DIR__ ) . 'build/amp.css', array(), LiveblogConfiguration::VERSION );
 		}
 	}
 
@@ -161,11 +167,12 @@ class WPCOM_Liveblog_AMP {
 		global $post;
 
 		// If we are not viewing a liveblog post then exist the filter.
-		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+		$liveblog_post = LiveblogPost::from_post( $post );
+		if ( ! $liveblog_post->is_liveblog() ) {
 			return;
 		}
 
-		$request = WPCOM_Liveblog::get_request_data();
+		$request = Container::instance()->request_router()->get_request_data();
 
 		// If no entry id set then not on single entry.
 		if ( false === $request->id ) {
@@ -173,7 +180,7 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		$entry       = self::get_entry( $request->id, $post->ID );
-		$title       = WPCOM_Liveblog_Entry::get_entry_title( $entry );
+		$title       = \Automattic\Liveblog\Application\Presenter\EntryPresenter::get_entry_title( $entry );
 		$description = wp_strip_all_tags( $entry->content );
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
@@ -221,13 +228,10 @@ class WPCOM_Liveblog_AMP {
 	 * @return array           Updated Meta
 	 */
 	public static function append_liveblog_to_metadata( $metadata, $post ) {
-
 		// Only append metadata to Liveblogs.
-		if ( false !== WPCOM_Liveblog::is_liveblog_post( $post->ID ) ) {
-			/**
-			 * This filter is documented in liveblog.php
-			 */
-			$metadata = WPCOM_Liveblog::get_liveblog_metadata( $metadata, $post );
+		$liveblog_post = LiveblogPost::from_post( $post );
+		if ( $liveblog_post->is_liveblog() ) {
+			$metadata = Container::instance()->metadata_presenter()->generate( $post, $metadata );
 		}
 
 		return $metadata;
@@ -242,11 +246,13 @@ class WPCOM_Liveblog_AMP {
 	public static function append_liveblog_to_content( $content ) {
 		global $post;
 
-		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+		$liveblog_post = LiveblogPost::from_post( $post );
+		if ( ! $liveblog_post->is_liveblog() ) {
 			return $content;
 		}
 
-		$request = WPCOM_Liveblog::get_request_data();
+		$router  = Container::instance()->request_router();
+		$request = $router->get_request_data();
 
 		// If AMP Polling request don't restrict content so it knows there is updates are available.
 		if ( self::is_amp_polling() ) {
@@ -254,13 +260,14 @@ class WPCOM_Liveblog_AMP {
 		}
 
 		if ( $request->id ) {
-			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
+			$entries  = $router->get_entries_paged( $post->ID, 1, null, (int) $request->id );
 			$request  = self::set_request_last_from_entries( $entries, $request );
-			$content .= self::build_single_entry( $entries, $request, $post->post_id );
+			$content .= self::build_single_entry( $entries, $request, $post->ID );
 		} else {
-			$entries  = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
-			$request  = self::set_request_last_from_entries( $entries, $request );
-			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
+			$last_entry = $request->last ? (string) $request->last : null;
+			$entries    = $router->get_entries_paged( $post->ID, (int) $request->page, $last_entry );
+			$request    = self::set_request_last_from_entries( $entries, $request );
+			$content   .= self::build_entries_feed( $entries, $request, $post->ID );
 		}
 
 		return $content;
@@ -329,7 +336,7 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function get_entry( $id, $post_id, $entries = false ) {
 		if ( false === $entries ) {
-			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $id );
+			$entries = Container::instance()->request_router()->get_entries_paged( $post_id, 1, null, (int) $id );
 		}
 
 		$entries['entries'] = self::filter_entries( $entries['entries'], $post_id );
@@ -360,7 +367,7 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function build_entries_feed( $entries, $request, $post_id ) {
 		// AMP live-list requires a minimum poll interval of 15 seconds.
-		$refresh_interval = max( self::AMP_MIN_REFRESH_INTERVAL, WPCOM_Liveblog::get_refresh_interval() );
+		$refresh_interval = max( self::AMP_MIN_REFRESH_INTERVAL, LiveblogConfiguration::get_refresh_interval() * 1000 );
 
 		$rendered = self::get_template(
 			'feed',

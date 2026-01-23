@@ -94,8 +94,4 @@ if ( $is_integration ) {
 
 	// Load WordPress function stubs (in global namespace).
 	require_once __DIR__ . '/Unit/wp-stubs.php';
-
-	// Load plugin classes needed for unit tests.
-	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry.php';
-	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
 }

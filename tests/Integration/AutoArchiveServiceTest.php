@@ -9,9 +9,9 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Service\AutoArchiveService;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog;
 
 /**
  * Integration tests for AutoArchiveService.
@@ -81,7 +81,7 @@ final class AutoArchiveServiceTest extends TestCase {
 
 		// Create a liveblog post with expired date.
 		$post_id = self::factory()->post->create();
-		update_post_meta( $post_id, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $post_id, LiveblogConfiguration::KEY, 'enable' );
 
 		$yesterday = strtotime( '-1 day' );
 		update_post_meta( $post_id, AutoArchiveService::EXPIRY_META_KEY, $yesterday );
@@ -89,7 +89,7 @@ final class AutoArchiveServiceTest extends TestCase {
 		$archived_count = $service->execute_housekeeping();
 
 		$this->assertSame( 1, $archived_count );
-		$this->assertSame( 'archive', get_post_meta( $post_id, WPCOM_Liveblog::KEY, true ) );
+		$this->assertSame( 'archive', get_post_meta( $post_id, LiveblogConfiguration::KEY, true ) );
 	}
 
 	/**
@@ -102,7 +102,7 @@ final class AutoArchiveServiceTest extends TestCase {
 
 		// Create a liveblog post with future expiry.
 		$post_id = self::factory()->post->create();
-		update_post_meta( $post_id, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $post_id, LiveblogConfiguration::KEY, 'enable' );
 
 		$tomorrow = strtotime( '+1 day' );
 		update_post_meta( $post_id, AutoArchiveService::EXPIRY_META_KEY, $tomorrow );
@@ -110,7 +110,7 @@ final class AutoArchiveServiceTest extends TestCase {
 		$archived_count = $service->execute_housekeeping();
 
 		$this->assertSame( 0, $archived_count );
-		$this->assertSame( 'enable', get_post_meta( $post_id, WPCOM_Liveblog::KEY, true ) );
+		$this->assertSame( 'enable', get_post_meta( $post_id, LiveblogConfiguration::KEY, true ) );
 	}
 
 	/**
@@ -126,23 +126,23 @@ final class AutoArchiveServiceTest extends TestCase {
 
 		// Create expired liveblog.
 		$expired_post = self::factory()->post->create();
-		update_post_meta( $expired_post, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $expired_post, LiveblogConfiguration::KEY, 'enable' );
 		update_post_meta( $expired_post, AutoArchiveService::EXPIRY_META_KEY, $yesterday );
 
 		// Create non-expired liveblog.
 		$active_post = self::factory()->post->create();
-		update_post_meta( $active_post, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $active_post, LiveblogConfiguration::KEY, 'enable' );
 		update_post_meta( $active_post, AutoArchiveService::EXPIRY_META_KEY, $tomorrow );
 
 		// Create liveblog without expiry.
 		$no_expiry_post = self::factory()->post->create();
-		update_post_meta( $no_expiry_post, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $no_expiry_post, LiveblogConfiguration::KEY, 'enable' );
 
 		$archived_count = $service->execute_housekeeping();
 
 		$this->assertSame( 1, $archived_count );
-		$this->assertSame( 'archive', get_post_meta( $expired_post, WPCOM_Liveblog::KEY, true ) );
-		$this->assertSame( 'enable', get_post_meta( $active_post, WPCOM_Liveblog::KEY, true ) );
-		$this->assertSame( 'enable', get_post_meta( $no_expiry_post, WPCOM_Liveblog::KEY, true ) );
+		$this->assertSame( 'archive', get_post_meta( $expired_post, LiveblogConfiguration::KEY, true ) );
+		$this->assertSame( 'enable', get_post_meta( $active_post, LiveblogConfiguration::KEY, true ) );
+		$this->assertSame( 'enable', get_post_meta( $no_expiry_post, LiveblogConfiguration::KEY, true ) );
 	}
 }

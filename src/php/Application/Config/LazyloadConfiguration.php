@@ -9,7 +9,8 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Config;
 
-use WPCOM_Liveblog;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 
 /**
  * Configuration for lazy loading liveblog entries.
@@ -78,7 +79,8 @@ final class LazyloadConfiguration {
 			$this->enabled = (bool) apply_filters( 'liveblog_enable_lazyloader', true );
 
 			// Disable lazy loading on archived liveblogs.
-			if ( 'enable' !== WPCOM_Liveblog::get_liveblog_state() ) {
+			$liveblog_post = LiveblogPost::from_id( (int) get_the_ID() );
+			if ( null === $liveblog_post || ! $liveblog_post->is_enabled() ) {
 				$this->enabled = false;
 			}
 		}
@@ -184,7 +186,7 @@ final class LazyloadConfiguration {
 	 */
 	public function render_deprecated_plugin_notice(): void {
 		echo wp_kses_post(
-			WPCOM_Liveblog::get_template_part(
+			Container::instance()->template_renderer()->render(
 				'lazyload-notice.php',
 				array(
 					'plugin' => 'Lazyload Liveblog Entries',

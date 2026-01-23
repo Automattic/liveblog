@@ -10,7 +10,8 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Application\Service;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
-use WPCOM_Liveblog;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 
 /**
  * Handles the [liveblog_key_events] shortcode.
@@ -79,33 +80,19 @@ final class KeyEventShortcodeHandler {
 		);
 
 		// Only run the shortcode on an archived or enabled post.
-		$state = WPCOM_Liveblog::get_liveblog_state( $post->ID );
-		if ( ! $state ) {
+		$liveblog_post = LiveblogPost::from_post( $post );
+		if ( ! $liveblog_post->is_liveblog() ) {
 			return null;
-		}
-
-		// Get the limit from post meta.
-		$limit = $this->configuration->get_current_limit( $post->ID );
-
-		// Get key events using the service.
-		$entries = $this->key_event_service->get_key_events( $post->ID, $limit );
-
-		// Convert domain entries to legacy format for template compatibility.
-		$legacy_entries = array();
-		foreach ( $entries as $entry ) {
-			$legacy_entries[] = \WPCOM_Liveblog_Entry::from_comment(
-				get_comment( $entry->id()->to_int() )
-			);
 		}
 
 		// Get template configuration.
 		$template = $this->configuration->get_current_template( $post->ID );
 
 		// Render using the existing template system.
-		return WPCOM_Liveblog::get_template_part(
+		// Note: The template renders a container div; key events are loaded via JS.
+		return Container::instance()->template_renderer()->render(
 			'liveblog-key-events.php',
 			array(
-				'entries'  => $legacy_entries,
 				'title'    => $atts['title'],
 				'template' => $template[0],
 				'wrap'     => $template[1],
@@ -121,7 +108,7 @@ final class KeyEventShortcodeHandler {
 	 * @return string The admin options HTML.
 	 */
 	public function get_admin_options( int $post_id ): string {
-		return WPCOM_Liveblog::get_template_part(
+		return Container::instance()->template_renderer()->render(
 			'liveblog-key-admin.php',
 			array(
 				'current_key_template' => get_post_meta( $post_id, KeyEventConfiguration::META_KEY_TEMPLATE, true ),

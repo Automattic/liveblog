@@ -11,6 +11,8 @@ namespace Automattic\Liveblog\Tests\Unit\Application\Presenter;
 
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
+use Automattic\Liveblog\Application\Service\EntryQueryService;
+use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\ValueObject\Author;
 use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
@@ -36,10 +38,11 @@ final class EntryPresenterTest extends TestCase {
 	public function test_for_json_returns_expected_structure(): void {
 		$this->setup_wordpress_mocks();
 
-		$entry     = $this->create_entry();
-		$comment   = $this->create_mock_comment();
-		$renderer  = $this->create_mock_renderer( '<p>Rendered content</p>' );
-		$presenter = new EntryPresenter( $entry, $comment, $renderer );
+		$entry             = $this->create_entry();
+		$key_event_service = $this->create_mock_key_event_service();
+		$comment           = $this->create_mock_comment();
+		$renderer          = $this->create_mock_renderer( '<p>Rendered content</p>' );
+		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
 
 		$json = $presenter->for_json();
 
@@ -70,9 +73,10 @@ final class EntryPresenterTest extends TestCase {
 			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
 		);
 
-		$comment   = $this->create_mock_comment();
-		$renderer  = $this->create_mock_renderer( '<p>Updated</p>' );
-		$presenter = new EntryPresenter( $entry, $comment, $renderer );
+		$key_event_service = $this->create_mock_key_event_service();
+		$comment           = $this->create_mock_comment();
+		$renderer          = $this->create_mock_renderer( '<p>Updated</p>' );
+		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
 
 		$json = $presenter->for_json();
 
@@ -86,8 +90,9 @@ final class EntryPresenterTest extends TestCase {
 	public function test_renderer_called_with_correct_arguments(): void {
 		$this->setup_wordpress_mocks();
 
-		$entry   = $this->create_entry();
-		$comment = $this->create_mock_comment();
+		$entry             = $this->create_entry();
+		$key_event_service = $this->create_mock_key_event_service();
+		$comment           = $this->create_mock_comment();
 
 		$renderer = Mockery::mock( ContentRendererInterface::class );
 		$renderer->shouldReceive( 'render' )
@@ -95,7 +100,7 @@ final class EntryPresenterTest extends TestCase {
 			->with( 'Test content', $comment )
 			->andReturn( '<p>Rendered</p>' );
 
-		$presenter = new EntryPresenter( $entry, $comment, $renderer );
+		$presenter = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
 		$presenter->for_json();
 
 		// Mockery verifies the expectation automatically.
@@ -129,9 +134,10 @@ final class EntryPresenterTest extends TestCase {
 			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
 		);
 
-		$comment   = $this->create_mock_comment();
-		$renderer  = $this->create_mock_renderer( '<p>Test</p>' );
-		$presenter = new EntryPresenter( $entry, $comment, $renderer );
+		$key_event_service = $this->create_mock_key_event_service();
+		$comment           = $this->create_mock_comment();
+		$renderer          = $this->create_mock_renderer( '<p>Test</p>' );
+		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
 
 		$json = $presenter->for_json();
 
@@ -145,10 +151,11 @@ final class EntryPresenterTest extends TestCase {
 	 */
 	public function test_entry_type_values(): void {
 		$this->setup_wordpress_mocks();
+		$key_event_service = $this->create_mock_key_event_service();
 
 		// New entry.
 		$new_entry  = $this->create_entry();
-		$presenter1 = new EntryPresenter( $new_entry, $this->create_mock_comment(), $this->create_mock_renderer() );
+		$presenter1 = new EntryPresenter( $new_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
 		$this->assertSame( 'new', $presenter1->for_json()->type );
 
 		// Update entry.
@@ -161,7 +168,7 @@ final class EntryPresenterTest extends TestCase {
 			EntryId::from_int( 100 ),
 			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
 		);
-		$presenter2   = new EntryPresenter( $update_entry, $this->create_mock_comment(), $this->create_mock_renderer() );
+		$presenter2   = new EntryPresenter( $update_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
 		$this->assertSame( 'update', $presenter2->for_json()->type );
 
 		// Delete entry.
@@ -174,7 +181,7 @@ final class EntryPresenterTest extends TestCase {
 			EntryId::from_int( 100 ),
 			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
 		);
-		$presenter3   = new EntryPresenter( $delete_entry, $this->create_mock_comment(), $this->create_mock_renderer() );
+		$presenter3   = new EntryPresenter( $delete_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
 		$this->assertSame( 'delete', $presenter3->for_json()->type );
 	}
 
@@ -233,6 +240,30 @@ final class EntryPresenterTest extends TestCase {
 		$renderer->shouldReceive( 'render' )->andReturn( $output );
 
 		return $renderer;
+	}
+
+	/**
+	 * Create a stub key event service for testing.
+	 *
+	 * Since KeyEventService is final and cannot be mocked directly,
+	 * we create the real service with mocked dependencies and stub the
+	 * underlying WordPress function.
+	 *
+	 * @param bool $is_key_event Whether the entry is a key event.
+	 * @return KeyEventService
+	 */
+	private function create_mock_key_event_service( bool $is_key_event = false ): KeyEventService {
+		// Mock the underlying WordPress function that KeyEventService::is_key_event() uses.
+		Functions\expect( 'get_comment_meta' )
+			->andReturn( $is_key_event ? 'true' : '' );
+
+		// Create the real service using interfaces which can be mocked.
+		$repository = Mockery::mock( \Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface::class );
+
+		// Create a real EntryQueryService instance with the mocked repository.
+		$query_service = new EntryQueryService( $repository );
+
+		return new KeyEventService( $repository, $query_service );
 	}
 
 	/**

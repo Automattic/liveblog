@@ -9,16 +9,19 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
-use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog;
-use WPCOM_Liveblog_Entry;
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Application\Service\EntryService;
+use Automattic\Liveblog\Domain\ValueObject\EntryId;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 
 /**
  * Schema metadata test case.
  *
+ * @coversDefaultClass \Automattic\Liveblog\Application\Presenter\MetadataPresenter
+ *
  * phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Schema.org properties use camelCase.
  */
-final class SchemaMetadataTest extends TestCase {
+final class SchemaMetadataTest extends IntegrationTestCase {
 
 	/**
 	 * Post ID for testing.
@@ -28,19 +31,19 @@ final class SchemaMetadataTest extends TestCase {
 	private int $post_id;
 
 	/**
+	 * Entry service.
+	 *
+	 * @var EntryService
+	 */
+	private EntryService $entry_service;
+
+	/**
 	 * Set up test fixtures.
 	 */
 	public function set_up(): void {
 		parent::set_up();
 
-		// Reset static properties to ensure clean state.
-		WPCOM_Liveblog::$is_rest_api_call     = false;
-		WPCOM_Liveblog::$supported_post_types = array( 'post' );
-
-		// Reset private static properties using reflection.
-		$entry_query = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
-		$entry_query->setAccessible( true );
-		$entry_query->setValue( null, null );
+		$this->entry_service = $this->container()->entry_service();
 
 		// Create a post and enable liveblog.
 		$this->post_id = self::factory()->post->create(
@@ -52,45 +55,29 @@ final class SchemaMetadataTest extends TestCase {
 		);
 
 		// Enable liveblog on the post.
-		update_post_meta( $this->post_id, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $this->post_id, LiveblogConfiguration::KEY, 'enable' );
 
 		// Simulate viewing the single post (required for is_singular() checks).
 		$this->go_to( get_permalink( $this->post_id ) );
-
-		// Set the static post_id on WPCOM_Liveblog.
-		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'post_id' );
-		$reflection->setAccessible( true );
-		$reflection->setValue( null, $this->post_id );
 	}
 
 	/**
 	 * Tear down test fixtures.
 	 */
 	public function tear_down(): void {
-		// Reset static properties.
-		WPCOM_Liveblog::$is_rest_api_call     = false;
-		WPCOM_Liveblog::$supported_post_types = array( 'post' );
-
-		// Reset the static post_id on WPCOM_Liveblog.
-		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'post_id' );
-		$reflection->setAccessible( true );
-		$reflection->setValue( null, null );
-
-		// Reset the static entry_query to ensure fresh queries per test.
-		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
-		$reflection->setAccessible( true );
-		$reflection->setValue( null, null );
-
 		parent::tear_down();
 	}
 
 	/**
 	 * Test that metadata includes required @context property.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_metadata_includes_context(): void {
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( '@context', $metadata );
 		$this->assertEquals( 'https://schema.org', $metadata['@context'] );
@@ -98,11 +85,14 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that metadata type is LiveBlogPosting.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_metadata_type_is_live_blog_posting(): void {
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( '@type', $metadata );
 		$this->assertEquals( 'LiveBlogPosting', $metadata['@type'] );
@@ -110,11 +100,14 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that metadata includes headline from post title.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_metadata_includes_headline(): void {
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'headline', $metadata );
 		$this->assertEquals( 'Test Liveblog', $metadata['headline'] );
@@ -122,47 +115,59 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that metadata includes coverageStartTime.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_metadata_includes_coverage_start_time(): void {
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'coverageStartTime', $metadata );
 	}
 
 	/**
 	 * Test that coverageEndTime is not present when liveblog is active.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_coverage_end_time_not_present_when_active(): void {
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayNotHasKey( 'coverageEndTime', $metadata );
 	}
 
 	/**
 	 * Test that coverageEndTime is present when liveblog is archived.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_coverage_end_time_present_when_archived(): void {
 		// Archive the liveblog.
-		update_post_meta( $this->post_id, WPCOM_Liveblog::KEY, 'archive' );
+		update_post_meta( $this->post_id, LiveblogConfiguration::KEY, 'archive' );
 
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'coverageEndTime', $metadata );
 	}
 
 	/**
 	 * Test that entry articleBody contains actual text content.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_entry_article_body_contains_text(): void {
 		$this->insert_entry( array( 'content' => '<p>This is test content</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'] );
 		$entry = $metadata['liveBlogUpdate'][0];
@@ -173,11 +178,14 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that /key command is stripped from articleBody.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_key_command_stripped_from_article_body(): void {
 		$this->insert_entry( array( 'content' => '<p>/key Breaking news!</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -189,11 +197,14 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that /key span is stripped from articleBody.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_key_span_stripped_from_article_body(): void {
 		$this->insert_entry( array( 'content' => '<p><span class="liveblog-command type-key">key</span> Breaking news!</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -205,11 +216,14 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that HTML tags are replaced with spaces to preserve word boundaries.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_html_tags_replaced_with_spaces(): void {
 		$this->insert_entry( array( 'content' => '<ul><li>First</li><li>Second</li></ul>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -223,12 +237,15 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that entries with empty content are skipped.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_empty_entries_are_skipped(): void {
 		$this->insert_entry( array( 'content' => '<p></p>' ) );
 		$this->insert_entry( array( 'content' => '<p>Actual content</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		// Only the non-empty entry should be present.
@@ -237,6 +254,8 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that multiple authors are listed as array.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_multiple_authors_listed_as_array(): void {
 		// Create users.
@@ -244,17 +263,18 @@ final class SchemaMetadataTest extends TestCase {
 		$user2 = self::factory()->user->create_and_get( array( 'display_name' => 'Author Two' ) );
 
 		// Insert entry with contributor.
-		$entry = $this->insert_entry(
+		$entry_id = $this->insert_entry(
 			array(
 				'content' => '<p>Multi-author entry</p>',
 				'user'    => $user1,
 			)
 		);
 
-		// Add contributor meta (using the correct meta key from WPCOM_Liveblog_Entry::CONTRIBUTORS_META_KEY).
-		add_comment_meta( $entry->get_id(), 'liveblog_contributors', array( $user2->ID ) );
+		// Add contributor meta.
+		add_comment_meta( $entry_id->to_int(), 'liveblog_contributors', array( $user2->ID ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -267,6 +287,8 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that single author is object not array.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_single_author_is_object(): void {
 		$user = self::factory()->user->create_and_get( array( 'display_name' => 'Single Author' ) );
@@ -278,7 +300,8 @@ final class SchemaMetadataTest extends TestCase {
 			)
 		);
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -291,11 +314,14 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that entry type is BlogPosting.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_entry_type_is_blog_posting(): void {
 		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -306,12 +332,15 @@ final class SchemaMetadataTest extends TestCase {
 
 	/**
 	 * Test that headline is truncated from content.
+	 *
+	 * @covers ::generate
 	 */
 	public function test_headline_is_truncated(): void {
 		$long_content = '<p>This is a very long piece of content that should be truncated when used as a headline because it exceeds the word limit.</p>';
 		$this->insert_entry( array( 'content' => $long_content ) );
 
-		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
 
 		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
 		$this->assertNotEmpty( $metadata['liveBlogUpdate'], 'liveBlogUpdate should not be empty' );
@@ -325,27 +354,12 @@ final class SchemaMetadataTest extends TestCase {
 	 * Insert a liveblog entry.
 	 *
 	 * @param array $args Arguments for entry.
-	 * @return WPCOM_Liveblog_Entry
+	 * @return EntryId The entry ID.
 	 */
-	private function insert_entry( array $args = array() ): WPCOM_Liveblog_Entry {
-		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( $args ) );
-		return $entry;
-	}
+	private function insert_entry( array $args = array() ): EntryId {
+		$user    = $args['user'] ?? self::factory()->user->create_and_get();
+		$content = $args['content'] ?? 'Default content';
 
-	/**
-	 * Build entry args.
-	 *
-	 * @param array $args Arguments to merge.
-	 * @return array
-	 */
-	private function build_entry_args( array $args = array() ): array {
-		$user     = $args['user'] ?? self::factory()->user->create_and_get();
-		$defaults = array(
-			'post_id'   => $this->post_id,
-			'content'   => 'Default content',
-			'user'      => $user,
-			'author_id' => $user->ID, // Required for 2.x to not mark entry as authorless.
-		);
-		return array_merge( $defaults, $args );
+		return $this->entry_service->create( $this->post_id, $content, $user );
 	}
 }

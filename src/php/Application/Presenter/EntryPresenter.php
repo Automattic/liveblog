@@ -11,10 +11,11 @@ namespace Automattic\Liveblog\Application\Presenter;
 
 use Automattic\Liveblog\Application\Config\AllowedTagsConfiguration;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
+use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
-use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\DI\Container;
-use WPCOM_Liveblog;
+use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use WP_Comment;
 
 /**
@@ -59,20 +60,30 @@ final class EntryPresenter {
 	private ContentRendererInterface $renderer;
 
 	/**
+	 * Key event service for checking key event status.
+	 *
+	 * @var KeyEventService
+	 */
+	private KeyEventService $key_event_service;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param Entry                         $entry    The entry to present.
-	 * @param WP_Comment|null               $comment  Optional comment for additional WordPress data.
-	 * @param ContentRendererInterface|null $renderer Optional content renderer (defaults to WordPress renderer).
+	 * @param Entry                         $entry             The entry to present.
+	 * @param KeyEventService               $key_event_service Service for key event operations.
+	 * @param WP_Comment|null               $comment           Optional comment for additional WordPress data.
+	 * @param ContentRendererInterface|null $renderer          Optional content renderer (defaults to WordPress renderer).
 	 */
 	public function __construct(
 		Entry $entry,
+		KeyEventService $key_event_service,
 		?WP_Comment $comment = null,
 		?ContentRendererInterface $renderer = null
 	) {
-		$this->entry    = $entry;
-		$this->comment  = $comment;
-		$this->renderer = $renderer ?? new WordPressContentRenderer();
+		$this->entry             = $entry;
+		$this->key_event_service = $key_event_service;
+		$this->comment           = $comment;
+		$this->renderer          = $renderer ?? new WordPressContentRenderer();
 	}
 
 	/**
@@ -80,13 +91,18 @@ final class EntryPresenter {
 	 *
 	 * Fetches the comment automatically and uses the default WordPress renderer.
 	 *
-	 * @param Entry $entry The entry to present.
+	 * @param Entry           $entry             The entry to present.
+	 * @param KeyEventService $key_event_service Service for key event operations.
 	 * @return self
 	 */
-	public static function from_entry( Entry $entry ): self {
+	public static function from_entry( Entry $entry, KeyEventService $key_event_service ): self {
 		$comment = get_comment( $entry->id()->to_int() );
 
-		return new self( $entry, $comment instanceof WP_Comment ? $comment : null );
+		return new self(
+			$entry,
+			$key_event_service,
+			$comment instanceof WP_Comment ? $comment : null
+		);
 	}
 
 	/**
@@ -153,7 +169,7 @@ final class EntryPresenter {
 			'timestamp'              => $this->entry->timestamp(),
 			'share_link'             => $this->get_share_link( $entry_id, 'liveblog-entry-' ),
 			'key_event'              => $this->is_key_event( $entry_id ),
-			'is_liveblog_editable'   => WPCOM_Liveblog::is_liveblog_editable(),
+			'is_liveblog_editable'   => self::is_liveblog_editable( $this->entry->post_id() ),
 			'allowed_tags_for_entry' => AllowedTagsConfiguration::get(),
 		);
 	}
@@ -164,7 +180,7 @@ final class EntryPresenter {
 	 * @return string
 	 */
 	public function render(): string {
-		return WPCOM_Liveblog::get_template_part( 'liveblog-single-entry.php', $this->for_render() );
+		return Container::instance()->template_renderer()->render( 'liveblog-single-entry.php', $this->for_render() );
 	}
 
 	/**
@@ -267,7 +283,7 @@ final class EntryPresenter {
 		}
 
 		if ( $this->comment ) {
-			return WPCOM_Liveblog::get_avatar( $this->comment->comment_author_email, $size );
+			return get_avatar( $this->comment->comment_author_email, $size );
 		}
 
 		return '';
@@ -309,6 +325,50 @@ final class EntryPresenter {
 	 * @return bool
 	 */
 	private function is_key_event( int $entry_id ): bool {
-		return Container::instance()->key_event_service()->is_key_event( $entry_id );
+		return $this->key_event_service->is_key_event( $entry_id );
+	}
+
+	/**
+	 * Get a truncated title from entry content.
+	 *
+	 * Static helper for generating titles from entry content.
+	 * Works with domain Entry objects or any object with a 'content' property.
+	 *
+	 * @param Entry|object $entry The entry object.
+	 * @return string The truncated title (max 10 words).
+	 */
+	public static function get_entry_title( $entry ): string {
+		$content = $entry instanceof Entry
+			? $entry->content()->raw()
+			: ( $entry->content ?? '' );
+
+		return wp_trim_words( $content, 10, '…' );
+	}
+
+	/**
+	 * Check if the liveblog is editable by the current user.
+	 *
+	 * Static helper that can be used without instantiating the presenter.
+	 * Checks if the post has an enabled liveblog and the user can edit it.
+	 *
+	 * @param int|null $post_id Optional post ID. Defaults to current post.
+	 * @return bool True if the current user can edit the liveblog.
+	 */
+	public static function is_liveblog_editable( ?int $post_id = null ): bool {
+		if ( null === $post_id ) {
+			$post_id = get_the_ID();
+		}
+
+		if ( ! $post_id ) {
+			return false;
+		}
+
+		$liveblog_post = LiveblogPost::from_id( $post_id );
+
+		if ( null === $liveblog_post ) {
+			return false;
+		}
+
+		return $liveblog_post->is_editable();
 	}
 }

@@ -5,6 +5,8 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+
 /**
  * The class responsible for adding WebSocket support
  * if the constant LIVEBLOG_USE_SOCKETIO is true and
@@ -135,8 +137,8 @@ class WPCOM_Liveblog_Socketio {
 		wp_enqueue_script(
 			$handle,
 			plugins_url( 'js/liveblog-socket.io.js', __DIR__ ),
-			array( 'jquery', 'socket.io', WPCOM_Liveblog::KEY ),
-			WPCOM_Liveblog::VERSION,
+			array( 'jquery', 'socket.io', LiveblogConfiguration::KEY ),
+			LiveblogConfiguration::VERSION,
 			true
 		);
 
@@ -167,7 +169,7 @@ class WPCOM_Liveblog_Socketio {
 	 */
 	public static function get_post_key( $post_id = null ) {
 		if ( is_null( $post_id ) ) {
-			$post_id = WPCOM_Liveblog::get_post_id();
+			$post_id = get_the_ID();
 		}
 
 		$post_key = wp_hash( $post_id . get_post_status( $post_id ), 'liveblog-socket' );
@@ -188,6 +190,10 @@ class WPCOM_Liveblog_Socketio {
 	 * @return bool
 	 */
 	public static function is_connected() {
+		if ( null === self::$redis_client ) {
+			return false;
+		}
+
 		return self::$redis_client->isConnected()
 				&& is_object( self::$emitter )
 				&& 'SocketIO\Emitter' === get_class( self::$emitter );

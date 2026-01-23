@@ -5,6 +5,8 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Application\Service\KeyEventShortcodeHandler;
+
 /**
  * Class WPCOM_Liveblog_Entry_Key_Events_Widget
  *
@@ -15,8 +17,29 @@
 class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 
 	/**
-	 * Called by WPCOM_Liveblog::load(), it attaches the
-	 * widget.
+	 * Injected shortcode handler.
+	 *
+	 * @var KeyEventShortcodeHandler|null
+	 */
+	private static ?KeyEventShortcodeHandler $shortcode_handler = null;
+
+	/**
+	 * Initialize the widget with the shortcode handler.
+	 *
+	 * This should be called from PluginBootstrapper instead of load().
+	 *
+	 * @param KeyEventShortcodeHandler $handler The shortcode handler.
+	 * @return void
+	 */
+	public static function init( KeyEventShortcodeHandler $handler ): void {
+		self::$shortcode_handler = $handler;
+		add_action( 'widgets_init', array( __CLASS__, 'widgets_init' ) );
+	}
+
+	/**
+	 * Attaches the widget.
+	 *
+	 * @deprecated Use init() instead with dependency injection.
 	 */
 	public static function load() {
 		add_action( 'widgets_init', array( __CLASS__, 'widgets_init' ) );
@@ -54,8 +77,12 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
-		$shortcode_handler = \Automattic\Liveblog\Infrastructure\DI\Container::instance()->key_event_shortcode_handler();
-		$shortcode_output  = $shortcode_handler->render( array( 'title' => false ) );
+		if ( null === self::$shortcode_handler ) {
+			// Widget not properly initialized - silently return.
+			return;
+		}
+
+		$shortcode_output = self::$shortcode_handler->render( array( 'title' => false ) );
 
 		if ( is_null( $shortcode_output ) ) {
 			// Don't display the widget if there are no key events to show.

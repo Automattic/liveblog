@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Service;
 
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+
 /**
  * Handles automatic archiving of liveblogs based on expiry dates.
  */
@@ -139,6 +141,9 @@ class AutoArchiveService {
 	 * @return void
 	 */
 	private function archive_liveblog( int $post_id ): void {
-		\WPCOM_Liveblog::set_liveblog_state( $post_id, 'archive' );
+		$liveblog_post = LiveblogPost::from_id( $post_id );
+		if ( null !== $liveblog_post ) {
+			$liveblog_post->archive();
+		}
 	}
 }

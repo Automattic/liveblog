@@ -5,6 +5,8 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+
 /*
  * Disable Socket support.
  */
@@ -30,7 +32,7 @@ add_action(
 	function () {
 
 		// No need to use an Ajax URL if we're using the REST API.
-		if ( WPCOM_Liveblog::use_rest_api() ) {
+		if ( LiveblogConfiguration::use_rest_api() ) {
 			return;
 		}
 

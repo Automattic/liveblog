@@ -5,6 +5,9 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\DI\Container;
+
 /**
  * Class used to decide whether to load or not
  * Socket.io support.
@@ -79,7 +82,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	public static function show_error_message( $message ) {
 		if ( current_user_can( 'manage_options' ) ) {
 			echo wp_kses_post(
-				WPCOM_Liveblog::get_template_part(
+				Container::instance()->template_renderer()->render(
 					'liveblog-socketio-error.php',
 					array( 'message' => $message )
 				)
@@ -147,7 +150,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 			$redis_client_connected = true;
 		}
 
-		return WPCOM_Liveblog::is_viewing_liveblog_post()
+		return LiveblogPost::is_viewing_liveblog_post()
 				&& self::is_socketio_constant_enabled()
 				&& ! self::is_php_too_old_for_socketio()
 				&& self::socketio_emitter_exists()

@@ -30,7 +30,10 @@
 	"autoload": {
 		"psr-4": {
 			"Automattic\\Liveblog\\": "src/php/"
-		}
+		},
+		"classmap": [
+			"classes/"
+		]
 	},
 	"autoload-dev": {
 		"psr-4": {

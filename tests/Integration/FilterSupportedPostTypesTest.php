@@ -9,17 +9,25 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog;
 
 /**
  * Tests for the liveblog_supported_post_types filter.
  *
- * @covers WPCOM_Liveblog::init
- * @covers WPCOM_Liveblog::is_viewing_liveblog_post
- * @covers WPCOM_Liveblog::get_liveblog_state
+ * @covers \Automattic\Liveblog\Application\Config\LiveblogConfiguration
+ * @covers \Automattic\Liveblog\Domain\Entity\LiveblogPost::is_viewing_liveblog_post
+ * @covers \Automattic\Liveblog\Domain\Entity\LiveblogPost::state
  */
 final class FilterSupportedPostTypesTest extends TestCase {
+
+	/**
+	 * Original supported post types to restore after tests.
+	 *
+	 * @var string[]
+	 */
+	private array $original_supported_types;
 
 	/**
 	 * Set up before each test.
@@ -27,9 +35,8 @@ final class FilterSupportedPostTypesTest extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		// Reset static properties that might be left over from other tests.
-		WPCOM_Liveblog::$is_rest_api_call = false;
-		WPCOM_Liveblog::$post_id          = null;
+		// Store original supported post types.
+		$this->original_supported_types = LiveblogConfiguration::get_supported_post_types();
 	}
 
 	/**
@@ -39,12 +46,8 @@ final class FilterSupportedPostTypesTest extends TestCase {
 		// Remove any filters added during tests.
 		remove_all_filters( 'liveblog_supported_post_types' );
 
-		// Reset supported post types to default.
-		WPCOM_Liveblog::$supported_post_types = array( 'post' );
-
-		// Reset static properties.
-		WPCOM_Liveblog::$is_rest_api_call = false;
-		WPCOM_Liveblog::$post_id          = null;
+		// Restore supported post types to original.
+		LiveblogConfiguration::set_supported_post_types( $this->original_supported_types );
 
 		parent::tear_down();
 	}
@@ -53,54 +56,14 @@ final class FilterSupportedPostTypesTest extends TestCase {
 	 * Test that post type is supported by default.
 	 */
 	public function test_post_type_supported_by_default(): void {
-		$this->assertTrue( post_type_supports( 'post', WPCOM_Liveblog::KEY ) );
+		$this->assertTrue( post_type_supports( 'post', LiveblogConfiguration::KEY ) );
 	}
 
 	/**
 	 * Test that page type is not supported by default.
 	 */
 	public function test_page_type_not_supported_by_default(): void {
-		$this->assertFalse( post_type_supports( 'page', WPCOM_Liveblog::KEY ) );
-	}
-
-	/**
-	 * Test that filter receives the correct default value.
-	 */
-	public function test_filter_receives_correct_default_value(): void {
-		$received_value = null;
-
-		add_filter(
-			'liveblog_supported_post_types',
-			function ( $post_types ) use ( &$received_value ) {
-				$received_value = $post_types;
-				return $post_types;
-			}
-		);
-
-		// Re-run init to trigger the filter.
-		WPCOM_Liveblog::init();
-
-		$this->assertIsArray( $received_value );
-		$this->assertContains( 'post', $received_value );
-	}
-
-	/**
-	 * Test that filter can add additional post types.
-	 */
-	public function test_filter_can_add_additional_post_types(): void {
-		add_filter(
-			'liveblog_supported_post_types',
-			function ( $post_types ) {
-				$post_types[] = 'page';
-				return $post_types;
-			}
-		);
-
-		// Re-run init to trigger the filter.
-		WPCOM_Liveblog::init();
-
-		$this->assertContains( 'page', WPCOM_Liveblog::$supported_post_types );
-		$this->assertTrue( post_type_supports( 'page', WPCOM_Liveblog::KEY ) );
+		$this->assertFalse( post_type_supports( 'page', LiveblogConfiguration::KEY ) );
 	}
 
 	/**
@@ -109,10 +72,7 @@ final class FilterSupportedPostTypesTest extends TestCase {
 	public function test_is_viewing_liveblog_post_uses_supported_types(): void {
 		// Create a page with liveblog enabled.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		update_post_meta( $page_id, WPCOM_Liveblog::KEY, 'enable' );
-
-		// Set the liveblog post ID.
-		WPCOM_Liveblog::$post_id = $page_id;
+		update_post_meta( $page_id, LiveblogConfiguration::KEY, 'enable' );
 
 		// Set the global post.
 		$GLOBALS['post'] = get_post( $page_id );
@@ -121,24 +81,21 @@ final class FilterSupportedPostTypesTest extends TestCase {
 		$this->go_to( get_permalink( $page_id ) );
 
 		// By default, pages are not supported, so should return false.
-		WPCOM_Liveblog::$supported_post_types = array( 'post' );
-		$this->assertFalse( WPCOM_Liveblog::is_viewing_liveblog_post() );
+		LiveblogConfiguration::set_supported_post_types( array( 'post' ) );
+		$this->assertFalse( LiveblogPost::is_viewing_liveblog_post() );
 
 		// Add page support.
-		WPCOM_Liveblog::$supported_post_types = array( 'post', 'page' );
-		$this->assertTrue( WPCOM_Liveblog::is_viewing_liveblog_post() );
+		LiveblogConfiguration::set_supported_post_types( array( 'post', 'page' ) );
+		$this->assertTrue( LiveblogPost::is_viewing_liveblog_post() );
 	}
 
 	/**
-	 * Test that get_liveblog_state uses supported post types.
+	 * Test that LiveblogPost::state() uses supported post types.
 	 */
-	public function test_get_liveblog_state_uses_supported_types(): void {
+	public function test_liveblog_state_uses_supported_types(): void {
 		// Create a page with liveblog enabled.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		update_post_meta( $page_id, WPCOM_Liveblog::KEY, 'enable' );
-
-		// Set the liveblog post ID.
-		WPCOM_Liveblog::$post_id = $page_id;
+		update_post_meta( $page_id, LiveblogConfiguration::KEY, 'enable' );
 
 		// Set the global post.
 		$GLOBALS['post'] = get_post( $page_id );
@@ -146,19 +103,22 @@ final class FilterSupportedPostTypesTest extends TestCase {
 		// Navigate to the page.
 		$this->go_to( get_permalink( $page_id ) );
 
-		// By default, pages are not supported, so should return false.
-		WPCOM_Liveblog::$supported_post_types = array( 'post' );
-		$this->assertFalse( WPCOM_Liveblog::get_liveblog_state( $page_id ) );
+		// By default, pages are not supported, so LiveblogPost should return null.
+		LiveblogConfiguration::set_supported_post_types( array( 'post' ) );
+		$liveblog_post = LiveblogPost::from_id( $page_id );
+		$this->assertNull( $liveblog_post );
 
 		// Add page support.
-		WPCOM_Liveblog::$supported_post_types = array( 'post', 'page' );
-		$this->assertEquals( 'enable', WPCOM_Liveblog::get_liveblog_state( $page_id ) );
+		LiveblogConfiguration::set_supported_post_types( array( 'post', 'page' ) );
+		$liveblog_post = LiveblogPost::from_id( $page_id );
+		$this->assertNotNull( $liveblog_post );
+		$this->assertEquals( 'enable', $liveblog_post->state() );
 	}
 
 	/**
-	 * Test that custom post types can be added via filter.
+	 * Test that supported post types can be configured.
 	 */
-	public function test_custom_post_type_support_via_filter(): void {
+	public function test_supported_post_types_can_be_configured(): void {
 		// Register a custom post type.
 		register_post_type(
 			'liveblog_event',
@@ -168,19 +128,14 @@ final class FilterSupportedPostTypesTest extends TestCase {
 			)
 		);
 
-		add_filter(
-			'liveblog_supported_post_types',
-			function ( $post_types ) {
-				$post_types[] = 'liveblog_event';
-				return $post_types;
-			}
-		);
+		// Add liveblog support to custom post type.
+		add_post_type_support( 'liveblog_event', LiveblogConfiguration::KEY );
 
-		// Re-run init to trigger the filter.
-		WPCOM_Liveblog::init();
+		// Update configuration.
+		LiveblogConfiguration::set_supported_post_types( array( 'post', 'liveblog_event' ) );
 
-		$this->assertContains( 'liveblog_event', WPCOM_Liveblog::$supported_post_types );
-		$this->assertTrue( post_type_supports( 'liveblog_event', WPCOM_Liveblog::KEY ) );
+		$this->assertContains( 'liveblog_event', LiveblogConfiguration::get_supported_post_types() );
+		$this->assertTrue( post_type_supports( 'liveblog_event', LiveblogConfiguration::KEY ) );
 
 		// Clean up.
 		unregister_post_type( 'liveblog_event' );

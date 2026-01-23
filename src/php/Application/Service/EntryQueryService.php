@@ -77,6 +77,53 @@ final class EntryQueryService {
 	}
 
 	/**
+	 * Get the ID of the latest entry for a post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return int|null The latest entry ID or null if none found.
+	 */
+	public function get_latest_id( int $post_id ): ?int {
+		$latest = $this->get_latest( $post_id );
+
+		return $latest?->id()->to_int();
+	}
+
+	/**
+	 * Get the timestamp of the latest entry for a post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return int|null The latest timestamp or null if none found.
+	 */
+	public function get_latest_timestamp( int $post_id ): ?int {
+		$latest = $this->get_latest( $post_id );
+
+		return $latest?->timestamp();
+	}
+
+	/**
+	 * Get all entries in ascending order (with caching).
+	 *
+	 * This method caches results for the duration of the request to avoid
+	 * repeated database queries.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return Entry[] Array of entries in ascending order.
+	 */
+	public function get_all_entries_asc( int $post_id ): array {
+		$cache_key      = 'liveblog_entries_asc_' . $post_id;
+		$cached_entries = wp_cache_get( $cache_key, 'liveblog' );
+
+		if ( false !== $cached_entries ) {
+			return $cached_entries;
+		}
+
+		$entries = $this->get_all( $post_id, 0, array( 'order' => 'ASC' ) );
+		wp_cache_set( $cache_key, $entries, 'liveblog' );
+
+		return $entries;
+	}
+
+	/**
 	 * Get entries between two timestamps.
 	 *
 	 * @param int $post_id         Post ID.
@@ -249,5 +296,117 @@ final class EntryQueryService {
 		);
 
 		return ! empty( $entries );
+	}
+
+	/**
+	 * Get a single entry by ID with navigation timestamps.
+	 *
+	 * Returns the entry along with timestamps for previous/next entries
+	 * to support navigation in the UI.
+	 *
+	 * @param int $post_id  Post ID.
+	 * @param int $entry_id Entry ID to find.
+	 * @return array{entry: Entry|null, previous_timestamp: int, next_timestamp: int}
+	 */
+	public function get_single_entry( int $post_id, int $entry_id ): array {
+		$result = array(
+			'entry'              => null,
+			'previous_timestamp' => 0,
+			'next_timestamp'     => 0,
+		);
+
+		$all_entries = array_values( $this->get_all( $post_id ) );
+
+		foreach ( $all_entries as $key => $entry ) {
+			if ( $entry_id !== $entry->id()->to_int() ) {
+				continue;
+			}
+
+			$result['entry'] = $entry;
+
+			// In DESC order, previous entry (older) is at key+1, next (newer) is at key-1.
+			if ( isset( $all_entries[ $key - 1 ] ) ) {
+				$result['next_timestamp'] = $all_entries[ $key - 1 ]->timestamp();
+			}
+
+			if ( isset( $all_entries[ $key + 1 ] ) ) {
+				$result['previous_timestamp'] = $all_entries[ $key + 1 ]->timestamp();
+			}
+
+			break;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get paginated entries.
+	 *
+	 * @param int         $post_id          Post ID.
+	 * @param int         $page             Page number (1-indexed).
+	 * @param int         $per_page         Entries per page.
+	 * @param string|null $last_known_entry Optional ID-timestamp string of last known entry.
+	 * @param int|null    $jump_to_id       Optional entry ID to jump to (calculates page).
+	 * @return array{entries: Entry[], page: int, pages: int, total: int}
+	 */
+	public function get_entries_paged(
+		int $post_id,
+		int $page,
+		int $per_page,
+		?string $last_known_entry = null,
+		?int $jump_to_id = null
+	): array {
+		$entries = $this->get_all_entries_asc( $post_id );
+		$entries = $this->flatten_entries( $entries );
+
+		// If there's a last known entry, offset from that point.
+		if ( null !== $last_known_entry ) {
+			$parts = explode( '-', $last_known_entry );
+			if ( isset( $parts[0], $parts[1] ) ) {
+				$last_entry_id = (int) $parts[0];
+				$keys          = array_keys( $entries );
+				$index         = array_search( $last_entry_id, $keys, true );
+				if ( false !== $index ) {
+					$entries = array_slice( $entries, $index, null, true );
+				}
+			}
+		}
+
+		$total = count( $entries );
+		$pages = (int) ceil( $total / $per_page );
+
+		// If no page given but jump_to_id is set, calculate the page.
+		if ( 0 === $page && null !== $jump_to_id ) {
+			$keys  = array_keys( $entries );
+			$index = array_search( $jump_to_id, $keys, true );
+			if ( false !== $index ) {
+				++$index; // 1-indexed.
+				$page = (int) ceil( $index / $per_page );
+			}
+		}
+
+		// Ensure page is at least 1.
+		$page = max( 1, $page );
+
+		$offset  = $per_page * ( $page - 1 );
+		$entries = array_slice( $entries, $offset, $per_page );
+
+		return array(
+			'entries' => $entries,
+			'page'    => $page,
+			'pages'   => $pages,
+			'total'   => $total,
+		);
+	}
+
+	/**
+	 * Get an entry by ID directly from the repository.
+	 *
+	 * @param int $entry_id Entry ID.
+	 * @return Entry|null The entry or null if not found.
+	 */
+	public function get_by_id( int $entry_id ): ?Entry {
+		$entry_id_vo = \Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( $entry_id );
+		return $this->repository->get_entry( $entry_id_vo );
 	}
 }

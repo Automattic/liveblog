@@ -9,13 +9,14 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
-use WPCOM_Liveblog;
 
 /**
  * Tests for the liveblog_output_at_top filter.
  *
- * @covers WPCOM_Liveblog::add_liveblog_to_content
+ * @covers \Automattic\Liveblog\Infrastructure\WordPress\TemplateRenderer::filter_the_content
  */
 final class FilterOutputLocationTest extends TestCase {
 
@@ -36,13 +37,10 @@ final class FilterOutputLocationTest extends TestCase {
 		$this->post_id = self::factory()->post->create();
 
 		// Enable liveblog on the post.
-		update_post_meta( $this->post_id, WPCOM_Liveblog::KEY, 'enable' );
+		update_post_meta( $this->post_id, LiveblogConfiguration::KEY, 'enable' );
 
 		// Set the global post.
 		$GLOBALS['post'] = get_post( $this->post_id );
-
-		// Set the liveblog post ID.
-		WPCOM_Liveblog::$post_id = $this->post_id;
 
 		// Simulate viewing a single post.
 		$this->go_to( get_permalink( $this->post_id ) );
@@ -64,7 +62,8 @@ final class FilterOutputLocationTest extends TestCase {
 	public function test_liveblog_output_appended_by_default(): void {
 		$content = '<p>Post content</p>';
 
-		$result = WPCOM_Liveblog::add_liveblog_to_content( $content );
+		$template_renderer = Container::instance()->template_renderer();
+		$result            = $template_renderer->filter_the_content( $content );
 
 		// Liveblog should come after content by default.
 		$this->assertStringStartsWith( '<p>Post content</p>', $result );
@@ -79,7 +78,8 @@ final class FilterOutputLocationTest extends TestCase {
 
 		$content = '<p>Post content</p>';
 
-		$result = WPCOM_Liveblog::add_liveblog_to_content( $content );
+		$template_renderer = Container::instance()->template_renderer();
+		$result            = $template_renderer->filter_the_content( $content );
 
 		// Liveblog should come before content when filter returns true.
 		$this->assertStringStartsWith( '<div id="wpcom-liveblog-container"', $result );
@@ -94,7 +94,8 @@ final class FilterOutputLocationTest extends TestCase {
 
 		$content = '<p>Post content</p>';
 
-		$result = WPCOM_Liveblog::add_liveblog_to_content( $content );
+		$template_renderer = Container::instance()->template_renderer();
+		$result            = $template_renderer->filter_the_content( $content );
 
 		// Liveblog should come after content when filter returns false.
 		$this->assertStringStartsWith( '<p>Post content</p>', $result );
@@ -115,8 +116,9 @@ final class FilterOutputLocationTest extends TestCase {
 			}
 		);
 
-		$content = '<p>Post content</p>';
-		WPCOM_Liveblog::add_liveblog_to_content( $content );
+		$content           = '<p>Post content</p>';
+		$template_renderer = Container::instance()->template_renderer();
+		$template_renderer->filter_the_content( $content );
 
 		$this->assertFalse( $received_value );
 	}
@@ -130,7 +132,8 @@ final class FilterOutputLocationTest extends TestCase {
 
 		$content = '<p>Post content</p>';
 
-		$result = WPCOM_Liveblog::add_liveblog_to_content( $content );
+		$template_renderer = Container::instance()->template_renderer();
+		$result            = $template_renderer->filter_the_content( $content );
 
 		// Should still append because 1 !== true.
 		$this->assertStringStartsWith( '<p>Post content</p>', $result );

@@ -5,6 +5,9 @@
  * @package Liveblog
  */
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+
 /**
  * Class WPCOM_Liveblog_Entry_Embed_SDKs
  *
@@ -25,7 +28,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	);
 
 	/**
-	 * Called by WPCOM_Liveblog::load(),
+	 * Called by PluginBootstrapper::init_legacy_classes(),
 	 * acts as a constructor
 	 */
 	public static function load() {
@@ -41,13 +44,13 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * @return void
 	 */
 	public static function enqueue() {
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
+		if ( ! LiveblogPost::is_viewing_liveblog_post() ) {
 			return;
 		}
 
 		foreach ( self::$sdks as $name => $url ) {
 			// Don't attach version with Reddit JS script file, it will generate 404 error.
-			$version = 'reddit' === $name ? null : WPCOM_Liveblog::VERSION;
+			$version = 'reddit' === $name ? null : LiveblogConfiguration::VERSION;
 			wp_enqueue_script( $name, esc_url( $url ), array(), $version, false );
 		}
 	}

@@ -11,13 +11,16 @@ namespace Automattic\Liveblog\Infrastructure\WordPress;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Filter\AuthorFilter;
 use Automattic\Liveblog\Application\Filter\CommandFilter;
 use Automattic\Liveblog\Application\Filter\EmojiFilter;
 use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Entity\Entry;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\DI\Container;
+use WP_Post;
 
 /**
  * Plugin bootstrapper - centralises hook wiring for DDD services.
@@ -50,11 +53,125 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	public function init(): void {
+		$this->load_textdomain();
+		$this->init_core();
+		$this->init_legacy_classes();
 		$this->init_shortcode_filter();
 		$this->init_content_filters();
 		$this->init_key_events();
 		$this->init_lazyload();
 		$this->init_auto_archive();
+		$this->init_rest_api();
+		$this->init_frontend();
+		$this->init_admin();
+	}
+
+	/**
+	 * Load plugin text domain.
+	 *
+	 * @return void
+	 */
+	private function load_textdomain(): void {
+		load_plugin_textdomain(
+			'liveblog',
+			false,
+			dirname( plugin_basename( LIVEBLOG_FILE ) ) . '/languages/'
+		);
+	}
+
+	/**
+	 * Initialize core plugin functionality.
+	 *
+	 * @return void
+	 */
+	private function init_core(): void {
+		add_action( 'init', array( $this, 'register_post_type_support' ) );
+		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
+		add_action( 'permalink_structure_changed', array( $this, 'add_rewrite_rules' ) );
+		add_action( 'init', array( $this, 'flush_rewrite_rules' ), 1000 );
+
+		// Register image embed handler.
+		add_action(
+			'init',
+			function () {
+				wp_embed_register_handler(
+					'liveblog_image',
+					'/\.(png|jpe?g|gif)(\?.*)?$/',
+					array( $this->container->template_renderer(), 'image_embed_handler' ),
+					99
+				);
+			}
+		);
+	}
+
+	/**
+	 * Register post type support for liveblog.
+	 *
+	 * @return void
+	 */
+	public function register_post_type_support(): void {
+		$post_types = array( 'post' );
+
+		/**
+		 * Filters the post types that support liveblog functionality.
+		 *
+		 * @param string[] $post_types Array of post type names.
+		 */
+		$post_types = apply_filters( 'liveblog_supported_post_types', $post_types );
+
+		foreach ( $post_types as $post_type ) {
+			add_post_type_support( $post_type, LiveblogConfiguration::KEY );
+		}
+
+		// Initialize auto-archive days from filter.
+		$auto_archive_days = apply_filters( 'liveblog_auto_archive_days', null );
+		LiveblogConfiguration::set_auto_archive_days( $auto_archive_days );
+
+		do_action( 'after_liveblog_init' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy hook name.
+	}
+
+	/**
+	 * Add rewrite rules for liveblog endpoints.
+	 *
+	 * @return void
+	 */
+	public function add_rewrite_rules(): void {
+		add_rewrite_endpoint( LiveblogConfiguration::URL_ENDPOINT, EP_PERMALINK );
+	}
+
+	/**
+	 * Flush rewrite rules if needed.
+	 *
+	 * @return void
+	 */
+	public function flush_rewrite_rules(): void {
+		$rewrites_version = (int) get_option( 'liveblog_rewrites_version', 0 );
+		if ( $rewrites_version < LiveblogConfiguration::REWRITES_VERSION ) {
+			flush_rewrite_rules(); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- Required for plugin activation.
+			update_option( 'liveblog_rewrites_version', LiveblogConfiguration::REWRITES_VERSION );
+		}
+	}
+
+	/**
+	 * Initialize legacy classes with injected dependencies.
+	 *
+	 * @return void
+	 */
+	private function init_legacy_classes(): void {
+		\WPCOM_Liveblog_Socketio_Loader::load();
+		\WPCOM_Liveblog_Entry_Embed_SDKs::load();
+		\WPCOM_Liveblog_AMP::load();
+	}
+
+	/**
+	 * Initialize the REST API with injected services.
+	 *
+	 * @return void
+	 */
+	private function init_rest_api(): void {
+		if ( LiveblogConfiguration::use_rest_api() ) {
+			$this->container->rest_api_controller()->init();
+		}
 	}
 
 	/**
@@ -129,6 +246,9 @@ final class PluginBootstrapper {
 		$key_event_service = $this->container->key_event_service();
 		$shortcode_handler = $this->container->key_event_shortcode_handler();
 
+		// Initialize the key events widget with the shortcode handler.
+		\WPCOM_Liveblog_Entry_Key_Events_Widget::init( $shortcode_handler );
+
 		// Initialize key event configuration (sets up templates/formats).
 		add_action( 'init', array( $configuration, 'initialize' ), 11 );
 
@@ -144,26 +264,14 @@ final class PluginBootstrapper {
 		// Enrich entry JSON with key event data.
 		add_filter(
 			'liveblog_entry_for_json',
-			function ( $entry, $entry_object ) use ( $key_event_service, $configuration ) {
-				// Support both legacy WPCOM_Liveblog_Entry and domain Entry objects.
-				if ( $entry_object instanceof Entry ) {
-					$post_id = $entry_object->post_id();
-					return $key_event_service->enrich_entry_for_json( $entry, $entry_object, $post_id );
+			function ( $entry, $entry_object ) use ( $key_event_service ) {
+				if ( ! $entry_object instanceof Entry ) {
+					return $entry;
 				}
 
-				// Handle legacy WPCOM_Liveblog_Entry.
-				$post_id = (int) $entry_object->get_post_id();
-				$content = $entry_object->get_content();
+				$post_id = $entry_object->post_id();
 
-				// Detect key event from content (more reliable than meta for updates).
-				$is_key_event       = $key_event_service->content_has_key_command( $content );
-				$entry['key_event'] = $is_key_event;
-
-				if ( $is_key_event ) {
-					$entry['key_event_content'] = $configuration->format_content( $content, $post_id );
-				}
-
-				return $entry;
+				return $key_event_service->enrich_entry_for_json( $entry, $entry_object, $post_id );
 			},
 			10,
 			2
@@ -245,5 +353,146 @@ final class PluginBootstrapper {
 	 */
 	private function init_auto_archive(): void {
 		$this->container->auto_archive_cron_handler()->register();
+
+		// Extend auto-archive expiry when entries are inserted.
+		add_filter(
+			'liveblog_before_insert_entry',
+			function ( $args ) {
+				$post_id = $args['post_id'] ?? 0;
+				if ( $post_id && LiveblogConfiguration::is_auto_archive_enabled() ) {
+					$liveblog_post = LiveblogPost::from_id( (int) $post_id );
+					if ( null !== $liveblog_post ) {
+						$days = LiveblogConfiguration::get_auto_archive_days();
+						if ( null !== $days ) {
+							$liveblog_post->extend_auto_archive_expiry( $days );
+						}
+					}
+				}
+				return $args;
+			},
+			10,
+			1
+		);
+	}
+
+	/**
+	 * Initialize frontend hooks.
+	 *
+	 * @return void
+	 */
+	private function init_frontend(): void {
+		$asset_manager      = $this->container->asset_manager();
+		$metadata_presenter = $this->container->metadata_presenter();
+		$template_renderer  = $this->container->template_renderer();
+
+		// Enqueue frontend scripts (uses named method so AMP can remove it).
+		add_action( 'wp_enqueue_scripts', array( $asset_manager, 'maybe_enqueue_frontend_scripts' ) );
+
+		// Print liveblog metadata in head.
+		add_action(
+			'wp_head',
+			function () use ( $metadata_presenter ) {
+				$post = get_post();
+				if ( $post instanceof WP_Post ) {
+					$liveblog_post = LiveblogPost::from_post( $post );
+					if ( $liveblog_post->is_liveblog() ) {
+						$metadata_presenter->print_json_ld( $post );
+					}
+				}
+			}
+		);
+
+		// Add liveblog content filter.
+		add_filter( 'the_content', array( $template_renderer, 'filter_the_content' ) );
+
+		// Add comment CSS class filter.
+		add_filter(
+			'comment_class',
+			function ( $classes, $css_class, $comment_id ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by filter signature.
+				if ( LiveblogPost::is_viewing_liveblog_post() ) {
+					$classes[] = 'liveblog-entry';
+				}
+				return $classes;
+			},
+			10,
+			3
+		);
+
+		// Protect liveblog meta key.
+		add_filter(
+			'is_protected_meta',
+			function ( $is_protected, $meta_key ) {
+				if ( LiveblogConfiguration::KEY === $meta_key ) {
+					return true;
+				}
+				return $is_protected;
+			},
+			10,
+			2
+		);
+	}
+
+	/**
+	 * Initialize admin hooks.
+	 *
+	 * @return void
+	 */
+	private function init_admin(): void {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$admin_controller = $this->container->admin_controller();
+		$asset_manager    = $this->container->asset_manager();
+
+		// Enqueue admin scripts.
+		add_action(
+			'admin_enqueue_scripts',
+			function ( $hook_suffix ) use ( $asset_manager ) {
+				$post      = get_post();
+				$post_id   = $post instanceof WP_Post ? $post->ID : 0;
+				$post_type = get_post_type( $post_id );
+				$post_type = $post_type ? $post_type : 'post';
+				$asset_manager->enqueue_admin_scripts( $hook_suffix, $post_id, $post_type );
+			}
+		);
+
+		// Add meta box.
+		add_action( 'add_meta_boxes', array( $admin_controller, 'add_meta_box' ) );
+
+		// Handle AJAX state change.
+		add_action(
+			'wp_ajax_set_liveblog_state_for_post',
+			function () use ( $admin_controller ) {
+				// Verify nonce first.
+				$nonce = isset( $_REQUEST['_ajax_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
+					? sanitize_text_field( wp_unslash( $_REQUEST['_ajax_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					: '';
+
+				if ( ! wp_verify_nonce( $nonce, 'liveblog_admin_nonce' ) ) {
+					wp_send_json_error( 'Invalid nonce' );
+				}
+
+				// Now safe to access other request data.
+				$post_id   = isset( $_REQUEST['post_id'] ) ? (int) $_REQUEST['post_id'] : 0;
+				$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
+
+				if ( ! $post_id || ! AdminController::current_user_can_edit() ) {
+					wp_send_json_error( 'Unauthorized' );
+				}
+
+				$result = $admin_controller->set_liveblog_state( $post_id, $new_state, $_REQUEST );
+				if ( false === $result ) {
+					wp_send_json_error( 'Failed to update state' );
+				}
+				wp_send_json_success( $result );
+			}
+		);
+
+		// Admin list filters.
+		add_filter( 'display_post_states', array( $admin_controller, 'add_display_post_state' ), 10, 2 );
+		add_filter( 'query_vars', array( $admin_controller, 'add_query_var' ) );
+		add_action( 'restrict_manage_posts', array( $admin_controller, 'render_filter_dropdown' ) );
+		add_action( 'pre_get_posts', array( $admin_controller, 'handle_filter_query' ) );
 	}
 }

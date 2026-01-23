@@ -9,8 +9,8 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Filter;
 
-use WPCOM_Liveblog;
-use WPCOM_Liveblog_Rest_Api;
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Infrastructure\WordPress\RestApiController;
 
 /**
  * Filters entry content for hashtag patterns (#hashtag).
@@ -284,8 +284,8 @@ final class HashtagFilter implements ContentFilterInterface {
 	public function get_autocomplete_config(): ?array {
 		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_terms';
 
-		if ( WPCOM_Liveblog::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags' );
+		if ( LiveblogConfiguration::use_rest_api() ) {
+			$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'hashtags' );
 		}
 
 		/**
@@ -322,7 +322,7 @@ final class HashtagFilter implements ContentFilterInterface {
 		$terms   = array();
 		$comment = get_comment( $comment_id );
 
-		if ( ! $comment || WPCOM_Liveblog::KEY !== $comment->comment_type ) {
+		if ( ! $comment || LiveblogConfiguration::KEY !== $comment->comment_type ) {
 			return $classes;
 		}
 

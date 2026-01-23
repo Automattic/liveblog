@@ -16,9 +16,13 @@ if ( $show_archived_message ) : ?>
 
 <div id="liveblog-entries">
 
-	<?php foreach ( (array) $entries as $entry ) : ?>
+	<?php
+	foreach ( (array) $entries as $entry ) :
+		$presenter = \Automattic\Liveblog\Application\Presenter\EntryPresenter::from_entry( $entry, $key_event_service );
+		$render    = $presenter->for_json()->render;
+		?>
 
-		<?php echo wp_kses_post( $entry->render() ); ?>
+		<?php echo wp_kses_post( $render ); ?>
 
 	<?php endforeach; ?>
 
