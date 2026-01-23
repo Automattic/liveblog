@@ -159,7 +159,6 @@ final class PluginBootstrapper {
 	 */
 	private function init_legacy_classes(): void {
 		\WPCOM_Liveblog_Socketio_Loader::load();
-		\WPCOM_Liveblog_Entry_Embed_SDKs::load();
 		\WPCOM_Liveblog_AMP::load();
 	}
 
@@ -385,8 +384,15 @@ final class PluginBootstrapper {
 		$metadata_presenter = $this->container->metadata_presenter();
 		$template_renderer  = $this->container->template_renderer();
 
+		// Initialise embed SDKs (applies filter for customisation).
+		$asset_manager->init_embed_sdks();
+
 		// Enqueue frontend scripts (uses named method so AMP can remove it).
 		add_action( 'wp_enqueue_scripts', array( $asset_manager, 'maybe_enqueue_frontend_scripts' ) );
+
+		// Enqueue social embed SDKs (Facebook, Twitter, Instagram, Reddit).
+		add_action( 'wp_enqueue_scripts', array( $asset_manager, 'enqueue_embed_sdks' ) );
+		add_filter( 'script_loader_tag', array( $asset_manager, 'add_async_to_embed_sdks' ), 10, 2 );
 
 		// Print liveblog metadata in head.
 		add_action(

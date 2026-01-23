@@ -24,6 +24,25 @@ use WP_Post;
 final class AssetManager {
 
 	/**
+	 * Default social embed SDKs.
+	 *
+	 * @var array<string, string>
+	 */
+	private const DEFAULT_EMBED_SDKS = array(
+		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
+		'twitter'   => 'https://platform.twitter.com/widgets.js',
+		'instagram' => 'https://www.instagram.com/embed.js',
+		'reddit'    => 'https://embed.reddit.com/widgets.js',
+	);
+
+	/**
+	 * Social embed SDKs to enqueue.
+	 *
+	 * @var array<string, string>
+	 */
+	private array $embed_sdks = array();
+
+	/**
 	 * Entry query service.
 	 *
 	 * @var EntryQueryService
@@ -402,5 +421,56 @@ final class AssetManager {
 			'dependencies' => array(),
 			'version'      => LiveblogConfiguration::VERSION,
 		);
+	}
+
+	/**
+	 * Initialise embed SDKs with filter support.
+	 *
+	 * Should be called once during plugin initialisation.
+	 *
+	 * @return void
+	 */
+	public function init_embed_sdks(): void {
+		/**
+		 * Filters the social embed SDKs to load on liveblog posts.
+		 *
+		 * @param array<string, string> $sdks Map of handle => URL.
+		 */
+		$this->embed_sdks = apply_filters( 'liveblog_embed_sdks', self::DEFAULT_EMBED_SDKS );
+	}
+
+	/**
+	 * Enqueue social embed SDKs on liveblog posts.
+	 *
+	 * As entries are rendered in React, social embeds require their SDKs
+	 * to be loaded on page load rather than dynamically.
+	 *
+	 * @return void
+	 */
+	public function enqueue_embed_sdks(): void {
+		if ( ! LiveblogPost::is_viewing_liveblog_post() ) {
+			return;
+		}
+
+		foreach ( $this->embed_sdks as $handle => $url ) {
+			// Reddit's JS fails with version query string - returns 404.
+			$version = 'reddit' === $handle ? null : LiveblogConfiguration::VERSION;
+			wp_enqueue_script( $handle, esc_url( $url ), array(), $version, false );
+		}
+	}
+
+	/**
+	 * Add async attribute to embed SDK scripts.
+	 *
+	 * @param string $tag    The script tag HTML.
+	 * @param string $handle The script handle.
+	 * @return string Modified script tag.
+	 */
+	public function add_async_to_embed_sdks( string $tag, string $handle ): string {
+		if ( ! array_key_exists( $handle, $this->embed_sdks ) ) {
+			return $tag;
+		}
+
+		return str_replace( ' src', ' async="async" src', $tag );
 	}
 }
