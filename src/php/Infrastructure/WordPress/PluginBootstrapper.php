@@ -56,6 +56,7 @@ final class PluginBootstrapper {
 		$this->load_textdomain();
 		$this->init_core();
 		$this->init_legacy_classes();
+		$this->init_amp();
 		$this->init_shortcode_filter();
 		$this->init_content_filters();
 		$this->init_key_events();
@@ -159,7 +160,23 @@ final class PluginBootstrapper {
 	 */
 	private function init_legacy_classes(): void {
 		\WPCOM_Liveblog_Socketio_Loader::load();
-		\WPCOM_Liveblog_AMP::load();
+	}
+
+	/**
+	 * Initialize AMP integration.
+	 *
+	 * Uses amp_init hook so code only runs when AMP plugin is active.
+	 * This is cleaner than checking for function existence.
+	 *
+	 * @return void
+	 */
+	private function init_amp(): void {
+		add_action(
+			'amp_init',
+			function () {
+				$this->container->amp_integration()->init();
+			}
+		);
 	}
 
 	/**

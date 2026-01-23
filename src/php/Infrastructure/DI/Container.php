@@ -27,6 +27,7 @@ use Automattic\Liveblog\Infrastructure\Cron\AutoArchiveCronHandler;
 use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 use Automattic\Liveblog\Infrastructure\WordPress\AdminController;
+use Automattic\Liveblog\Infrastructure\WordPress\AmpIntegration;
 use Automattic\Liveblog\Infrastructure\WordPress\AssetManager;
 use Automattic\Liveblog\Infrastructure\WordPress\RequestRouter;
 use Automattic\Liveblog\Infrastructure\WordPress\RestApiController;
@@ -184,6 +185,13 @@ final class Container {
 	 * @var RequestRouter|null
 	 */
 	private ?RequestRouter $request_router = null;
+
+	/**
+	 * Cached AMP integration instance.
+	 *
+	 * @var AmpIntegration|null
+	 */
+	private ?AmpIntegration $amp_integration = null;
 
 	/**
 	 * Private constructor to enforce singleton.
@@ -577,6 +585,31 @@ final class Container {
 		}
 
 		return $this->request_router;
+	}
+
+	/**
+	 * Get the AMP integration.
+	 *
+	 * @return AmpIntegration
+	 */
+	public function amp_integration(): AmpIntegration {
+		if ( isset( $this->overrides['amp_integration'] ) ) {
+			return ( $this->overrides['amp_integration'] )();
+		}
+
+		if ( null === $this->amp_integration ) {
+			$plugin_dir = defined( 'LIVEBLOG_FILE' ) ? dirname( LIVEBLOG_FILE ) : '';
+
+			$this->amp_integration = new AmpIntegration(
+				$this->template_renderer(),
+				$this->asset_manager(),
+				$this->request_router(),
+				$this->metadata_presenter(),
+				$plugin_dir
+			);
+		}
+
+		return $this->amp_integration;
 	}
 
 	/**
