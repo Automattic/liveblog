@@ -165,7 +165,7 @@ final class AssetManager {
 		$liveblog_post = LiveblogPost::from_post( $post );
 		$state         = $liveblog_post->state();
 		$is_editable   = EntryPresenter::is_liveblog_editable( $post->ID );
-		$endpoint_url  = RestApiController::build_endpoint_base();
+		$endpoint_url  = RestApiController::build_endpoint_base() . $post->ID . '/';
 
 		$this->enqueue_frontend_scripts( $post->ID, $state, $is_editable, $endpoint_url );
 	}
