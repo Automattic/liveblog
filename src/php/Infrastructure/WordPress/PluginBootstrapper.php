@@ -16,10 +16,13 @@ use Automattic\Liveblog\Application\Filter\AuthorFilter;
 use Automattic\Liveblog\Application\Filter\CommandFilter;
 use Automattic\Liveblog\Application\Filter\EmojiFilter;
 use Automattic\Liveblog\Application\Filter\HashtagFilter;
+use Automattic\Liveblog\Application\Service\ArchiveRepairService;
 use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\CLI\FixArchiveCommand;
 use Automattic\Liveblog\Infrastructure\DI\Container;
+use WP_CLI;
 use WP_Post;
 
 /**
@@ -56,6 +59,7 @@ final class PluginBootstrapper {
 		$this->load_textdomain();
 		$this->init_core();
 		$this->init_legacy_classes();
+		$this->init_cli();
 		$this->init_amp();
 		$this->init_shortcode_filter();
 		$this->init_content_filters();
@@ -160,6 +164,27 @@ final class PluginBootstrapper {
 	 */
 	private function init_legacy_classes(): void {
 		\WPCOM_Liveblog_Socketio_Loader::load();
+	}
+
+	/**
+	 * Initialize WP-CLI commands.
+	 *
+	 * Each command is a separate class with injected dependencies.
+	 * Commands handle only CLI concerns; business logic lives in services.
+	 *
+	 * @return void
+	 */
+	private function init_cli(): void {
+		if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
+			return;
+		}
+
+		// Register fix-archive command with injected service.
+		$archive_repair_service = new ArchiveRepairService();
+		WP_CLI::add_command(
+			'liveblog fix-archive',
+			new FixArchiveCommand( $archive_repair_service )
+		);
 	}
 
 	/**
