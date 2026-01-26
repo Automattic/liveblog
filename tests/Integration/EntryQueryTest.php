@@ -142,9 +142,9 @@ final class EntryQueryTest extends TestCase {
 	}
 
 	/**
-	 * Test remove_replaced_entries removes entries replacing other entries.
+	 * Test remove_replaced_entries removes the original when an update exists.
 	 */
-	public function test_remove_replaced_entries_should_remove_entries_replacing_other_entries(): void {
+	public function test_remove_replaced_entries_should_remove_original_when_update_exists(): void {
 		// Create original entry.
 		$original_id = $this->create_comment( array( 'comment_date_gmt' => self::JAN_1_MYSQL ) );
 
@@ -159,7 +159,7 @@ final class EntryQueryTest extends TestCase {
 		// The original should be filtered out, keeping only the update.
 		$this->assertEquals( 1, count( $entries ) );
 		$ids = $this->get_ids_from_entries( $entries );
-		$this->assertEquals( array( $original_id ), $ids ); // Original ID is kept, update is filtered.
+		$this->assertEquals( array( $update_id ), $ids );
 	}
 
 	/**
