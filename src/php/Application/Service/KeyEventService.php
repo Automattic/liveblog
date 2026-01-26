@@ -172,6 +172,30 @@ final class KeyEventService {
 	}
 
 	/**
+	 * Strip the /key command from displayed content.
+	 *
+	 * Removes both:
+	 * 1. The span that CommandFilter creates: <span class="liveblog-command type-key">key</span>
+	 * 2. Legacy raw "key " text at the start of content (from older entries)
+	 *
+	 * @param string $content The entry content.
+	 * @return string Content with key command removed.
+	 */
+	public function strip_key_command_from_content( string $content ): string {
+		// Remove the command span: <span class="liveblog-command type-key">key</span>
+		$content = preg_replace(
+			'/<span[^>]*class="[^"]*liveblog-command[^"]*type-key[^"]*"[^>]*>.*?<\/span>\s*/i',
+			'',
+			$content
+		) ?? $content;
+
+		// Also handle legacy entries with raw "key " at the start (before proper filtering existed).
+		$content = preg_replace( '/^key\s+/i', '', $content );
+
+		return $content;
+	}
+
+	/**
 	 * Get all key events for a post.
 	 *
 	 * @param int $post_id The post ID.

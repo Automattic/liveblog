@@ -92,7 +92,7 @@ final class StatsCommand {
 		$most_active_title = '';
 		$most_active_count = 0;
 		if ( $most_active ) {
-			$post = get_post( $most_active->comment_post_ID );
+			$post              = get_post( $most_active->comment_post_ID );
 			$most_active_title = $post ? $post->post_title : 'Unknown';
 			$most_active_count = (int) $most_active->entry_count;
 		}

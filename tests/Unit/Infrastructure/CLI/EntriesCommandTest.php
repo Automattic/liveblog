@@ -24,9 +24,9 @@ final class EntriesCommandTest extends TestCase {
 	 * Test command requires service in constructor.
 	 */
 	public function test_constructor_requires_service(): void {
-		$reflection = new \ReflectionClass( EntriesCommand::class );
+		$reflection  = new \ReflectionClass( EntriesCommand::class );
 		$constructor = $reflection->getConstructor();
-		$params = $constructor->getParameters();
+		$params      = $constructor->getParameters();
 
 		$this->assertCount( 1, $params );
 		$this->assertSame( 'entry_query_service', $params[0]->getName() );
@@ -40,7 +40,7 @@ final class EntriesCommandTest extends TestCase {
 		$this->assertTrue( method_exists( EntriesCommand::class, '__invoke' ) );
 
 		$reflection = new \ReflectionMethod( EntriesCommand::class, '__invoke' );
-		$params = $reflection->getParameters();
+		$params     = $reflection->getParameters();
 
 		$this->assertCount( 2, $params );
 		$this->assertSame( 'args', $params[0]->getName() );

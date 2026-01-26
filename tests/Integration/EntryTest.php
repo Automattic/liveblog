@@ -73,7 +73,7 @@ final class EntryTest extends IntegrationTestCase {
 			'updated content',
 			$this->create_user()
 		);
-		$updated = $this->repository->get_entry( $update_id );
+		$updated   = $this->repository->get_entry( $update_id );
 		$this->assertNotNull( $updated->replaces() );
 		$this->assertSame( $entry->id()->to_int(), $updated->replaces()->to_int() );
 	}
@@ -89,7 +89,7 @@ final class EntryTest extends IntegrationTestCase {
 			'updated content',
 			$this->create_user()
 		);
-		$updated = $this->repository->get_entry( $update_id );
+		$updated   = $this->repository->get_entry( $update_id );
 		$this->assertTrue( $updated->type()->is_update() );
 		$this->assertSame( 'update', $updated->type()->value );
 	}
@@ -320,7 +320,7 @@ final class EntryTest extends IntegrationTestCase {
 			'updated content',
 			$this->create_user()
 		);
-		$updated = $this->repository->get_entry( $update_id );
+		$updated   = $this->repository->get_entry( $update_id );
 		$this->assertNotNull( $updated->replaces() );
 		$this->assertSame( $original->id()->to_int(), $updated->replaces()->to_int() );
 	}

@@ -210,10 +210,11 @@ final class EntryQueryService {
 
 		$entries_by_id = $this->assoc_array_by_id( $entries );
 
-		foreach ( $entries_by_id as $id => $entry ) {
+		foreach ( $entries_by_id as $entry ) {
 			$replaces = $entry->replaces();
 			if ( null !== $replaces && isset( $entries_by_id[ $replaces->to_int() ] ) ) {
-				unset( $entries_by_id[ $id ] );
+				// Remove the OLD entry that is being replaced, keeping the newer one.
+				unset( $entries_by_id[ $replaces->to_int() ] );
 			}
 		}
 

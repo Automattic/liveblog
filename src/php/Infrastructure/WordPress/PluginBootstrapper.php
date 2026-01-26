@@ -68,7 +68,7 @@ final class PluginBootstrapper {
 	public function init(): void {
 		$this->load_textdomain();
 		$this->init_core();
-		$this->init_legacy_classes();
+		$this->init_socketio();
 		$this->init_cli();
 		$this->init_amp();
 		$this->init_shortcode_filter();
@@ -168,12 +168,12 @@ final class PluginBootstrapper {
 	}
 
 	/**
-	 * Initialize legacy classes with injected dependencies.
+	 * Initialize Socket.IO support if enabled.
 	 *
 	 * @return void
 	 */
-	private function init_legacy_classes(): void {
-		\WPCOM_Liveblog_Socketio_Loader::load();
+	private function init_socketio(): void {
+		$this->container->socketio_manager()->initialize();
 	}
 
 	/**
@@ -320,8 +320,13 @@ final class PluginBootstrapper {
 		$key_event_service = $this->container->key_event_service();
 		$shortcode_handler = $this->container->key_event_shortcode_handler();
 
-		// Initialize the key events widget with the shortcode handler.
-		\WPCOM_Liveblog_Entry_Key_Events_Widget::init( $shortcode_handler );
+		// Register the key events widget.
+		add_action(
+			'widgets_init',
+			function () {
+				register_widget( \Automattic\Liveblog\Infrastructure\WordPress\Widget\KeyEventsWidget::class );
+			}
+		);
 
 		// Initialize key event configuration (sets up templates/formats).
 		add_action( 'init', array( $configuration, 'initialize' ), 11 );
@@ -334,6 +339,13 @@ final class PluginBootstrapper {
 				return $commands;
 			}
 		);
+
+		// Strip the /key command span from displayed content.
+		// This runs during save via liveblog_command_key_before.
+		add_filter( 'liveblog_command_key_before', array( $key_event_service, 'strip_key_command_from_content' ) );
+
+		// Also strip during display via comment_text filter (content is already saved with span).
+		add_filter( 'comment_text', array( $key_event_service, 'strip_key_command_from_content' ), 5 );
 
 		// Enrich entry JSON with key event data.
 		add_filter(

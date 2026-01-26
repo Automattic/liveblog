@@ -86,6 +86,8 @@ final class TemplateRenderer {
 		'allowed_tags_for_entry',
 		// DDD services.
 		'key_event_service',
+		// Feature flags.
+		'socketio_enabled',
 	);
 
 	/**
@@ -257,10 +259,11 @@ final class TemplateRenderer {
 		$show_archived_message = LiveblogPost::STATE_ARCHIVED === $state
 			&& $liveblog_post
 			&& $liveblog_post->current_user_can_edit();
+		$socketio_enabled      = $container->socketio_manager()->is_enabled();
 
 		return $this->render(
 			'liveblog-loop.php',
-			compact( 'entries', 'show_archived_message', 'key_event_service' )
+			compact( 'entries', 'show_archived_message', 'key_event_service', 'socketio_enabled' )
 		);
 	}
 }

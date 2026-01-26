@@ -16,6 +16,7 @@ use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\SocketIO\SocketioManager;
 use WP_Post;
 
 /**
@@ -64,20 +65,30 @@ final class AssetManager {
 	private string $plugin_file;
 
 	/**
+	 * Socket.IO manager.
+	 *
+	 * @var SocketioManager
+	 */
+	private SocketioManager $socketio_manager;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param EntryQueryService     $entry_query_service     The entry query service.
 	 * @param ContentFilterRegistry $content_filter_registry The content filter registry.
 	 * @param string                $plugin_file             The main plugin file path.
+	 * @param SocketioManager       $socketio_manager        The Socket.IO manager.
 	 */
 	public function __construct(
 		EntryQueryService $entry_query_service,
 		ContentFilterRegistry $content_filter_registry,
-		string $plugin_file
+		string $plugin_file,
+		SocketioManager $socketio_manager
 	) {
 		$this->entry_query_service     = $entry_query_service;
 		$this->content_filter_registry = $content_filter_registry;
 		$this->plugin_file             = $plugin_file;
+		$this->socketio_manager        = $socketio_manager;
 	}
 
 	/**
@@ -270,9 +281,7 @@ final class AssetManager {
 			'state'                        => $state,
 			'is_liveblog_editable'         => $is_editable,
 			'current_user'                 => $this->get_current_user_data(),
-			'socketio_enabled'             => class_exists( 'WPCOM_Liveblog_Socketio_Loader' )
-				? \WPCOM_Liveblog_Socketio_Loader::is_enabled()
-				: false,
+			'socketio_enabled'             => $this->socketio_manager->is_enabled(),
 
 			'key'                          => LiveblogConfiguration::KEY,
 			'nonce_key'                    => LiveblogConfiguration::NONCE_KEY,

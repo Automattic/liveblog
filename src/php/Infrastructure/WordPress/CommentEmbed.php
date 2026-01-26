@@ -51,9 +51,9 @@ class CommentEmbed extends WP_Embed implements EmbedHandlerInterface {
 	 *
 	 * Attempts to convert a URL into embed HTML, caching results in comment meta.
 	 *
-	 * @param array       $attr    Shortcode attributes (width, height).
-	 * @param string      $url     The URL to embed.
-	 * @param int|null    $comment The comment ID.
+	 * @param array    $attr    Shortcode attributes (width, height).
+	 * @param string   $url     The URL to embed.
+	 * @param int|null $comment The comment ID.
 	 * @return string|false The embed HTML or original URL on failure.
 	 */
 	public function shortcode( $attr, $url = '', $comment = null ) {
@@ -156,7 +156,7 @@ class CommentEmbed extends WP_Embed implements EmbedHandlerInterface {
 			}
 		}
 
-		$cache_time     = $cache_time ? (int) $cache_time : 0;
+		$cache_time      = $cache_time ? (int) $cache_time : 0;
 		$cached_recently = ( time() - $cache_time ) < $ttl;
 
 		if ( $this->usecache || $cached_recently ) {

@@ -76,9 +76,9 @@ final class ArchiveOldCommand {
 		$preview_data = array_map(
 			function ( $post ) {
 				return array(
-					'ID'           => $post->ID,
-					'title'        => $post->post_title,
-					'last_entry'   => $this->get_last_entry_date( $post->ID ) ?? 'No entries',
+					'ID'         => $post->ID,
+					'title'      => $post->post_title,
+					'last_entry' => $this->get_last_entry_date( $post->ID ) ?? 'No entries',
 				);
 			},
 			$liveblogs_to_archive

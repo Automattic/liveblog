@@ -84,8 +84,8 @@ final class AddCommand {
 	 * @param array $assoc_args Associative arguments.
 	 */
 	public function __invoke( array $args, array $assoc_args ): void {
-		$post_id  = absint( $args[0] ?? 0 );
-		$content  = $args[1] ?? '';
+		$post_id   = absint( $args[0] ?? 0 );
+		$content   = $args[1] ?? '';
 		$porcelain = isset( $assoc_args['porcelain'] );
 
 		if ( 0 === $post_id ) {
@@ -179,7 +179,12 @@ final class AddCommand {
 		}
 
 		// Fall back to first admin.
-		$admins = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
+		$admins = get_users(
+			array(
+				'role'   => 'administrator',
+				'number' => 1,
+			) 
+		);
 		if ( ! empty( $admins ) ) {
 			return $admins[0];
 		}

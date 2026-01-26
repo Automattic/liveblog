@@ -107,17 +107,17 @@ final class EntriesCommand {
 		}
 
 		if ( 'ids' === $format ) {
-			echo implode( ' ', wp_list_pluck( $entries, 'ID' ) ) . "\n";
+			WP_CLI::log( implode( ' ', wp_list_pluck( $entries, 'ID' ) ) );
 			return;
 		}
 
 		$formatted_entries = array_map(
 			function ( $entry ) use ( $key_events ) {
 				$data = array(
-					'ID'        => $entry->comment_ID,
-					'author'    => $entry->comment_author,
-					'date'      => $entry->comment_date,
-					'content'   => wp_trim_words( wp_strip_all_tags( $entry->comment_content ), 20 ),
+					'ID'      => $entry->comment_ID,
+					'author'  => $entry->comment_author,
+					'date'    => $entry->comment_date,
+					'content' => wp_trim_words( wp_strip_all_tags( $entry->comment_content ), 20 ),
 				);
 
 				if ( ! $key_events ) {

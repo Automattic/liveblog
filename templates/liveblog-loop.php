@@ -37,7 +37,7 @@ if ( $show_archived_message ) : ?>
 		</a>
 	</div>
 
-	<?php if ( WPCOM_Liveblog_Socketio_Loader::is_enabled() ) : ?>
+	<?php if ( ! empty( $socketio_enabled ) ) : ?>
 		<div id="liveblog-socketio-error-container" class="liveblog-fixed-bar">
 			<p id="liveblog-socketio-error"></p>
 		</div>

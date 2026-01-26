@@ -28,6 +28,7 @@ use Automattic\Liveblog\Infrastructure\Cron\AutoArchiveCronHandler;
 use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 use Automattic\Liveblog\Infrastructure\WordPress\AdminController;
+use Automattic\Liveblog\Infrastructure\SocketIO\SocketioManager;
 use Automattic\Liveblog\Infrastructure\WordPress\AmpIntegration;
 use Automattic\Liveblog\Infrastructure\WordPress\AssetManager;
 use Automattic\Liveblog\Infrastructure\WordPress\CommentEmbed;
@@ -201,6 +202,13 @@ final class Container {
 	 * @var AmpIntegration|null
 	 */
 	private ?AmpIntegration $amp_integration = null;
+
+	/**
+	 * Cached Socket.IO manager instance.
+	 *
+	 * @var SocketioManager|null
+	 */
+	private ?SocketioManager $socketio_manager = null;
 
 	/**
 	 * Private constructor to enforce singleton.
@@ -529,7 +537,8 @@ final class Container {
 			$this->asset_manager = new AssetManager(
 				$this->entry_query_service(),
 				$this->content_filter_registry(),
-				defined( 'LIVEBLOG_FILE' ) ? LIVEBLOG_FILE : ''
+				defined( 'LIVEBLOG_FILE' ) ? LIVEBLOG_FILE : '',
+				$this->socketio_manager()
 			);
 		}
 
@@ -638,6 +647,25 @@ final class Container {
 		}
 
 		return $this->amp_integration;
+	}
+
+	/**
+	 * Get the Socket.IO manager.
+	 *
+	 * @return SocketioManager
+	 */
+	public function socketio_manager(): SocketioManager {
+		if ( isset( $this->overrides['socketio_manager'] ) ) {
+			return ( $this->overrides['socketio_manager'] )();
+		}
+
+		if ( null === $this->socketio_manager ) {
+			$this->socketio_manager = new SocketioManager(
+				$this->template_renderer()
+			);
+		}
+
+		return $this->socketio_manager;
 	}
 
 	/**

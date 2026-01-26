@@ -37,12 +37,46 @@ final class LazyloadConfigurationTest extends TestCase {
 	}
 
 	/**
-	 * Test is_enabled returns true by default for active liveblog.
+	 * Set up mock for viewing an enabled liveblog post.
 	 *
-	 * Note: WPCOM_Liveblog::get_liveblog_state() is stubbed in wp-stubs.php
-	 * to return 'enable' by default.
+	 * Mocks all the WordPress functions called by is_enabled().
+	 */
+	private function mock_enabled_liveblog_context(): void {
+		// Mock get_the_ID() to return a valid post ID.
+		Functions\expect( 'get_the_ID' )
+			->zeroOrMoreTimes()
+			->andReturn( 123 );
+
+		// Create a mock WP_Post (class is stubbed in wp-stubs.php).
+		$mock_post            = new \WP_Post();
+		$mock_post->ID        = 123;
+		$mock_post->post_type = 'post';
+
+		// Mock get_post() to return our mock post.
+		Functions\expect( 'get_post' )
+			->zeroOrMoreTimes()
+			->with( 123 )
+			->andReturn( $mock_post );
+
+		// Mock post_type_supports() to return true.
+		Functions\expect( 'post_type_supports' )
+			->zeroOrMoreTimes()
+			->with( 'post', 'liveblog' )
+			->andReturn( true );
+
+		// Mock get_post_meta() to return 'enable' state.
+		Functions\expect( 'get_post_meta' )
+			->zeroOrMoreTimes()
+			->with( 123, 'liveblog', true )
+			->andReturn( 'enable' );
+	}
+
+	/**
+	 * Test is_enabled returns true by default for active liveblog.
 	 */
 	public function test_is_enabled_returns_true_by_default(): void {
+		$this->mock_enabled_liveblog_context();
+
 		Functions\expect( 'apply_filters' )
 			->once()
 			->with( 'liveblog_enable_lazyloader', true )
@@ -55,6 +89,8 @@ final class LazyloadConfigurationTest extends TestCase {
 	 * Test is_enabled caches the result.
 	 */
 	public function test_is_enabled_caches_result(): void {
+		$this->mock_enabled_liveblog_context();
+
 		Functions\expect( 'apply_filters' )
 			->once()
 			->with( 'liveblog_enable_lazyloader', true )
@@ -69,6 +105,8 @@ final class LazyloadConfigurationTest extends TestCase {
 	 * Test is_enabled returns false when filter disables it.
 	 */
 	public function test_is_enabled_returns_false_when_filter_disables(): void {
+		$this->mock_enabled_liveblog_context();
+
 		Functions\expect( 'apply_filters' )
 			->once()
 			->with( 'liveblog_enable_lazyloader', true )

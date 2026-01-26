@@ -76,7 +76,7 @@ final class ListCommand {
 
 		// Filter by state if specified.
 		if ( 'all' !== $state ) {
-			$meta_value = 'enabled' === $state ? 'enable' : 'archive';
+			$meta_value               = 'enabled' === $state ? 'enable' : 'archive';
 			$query_args['meta_value'] = $meta_value; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for filtering by state.
 		}
 
@@ -104,7 +104,7 @@ final class ListCommand {
 		}
 
 		if ( 'ids' === $format ) {
-			echo implode( ' ', wp_list_pluck( $liveblogs, 'ID' ) ) . "\n";
+			WP_CLI::log( implode( ' ', wp_list_pluck( $liveblogs, 'ID' ) ) );
 			return;
 		}
 

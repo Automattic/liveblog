@@ -2,62 +2,45 @@
 /**
  * Key Events Widget for liveblog entries.
  *
- * @package Liveblog
+ * @package Automattic\Liveblog\Infrastructure\WordPress\Widget
  */
+
+declare( strict_types=1 );
+
+namespace Automattic\Liveblog\Infrastructure\WordPress\Widget;
 
 use Automattic\Liveblog\Application\Service\KeyEventShortcodeHandler;
+use Automattic\Liveblog\Infrastructure\DI\Container;
+use WP_Widget;
 
 /**
- * Class WPCOM_Liveblog_Entry_Key_Events_Widget
+ * Widget that displays a list of key events.
  *
- * Class to create a widget that displays a list of key events.
- * This widget is just a wrapper for the shortcode
- * [liveblog_key_events].
+ * This widget is a wrapper for the liveblog_key_events shortcode,
+ * allowing key events to be displayed in widget areas.
+ *
+ * Note: WordPress's widget system requires widgets to be instantiable
+ * with no arguments. The shortcode handler is retrieved from the DI
+ * container in the constructor.
  */
-class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
+final class KeyEventsWidget extends WP_Widget {
 
 	/**
-	 * Injected shortcode handler.
+	 * Shortcode handler for rendering key events.
 	 *
 	 * @var KeyEventShortcodeHandler|null
 	 */
-	private static ?KeyEventShortcodeHandler $shortcode_handler = null;
+	private ?KeyEventShortcodeHandler $shortcode_handler = null;
 
 	/**
-	 * Initialize the widget with the shortcode handler.
+	 * Constructor.
 	 *
-	 * This should be called from PluginBootstrapper instead of load().
-	 *
-	 * @param KeyEventShortcodeHandler $handler The shortcode handler.
-	 * @return void
-	 */
-	public static function init( KeyEventShortcodeHandler $handler ): void {
-		self::$shortcode_handler = $handler;
-		add_action( 'widgets_init', array( __CLASS__, 'widgets_init' ) );
-	}
-
-	/**
-	 * Attaches the widget.
-	 *
-	 * @deprecated Use init() instead with dependency injection.
-	 */
-	public static function load() {
-		add_action( 'widgets_init', array( __CLASS__, 'widgets_init' ) );
-	}
-
-	/**
-	 * Registers the widget
-	 */
-	public static function widgets_init() {
-		register_widget( __CLASS__ );
-	}
-
-	/**
-	 * Configure widget
+	 * WordPress instantiates widgets itself, so we retrieve the handler
+	 * from the DI container rather than accepting it as a parameter.
 	 */
 	public function __construct() {
 		$widget_ops = array(
-			'class_name'  => 'liveblog-key-events-widget',
+			'classname'   => 'liveblog-key-events-widget',
 			'description' => __( 'A list of key events displayed when the user is viewing a Liveblog post.', 'liveblog' ),
 		);
 
@@ -69,23 +52,32 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	}
 
 	/**
+	 * Get the shortcode handler, lazy-loading from container.
+	 *
+	 * @return KeyEventShortcodeHandler|null
+	 */
+	private function get_shortcode_handler(): ?KeyEventShortcodeHandler {
+		if ( null === $this->shortcode_handler ) {
+			$this->shortcode_handler = Container::instance()->key_event_shortcode_handler();
+		}
+		return $this->shortcode_handler;
+	}
+
+	/**
 	 * Output the list of key events for the current post.
 	 *
 	 * @param array $args     Widget arguments.
 	 * @param array $instance Widget instance data.
-	 *
-	 * @return void
 	 */
-	public function widget( $args, $instance ) {
-		if ( null === self::$shortcode_handler ) {
-			// Widget not properly initialized - silently return.
+	public function widget( $args, $instance ): void {
+		$handler = $this->get_shortcode_handler();
+		if ( null === $handler ) {
 			return;
 		}
 
-		$shortcode_output = self::$shortcode_handler->render( array( 'title' => false ) );
+		$shortcode_output = $handler->render( array( 'title' => false ) );
 
-		if ( is_null( $shortcode_output ) ) {
-			// Don't display the widget if there are no key events to show.
+		if ( null === $shortcode_output ) {
 			return;
 		}
 
@@ -100,13 +92,11 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Back-end form to display widget options (.
+	 * Back-end form to display widget options.
 	 *
 	 * @param array $instance Previously saved values from database.
-	 *
-	 * @return void
 	 */
-	public function form( $instance ) {
+	public function form( $instance ): void {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : '';
 		?>
 		<p>
@@ -124,13 +114,11 @@ class WPCOM_Liveblog_Entry_Key_Events_Widget extends WP_Widget {
 	 *
 	 * @param array $new_instance Values just sent to be saved.
 	 * @param array $old_instance Previously saved values from database.
-	 *
 	 * @return array Updated safe values to be saved.
 	 */
-	public function update( $new_instance, $old_instance ) {
-		$instance          = array();
-		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
-
-		return $instance;
+	public function update( $new_instance, $old_instance ): array {
+		return array(
+			'title' => ! empty( $new_instance['title'] ) ? sanitize_text_field( $new_instance['title'] ) : '',
+		);
 	}
 }
