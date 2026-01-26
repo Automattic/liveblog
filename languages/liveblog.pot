@@ -9,15 +9,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-04T16:01:38+00:00\n"
+"POT-Creation-Date: 2026-01-26T18:07:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: liveblog\n"
 
 #. Plugin Name of the plugin
 #: liveblog.php
-#: liveblog.php:1579
-#: liveblog.php:1795
+#: src/php/Infrastructure/WordPress/AdminController.php:53
+#: src/php/Infrastructure/WordPress/AdminController.php:205
 msgid "Liveblog"
 msgstr ""
 
@@ -41,296 +41,253 @@ msgstr ""
 msgid "https://github.com/Automattic/liveblog/graphs/contributors"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:331
+#: src/php/Application/Filter/HashtagFilter.php:408
 msgctxt "taxonomy general name"
 msgid "Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:332
+#: src/php/Application/Filter/HashtagFilter.php:409
 msgctxt "taxonomy singular name"
 msgid "Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:333
+#: src/php/Application/Filter/HashtagFilter.php:410
 msgid "Search Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:334
+#: src/php/Application/Filter/HashtagFilter.php:411
 msgid "All Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:335
+#: src/php/Application/Filter/HashtagFilter.php:412
 msgid "Parent Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:336
+#: src/php/Application/Filter/HashtagFilter.php:413
 msgid "Parent Hashtag:"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:337
+#: src/php/Application/Filter/HashtagFilter.php:414
 msgid "Edit Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:338
+#: src/php/Application/Filter/HashtagFilter.php:415
 msgid "Update Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:339
+#: src/php/Application/Filter/HashtagFilter.php:416
 msgid "Add New Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:340
+#: src/php/Application/Filter/HashtagFilter.php:417
 msgid "New Hashtag"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php:341
+#: src/php/Application/Filter/HashtagFilter.php:418
 msgid "Hashtags"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry-key-events-widget.php:38
-msgid "A list of key events displayed when the user is viewing a Liveblog post."
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events-widget.php:43
-msgid "Liveblog Key Events Widget"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events-widget.php:85
-msgid "Title:"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events-widget.php:89
-msgid "Note: the number of key events displayed in the widget is defined in the Liveblog configuration inside each post."
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events.php:267
-msgid "Template:"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events.php:268
-msgid "Format:"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events.php:269
-msgid "Set template for key events shortcode, select a format and restrict most recent shown."
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events.php:270
-msgid "Limit"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry-key-events.php:271
-msgid "Save"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry.php:400
-#: classes/class-wpcom-liveblog-entry.php:445
-#: classes/class-wpcom-liveblog-entry.php:482
-msgid "Missing entry ID"
-msgstr ""
-
-#: classes/class-wpcom-liveblog-entry.php:517
+#: src/php/Application/Service/EntryOperations.php:212
 msgid "Error posting entry"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:521
-#: classes/class-wpcom-liveblog-entry.php:552
-msgid "Error retrieving comment"
+#: src/php/Application/Service/KeyEventShortcodeHandler.php:117
+msgid "Template:"
 msgstr ""
 
-#. translators: 1: argument.
-#: classes/class-wpcom-liveblog-entry.php:537
-#, php-format
-msgid "Missing entry argument: %s"
+#: src/php/Application/Service/KeyEventShortcodeHandler.php:118
+msgid "Format:"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:556
-msgid "Error retrieving user"
+#: src/php/Application/Service/KeyEventShortcodeHandler.php:119
+msgid "Set template for key events shortcode, select a format and restrict most recent shown."
 msgstr ""
 
-#: classes/class-wpcom-liveblog-socketio-loader.php:105
-msgid "It is necessary to install socket.io-php-emitter in order to use Liveblog plugin with WebSocket support enabled."
+#: src/php/Application/Service/KeyEventShortcodeHandler.php:120
+msgid "Limit"
 msgstr ""
 
-#. translators: 1: current PHP version, 2: minimum required PHP version.
-#: classes/class-wpcom-liveblog-socketio-loader.php:127
+#: src/php/Application/Service/KeyEventShortcodeHandler.php:121
+msgid "Save"
+msgstr ""
+
+#: src/php/Infrastructure/SocketIO/SocketioManager.php:207
+msgid "Unable to connect to the server to get new entries"
+msgstr ""
+
+#. translators: 1: current PHP version, 2: minimum required PHP version
+#: src/php/Infrastructure/SocketIO/SocketioManager.php:219
 #, php-format
 msgid "Your current PHP is version %1$s, which is too old to run the Liveblog plugin with WebSocket support enabled. The minimum required version is %2$s. Please, either update PHP or disable WebSocket support by removing or setting to false the constant LIVEBLOG_USE_SOCKETIO in wp-config.php."
 msgstr ""
 
-#: classes/class-wpcom-liveblog-socketio.php:98
+#: src/php/Infrastructure/SocketIO/SocketioManager.php:231
+msgid "It is necessary to install socket.io-php-emitter in order to use Liveblog plugin with WebSocket support enabled."
+msgstr ""
+
+#: src/php/Infrastructure/SocketIO/SocketioManager.php:239
 msgid "Liveblog was unable to connect to the Redis server. Please check your configuration."
 msgstr ""
 
-#: classes/class-wpcom-liveblog-socketio.php:153
-msgid "Unable to connect to the server to get new entries"
+#: src/php/Infrastructure/WordPress/AdminController.php:84
+msgid "Visit the liveblog &rarr;"
 msgstr ""
 
-#: liveblog.php:511
-msgid "No Liveblog post ID is set yet"
-msgstr ""
-
-#: liveblog.php:637
-msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
-msgstr ""
-
-#. translators: 1: crud action.
-#: liveblog.php:828
-#, php-format
-msgid "Invalid entry crud_action: %s"
-msgstr ""
-
-#: liveblog.php:1194
-msgid "Unknown liveblog action"
-msgstr ""
-
-#: liveblog.php:1248
-#: liveblog.php:1341
-msgid "Error {error-code}: {error-message}"
-msgstr ""
-
-#: liveblog.php:1249
-#: liveblog.php:1342
-msgid "Error: {error-message}"
-msgstr ""
-
-#: liveblog.php:1339
-msgid "Do you really want to delete this entry? There is no way back."
-msgstr ""
-
-#: liveblog.php:1340
-msgid "Do you want to delete this key entry?"
-msgstr ""
-
-#: liveblog.php:1343
-msgid "Liveblog: {number} new update"
-msgstr ""
-
-#: liveblog.php:1344
-msgid "Liveblog: {number} new updates"
-msgstr ""
-
-#: liveblog.php:1345
-msgid "Provide URL for link:"
-msgstr ""
-
-#: liveblog.php:1348
-msgid "term-"
-msgstr ""
-
-#: liveblog.php:1349
-msgid "type-alert"
-msgstr ""
-
-#: liveblog.php:1350
-msgid "type-key"
-msgstr ""
-
-#: liveblog.php:1367
-msgid "Loading preview…"
-msgstr ""
-
-#: liveblog.php:1368
-msgid "New Entry"
-msgstr ""
-
-#: liveblog.php:1369
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:357
-#: build/994.bundle.js:504
-msgid "Publish Update"
-msgstr ""
-
-#: liveblog.php:1370
-msgid "Edit Entry"
-msgstr ""
-
-#: liveblog.php:1371
-msgid "Update"
-msgstr ""
-
-#: liveblog.php:1394
-msgid "Allowed Files"
-msgstr ""
-
-#: liveblog.php:1620
-msgid "Enable"
-msgstr ""
-
-#: liveblog.php:1621
-msgid "Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates."
-msgstr ""
-
-#. translators: 1: post url.
-#: liveblog.php:1623
-#, php-format
-msgid "There is an <strong>enabled</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog &rarr;</a>"
-msgstr ""
-
-#: liveblog.php:1629
-msgid "Archive"
-msgstr ""
-
-#: liveblog.php:1630
-msgid "Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden."
-msgstr ""
-
-#. translators: 1: archive url.
-#: liveblog.php:1632
-#, php-format
-msgid "There is an <strong>archived</strong> liveblog on this post. <a href=\"%s\">Visit the liveblog archive &rarr;</a>"
-msgstr ""
-
-#: liveblog.php:1641
+#: src/php/Infrastructure/WordPress/AdminController.php:94
 msgid "This is a normal WordPress post, without a liveblog."
 msgstr ""
 
-#: liveblog.php:1644
+#: src/php/Infrastructure/WordPress/AdminController.php:99
 msgid "Settings have been successfully updated."
 msgstr ""
 
-#. translators: 1: post ID.
-#: liveblog.php:1670
-#, php-format
-msgid "The post is a revision: %s"
+#: src/php/Infrastructure/WordPress/AdminController.php:119
+msgid "Enable"
 msgstr ""
 
-#. translators: 1: post ID.
-#: liveblog.php:1674
-#, php-format
-msgid "Non-existing post ID: %s"
+#: src/php/Infrastructure/WordPress/AdminController.php:120
+msgid "Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates."
 msgstr ""
 
-#: liveblog.php:1797
+#. translators: %s: optional link to view the liveblog
+#: src/php/Infrastructure/WordPress/AdminController.php:123
+#, php-format
+msgid "There is an <strong>enabled</strong> liveblog on this post.%s"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AdminController.php:131
+msgid "Archive"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AdminController.php:132
+msgid "Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden."
+msgstr ""
+
+#. translators: %s: optional link to view the liveblog archive
+#: src/php/Infrastructure/WordPress/AdminController.php:135
+#, php-format
+msgid "There is an <strong>archived</strong> liveblog on this post.%s"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AdminController.php:143
+msgid "Disable"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AdminController.php:144
+msgid "Removes liveblog from this post. Existing entries are kept as comments."
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AdminController.php:207
 msgid "Liveblog (archived)"
 msgstr ""
 
-#: liveblog.php:1828
+#: src/php/Infrastructure/WordPress/AdminController.php:237
 msgid "Filter liveblogs"
 msgstr ""
 
-#: liveblog.php:1829
+#: src/php/Infrastructure/WordPress/AdminController.php:238
 msgid "Any liveblogs"
 msgstr ""
 
-#: liveblog.php:1830
+#: src/php/Infrastructure/WordPress/AdminController.php:239
 msgid "Enabled liveblogs"
 msgstr ""
 
-#: liveblog.php:1831
+#: src/php/Infrastructure/WordPress/AdminController.php:240
 msgid "Archived liveblogs"
 msgstr ""
 
-#: liveblog.php:1832
+#: src/php/Infrastructure/WordPress/AdminController.php:241
 msgid "No liveblogs"
 msgstr ""
 
-#: liveblog.php:1905
-msgid "Cheatin', uh?"
+#: src/php/Infrastructure/WordPress/AssetManager.php:142
+#: src/php/Infrastructure/WordPress/AssetManager.php:321
+msgid "Error {error-code}: {error-message}"
 msgstr ""
 
-#: liveblog.php:1917
-msgid "Sorry, we could not authenticate you."
+#: src/php/Infrastructure/WordPress/AssetManager.php:143
+#: src/php/Infrastructure/WordPress/AssetManager.php:322
+msgid "Error: {error-message}"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:247
+msgid "Loading preview..."
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:248
+msgid "New Entry"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:249
+#: build/994.bundle.js:1
+#: src/react/containers/EditorContainer.js:479
+#: build/994.bundle.js:626
+msgid "Publish Update"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:250
+msgid "Edit Entry"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:251
+msgid "Update"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:319
+msgid "Do you really want to delete this entry? There is no way back."
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:320
+msgid "Do you want to delete this key entry?"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:323
+msgid "Liveblog: {number} new update"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:324
+msgid "Liveblog: {number} new updates"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:325
+msgid "Provide URL for link:"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:328
+msgid "term-"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:329
+msgid "type-alert"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:330
+msgid "type-key"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/AssetManager.php:381
+msgid "Allowed Files"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/RestApiController.php:431
+msgid "Invalid user"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/Widget/KeyEventsWidget.php:44
+msgid "A list of key events displayed when the user is viewing a Liveblog post."
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/Widget/KeyEventsWidget.php:49
+msgid "Liveblog Key Events Widget"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/Widget/KeyEventsWidget.php:103
+msgid "Title:"
+msgstr ""
+
+#: src/php/Infrastructure/WordPress/Widget/KeyEventsWidget.php:107
+msgid "Note: the number of key events displayed in the widget is defined in the Liveblog configuration inside each post."
 msgstr ""
 
 #: templates/amp/feed.php:34
@@ -361,8 +318,8 @@ msgstr ""
 
 #: templates/liveblog-form.php:17
 #: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:299
-#: build/994.bundle.js:446
+#: src/react/containers/EditorContainer.js:440
+#: build/994.bundle.js:587
 msgid "Preview"
 msgstr ""
 
@@ -443,9 +400,10 @@ msgid "Cancel"
 msgstr ""
 
 #: templates/liveblog-form.php:46
-#: templates/liveblog-single-entry.php:20
+#: templates/liveblog-single-entry.php:37
 #: build/app.js:1
 #: src/react/containers/EntryContainer.js:73
+#: src/react/containers/EntryContainer.js:100
 msgid "Delete"
 msgstr ""
 
@@ -455,13 +413,14 @@ msgstr ""
 msgid "<strong>This liveblog is archived.</strong> If you need to publish new updates or edit or delete the old ones, you need to <a href=\"%s\">enable it first</a>."
 msgstr ""
 
-#: templates/liveblog-loop.php:27
+#: templates/liveblog-loop.php:31
 msgid "Load more entries&hellip;"
 msgstr ""
 
-#: templates/liveblog-single-entry.php:20
+#: templates/liveblog-single-entry.php:36
 #: build/app.js:1
 #: src/react/containers/EntryContainer.js:67
+#: src/react/containers/EntryContainer.js:98
 msgid "Edit"
 msgstr ""
 
@@ -478,6 +437,8 @@ msgid "Crop Image"
 msgstr ""
 
 #: build/822.bundle.js:1
+#: build/app.js:1
+#: src/react/containers/EntryContainer.js:97
 #: src/react/Editor/ImageCropModal.js:137
 #: build/822.bundle.js:137
 msgid "Close"
@@ -586,64 +547,70 @@ msgid "Start writing your liveblog entry…"
 msgstr ""
 
 #: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:164
-#: build/994.bundle.js:311
+#: src/react/containers/EditorContainer.js:273
+#: build/994.bundle.js:420
 msgid "Type to search for more authors…"
 msgstr ""
 
 #: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:281
-#: build/994.bundle.js:428
+#: src/react/containers/EditorContainer.js:391
+#: build/994.bundle.js:538
 msgid "Add New Entry"
 msgstr ""
 
 #: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:287
-#: build/994.bundle.js:434
+#: src/react/containers/EditorContainer.js:393
+#: build/994.bundle.js:540
+msgid "Authors:"
+msgstr ""
+
+#: build/994.bundle.js:1
+#: src/react/containers/EditorContainer.js:396
+#: build/994.bundle.js:543
+msgid "Entry authors"
+msgstr ""
+
+#: build/994.bundle.js:1
+#: src/react/containers/EditorContainer.js:409
+#: build/994.bundle.js:556
+msgid "No authors matched"
+msgstr ""
+
+#: build/994.bundle.js:1
+#: src/react/containers/EditorContainer.js:409
+#: build/994.bundle.js:556
+msgid "Loading authors…"
+msgstr ""
+
+#: build/994.bundle.js:1
+#: src/react/containers/EditorContainer.js:420
+#: build/994.bundle.js:567
+msgid "Key Event"
+msgstr ""
+
+#: build/994.bundle.js:1
+#: src/react/containers/EditorContainer.js:428
+#: build/994.bundle.js:575
 msgid "Visual"
 msgstr ""
 
 #: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:293
-#: build/994.bundle.js:440
+#: src/react/containers/EditorContainer.js:434
+#: build/994.bundle.js:581
 msgid "Text"
 msgstr ""
 
 #: build/994.bundle.js:1
 #: build/app.js:1
-#: src/react/containers/EditorContainer.js:312
-#: src/react/containers/EntryContainer.js:125
-#: build/994.bundle.js:459
+#: src/react/containers/EditorContainer.js:453
+#: src/react/containers/EntryContainer.js:135
+#: build/994.bundle.js:600
 msgid "Loading editor…"
 msgstr ""
 
 #: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:337
-#: build/994.bundle.js:484
-msgid "Authors:"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:340
-#: build/994.bundle.js:487
-msgid "Entry authors"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:353
-#: build/994.bundle.js:500
-msgid "No authors matched"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:353
-#: build/994.bundle.js:500
-msgid "Loading authors…"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:357
-#: build/994.bundle.js:504
+#: src/react/containers/EditorContainer.js:479
+#: build/994.bundle.js:626
 msgid "Publish New Entry"
 msgstr ""
 
@@ -658,7 +625,7 @@ msgid "Close Editor"
 msgstr ""
 
 #: build/app.js:1
-#: src/react/containers/EntryContainer.js:97
+#: src/react/containers/EntryContainer.js:107
 #: src/react/containers/EventsContainer.js:24
 msgid "Are you sure you want to delete this entry?"
 msgstr ""

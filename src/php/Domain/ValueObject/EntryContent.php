@@ -169,7 +169,7 @@ final class EntryContent {
 	 * @param string $ellipsis   String to append if truncated.
 	 * @return string
 	 */
-	public function truncate( int $word_count = 10, string $ellipsis = "\u{2026}" ): string {
+	public function truncate( int $word_count = 10, string $ellipsis = "…" ): string {
 		$plain = $this->plain();
 		$words = preg_split( '/\s+/', $plain, -1, PREG_SPLIT_NO_EMPTY );
 
