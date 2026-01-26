@@ -20,7 +20,17 @@ use Automattic\Liveblog\Application\Service\ArchiveRepairService;
 use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Infrastructure\CLI\AddCommand;
+use Automattic\Liveblog\Infrastructure\CLI\ArchiveCommand;
+use Automattic\Liveblog\Infrastructure\CLI\ArchiveOldCommand;
+use Automattic\Liveblog\Infrastructure\CLI\DisableCommand;
+use Automattic\Liveblog\Infrastructure\CLI\EnableCommand;
+use Automattic\Liveblog\Infrastructure\CLI\EntriesCommand;
 use Automattic\Liveblog\Infrastructure\CLI\FixArchiveCommand;
+use Automattic\Liveblog\Infrastructure\CLI\ListCommand;
+use Automattic\Liveblog\Infrastructure\CLI\StatsCommand;
+use Automattic\Liveblog\Infrastructure\CLI\StatusCommand;
+use Automattic\Liveblog\Infrastructure\CLI\UnarchiveCommand;
 use Automattic\Liveblog\Infrastructure\DI\Container;
 use WP_CLI;
 use WP_Post;
@@ -179,11 +189,34 @@ final class PluginBootstrapper {
 			return;
 		}
 
-		// Register fix-archive command with injected service.
-		$archive_repair_service = new ArchiveRepairService();
+		// Listing and status commands (no service dependencies).
+		WP_CLI::add_command( 'liveblog list', new ListCommand() );
+		WP_CLI::add_command( 'liveblog status', new StatusCommand() );
+		WP_CLI::add_command( 'liveblog stats', new StatsCommand() );
+
+		// State management commands (no service dependencies).
+		WP_CLI::add_command( 'liveblog enable', new EnableCommand() );
+		WP_CLI::add_command( 'liveblog archive', new ArchiveCommand() );
+		WP_CLI::add_command( 'liveblog unarchive', new UnarchiveCommand() );
+		WP_CLI::add_command( 'liveblog disable', new DisableCommand() );
+
+		// Entry commands (with service dependencies).
+		WP_CLI::add_command(
+			'liveblog entries',
+			new EntriesCommand( $this->container->entry_query_service() )
+		);
+		WP_CLI::add_command(
+			'liveblog add',
+			new AddCommand( $this->container->entry_service() )
+		);
+
+		// Bulk operations.
+		WP_CLI::add_command( 'liveblog archive-old', new ArchiveOldCommand() );
+
+		// Maintenance commands.
 		WP_CLI::add_command(
 			'liveblog fix-archive',
-			new FixArchiveCommand( $archive_repair_service )
+			new FixArchiveCommand( new ArchiveRepairService() )
 		);
 	}
 
