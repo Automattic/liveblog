@@ -1,5 +1,58 @@
 # Changelog
 
+## [Unreleased] - 2.0.0
+
+### Breaking Changes
+
+* **Minimum PHP version raised to 8.2** - The plugin now requires PHP 8.2 or higher
+* **Complete architecture rewrite using Domain-Driven Design** - All legacy `WPCOM_Liveblog_*` classes have been replaced with a modern DDD architecture. Custom integrations relying on internal class methods may need updates
+* **Modernised PHP entry template** - The `entry.php` template structure has been updated to match the React component structure for consistency
+
+### Added
+
+* Add key event checkbox UI with backward-compatible `/key` command handling by @GaryJones in https://github.com/Automattic/liveblog/pull/814
+* Add comprehensive WP-CLI command suite (`wp liveblog list`, `add`, `entries`, `stats`, `archive-old`, `fix-archive`) with full documentation
+* Support authorless entries - entries can now be published without an author attribution
+
+### Changed
+
+* Increase default entries per page from 5 to 20 for better initial content display
+* Improve entry styling for better readability with modernised typography and spacing
+* Improve author selection UX with better dropdown behaviour and keyboard navigation
+* Improve schema.org LiveBlogPosting structured data output with proper article body text by @GaryJones in https://github.com/Automattic/liveblog/pull/815
+
+### Fixed
+
+* Fix schema.org structured data PHP warning when rendering authorless entries by @GaryJones in https://github.com/Automattic/liveblog/pull/815
+
+### Maintenance
+
+**Complete Domain-Driven Design architecture rewrite:**
+
+The 2.0 release represents a complete internal rewrite using DDD principles, improving testability, maintainability, and code organisation:
+
+* **Domain Layer**: Entry entity with immutable value objects (EntryId, EntryContent, EntryType, Author, AuthorCollection), clear boundaries between concepts
+* **Application Layer**: Services encapsulating use cases (EntryService for CRUD, EntryQueryService for reads, KeyEventService for key events)
+* **Infrastructure Layer**: Repository pattern (EntryRepositoryInterface, CommentEntryRepository), WordPress integrations (widgets, REST API, WP-CLI), AMP support, Socket.IO manager
+* **Presentation Layer**: EntryPresenter for consistent JSON serialisation with injected content rendering
+* **Dependency Injection**: Container with PluginBootstrapper as composition root
+
+All legacy classes from the `classes/` directory have been migrated or eliminated:
+- `WPCOM_Liveblog` → Eliminated (functionality distributed across services)
+- `WPCOM_Liveblog_Entry` → `Entry` entity + `EntryService` + `EntryPresenter`
+- `WPCOM_Liveblog_Entry_Query` → `EntryQueryService`
+- `WPCOM_Liveblog_Entry_Key_Events` → `KeyEventService` + `KeyEventShortcodeHandler`
+- `WPCOM_Liveblog_Rest_Api` → `RestApiController`
+- `WPCOM_Liveblog_AMP` → `AmpIntegration`
+- `WPCOM_Liveblog_Socketio*` → `SocketioManager`
+- `WPCOM_Liveblog_Entry_Key_Events_Widget` → `KeyEventsWidget`
+- `WPCOM_Liveblog_Lazyloader` → `LazyloadConfiguration` + integrated into services
+
+**Testing improvements:**
+* 197 unit tests covering domain logic, value objects, services, and infrastructure
+* 132 integration tests for WordPress interactions
+* Testable architecture with dependency injection and interface-based design
+
 ## [1.10.0] - 2026-01-06
 
 ### Added
