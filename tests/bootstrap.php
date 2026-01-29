@@ -83,6 +83,14 @@ if ( $is_integration ) {
 	 */
 	WPIntegration\bootstrap_it();
 
+	// Load WP_CLI stubs for integration tests.
+	require __DIR__ . '/Stubs/WpCliStubs.php';
+	require __DIR__ . '/Stubs/WpCliUtilsStubs.php';
+
+	if ( ! defined( 'WP_CLI' ) ) {
+		define( 'WP_CLI', true );
+	}
+
 	// Load the custom Spy REST Server for testing.
 	require __DIR__ . '/Integration/SpyRestServer.php';
 } else {
