@@ -57,6 +57,7 @@ if ( ! function_exists( 'get_comment_meta' ) ) {
 
 // phpcs:enable
 
+// phpcs:disable Generic.Classes.DuplicateClassName.Found, Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
 if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 	/**
 	 * Minimal WPCOM_Liveblog stub for unit testing.
@@ -66,7 +67,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 	 * WordPress dependencies to load for unit tests.
 	 */
 	final class WPCOM_Liveblog {
- // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
 		public const KEY = 'liveblog';
 
 		/**
@@ -80,3 +80,4 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) {
 		}
 	}
 }
+// phpcs:enable Generic.Classes.DuplicateClassName.Found, Generic.Files.OneObjectStructurePerFile.MultipleFound, PEAR.NamingConventions.ValidClassName.Invalid
