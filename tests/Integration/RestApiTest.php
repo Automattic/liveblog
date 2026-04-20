@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use ReflectionClass;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 use WP_REST_Request;
 use WPCOM_Liveblog;
@@ -36,6 +37,18 @@ final class RestApiTest extends TestCase {
 	 */
 	public function set_up(): void {
 		parent::set_up();
+
+		// Reset WPCOM_Liveblog static state that leaks between tests. The private
+		// $entry_query is cached on first use and bound to whatever $post_id was
+		// current at that moment, so subsequent tests against a different post
+		// would otherwise see zero entries via the stale query.
+		$reflection  = new ReflectionClass( WPCOM_Liveblog::class );
+		$entry_query = $reflection->getProperty( 'entry_query' );
+		$entry_query->setAccessible( true );
+		$entry_query->setValue( null, null );
+
+		WPCOM_Liveblog::$post_id          = null;
+		WPCOM_Liveblog::$is_rest_api_call = false;
 
 		global $wp_rest_server;
 		$wp_rest_server = new SpyRestServer();
@@ -803,7 +816,7 @@ final class RestApiTest extends TestCase {
 		}
 		wp_update_post( $update );
 
-		foreach ( $this->public_read_urls_for_post( $post_id, $entry->get_id() ) as $url ) {
+		foreach ( $this->public_read_urls_for_post( $post_id, (int) $entry->get_id() ) as $url ) {
 			$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
 
 			$this->assertEquals(
