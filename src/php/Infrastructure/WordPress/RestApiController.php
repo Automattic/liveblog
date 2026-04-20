@@ -17,6 +17,7 @@ use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
+use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -136,6 +137,62 @@ final class RestApiController {
 	}
 
 	/**
+	 * Permission callback for the public read REST endpoints.
+	 *
+	 * Public read endpoints (entries, lazyload, single entry, paged entries, key
+	 * events, jump-to-key-event) accept a post_id from the URL, so they are the
+	 * gateway for CWE-639 (IDOR). Without this check, an unauthenticated caller
+	 * could retrieve entries from a draft, private, future or trashed parent
+	 * post simply by enumerating post IDs.
+	 *
+	 * Access is permitted when all of the following are true:
+	 *
+	 * - The post exists and its post type supports liveblog.
+	 * - Liveblog is enabled or archived on the post.
+	 * - The post is published, or the current user has `read_post` for it.
+	 *
+	 * All failure paths return a 404 so the endpoint cannot be used as an oracle
+	 * for post existence, status or liveblog-ness.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return true|WP_Error True when the request is permitted, otherwise a 404 error.
+	 */
+	public static function can_read_liveblog( WP_REST_Request $request ) {
+		$post_id       = (int) $request->get_param( 'post_id' );
+		$liveblog_post = $post_id > 0 ? LiveblogPost::from_id( $post_id ) : null;
+
+		$allowed = (
+			$liveblog_post instanceof LiveblogPost
+			&& $liveblog_post->is_liveblog()
+			&& ( $liveblog_post->is_published() || current_user_can( 'read_post', $post_id ) )
+		);
+
+		/**
+		 * Filters whether the current request may read liveblog entries for a given post.
+		 *
+		 * Default behaviour requires that the post exists, supports liveblog,
+		 * has liveblog enabled or archived, and is either published or readable
+		 * by the current user. Filter to loosen (e.g. for a headless front end
+		 * serving drafts) or tighten.
+		 *
+		 * @param bool            $allowed Whether the request is allowed.
+		 * @param int             $post_id The post ID being queried (0 when not supplied).
+		 * @param WP_REST_Request $request The current REST request.
+		 */
+		$allowed = (bool) apply_filters( 'liveblog_rest_read_permission', $allowed, $post_id, $request );
+
+		if ( $allowed ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_liveblog_not_found',
+			__( 'Liveblog not found.', 'liveblog' ),
+			array( 'status' => 404 )
+		);
+	}
+
+	/**
 	 * Initialize the REST API controller.
 	 *
 	 * Called from PluginBootstrapper to wire up the controller.
@@ -209,7 +266,7 @@ final class RestApiController {
 					'start_time' => array( 'required' => true ),
 					'end_time'   => array( 'required' => true ),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 
@@ -251,7 +308,7 @@ final class RestApiController {
 					'max_time' => array( 'required' => true ),
 					'min_time' => array( 'required' => true ),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 
@@ -266,7 +323,7 @@ final class RestApiController {
 					'post_id'  => array( 'required' => true ),
 					'entry_id' => array( 'required' => true ),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 
@@ -342,7 +399,7 @@ final class RestApiController {
 					'page'             => array( 'required' => true ),
 					'last_known_entry' => array( 'required' => true ),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 
@@ -356,7 +413,7 @@ final class RestApiController {
 				'args'                => array(
 					'last_known_entry' => array( 'required' => true ),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 
@@ -372,7 +429,7 @@ final class RestApiController {
 					'id'               => array( 'required' => true ),
 					'last_known_entry' => array( 'required' => true ),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 	}
