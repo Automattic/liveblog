@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use ReflectionClass;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 use WP_REST_Request;
 use WPCOM_Liveblog;
@@ -36,6 +37,18 @@ final class RestApiTest extends TestCase {
 	 */
 	public function set_up(): void {
 		parent::set_up();
+
+		// Reset WPCOM_Liveblog static state that leaks between tests. The private
+		// $entry_query is cached on first use and bound to whatever $post_id was
+		// current at that moment, so subsequent tests against a different post
+		// would otherwise see zero entries via the stale query.
+		$reflection  = new ReflectionClass( WPCOM_Liveblog::class );
+		$entry_query = $reflection->getProperty( 'entry_query' );
+		$entry_query->setAccessible( true );
+		$entry_query->setValue( null, null );
+
+		WPCOM_Liveblog::$post_id          = null;
+		WPCOM_Liveblog::$is_rest_api_call = false;
 
 		global $wp_rest_server;
 		$wp_rest_server = new SpyRestServer();
@@ -384,15 +397,15 @@ final class RestApiTest extends TestCase {
 	 * Integration test - Test accessing the get entries endpoint.
 	 */
 	public function test_endpoint_get_entries(): void {
-		// Insert 1 entry.
-		$this->insert_entries();
+		$post_id = $this->create_liveblog_post();
+		$this->insert_entries( 1, array( 'post_id' => $post_id ) );
 
 		// A time window with entries.
 		$start_time = strtotime( '-1 hour' );
 		$end_time   = strtotime( '+1 hour' );
 
 		// Try to access the endpoint.
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entries/' . $start_time . '/' . $end_time );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/entries/' . $start_time . '/' . $end_time );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -436,15 +449,15 @@ final class RestApiTest extends TestCase {
 	 * Integration test - Test accessing the lazyload endpoint.
 	 */
 	public function test_endpoint_lazyload(): void {
-		// Insert 1 entry.
-		$this->insert_entries();
+		$post_id = $this->create_liveblog_post();
+		$this->insert_entries( 1, array( 'post_id' => $post_id ) );
 
 		// A time window with entries.
 		$max_timestamp = strtotime( '+1 day' );
 		$min_timestamp = 0;
 
 		// Try to access the endpoint.
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/lazyload/' . $max_timestamp . '/' . $min_timestamp );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/lazyload/' . $max_timestamp . '/' . $min_timestamp );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -460,11 +473,11 @@ final class RestApiTest extends TestCase {
 	 * Integration test - Test accessing the get single entry endpoint.
 	 */
 	public function test_endpoint_get_single_entry(): void {
-		// Insert 1 entry.
-		$new_entries = $this->insert_entries();
+		$post_id     = $this->create_liveblog_post();
+		$new_entries = $this->insert_entries( 1, array( 'post_id' => $post_id ) );
 
 		// Try to access the endpoint.
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/1/entry/' . $new_entries[0]->get_id() );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/entry/' . $new_entries[0]->get_id() );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -745,11 +758,12 @@ final class RestApiTest extends TestCase {
 	/**
 	 * Create a new post and make it a liveblog.
 	 *
+	 * @param array $post_args Optional post arguments to override the defaults (e.g. post_status).
 	 * @return int The ID of the new liveblog post.
 	 */
-	private function create_liveblog_post(): int {
+	private function create_liveblog_post( array $post_args = array() ): int {
 		// Create a new post.
-		$post_id = self::factory()->post->create();
+		$post_id = self::factory()->post->create( $post_args );
 
 		// Make the new post a liveblog.
 		$state        = 'enable';
@@ -757,5 +771,163 @@ final class RestApiTest extends TestCase {
 		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, $state, $request_vars );
 
 		return $post_id;
+	}
+
+	/**
+	 * Data provider for non-public liveblog posts.
+	 *
+	 * Each entry is a post_status that should not expose liveblog entries to anonymous
+	 * callers of the public read endpoints.
+	 *
+	 * @return array<string, array{0: string}>
+	 */
+	public static function non_public_post_statuses(): array {
+		return array(
+			'draft'   => array( 'draft' ),
+			'private' => array( 'private' ),
+			'future'  => array( 'future' ),
+			'trash'   => array( 'trash' ),
+		);
+	}
+
+	/**
+	 * Anonymous requests must not retrieve liveblog entries for non-public posts.
+	 *
+	 * Covers HackerOne reports #3683538 and #3615321 (CWE-639, IDOR).
+	 *
+	 * @dataProvider non_public_post_statuses
+	 *
+	 * @param string $post_status Post status to test.
+	 */
+	public function test_public_read_endpoints_deny_anonymous_for_non_public_posts( string $post_status ): void {
+		// Create as a published liveblog post with entries, then transition to the target
+		// status. This avoids WordPress rewriting the status during insert (e.g. future
+		// posts with no future date, or liveblog enablement refusing non-publish states).
+		$post_id = $this->create_liveblog_post();
+		$entry   = $this->insert_entries( 1, array( 'post_id' => $post_id ) )[0];
+
+		$update = array(
+			'ID'          => $post_id,
+			'post_status' => $post_status,
+		);
+		if ( 'future' === $post_status ) {
+			$update['post_date']     = gmdate( 'Y-m-d H:i:s', strtotime( '+1 day' ) );
+			$update['post_date_gmt'] = gmdate( 'Y-m-d H:i:s', strtotime( '+1 day' ) );
+		}
+		wp_update_post( $update );
+
+		foreach ( $this->public_read_urls_for_post( $post_id, (int) $entry->get_id() ) as $url ) {
+			$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
+
+			$this->assertEquals(
+				404,
+				$response->get_status(),
+				sprintf( 'Expected 404 on %s for post_status=%s', $url, $post_status )
+			);
+		}
+	}
+
+	/**
+	 * Anonymous requests for a post that does not exist must receive a 404.
+	 */
+	public function test_public_read_endpoints_deny_anonymous_for_missing_post(): void {
+		$missing_post_id = 999999;
+
+		foreach ( $this->public_read_urls_for_post( $missing_post_id, 1 ) as $url ) {
+			$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
+			$this->assertEquals( 404, $response->get_status(), sprintf( 'Expected 404 on %s', $url ) );
+		}
+	}
+
+	/**
+	 * Anonymous requests for a published post that is not a liveblog must receive a 404.
+	 *
+	 * This prevents the endpoints from being used as an oracle to distinguish liveblog
+	 * posts from regular posts.
+	 */
+	public function test_public_read_endpoints_deny_anonymous_for_non_liveblog_post(): void {
+		$post_id = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+
+		foreach ( $this->public_read_urls_for_post( $post_id, 1 ) as $url ) {
+			$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
+			$this->assertEquals( 404, $response->get_status(), sprintf( 'Expected 404 on %s', $url ) );
+		}
+	}
+
+	/**
+	 * An editor user can read liveblog entries on a draft post they have permission to read.
+	 */
+	public function test_public_read_endpoints_allow_editor_on_draft_post(): void {
+		$post_id = $this->create_liveblog_post();
+		$entry   = $this->insert_entries( 1, array( 'post_id' => $post_id ) )[0];
+		wp_update_post(
+			array(
+				'ID'          => $post_id,
+				'post_status' => 'draft',
+			)
+		);
+
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $editor_id );
+
+		$request  = new WP_REST_Request(
+			'GET',
+			self::ENDPOINT_BASE . '/' . $post_id . '/entries/' . strtotime( '-1 hour' ) . '/' . strtotime( '+1 hour' )
+		);
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertCount( 1, $response->get_data()['entries'] );
+	}
+
+	/**
+	 * The liveblog_rest_read_permission filter can override the default denial.
+	 *
+	 * Useful for headless setups that want to expose entries for drafts without granting
+	 * `read_post` to the anonymous caller.
+	 */
+	public function test_liveblog_rest_read_permission_filter_can_allow(): void {
+		$post_id = $this->create_liveblog_post();
+		$this->insert_entries( 1, array( 'post_id' => $post_id ) );
+		wp_update_post(
+			array(
+				'ID'          => $post_id,
+				'post_status' => 'draft',
+			)
+		);
+
+		add_filter( 'liveblog_rest_read_permission', '__return_true' );
+
+		$url      = self::ENDPOINT_BASE . '/' . $post_id . '/entries/' . strtotime( '-1 hour' ) . '/' . strtotime( '+1 hour' );
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
+
+		remove_filter( 'liveblog_rest_read_permission', '__return_true' );
+
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	/**
+	 * Build the list of public read endpoint URLs that accept a post_id for testing.
+	 *
+	 * @param int $post_id  Post ID to embed.
+	 * @param int $entry_id Entry ID to embed for routes that accept one.
+	 * @return string[]
+	 */
+	private function public_read_urls_for_post( int $post_id, int $entry_id ): array {
+		$base    = self::ENDPOINT_BASE . '/' . $post_id;
+		$start   = strtotime( '-1 hour' );
+		$end     = strtotime( '+1 hour' );
+		$max_ts  = strtotime( '+1 day' );
+		$min_ts  = 0;
+		$last_id = 0;
+
+		return array(
+			$base . '/entries/' . $start . '/' . $end,
+			$base . '/lazyload/' . $max_ts . '/' . $min_ts,
+			$base . '/entry/' . $entry_id,
+			$base . '/get-entries/1/' . $last_id,
+			$base . '/get-key-events/' . $last_id,
+			$base . '/jump-to-key-event/' . $entry_id . '/' . $last_id,
+		);
 	}
 }
