@@ -78,7 +78,7 @@ final class RestApiTest extends IntegrationTestCase {
 		$hook_registered = false;
 		foreach ( $collection as $priority => $callbacks ) {
 			foreach ( $callbacks as $callback ) {
-				if ( is_array( $callback['function'] ) && $callback['function'][1] === 'register_routes' ) {
+				if ( is_array( $callback['function'] ) && 'register_routes' === $callback['function'][1] ) {
 					$hook_registered = true;
 					break 2;
 				}

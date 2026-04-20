@@ -58,7 +58,7 @@ abstract class CliTestCase extends IntegrationTestCase {
 	 * @return void
 	 * @throws WP_CLI_ExitException When command calls WP_CLI::error().
 	 */
-	protected function invoke_command( object $command, array $args = [], array $assoc_args = [] ): void {
+	protected function invoke_command( object $command, array $args = array(), array $assoc_args = array() ): void {
 		$command( $args, $assoc_args );
 	}
 
@@ -70,7 +70,7 @@ abstract class CliTestCase extends IntegrationTestCase {
 	 * @param array  $assoc_args Associative arguments.
 	 * @return void
 	 */
-	protected function invoke_expecting_success( object $command, array $args = [], array $assoc_args = [] ): void {
+	protected function invoke_expecting_success( object $command, array $args = array(), array $assoc_args = array() ): void {
 		try {
 			$this->invoke_command( $command, $args, $assoc_args );
 		} catch ( WP_CLI_ExitException $e ) {
@@ -86,7 +86,7 @@ abstract class CliTestCase extends IntegrationTestCase {
 	 * @param array  $assoc_args Associative arguments.
 	 * @return WP_CLI_ExitException The caught exception.
 	 */
-	protected function invoke_expecting_error( object $command, array $args = [], array $assoc_args = [] ): WP_CLI_ExitException {
+	protected function invoke_expecting_error( object $command, array $args = array(), array $assoc_args = array() ): WP_CLI_ExitException {
 		try {
 			$this->invoke_command( $command, $args, $assoc_args );
 			$this->fail( 'Command should have failed with an error.' );
@@ -282,11 +282,11 @@ abstract class CliTestCase extends IntegrationTestCase {
 	 * @param array $args Post arguments.
 	 * @return int Post ID.
 	 */
-	protected function create_liveblog( array $args = [] ): int {
-		$defaults = [
+	protected function create_liveblog( array $args = array() ): int {
+		$defaults = array(
 			'post_title'  => 'Test Liveblog',
 			'post_status' => 'publish',
-		];
+		);
 
 		$post_id = self::factory()->post->create( array_merge( $defaults, $args ) );
 		$this->enable_liveblog( $post_id );
@@ -328,7 +328,7 @@ abstract class CliTestCase extends IntegrationTestCase {
 	 * @param array  $args    Additional arguments.
 	 * @return int Entry ID.
 	 */
-	protected function add_entry( int $post_id, string $content, array $args = [] ): int {
+	protected function add_entry( int $post_id, string $content, array $args = array() ): int {
 		$user = $args['user'] ?? self::factory()->user->create_and_get();
 
 		$entry_service = $this->container()->entry_service();
@@ -347,7 +347,7 @@ abstract class CliTestCase extends IntegrationTestCase {
 	 * @param array $args User arguments.
 	 * @return \WP_User
 	 */
-	protected function create_user( array $args = [] ): \WP_User {
+	protected function create_user( array $args = array() ): \WP_User {
 		return self::factory()->user->create_and_get( $args );
 	}
 

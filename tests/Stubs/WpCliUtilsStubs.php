@@ -23,11 +23,11 @@ function format_items( $format, $items, $columns ) {
 	\WP_CLI::line( sprintf( '[format_items: %s, %d items, columns: %s]', $format, count( $items ), implode( ',', $columns ) ) );
 
 	// Store formatted output for assertions.
-	$GLOBALS['wp_cli_format_items_calls'][] = [
+	$GLOBALS['wp_cli_format_items_calls'][] = array(
 		'format'  => $format,
 		'items'   => $items,
 		'columns' => $columns,
-	];
+	);
 }
 
 /**
@@ -40,7 +40,7 @@ function format_items( $format, $items, $columns ) {
 function make_progress_bar( $message, $count ) {
 	\WP_CLI::line( sprintf( '[progress_bar: %s, %d items]', $message, $count ) );
 
-	return new class {
+	return new class() {
 		/**
 		 * Tick the progress bar.
 		 *
@@ -63,7 +63,7 @@ function make_progress_bar( $message, $count ) {
  * @return void
  */
 function reset_format_items_calls() {
-	$GLOBALS['wp_cli_format_items_calls'] = [];
+	$GLOBALS['wp_cli_format_items_calls'] = array();
 }
 
 /**
@@ -72,5 +72,5 @@ function reset_format_items_calls() {
  * @return array
  */
 function get_format_items_calls() {
-	return $GLOBALS['wp_cli_format_items_calls'] ?? [];
+	return $GLOBALS['wp_cli_format_items_calls'] ?? array();
 }

@@ -39,7 +39,7 @@ final class StatsCommandTest extends CliTestCase {
 		$this->create_liveblog();
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$this->assertNotEmpty( $logs );
@@ -55,7 +55,7 @@ final class StatsCommandTest extends CliTestCase {
 		$this->create_liveblog();
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'yaml' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'yaml' ) );
 
 		$logs = $this->output->get_logs();
 		$this->assertNotEmpty( $logs );
@@ -71,7 +71,7 @@ final class StatsCommandTest extends CliTestCase {
 		$this->archive_liveblog( $archived_id );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -90,7 +90,7 @@ final class StatsCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Entry 3' );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -103,11 +103,11 @@ final class StatsCommandTest extends CliTestCase {
 	public function test_stats_shows_key_events(): void {
 		$post_id = $this->create_liveblog();
 		$this->add_entry( $post_id, 'Regular entry' );
-		$this->add_entry( $post_id, 'Key event 1', [ 'key_event' => true ] );
-		$this->add_entry( $post_id, 'Key event 2', [ 'key_event' => true ] );
+		$this->add_entry( $post_id, 'Key event 1', array( 'key_event' => true ) );
+		$this->add_entry( $post_id, 'Key event 2', array( 'key_event' => true ) );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -122,13 +122,13 @@ final class StatsCommandTest extends CliTestCase {
 		$user1   = $this->create_user();
 		$user2   = $this->create_user();
 		$user3   = $this->create_user();
-		$this->add_entry( $post_id, 'Entry 1', [ 'user' => $user1 ] );
-		$this->add_entry( $post_id, 'Entry 2', [ 'user' => $user2 ] );
-		$this->add_entry( $post_id, 'Entry 3', [ 'user' => $user3 ] );
-		$this->add_entry( $post_id, 'Entry 4', [ 'user' => $user1 ] );
+		$this->add_entry( $post_id, 'Entry 1', array( 'user' => $user1 ) );
+		$this->add_entry( $post_id, 'Entry 2', array( 'user' => $user2 ) );
+		$this->add_entry( $post_id, 'Entry 3', array( 'user' => $user3 ) );
+		$this->add_entry( $post_id, 'Entry 4', array( 'user' => $user1 ) );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -141,7 +141,7 @@ final class StatsCommandTest extends CliTestCase {
 	public function test_stats_empty_site(): void {
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -153,15 +153,15 @@ final class StatsCommandTest extends CliTestCase {
 	 * Test stats shows most active liveblog.
 	 */
 	public function test_stats_shows_most_active_liveblog(): void {
-		$post_id1 = $this->create_liveblog( [ 'post_title' => 'Less Active' ] );
-		$post_id2 = $this->create_liveblog( [ 'post_title' => 'Most Active' ] );
+		$post_id1 = $this->create_liveblog( array( 'post_title' => 'Less Active' ) );
+		$post_id2 = $this->create_liveblog( array( 'post_title' => 'Most Active' ) );
 		$this->add_entry( $post_id1, 'Entry 1' );
 		$this->add_entry( $post_id2, 'Entry 1' );
 		$this->add_entry( $post_id2, 'Entry 2' );
 		$this->add_entry( $post_id2, 'Entry 3' );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -177,7 +177,7 @@ final class StatsCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Entry' );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -196,7 +196,7 @@ final class StatsCommandTest extends CliTestCase {
 		$this->add_entry( $post_id2, 'Entry 2' );
 		$command = new StatsCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );

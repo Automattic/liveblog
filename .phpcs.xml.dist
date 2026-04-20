@@ -51,6 +51,7 @@
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="liveblog"/>
+				<element value="Automattic\Liveblog"/>
 			</property>
 		</properties>
 	</rule>

@@ -22,8 +22,8 @@ final class ListCommandTest extends CliTestCase {
 	 * Test listing all liveblogs.
 	 */
 	public function test_list_all_liveblogs(): void {
-		$this->create_liveblog( [ 'post_title' => 'Enabled Liveblog' ] );
-		$archived_id = $this->create_liveblog( [ 'post_title' => 'Archived Liveblog' ] );
+		$this->create_liveblog( array( 'post_title' => 'Enabled Liveblog' ) );
+		$archived_id = $this->create_liveblog( array( 'post_title' => 'Archived Liveblog' ) );
 		$this->archive_liveblog( $archived_id );
 		$command = new ListCommand();
 
@@ -38,12 +38,12 @@ final class ListCommandTest extends CliTestCase {
 	 * Test listing with --state=enabled.
 	 */
 	public function test_list_state_enabled(): void {
-		$this->create_liveblog( [ 'post_title' => 'Enabled Liveblog' ] );
-		$archived_id = $this->create_liveblog( [ 'post_title' => 'Archived Liveblog' ] );
+		$this->create_liveblog( array( 'post_title' => 'Enabled Liveblog' ) );
+		$archived_id = $this->create_liveblog( array( 'post_title' => 'Archived Liveblog' ) );
 		$this->archive_liveblog( $archived_id );
 		$command = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'state' => 'enabled' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'state' => 'enabled' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -55,12 +55,12 @@ final class ListCommandTest extends CliTestCase {
 	 * Test listing with --state=archived.
 	 */
 	public function test_list_state_archived(): void {
-		$this->create_liveblog( [ 'post_title' => 'Enabled Liveblog' ] );
-		$archived_id = $this->create_liveblog( [ 'post_title' => 'Archived Liveblog' ] );
+		$this->create_liveblog( array( 'post_title' => 'Enabled Liveblog' ) );
+		$archived_id = $this->create_liveblog( array( 'post_title' => 'Archived Liveblog' ) );
 		$this->archive_liveblog( $archived_id );
 		$command = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'state' => 'archived' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'state' => 'archived' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -75,7 +75,7 @@ final class ListCommandTest extends CliTestCase {
 		$this->create_liveblog();
 		$command = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'table' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'table' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -89,7 +89,7 @@ final class ListCommandTest extends CliTestCase {
 		$this->create_liveblog();
 		$command = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -103,7 +103,7 @@ final class ListCommandTest extends CliTestCase {
 		$this->create_liveblog();
 		$command = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'csv' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'csv' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -117,7 +117,7 @@ final class ListCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'ids' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'ids' ) );
 
 		$logs = $this->output->get_logs();
 		$this->assertNotEmpty( $logs );
@@ -175,7 +175,7 @@ final class ListCommandTest extends CliTestCase {
 	 * Test list item includes title.
 	 */
 	public function test_list_item_includes_title(): void {
-		$this->create_liveblog( [ 'post_title' => 'My Test Liveblog' ] );
+		$this->create_liveblog( array( 'post_title' => 'My Test Liveblog' ) );
 		$command = new ListCommand();
 
 		$this->invoke_expecting_success( $command );
@@ -193,7 +193,7 @@ final class ListCommandTest extends CliTestCase {
 		$post_id2 = $this->create_liveblog();
 		$command  = new ListCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'format' => 'ids' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'format' => 'ids' ) );
 
 		$logs = $this->output->get_logs();
 		$this->assertNotEmpty( $logs );

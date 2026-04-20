@@ -27,7 +27,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 		$this->archive_liveblog( $post_id );
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_success( 'unarchived and re-enabled' );
 
@@ -44,7 +44,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 		$this->archive_liveblog( $post_id );
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assertSame( 'enable', $this->get_liveblog_meta( $post_id ) );
 	}
@@ -55,7 +55,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 	public function test_unarchive_with_invalid_id(): void {
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_error( $command, [ '0' ] );
+		$this->invoke_expecting_error( $command, array( '0' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}
@@ -66,7 +66,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 	public function test_unarchive_non_existent_post(): void {
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_error( $command, [ '999999' ] );
+		$this->invoke_expecting_error( $command, array( '999999' ) );
 
 		$this->assert_error_contains( 'not found' );
 	}
@@ -78,7 +78,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_warning( 'already enabled' );
 	}
@@ -90,7 +90,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_error( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_error( $command, array( (string) $post_id ) );
 
 		$this->assert_error_contains( 'not an archived liveblog' );
 	}
@@ -103,7 +103,7 @@ final class UnarchiveCommandTest extends CliTestCase {
 		$this->archive_liveblog( $post_id );
 		$command = new UnarchiveCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_success_contains( (string) $post_id );
 	}
