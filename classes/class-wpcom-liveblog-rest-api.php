@@ -91,6 +91,10 @@ class WPCOM_Liveblog_Rest_Api {
 	 * Register all of our endpoints.
 	 * Any validation, sanitization, and permission checks can be done here using callbacks.
 	 *
+	 * Public read endpoints share the `can_read_liveblog` permission callback so that
+	 * liveblog entries are not returned for posts the current request cannot otherwise
+	 * read. Any new public read route should use the same callback.
+	 *
 	 * @return void
 	 */
 	public static function register_routes() {
@@ -116,7 +120,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( __CLASS__, 'can_read_liveblog' ),
 			)
 		);
 
@@ -177,7 +181,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( __CLASS__, 'can_read_liveblog' ),
 			)
 		);
 
@@ -201,7 +205,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( __CLASS__, 'can_read_liveblog' ),
 			)
 		);
 
@@ -332,7 +336,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( __CLASS__, 'can_read_liveblog' ),
 			)
 		);
 
@@ -353,7 +357,7 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( __CLASS__, 'can_read_liveblog' ),
 			)
 		);
 
@@ -380,8 +384,70 @@ class WPCOM_Liveblog_Rest_Api {
 						'required' => true,
 					),
 				),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( __CLASS__, 'can_read_liveblog' ),
 			)
+		);
+	}
+
+	/**
+	 * Permission callback for public liveblog read endpoints.
+	 *
+	 * Liveblog entries inherit their access rules from the parent post. To avoid leaking
+	 * entries that belong to draft, private, scheduled, trashed, or otherwise non-public
+	 * posts, this callback requires:
+	 *
+	 * - The referenced post to exist.
+	 * - Liveblog to be enabled (or archived) on the post.
+	 * - The post to be published, or the current user to have the `read_post` capability
+	 *   for it.
+	 *
+	 * All failure paths return a 404 so the endpoint cannot be used as an oracle for
+	 * post existence or status.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return true|WP_Error True when the request is permitted, otherwise a 404 error.
+	 */
+	public static function can_read_liveblog( WP_REST_Request $request ) {
+		// Flag the REST API context before calling is_liveblog_post(). Without this,
+		// WPCOM_Liveblog::get_liveblog_state() short-circuits to false because none
+		// of is_singular(), is_admin() or $is_rest_api_call is truthy yet at
+		// permission-callback time (set_liveblog_vars() only runs inside the route
+		// callback, after the permission check has already passed).
+		WPCOM_Liveblog::$is_rest_api_call = true;
+
+		$post_id = (int) $request->get_param( 'post_id' );
+		$post    = $post_id > 0 ? get_post( $post_id ) : null;
+
+		$allowed = (
+			$post instanceof WP_Post
+			&& WPCOM_Liveblog::is_liveblog_post( $post_id )
+			&& ( 'publish' === $post->post_status || current_user_can( 'read_post', $post_id ) )
+		);
+
+		/**
+		 * Filters whether the current request may read liveblog entries for a given post.
+		 *
+		 * Default behaviour requires that the post exists, has liveblog enabled, and is
+		 * either published or readable by the current user. Filter to loosen or tighten.
+		 *
+		 * @since 1.12.0
+		 *
+		 * @param bool            $allowed Whether the request is allowed.
+		 * @param int             $post_id The post ID being queried (0 when not supplied).
+		 * @param WP_REST_Request $request The current REST request.
+		 */
+		$allowed = (bool) apply_filters( 'liveblog_rest_read_permission', $allowed, $post_id, $request );
+
+		if ( $allowed ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_liveblog_not_found',
+			__( 'Liveblog not found.', 'liveblog' ),
+			array( 'status' => 404 )
 		);
 	}
 
