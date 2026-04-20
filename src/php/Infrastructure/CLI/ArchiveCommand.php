@@ -38,7 +38,7 @@ final class ArchiveCommand {
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 */
-	public function __invoke( array $args, array $assoc_args ): void {
+	public function __invoke( array $args, array $assoc_args ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- WP-CLI requires this signature.
 		$post_id = absint( $args[0] ?? 0 );
 
 		if ( 0 === $post_id ) {

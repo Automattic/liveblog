@@ -39,8 +39,7 @@ require_once __DIR__ . '/src/php/functions.php';
 PluploadCompat::ensure_functions();
 
 // Initialise the plugin.
-$container = Container::instance();
-( new PluginBootstrapper( $container ) )->init();
+( new PluginBootstrapper( Container::instance() ) )->init();
 
 /**
  * Get the DI container.

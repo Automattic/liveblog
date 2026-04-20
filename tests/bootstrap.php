@@ -88,7 +88,7 @@ if ( $is_integration ) {
 	require __DIR__ . '/Stubs/WpCliUtilsStubs.php';
 
 	if ( ! defined( 'WP_CLI' ) ) {
-		define( 'WP_CLI', true );
+		define( 'WP_CLI', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Stubs the WP_CLI runtime flag.
 	}
 
 	// Load the custom Spy REST Server for testing.

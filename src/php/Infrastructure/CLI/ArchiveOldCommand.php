@@ -177,7 +177,7 @@ final class ArchiveOldCommand {
 			)
 		);
 
-		return $date ?: null;
+		return $date ? $date : null;
 	}
 
 	/**

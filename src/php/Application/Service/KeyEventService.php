@@ -182,7 +182,7 @@ final class KeyEventService {
 	 * @return string Content with key command removed.
 	 */
 	public function strip_key_command_from_content( string $content ): string {
-		// Remove the command span: <span class="liveblog-command type-key">key</span>
+		// Remove the command span: <span class="liveblog-command type-key">key</span>.
 		$content = preg_replace(
 			'/<span[^>]*class="[^"]*liveblog-command[^"]*type-key[^"]*"[^>]*>.*?<\/span>\s*/i',
 			'',

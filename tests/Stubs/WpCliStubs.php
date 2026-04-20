@@ -12,6 +12,9 @@
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Stub for external namespace.
 // phpcs:disable Squiz.Classes.ClassFileName.NoMatch -- Stub file containing multiple classes.
 // phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses -- Stub file containing multiple classes.
+// phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound -- Stub file containing multiple classes.
+// phpcs:disable Universal.NamingConventions.NoReservedKeywordParameterNames -- Mirrors the real WP_CLI signature.
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is stub-only and not rendered.
 
 if ( ! class_exists( 'WP_CLI' ) ) {
 	/**
@@ -25,7 +28,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 *
 		 * @var array
 		 */
-		private static $calls = [];
+		private static $calls = array();
 
 		/**
 		 * Flag to control confirm() behaviour.
@@ -40,7 +43,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		public static function reset() {
-			self::$calls           = [];
+			self::$calls           = array();
 			self::$confirm_returns = true;
 		}
 
@@ -52,10 +55,10 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		private static function record_call( $method, $args ) {
-			self::$calls[] = [
+			self::$calls[] = array(
 				'method' => $method,
 				'args'   => $args,
-			];
+			);
 		}
 
 		/**
@@ -122,7 +125,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		public static function success( $message ) {
-			self::record_call( 'success', [ $message ] );
+			self::record_call( 'success', array( $message ) );
 		}
 
 		/**
@@ -132,7 +135,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @throws WP_CLI_ExitException Always throws to simulate exit.
 		 */
 		public static function error( $message ) {
-			self::record_call( 'error', [ $message ] );
+			self::record_call( 'error', array( $message ) );
 			throw new WP_CLI_ExitException( $message, 1 );
 		}
 
@@ -143,7 +146,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		public static function warning( $message ) {
-			self::record_call( 'warning', [ $message ] );
+			self::record_call( 'warning', array( $message ) );
 		}
 
 		/**
@@ -153,7 +156,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		public static function line( $message = '' ) {
-			self::record_call( 'line', [ $message ] );
+			self::record_call( 'line', array( $message ) );
 		}
 
 		/**
@@ -163,7 +166,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		public static function log( $message ) {
-			self::record_call( 'log', [ $message ] );
+			self::record_call( 'log', array( $message ) );
 		}
 
 		/**
@@ -173,7 +176,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @return void
 		 */
 		public static function debug( $message ) {
-			self::record_call( 'debug', [ $message ] );
+			self::record_call( 'debug', array( $message ) );
 		}
 
 		/**
@@ -184,7 +187,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @throws WP_CLI_ExitException When confirm returns false.
 		 */
 		public static function confirm( $question ) {
-			self::record_call( 'confirm', [ $question ] );
+			self::record_call( 'confirm', array( $question ) );
 
 			if ( ! self::$confirm_returns ) {
 				throw new WP_CLI_ExitException( 'Cancelled by user.', 0 );
@@ -220,8 +223,8 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 		 * @param array  $args    Command arguments.
 		 * @return void
 		 */
-		public static function add_command( $name, $handler, $args = [] ) {
-			self::record_call( 'add_command', [ $name, $handler, $args ] );
+		public static function add_command( $name, $handler, $args = array() ) {
+			self::record_call( 'add_command', array( $name, $handler, $args ) );
 		}
 	}
 
@@ -262,5 +265,5 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 
 // Initialize the global for format_items tracking.
 if ( ! isset( $GLOBALS['wp_cli_format_items_calls'] ) ) {
-	$GLOBALS['wp_cli_format_items_calls'] = [];
+	$GLOBALS['wp_cli_format_items_calls'] = array();
 }

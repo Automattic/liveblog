@@ -62,13 +62,6 @@ final class SchemaMetadataTest extends IntegrationTestCase {
 	}
 
 	/**
-	 * Tear down test fixtures.
-	 */
-	public function tear_down(): void {
-		parent::tear_down();
-	}
-
-	/**
 	 * Test that metadata includes required @context property.
 	 *
 	 * @covers ::generate
