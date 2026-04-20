@@ -28,7 +28,7 @@ final class FixArchiveCommandTest extends CliTestCase {
 		$service = new ArchiveRepairService();
 		$command = new FixArchiveCommand( $service );
 
-		$this->invoke_expecting_success( $command, [], [ 'dry-run' => true ] );
+		$this->invoke_expecting_success( $command, array(), array( 'dry-run' => true ) );
 
 		$this->assert_success_contains( 'Dry run completed' );
 		$this->assert_line_contains( 'dry-run mode' );
@@ -114,7 +114,7 @@ final class FixArchiveCommandTest extends CliTestCase {
 		$service = new ArchiveRepairService();
 		$command = new FixArchiveCommand( $service );
 
-		$this->invoke_expecting_success( $command, [], [ 'dry-run' => true ] );
+		$this->invoke_expecting_success( $command, array(), array( 'dry-run' => true ) );
 
 		$this->assert_success_contains( 'Re-run without --dry-run' );
 	}
@@ -155,7 +155,7 @@ final class FixArchiveCommandTest extends CliTestCase {
 	public function test_fix_archive_with_edited_entry(): void {
 		$post_id  = $this->create_liveblog();
 		$user     = $this->create_user();
-		$entry_id = $this->add_entry( $post_id, 'Original content', [ 'user' => $user ] );
+		$entry_id = $this->add_entry( $post_id, 'Original content', array( 'user' => $user ) );
 
 		// Simulate an edit by creating an update entry via the service.
 		$entry_service = $this->container()->entry_service();

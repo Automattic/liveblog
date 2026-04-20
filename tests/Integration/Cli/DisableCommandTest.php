@@ -27,7 +27,7 @@ final class DisableCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'yes' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
 		$this->assert_command_success( 'Liveblog disabled' );
 		$this->assert_confirm_not_called();
@@ -44,7 +44,7 @@ final class DisableCommandTest extends CliTestCase {
 		$command = new DisableCommand();
 
 		// Confirm will auto-return true by default.
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_confirm_called();
 		$this->assert_command_success( 'Liveblog disabled' );
@@ -57,7 +57,7 @@ final class DisableCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'yes' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
 		// Meta should be removed after disable.
 		$meta = $this->get_liveblog_meta( $post_id );
@@ -70,7 +70,7 @@ final class DisableCommandTest extends CliTestCase {
 	public function test_disable_with_invalid_id(): void {
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_error( $command, [ '0' ] );
+		$this->invoke_expecting_error( $command, array( '0' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}
@@ -81,7 +81,7 @@ final class DisableCommandTest extends CliTestCase {
 	public function test_disable_non_existent_post(): void {
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_error( $command, [ '999999' ] );
+		$this->invoke_expecting_error( $command, array( '999999' ) );
 
 		$this->assert_error_contains( 'not found' );
 	}
@@ -93,7 +93,7 @@ final class DisableCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_warning( 'not a liveblog' );
 	}
@@ -106,7 +106,7 @@ final class DisableCommandTest extends CliTestCase {
 		$entry_id = $this->add_entry( $post_id, 'Test entry content' );
 		$command  = new DisableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'yes' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
 		// Entry should still exist.
 		$comment = get_comment( $entry_id );
@@ -121,7 +121,7 @@ final class DisableCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'yes' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
 		$this->assert_success_contains( 'preserved' );
 	}
@@ -134,7 +134,7 @@ final class DisableCommandTest extends CliTestCase {
 		$this->archive_liveblog( $post_id );
 		$command = new DisableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'yes' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
 		$this->assert_command_success( 'Liveblog disabled' );
 

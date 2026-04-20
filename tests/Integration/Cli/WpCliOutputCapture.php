@@ -94,10 +94,10 @@ final class WpCliOutputCapture {
 	 * @return string All output joined by newlines.
 	 */
 	public function get_all_output(): string {
-		$output = [];
+		$output = array();
 
 		foreach ( WP_CLI::get_calls() as $call ) {
-			if ( in_array( $call['method'], [ 'success', 'error', 'warning', 'line', 'log' ], true ) ) {
+			if ( in_array( $call['method'], array( 'success', 'error', 'warning', 'line', 'log' ), true ) ) {
 				$output[] = sprintf( '[%s] %s', $call['method'], $call['args'][0] ?? '' );
 			}
 		}

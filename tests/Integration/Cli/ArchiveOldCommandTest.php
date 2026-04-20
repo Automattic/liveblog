@@ -37,14 +37,21 @@ final class ArchiveOldCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		// Create old post and entry.
 		wp_update_post(
-			[
+			array(
 				'ID'        => $post_id,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30', 'dry-run' => true ] );
+		$this->invoke_expecting_success(
+			$command,
+			array(),
+			array(
+				'days'    => '30',
+				'dry-run' => true,
+			) 
+		);
 
 		$this->assert_success_contains( 'Dry run complete' );
 		$this->assert_success_contains( 'No changes made' );
@@ -61,14 +68,21 @@ final class ArchiveOldCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		// Create old post.
 		wp_update_post(
-			[
+			array(
 				'ID'        => $post_id,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30', 'yes' => true ] );
+		$this->invoke_expecting_success(
+			$command,
+			array(),
+			array(
+				'days' => '30',
+				'yes'  => true,
+			) 
+		);
 
 		$this->assert_command_success( 'Archived' );
 		$this->assert_confirm_not_called();
@@ -85,14 +99,14 @@ final class ArchiveOldCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		// Create old post.
 		wp_update_post(
-			[
+			array(
 				'ID'        => $post_id,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'days' => '30' ) );
 
 		$this->assert_confirm_called();
 	}
@@ -103,7 +117,7 @@ final class ArchiveOldCommandTest extends CliTestCase {
 	public function test_archive_old_invalid_days(): void {
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_error( $command, [], [ 'days' => '0' ] );
+		$this->invoke_expecting_error( $command, array(), array( 'days' => '0' ) );
 
 		$this->assert_error_contains( 'at least 1' );
 	}
@@ -113,21 +127,28 @@ final class ArchiveOldCommandTest extends CliTestCase {
 	 */
 	public function test_archive_old_finds_inactive_liveblogs(): void {
 		// Create an old inactive liveblog.
-		$old_id = $this->create_liveblog( [ 'post_title' => 'Old Liveblog' ] );
+		$old_id = $this->create_liveblog( array( 'post_title' => 'Old Liveblog' ) );
 		wp_update_post(
-			[
+			array(
 				'ID'        => $old_id,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 
 		// Create a recent liveblog.
-		$recent_id = $this->create_liveblog( [ 'post_title' => 'Recent Liveblog' ] );
+		$recent_id = $this->create_liveblog( array( 'post_title' => 'Recent Liveblog' ) );
 		$this->add_entry( $recent_id, 'Recent entry' );
 
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30', 'dry-run' => true ] );
+		$this->invoke_expecting_success(
+			$command,
+			array(),
+			array(
+				'days'    => '30',
+				'dry-run' => true,
+			) 
+		);
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -150,20 +171,27 @@ final class ArchiveOldCommandTest extends CliTestCase {
 		// Update the comment date directly.
 		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->comments,
-			[
+			array(
 				'comment_date'     => $entry_date,
 				'comment_date_gmt' => $entry_date,
-			],
-			[
-				'comment_post_ID'   => $post_id,
-				'comment_approved'  => 'liveblog',
-			]
+			),
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_approved' => 'liveblog',
+			)
 		);
 		clean_comment_cache( $post_id );
 
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30', 'dry-run' => true ] );
+		$this->invoke_expecting_success(
+			$command,
+			array(),
+			array(
+				'days'    => '30',
+				'dry-run' => true,
+			) 
+		);
 
 		$this->assert_success_contains( 'No inactive liveblogs found' );
 	}
@@ -174,7 +202,7 @@ final class ArchiveOldCommandTest extends CliTestCase {
 	public function test_archive_old_no_liveblogs(): void {
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30' ] );
+		$this->invoke_expecting_success( $command, array(), array( 'days' => '30' ) );
 
 		$this->assert_success_contains( 'No inactive liveblogs found' );
 	}
@@ -183,16 +211,23 @@ final class ArchiveOldCommandTest extends CliTestCase {
 	 * Test archive-old shows preview table.
 	 */
 	public function test_archive_old_shows_preview(): void {
-		$post_id = $this->create_liveblog( [ 'post_title' => 'Old Liveblog' ] );
+		$post_id = $this->create_liveblog( array( 'post_title' => 'Old Liveblog' ) );
 		wp_update_post(
-			[
+			array(
 				'ID'        => $post_id,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30', 'dry-run' => true ] );
+		$this->invoke_expecting_success(
+			$command,
+			array(),
+			array(
+				'days'    => '30',
+				'dry-run' => true,
+			) 
+		);
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -208,20 +243,27 @@ final class ArchiveOldCommandTest extends CliTestCase {
 		$post_id1 = $this->create_liveblog();
 		$post_id2 = $this->create_liveblog();
 		wp_update_post(
-			[
+			array(
 				'ID'        => $post_id1,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 		wp_update_post(
-			[
+			array(
 				'ID'        => $post_id2,
 				'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
-			]
+			)
 		);
 		$command = new ArchiveOldCommand();
 
-		$this->invoke_expecting_success( $command, [], [ 'days' => '30', 'yes' => true ] );
+		$this->invoke_expecting_success(
+			$command,
+			array(),
+			array(
+				'days' => '30',
+				'yes'  => true,
+			) 
+		);
 
 		$this->assert_success_contains( '2 liveblog' );
 

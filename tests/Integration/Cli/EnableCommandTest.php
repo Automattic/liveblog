@@ -26,7 +26,7 @@ final class EnableCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new EnableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_success( 'Liveblog enabled' );
 		$this->assertSame( 'enable', $this->get_liveblog_meta( $post_id ) );
@@ -39,7 +39,7 @@ final class EnableCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new EnableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$liveblog = LiveblogPost::from_id( $post_id );
 		$this->assertNotNull( $liveblog );
@@ -53,7 +53,7 @@ final class EnableCommandTest extends CliTestCase {
 	public function test_enable_with_invalid_id(): void {
 		$command = new EnableCommand();
 
-		$this->invoke_expecting_error( $command, [ '0' ] );
+		$this->invoke_expecting_error( $command, array( '0' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}
@@ -64,7 +64,7 @@ final class EnableCommandTest extends CliTestCase {
 	public function test_enable_with_non_existent_post(): void {
 		$command = new EnableCommand();
 
-		$this->invoke_expecting_error( $command, [ '999999' ] );
+		$this->invoke_expecting_error( $command, array( '999999' ) );
 
 		$this->assert_error_contains( 'not found' );
 	}
@@ -76,7 +76,7 @@ final class EnableCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new EnableCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_warning( 'already an enabled liveblog' );
 	}
@@ -93,7 +93,7 @@ final class EnableCommandTest extends CliTestCase {
 		$this->assertTrue( $liveblog->is_archived() );
 
 		$command = new EnableCommand();
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_success( 'Liveblog enabled' );
 
@@ -110,7 +110,7 @@ final class EnableCommandTest extends CliTestCase {
 		$command = new EnableCommand();
 
 		// 'abc' converts to 0 via absint, which triggers the invalid ID error.
-		$this->invoke_expecting_error( $command, [ 'abc' ] );
+		$this->invoke_expecting_error( $command, array( 'abc' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}

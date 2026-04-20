@@ -36,7 +36,7 @@ final class AddCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id, 'Test entry content' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id, 'Test entry content' ) );
 
 		$this->assert_command_success( 'Entry' );
 		$this->assert_success_contains( 'added to liveblog' );
@@ -49,13 +49,13 @@ final class AddCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id, 'Test entry content' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id, 'Test entry content' ) );
 
 		$comments = get_comments(
-			[
+			array(
 				'post_id' => $post_id,
 				'status'  => 'liveblog',
-			]
+			)
 		);
 
 		$this->assertCount( 1, $comments );
@@ -67,20 +67,20 @@ final class AddCommandTest extends CliTestCase {
 	 */
 	public function test_add_with_author(): void {
 		$post_id = $this->create_liveblog();
-		$user    = $this->create_user( [ 'display_name' => 'Test Author' ] );
+		$user    = $this->create_user( array( 'display_name' => 'Test Author' ) );
 		$command = new AddCommand( $this->container()->entry_service() );
 
 		$this->invoke_expecting_success(
 			$command,
-			[ (string) $post_id, 'Test entry' ],
-			[ 'author' => (string) $user->ID ]
+			array( (string) $post_id, 'Test entry' ),
+			array( 'author' => (string) $user->ID )
 		);
 
 		$comments = get_comments(
-			[
+			array(
 				'post_id' => $post_id,
 				'status'  => 'liveblog',
-			]
+			)
 		);
 
 		$this->assertSame( (int) $user->ID, (int) $comments[0]->user_id );
@@ -97,15 +97,15 @@ final class AddCommandTest extends CliTestCase {
 
 		$this->invoke_expecting_success(
 			$command,
-			[ (string) $post_id, 'Test entry' ],
-			[ 'contributors' => sprintf( '%d,%d', $user1->ID, $user2->ID ) ]
+			array( (string) $post_id, 'Test entry' ),
+			array( 'contributors' => sprintf( '%d,%d', $user1->ID, $user2->ID ) )
 		);
 
 		$comments = get_comments(
-			[
+			array(
 				'post_id' => $post_id,
 				'status'  => 'liveblog',
-			]
+			)
 		);
 
 		$contributors = get_comment_meta( $comments[0]->comment_ID, 'liveblog_contributors', true );
@@ -122,15 +122,15 @@ final class AddCommandTest extends CliTestCase {
 
 		$this->invoke_expecting_success(
 			$command,
-			[ (string) $post_id, 'Test entry' ],
-			[ 'hide-authors' => true ]
+			array( (string) $post_id, 'Test entry' ),
+			array( 'hide-authors' => true )
 		);
 
 		$comments = get_comments(
-			[
+			array(
 				'post_id' => $post_id,
 				'status'  => 'liveblog',
-			]
+			)
 		);
 
 		$hide_authors = get_comment_meta( $comments[0]->comment_ID, 'liveblog_hide_authors', true );
@@ -146,17 +146,17 @@ final class AddCommandTest extends CliTestCase {
 
 		$this->invoke_expecting_success(
 			$command,
-			[ (string) $post_id, 'Test entry' ],
-			[ 'key-event' => true ]
+			array( (string) $post_id, 'Test entry' ),
+			array( 'key-event' => true )
 		);
 
 		$this->assert_success_contains( 'Key event' );
 
 		$comments = get_comments(
-			[
+			array(
 				'post_id' => $post_id,
 				'status'  => 'liveblog',
-			]
+			)
 		);
 
 		$key_event = get_comment_meta( $comments[0]->comment_ID, 'liveblog_key_entry', true );
@@ -172,8 +172,8 @@ final class AddCommandTest extends CliTestCase {
 
 		$this->invoke_expecting_success(
 			$command,
-			[ (string) $post_id, 'Test entry' ],
-			[ 'porcelain' => true ]
+			array( (string) $post_id, 'Test entry' ),
+			array( 'porcelain' => true )
 		);
 
 		// Should output just the ID via log, not success message.
@@ -190,7 +190,7 @@ final class AddCommandTest extends CliTestCase {
 	public function test_add_with_invalid_post_id(): void {
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_error( $command, [ '0', 'Test entry' ] );
+		$this->invoke_expecting_error( $command, array( '0', 'Test entry' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}
@@ -202,7 +202,7 @@ final class AddCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_error( $command, [ (string) $post_id, 'Test entry' ] );
+		$this->invoke_expecting_error( $command, array( (string) $post_id, 'Test entry' ) );
 
 		$this->assert_error_contains( 'not an enabled liveblog' );
 	}
@@ -215,7 +215,7 @@ final class AddCommandTest extends CliTestCase {
 		$this->archive_liveblog( $post_id );
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_error( $command, [ (string) $post_id, 'Test entry' ] );
+		$this->invoke_expecting_error( $command, array( (string) $post_id, 'Test entry' ) );
 
 		$this->assert_error_contains( 'archived' );
 		$this->assert_error_contains( 'Unarchive it first' );
@@ -228,7 +228,7 @@ final class AddCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_error( $command, [ (string) $post_id, '' ] );
+		$this->invoke_expecting_error( $command, array( (string) $post_id, '' ) );
 
 		$this->assert_error_contains( 'provide entry content' );
 	}
@@ -239,15 +239,15 @@ final class AddCommandTest extends CliTestCase {
 	public function test_add_with_invalid_author_shows_warning(): void {
 		$post_id = $this->create_liveblog();
 		// Create a user so there's a fallback admin.
-		$admin = self::factory()->user->create_and_get( [ 'role' => 'administrator' ] );
+		$admin = self::factory()->user->create_and_get( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin->ID );
 
 		$command = new AddCommand( $this->container()->entry_service() );
 
 		$this->invoke_expecting_success(
 			$command,
-			[ (string) $post_id, 'Test entry' ],
-			[ 'author' => '999999' ]
+			array( (string) $post_id, 'Test entry' ),
+			array( 'author' => '999999' )
 		);
 
 		$this->assert_warning_contains( 'not found' );
@@ -261,7 +261,7 @@ final class AddCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new AddCommand( $this->container()->entry_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id, 'Test entry' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id, 'Test entry' ) );
 
 		$this->assert_success_contains( (string) $post_id );
 	}

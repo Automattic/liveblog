@@ -25,7 +25,7 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -39,7 +39,7 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$this->assertNotEmpty( $logs );
@@ -56,7 +56,7 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'yaml' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'yaml' ) );
 
 		$logs = $this->output->get_logs();
 		$this->assertNotEmpty( $logs );
@@ -70,7 +70,7 @@ final class StatusCommandTest extends CliTestCase {
 	public function test_status_with_invalid_id(): void {
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_error( $command, [ '0' ] );
+		$this->invoke_expecting_error( $command, array( '0' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}
@@ -81,7 +81,7 @@ final class StatusCommandTest extends CliTestCase {
 	public function test_status_non_existent_post(): void {
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_error( $command, [ '999999' ] );
+		$this->invoke_expecting_error( $command, array( '999999' ) );
 
 		$this->assert_error_contains( 'not found' );
 	}
@@ -93,7 +93,7 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_error( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_error( $command, array( (string) $post_id ) );
 
 		$this->assert_error_contains( 'not a liveblog' );
 	}
@@ -107,7 +107,7 @@ final class StatusCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Entry 2' );
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -120,10 +120,10 @@ final class StatusCommandTest extends CliTestCase {
 	public function test_status_includes_key_events(): void {
 		$post_id = $this->create_liveblog();
 		$this->add_entry( $post_id, 'Regular entry' );
-		$this->add_entry( $post_id, 'Key event', [ 'key_event' => true ] );
+		$this->add_entry( $post_id, 'Key event', array( 'key_event' => true ) );
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -137,7 +137,7 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -151,7 +151,7 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -166,7 +166,7 @@ final class StatusCommandTest extends CliTestCase {
 		$this->archive_liveblog( $post_id );
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -177,10 +177,10 @@ final class StatusCommandTest extends CliTestCase {
 	 * Test status includes post title.
 	 */
 	public function test_status_includes_title(): void {
-		$post_id = $this->create_liveblog( [ 'post_title' => 'My Liveblog Title' ] );
+		$post_id = $this->create_liveblog( array( 'post_title' => 'My Liveblog Title' ) );
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );
@@ -194,12 +194,12 @@ final class StatusCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$user1   = $this->create_user();
 		$user2   = $this->create_user();
-		$this->add_entry( $post_id, 'Entry 1', [ 'user' => $user1 ] );
-		$this->add_entry( $post_id, 'Entry 2', [ 'user' => $user2 ] );
-		$this->add_entry( $post_id, 'Entry 3', [ 'user' => $user1 ] );
+		$this->add_entry( $post_id, 'Entry 1', array( 'user' => $user1 ) );
+		$this->add_entry( $post_id, 'Entry 2', array( 'user' => $user2 ) );
+		$this->add_entry( $post_id, 'Entry 3', array( 'user' => $user1 ) );
 		$command = new StatusCommand();
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$logs = $this->output->get_logs();
 		$json = json_decode( implode( '', $logs ), true );

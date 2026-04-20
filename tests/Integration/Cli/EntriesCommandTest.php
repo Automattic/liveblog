@@ -27,7 +27,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Second entry' );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -43,7 +43,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Test entry' );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'json' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -58,7 +58,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Test entry' );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'csv' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'csv' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -73,7 +73,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$entry_id = $this->add_entry( $post_id, 'Test entry' );
 		$command  = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'format' => 'ids' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'ids' ) );
 
 		// IDs format outputs via WP_CLI::log() and format_items is not called.
 		$this->assertTrue( \WP_CLI::was_called( 'log' ) );
@@ -91,7 +91,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Entry 3' );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'limit' => '2' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'limit' => '2' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -104,10 +104,10 @@ final class EntriesCommandTest extends CliTestCase {
 	public function test_entries_key_events_filter(): void {
 		$post_id = $this->create_liveblog();
 		$this->add_entry( $post_id, 'Regular entry' );
-		$this->add_entry( $post_id, 'Key event entry', [ 'key_event' => true ] );
+		$this->add_entry( $post_id, 'Key event entry', array( 'key_event' => true ) );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'key-events' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'key-events' => true ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -121,7 +121,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$post_id = self::factory()->post->create();
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_error( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_error( $command, array( (string) $post_id ) );
 
 		$this->assert_error_contains( 'not a liveblog' );
 	}
@@ -133,7 +133,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_warning( 'No entries found' );
 	}
@@ -146,7 +146,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Test entry' );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -164,10 +164,10 @@ final class EntriesCommandTest extends CliTestCase {
 	 */
 	public function test_key_events_filter_excludes_key_event_column(): void {
 		$post_id = $this->create_liveblog();
-		$this->add_entry( $post_id, 'Key event', [ 'key_event' => true ] );
+		$this->add_entry( $post_id, 'Key event', array( 'key_event' => true ) );
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'key-events' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'key-events' => true ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
@@ -182,7 +182,7 @@ final class EntriesCommandTest extends CliTestCase {
 	public function test_entries_with_invalid_post_id(): void {
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_error( $command, [ '0' ] );
+		$this->invoke_expecting_error( $command, array( '0' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
 	}
@@ -195,7 +195,7 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->add_entry( $post_id, 'Regular entry' ); // Not a key event.
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'key-events' => true ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'key-events' => true ) );
 
 		$this->assert_command_warning( 'No key events found' );
 	}
@@ -210,7 +210,7 @@ final class EntriesCommandTest extends CliTestCase {
 		}
 		$command = new EntriesCommand( $this->container()->entry_query_service() );
 
-		$this->invoke_expecting_success( $command, [ (string) $post_id ], [ 'limit' => '0' ] );
+		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'limit' => '0' ) );
 
 		$format_calls = $this->output->get_format_items_calls();
 		$this->assertNotEmpty( $format_calls );
