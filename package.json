@@ -11,7 +11,7 @@
     "sass-mq": "^7.0.0"
   },
   "dependencies": {
-    "@lexical/html": "^0.39.0",
+    "@lexical/html": "^0.43.0",
     "@lexical/link": "^0.39.0",
     "@lexical/list": "^0.39.0",
     "@lexical/react": "^0.40.0",
