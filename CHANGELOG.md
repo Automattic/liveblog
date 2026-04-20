@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.11.1] - 2026-04-20
+
+### Security
+
+* fix: require post read permission on public Liveblog REST endpoints by @GaryJones in https://github.com/Automattic/liveblog/pull/857 (CWE-639 IDOR)
+
+### Fixed
+
+* fix: improve schema.org LiveBlogPosting structured data output by @GaryJones in https://github.com/Automattic/liveblog/pull/816
+* fix: handle malformed comment_date_gmt in entry timestamp by @Ritesh-patel in https://github.com/Automattic/liveblog/pull/829
+
+### Maintenance
+
+* chore: clean up distribution and remove non-functional Behat workflow by @GaryJones in https://github.com/Automattic/liveblog/pull/802
+* fix: suppress duplicate class name PHPCS warning in test stub by @GaryJones in https://github.com/Automattic/liveblog/pull/851
+* npm(deps): bump @lexical/html, @lexical/link, @lexical/list, @lexical/react, lexical from 0.39.0 to 0.40.0 by @dependabot in https://github.com/Automattic/liveblog/pull/831, https://github.com/Automattic/liveblog/pull/832, https://github.com/Automattic/liveblog/pull/833, https://github.com/Automattic/liveblog/pull/834, https://github.com/Automattic/liveblog/pull/835
+* npm(deps): bump lodash, lodash-es from 4.17.21 to 4.18.1 by @dependabot in https://github.com/Automattic/liveblog/pull/826, https://github.com/Automattic/liveblog/pull/827, https://github.com/Automattic/liveblog/pull/849, https://github.com/Automattic/liveblog/pull/850
+* npm(deps-dev): bump axios from 1.13.2 to 1.15.0 by @dependabot in https://github.com/Automattic/liveblog/pull/853
+* npm(deps-dev): bump basic-ftp from 5.1.0 to 5.2.2 by @dependabot in https://github.com/Automattic/liveblog/pull/852
+* npm(deps-dev): bump brace-expansion from 1.1.12 to 1.1.13 by @dependabot in https://github.com/Automattic/liveblog/pull/848
+* npm(deps-dev): bump flatted from 3.3.3 to 3.4.2 by @dependabot in https://github.com/Automattic/liveblog/pull/844
+* npm(deps-dev): bump follow-redirects from 1.15.11 to 1.16.0 by @dependabot in https://github.com/Automattic/liveblog/pull/855
+* npm(deps-dev): bump immutable from 5.1.4 to 5.1.5 by @dependabot in https://github.com/Automattic/liveblog/pull/840
+* npm(deps-dev): bump node-forge from 1.3.3 to 1.4.0 by @dependabot in https://github.com/Automattic/liveblog/pull/847
+* npm(deps-dev): bump qs from 6.14.1 to 6.14.2 by @dependabot in https://github.com/Automattic/liveblog/pull/836
+* npm(deps-dev): bump svgo from 3.3.2 to 3.3.3 by @dependabot in https://github.com/Automattic/liveblog/pull/841
+* npm(deps): bump picomatch by @dependabot in https://github.com/Automattic/liveblog/pull/846
+* npm(deps): bump yaml from 1.10.2 to 1.10.3 by @dependabot in https://github.com/Automattic/liveblog/pull/845
+* Actions(deps): bump actions/checkout, actions/setup-node, softprops/action-gh-release by @dependabot in https://github.com/Automattic/liveblog/pull/821, https://github.com/Automattic/liveblog/pull/828, https://github.com/Automattic/liveblog/pull/843, https://github.com/Automattic/liveblog/pull/854
+
 ## [1.11.0] - 2026-01-14
 
 ### Added
@@ -275,6 +305,7 @@ Fixed problems:
 * Initial release
 
 
+[1.11.1]: https://github.com/Automattic/liveblog/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/Automattic/liveblog/compare/1.10.0...1.11.0
 [1.10.0]: https://github.com/Automattic/liveblog/compare/1.9.7...1.10.0
 [1.9.7]: https://github.com/Automattic/liveblog/compare/1.9.6...1.9.7

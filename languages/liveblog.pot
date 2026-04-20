@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Liveblog plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Liveblog 1.11.0\n"
+"Project-Id-Version: Liveblog 1.11.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/liveblog\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-14T07:51:56+00:00\n"
+"POT-Creation-Date: 2026-04-20T12:18:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: liveblog\n"
@@ -123,29 +123,33 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:400
-#: classes/class-wpcom-liveblog-entry.php:445
-#: classes/class-wpcom-liveblog-entry.php:482
+#: classes/class-wpcom-liveblog-entry.php:403
+#: classes/class-wpcom-liveblog-entry.php:448
+#: classes/class-wpcom-liveblog-entry.php:485
 msgid "Missing entry ID"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:517
+#: classes/class-wpcom-liveblog-entry.php:520
 msgid "Error posting entry"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:521
-#: classes/class-wpcom-liveblog-entry.php:552
+#: classes/class-wpcom-liveblog-entry.php:524
+#: classes/class-wpcom-liveblog-entry.php:555
 msgid "Error retrieving comment"
 msgstr ""
 
 #. translators: 1: argument.
-#: classes/class-wpcom-liveblog-entry.php:537
+#: classes/class-wpcom-liveblog-entry.php:540
 #, php-format
 msgid "Missing entry argument: %s"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:556
+#: classes/class-wpcom-liveblog-entry.php:559
 msgid "Error retrieving user"
+msgstr ""
+
+#: classes/class-wpcom-liveblog-rest-api.php:449
+msgid "Liveblog not found."
 msgstr ""
 
 #: classes/class-wpcom-liveblog-socketio-loader.php:105
@@ -235,9 +239,7 @@ msgid "New Entry"
 msgstr ""
 
 #: liveblog.php:1383
-#: build/994.bundle.js:1
 #: src/react/containers/EditorContainer.js:357
-#: build/994.bundle.js:504
 msgid "Publish Update"
 msgstr ""
 
@@ -372,9 +374,7 @@ msgid "Please <a href=\"%2$s\">deactivate the %1$s plugin</a> as Liveblog itself
 msgstr ""
 
 #: templates/liveblog-form.php:17
-#: build/994.bundle.js:1
 #: src/react/containers/EditorContainer.js:299
-#: build/994.bundle.js:446
 msgid "Preview"
 msgstr ""
 
@@ -444,19 +444,14 @@ msgid "Remove formatting"
 msgstr ""
 
 #: templates/liveblog-form.php:45
-#: build/822.bundle.js:1
-#: build/app.js:1
 #: src/react/components/DeleteConfirmation.js:13
 #: src/react/Editor/ImageCropModal.js:170
 #: src/react/Editor/LexicalEditor.js:977
-#: build/822.bundle.js:170
-#: build/822.bundle.js:1302
 msgid "Cancel"
 msgstr ""
 
 #: templates/liveblog-form.php:46
 #: templates/liveblog-single-entry.php:20
-#: build/app.js:1
 #: src/react/containers/EntryContainer.js:73
 msgid "Delete"
 msgstr ""
@@ -472,7 +467,6 @@ msgid "Load more entries&hellip;"
 msgstr ""
 
 #: templates/liveblog-single-entry.php:20
-#: build/app.js:1
 #: src/react/containers/EntryContainer.js:67
 msgid "Edit"
 msgstr ""
@@ -483,199 +477,136 @@ msgstr ""
 msgid "Your current WordPress is version %1$s, which is too old to run the liveblog plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s\">update WordPress</a>, or <a href=\"%4$s\">deactivate the liveblog plugin</a>."
 msgstr ""
 
-#: build/822.bundle.js:1
-#: src/react/Editor/ImageCropModal.js:131
-#: build/822.bundle.js:131
-msgid "Crop Image"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/ImageCropModal.js:137
-#: build/822.bundle.js:137
-msgid "Close"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/ImageCropModal.js:154
-#: build/822.bundle.js:154
-msgid "Crop preview"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/ImageCropModal.js:159
-#: build/822.bundle.js:159
-msgid "Drag to select the area you want to keep. Click Apply to use the full image without cropping."
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/ImageCropModal.js:178
-#: build/822.bundle.js:178
-msgid "Processing…"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/ImageCropModal.js:178
-#: build/822.bundle.js:178
-msgid "Apply"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:969
-#: build/822.bundle.js:1294
-msgid "Add link"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1215
-#: build/822.bundle.js:1540
-msgid "Bold (Ctrl+B)"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1222
-#: build/822.bundle.js:1547
-msgid "Italic (Ctrl+I)"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1229
-#: build/822.bundle.js:1554
-msgid "Underline (Ctrl+U)"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1236
-#: build/822.bundle.js:1561
-msgid "Ordered List"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1243
-#: build/822.bundle.js:1568
-msgid "Unordered List"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1250
-#: build/822.bundle.js:1575
-msgid "Blockquote"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1258
-#: build/822.bundle.js:1583
-msgid "Add Link"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1274
-#: build/822.bundle.js:1599
-msgid "Remove Link"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1282
-#: build/822.bundle.js:1607
-msgid "Uploading…"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1282
-#: build/822.bundle.js:1607
-msgid "Insert Image"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1354
-#: build/822.bundle.js:1679
-msgid "Liveblog entry content"
-msgstr ""
-
-#: build/822.bundle.js:1
-#: src/react/Editor/LexicalEditor.js:1359
-#: build/822.bundle.js:1684
-msgid "Start writing your liveblog entry…"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:164
-#: build/994.bundle.js:311
-msgid "Type to search for more authors…"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:281
-#: build/994.bundle.js:428
-msgid "Add New Entry"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:287
-#: build/994.bundle.js:434
-msgid "Visual"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:293
-#: build/994.bundle.js:440
-msgid "Text"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: build/app.js:1
-#: src/react/containers/EditorContainer.js:312
-#: src/react/containers/EntryContainer.js:125
-#: build/994.bundle.js:459
-msgid "Loading editor…"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:337
-#: build/994.bundle.js:484
-msgid "Authors:"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:340
-#: build/994.bundle.js:487
-msgid "Entry authors"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:353
-#: build/994.bundle.js:500
-msgid "No authors matched"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:353
-#: build/994.bundle.js:500
-msgid "Loading authors…"
-msgstr ""
-
-#: build/994.bundle.js:1
-#: src/react/containers/EditorContainer.js:357
-#: build/994.bundle.js:504
-msgid "Publish New Entry"
-msgstr ""
-
-#: build/app.js:1
 #: src/react/components/DeleteConfirmation.js:19
 msgid "Confirm"
 msgstr ""
 
-#: build/app.js:1
+#: src/react/containers/EditorContainer.js:164
+msgid "Type to search for more authors…"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:281
+msgid "Add New Entry"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:287
+msgid "Visual"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:293
+msgid "Text"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:312
+#: src/react/containers/EntryContainer.js:125
+msgid "Loading editor…"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:337
+msgid "Authors:"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:340
+msgid "Entry authors"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:353
+msgid "No authors matched"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:353
+msgid "Loading authors…"
+msgstr ""
+
+#: src/react/containers/EditorContainer.js:357
+msgid "Publish New Entry"
+msgstr ""
+
 #: src/react/containers/EntryContainer.js:64
 msgid "Close Editor"
 msgstr ""
 
-#: build/app.js:1
 #: src/react/containers/EntryContainer.js:97
 #: src/react/containers/EventsContainer.js:24
 msgid "Are you sure you want to delete this entry?"
 msgstr ""
 
-#: build/app.js:1
 #: src/react/containers/EventsContainer.js:72
 msgid "Are you sure you want to remove this entry as a key event?"
+msgstr ""
+
+#: src/react/Editor/ImageCropModal.js:131
+msgid "Crop Image"
+msgstr ""
+
+#: src/react/Editor/ImageCropModal.js:137
+msgid "Close"
+msgstr ""
+
+#: src/react/Editor/ImageCropModal.js:154
+msgid "Crop preview"
+msgstr ""
+
+#: src/react/Editor/ImageCropModal.js:159
+msgid "Drag to select the area you want to keep. Click Apply to use the full image without cropping."
+msgstr ""
+
+#: src/react/Editor/ImageCropModal.js:178
+msgid "Processing…"
+msgstr ""
+
+#: src/react/Editor/ImageCropModal.js:178
+msgid "Apply"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:969
+msgid "Add link"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1215
+msgid "Bold (Ctrl+B)"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1222
+msgid "Italic (Ctrl+I)"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1229
+msgid "Underline (Ctrl+U)"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1236
+msgid "Ordered List"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1243
+msgid "Unordered List"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1250
+msgid "Blockquote"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1258
+msgid "Add Link"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1274
+msgid "Remove Link"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1282
+msgid "Uploading…"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1282
+msgid "Insert Image"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1354
+msgid "Liveblog entry content"
+msgstr ""
+
+#: src/react/Editor/LexicalEditor.js:1359
+msgid "Start writing your liveblog entry…"
 msgstr ""
