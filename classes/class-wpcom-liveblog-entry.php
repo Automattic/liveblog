@@ -182,9 +182,12 @@ class WPCOM_Liveblog_Entry {
 		$comment = get_comment( $comment_id );
 
 		// For Unix timestamp format, use DateTimeImmutable to avoid timezone issues with mysql2date.
+		// Fall through to mysql2date if the date is empty or malformed (e.g. deleted entries).
 		if ( 'U' === $d || 'G' === $d ) {
 			$datetime = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $comment->comment_date_gmt, new DateTimeZone( 'UTC' ) );
-			return $datetime->getTimestamp();
+			if ( false !== $datetime ) {
+				return $datetime->getTimestamp();
+			}
 		}
 
 		if ( '' === $d ) {

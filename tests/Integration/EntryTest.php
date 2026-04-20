@@ -299,6 +299,40 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * Test that get_comment_date_gmt falls back to mysql2date when date is empty.
+	 *
+	 * Regression test for https://github.com/Automattic/liveblog/pull/829 — deleted
+	 * entries have an empty comment_date_gmt, which caused a fatal error when passed
+	 * to DateTimeImmutable::createFromFormat(). The DB schema coerces empty values
+	 * back to '0000-00-00 00:00:00', so the scenario is forced via the get_comment
+	 * filter instead.
+	 */
+	public function test_get_comment_date_gmt_falls_back_when_date_is_empty(): void {
+		$comment    = self::factory()->comment->create_and_get();
+		$comment_id = (int) $comment->comment_ID;
+
+		$blank_date = function ( $fetched ) use ( $comment_id ) {
+			if ( $fetched && (int) $fetched->comment_ID === $comment_id ) {
+				$fetched->comment_date_gmt = '';
+			}
+			return $fetched;
+		};
+		add_filter( 'get_comment', $blank_date );
+
+		try {
+			// The important assertion is that this does not fatal. mysql2date() returns
+			// false for an empty input; the exact return contract for deleted entries
+			// is the subject of the follow-up root-cause work.
+			$timestamp = ( new WPCOM_Liveblog_Entry( get_comment( $comment_id ) ) )
+				->get_comment_date_gmt( 'U', $comment_id );
+
+			$this->assertFalse( $timestamp );
+		} finally {
+			remove_filter( 'get_comment', $blank_date );
+		}
+	}
+
+	/**
 	 * Test that get_comment_date_gmt still works with other formats.
 	 */
 	public function test_get_comment_date_gmt_with_date_format_returns_formatted_string(): void {
