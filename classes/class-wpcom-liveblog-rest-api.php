@@ -410,6 +410,13 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return true|WP_Error True when the request is permitted, otherwise a 404 error.
 	 */
 	public static function can_read_liveblog( WP_REST_Request $request ) {
+		// Flag the REST API context before calling is_liveblog_post(). Without this,
+		// WPCOM_Liveblog::get_liveblog_state() short-circuits to false because none
+		// of is_singular(), is_admin() or $is_rest_api_call is truthy yet at
+		// permission-callback time (set_liveblog_vars() only runs inside the route
+		// callback, after the permission check has already passed).
+		WPCOM_Liveblog::$is_rest_api_call = true;
+
 		$post_id = (int) $request->get_param( 'post_id' );
 		$post    = $post_id > 0 ? get_post( $post_id ) : null;
 
