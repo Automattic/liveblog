@@ -64,6 +64,40 @@ final class LiveblogTest extends TestCase {
 	}
 
 	/**
+	 * The check is capability-driven, not role-driven: a user without
+	 * `edit_others_posts` is denied write access to another user's liveblog,
+	 * even if they hold the Editor role by name.
+	 *
+	 * This protects against drift if a site customises the default role caps —
+	 * the fix follows whatever WordPress maps `edit_post` to in the current
+	 * environment, rather than hard-coding role names.
+	 */
+	public function test_current_user_can_edit_liveblog_for_post_follows_capability_not_role(): void {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+
+		wp_set_current_user( $editor_id );
+
+		// Baseline: a default Editor can edit another user's post.
+		$this->assertTrue( WPCOM_Liveblog::current_user_can_edit_liveblog_for_post( $post_id ) );
+
+		// Strip `edit_others_posts` from this user via the user_has_cap filter.
+		// This is per-request and does not mutate the shared role definition.
+		$strip_cap = static function ( $allcaps ) {
+			unset( $allcaps['edit_others_posts'] );
+			return $allcaps;
+		};
+		add_filter( 'user_has_cap', $strip_cap );
+
+		try {
+			$this->assertFalse( WPCOM_Liveblog::current_user_can_edit_liveblog_for_post( $post_id ) );
+		} finally {
+			remove_filter( 'user_has_cap', $strip_cap );
+		}
+	}
+
+	/**
 	 * Anonymous callers cannot edit liveblog content.
 	 */
 	public function test_current_user_can_edit_liveblog_for_post_denies_anonymous(): void {
