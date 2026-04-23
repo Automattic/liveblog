@@ -14,7 +14,7 @@
     "@lexical/html": "^0.43.0",
     "@lexical/link": "^0.43.0",
     "@lexical/list": "^0.43.0",
-    "@lexical/react": "^0.40.0",
+    "@lexical/react": "^0.43.0",
     "@lexical/rich-text": "^0.43.0",
     "js-beautify": "^1.7.5",
     "lexical": "^0.43.0",
