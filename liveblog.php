@@ -814,7 +814,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Handle CRUD actions for liveblog entries.
 		 */
 		public static function ajax_crud_entry() {
-			self::ajax_current_user_can_edit_liveblog();
+			// The URL post (set by handle_request() from the permalink) is the
+			// authoritative target so a body parameter cannot redirect the action
+			// at a post the caller is not permitted to edit.
+			$post_id = (int) self::$post_id;
+
+			self::ajax_current_user_can_edit_liveblog_for_post( $post_id );
 			self::ajax_check_nonce();
 
 			$args = array();
@@ -829,7 +834,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in ajax_check_nonce().
-			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+			$args['post_id']         = $post_id;
 			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : '';
 			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false;
@@ -1158,7 +1163,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return void
 		 */
 		public static function ajax_preview_entry() {
-			self::ajax_current_user_can_edit_liveblog();
+			self::ajax_current_user_can_edit_liveblog_for_post( (int) self::$post_id );
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Preview does not modify data.
 			$entry_content = isset( $_REQUEST['entry_content'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['entry_content'] ) ) : '';
@@ -1689,11 +1694,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function admin_ajax_set_liveblog_state_for_post() {
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce verified in ajax_check_nonce().
-			$post_id   = isset( $_REQUEST['post_id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['post_id'] ) ) : 0;
+			$post_id   = isset( $_REQUEST['post_id'] ) ? (int) $_REQUEST['post_id'] : 0;
 			$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
 			// phpcs:enable
 
-			self::ajax_current_user_can_edit_liveblog();
+			self::ajax_current_user_can_edit_liveblog_for_post( $post_id );
 			self::ajax_check_nonce();
 
 			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above.
@@ -1936,6 +1941,41 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function ajax_current_user_can_edit_liveblog() {
 			if ( ! self::current_user_can_edit_liveblog() ) {
+				self::send_forbidden_error( __( "Cheatin', uh?", 'liveblog' ) );
+			}
+		}
+
+		/**
+		 * Can the current user edit liveblog entries on a specific post.
+		 *
+		 * Post-scoped variant of `current_user_can_edit_liveblog()`. Checks the
+		 * `edit_post` meta capability on the supplied post so that holding only a
+		 * global capability such as `publish_posts` does not authorise mutation of
+		 * another user's liveblog.
+		 *
+		 * @param int $post_id The target post ID.
+		 * @return bool
+		 */
+		public static function current_user_can_edit_liveblog_for_post( $post_id ) {
+			$post_id = (int) $post_id;
+			$post    = $post_id > 0 ? get_post( $post_id ) : null;
+			$retval  = ( $post instanceof \WP_Post && current_user_can( 'edit_post', $post_id ) );
+
+			/** This filter is documented above in current_user_can_edit_liveblog(). */
+			return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
+		}
+
+		/**
+		 * Post-scoped ajax permission gate.
+		 *
+		 * Sends a 403 error response if the current user cannot edit liveblog
+		 * entries on the supplied post.
+		 *
+		 * @param int $post_id The target post ID.
+		 * @return void
+		 */
+		public static function ajax_current_user_can_edit_liveblog_for_post( $post_id ) {
+			if ( ! self::current_user_can_edit_liveblog_for_post( $post_id ) ) {
 				self::send_forbidden_error( __( "Cheatin', uh?", 'liveblog' ) );
 			}
 		}
