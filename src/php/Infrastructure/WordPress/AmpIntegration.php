@@ -294,11 +294,11 @@ final class AmpIntegration {
 
 		echo '<meta property="og:title" content="' . esc_attr( $title ) . '">';
 		echo '<meta property="og:description" content="' . esc_attr( $description ) . '">';
-		echo '<meta property="og:url" content="' . esc_attr( $url ) . '">';
+		echo '<meta property="og:url" content="' . esc_url( $url ) . '">';
 		echo '<meta name="twitter:card" content="' . esc_attr( $description ) . '">';
 
 		if ( $image ) {
-			echo '<meta property="og:image" content="' . esc_attr( $image ) . '">';
+			echo '<meta property="og:image" content="' . esc_url( $image ) . '">';
 		}
 	}
 
