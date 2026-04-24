@@ -643,6 +643,11 @@ class WPCOM_Liveblog_Entry {
 		}
 
 		if ( is_array( $contributors ) ) {
+			// The REST and legacy AJAX entry points do not guarantee this array
+			// contains integers. Coerce to positive integers here so arbitrary
+			// strings cannot be persisted to comment meta.
+			$contributors = array_values( array_filter( array_map( 'absint', $contributors ) ) );
+
 			if ( metadata_exists( 'comment', $comment_id, self::CONTRIBUTORS_META_KEY ) ) {
 				update_comment_meta( $comment_id, self::CONTRIBUTORS_META_KEY, $contributors );
 				return;
