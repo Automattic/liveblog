@@ -249,6 +249,12 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function ajax_terms() {
 
+		// Mirrors the REST hashtag endpoint's permission check. Without this any
+		// authenticated user could scrape the full hashtag taxonomy.
+		if ( ! WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+			wp_send_json_error( null, 403 );
+		}
+
 		// Sanitize the input safely.
 		if ( isset( $_GET['autocomplete'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
 			$search_term = sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
