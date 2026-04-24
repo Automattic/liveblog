@@ -214,6 +214,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function ajax_authors() {
 
+		// Only users who can edit a liveblog should be able to enumerate the
+		// author list. Without this any authenticated user (including
+		// subscribers) could scrape every user holding `edit_posts`.
+		if ( ! WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+			wp_send_json_error( null, 403 );
+		}
+
 		// Sanitize the input safely.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
 		if ( isset( $_GET['autocomplete'] ) ) {
