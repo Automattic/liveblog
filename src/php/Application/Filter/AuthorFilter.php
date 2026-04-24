@@ -313,6 +313,13 @@ final class AuthorFilter implements ContentFilterInterface {
 	 * @return void
 	 */
 	public function ajax_authors(): void {
+		// Only users who can edit a liveblog should be able to enumerate the
+		// author list. Without this any authenticated user (including
+		// subscribers) could scrape every user holding `edit_posts`.
+		if ( ! RestApiController::current_user_can_edit_liveblog() ) {
+			wp_send_json_error( null, 403 );
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
 		$term = isset( $_GET['autocomplete'] ) ? sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ) : '';
 
