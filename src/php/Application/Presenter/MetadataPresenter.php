@@ -117,8 +117,13 @@ final class MetadataPresenter {
 			return;
 		}
 
+		// Entry content is html_entity_decoded when building `articleBody`, so a
+		// user-supplied `&lt;/script&gt;` in an entry becomes a literal `</script>` in the
+		// encoded payload. PHP's default slash escaping saves us from breakout today, but
+		// JSON_HEX_TAG explicitly escapes `<` and `>` so the JSON-LD block is safe by
+		// construction regardless of future json_encode default changes.
 		?>
-		<script type="application/ld+json"><?php echo wp_json_encode( $metadata ); ?></script>
+		<script type="application/ld+json"><?php echo wp_json_encode( $metadata, JSON_HEX_TAG ); ?></script>
 		<?php
 	}
 

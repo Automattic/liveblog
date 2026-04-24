@@ -341,6 +341,12 @@ final class HashtagFilter implements ContentFilterInterface {
 	 * @return void
 	 */
 	public function ajax_terms(): void {
+		// Mirrors the REST hashtag endpoint's permission check. Without this any
+		// authenticated user could scrape the full hashtag taxonomy.
+		if ( ! RestApiController::current_user_can_edit_liveblog() ) {
+			wp_send_json_error( null, 403 );
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
 		$search_term = isset( $_GET['autocomplete'] ) ? sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ) : '';
 
