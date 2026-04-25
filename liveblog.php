@@ -1165,7 +1165,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		public static function ajax_preview_entry() {
 			self::ajax_current_user_can_edit_liveblog_for_post( (int) self::$post_id );
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Preview does not modify data.
+			// Preview runs the same `liveblog_before_preview_entry` filter chain as the
+			// editor. Feature filters (notably hashtags) call wp_insert_term() on any
+			// new tag in the content, so an unauthenticated POST can pollute the
+			// hashtag taxonomy. Require the standard liveblog nonce here.
+			self::ajax_check_nonce();
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified in ajax_check_nonce().
 			$entry_content = isset( $_REQUEST['entry_content'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['entry_content'] ) ) : '';
 			$entry_content = self::format_preview_entry( $entry_content );
 
