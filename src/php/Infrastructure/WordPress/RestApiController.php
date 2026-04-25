@@ -125,13 +125,42 @@ final class RestApiController {
 	/**
 	 * Check if the current user can edit the liveblog.
 	 *
-	 * Static method for REST API permission callbacks.
+	 * Static method for REST API permission callbacks that have no post in the URL
+	 * (e.g. authors and hashtags autocomplete). Gates on the configured global
+	 * editor capability without any post context.
 	 *
 	 * @return bool True if the current user can edit.
 	 */
 	public static function current_user_can_edit_liveblog(): bool {
 		$cap    = LiveblogConfiguration::get_edit_capability();
 		$retval = current_user_can( $cap );
+
+		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
+	}
+
+	/**
+	 * Permission callback for REST write routes that target a specific post.
+	 *
+	 * The CRUD, preview and post_state routes all live under
+	 * `/posts/(?P<post_id>\d+)/...`. Authorisation must be scoped to the post in
+	 * the URL rather than to a global capability, otherwise any user holding
+	 * `publish_posts` (every default Author and above) could mutate liveblog
+	 * state on a post they have no right to edit.
+	 *
+	 * The check delegates to the `edit_post` meta capability, which WordPress
+	 * maps to whatever primitive caps the current site honours. This keeps the
+	 * check correct under role customisation rather than naming roles directly.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return bool True when the current user can edit the URL post.
+	 */
+	public static function current_user_can_edit_liveblog_for_request( WP_REST_Request $request ): bool {
+		$url_params = $request->get_url_params();
+		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+
+		$retval = ( $post_id > 0 )
+			&& ( get_post( $post_id ) instanceof \WP_Post )
+			&& current_user_can( 'edit_post', $post_id );
 
 		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
 	}
@@ -277,7 +306,7 @@ final class RestApiController {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'crud_entry' ),
-				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
 					'crud_action' => array(
 						'required'          => true,
@@ -334,7 +363,7 @@ final class RestApiController {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'format_preview_entry' ),
-				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
 					'entry_content' => array( 'required' => true ),
 				),
@@ -376,7 +405,7 @@ final class RestApiController {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'update_post_state' ),
-				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
 					'post_id'         => array( 'required' => true ),
 					'state'           => array( 'required' => true ),
@@ -473,15 +502,21 @@ final class RestApiController {
 		$crud_action = $request->get_param( 'crud_action' );
 		$json        = $request->get_json_params();
 
+		// Use the URL post_id as the authoritative target. The permission
+		// callback authorises against the URL post_id, so the JSON body must
+		// not be allowed to redirect the action at a different post.
+		$url_params = $request->get_url_params();
+		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+
 		$args = array(
-			'post_id'         => $this->get_json_param( 'post_id', $json ),
+			'post_id'         => $post_id,
 			'content'         => $this->get_json_param( 'content', $json ),
 			'entry_id'        => $this->get_json_param( 'entry_id', $json ),
 			'author_id'       => $this->get_json_param( 'author_id', $json ),
 			'contributor_ids' => $this->get_json_param( 'contributor_ids', $json ),
 		);
 
-		$this->set_liveblog_vars( (int) $args['post_id'] );
+		$this->set_liveblog_vars( $post_id );
 
 		$user = wp_get_current_user();
 		if ( ! $user || ! $user->exists() ) {
