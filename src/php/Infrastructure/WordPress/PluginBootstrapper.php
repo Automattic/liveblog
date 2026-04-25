@@ -570,7 +570,7 @@ final class PluginBootstrapper {
 				$post_id   = isset( $_REQUEST['post_id'] ) ? (int) $_REQUEST['post_id'] : 0;
 				$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
 
-				if ( ! $post_id || ! AdminController::current_user_can_edit() ) {
+				if ( ! AdminController::current_user_can_edit_for_post( $post_id ) ) {
 					wp_send_json_error( 'Unauthorized' );
 				}
 

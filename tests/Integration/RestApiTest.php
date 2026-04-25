@@ -440,17 +440,21 @@ final class RestApiTest extends IntegrationTestCase {
 	 * Integration test - Test accessing the crud endpoint with an insert action.
 	 */
 	public function test_endpoint_crud_action(): void {
-		// Create an author and set as the current user.
-		$this->set_author_user();
-
-		// Create a post.
-		self::factory()->post->create();
+		// Create an author who also owns the target post — the permission
+		// callback now requires `edit_post` on the URL post_id.
+		$author_id = $this->set_author_user();
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
 
 		// The POST data to insert.
-		$post_vars = $this->build_entry_args( array( 'crud_action' => 'insert' ) );
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+				'post_id'     => $post_id,
+			)
+		);
 
 		// Try to access the endpoint and insert an entry.
-		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/crud' );
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
 		$request->add_header( 'content-type', 'application/json' );
 		$request->set_body( wp_json_encode( $post_vars ) );
 		$response = $this->server->dispatch( $request );
@@ -512,14 +516,16 @@ final class RestApiTest extends IntegrationTestCase {
 	 * Integration test - Test accessing the entry preview endpoint.
 	 */
 	public function test_endpoint_entry_preview(): void {
-		// Create an author and set as the current user.
-		$this->set_author_user();
+		// Create an author who also owns the target post — the preview route
+		// is now scoped to `edit_post` on the URL post_id.
+		$author_id = $this->set_author_user();
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
 
 		// The POST data to preview.
 		$post_vars = array( 'entry_content' => 'Test Liveblog entry with /key' );
 
 		// Try to access the endpoint.
-		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/1/preview' );
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/preview' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$request->set_body_params( $post_vars );
 		$response = $this->server->dispatch( $request );
@@ -600,11 +606,10 @@ final class RestApiTest extends IntegrationTestCase {
 	 * Integration test - Test accessing the update post state endpoint.
 	 */
 	public function test_endpoint_update_post_state(): void {
-		// Create an author and set as the current user.
-		$this->set_author_user();
-
-		// Create a post.
-		$post = self::factory()->post->create_and_get();
+		// Create an author who also owns the target post — the post_state
+		// route is now scoped to `edit_post` on the URL post_id.
+		$author_id = $this->set_author_user();
+		$post      = self::factory()->post->create_and_get( array( 'post_author' => $author_id ) );
 
 		// The POST data.
 		$post_vars = array(
@@ -675,6 +680,171 @@ final class RestApiTest extends IntegrationTestCase {
 
 		// Assert forbidden response.
 		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
+	}
+
+	/**
+	 * An author who does not own the target post must not be able to insert
+	 * an entry into another user's liveblog (CWE-285).
+	 */
+	public function test_endpoint_crud_insert_denies_non_owner_author(): void {
+		// Post belongs to a different author.
+		$owner_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id  = self::factory()->post->create( array( 'post_author' => $owner_id ) );
+
+		// Current user is a different author with `publish_posts` but no
+		// `edit_post` on the target.
+		$attacker_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $attacker_id );
+
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+				'post_id'     => $post_id,
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $post_vars ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 403, $response->get_status() );
+	}
+
+	/**
+	 * An editor (default cap `edit_others_posts`) can edit any post's liveblog.
+	 */
+	public function test_endpoint_crud_insert_allows_editor_on_others_post(): void {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $editor_id );
+
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+				'post_id'     => $post_id,
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $post_vars ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	/**
+	 * The CRUD endpoint must use the URL post_id, not the JSON body. Otherwise
+	 * a caller who passes the permission check for one post could redirect
+	 * the action at another post they have no right to edit.
+	 */
+	public function test_endpoint_crud_json_body_post_id_cannot_override_url(): void {
+		// Author owns post A.
+		$author_id    = $this->set_author_user();
+		$owned_post   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$victim_owner = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post  = self::factory()->post->create( array( 'post_author' => $victim_owner ) );
+
+		// Capture the post_id the entry was actually inserted against, so the
+		// test does not depend on for_json() exposing post_id (it does not).
+		$inserted_post_ids = array();
+		$capture           = static function ( $entry_id, $post_id ) use ( &$inserted_post_ids ) {
+			$inserted_post_ids[] = (int) $post_id;
+		};
+		add_action( 'liveblog_insert_entry', $capture, 10, 2 );
+
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+				'post_id'     => $victim_post, // Body claims a post the caller cannot edit.
+				'content'     => 'attacker entry',
+			)
+		);
+
+		// URL targets the owned post (so permission_callback passes).
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $owned_post . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $post_vars ) );
+		$response = $this->server->dispatch( $request );
+
+		remove_action( 'liveblog_insert_entry', $capture, 10 );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		// Entry must have been attached to the URL post, not the body post.
+		$this->assertSame( array( (int) $owned_post ), $inserted_post_ids );
+	}
+
+	/**
+	 * The post-scoped permission helper follows whatever WordPress maps
+	 * `edit_post` to in the current environment, rather than naming roles. If
+	 * a site customises role caps (for instance, removes `edit_others_posts`
+	 * from Editors), the check correctly denies write access to other users'
+	 * liveblogs.
+	 */
+	public function test_endpoint_crud_follows_capability_not_role(): void {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $editor_id );
+
+		$post_vars = $this->build_entry_args(
+			array(
+				'crud_action' => 'insert',
+				'post_id'     => $post_id,
+			)
+		);
+
+		// Strip `edit_others_posts` from this user via the user_has_cap filter.
+		// Per-request only; does not mutate the shared role definition.
+		$strip_cap = static function ( $allcaps ) {
+			unset( $allcaps['edit_others_posts'] );
+			return $allcaps;
+		};
+		add_filter( 'user_has_cap', $strip_cap );
+
+		try {
+			$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+			$request->add_header( 'content-type', 'application/json' );
+			$request->set_body( wp_json_encode( $post_vars ) );
+			$response = $this->server->dispatch( $request );
+
+			$this->assertEquals( 403, $response->get_status() );
+		} finally {
+			remove_filter( 'user_has_cap', $strip_cap );
+		}
+	}
+
+	/**
+	 * The `liveblog_current_user_can_edit_liveblog` filter still applies to
+	 * the post-scoped permission callback, preserving the existing extension
+	 * point for downstream code that further restricts editing.
+	 */
+	public function test_endpoint_crud_filter_can_deny(): void {
+		$author_id = $this->set_author_user();
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+
+		add_filter( 'liveblog_current_user_can_edit_liveblog', '__return_false' );
+
+		try {
+			$post_vars = $this->build_entry_args(
+				array(
+					'crud_action' => 'insert',
+					'post_id'     => $post_id,
+				)
+			);
+
+			$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+			$request->add_header( 'content-type', 'application/json' );
+			$request->set_body( wp_json_encode( $post_vars ) );
+			$response = $this->server->dispatch( $request );
+
+			$this->assertEquals( 403, $response->get_status() );
+		} finally {
+			remove_filter( 'liveblog_current_user_can_edit_liveblog', '__return_false' );
+		}
 	}
 
 	/**
@@ -766,12 +936,16 @@ final class RestApiTest extends IntegrationTestCase {
 	}
 
 	/**
-	 * Create and author and set it as the current user.
+	 * Create an author and set it as the current user.
+	 *
+	 * @return int The new author's user ID.
 	 */
-	private function set_author_user(): void {
+	private function set_author_user(): int {
 		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
 
 		wp_set_current_user( $author_id );
+
+		return $author_id;
 	}
 
 	/**
