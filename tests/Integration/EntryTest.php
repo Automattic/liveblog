@@ -220,6 +220,90 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * `author_id` for a user with `edit_posts` is accepted and the resulting
+	 * comment is attributed to that user. This is the legitimate co-author
+	 * flow and must keep working.
+	 */
+	public function test_insert_with_author_id_for_editable_user_attributes_entry_to_them(): void {
+		$inserter_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		$author_id   = self::factory()->user->create(
+			array(
+				'role'         => 'author',
+				'display_name' => 'Picked Author',
+			)
+		);
+
+		$entry = WPCOM_Liveblog_Entry::insert(
+			$this->build_entry_args(
+				array(
+					'user'      => get_userdata( $inserter_id ),
+					'author_id' => $author_id,
+				)
+			)
+		);
+
+		$comment = get_comment( $entry->get_id() );
+		$this->assertEquals( $author_id, (int) $comment->user_id );
+		$this->assertEquals( 'Picked Author', $comment->comment_author );
+	}
+
+	/**
+	 * `author_id` pointing at a user without `edit_posts` (e.g. a
+	 * subscriber) must be rejected silently and the entry must remain
+	 * attributed to the inserting user. Otherwise an editor could spoof
+	 * arbitrary site users — including subscribers, leaking their email —
+	 * through a pure server-side input the autocomplete UI would never have
+	 * suggested.
+	 */
+	public function test_insert_with_author_id_for_subscriber_keeps_inserter_as_author(): void {
+		$inserter_id   = self::factory()->user->create(
+			array(
+				'role'         => 'editor',
+				'display_name' => 'Real Editor',
+			)
+		);
+		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+
+		$entry = WPCOM_Liveblog_Entry::insert(
+			$this->build_entry_args(
+				array(
+					'user'      => get_userdata( $inserter_id ),
+					'author_id' => $subscriber_id,
+				)
+			)
+		);
+
+		$comment = get_comment( $entry->get_id() );
+		$this->assertEquals( $inserter_id, (int) $comment->user_id );
+		$this->assertEquals( 'Real Editor', $comment->comment_author );
+	}
+
+	/**
+	 * `contributor_ids` containing users without `edit_posts` are dropped
+	 * before they are persisted to comment meta. The contributor picker
+	 * surfaces only `edit_posts` users; the back end must not accept ids
+	 * outside that set.
+	 */
+	public function test_insert_with_contributor_ids_filters_out_subscribers(): void {
+		$inserter_id     = self::factory()->user->create( array( 'role' => 'editor' ) );
+		$valid_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$subscriber_id   = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+
+		$entry = WPCOM_Liveblog_Entry::insert(
+			$this->build_entry_args(
+				array(
+					'user'            => get_userdata( $inserter_id ),
+					'contributor_ids' => array( $valid_author_id, $subscriber_id ),
+				)
+			)
+		);
+
+		$stored = get_comment_meta( $entry->get_id(), 'liveblog_contributors', true );
+
+		$this->assertEquals( array( $valid_author_id ), $stored );
+	}
+
+	/**
 	 * Set liveblog hook fired global.
 	 */
 	public static function set_liveblog_hook_fired(): void {
