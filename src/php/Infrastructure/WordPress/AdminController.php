@@ -312,11 +312,35 @@ final class AdminController {
 	/**
 	 * Check if the current user can edit liveblog.
 	 *
+	 * Gates on the configured global editor capability with no post context.
+	 * Use {@see self::current_user_can_edit_for_post()} when a target post is
+	 * known, so authorisation is scoped to that post.
+	 *
 	 * @return bool True if user can edit.
 	 */
 	public static function current_user_can_edit(): bool {
 		$cap    = LiveblogConfiguration::get_edit_capability();
 		$retval = current_user_can( $cap );
+
+		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
+	}
+
+	/**
+	 * Check if the current user can edit liveblog state for a specific post.
+	 *
+	 * Mirrors {@see RestApiController::current_user_can_edit_liveblog_for_request()}
+	 * for non-REST entry points (e.g. the admin-ajax state handler), which have
+	 * no `WP_REST_Request` to inspect. Delegates to the `edit_post` meta
+	 * capability so the check follows whatever WordPress maps that to in the
+	 * current environment.
+	 *
+	 * @param int $post_id The target post ID.
+	 * @return bool True if user can edit liveblog state on the post.
+	 */
+	public static function current_user_can_edit_for_post( int $post_id ): bool {
+		$retval = ( $post_id > 0 )
+			&& ( get_post( $post_id ) instanceof \WP_Post )
+			&& current_user_can( 'edit_post', $post_id );
 
 		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
 	}
