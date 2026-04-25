@@ -525,7 +525,10 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_endpoint_get_authors(): void {
 		// Create an author and set as the current user.
-		$this->set_author_user();
+		$author_id = $this->set_author_user();
+
+		// Create a post owned by the author so the post-scoped permission check passes.
+		$post_id = self::factory()->post->create( array( 'post_author' => $author_id ) );
 
 		// Create 2 authors.
 		self::factory()->user->create(
@@ -542,7 +545,7 @@ final class RestApiTest extends TestCase {
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/authors/jo' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -553,11 +556,35 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * Integration test - The authors endpoint must require edit_post on the
+	 * supplied post. A user without that capability is denied even if they
+	 * hold a global capability such as `publish_posts`.
+	 */
+	public function test_endpoint_get_authors_denies_user_without_edit_post(): void {
+		// Author A owns the post.
+		$post_owner_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id       = self::factory()->post->create( array( 'post_author' => $post_owner_id ) );
+
+		// Author B is logged in and has `publish_posts` but no `edit_post` on
+		// the post owned by Author A.
+		$other_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $other_author_id );
+
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/authors/jo' );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 403, $response->get_status() );
+	}
+
+	/**
 	 * Integration test - Test accessing the get hashtags endpoint.
 	 */
 	public function test_endpoint_get_hashtags(): void {
 		// Create an author and set as the current user.
-		$this->set_author_user();
+		$author_id = $this->set_author_user();
+
+		// Create a post owned by the author so the post-scoped permission check passes.
+		$post_id = self::factory()->post->create( array( 'post_author' => $author_id ) );
 
 		// Create 2 hashtags.
 		self::factory()->term->create(
@@ -575,7 +602,7 @@ final class RestApiTest extends TestCase {
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/hashtags/cool' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -583,6 +610,27 @@ final class RestApiTest extends TestCase {
 
 		// The array should contain 2 authors.
 		$this->assertCount( 2, $response->get_data() );
+	}
+
+	/**
+	 * Integration test - The hashtags endpoint must require edit_post on the
+	 * supplied post. A user without that capability is denied even if they
+	 * hold a global capability such as `publish_posts`.
+	 */
+	public function test_endpoint_get_hashtags_denies_user_without_edit_post(): void {
+		// Author A owns the post.
+		$post_owner_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id       = self::factory()->post->create( array( 'post_author' => $post_owner_id ) );
+
+		// Author B is logged in and has `publish_posts` but no `edit_post` on
+		// the post owned by Author A.
+		$other_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $other_author_id );
+
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/hashtags/cool' );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 403, $response->get_status() );
 	}
 
 	/**
