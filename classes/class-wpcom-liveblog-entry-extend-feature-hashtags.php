@@ -190,11 +190,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// Get the term link for the hashtag.
 		$term_link = $term ? get_term_link( $term, self::$taxonomy ) : '';
 
-		// Replace the #hashtag content with a link to the hashtag archive.
+		// Replace the #hashtag content with a link to the hashtag archive. The
+		// `liveblog_hashtag_class` filter lets third parties replace `class_prefix`
+		// with arbitrary content, so escape every interpolated value at the point
+		// of attribute construction rather than relying solely on upstream
+		// sanitisation.
+		$class_attr = esc_attr( $this->class_prefix . $hashtag );
 		if ( $term_link && ! is_wp_error( $term_link ) ) {
 			return str_replace(
 				$regex_match[1],
-				'<a href="' . esc_url( $term_link ) . '" class="liveblog-hash ' . $this->class_prefix . $hashtag . '">' . esc_html( $hashtag ) . '</a>',
+				'<a href="' . esc_url( $term_link ) . '" class="liveblog-hash ' . $class_attr . '">' . esc_html( $hashtag ) . '</a>',
 				$regex_match[0]
 			);
 		}
@@ -202,7 +207,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 		// Fallback to span if term link fails.
 		return str_replace(
 			$regex_match[1],
-			'<span class="liveblog-hash ' . $this->class_prefix . $hashtag . '">' . esc_html( $hashtag ) . '</span>',
+			'<span class="liveblog-hash ' . $class_attr . '">' . esc_html( $hashtag ) . '</span>',
 			$regex_match[0]
 		);
 	}

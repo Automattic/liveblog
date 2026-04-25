@@ -164,10 +164,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		$user         = get_user_by( 'slug', $author );
 		$display_name = $user ? $user->display_name : $author;
 
-		// Replace @author with a link to the author's post listing page.
+		// Replace @author with a link to the author's post listing page. The
+		// `liveblog_author_class` and `liveblog_author` filters allow third
+		// parties to influence both the class prefix and the matched author
+		// slug, so escape every interpolated value at the point of attribute
+		// construction.
 		return str_replace(
 			$regex_match[1],
-			'<a href="' . get_author_posts_url( -1, $author ) . '" class="liveblog-author ' . $this->class_prefix . $author . '">' . esc_html( $display_name ) . '</a>',
+			'<a href="' . esc_url( get_author_posts_url( -1, $author ) ) . '" class="liveblog-author ' . esc_attr( $this->class_prefix . $author ) . '">' . esc_html( $display_name ) . '</a>',
 			$regex_match[0]
 		);
 	}
