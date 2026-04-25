@@ -1,4 +1,4 @@
-# Customisation
+# Customization
 
 Hooks and extension points for theme and plugin developers.
 
@@ -20,7 +20,7 @@ Example: an author writes the following in the New Entry box:
 New iPad announced, launching next week — more info to come. /key
 ```
 
-You can add new commands easily with a filter. The simplest command adds a class to the entry, so you could implement `/highlight` which adds `type-highlight` to the entry container, letting you style the background colour:
+You can add new commands easily with a filter. The simplest command adds a class to the entry, so you could implement `/highlight` which adds `type-highlight` to the entry container, letting you style the background color:
 
 ```php
 add_filter( 'liveblog_active_commands', 'add_highlight_command', 10 );
@@ -38,7 +38,7 @@ apply_filters( "liveblog_command_{$command}_before", $arg );
 do_action( "liveblog_command_{$command}_after", $arg );
 ```
 
-### Customising the Key Events shortcode
+### Customizing the Key Events shortcode
 
 You can change the shortcode title from the default "Key Events":
 

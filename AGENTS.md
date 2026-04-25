@@ -12,7 +12,7 @@ Real-time liveblogging plugin for WordPress with a React-based editor and a comm
 | **Requires PHP** | 7.4+ |
 | **Requires WP** | 6.4+ |
 | **Default branch** | `develop` |
-| **Maintenance branch** | `2.x` (parallel modernised line; do not cross-port without checking) |
+| **Maintenance branch** | `2.x` (parallel modernized line; do not cross-port without checking) |
 
 ### Directory structure
 
@@ -85,7 +85,7 @@ npx wp-env start              # start local WordPress on http://localhost:8888
 * **Each entry change is a new entry.** Updates and deletions insert a new entry that "replaces" the old one. This lets us cache the timestamp-bounded polling endpoints indefinitely without per-edit invalidation.
 * **Timestamp-bounded polling URLs.** Endpoints take the form `/liveblog/<start>/<end>/`, returning entries in that window. Closed ranges are cacheable forever.
 * **AJAX polling by default, WebSockets optional.** The plugin polls for updates by default. WebSocket support via Redis and Socket.IO is opt-in (`LIVEBLOG_USE_SOCKETIO`) and only used for public posts.
-* **Two parallel branches.** `develop` is the legacy-architecture mainline. `2.x` is a parallel modernised branch (DDD layout under `src/php/`, DI container, namespaced classes). Security fixes and important bug fixes are typically backported by hand. Architectural changes do **not** cross-port automatically.
+* **Two parallel branches.** `develop` is the legacy-architecture mainline. `2.x` is a parallel modernized branch (DDD layout under `src/php/`, DI container, namespaced classes). Security fixes and important bug fixes are typically backported by hand. Architectural changes do **not** cross-port automatically.
 * **WordPress.org deployment.** A GitHub Actions workflow deploys to the WordPress.org SVN repository. Do not modify SVN assets manually.
 
 ## Common pitfalls

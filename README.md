@@ -48,7 +48,7 @@ If you'd like to check out the code and contribute, [join us on GitHub](https://
 Developer and end-user documentation lives in the [`docs/`](https://github.com/Automattic/liveblog/tree/develop/docs) directory:
 
 * [End user guide](https://github.com/Automattic/liveblog/blob/develop/docs/end-user-guide.md) — for editors and site administrators.
-* [Customisation](https://github.com/Automattic/liveblog/blob/develop/docs/customisation.md) — entry features, key events, hashtags, commands, emoji, shortcodes, template overrides.
+* [Customization](https://github.com/Automattic/liveblog/blob/develop/docs/customization.md) — entry features, key events, hashtags, commands, emoji, shortcodes, template overrides.
 * [Extending the admin meta box](https://github.com/Automattic/liveblog/blob/develop/docs/admin-meta-box.md)
 * [Hooking into entries](https://github.com/Automattic/liveblog/blob/develop/docs/entry-hooks.md)
 * [Auto-archiving](https://github.com/Automattic/liveblog/blob/develop/docs/auto-archive.md)

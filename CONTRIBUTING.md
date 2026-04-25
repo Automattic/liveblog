@@ -80,7 +80,7 @@ Reviews can take a little time — we're [busy people](https://automattic.com/wo
 * **Polling URLs use timestamp ranges.** Endpoints take the form `/liveblog/<start-timestamp>/<end-timestamp>/` and return entries in that window. Bounded ranges can be cached indefinitely so we don't have to invalidate on each entry.
 * **Each entry change is a new entry.** Because cached results can't be invalidated, we don't allow changing an entry in place. Updates insert a new entry and mark it as a replacement of the older one.
 
-### Code organisation
+### Code organization
 
 * `liveblog.php` — main plugin file.
 * `classes/` — most of the PHP backend (legacy procedural-style classes prefixed `WPCOM_Liveblog_`).
