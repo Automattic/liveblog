@@ -804,17 +804,20 @@ class WPCOM_Liveblog_Rest_Api {
 	/**
 	 * Get parameter from JSON.
 	 *
+	 * Returns the value as supplied by the client. Per-field sanitisation is
+	 * applied downstream (`wp_filter_post_kses` for content, `absint` for the
+	 * contributor IDs), and that is the right place for it. Decoding HTML
+	 * entities here would silently undo any encoding the client applied,
+	 * weaken defence in depth, and trigger PHP 8.1+ deprecation warnings when
+	 * the value is non-string (e.g. integer contributor IDs).
+	 *
 	 * @param string $param The parameter name.
 	 * @param array  $json  The JSON data.
 	 * @return mixed The parameter value or false if not found.
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
-			// Handle arrays (e.g., contributor_ids from multi-select).
-			if ( is_array( $json[ $param ] ) ) {
-				return array_map( 'html_entity_decode', $json[ $param ] );
-			}
-			return html_entity_decode( $json[ $param ] );
+			return $json[ $param ];
 		}
 		return false;
 	}
