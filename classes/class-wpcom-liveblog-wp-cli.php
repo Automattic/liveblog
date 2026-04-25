@@ -18,21 +18,6 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	// @phpcs:enable
 
 	/**
-	 * Converts readme.txt to markdown format for GitHub.
-	 *
-	 * @return void
-	 */
-	public function readme_for_github() {
-		$readme_path = __DIR__ . '/../readme.txt';
-		$readme      = file_get_contents( $readme_path ); // @codingStandardsIgnoreLine
-		$readme      = $this->listify_meta( $readme );
-		$readme      = $this->add_contributors_wp_org_profile_links( $readme );
-		$readme      = $this->add_screenshot_links( $readme );
-		$readme      = $this->markdownify_headings( $readme );
-		echo $readme; // @codingStandardsIgnoreLine
-	}
-
-	/**
 	 * Fix wp_commentmeta table so archived liveblog posts comments display properly.
 	 *
 	 * @subcommand fix-archive
@@ -203,95 +188,5 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 		} else {
 			WP_CLI::success( 'Fixed all entries on all liveblog posts!' );
 		}
-	}
-
-	/**
-	 * Convert WordPress readme headings to markdown.
-	 *
-	 * @param string $readme The readme content.
-	 * @return string Modified readme content.
-	 */
-	private function markdownify_headings( $readme ) {
-		return preg_replace_callback(
-			'/^\s*(=+)\s*(.*?)\s*=+\s*$/m',
-			function ( $matches ) {
-				return "\n" . str_repeat( '#', 4 - strlen( $matches[1] ) ) . ' ' . $matches[2] . "\n";
-			},
-			$readme
-		);
-	}
-
-	/**
-	 * Convert plugin meta section to bulleted list.
-	 *
-	 * @param string $readme The readme content.
-	 * @return string Modified readme content.
-	 */
-	private function listify_meta( $readme ) {
-		return preg_replace_callback(
-			'/===\s*\n+(.*?)\n\n/s',
-			function ( $matches ) {
-				$meta = $matches[1];
-				if ( ! $meta ) {
-					return $matches[0];
-				}
-				return "===\n" . preg_replace( '/^/m', '* ', $meta ) . "\n\n";
-			},
-			$readme
-		);
-	}
-
-	/**
-	 * Add WordPress.org profile links for contributors.
-	 *
-	 * @param string $readme The readme content.
-	 * @return string Modified readme content.
-	 */
-	private function add_contributors_wp_org_profile_links( $readme ) {
-		return preg_replace_callback(
-			'/Contributors: (.*)/',
-			function ( $matches ) {
-				$links = array_filter(
-					array_map(
-						function ( $username ) {
-							return "[$username](http://profiles.wordpress.org/$username)";
-						},
-						preg_split( '/\s*,\s*/', $matches[1] )
-					)
-				);
-				return 'Contributors: ' . implode( ', ', $links );
-			},
-			$readme
-		);
-	}
-
-	/**
-	 * Add screenshot image links.
-	 *
-	 * @param string $readme The readme content.
-	 * @return string Modified readme content.
-	 */
-	private function add_screenshot_links( $readme ) {
-		return preg_replace_callback(
-			'/==\s*Screenshots\s*==\n(.*?)==/ms',
-			function ( $matches ) {
-				return "== Screenshots ==\n" . preg_replace( '/^\s*(\d+)\.\s*(.*?)$/m', '![\2](https://raw.github.com/Automattic/liveblog/master/screenshot-\1.png)', $matches[1] ) . "\n==";
-			},
-			$readme
-		);
-	}
-
-	/**
-	 * Display help information.
-	 *
-	 * @return void
-	 */
-	public static function help() {
-		WP_CLI::log(
-			<<<'HELP'
-usage: wp liveblog readme_for_github
-	Converts the readme.txt to real markdown to be used as a README.md
-HELP
-		);
 	}
 }
