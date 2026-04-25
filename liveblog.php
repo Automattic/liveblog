@@ -1357,7 +1357,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'cross_domain'                 => false,
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
-						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
+						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete( get_the_ID() ),
 						'command_class'                => apply_filters( 'liveblog_command_class', WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ),
 
 						// Internationalization strings.

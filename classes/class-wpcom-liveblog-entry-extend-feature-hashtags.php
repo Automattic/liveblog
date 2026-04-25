@@ -104,10 +104,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function get_config( $config ) {
 
-		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_terms';
+		// The endpoint is built at plugin-load time, before the current post
+		// is known. Use the `%POST_ID%` placeholder here and have
+		// `WPCOM_Liveblog_Entry_Extend::get_autocomplete()` substitute the
+		// actual post id at render time so the autocomplete URL targets
+		// the post-scoped route.
+		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_terms&post_id=%POST_ID%';
 
 		if ( WPCOM_Liveblog::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'hashtags' );
+			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . '%POST_ID%/hashtags' );
 		}
 
 		// Add config to frontend autocomplete after allowing modifications.
@@ -123,7 +128,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 				'name'        => 'Hashtag',
 				'template'    => '${slug}',
 				'replaceText' => '#$',
-				'url'         => esc_url( $endpoint_url ),
+				'url'         => $endpoint_url,
 			)
 		);
 
@@ -254,9 +259,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Hashtags extends WPCOM_Liveblog_Entry_
 	 */
 	public function ajax_terms() {
 
-		// Mirrors the REST hashtag endpoint's permission check. Without this any
-		// authenticated user could scrape the full hashtag taxonomy.
-		if ( ! WPCOM_Liveblog::current_user_can_edit_liveblog() ) {
+		// Post-scoped permission check. Mirrors the REST hashtag endpoint:
+		// callers must hold `edit_post` on the target post, not just a
+		// global cap, otherwise any contributor could scrape the full
+		// hashtag taxonomy across the whole site.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint; CSRF is irrelevant for a read.
+		$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
+		if ( ! WPCOM_Liveblog::current_user_can_edit_liveblog_for_post( $post_id ) ) {
 			wp_send_json_error( null, 403 );
 		}
 
