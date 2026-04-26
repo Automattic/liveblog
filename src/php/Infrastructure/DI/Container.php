@@ -461,9 +461,7 @@ final class Container {
 		}
 
 		if ( null === $this->lazyload_configuration ) {
-			$this->lazyload_configuration = new LazyloadConfiguration(
-				$this->template_renderer()
-			);
+			$this->lazyload_configuration = new LazyloadConfiguration();
 		}
 
 		return $this->lazyload_configuration;
