@@ -602,7 +602,7 @@ class WPCOM_Liveblog_Entry {
 	 * @return WP_User The user object.
 	 */
 	private static function handle_author_select( $args, $entry_id ) {
-		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
+		if ( isset( $args['author_id'] ) && $args['author_id'] && self::is_user_assignable_as_author( (int) $args['author_id'] ) ) {
 			$user_object = self::get_userdata_with_filter( $args['author_id'] );
 			if ( $user_object ) {
 				$args['user'] = $user_object;
@@ -631,6 +631,29 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
+	 * Whether a supplied user id may be set as an entry's author or contributor.
+	 *
+	 * The author/contributor pickers in the editor only suggest users who hold
+	 * the `edit_posts` capability — that is the data set returned by the
+	 * autocomplete endpoint. The back end did not previously enforce that
+	 * boundary, so a malicious editor could pass any user id (including a
+	 * subscriber's) and have the resulting comment attributed to them, leaking
+	 * `comment_author_email` for that user and breaking the audit trail.
+	 *
+	 * @param int $user_id Candidate user id.
+	 * @return bool True when the candidate is a real user with `edit_posts`.
+	 */
+	private static function is_user_assignable_as_author( $user_id ) {
+		if ( $user_id <= 0 ) {
+			return false;
+		}
+
+		// `user_can()` handles a non-existent user id by returning false; no
+		// additional `get_userdata()` round trip is needed.
+		return user_can( $user_id, 'edit_posts' );
+	}
+
+	/**
 	 * Store the contributors as comment meta.
 	 *
 	 * @param int   $comment_id   The comment ID for the meta we should update.
@@ -647,6 +670,19 @@ class WPCOM_Liveblog_Entry {
 			// contains integers. Coerce to positive integers here so arbitrary
 			// strings cannot be persisted to comment meta.
 			$contributors = array_values( array_filter( array_map( 'absint', $contributors ) ) );
+
+			// Keep only users who could legitimately appear in the contributor
+			// picker (those with `edit_posts`). Without this filter a malicious
+			// editor could attribute an entry to any user id, including
+			// subscribers, leaking the assigned user's display name and avatar
+			// onto the post.
+			$assignable = array();
+			foreach ( $contributors as $contributor_id ) {
+				if ( self::is_user_assignable_as_author( $contributor_id ) ) {
+					$assignable[] = $contributor_id;
+				}
+			}
+			$contributors = $assignable;
 
 			if ( metadata_exists( 'comment', $comment_id, self::CONTRIBUTORS_META_KEY ) ) {
 				update_comment_meta( $comment_id, self::CONTRIBUTORS_META_KEY, $contributors );

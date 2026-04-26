@@ -232,23 +232,28 @@ class WPCOM_Liveblog_Rest_Api {
 
 		/*
 		 * Get a list of authors matching a search term.
-		 * Used to autocomplete @ mentions
+		 * Used to autocomplete @ mentions.
 		 *
-		 * /authors/<term>
+		 * The route is post-scoped so the permission check can require
+		 * `edit_post` on the target post rather than relying on a global
+		 * capability such as `publish_posts`. Pre-1.12.0 callers using the
+		 * legacy `/authors/<term>` shape are no longer accepted; the post
+		 * id is now mandatory.
 		 *
-		 * TODO: The regex pattern will allow no slash between 'authors' and the search term.
-		 *       Look into requiring the slash
-		 *
+		 * /<post_id>/authors/<term>
 		 */
 		register_rest_route(
 			self::$api_namespace,
-			'/authors([/]*)(?P<term>.*)',
+			'/(?P<post_id>\d+)/authors([/]*)(?P<term>.*)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( __CLASS__, 'get_authors' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
-					'term' => array(
+					'post_id' => array(
+						'required' => true,
+					),
+					'term'    => array(
 						'required' => false,
 					),
 				),
@@ -257,23 +262,24 @@ class WPCOM_Liveblog_Rest_Api {
 
 		/*
 		 * Get a list of hashtags matching a search term.
-		 * Used to autocomplete previously used #hashtags
+		 * Used to autocomplete previously used #hashtags.
 		 *
-		 * /hashtags/<term>
+		 * Post-scoped for the same reason as the authors route.
 		 *
-		 * TODO: The regex pattern will allow no slash between 'hashtags' and the search term.
-		 *       Look into requiring the slash
-		 *
+		 * /<post_id>/hashtags/<term>
 		 */
 		register_rest_route(
 			self::$api_namespace,
-			'/hashtags([/]*)(?P<term>.*)',
+			'/(?P<post_id>\d+)/hashtags([/]*)(?P<term>.*)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( __CLASS__, 'get_hashtag_terms' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
-					'term' => array(
+					'post_id' => array(
+						'required' => true,
+					),
+					'term'    => array(
 						'required' => false,
 					),
 				),
@@ -804,17 +810,20 @@ class WPCOM_Liveblog_Rest_Api {
 	/**
 	 * Get parameter from JSON.
 	 *
+	 * Returns the value as supplied by the client. Per-field sanitisation is
+	 * applied downstream (`wp_filter_post_kses` for content, `absint` for the
+	 * contributor IDs), and that is the right place for it. Decoding HTML
+	 * entities here would silently undo any encoding the client applied,
+	 * weaken defence in depth, and trigger PHP 8.1+ deprecation warnings when
+	 * the value is non-string (e.g. integer contributor IDs).
+	 *
 	 * @param string $param The parameter name.
 	 * @param array  $json  The JSON data.
 	 * @return mixed The parameter value or false if not found.
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
-			// Handle arrays (e.g., contributor_ids from multi-select).
-			if ( is_array( $json[ $param ] ) ) {
-				return array_map( 'html_entity_decode', $json[ $param ] );
-			}
-			return html_entity_decode( $json[ $param ] );
+			return $json[ $param ];
 		}
 		return false;
 	}

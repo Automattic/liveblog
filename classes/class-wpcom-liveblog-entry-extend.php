@@ -102,10 +102,34 @@ class WPCOM_Liveblog_Entry_Extend {
 	 * Returns the settings for autocomplete that are used by
 	 * the frontend javascript for autocomplete matching.
 	 *
+	 * Feature configs (authors, hashtags) emit URLs that contain a
+	 * `%POST_ID%` placeholder because the configs are computed at plugin
+	 * load time, before the current post is known. This method substitutes
+	 * the placeholder with the supplied post id so the URLs target the
+	 * post-scoped REST/AJAX routes added in 1.12.0.
+	 *
+	 * @param int|null $post_id The post id to inject into autocomplete URLs.
+	 *                          Falls back to `get_the_ID()` for callers that
+	 *                          don't pass one explicitly.
 	 * @return array
 	 */
-	public static function get_autocomplete() {
-		return self::$autocomplete;
+	public static function get_autocomplete( $post_id = null ) {
+		$autocomplete = self::$autocomplete;
+
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( $post_id <= 0 ) {
+			return $autocomplete;
+		}
+
+		$placeholder = '%POST_ID%';
+		foreach ( $autocomplete as $key => $entry ) {
+			if ( isset( $entry['url'] ) && false !== strpos( $entry['url'], $placeholder ) ) {
+				$autocomplete[ $key ]['url'] = esc_url( str_replace( $placeholder, (string) $post_id, $entry['url'] ) );
+			}
+		}
+
+		return $autocomplete;
 	}
 
 	/**

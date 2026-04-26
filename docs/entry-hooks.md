@@ -27,7 +27,7 @@ public static function filter( $entry ) {
 This is where `:emoji:` is converted back to `<img>`:
 
 ```php
-add_filter( 'liveblog_preview_update_entry', array( __CLASS__, 'filter' ), 10 );
+add_filter( 'liveblog_before_preview_entry', array( __CLASS__, 'filter' ), 10 );
 
 public static function filter( $entry ) {
 	return $entry;
