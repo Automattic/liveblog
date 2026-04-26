@@ -42,7 +42,7 @@ final class EntryPresenterTest extends TestCase {
 		$key_event_service = $this->create_mock_key_event_service();
 		$comment           = $this->create_mock_comment();
 		$renderer          = $this->create_mock_renderer( '<p>Rendered content</p>' );
-		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
+		$presenter         = new EntryPresenter( $entry, $key_event_service, $renderer, $comment );
 
 		$json = $presenter->for_json();
 
@@ -76,7 +76,7 @@ final class EntryPresenterTest extends TestCase {
 		$key_event_service = $this->create_mock_key_event_service();
 		$comment           = $this->create_mock_comment();
 		$renderer          = $this->create_mock_renderer( '<p>Updated</p>' );
-		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
+		$presenter         = new EntryPresenter( $entry, $key_event_service, $renderer, $comment );
 
 		$json = $presenter->for_json();
 
@@ -100,7 +100,7 @@ final class EntryPresenterTest extends TestCase {
 			->with( 'Test content', $comment )
 			->andReturn( '<p>Rendered</p>' );
 
-		$presenter = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
+		$presenter = new EntryPresenter( $entry, $key_event_service, $renderer, $comment );
 		$presenter->for_json();
 
 		// Mockery verifies the expectation automatically.
@@ -137,7 +137,7 @@ final class EntryPresenterTest extends TestCase {
 		$key_event_service = $this->create_mock_key_event_service();
 		$comment           = $this->create_mock_comment();
 		$renderer          = $this->create_mock_renderer( '<p>Test</p>' );
-		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
+		$presenter         = new EntryPresenter( $entry, $key_event_service, $renderer, $comment );
 
 		$json = $presenter->for_json();
 
@@ -155,7 +155,7 @@ final class EntryPresenterTest extends TestCase {
 
 		// New entry.
 		$new_entry  = $this->create_entry();
-		$presenter1 = new EntryPresenter( $new_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
+		$presenter1 = new EntryPresenter( $new_entry, $key_event_service, $this->create_mock_renderer(), $this->create_mock_comment() );
 		$this->assertSame( 'new', $presenter1->for_json()->type );
 
 		// Update entry.
@@ -168,7 +168,7 @@ final class EntryPresenterTest extends TestCase {
 			EntryId::from_int( 100 ),
 			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
 		);
-		$presenter2   = new EntryPresenter( $update_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
+		$presenter2   = new EntryPresenter( $update_entry, $key_event_service, $this->create_mock_renderer(), $this->create_mock_comment() );
 		$this->assertSame( 'update', $presenter2->for_json()->type );
 
 		// Delete entry.
@@ -181,7 +181,7 @@ final class EntryPresenterTest extends TestCase {
 			EntryId::from_int( 100 ),
 			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
 		);
-		$presenter3   = new EntryPresenter( $delete_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
+		$presenter3   = new EntryPresenter( $delete_entry, $key_event_service, $this->create_mock_renderer(), $this->create_mock_comment() );
 		$this->assertSame( 'delete', $presenter3->for_json()->type );
 	}
 

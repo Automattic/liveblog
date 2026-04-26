@@ -19,7 +19,7 @@ use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Automattic\Liveblog\Application\Service\ArchiveRepairService;
 use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Entity\Entry;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\CLI\AddCommand;
 use Automattic\Liveblog\Infrastructure\CLI\ArchiveCommand;
 use Automattic\Liveblog\Infrastructure\CLI\ArchiveOldCommand;
@@ -425,11 +425,8 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_lazyload(): void {
-		// Create configuration directly - it just reads options, no dependencies.
-		$configuration = new LazyloadConfiguration();
-
 		// Initialize on template_redirect when liveblog state is available.
-		add_action( 'template_redirect', array( $configuration, 'initialize' ) );
+		add_action( 'template_redirect', array( $this->container->lazyload_configuration(), 'initialize' ) );
 	}
 
 	/**

@@ -10,7 +10,9 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Unit\Application\Config;
 
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
+use Automattic\Liveblog\Application\Renderer\TemplateRendererInterface;
 use Brain\Monkey\Functions;
+use Mockery;
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
 
 /**
@@ -33,7 +35,7 @@ final class LazyloadConfigurationTest extends TestCase {
 	protected function set_up(): void {
 		parent::set_up();
 
-		$this->config = new LazyloadConfiguration();
+		$this->config = new LazyloadConfiguration( Mockery::mock( TemplateRendererInterface::class ) );
 	}
 
 	/**

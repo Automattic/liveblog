@@ -9,8 +9,8 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Config;
 
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
-use Automattic\Liveblog\Infrastructure\DI\Container;
+use Automattic\Liveblog\Application\Renderer\TemplateRendererInterface;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 
 /**
  * Configuration for lazy loading liveblog entries.
@@ -61,6 +61,22 @@ final class LazyloadConfiguration {
 	 * @var int|null
 	 */
 	private ?int $entries_per_page = null;
+
+	/**
+	 * Template renderer for admin notices.
+	 *
+	 * @var TemplateRendererInterface
+	 */
+	private TemplateRendererInterface $template_renderer;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param TemplateRendererInterface $template_renderer Renderer used for the deprecated plugin admin notice.
+	 */
+	public function __construct( TemplateRendererInterface $template_renderer ) {
+		$this->template_renderer = $template_renderer;
+	}
 
 	/**
 	 * Check if lazy loading is enabled.
@@ -186,7 +202,7 @@ final class LazyloadConfiguration {
 	 */
 	public function render_deprecated_plugin_notice(): void {
 		echo wp_kses_post(
-			Container::instance()->template_renderer()->render(
+			$this->template_renderer->render(
 				'lazyload-notice.php',
 				array(
 					'plugin' => 'Lazyload Liveblog Entries',

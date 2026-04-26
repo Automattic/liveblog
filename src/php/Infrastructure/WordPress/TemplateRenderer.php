@@ -9,7 +9,8 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure\WordPress;
 
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Renderer\TemplateRendererInterface;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\DI\Container;
 
 /**
@@ -17,7 +18,7 @@ use Automattic\Liveblog\Infrastructure\DI\Container;
  *
  * Supports theme overrides in child-theme/liveblog/ and theme/liveblog/ directories.
  */
-final class TemplateRenderer {
+final class TemplateRenderer implements TemplateRendererInterface {
 
 	/**
 	 * Plugin templates directory path.

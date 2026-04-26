@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Application\Service;
 
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
@@ -61,23 +62,33 @@ final class EntryOperations {
 	private ContentProcessor $content_processor;
 
 	/**
+	 * Content renderer used when presenting entries for JSON.
+	 *
+	 * @var ContentRendererInterface
+	 */
+	private ContentRendererInterface $content_renderer;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param EntryService             $entry_service     The entry service.
 	 * @param KeyEventService          $key_event_service The key event service.
 	 * @param EntryRepositoryInterface $repository        The entry repository.
 	 * @param ContentProcessor         $content_processor The content processor.
+	 * @param ContentRendererInterface $content_renderer  Content renderer used by the entry presenter.
 	 */
 	public function __construct(
 		EntryService $entry_service,
 		KeyEventService $key_event_service,
 		EntryRepositoryInterface $repository,
-		ContentProcessor $content_processor
+		ContentProcessor $content_processor,
+		ContentRendererInterface $content_renderer
 	) {
 		$this->entry_service     = $entry_service;
 		$this->key_event_service = $key_event_service;
 		$this->repository        = $repository;
 		$this->content_processor = $content_processor;
+		$this->content_renderer  = $content_renderer;
 	}
 
 	/**
@@ -200,7 +211,7 @@ final class EntryOperations {
 
 			// Get the entry and present it for JSON.
 			$entry     = $this->repository->get_entry( $entry_id );
-			$presenter = EntryPresenter::from_entry( $entry, $this->key_event_service );
+			$presenter = EntryPresenter::from_entry( $entry, $this->key_event_service, $this->content_renderer );
 
 			return array(
 				'entries'          => array( $presenter->for_json() ),
@@ -329,6 +340,10 @@ final class EntryOperations {
 	/**
 	 * Execute delete_key action.
 	 *
+	 * Strips the /key command from the entry content via KeyEventService,
+	 * then updates the entry through EntryService. Coordinating these here
+	 * keeps EntryService and KeyEventService independent of each other.
+	 *
 	 * @param array $args    Arguments.
 	 * @param int   $post_id Post ID.
 	 * @return EntryId The entry ID.
@@ -338,10 +353,16 @@ final class EntryOperations {
 		$original_comment = get_comment( $args['entry_id'] );
 		$user             = get_userdata( $original_comment->user_id );
 
-		return $this->entry_service->delete_key(
-			$post_id,
-			EntryId::from_int( (int) $args['entry_id'] ),
+		$entry_id        = EntryId::from_int( (int) $args['entry_id'] );
+		$updated_content = $this->key_event_service->remove_key_action(
 			$args['content'] ?? '',
+			$entry_id->to_int()
+		);
+
+		return $this->entry_service->update(
+			$post_id,
+			$entry_id,
+			$updated_content,
 			$user
 		);
 	}
