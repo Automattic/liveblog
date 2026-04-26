@@ -12,6 +12,7 @@ namespace Automattic\Liveblog\Infrastructure\WordPress;
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\KeyEventService;
@@ -45,20 +46,30 @@ final class RequestRouter {
 	private KeyEventService $key_event_service;
 
 	/**
+	 * Content renderer used by the entry presenter.
+	 *
+	 * @var ContentRendererInterface
+	 */
+	private ContentRendererInterface $content_renderer;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param EntryQueryService $entry_query_service The entry query service.
-	 * @param EntryOperations   $entry_operations    The entry operations service.
-	 * @param KeyEventService   $key_event_service   The key event service.
+	 * @param EntryQueryService        $entry_query_service The entry query service.
+	 * @param EntryOperations          $entry_operations    The entry operations service.
+	 * @param KeyEventService          $key_event_service   The key event service.
+	 * @param ContentRendererInterface $content_renderer    Content renderer used by the entry presenter.
 	 */
 	public function __construct(
 		EntryQueryService $entry_query_service,
 		EntryOperations $entry_operations,
-		KeyEventService $key_event_service
+		KeyEventService $key_event_service,
+		ContentRendererInterface $content_renderer
 	) {
 		$this->entry_query_service = $entry_query_service;
 		$this->entry_operations    = $entry_operations;
 		$this->key_event_service   = $key_event_service;
+		$this->content_renderer    = $content_renderer;
 	}
 
 	/**
@@ -348,7 +359,7 @@ final class RequestRouter {
 		$result = array();
 
 		foreach ( $entries as $entry ) {
-			$presenter = EntryPresenter::from_entry( $entry, $this->key_event_service );
+			$presenter = EntryPresenter::from_entry( $entry, $this->key_event_service, $this->content_renderer );
 			$result[]  = $presenter->for_json();
 		}
 

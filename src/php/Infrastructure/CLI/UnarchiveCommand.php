@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure\CLI;
 
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use WP_CLI;
 
 /**

@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Service;
 
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 
 /**
  * Handles automatic archiving of liveblogs based on expiry dates.

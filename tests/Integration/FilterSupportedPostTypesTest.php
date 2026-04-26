@@ -10,15 +10,15 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Tests\Integration;
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
  * Tests for the liveblog_supported_post_types filter.
  *
  * @covers \Automattic\Liveblog\Application\Config\LiveblogConfiguration
- * @covers \Automattic\Liveblog\Domain\Entity\LiveblogPost::is_viewing_liveblog_post
- * @covers \Automattic\Liveblog\Domain\Entity\LiveblogPost::state
+ * @covers \Automattic\Liveblog\Application\Aggregate\LiveblogPost::is_viewing_liveblog_post
+ * @covers \Automattic\Liveblog\Application\Aggregate\LiveblogPost::state
  */
 final class FilterSupportedPostTypesTest extends TestCase {
 
