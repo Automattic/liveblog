@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration\Cli;
 
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Automattic\Liveblog\Tests\Integration\IntegrationTestCase;
 use WP_CLI;
 use WP_CLI_ExitException;

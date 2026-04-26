@@ -15,7 +15,7 @@ use Automattic\Liveblog\Application\Filter\CommandFilter;
 use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\SocketIO\SocketioManager;
 use WP_Post;
 

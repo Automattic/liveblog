@@ -10,7 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Infrastructure\SocketIO;
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\WordPress\TemplateRenderer;
 use Exception;
 use Predis\Client as RedisClient;
