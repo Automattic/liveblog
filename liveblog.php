@@ -3,7 +3,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.11.1
+ * Version:     1.12.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
@@ -33,7 +33,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 *
 		 * @var string
 		 */
-		const VERSION = '1.11.1';
+		const VERSION = '1.12.0';
 
 		/**
 		 * Rewrites version for flushing rewrite rules.
@@ -814,7 +814,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * Handle CRUD actions for liveblog entries.
 		 */
 		public static function ajax_crud_entry() {
-			self::ajax_current_user_can_edit_liveblog();
+			// The URL post (set by handle_request() from the permalink) is the
+			// authoritative target so a body parameter cannot redirect the action
+			// at a post the caller is not permitted to edit.
+			$post_id = (int) self::$post_id;
+
+			self::ajax_current_user_can_edit_liveblog_for_post( $post_id );
 			self::ajax_check_nonce();
 
 			$args = array();
@@ -829,7 +834,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in ajax_check_nonce().
-			$args['post_id']         = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+			$args['post_id']         = $post_id;
 			$args['content']         = isset( $_POST['content'] ) ? sanitize_text_field( wp_unslash( $_POST['content'] ) ) : '';
 			$args['entry_id']        = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
 			$args['author_id']       = isset( $_POST['author_id'] ) ? intval( $_POST['author_id'] ) : false;
@@ -1158,9 +1163,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @return void
 		 */
 		public static function ajax_preview_entry() {
-			self::ajax_current_user_can_edit_liveblog();
+			self::ajax_current_user_can_edit_liveblog_for_post( (int) self::$post_id );
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Preview does not modify data.
+			// Preview runs the same `liveblog_before_preview_entry` filter chain as the
+			// editor. Feature filters (notably hashtags) call wp_insert_term() on any
+			// new tag in the content, so an unauthenticated POST can pollute the
+			// hashtag taxonomy. Require the standard liveblog nonce here.
+			self::ajax_check_nonce();
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified in ajax_check_nonce().
 			$entry_content = isset( $_REQUEST['entry_content'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['entry_content'] ) ) : '';
 			$entry_content = self::format_preview_entry( $entry_content );
 
@@ -1346,7 +1357,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'cross_domain'                 => false,
 
 						'features'                     => WPCOM_Liveblog_Entry_Extend::get_enabled_features(),
-						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete(),
+						'autocomplete'                 => WPCOM_Liveblog_Entry_Extend::get_autocomplete( get_the_ID() ),
 						'command_class'                => apply_filters( 'liveblog_command_class', WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ),
 
 						// Internationalization strings.
@@ -1689,11 +1700,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function admin_ajax_set_liveblog_state_for_post() {
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce verified in ajax_check_nonce().
-			$post_id   = isset( $_REQUEST['post_id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['post_id'] ) ) : 0;
+			$post_id   = isset( $_REQUEST['post_id'] ) ? (int) $_REQUEST['post_id'] : 0;
 			$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
 			// phpcs:enable
 
-			self::ajax_current_user_can_edit_liveblog();
+			self::ajax_current_user_can_edit_liveblog_for_post( $post_id );
 			self::ajax_check_nonce();
 
 			$meta_box = self::admin_set_liveblog_state_for_post( $post_id, $new_state, $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above.
@@ -1936,6 +1947,41 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 */
 		public static function ajax_current_user_can_edit_liveblog() {
 			if ( ! self::current_user_can_edit_liveblog() ) {
+				self::send_forbidden_error( __( "Cheatin', uh?", 'liveblog' ) );
+			}
+		}
+
+		/**
+		 * Can the current user edit liveblog entries on a specific post.
+		 *
+		 * Post-scoped variant of `current_user_can_edit_liveblog()`. Checks the
+		 * `edit_post` meta capability on the supplied post so that holding only a
+		 * global capability such as `publish_posts` does not authorise mutation of
+		 * another user's liveblog.
+		 *
+		 * @param int $post_id The target post ID.
+		 * @return bool
+		 */
+		public static function current_user_can_edit_liveblog_for_post( $post_id ) {
+			$post_id = (int) $post_id;
+			$post    = $post_id > 0 ? get_post( $post_id ) : null;
+			$retval  = ( $post instanceof \WP_Post && current_user_can( 'edit_post', $post_id ) );
+
+			/** This filter is documented above in current_user_can_edit_liveblog(). */
+			return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
+		}
+
+		/**
+		 * Post-scoped ajax permission gate.
+		 *
+		 * Sends a 403 error response if the current user cannot edit liveblog
+		 * entries on the supplied post.
+		 *
+		 * @param int $post_id The target post ID.
+		 * @return void
+		 */
+		public static function ajax_current_user_can_edit_liveblog_for_post( $post_id ) {
+			if ( ! self::current_user_can_edit_liveblog_for_post( $post_id ) ) {
 				self::send_forbidden_error( __( "Cheatin', uh?", 'liveblog' ) );
 			}
 		}
@@ -2297,8 +2343,13 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return;
 			}
 
+			// Entry content is html_entity_decoded inside `get_liveblog_metadata()`, so a
+			// user-supplied `&lt;/script&gt;` in an entry becomes a literal `</script>` in the
+			// encoded payload. PHP's default slash escaping saves us from breakout today, but
+			// JSON_HEX_TAG explicitly escapes `<` and `>` so the JSON-LD block is safe by
+			// construction regardless of future json_encode default changes.
 			?>
-			<script type="application/ld+json"><?php echo wp_json_encode( $metadata ); ?></script>
+			<script type="application/ld+json"><?php echo wp_json_encode( $metadata, JSON_HEX_TAG ); ?></script>
 			<?php
 		}
 

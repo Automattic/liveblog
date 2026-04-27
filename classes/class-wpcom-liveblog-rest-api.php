@@ -137,7 +137,7 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'crud_entry' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
 					'crud_action' => array(
 						'required'          => true,
@@ -221,7 +221,7 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'format_preview_entry' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
 					'entry_content' => array(
 						'required' => true,
@@ -232,23 +232,28 @@ class WPCOM_Liveblog_Rest_Api {
 
 		/*
 		 * Get a list of authors matching a search term.
-		 * Used to autocomplete @ mentions
+		 * Used to autocomplete @ mentions.
 		 *
-		 * /authors/<term>
+		 * The route is post-scoped so the permission check can require
+		 * `edit_post` on the target post rather than relying on a global
+		 * capability such as `publish_posts`. Pre-1.12.0 callers using the
+		 * legacy `/authors/<term>` shape are no longer accepted; the post
+		 * id is now mandatory.
 		 *
-		 * TODO: The regex pattern will allow no slash between 'authors' and the search term.
-		 *       Look into requiring the slash
-		 *
+		 * /<post_id>/authors/<term>
 		 */
 		register_rest_route(
 			self::$api_namespace,
-			'/authors([/]*)(?P<term>.*)',
+			'/(?P<post_id>\d+)/authors([/]*)(?P<term>.*)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( __CLASS__, 'get_authors' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
-					'term' => array(
+					'post_id' => array(
+						'required' => true,
+					),
+					'term'    => array(
 						'required' => false,
 					),
 				),
@@ -257,23 +262,24 @@ class WPCOM_Liveblog_Rest_Api {
 
 		/*
 		 * Get a list of hashtags matching a search term.
-		 * Used to autocomplete previously used #hashtags
+		 * Used to autocomplete previously used #hashtags.
 		 *
-		 * /hashtags/<term>
+		 * Post-scoped for the same reason as the authors route.
 		 *
-		 * TODO: The regex pattern will allow no slash between 'hashtags' and the search term.
-		 *       Look into requiring the slash
-		 *
+		 * /<post_id>/hashtags/<term>
 		 */
 		register_rest_route(
 			self::$api_namespace,
-			'/hashtags([/]*)(?P<term>.*)',
+			'/(?P<post_id>\d+)/hashtags([/]*)(?P<term>.*)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( __CLASS__, 'get_hashtag_terms' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
-					'term' => array(
+					'post_id' => array(
+						'required' => true,
+					),
+					'term'    => array(
 						'required' => false,
 					),
 				),
@@ -292,7 +298,7 @@ class WPCOM_Liveblog_Rest_Api {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'update_post_state' ),
-				'permission_callback' => array( 'WPCOM_Liveblog', 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_liveblog_entries' ),
 				'args'                => array(
 					'post_id'         => array(
 						'required' => true,
@@ -452,6 +458,41 @@ class WPCOM_Liveblog_Rest_Api {
 	}
 
 	/**
+	 * Permission callback for liveblog write routes scoped to a specific post.
+	 *
+	 * Enforces a post-scoped capability check so that users holding only a global
+	 * capability such as `publish_posts` cannot modify another user's liveblog.
+	 * The caller must have `edit_post` on the target post identified by the URL
+	 * path parameter (JSON body values are deliberately ignored here so the body
+	 * cannot override the route's target post).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return true|WP_Error True when the request is permitted, otherwise a 403 error.
+	 */
+	public static function can_edit_liveblog_entries( WP_REST_Request $request ) {
+		$url_params = $request->get_url_params();
+		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+		$post       = $post_id > 0 ? get_post( $post_id ) : null;
+
+		$allowed = ( $post instanceof WP_Post && current_user_can( 'edit_post', $post_id ) );
+
+		/** This filter is documented in liveblog.php */
+		$allowed = (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $allowed );
+
+		if ( $allowed ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_forbidden',
+			__( 'Sorry, you are not allowed to edit this liveblog.', 'liveblog' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
+	}
+
+	/**
 	 * Get all entries for a post in between two timestamps.
 	 *
 	 * @param WP_REST_Request $request A REST request object.
@@ -490,8 +531,14 @@ class WPCOM_Liveblog_Rest_Api {
 		$crud_action = $request->get_param( 'crud_action' );
 		$json        = $request->get_json_params();
 
+		// The URL path post_id is authoritative for the target post; the permission
+		// callback uses the same source. JSON body `post_id` is ignored so a caller
+		// cannot target a different post than the one authorised by the route.
+		$url_params = $request->get_url_params();
+		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+
 		$args = array(
-			'post_id'         => self::get_json_param( 'post_id', $json ),
+			'post_id'         => $post_id,
 			'content'         => self::get_json_param( 'content', $json ),
 			'entry_id'        => self::get_json_param( 'entry_id', $json ),
 			'author_id'       => self::get_json_param( 'author_id', $json ),
@@ -763,17 +810,20 @@ class WPCOM_Liveblog_Rest_Api {
 	/**
 	 * Get parameter from JSON.
 	 *
+	 * Returns the value as supplied by the client. Per-field sanitisation is
+	 * applied downstream (`wp_filter_post_kses` for content, `absint` for the
+	 * contributor IDs), and that is the right place for it. Decoding HTML
+	 * entities here would silently undo any encoding the client applied,
+	 * weaken defence in depth, and trigger PHP 8.1+ deprecation warnings when
+	 * the value is non-string (e.g. integer contributor IDs).
+	 *
 	 * @param string $param The parameter name.
 	 * @param array  $json  The JSON data.
 	 * @return mixed The parameter value or false if not found.
 	 */
 	public static function get_json_param( $param, $json ) {
 		if ( isset( $json[ $param ] ) ) {
-			// Handle arrays (e.g., contributor_ids from multi-select).
-			if ( is_array( $json[ $param ] ) ) {
-				return array_map( 'html_entity_decode', $json[ $param ] );
-			}
-			return html_entity_decode( $json[ $param ] );
+			return $json[ $param ];
 		}
 		return false;
 	}

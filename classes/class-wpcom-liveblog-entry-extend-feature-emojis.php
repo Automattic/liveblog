@@ -1065,10 +1065,13 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Emojis extends WPCOM_Liveblog_Entry_Ex
 		$image = $this->map_emoji( $this->emojis[ $emoji ], $emoji );
 		$image = $image['image'];
 
-		// Replace the emoji with a img tag of the emoji.
+		// Replace the emoji with a img tag of the emoji. `liveblog_cdn_emojis`,
+		// `liveblog_emoji_class` and `liveblog_active_emojis` are all
+		// publicly-documented filters, so escape every interpolated value at
+		// the point of attribute construction.
 		return str_replace(
 			$regex_match[1],
-			'<img src="' . $this->emoji_cdn . $image . '.png" class="liveblog-emoji ' . $this->class_prefix . $emoji . '" data-emoji="' . $emoji . '">',
+			'<img src="' . esc_url( $this->emoji_cdn . $image . '.png' ) . '" class="liveblog-emoji ' . esc_attr( $this->class_prefix . $emoji ) . '" data-emoji="' . esc_attr( $emoji ) . '">',
 			$regex_match[0]
 		);
 	}

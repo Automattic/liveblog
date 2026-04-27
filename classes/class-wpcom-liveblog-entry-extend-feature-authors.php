@@ -79,10 +79,15 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 */
 	public function get_config( $config ) {
 
-		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_authors';
+		// The endpoint is built at plugin-load time, before the current post
+		// is known. Use the `%POST_ID%` placeholder here and have
+		// `WPCOM_Liveblog_Entry_Extend::get_autocomplete()` substitute the
+		// actual post id at render time so the autocomplete URL targets
+		// the post-scoped route.
+		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_authors&post_id=%POST_ID%';
 
 		if ( WPCOM_Liveblog::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . 'authors' );
+			$endpoint_url = trailingslashit( trailingslashit( WPCOM_Liveblog_Rest_Api::build_endpoint_base() ) . '%POST_ID%/authors' );
 		}
 
 		// Add config to frontend autocomplete after allowing modifications.
@@ -91,7 +96,7 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 			array(
 				'type'        => 'ajax',
 				'cache'       => 1000 * 60 * 30,
-				'url'         => esc_url( $endpoint_url ),
+				'url'         => $endpoint_url,
 				'displayKey'  => 'key',
 				'search'      => 'key',
 				'regex'       => '@([\w\-]*)$',
@@ -164,10 +169,14 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 		$user         = get_user_by( 'slug', $author );
 		$display_name = $user ? $user->display_name : $author;
 
-		// Replace @author with a link to the author's post listing page.
+		// Replace @author with a link to the author's post listing page. The
+		// `liveblog_author_class` and `liveblog_author` filters allow third
+		// parties to influence both the class prefix and the matched author
+		// slug, so escape every interpolated value at the point of attribute
+		// construction.
 		return str_replace(
 			$regex_match[1],
-			'<a href="' . get_author_posts_url( -1, $author ) . '" class="liveblog-author ' . $this->class_prefix . $author . '">' . esc_html( $display_name ) . '</a>',
+			'<a href="' . esc_url( get_author_posts_url( -1, $author ) ) . '" class="liveblog-author ' . esc_attr( $this->class_prefix . $author ) . '">' . esc_html( $display_name ) . '</a>',
 			$regex_match[0]
 		);
 	}
@@ -213,6 +222,16 @@ class WPCOM_Liveblog_Entry_Extend_Feature_Authors extends WPCOM_Liveblog_Entry_E
 	 * @return void Outputs JSON and exits.
 	 */
 	public function ajax_authors() {
+
+		// Post-scoped permission check. Mirrors the REST authors endpoint:
+		// callers must hold `edit_post` on the target post, not just a
+		// global cap, otherwise any contributor could enumerate every user
+		// holding `edit_posts` across the whole site.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint; CSRF is irrelevant for a read.
+		$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
+		if ( ! WPCOM_Liveblog::current_user_can_edit_liveblog_for_post( $post_id ) ) {
+			wp_send_json_error( null, 403 );
+		}
 
 		// Sanitize the input safely.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
