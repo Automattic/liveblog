@@ -45,7 +45,7 @@
 		"cs-fix": [
 			"@php ./vendor/bin/phpcbf -q"
 		],
-		"i18n": "@php wp i18n make-pot . ./languages/liveblog.pot",
+		"i18n": "@php wp i18n make-pot . ./languages/liveblog.pot --slug=liveblog",
 		"lint": [
 			"@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --exclude vendor --exclude .git"
 		],
