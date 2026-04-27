@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.12.0] - 2026-04-27
+
+**Breaking change (security fix):** The pre-1.12.0 `/liveblog/v1/authors/<term>` and `/liveblog/v1/hashtags/<term>` REST routes, and the matching admin-ajax `liveblog_authors` and `liveblog_terms` actions, only checked a global capability. That allowed any user holding `publish_posts` to enumerate every editor on the site and every entry in the `hashtags` taxonomy, regardless of which post — if any — they were editing (CWE-863). Closing that gap requires scoping the permission check to a specific post, which forces the post id to appear in the URL or the query string. The new shapes are `/liveblog/v1/<post_id>/authors/<term>`, `/liveblog/v1/<post_id>/hashtags/<term>`, and `admin-ajax.php?action=liveblog_authors&post_id=…` (likewise for `liveblog_terms`). The bundled JavaScript client has been updated. Anything else calling these endpoints — bespoke integrations, custom blocks, headless clients — needs to be updated to include the target post id.
+
+### Security
+
+* fix: scope liveblog write authorisation to the target post by @GaryJones in https://github.com/Automattic/liveblog/pull/870 (CWE-285 BAC)
+* fix: harden preview CSRF, autocomplete post-scoping, attribute escaping, and author/contributor validation by @GaryJones in https://github.com/Automattic/liveblog/pull/873 (CWE-352, CWE-863, CWE-79, CWE-639)
+* fix: cap checks, ID sanitisation, and safer JSON-LD and AMP output by @GaryJones in https://github.com/Automattic/liveblog/pull/867 (CWE-285, CWE-20, CWE-79)
+
+### Documentation
+
+* docs: restructure documentation around audience by @GaryJones in https://github.com/Automattic/liveblog/pull/872
+
+### Maintenance
+
+* npm(deps): bump @lexical/react from 0.40.0 to 0.43.0 by @dependabot in https://github.com/Automattic/liveblog/pull/866
+* npm(deps): bump @lexical/rich-text from 0.39.0 to 0.43.0 by @dependabot in https://github.com/Automattic/liveblog/pull/865
+* npm(deps-dev): bump the dev-dependencies group with 2 updates by @dependabot in https://github.com/Automattic/liveblog/pull/864
+* Actions(deps): bump actions/setup-node from 6.3.0 to 6.4.0 in the actions group by @dependabot in https://github.com/Automattic/liveblog/pull/863
+
 ## [1.11.1] - 2026-04-20
 
 ### Security
@@ -305,6 +326,7 @@ Fixed problems:
 * Initial release
 
 
+[1.12.0]: https://github.com/Automattic/liveblog/compare/1.11.1...1.12.0
 [1.11.1]: https://github.com/Automattic/liveblog/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/Automattic/liveblog/compare/1.10.0...1.11.0
 [1.10.0]: https://github.com/Automattic/liveblog/compare/1.9.7...1.10.0
