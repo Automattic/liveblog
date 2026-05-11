@@ -31,7 +31,6 @@ final class MetadataPresenter {
 	private EntryQueryService $entry_query_service;
 
 	/**
-	/**
 	 * Constructor.
 	 *
 	 * @param EntryQueryService $entry_query_service Entry query service.
@@ -62,12 +61,13 @@ final class MetadataPresenter {
 
 		$metadata = $existing_metadata;
 
-		$metadata['@context']      = 'https://schema.org';
-		$metadata['@type']         = 'LiveBlogPosting';
-		$metadata['headline']      = get_the_title( $post );
-		$metadata['url']           = get_permalink( $post );
-		$metadata['datePublished'] = get_post_datetime( $post, 'date', 'gmt' )->format( 'c' );
-		$metadata['dateModified']  = get_post_datetime( $post, 'modified', 'gmt' )->format( 'c' );
+		$metadata['@context']         = 'https://schema.org';
+		$metadata['@type']            = 'LiveBlogPosting';
+		$metadata['headline']         = get_the_title( $post );
+		$metadata['url']              = get_permalink( $post );
+		$metadata['mainEntityOfPage'] = get_permalink( $post );
+		$metadata['datePublished']    = get_post_datetime( $post, 'date', 'gmt' )->format( 'c' );
+		$metadata['dateModified']     = get_post_datetime( $post, 'modified', 'gmt' )->format( 'c' );
 
 		// Add coverage times for LiveBlogPosting (helps with Google's "LIVE" badge).
 		$metadata['coverageStartTime'] = $metadata['datePublished'];
@@ -75,6 +75,34 @@ final class MetadataPresenter {
 		// Add coverageEndTime only if the liveblog is archived.
 		if ( LiveblogPost::STATE_ARCHIVED === $liveblog_state ) {
 			$metadata['coverageEndTime'] = $metadata['dateModified'];
+		}
+
+		// Add author from the post.
+		$post_author = get_userdata( (int) $post->post_author );
+		if ( $post_author ) {
+			$metadata['author'] = array(
+				'@type' => 'Person',
+				'name'  => $post_author->display_name,
+				'url'   => get_author_posts_url( $post_author->ID ),
+			);
+		}
+
+		// Add publisher if not already provided by existing metadata.
+		if ( ! isset( $metadata['publisher'] ) ) {
+			$metadata['publisher'] = array(
+				'@type' => 'Organization',
+				'name'  => get_bloginfo( 'name' ),
+				'url'   => home_url(),
+			);
+		}
+
+		// Add featured image if available.
+		$thumbnail_id = get_post_thumbnail_id( $post );
+		if ( $thumbnail_id ) {
+			$image_url = wp_get_attachment_image_url( $thumbnail_id, 'full' );
+			if ( $image_url ) {
+				$metadata['image'] = $image_url;
+			}
 		}
 
 		$metadata['liveBlogUpdate'] = $blog_updates;
@@ -172,13 +200,18 @@ final class MetadataPresenter {
 
 			$headline = wp_trim_words( $article_body, 10, '…' );
 
+			// For updates (replaces), datePublished is the original entry time and
+			// dateModified is the update time. For new entries, they are the same.
+			$date_published = gmdate( 'c', (int) ( $entry->entry_time ?? 0 ) );
+			$date_modified  = gmdate( 'c', (int) ( $entry->timestamp ?? 0 ) );
+
 			$blog_item = array(
 				'@type'            => 'BlogPosting',
 				'headline'         => $headline,
 				'url'              => $entry->share_link ?? '',
 				'mainEntityOfPage' => $entry->share_link ?? '',
-				'datePublished'    => gmdate( 'c', (int) ( $entry->entry_time ?? 0 ) ),
-				'dateModified'     => gmdate( 'c', (int) ( $entry->timestamp ?? 0 ) ),
+				'datePublished'    => $date_published,
+				'dateModified'     => $date_modified,
 				'articleBody'      => $article_body,
 			);
 
@@ -192,7 +225,7 @@ final class MetadataPresenter {
 				}
 			}
 
-			// Inherit publisher if provided.
+			// Inherit publisher from top-level if available.
 			if ( isset( $existing_metadata['publisher'] ) ) {
 				$blog_item['publisher'] = $existing_metadata['publisher'];
 			}

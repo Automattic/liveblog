@@ -61,7 +61,9 @@ const fields = [
 		label: __( 'ID', 'liveblog' ),
 		type: 'text' as const,
 		render: ( { item }: { item: EntryRecord } ) => (
-			<a href={ `post.php?post=${ item.id }&action=edit` }>#{ item.id }</a>
+			<a href={ `post.php?post=${ item.id }&action=edit` }>
+				#{ item.id }
+			</a>
 		),
 	},
 	{
@@ -93,8 +95,8 @@ const fields = [
 			}
 
 			const isPublished = item.breakout_status === 'publish';
-			const color       = isPublished ? '#00a32a' : '#dba617';
-			const label       = isPublished
+			const color = isPublished ? '#00a32a' : '#dba617';
+			const label = isPublished
 				? __( 'Published', 'liveblog' )
 				: __( 'Draft', 'liveblog' );
 
@@ -113,6 +115,7 @@ const fields = [
 export default function EntriesDataView( {
 	entries,
 	postId,
+	isArchived,
 }: EntriesDataViewProps ): JSX.Element {
 	const [ data, setData ] = useState< EntryRecord[] >( entries );
 	const [ deleteError, setDeleteError ] = useState< string | null >( null );
@@ -129,7 +132,10 @@ export default function EntriesDataView( {
 		search: '',
 		sort: { field: 'date', direction: 'desc' },
 		fields: [ 'id', 'title', 'breakout', 'date' ],
-		layout: { density: 'compact', styles: { id: { width: 50, minWidth: 50 } } },
+		layout: {
+			density: 'compact',
+			styles: { id: { width: 50, minWidth: 50 } },
+		},
 		titleField: '',
 	} );
 
@@ -138,43 +144,40 @@ export default function EntriesDataView( {
 		[ data, view ]
 	);
 
-	const handleDelete = useCallback(
-		async ( items: EntryRecord[] ) => {
-			setDeleteError( null );
-			const ids: number[] = [];
-			let failed = 0;
+	const handleDelete = useCallback( async ( items: EntryRecord[] ) => {
+		setDeleteError( null );
+		const ids: number[] = [];
+		let failed = 0;
 
-			for ( const item of items ) {
-				try {
-					await apiFetch( {
-						path: `/wp/v2/posts/${ item.id }?force=true`,
-						method: 'DELETE',
-					} );
-					ids.push( item.id );
-				} catch ( e ) {
-					failed++;
-				}
+		for ( const item of items ) {
+			try {
+				await apiFetch( {
+					path: `/wp/v2/posts/${ item.id }?force=true`,
+					method: 'DELETE',
+				} );
+				ids.push( item.id );
+			} catch ( e ) {
+				failed++;
 			}
+		}
 
-			if ( failed > 0 ) {
-				setDeleteError(
-					sprintf(
-						/* translators: %d: number of entries that failed to delete */
-						__( '%d entry deletion(s) failed.', 'liveblog' ),
-						failed
-					)
-				);
-			}
+		if ( failed > 0 ) {
+			setDeleteError(
+				sprintf(
+					/* translators: %d: number of entries that failed to delete */
+					__( '%d entry deletion(s) failed.', 'liveblog' ),
+					failed
+				)
+			);
+		}
 
-			if ( ids.length ) {
-				setData( ( prev ) =>
-					prev.filter( ( e ) => ! ids.includes( e.id ) )
-				);
-			}
-			setShowDeleteModal( null );
-		},
-		[]
-	);
+		if ( ids.length ) {
+			setData( ( prev ) =>
+				prev.filter( ( e ) => ! ids.includes( e.id ) )
+			);
+		}
+		setShowDeleteModal( null );
+	}, [] );
 
 	const handleBreakout = useCallback(
 		async ( item: EntryRecord ) => {
@@ -218,38 +221,51 @@ export default function EntriesDataView( {
 		[ postId ]
 	);
 
-	const actions = [
-		{
-			id: 'edit',
-			label: __( 'Edit', 'liveblog' ),
-			icon: <PencilIcon />,
-			isPrimary: true,
-			supportsBulk: false,
-			callback: ( items: EntryRecord[] ) => {
-				window.location.href = `post.php?post=${ items[ 0 ].id }&action=edit`;
-			},
-		},
-		{
-			id: 'breakout',
-			label: __( 'Breakout', 'liveblog' ),
-			icon: <BreakoutIcon />,
-			supportsBulk: false,
-			callback: ( items: EntryRecord[] ) => {
-				handleBreakout( items[ 0 ] );
-			},
-		},
-		{
-			id: 'delete',
-			label: __( 'Delete', 'liveblog' ),
-			icon: <TrashIcon />,
-			supportsBulk: true,
-			callback: ( items: EntryRecord[] ) => setShowDeleteModal( items ),
-		},
-	];
+	const actions = isArchived
+		? []
+		: [
+				{
+					id: 'edit',
+					label: __( 'Edit', 'liveblog' ),
+					icon: <PencilIcon />,
+					isPrimary: true,
+					supportsBulk: false,
+					callback: ( items: EntryRecord[] ) => {
+						window.location.href = `post.php?post=${ items[ 0 ].id }&action=edit`;
+					},
+				},
+				{
+					id: 'breakout',
+					label: __( 'Breakout', 'liveblog' ),
+					icon: <BreakoutIcon />,
+					supportsBulk: false,
+					callback: ( items: EntryRecord[] ) => {
+						handleBreakout( items[ 0 ] );
+					},
+				},
+				{
+					id: 'delete',
+					label: __( 'Delete', 'liveblog' ),
+					icon: <TrashIcon />,
+					supportsBulk: true,
+					callback: ( items: EntryRecord[] ) =>
+						setShowDeleteModal( items ),
+				},
+		  ];
 
 	return (
 		<>
 			<div className="liveblog-dataview-metabox">
+				{ isArchived && (
+					<div className="notice notice-info inline">
+						<p>
+							{ __(
+								'This liveblog is archived. Entries are read-only.',
+								'liveblog'
+							) }
+						</p>
+					</div>
+				) }
 				{ deleteError && (
 					<div className="notice notice-error inline">
 						<p>{ deleteError }</p>
@@ -355,6 +371,10 @@ export function mountEntriesDataView(): void {
 	}
 	root = createRoot( container );
 	root.render(
-		<EntriesDataView entries={ config.entries } postId={ config.postId } />
+		<EntriesDataView
+			entries={ config.entries }
+			postId={ config.postId }
+			isArchived={ config.isArchived }
+		/>
 	);
 }

@@ -46,8 +46,10 @@ export default class LiveblogAdmin {
 
 	bindEvents(): void {
 		this.metaBox!.addEventListener( 'click', ( event ) => {
-			const button = ( event.target as HTMLElement ).closest( 'button' ) as HTMLButtonElement | null;
-			if ( button && button.closest( '#liveblog' ) ) {
+			const button = ( event.target as HTMLElement ).closest(
+				'button'
+			) as HTMLButtonElement | null;
+			if ( button && button.closest( '.liveblog-state-buttons' ) ) {
 				event.preventDefault();
 				this.toggleState( button );
 			}

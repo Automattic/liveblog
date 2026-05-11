@@ -123,6 +123,17 @@ final class AdminController {
 			),
 		);
 
+		// Add Archive button when liveblog is currently enabled.
+		if ( LiveblogPost::STATE_ENABLED === $current_state ) {
+			$buttons[] = array(
+				'text'        => __( 'Archive', 'liveblog' ),
+				'value'       => LiveblogPost::STATE_ARCHIVED,
+				'primary'     => false,
+				'disabled'    => false,
+				'description' => __( 'Archive the liveblog. Visitors can still read entries but no new entries can be added.', 'liveblog' ),
+			);
+		}
+
 		$extra_fields   = apply_filters( 'liveblog_admin_add_settings', array(), $post->ID );
 		$permalink_link = $is_published
 			? '<a href="' . esc_url( get_permalink( $post ) ) . '">' . esc_html__( 'View liveblog', 'liveblog' ) . '</a>'
@@ -131,7 +142,7 @@ final class AdminController {
 		ob_start();
 		include __DIR__ . '/../../../../templates/meta-box.php';
 
-		if ( LiveblogPost::STATE_ENABLED === $current_state ) {
+		if ( LiveblogPost::STATE_ENABLED === $current_state || $is_archived ) {
 			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $this->get_entries_metabox_html( $post );
 			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -273,20 +284,23 @@ final class AdminController {
 		}
 
 		$config = array(
-			'entries' => $entries_data,
-			'postId'  => $post->ID,
-			'nonce'   => wp_create_nonce( LiveblogConfiguration::NONCE_ACTION ),
+			'entries'    => $entries_data,
+			'postId'     => $post->ID,
+			'nonce'      => wp_create_nonce( LiveblogConfiguration::NONCE_ACTION ),
+			'isArchived' => LiveblogPost::STATE_ARCHIVED === $liveblog_post->state(),
 		);
 
 		ob_start();
 		?>
 		<div id="liveblog-entries-dataview" data-config="<?php echo esc_attr( wp_json_encode( $config ) ); ?>"></div>
-		<p style="margin-top:12px">
+		<?php if ( ! $config['isArchived'] ) : ?>
+		<p class="liveblog-add-entry">
 			<a href="<?php echo esc_url( admin_url( 'post-new.php?post_parent=' . $post->ID ) ); ?>" class="button button-primary">
 				<?php esc_html_e( 'Add New Entry', 'liveblog' ); ?>
 			</a>
 			<span class="description"><?php esc_html_e( 'Opens the WordPress editor with this post set as parent.', 'liveblog' ); ?></span>
 		</p>
+		<?php endif; ?>
 		<?php
 		return ob_get_clean();
 	}

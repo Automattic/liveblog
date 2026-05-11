@@ -17,9 +17,10 @@ module.exports = function (env, argv) {
 	const config = { ...defaultConfig };
 
 	config.entry = {
-		'frontend/app':  path.join( __dirname, './src/js/index.ts' ),
-		'frontend/style': path.join( __dirname, './src/styles/theme.scss' ),
-		'admin/admin':   path.join( __dirname, './src/admin/index.ts' ),
+		'frontend/app':      path.join( __dirname, './src/js/index.ts' ),
+		'frontend/style':    path.join( __dirname, './src/styles/theme.scss' ),
+		'admin/admin':       path.join( __dirname, './src/admin/index.ts' ),
+		'admin/admin-style': path.join( __dirname, './src/styles/admin/admin.scss' ),
 	};
 
 	config.output = {

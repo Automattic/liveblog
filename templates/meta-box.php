@@ -35,7 +35,7 @@
 	?>
 <p class="error"></p>
 <h2><?php echo wp_kses_post( $active_text ); ?></h2>
-<ul>
+<ul class="liveblog-state-buttons">
 <?php
 foreach ( $buttons as $button ) :
 	if ( $button['disabled'] ) {

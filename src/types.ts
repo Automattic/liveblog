@@ -36,7 +36,10 @@ export interface ViewSort {
 /** DataViews layout configuration. */
 export interface ViewLayout {
 	density?: 'comfortable' | 'compact';
-	styles?: Record< string, { width?: string | number; minWidth?: string | number } >;
+	styles?: Record<
+		string,
+		{ width?: string | number; minWidth?: string | number }
+	>;
 }
 
 /** DataViews view state. */
@@ -67,6 +70,7 @@ export interface FilteredData {
 export interface EntriesDataViewProps {
 	entries: EntryRecord[];
 	postId: number;
+	isArchived: boolean;
 }
 
 /** Config injected into the DataViews mount point via data-config attribute. */
@@ -74,6 +78,7 @@ export interface DataViewConfig {
 	entries: EntryRecord[];
 	postId: number;
 	nonce: string;
+	isArchived: boolean;
 }
 
 /** Breakout API response. */

@@ -1,0 +1,77 @@
+#liveblog {
+	.liveblog-state-buttons {
+		list-style: none;
+		margin: 10px 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: baseline;
+
+		li {
+			margin: 0;
+			display: flex;
+			align-items: baseline;
+			gap: 6px;
+		}
+
+		.button {
+			min-width: 120px;
+			text-align: center;
+			line-height: 2;
+			height: auto;
+			padding: 0 10px;
+			margin: 0;
+			box-sizing: border-box;
+		}
+
+		.description {
+			font-size: 13px;
+			color: #666;
+		}
+
+		.disabled {
+			color: #999;
+		}
+	}
+}
+
+.liveblog-dataview-metabox {
+	margin-top: 16px;
+
+	// Reset inherited styles from WP metabox .inside
+	font-size: 13px;
+	line-height: 1.5;
+	box-sizing: border-box;
+
+	// Force DataViews to full width regardless of WP version
+	.dataviews-view-table {
+		width: 100%;
+	}
+
+	.dataviews-view-table__cell-content-wrapper {
+		text-align: center;
+	}
+
+	.dataviews-item-actions {
+		justify-content: center !important;
+	}
+
+	.notice {
+		margin: 5px 0 20px;
+	}
+}
+
+// Add New Entry link
+.liveblog-add-entry {
+	margin-top: 12px;
+
+	.button-primary {
+		margin-right: 8px;
+	}
+
+	.description {
+		font-size: 13px;
+		color: #666;
+	}
+}

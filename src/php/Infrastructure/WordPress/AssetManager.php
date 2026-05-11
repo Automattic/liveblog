@@ -102,13 +102,15 @@ final class AssetManager {
 
 		$endpoint_url = RestApiController::build_endpoint_base() . $post_id . '/post_state';
 
-		$asset = $this->load_asset_file( 'admin/admin' );
+		$asset       = $this->load_asset_file( 'admin/admin' );
+		$style_asset = $this->load_asset_file( 'admin/admin-style' );
 
+		// Admin metabox layout styles.
 		wp_enqueue_style(
-			LiveblogConfiguration::KEY,
-			plugins_url( 'build/admin/admin.css', $this->plugin_file ),
-			array(),
-			$asset['version']
+			LiveblogConfiguration::KEY . '-admin',
+			plugins_url( 'build/admin/admin-style.css', $this->plugin_file ),
+			array( 'wp-components' ),
+			$style_asset['version']
 		);
 
 		wp_enqueue_script(
