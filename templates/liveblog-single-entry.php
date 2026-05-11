@@ -13,16 +13,12 @@
  * - $entry_timestamp     - ISO 8601 timestamp for datetime attribute
  * - $timestamp           - Unix timestamp
  * - $share_link          - Permalink to this entry
- * - $key_event           - Whether this is a key event
  * - $is_liveblog_editable - Whether the liveblog can be edited
  *
  * @package Liveblog
  */
 
 $entry_classes = 'liveblog-entry ' . esc_attr( $css_classes );
-if ( $key_event ) {
-	$entry_classes .= ' is-key-event';
-}
 ?>
 <article id="liveblog-entry-<?php echo esc_attr( $entry_id ); ?>" class="<?php echo esc_attr( $entry_classes ); ?>" data-timestamp="<?php echo esc_attr( $timestamp ); ?>">
 	<header class="liveblog-entry-header">
@@ -49,7 +45,7 @@ if ( $key_event ) {
 							</div>
 						<?php endif; ?>
 						<span class="liveblog-meta-author-name">
-							<?php echo wp_kses_post( $author['name'] ); ?>
+							<?php echo esc_html( $author['name'] ); ?>
 						</span>
 					</div>
 				<?php endforeach; ?>
