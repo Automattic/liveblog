@@ -13,7 +13,6 @@
 /src/admin/
 /src/styles/
 /tests/
-/vendor/
 
 # Development configuration
 .babelrc
