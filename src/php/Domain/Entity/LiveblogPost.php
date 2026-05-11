@@ -10,14 +10,15 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Domain\Entity;
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use DateTimeImmutable;
 use WP_Post;
 
 /**
  * Domain entity wrapping WP_Post with liveblog-specific behaviour.
  *
- * Encapsulates the liveblog state and operations for a WordPress post,
- * providing a clean domain interface for working with liveblog posts.
+ * Encapsulates the liveblog state and operations for a WordPress post.
+ * State is stored via the liveblog_state taxonomy (terms: enabled, archived)
+ * rather than post meta, providing a clean domain interface for working
+ * with liveblog posts.
  */
 final class LiveblogPost {
 
@@ -104,20 +105,23 @@ final class LiveblogPost {
 	}
 
 	/**
-	 * Get the liveblog state.
+	 * Get the liveblog state from the liveblog_state taxonomy.
 	 *
 	 * @return string One of STATE_ENABLED, STATE_ARCHIVED, or STATE_DISABLED.
 	 */
 	public function state(): string {
-		$state = get_post_meta( $this->post->ID, LiveblogConfiguration::KEY, true );
+		$terms = wp_get_post_terms( $this->post->ID, LiveblogConfiguration::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		// Handle backwards compatibility with older values.
-		if ( 1 === $state ) {
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return self::STATE_DISABLED;
+		}
+
+		if ( in_array( LiveblogConfiguration::TERM_ENABLED, $terms, true ) ) {
 			return self::STATE_ENABLED;
 		}
 
-		if ( self::STATE_ENABLED === $state || self::STATE_ARCHIVED === $state ) {
-			return $state;
+		if ( in_array( LiveblogConfiguration::TERM_ARCHIVED, $terms, true ) ) {
+			return self::STATE_ARCHIVED;
 		}
 
 		return self::STATE_DISABLED;
@@ -180,80 +184,28 @@ final class LiveblogPost {
 	/**
 	 * Set the liveblog state.
 	 *
-	 * Handles auto-archive expiry updates when enabling/re-enabling.
-	 *
 	 * @param string $new_state The new state to set.
-	 * @return void
+	 * @return bool True if state was set successfully, false for unknown states.
 	 */
-	private function set_state( string $new_state ): void {
-		$current_state = $this->state();
-
-		// Handle auto-archive when enabling/re-enabling.
-		if ( LiveblogConfiguration::is_auto_archive_enabled() ) {
-			$should_update_auto_archive =
-				( self::STATE_DISABLED === $current_state && self::STATE_ENABLED === $new_state ) ||
-				( self::STATE_ARCHIVED === $current_state && self::STATE_ENABLED === $new_state );
-
-			if ( $should_update_auto_archive ) {
-				$this->set_auto_archive_from_now();
-			}
-		}
-
-		// Update the state.
-		if ( self::STATE_ENABLED === $new_state || self::STATE_ARCHIVED === $new_state ) {
-			update_post_meta( $this->post->ID, LiveblogConfiguration::KEY, $new_state );
-			do_action( "liveblog_{$new_state}_post", $this->post->ID );
+	public function set_state( string $new_state ): bool {
+		if ( self::STATE_ENABLED === $new_state ) {
+			wp_set_object_terms( $this->post->ID, LiveblogConfiguration::TERM_ENABLED, LiveblogConfiguration::TAXONOMY, false );
+			wp_cache_delete( 'liveblog_child_post_ids', 'liveblog' );
+			do_action( 'liveblog_enable_post', $this->post->ID );
+			return true;
+		} elseif ( self::STATE_ARCHIVED === $new_state ) {
+			wp_set_object_terms( $this->post->ID, LiveblogConfiguration::TERM_ARCHIVED, LiveblogConfiguration::TAXONOMY, false );
+			wp_cache_delete( 'liveblog_child_post_ids', 'liveblog' );
+			do_action( 'liveblog_archive_post', $this->post->ID );
+			return true;
 		} elseif ( self::STATE_DISABLED === $new_state ) {
-			delete_post_meta( $this->post->ID, LiveblogConfiguration::KEY );
-			delete_post_meta( $this->post->ID, LiveblogConfiguration::AUTO_ARCHIVE_EXPIRY_KEY );
+			wp_remove_object_terms( $this->post->ID, array( LiveblogConfiguration::TERM_ENABLED, LiveblogConfiguration::TERM_ARCHIVED ), LiveblogConfiguration::TAXONOMY );
+			wp_cache_delete( 'liveblog_child_post_ids', 'liveblog' );
 			do_action( 'liveblog_disable_post', $this->post->ID );
-		}
-	}
-
-	/**
-	 * Get the auto-archive expiry date.
-	 *
-	 * @return DateTimeImmutable|null The expiry date, or null if not set.
-	 */
-	public function auto_archive_expiry(): ?DateTimeImmutable {
-		$expiry = get_post_meta( $this->post->ID, LiveblogConfiguration::AUTO_ARCHIVE_EXPIRY_KEY, true );
-
-		if ( empty( $expiry ) ) {
-			return null;
+			return true;
 		}
 
-		return ( new DateTimeImmutable() )->setTimestamp( (int) $expiry );
-	}
-
-	/**
-	 * Extend the auto-archive expiry by a number of days from a given timestamp.
-	 *
-	 * @param int $days             Number of days to extend.
-	 * @param int $from_timestamp   Optional. Unix timestamp to calculate from. Default is now.
-	 * @return void
-	 */
-	public function extend_auto_archive_expiry( int $days, int $from_timestamp = 0 ): void {
-		if ( 0 === $from_timestamp ) {
-			$from_timestamp = time();
-		}
-
-		$expiry = strtotime( ' + ' . $days . ' days', $from_timestamp );
-		update_post_meta( $this->post->ID, LiveblogConfiguration::AUTO_ARCHIVE_EXPIRY_KEY, $expiry );
-	}
-
-	/**
-	 * Set auto-archive expiry from now using the configured days.
-	 *
-	 * @return void
-	 */
-	private function set_auto_archive_from_now(): void {
-		$days = LiveblogConfiguration::get_auto_archive_days();
-
-		if ( null === $days ) {
-			return;
-		}
-
-		$this->extend_auto_archive_expiry( $days );
+		return false;
 	}
 
 	/**
@@ -300,6 +252,27 @@ final class LiveblogPost {
 	 */
 	public function post_type_supports_liveblog(): bool {
 		return post_type_supports( $this->post->post_type, LiveblogConfiguration::KEY );
+	}
+
+	/**
+	 * Check if this post can be a liveblog.
+	 *
+	 * Only parent posts (not entries) of type 'post' can have liveblog enabled.
+	 *
+	 * @return bool True if post can be a liveblog.
+	 */
+	public function can_be_liveblog(): bool {
+		// Must be 'post' type.
+		if ( 'post' !== $this->post->post_type ) {
+			return false;
+		}
+
+		// Must not be a child post (entries cannot have liveblog).
+		if ( $this->post->post_parent > 0 ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

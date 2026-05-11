@@ -9,7 +9,6 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Domain\ValueObject;
 
-use WP_Comment;
 use WP_User;
 
 /**
@@ -112,21 +111,21 @@ final class Author {
 	}
 
 	/**
-	 * Create an Author from a WordPress comment.
+	 * Create an Author from a WordPress post object.
 	 *
-	 * Uses the comment's stored author information.
+	 * Uses the post's stored author information.
 	 *
-	 * @param WP_Comment $comment WordPress comment object.
+	 * @param \WP_Post $post WordPress post object.
 	 * @return self
 	 */
-	public static function from_comment( WP_Comment $comment ): self {
-		return new self(
-			$comment->user_id ? (int) $comment->user_id : null,
-			$comment->comment_author,
-			$comment->comment_author_email,
-			$comment->comment_author_url,
-			strtolower( sanitize_title( $comment->comment_author ) )
-		);
+	public static function from_post( \WP_Post $post ): self {
+		$user = get_userdata( (int) $post->post_author );
+
+		if ( ! $user instanceof WP_User ) {
+			return self::anonymous();
+		}
+
+		return self::from_user( $user );
 	}
 
 	/**

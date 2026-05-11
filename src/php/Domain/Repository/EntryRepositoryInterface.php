@@ -11,7 +11,7 @@ namespace Automattic\Liveblog\Domain\Repository;
 
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
-use WP_Comment;
+use WP_Post;
 
 /**
  * Defines the contract for liveblog entry persistence.
@@ -19,6 +19,12 @@ use WP_Comment;
  * This interface abstracts the storage mechanism for liveblog entries,
  * allowing different implementations (comments, custom post types, etc.)
  * while maintaining a consistent API.
+ *
+ * @todo Replace WP_Post references with domain DTOs to remove the
+ *       WordPress dependency from the Domain layer. find_by_id() 
+ *       and find_by_post_id() return WordPress infrastructure types — 
+ *       extract these into a separate infrastructure-facing interface 
+ *       or replace with array DTOs.
  */
 interface EntryRepositoryInterface {
 
@@ -46,25 +52,25 @@ interface EntryRepositoryInterface {
 	public function get_entries( int $post_id, array $args = array() ): array;
 
 	/**
-	 * Find raw comment data by entry ID.
+	 * Find raw entry data by entry ID.
 	 *
-	 * Lower-level method that returns the underlying WP_Comment.
+	 * Lower-level method that returns the underlying WordPress object.
 	 * Prefer get_entry() for most use cases.
 	 *
 	 * @param EntryId $id Entry ID.
-	 * @return WP_Comment|null The entry data or null if not found.
+	 * @return WP_Post|null The entry data or null if not found.
 	 */
-	public function find_by_id( EntryId $id ): ?WP_Comment;
+	public function find_by_id( EntryId $id ): ?WP_Post;
 
 	/**
-	 * Find raw comment data by post ID.
+	 * Find raw entry data by post ID.
 	 *
-	 * Lower-level method that returns underlying WP_Comments.
+	 * Lower-level method that returns underlying WordPress objects.
 	 * Prefer get_entries() for most use cases.
 	 *
 	 * @param int   $post_id Post ID.
 	 * @param array $args    Optional query arguments.
-	 * @return WP_Comment[] Array of entries.
+	 * @return array Array of WP_Post objects.
 	 */
 	public function find_by_post_id( int $post_id, array $args = array() ): array;
 
@@ -112,18 +118,6 @@ interface EntryRepositoryInterface {
 	 * @return bool True on success.
 	 */
 	public function set_replaces_id( EntryId $id, EntryId $replaces ): bool;
-
-	/**
-	 * Find entries that reference a given entry as their replacement target.
-	 *
-	 * Used to find orphaned update/delete entries when cleaning up.
-	 *
-	 * @param int     $post_id  Post ID.
-	 * @param EntryId $entry_id Entry ID being replaced.
-	 * @param EntryId $exclude  Entry ID to exclude from results.
-	 * @return WP_Comment[] Array of referencing entries.
-	 */
-	public function find_referencing_entries( int $post_id, EntryId $entry_id, EntryId $exclude ): array;
 
 	/**
 	 * Get contributor user IDs for an entry.
