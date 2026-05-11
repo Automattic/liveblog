@@ -1,32 +1,194 @@
 @use "../utils" as *;
-@use "theme-shared";
 
-/**
- * Theme-specific entry styles
- * Additional styles on top of shared base
- */
-
-// Container for all entries
 #liveblog-entries {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
 }
 
-// New entry highlight animation
+.liveblog-empty {
+	margin: 0;
+	padding: 2rem 0;
+	text-align: center;
+	color: $color-grey-mid-dark;
+}
+
+.liveblog-archived-message {
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
+	background: $color-grey-x-light;
+	border: 1px solid $color-grey-mid-light;
+	border-radius: 3px;
+	font-size: 0.9rem;
+}
+
+.liveblog-load-more {
+	display: block;
+	width: 100%;
+	margin-top: 0.5rem;
+	padding: 0.5rem 1rem;
+	background: $color-grey-x-light;
+	border: 1px solid $color-grey-mid;
+	border-radius: 3px;
+	cursor: pointer;
+	font-size: 0.9rem;
+	color: $color-grey-dark;
+	text-align: center;
+
+	&:hover {
+		background: $color-grey-mid-light;
+	}
+}
+
+// Card entry styles.
+.liveblog-entry {
+	margin-bottom: 0;
+}
+
+.liveblog-entry-card {
+	border-radius: 5px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+	margin-bottom: 1.25rem;
+	overflow: hidden;
+	background: #fff;
+	transition: box-shadow 0.2s ease;
+
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+	}
+}
+
+.liveblog-entry-normal {
+	border-left: 4px solid #2271b1;
+}
+
+.liveblog-entry-breakout {
+	border-left: 4px solid #dba617;
+}
+
+.liveblog-card-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.85rem;
+	color: #6c757d;
+}
+
+.liveblog-card-author {
+	font-weight: 600;
+	color: #1e293b;
+}
+
+.liveblog-breakout-badge {
+	margin-left: auto;
+	background: #dba617;
+	color: #fff;
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	line-height: 1.4;
+}
+
+.liveblog-card-featured {
+	margin: 0 1.25rem;
+	overflow: hidden;
+	border-radius: 8px;
+	line-height: 0;
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+}
+
+.liveblog-card-featured + .liveblog-card-content {
+	padding-top: 1rem;
+}
+
+.liveblog-entry-content,
+.liveblog-card-content {
+	padding: 0 1.25rem 1.25rem;
+	line-height: 1.6;
+
+	p:last-child {
+		margin-bottom: 0;
+	}
+
+	> *:first-child {
+		margin-top: 0;
+	}
+}
+
+.liveblog-card-footer {
+	padding: 0.75rem 1.25rem;
+	background: #f9fafb;
+	text-align: right;
+}
+
+.liveblog-read-more {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	color: #dba617;
+	font-weight: 600;
+	text-decoration: none;
+	font-size: 0.9rem;
+	transition: color 0.15s ease, gap 0.15s ease;
+
+	&:hover {
+		color: #a67c12;
+		gap: 0.5rem;
+	}
+}
+
+// Floating "N new updates" button.
+.liveblog-new-updates {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	background: #2271b1;
+	color: #fff;
+	border: none;
+	border-radius: 24px;
+	padding: 10px 28px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(34, 113, 177, 0.35);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	display: inline-block;
+
+	&:hover {
+		background: #1a5a8a;
+		transform: translateX(-50%) translateY(-2px);
+		box-shadow: 0 6px 18px rgba(34, 113, 177, 0.45);
+	}
+
+	&:active {
+		transform: translateX(-50%) translateY(0);
+	}
+}
+
+// New entry highlight animation.
 .liveblog-entry.is-new {
 	animation: liveblog-highlight 3s ease-out;
 }
 
 @keyframes liveblog-highlight {
-
 	0% {
 		background-color: rgba(33, 150, 243, 0.15);
-		border-color: $color-accent;
+		border-color: #2196f3;
 	}
-
 	100% {
-		background-color: $color-grey-x-light;
-		border-color: $color-grey-mid-light;
+		background-color: #f7f7f7;
+		border-color: #eee;
 	}
 }

@@ -98,11 +98,6 @@
 	}
 }
 
-// Key events use warning colour for time
-.liveblog-entry.is-key-event .liveblog-meta-time {
-	background: $color-warning;
-}
-
 // Author avatar and name styling
 .liveblog-meta-author-avatar {
 	flex-shrink: 0;
@@ -136,10 +131,6 @@
 
 .liveblog-entry-tools .liveblog-btn:first-child {
 	margin-right: 0.5rem;
-}
-
-.liveblog-entry .type-key {
-	display: none;
 }
 
 .liveblog-emoji {
@@ -183,3 +174,118 @@
 .liveblog-entry-delete-confirm-buttons button:first-child {
 	margin-right: 0.5rem;
 }
+
+// Card UI for liveblog entries.
+.liveblog-entry-card {
+	border-radius: 5px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+	margin-bottom: 1.25rem;
+	overflow: hidden;
+	background: #fff;
+	transition: box-shadow 0.2s ease;
+
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+	}
+}
+
+.liveblog-entry-normal {
+	border-left: 4px solid #2271b1;
+}
+
+.liveblog-entry-breakout {
+	border-left: 4px solid #dba617;
+}
+
+.liveblog-card-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.85rem;
+	color: #6c757d;
+}
+
+.liveblog-card-author {
+	font-weight: 600;
+	color: #1e293b;
+}
+
+.liveblog-breakout-badge {
+	margin-left: auto;
+	background: #dba617;
+	color: #fff;
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	line-height: 1.4;
+}
+
+.liveblog-card-content {
+	padding: 1.25rem;
+	line-height: 1.6;
+
+	p:last-child {
+		margin-bottom: 0;
+	}
+
+	> *:first-child {
+		margin-top: 0;
+	}
+}
+
+.liveblog-card-footer {
+	padding: 0.75rem 1.25rem;
+	background: #f9fafb;
+	text-align: right;
+}
+
+.liveblog-read-more {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	color: #dba617;
+	font-weight: 600;
+	text-decoration: none;
+	font-size: 0.9rem;
+	transition: color 0.15s ease, gap 0.15s ease;
+
+	&:hover {
+		color: #a67c12;
+		gap: 0.5rem;
+	}
+}
+
+.liveblog-new-updates {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	background: #2271b1;
+	color: #fff;
+	border: none;
+	border-radius: 24px;
+	padding: 10px 28px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(34, 113, 177, 0.35);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	display: inline-block;
+
+	&:hover {
+		background: #1a5a8a;
+		transform: translateX(-50%) translateY(-2px);
+		box-shadow: 0 6px 18px rgba(34, 113, 177, 0.45);
+	}
+
+	&:active {
+		transform: translateX(-50%) translateY(0);
+	}
+}
+

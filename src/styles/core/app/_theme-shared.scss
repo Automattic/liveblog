@@ -7,14 +7,9 @@
 
 // Entry card styles
 .liveblog-entry {
-	background: $color-grey-x-light;
 	border-top: 3px solid $color-primary;
 	padding: 1rem 1.25rem 1.25rem;
 	margin-bottom: 1.75rem;
-}
-
-.liveblog-entry.is-key-event {
-	border-top-color: $color-warning;
 }
 
 .liveblog-entry-edit {
