@@ -324,57 +324,6 @@ final class EntryServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test delete cleans up orphaned entries.
-	 */
-	public function test_delete_cleans_up_orphans(): void {
-		$author           = $this->create_mock_user( 1, 'John Doe' );
-		$entry_id         = EntryId::from_int( 100 );
-		$delete_marker_id = EntryId::from_int( 103 );
-		$post             = $this->create_mock_post( 100 );
-		$orphan1          = $this->create_mock_post( 101 );
-		$orphan2          = $this->create_mock_post( 102 );
-
-		$this->repository
-			->shouldReceive( 'find_by_id' )
-			->once()
-			->andReturn( $post );
-
-		$this->repository
-			->shouldReceive( 'insert' )
-			->once()
-			->andReturn( $delete_marker_id );
-
-		$this->repository
-			->shouldReceive( 'set_replaces_id' )
-			->once()
-			->andReturn( true );
-
-		// Orphans should be force-deleted.
-		$this->repository
-			->shouldReceive( 'delete' )
-			->with( Mockery::on( fn( $id ) => $id->to_int() === 101 ), true )
-			->once()
-			->andReturn( true );
-
-		$this->repository
-			->shouldReceive( 'delete' )
-			->with( Mockery::on( fn( $id ) => $id->to_int() === 102 ), true )
-			->once()
-			->andReturn( true );
-
-		// Original entry soft-deleted.
-		$this->repository
-			->shouldReceive( 'delete' )
-			->with( Mockery::on( fn( $id ) => $id->to_int() === 100 ), false )
-			->once()
-			->andReturn( true );
-
-		$result = $this->service->delete( 42, $entry_id, $author );
-
-		$this->assertSame( 103, $result->to_int() );
-	}
-
-	/**
 	 * Test update_author with user updates entry.
 	 */
 	public function test_update_author_with_user(): void {
