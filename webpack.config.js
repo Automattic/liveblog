@@ -3,6 +3,7 @@
  */
 const path = require('path');
 const webpack = require('webpack');
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin');
 
 /**
  * WordPress dependencies
@@ -13,33 +14,25 @@ const defaultConfig = require('@wordpress/scripts/config/webpack.config');
  * Extend the @wordpress/scripts webpack config with custom settings
  */
 module.exports = function (env, argv) {
-	const config = defaultConfig;
+	const config = { ...defaultConfig };
 
-	// Custom entry points
 	config.entry = {
-		app: path.join(__dirname, './src/react/index.js'),
-		amp: path.join(__dirname, './src/react/amp.js'),
-		admin: path.join(__dirname, './src/admin/index.js'),
+		'frontend/app':  path.join( __dirname, './src/js/index.ts' ),
+		'frontend/style': path.join( __dirname, './src/styles/theme.scss' ),
+		'admin/admin':   path.join( __dirname, './src/admin/index.ts' ),
 	};
 
-	// Custom output settings
 	config.output = {
 		...config.output,
 		path: path.join(__dirname, './build'),
 		filename: '[name].js',
 		chunkFilename: '[name].bundle.js',
-		// Custom chunkLoadingGlobal to avoid conflicts
 		chunkLoadingGlobal: 'wpJsonpLiveBlog',
-		// Use 'auto' to determine publicPath at runtime from document.currentScript
-		// This is required for React.lazy() dynamic imports to work correctly
 		publicPath: 'auto',
 	};
 
-	// Enable source maps for better debugging
-	config.devtool = 'source-map';
+	config.devtool = argv.mode === 'development' ? 'source-map' : false;
 
-	// Configure sass-loader to suppress @import deprecation warnings
-	// We'll migrate to @use in a future PR when we can properly refactor all SCSS
 	const configureSassLoader = (rule) => {
 		if (Array.isArray(rule.use)) {
 			rule.use.forEach((loader) => {
@@ -59,15 +52,27 @@ module.exports = function (env, argv) {
 
 	config.module.rules.forEach(configureSassLoader);
 
-	// Add custom plugins
+	config.plugins = config.plugins.map((plugin) => {
+		if (plugin instanceof DependencyExtractionWebpackPlugin) {
+			return new DependencyExtractionWebpackPlugin({
+				injectPolyfill: true,
+				bundledPackages: [
+					'@wordpress/dataviews',
+					'@wordpress/ui',
+					'@wordpress/private-apis',
+					'@ariakit/react',
+				],
+			});
+		}
+		return plugin;
+	});
+
 	config.plugins.push(
-		// Global vars for checking dev environment
 		new webpack.DefinePlugin({
 			__DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
 			__PROD__: JSON.stringify(process.env.NODE_ENV === 'production'),
 			__TEST__: JSON.stringify(process.env.NODE_ENV === 'test'),
 		}),
-		// Ignore moment locales to reduce bundle size
 		new webpack.IgnorePlugin({
 			resourceRegExp: /^\.\/locale$/,
 			contextRegExp: /moment$/,

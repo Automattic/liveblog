@@ -7,10 +7,7 @@
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 
-/*
- * Disable Socket support.
- */
-define( 'LIVEBLOG_USE_SOCKETIO', false );
+
 
 /**
  * Bump stats extras for liveblog actions.

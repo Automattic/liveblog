@@ -1,7 +1,7 @@
 {
   "name": "liveblog",
   "description": "Liveblogging done right. Using WordPress",
-  "version": "1.10.0",
+  "version": "2.0.0",
   "author": "Automattic",
   "private": true,
   "devDependencies": {
@@ -11,33 +11,19 @@
     "sass-mq": "^7.0.0"
   },
   "dependencies": {
-    "@lexical/html": "^0.39.0",
-    "@lexical/link": "^0.39.0",
-    "@lexical/list": "^0.39.0",
-    "@lexical/react": "^0.39.0",
-    "@lexical/rich-text": "^0.39.0",
-    "js-beautify": "^1.7.5",
-    "lexical": "^0.39.0",
-    "lodash-es": "^4.17.22",
-    "prop-types": "^15.6.0",
-    "react": "^18.3.1",
-    "react-ace": "^14.0.1",
-    "react-dom": "^18.3.1",
-    "react-image-crop": "^11.0.10",
-    "react-redux": "^8.1.0",
-    "react-select": "^5.8.0",
-    "react-select-async-paginate": "^0.7.11",
-    "redux": "^4.2.1",
-    "redux-devtools-extension": "^2.13.2",
-    "redux-observable": "^2.0.0",
-    "rxjs": "^7.8.0"
+    "@wordpress/api-fetch": "^7.45.0",
+    "@wordpress/components": "^33.0.0",
+    "@wordpress/dataviews": "^14.2.0",
+    "@wordpress/element": "^6.45.0"
   },
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
+    "dev": "wp-scripts start",
     "lint:js": "wp-scripts lint-js ./src",
     "lint:css": "wp-scripts lint-style \"src/**/*.scss\"",
-    "test": "wp-scripts test-unit-js"
+    "test": "wp-scripts test-unit-js",
+    "dist": "npm run build && composer install --no-dev --optimize-autoloader && rm -rf dist && mkdir -p dist/liveblog && rsync -r --exclude-from=.distignore . dist/liveblog/ && cd dist && zip -r liveblog.zip liveblog && cd .. && echo ' dist/liveblog.zip ready'"
   },
   "overrides": {
     "webpack-dev-server": "^5.2.1"

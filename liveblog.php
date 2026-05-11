@@ -3,9 +3,9 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.10.0
+ * Version:     2.0.0
  * Requires at least: 6.4
- * Requires PHP: 7.4
+ * Requires PHP: 8.2
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
  * Text Domain: liveblog
@@ -23,7 +23,7 @@ use Automattic\Liveblog\Infrastructure\WordPress\PluploadCompat;
 
 // Define plugin constants.
 const PLUGIN_FILE = __FILE__;
-const VERSION     = '1.10.0';
+const VERSION     = '2.0.0';
 
 // Legacy constants for backwards compatibility.
 \define( 'LIVEBLOG_FILE', __FILE__ );
