@@ -19,7 +19,7 @@ final class LiveblogConfiguration {
 	/**
 	 * Plugin version.
 	 */
-	public const VERSION = '1.10.0';
+	public const VERSION = '2.0.0';
 
 	/**
 	 * Rewrites version for flushing rewrite rules.
@@ -29,17 +29,31 @@ final class LiveblogConfiguration {
 	/**
 	 * Minimum WordPress version required.
 	 */
-	public const MIN_WP_VERSION = '4.4';
+	public const MIN_WP_VERSION = '6.4';
 
 	/**
 	 * Minimum WordPress REST API version required.
 	 */
-	public const MIN_WP_REST_API_VERSION = '4.4';
+	public const MIN_WP_REST_API_VERSION = '6.4';
 
 	/**
-	 * Meta key for liveblog state.
+	 * Plugin feature identifier.
+	 *
+	 * Used for post type support registration, metabox ID,
+	 * and script/style handles. Not used as a meta key.
 	 */
 	public const KEY = 'liveblog';
+
+	/**
+	 * Hidden taxonomy for liveblog state classification.
+	 */
+	public const TAXONOMY = 'liveblog_state';
+
+	/**
+	 * Taxonomy term slugs.
+	 */
+	public const TERM_ENABLED  = 'enabled';
+	public const TERM_ARCHIVED = 'archived';
 
 	/**
 	 * URL endpoint for liveblog.
@@ -122,11 +136,6 @@ final class LiveblogConfiguration {
 	public const AUTHOR_LIST_DEBOUNCE_TIME = 500;
 
 	/**
-	 * Meta key for auto-archive expiry date.
-	 */
-	public const AUTO_ARCHIVE_EXPIRY_KEY = 'liveblog_autoarchive_expiry_date';
-
-	/**
 	 * Liveblog state: enabled.
 	 */
 	public const STATE_ENABLED = 'enable';
@@ -140,13 +149,6 @@ final class LiveblogConfiguration {
 	 * Liveblog state: disabled (empty string).
 	 */
 	public const STATE_DISABLED = '';
-
-	/**
-	 * Number of days for auto-archive (null = disabled).
-	 *
-	 * @var int|null
-	 */
-	private static ?int $auto_archive_days = null;
 
 	/**
 	 * Supported post types for liveblog.
@@ -170,7 +172,10 @@ final class LiveblogConfiguration {
 	 * @return int Refresh interval in seconds.
 	 */
 	public static function get_refresh_interval( ?int $post_id = null ): int {
-		$refresh_interval = WP_DEBUG ? self::DEBUG_REFRESH_INTERVAL : self::REFRESH_INTERVAL;
+		$refresh_interval = (int) get_option( 'liveblog_polling_interval', 0 );
+		if ( $refresh_interval < 1 ) {
+			$refresh_interval = WP_DEBUG ? self::DEBUG_REFRESH_INTERVAL : self::REFRESH_INTERVAL;
+		}
 		$refresh_interval = (int) apply_filters( 'liveblog_refresh_interval', $refresh_interval );
 
 		if ( null !== $post_id ) {
@@ -178,43 +183,6 @@ final class LiveblogConfiguration {
 		}
 
 		return $refresh_interval;
-	}
-
-	/**
-	 * Get the auto-archive days setting.
-	 *
-	 * @return int|null Number of days, or null if disabled.
-	 */
-	public static function get_auto_archive_days(): ?int {
-		return self::$auto_archive_days;
-	}
-
-	/**
-	 * Set the auto-archive days.
-	 *
-	 * @param int|null $days Number of days, or null to disable.
-	 * @return void
-	 */
-	public static function set_auto_archive_days( ?int $days ): void {
-		self::$auto_archive_days = $days;
-	}
-
-	/**
-	 * Check if auto-archive is enabled.
-	 *
-	 * @return bool True if auto-archive is enabled.
-	 */
-	public static function is_auto_archive_enabled(): bool {
-		return null !== self::$auto_archive_days;
-	}
-
-	/**
-	 * Get the supported post types.
-	 *
-	 * @return string[] Array of post type names.
-	 */
-	public static function get_supported_post_types(): array {
-		return self::$supported_post_types;
 	}
 
 	/**
@@ -289,7 +257,7 @@ final class LiveblogConfiguration {
 	 * @return bool True if valid.
 	 */
 	public static function is_valid_crud_action( string $action ): bool {
-		return in_array( $action, array( 'insert', 'update', 'delete', 'delete_key' ), true );
+		return in_array( $action, array( 'insert', 'update', 'delete' ), true );
 	}
 
 	/**

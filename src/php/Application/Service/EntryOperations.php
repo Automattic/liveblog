@@ -12,7 +12,6 @@ namespace Automattic\Liveblog\Application\Service;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
-use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
 use WP_Error;
 use WP_User;
 
@@ -20,8 +19,8 @@ use WP_User;
  * Entry operations service - provides CRUD operations for liveblog entries.
  *
  * This facade coordinates between the EntryService (for database operations)
- * and KeyEventService (for key event handling) to provide a unified interface
- * for legacy code that previously used Container::instance() directly.
+ * to provide a unified interface for legacy code that previously used
+ * Container::instance() directly.
  */
 final class EntryOperations {
 
@@ -30,7 +29,7 @@ final class EntryOperations {
 	 *
 	 * @var string[]
 	 */
-	private const VALID_ACTIONS = array( 'insert', 'update', 'delete', 'delete_key' );
+	private const VALID_ACTIONS = array( 'insert', 'update', 'delete' );
 
 	/**
 	 * Entry service for CRUD operations.
@@ -38,13 +37,6 @@ final class EntryOperations {
 	 * @var EntryService
 	 */
 	private EntryService $entry_service;
-
-	/**
-	 * Key event service for key event handling.
-	 *
-	 * @var KeyEventService
-	 */
-	private KeyEventService $key_event_service;
 
 	/**
 	 * Entry repository for fetching entries.
@@ -64,18 +56,15 @@ final class EntryOperations {
 	 * Constructor.
 	 *
 	 * @param EntryService             $entry_service     The entry service.
-	 * @param KeyEventService          $key_event_service The key event service.
 	 * @param EntryRepositoryInterface $repository        The entry repository.
 	 * @param ContentProcessor         $content_processor The content processor.
 	 */
 	public function __construct(
 		EntryService $entry_service,
-		KeyEventService $key_event_service,
 		EntryRepositoryInterface $repository,
 		ContentProcessor $content_processor
 	) {
 		$this->entry_service     = $entry_service;
-		$this->key_event_service = $key_event_service;
 		$this->repository        = $repository;
 		$this->content_processor = $content_processor;
 	}
@@ -115,7 +104,7 @@ final class EntryOperations {
 	 * @param EntryId $entry_id The entry ID to update.
 	 * @param string  $content  The new content.
 	 * @param WP_User $user     The user making the update.
-	 * @return EntryId The new entry ID (update creates a new comment).
+	 * @return EntryId The new entry ID.
 	 * @throws \InvalidArgumentException If arguments are invalid.
 	 * @throws \RuntimeException If entry update fails.
 	 */
@@ -138,42 +127,12 @@ final class EntryOperations {
 	}
 
 	/**
-	 * Check if an entry is a key event.
-	 *
-	 * @param int $entry_id The entry ID.
-	 * @return bool True if the entry is a key event.
-	 */
-	public function is_key_event( int $entry_id ): bool {
-		return $this->key_event_service->is_key_event( $entry_id );
-	}
-
-	/**
-	 * Remove key action from entry content.
-	 *
-	 * @param string $content  The entry content.
-	 * @param int    $entry_id The entry ID.
-	 * @return string Modified content with /key removed.
-	 */
-	public function remove_key_action( string $content, int $entry_id ): string {
-		return $this->key_event_service->remove_key_action( $content, $entry_id );
-	}
-
-	/**
 	 * Get the entry service.
 	 *
 	 * @return EntryService
 	 */
 	public function entry_service(): EntryService {
 		return $this->entry_service;
-	}
-
-	/**
-	 * Get the key event service.
-	 *
-	 * @return KeyEventService
-	 */
-	public function key_event_service(): KeyEventService {
-		return $this->key_event_service;
 	}
 
 	/**
@@ -189,7 +148,7 @@ final class EntryOperations {
 	/**
 	 * Perform a CRUD operation and return the result for JSON.
 	 *
-	 * @param string  $action The CRUD action (insert, update, delete, delete_key).
+	 * @param string  $action The CRUD action (insert, update, delete).
 	 * @param array   $args   Arguments including post_id, content, entry_id, author_id, contributor_ids.
 	 * @param WP_User $user   The user performing the action.
 	 * @return array|WP_Error The result array with entries, or WP_Error on failure.
@@ -198,18 +157,17 @@ final class EntryOperations {
 		try {
 			$entry_id = $this->execute_action( $action, $args, $user );
 
-			// Get the entry and present it for JSON.
 			$entry     = $this->repository->get_entry( $entry_id );
-			$presenter = EntryPresenter::from_entry( $entry, $this->key_event_service );
+			$presenter = EntryPresenter::from_entry( $entry );
 
 			return array(
 				'entries'          => array( $presenter->for_json() ),
 				'latest_timestamp' => null,
 			);
 		} catch ( \InvalidArgumentException $e ) {
-			return new WP_Error( 'entry-invalid-args', $e->getMessage() );
+			return new WP_Error( 'entry-invalid-args', $e->getMessage(), array( 'status' => 400 ) );
 		} catch ( \RuntimeException $e ) {
-			return new WP_Error( 'comment-insert', __( 'Error posting entry', 'liveblog' ) );
+			return new WP_Error( 'entry-insert', __( 'Error posting entry', 'liveblog' ), array( 'status' => 500 ) );
 		}
 	}
 
@@ -235,9 +193,6 @@ final class EntryOperations {
 			case 'delete':
 				return $this->execute_delete( $args, $user, $post_id );
 
-			case 'delete_key':
-				return $this->execute_delete_key( $args, $post_id );
-
 			default:
 				throw new \InvalidArgumentException( 'Invalid CRUD action: ' . esc_html( $action ) );
 		}
@@ -252,12 +207,13 @@ final class EntryOperations {
 	 * @return EntryId The new entry ID.
 	 */
 	private function execute_insert( array $args, WP_User $user, int $post_id ): EntryId {
-		// Apply filter before insert.
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
-		// Set the author if provided, otherwise use current user.
 		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
-			$user = apply_filters( 'liveblog_userdata', get_userdata( $args['author_id'] ), $args['author_id'] );
+			$author_user = get_userdata( $args['author_id'] );
+			if ( $author_user instanceof WP_User ) {
+				$user = apply_filters( 'liveblog_userdata', $author_user, $args['author_id'] );
+			}
 		}
 
 		$hide_author     = ! isset( $args['author_id'] ) || ! $args['author_id'];
@@ -282,17 +238,26 @@ final class EntryOperations {
 	 * @param array $args    Arguments.
 	 * @param int   $post_id Post ID.
 	 * @return EntryId The new entry ID.
+	 * @throws \RuntimeException If the original entry is not found or the author cannot be determined.
 	 */
 	private function execute_update( array $args, int $post_id ): EntryId {
-		// Handle author selection and contributors on the original entry.
 		$this->handle_update_metadata( $args );
 
-		// Apply filter before update.
 		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
-		// Get original author for the update.
-		$original_comment = get_comment( $args['entry_id'] );
-		$user             = get_userdata( $original_comment->user_id );
+		$original_post = get_post( (int) $args['entry_id'] );
+		if ( ! $original_post ) {
+			throw new \RuntimeException( 'Entry not found for update.' );
+		}
+
+		$author_user = get_userdata( (int) $original_post->post_author );
+		$user        = $author_user instanceof WP_User
+			? $author_user
+			: wp_get_current_user();
+
+		if ( ! $user instanceof WP_User ) {
+			throw new \RuntimeException( 'Unable to determine author for update.' );
+		}
 
 		$entry_id = $this->entry_service->update(
 			$post_id,
@@ -327,26 +292,6 @@ final class EntryOperations {
 	}
 
 	/**
-	 * Execute delete_key action.
-	 *
-	 * @param array $args    Arguments.
-	 * @param int   $post_id Post ID.
-	 * @return EntryId The entry ID.
-	 */
-	private function execute_delete_key( array $args, int $post_id ): EntryId {
-		// Get the original author.
-		$original_comment = get_comment( $args['entry_id'] );
-		$user             = get_userdata( $original_comment->user_id );
-
-		return $this->entry_service->delete_key(
-			$post_id,
-			EntryId::from_int( (int) $args['entry_id'] ),
-			$args['content'] ?? '',
-			$user
-		);
-	}
-
-	/**
 	 * Handle metadata updates for entry updates (author, contributors).
 	 *
 	 * @param array $args The update arguments.
@@ -355,26 +300,23 @@ final class EntryOperations {
 	private function handle_update_metadata( array $args ): void {
 		$entry_id = (int) $args['entry_id'];
 
-		// Update author if provided.
 		if ( isset( $args['author_id'] ) && $args['author_id'] ) {
-			$user = apply_filters( 'liveblog_userdata', get_userdata( $args['author_id'] ), $args['author_id'] );
-			if ( $user ) {
-				wp_update_comment(
-					array(
-						'comment_ID'           => $entry_id,
-						'user_id'              => $user->ID,
-						'comment_author'       => $user->display_name,
-						'comment_author_email' => $user->user_email,
-						'comment_author_url'   => $user->user_url,
-					)
+			$author_user = get_userdata( $args['author_id'] );
+			if ( $author_user instanceof WP_User ) {
+				$user = apply_filters( 'liveblog_userdata', $author_user, $args['author_id'] );
+			}
+			if ( isset( $user ) && $user instanceof WP_User ) {
+				$post_data = array(
+					'ID'          => $entry_id,
+					'post_author' => $user->ID,
 				);
-				update_comment_meta( $entry_id, CommentEntryRepository::HIDE_AUTHORS_KEY, false );
+				wp_update_post( $post_data, true );
+				$this->repository->set_authors_hidden( EntryId::from_int( $entry_id ), false );
 			}
 		} else {
-			update_comment_meta( $entry_id, CommentEntryRepository::HIDE_AUTHORS_KEY, true );
+			$this->repository->set_authors_hidden( EntryId::from_int( $entry_id ), true );
 		}
 
-		// Update contributors.
 		if ( isset( $args['contributor_ids'] ) ) {
 			$this->repository->set_contributors(
 				EntryId::from_int( $entry_id ),

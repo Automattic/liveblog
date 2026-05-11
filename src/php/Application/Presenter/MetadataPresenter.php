@@ -11,7 +11,6 @@ namespace Automattic\Liveblog\Application\Presenter;
 
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
-use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use WP_Post;
 
@@ -32,24 +31,15 @@ final class MetadataPresenter {
 	private EntryQueryService $entry_query_service;
 
 	/**
-	 * Key event service.
-	 *
-	 * @var KeyEventService
-	 */
-	private KeyEventService $key_event_service;
-
 	/**
 	 * Constructor.
 	 *
 	 * @param EntryQueryService $entry_query_service Entry query service.
-	 * @param KeyEventService   $key_event_service   Key event service.
 	 */
 	public function __construct(
-		EntryQueryService $entry_query_service,
-		KeyEventService $key_event_service
+		EntryQueryService $entry_query_service
 	) {
 		$this->entry_query_service = $entry_query_service;
-		$this->key_event_service   = $key_event_service;
 	}
 
 	/**
@@ -149,7 +139,7 @@ final class MetadataPresenter {
 		$entries_for_json = array();
 
 		foreach ( $result['entries'] as $entry ) {
-			$presenter          = EntryPresenter::from_entry( $entry, $this->key_event_service );
+			$presenter          = EntryPresenter::from_entry( $entry );
 			$entries_for_json[] = $presenter->for_json();
 		}
 
@@ -168,10 +158,6 @@ final class MetadataPresenter {
 
 		foreach ( $entries as $entry ) {
 			$content = $entry->content ?? '';
-
-			// Strip /key command (plain and span versions) from content.
-			$content = preg_replace( '/<span[^>]*class="[^"]*type-key[^"]*"[^>]*>[^<]*<\/span>\s*/i', '', $content );
-			$content = preg_replace( '/(^|[>\s])\/key\s*/i', '$1', $content );
 
 			// Replace HTML tags with spaces to preserve word boundaries, then strip.
 			$article_body = preg_replace( '/<[^>]+>/', ' ', $content );

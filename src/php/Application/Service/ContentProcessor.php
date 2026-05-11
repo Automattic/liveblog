@@ -9,8 +9,9 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Service;
 
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Renderer\EmbedHandlerInterface;
-use WP_Comment;
+use WP_Post;
 
 /**
  * Processes and renders liveblog entry content.
@@ -19,21 +20,21 @@ use WP_Comment;
  * WPCOM_Liveblog_Entry class, handling embeds, shortcodes, image filtering,
  * and WordPress content filters.
  */
-final class ContentProcessor {
+final class ContentProcessor implements ContentRendererInterface {
 
 	/**
 	 * Embed handler for processing URLs.
 	 *
-	 * @var EmbedHandlerInterface
+	 * @var EmbedHandlerInterface|null
 	 */
-	private EmbedHandlerInterface $embed_handler;
+	private ?EmbedHandlerInterface $embed_handler;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param EmbedHandlerInterface $embed_handler Embed handler for URL processing.
+	 * @param EmbedHandlerInterface|null $embed_handler Embed handler for URL processing.
 	 */
-	public function __construct( EmbedHandlerInterface $embed_handler ) {
+	public function __construct( ?EmbedHandlerInterface $embed_handler = null ) {
 		$this->embed_handler = $embed_handler;
 	}
 
@@ -43,19 +44,21 @@ final class ContentProcessor {
 	 * Processes the raw content through the WordPress rendering pipeline,
 	 * including auto-embeds, shortcodes, and content filters.
 	 *
-	 * @param string          $content The raw content to render.
-	 * @param WP_Comment|null $comment Optional comment for embed context.
+	 * @param string       $content The raw content to render.
+	 * @param WP_Post|null $post  Optional post for embed context.
 	 * @return string The rendered HTML.
 	 */
-	public function render( string $content, ?WP_Comment $comment = null ): string {
+	public function render( string $content, ?WP_Post $post = null ): string {
 		/**
 		 * Filter whether to enable embeds for liveblog entries.
 		 *
 		 * @param bool $enable_embeds Whether embeds are enabled. Default true.
 		 */
 		if ( apply_filters( 'liveblog_entry_enable_embeds', true ) ) {
-			if ( get_option( 'embed_autourls' ) ) {
-				$content = $this->embed_handler->autoembed( $content, $comment );
+			if ( get_option( 'embed_autourls' ) && $this->embed_handler ) {
+				$content = $this->embed_handler->autoembed( $content, $post );
+			} elseif ( get_option( 'embed_autourls' ) ) {
+				$content = $GLOBALS['wp_embed']->autoembed( $content );
 			}
 			$content = do_shortcode( $content );
 		}
@@ -64,12 +67,12 @@ final class ContentProcessor {
 		$content = $this->filter_image_attributes( $content );
 
 		/**
-		 * Filter the comment text.
+		 * Filter the post content.
 		 *
-		 * @param string          $content The processed content.
-		 * @param WP_Comment|null $comment The comment object or null.
+		 * @param string      $content The processed content.
+		 * @param WP_Post|null $post   The post object or null.
 		 */
-		return apply_filters( 'comment_text', $content, $comment ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WP filter.
+		return apply_filters( 'liveblog_the_content', $content );
 	}
 
 	/**

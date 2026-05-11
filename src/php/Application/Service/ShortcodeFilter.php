@@ -13,8 +13,7 @@ namespace Automattic\Liveblog\Application\Service;
  * Filters restricted shortcodes from liveblog entry content.
  *
  * This service handles stripping out shortcodes that should not be allowed
- * in liveblog entries. By default, the `liveblog_key_events` shortcode is
- * restricted to prevent recursion issues.
+ * in liveblog entries.
  */
 final class ShortcodeFilter {
 
@@ -25,9 +24,7 @@ final class ShortcodeFilter {
 	 *
 	 * @var array<string, string>
 	 */
-	private const DEFAULT_RESTRICTED_SHORTCODES = array(
-		'liveblog_key_events' => '',
-	);
+	private const DEFAULT_RESTRICTED_SHORTCODES = array();
 
 	/**
 	 * Filter restricted shortcodes from entry arguments.

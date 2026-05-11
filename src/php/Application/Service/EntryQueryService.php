@@ -46,11 +46,10 @@ final class EntryQueryService {
 	 * @return Entry[] Array of entries.
 	 */
 	public function get_all( int $post_id, int $limit = 0, array $args = array() ): array {
-		$defaults = array(
-			'orderby' => 'comment_date_gmt',
+		$defaults   = array(
+			'orderby' => 'post_date_gmt',
 			'order'   => 'DESC',
 		);
-
 		$query_args = array_merge( $defaults, $args );
 		$entries    = $this->repository->get_entries( $post_id, $query_args );
 
@@ -67,9 +66,9 @@ final class EntryQueryService {
 		$entries = $this->repository->get_entries(
 			$post_id,
 			array(
-				'orderby' => 'comment_date_gmt',
-				'order'   => 'DESC',
-				'number'  => 1,
+				'orderby'     => 'post_date_gmt',
+				'order'       => 'DESC',
+				'numberposts' => 1,
 			)
 		);
 
@@ -293,7 +292,7 @@ final class EntryQueryService {
 	public function has_any( int $post_id ): bool {
 		$entries = $this->repository->get_entries(
 			$post_id,
-			array( 'number' => 1 )
+			array( 'numberposts' => 1 )
 		);
 
 		return ! empty( $entries );

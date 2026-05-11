@@ -34,39 +34,12 @@ final class EntryService {
 	private EntryRepositoryInterface $repository;
 
 	/**
-	 * Key event service.
-	 *
-	 * @var KeyEventService|null
-	 */
-	private ?KeyEventService $key_event_service = null;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param EntryRepositoryInterface $repository        Entry repository.
-	 * @param KeyEventService|null     $key_event_service Optional key event service.
+	 * @param EntryRepositoryInterface $repository Entry repository.
 	 */
-	public function __construct( EntryRepositoryInterface $repository, ?KeyEventService $key_event_service = null ) {
-		$this->repository        = $repository;
-		$this->key_event_service = $key_event_service;
-	}
-
-	/**
-	 * Get the key event service.
-	 *
-	 * Uses lazy loading to avoid circular dependencies.
-	 *
-	 * @return KeyEventService
-	 */
-	private function get_key_event_service(): KeyEventService {
-		if ( null === $this->key_event_service ) {
-			$this->key_event_service = new KeyEventService(
-				$this->repository,
-				new EntryQueryService( $this->repository )
-			);
-		}
-
-		return $this->key_event_service;
+	public function __construct( EntryRepositoryInterface $repository ) {
+		$this->repository = $repository;
 	}
 
 	/**
@@ -175,7 +148,7 @@ final class EntryService {
 		// Link the new entry to the original.
 		$this->repository->set_replaces_id( $new_entry_id, $entry_id );
 
-		// Update the original entry's content for audit trail.
+		// Update the original entry's content.
 		$this->repository->update( $entry_id, array( 'content' => $content ) );
 
 		return $new_entry_id;
@@ -220,9 +193,6 @@ final class EntryService {
 
 		// Link the delete marker to the original.
 		$this->repository->set_replaces_id( $delete_marker_id, $entry_id );
-
-		// Clean up orphaned update entries.
-		$this->cleanup_orphaned_entries( $post_id, $entry_id, $delete_marker_id );
 
 		// Delete the original entry.
 		$this->repository->delete( $entry_id, false );
@@ -299,51 +269,6 @@ final class EntryService {
 	 */
 	public function is_authors_hidden( EntryId $entry_id ): bool {
 		return $this->repository->is_authors_hidden( $entry_id );
-	}
-
-	/**
-	 * Delete a key event from an entry.
-	 *
-	 * Removes the key event meta and strips the /key command from content,
-	 * then updates the entry.
-	 *
-	 * @param int     $post_id  Post ID for the liveblog.
-	 * @param EntryId $entry_id ID of the entry.
-	 * @param string  $content  Current content (with /key to be stripped).
-	 * @param WP_User $author   Author of the update.
-	 * @return EntryId The updated entry's ID.
-	 * @throws InvalidArgumentException If entry not found or post ID is invalid.
-	 */
-	public function delete_key(
-		int $post_id,
-		EntryId $entry_id,
-		string $content,
-		WP_User $author
-	): EntryId {
-		// Remove the key event meta and strip /key from content.
-		$updated_content = $this->get_key_event_service()->remove_key_action( $content, $entry_id->to_int() );
-
-		// Update the entry with the new content.
-		return $this->update( $post_id, $entry_id, $updated_content, $author );
-	}
-
-	/**
-	 * Clean up orphaned update entries.
-	 *
-	 * When an entry is deleted, any previous update entries that reference
-	 * it should also be removed.
-	 *
-	 * @param int     $post_id          Post ID.
-	 * @param EntryId $entry_id         Original entry ID.
-	 * @param EntryId $exclude_entry_id Entry ID to exclude (the delete marker).
-	 * @return void
-	 */
-	private function cleanup_orphaned_entries( int $post_id, EntryId $entry_id, EntryId $exclude_entry_id ): void {
-		$orphans = $this->repository->find_referencing_entries( $post_id, $entry_id, $exclude_entry_id );
-
-		foreach ( $orphans as $orphan ) {
-			$this->repository->delete( EntryId::from_int( (int) $orphan->comment_ID ), true );
-		}
 	}
 
 	/**

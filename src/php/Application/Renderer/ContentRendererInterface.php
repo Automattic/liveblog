@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Renderer;
 
-use WP_Comment;
+use WP_Post;
 
 /**
  * Interface for rendering entry content.
@@ -22,9 +22,9 @@ interface ContentRendererInterface {
 	/**
 	 * Render content to HTML.
 	 *
-	 * @param string          $content The raw content to render.
-	 * @param WP_Comment|null $comment Optional comment for context.
+	 * @param string       $content The raw content to render.
+	 * @param WP_Post|null $post  Optional post for context.
 	 * @return string The rendered HTML.
 	 */
-	public function render( string $content, ?WP_Comment $comment = null ): string;
+	public function render( string $content, ?WP_Post $post = null ): string;
 }

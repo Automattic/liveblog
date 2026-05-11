@@ -11,11 +11,10 @@ namespace Automattic\Liveblog\Application\Presenter;
 
 use Automattic\Liveblog\Application\Config\AllowedTagsConfiguration;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
-use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\DI\Container;
-use WP_Comment;
+use WP_Post;
 
 /**
  * Transforms Entry entities into various presentation formats.
@@ -45,62 +44,50 @@ final class EntryPresenter {
 	private Entry $entry;
 
 	/**
-	 * The underlying comment object for WordPress integration.
+	 * WordPress post object (for post-based liveblog).
 	 *
-	 * @var WP_Comment|null
+	 * @var WP_Post|null
 	 */
-	private ?WP_Comment $comment;
+	private ?WP_Post $entry_post;
 
 	/**
-	 * Content renderer for transforming raw content to HTML.
+	 * Content renderer instance.
 	 *
-	 * @var ContentRendererInterface
+	 * @var ContentRendererInterface|null
 	 */
-	private ContentRendererInterface $renderer;
-
-	/**
-	 * Key event service for checking key event status.
-	 *
-	 * @var KeyEventService
-	 */
-	private KeyEventService $key_event_service;
+	private ?ContentRendererInterface $renderer;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Entry                         $entry             The entry to present.
-	 * @param KeyEventService               $key_event_service Service for key event operations.
-	 * @param WP_Comment|null               $comment           Optional comment for additional WordPress data.
-	 * @param ContentRendererInterface|null $renderer          Optional content renderer (defaults to container renderer).
+	 * @param Entry                         $entry      The entry to present.
+	 * @param WP_Post|null                  $entry_post Optional post for additional WordPress data.
+	 * @param ContentRendererInterface|null $renderer   Optional content renderer (defaults to container renderer).
 	 */
 	public function __construct(
 		Entry $entry,
-		KeyEventService $key_event_service,
-		?WP_Comment $comment = null,
+		?WP_Post $entry_post = null,
 		?ContentRendererInterface $renderer = null
 	) {
-		$this->entry             = $entry;
-		$this->key_event_service = $key_event_service;
-		$this->comment           = $comment;
-		$this->renderer          = $renderer ?? Container::instance()->content_renderer();
+		$this->entry      = $entry;
+		$this->entry_post = $entry_post;
+		$this->renderer   = $renderer;
 	}
 
 	/**
 	 * Create a presenter from an Entry.
 	 *
-	 * Fetches the comment automatically and uses the default WordPress renderer.
+	 * Fetches the post automatically and uses the default WordPress renderer.
 	 *
-	 * @param Entry           $entry             The entry to present.
-	 * @param KeyEventService $key_event_service Service for key event operations.
+	 * @param Entry $entry The entry to present.
 	 * @return self
 	 */
-	public static function from_entry( Entry $entry, KeyEventService $key_event_service ): self {
-		$comment = get_comment( $entry->id()->to_int() );
+	public static function from_entry( Entry $entry ): self {
+		$post = get_post( $entry->id()->to_int() );
 
 		return new self(
 			$entry,
-			$key_event_service,
-			$comment instanceof WP_Comment ? $comment : null
+			$post instanceof WP_Post ? $post : null
 		);
 	}
 
@@ -167,7 +154,6 @@ final class EntryPresenter {
 			'entry_timestamp'        => $this->get_entry_time( 'c' ),
 			'timestamp'              => $this->entry->timestamp(),
 			'share_link'             => $this->get_share_link( $entry_id, 'liveblog-entry-' ),
-			'key_event'              => $this->is_key_event( $entry_id ),
 			'is_liveblog_editable'   => self::is_liveblog_editable( $this->entry->post_id() ),
 			'allowed_tags_for_entry' => AllowedTagsConfiguration::get(),
 		);
@@ -194,13 +180,23 @@ final class EntryPresenter {
 	}
 
 	/**
-	 * Get CSS classes for the entry.
+	 * Get the avatar image for the entry.
 	 *
-	 * @param int $entry_id The entry ID.
+	 * @param int $size Avatar size.
 	 * @return string
 	 */
-	private function get_css_classes( int $entry_id ): string {
-		return implode( ' ', get_comment_class( '', $entry_id, $this->entry->post_id() ) );
+	private function get_avatar( int $size ): string {
+		$author = $this->entry->authors()->primary();
+		if ( $author ) {
+			return get_avatar( $author->email(), $size );
+		}
+
+		// Fallback to post author.
+		if ( $this->entry_post ) {
+			return get_avatar( $this->entry_post->post_author, $size );
+		}
+
+		return '';
 	}
 
 	/**
@@ -220,10 +216,12 @@ final class EntryPresenter {
 	 * @return string
 	 */
 	private function get_rendered_content(): string {
-		return $this->renderer->render(
-			$this->entry->content()->raw(),
-			$this->comment
-		);
+		// If no renderer is available, return the raw content.
+		if ( ! $this->renderer instanceof ContentRendererInterface ) {
+			return $this->entry->content()->raw();
+		}
+
+		return $this->renderer->render( $this->entry->content()->raw() );
 	}
 
 	/**
@@ -281,8 +279,9 @@ final class EntryPresenter {
 			return $primary->avatar_html( $size );
 		}
 
-		if ( $this->comment ) {
-			return get_avatar( $this->comment->comment_author_email, $size );
+		// Fallback to post author.
+		if ( $this->entry_post ) {
+			return get_avatar( $this->entry_post->post_author, $size );
 		}
 
 		return '';
@@ -291,11 +290,20 @@ final class EntryPresenter {
 	/**
 	 * Get author link HTML.
 	 *
-	 * @param int $entry_id The entry ID.
 	 * @return string
 	 */
-	private function get_author_link( int $entry_id ): string {
-		return get_comment_author_link( $entry_id );
+	private function get_author_link(): string {
+		$primary = $this->entry->authors()->primary();
+		if ( $primary ) {
+			return $primary->link_html();
+		}
+
+		// Fallback to post author.
+		if ( $this->entry_post ) {
+			return get_the_author_meta( 'display_name', $this->entry_post->post_author );
+		}
+
+		return '';
 	}
 
 	/**
@@ -304,44 +312,79 @@ final class EntryPresenter {
 	 * @return string
 	 */
 	private function get_entry_date(): string {
-		return get_comment_date( get_option( 'date_format' ), $this->get_display_id() );
+		return get_the_date( get_option( 'date_format' ), $this->get_display_id() );
 	}
 
 	/**
 	 * Get formatted entry time.
 	 *
-	 * @param string $format PHP date format.
+	 * @param string $format Time format string.
 	 * @return string
 	 */
 	private function get_entry_time( string $format ): string {
-		return (string) get_comment_date( $format, $this->get_display_id() );
+		return (string) get_post_time( $format, false, $this->get_display_id() );
 	}
 
 	/**
-	 * Check if this entry is a key event.
+	 * Get CSS classes for the entry.
 	 *
-	 * @param int $entry_id The entry ID.
-	 * @return bool
+	 * @param int $entry_id Entry ID.
+	 * @return string
 	 */
-	private function is_key_event( int $entry_id ): bool {
-		return $this->key_event_service->is_key_event( $entry_id );
+	private function get_css_classes( int $entry_id ): string {
+		$classes = array( 'liveblog-entry' );
+
+		$authors = $this->entry->authors();
+		if ( ! $authors->is_empty() ) {
+			foreach ( $authors as $author ) {
+				$classes[] = 'liveblog-entry-author-' . \sanitize_html_class( $author->key() );
+			}
+		}
+
+		/**
+		 * Filters the entry CSS classes.
+		 *
+		 * @param string[] $classes  Array of CSS class names.
+		 * @param int      $entry_id Entry ID.
+		 */
+		$classes = apply_filters( 'liveblog_entry_classes', $classes, $entry_id );
+
+		return implode( ' ', $classes );
 	}
 
 	/**
-	 * Get a truncated title from entry content.
+	 * Get a truncated content preview from entry content.
 	 *
-	 * Static helper for generating titles from entry content.
+	 * Static helper for generating content summaries from entry content.
 	 * Works with domain Entry objects or any object with a 'content' property.
 	 *
 	 * @param Entry|object $entry The entry object.
-	 * @return string The truncated title (max 10 words).
+	 * @return string The truncated content (max 10 words).
 	 */
-	public static function get_entry_title( $entry ): string {
+	public static function get_entry_content( $entry ): string {
 		$content = $entry instanceof Entry
 			? $entry->content()->raw()
 			: ( $entry->content ?? '' );
 
 		return wp_trim_words( $content, 10, '…' );
+	}
+
+	/**
+	 * Get the WordPress post title for an entry.
+	 *
+	 * Static helper for retrieving the actual WP post title.
+	 *
+	 * @param Entry $entry The entry entity.
+	 * @return string The post title, or '(no title)' if empty.
+	 */
+	public static function get_entry_title( Entry $entry ): string {
+		$title = get_post_field( 'post_title', $entry->id()->to_int() );
+
+		if ( ! $title ) {
+			return __( '(no title)', 'liveblog' );
+		}
+
+		return mb_strlen( $title ) > 40 ? mb_substr( $title, 0, 40 ) . '…' : $title;
 	}
 
 	/**

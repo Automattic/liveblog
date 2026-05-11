@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Renderer;
 
-use WP_Comment;
+use WP_Post;
 
 /**
  * Defines the contract for processing embeds in content.
@@ -22,9 +22,9 @@ interface EmbedHandlerInterface {
 	/**
 	 * Convert standalone URLs in content to embeds.
 	 *
-	 * @param string              $content The content to process.
-	 * @param int|WP_Comment|null $comment Optional comment for cache context.
+	 * @param string           $content The content to process.
+	 * @param int|WP_Post|null $post  Optional post for cache context.
 	 * @return string The processed content with URLs converted to embeds.
 	 */
-	public function autoembed( $content, $comment = null );
+	public function autoembed( $content, $post = null );
 }
