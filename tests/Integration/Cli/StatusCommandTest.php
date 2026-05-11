@@ -115,22 +115,6 @@ final class StatusCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test status includes key events count.
-	 */
-	public function test_status_includes_key_events(): void {
-		$post_id = $this->create_liveblog();
-		$this->add_entry( $post_id, 'Regular entry' );
-		$this->add_entry( $post_id, 'Key event', array( 'key_event' => true ) );
-		$command = new StatusCommand();
-
-		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'format' => 'json' ) );
-
-		$logs = $this->output->get_logs();
-		$json = json_decode( implode( '', $logs ), true );
-		$this->assertSame( '1', $json['Key Events'] );
-	}
-
-	/**
 	 * Test status includes auto-archive info.
 	 */
 	public function test_status_includes_auto_archive(): void {

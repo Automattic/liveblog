@@ -12,7 +12,7 @@ namespace Automattic\Liveblog\Tests\Unit\Domain\ValueObject;
 use Automattic\Liveblog\Domain\ValueObject\Author;
 use Brain\Monkey\Functions;
 use Mockery;
-use WP_Comment;
+use WP_Post;
 use WP_User;
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
 
@@ -80,46 +80,48 @@ final class AuthorTest extends TestCase {
 	}
 
 	/**
-	 * Test from_comment creates Author from WP_Comment.
+	 * Test from_post creates Author from WP_Post.
 	 */
-	public function test_from_comment(): void {
-		$comment                       = Mockery::mock( WP_Comment::class );
-		$comment->user_id              = 42;
-		$comment->comment_author       = 'Commenter';
-		$comment->comment_author_email = 'commenter@example.com';
-		$comment->comment_author_url   = 'https://commenter.example.com';
+	public function test_from_post(): void {
+		$user                = Mockery::mock( WP_User::class );
+		$user->ID            = 42;
+		$user->display_name  = 'Post Author';
+		$user->user_email    = 'postauthor@example.com';
+		$user->user_url      = 'https://postauthor.example.com';
+		$user->user_nicename = 'post-author';
 
-		Functions\expect( 'sanitize_title' )
+		$post              = Mockery::mock( WP_Post::class );
+		$post->post_author = 42;
+
+		Functions\expect( 'get_userdata' )
 			->once()
-			->with( 'Commenter' )
-			->andReturn( 'commenter' );
+			->with( 42 )
+			->andReturn( $user );
 
-		$author = Author::from_comment( $comment );
+		$author = Author::from_post( $post );
 
 		$this->assertSame( 42, $author->id() );
-		$this->assertSame( 'Commenter', $author->name() );
-		$this->assertSame( 'commenter@example.com', $author->email() );
-		$this->assertSame( 'https://commenter.example.com', $author->url() );
-		$this->assertSame( 'commenter', $author->key() );
+		$this->assertSame( 'Post Author', $author->name() );
+		$this->assertSame( 'postauthor@example.com', $author->email() );
+		$this->assertSame( 'https://postauthor.example.com', $author->url() );
+		$this->assertSame( 'post-author', $author->key() );
 	}
 
 	/**
-	 * Test from_comment handles zero user_id as null.
+	 * Test from_post handles missing author user.
 	 */
-	public function test_from_comment_with_zero_user_id(): void {
-		$comment                       = Mockery::mock( WP_Comment::class );
-		$comment->user_id              = 0;
-		$comment->comment_author       = 'Guest';
-		$comment->comment_author_email = 'guest@example.com';
-		$comment->comment_author_url   = '';
+	public function test_from_post_with_missing_author(): void {
+		$post              = Mockery::mock( WP_Post::class );
+		$post->post_author = 0;
 
-		Functions\expect( 'sanitize_title' )
+		Functions\expect( 'get_userdata' )
 			->once()
-			->andReturn( 'guest' );
+			->with( 0 )
+			->andReturn( false );
 
-		$author = Author::from_comment( $comment );
+		$author = Author::from_post( $post );
 
-		$this->assertNull( $author->id() );
+		$this->assertTrue( $author->is_anonymous() );
 	}
 
 	/**

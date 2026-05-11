@@ -29,13 +29,13 @@ final class EnableCommandTest extends CliTestCase {
 		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
 		$this->assert_command_success( 'Liveblog enabled' );
-		$this->assertSame( 'enable', $this->get_liveblog_meta( $post_id ) );
+		$this->assertSame( 'enable', $this->get_liveblog_state( $post_id ) );
 	}
 
 	/**
-	 * Test enabling liveblog verifies meta is set correctly.
+	 * Test enabling liveblog verifies taxonomy state is set correctly.
 	 */
-	public function test_enable_sets_liveblog_meta(): void {
+	public function test_enable_sets_liveblog_state(): void {
 		$post_id = self::factory()->post->create();
 		$command = new EnableCommand();
 

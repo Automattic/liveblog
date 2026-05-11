@@ -20,7 +20,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
 use Mockery;
-use WP_Comment;
+use WP_Post;
 use WP_User;
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
 
@@ -229,13 +229,13 @@ final class EntryServiceTest extends TestCase {
 		$author       = $this->create_mock_user( 1, 'John Doe' );
 		$entry_id     = EntryId::from_int( 100 );
 		$new_entry_id = EntryId::from_int( 101 );
-		$comment      = $this->create_mock_comment( 100 );
+		$post         = $this->create_mock_post( 100 );
 
 		$this->repository
 			->shouldReceive( 'find_by_id' )
 			->once()
 			->with( Mockery::on( fn( $id ) => $id->to_int() === 100 ) )
-			->andReturn( $comment );
+			->andReturn( $post );
 
 		$this->repository
 			->shouldReceive( 'insert' )
@@ -290,13 +290,13 @@ final class EntryServiceTest extends TestCase {
 		$author           = $this->create_mock_user( 1, 'John Doe' );
 		$entry_id         = EntryId::from_int( 100 );
 		$delete_marker_id = EntryId::from_int( 101 );
-		$comment          = $this->create_mock_comment( 100 );
+		$post             = $this->create_mock_post( 100 );
 
 		$this->repository
 			->shouldReceive( 'find_by_id' )
 			->once()
 			->with( Mockery::on( fn( $id ) => $id->to_int() === 100 ) )
-			->andReturn( $comment );
+			->andReturn( $post );
 
 		$this->repository
 			->shouldReceive( 'insert' )
@@ -308,11 +308,6 @@ final class EntryServiceTest extends TestCase {
 			->shouldReceive( 'set_replaces_id' )
 			->once()
 			->andReturn( true );
-
-		$this->repository
-			->shouldReceive( 'find_referencing_entries' )
-			->once()
-			->andReturn( array() );
 
 		$this->repository
 			->shouldReceive( 'delete' )
@@ -335,14 +330,14 @@ final class EntryServiceTest extends TestCase {
 		$author           = $this->create_mock_user( 1, 'John Doe' );
 		$entry_id         = EntryId::from_int( 100 );
 		$delete_marker_id = EntryId::from_int( 103 );
-		$comment          = $this->create_mock_comment( 100 );
-		$orphan1          = $this->create_mock_comment( 101 );
-		$orphan2          = $this->create_mock_comment( 102 );
+		$post             = $this->create_mock_post( 100 );
+		$orphan1          = $this->create_mock_post( 101 );
+		$orphan2          = $this->create_mock_post( 102 );
 
 		$this->repository
 			->shouldReceive( 'find_by_id' )
 			->once()
-			->andReturn( $comment );
+			->andReturn( $post );
 
 		$this->repository
 			->shouldReceive( 'insert' )
@@ -353,11 +348,6 @@ final class EntryServiceTest extends TestCase {
 			->shouldReceive( 'set_replaces_id' )
 			->once()
 			->andReturn( true );
-
-		$this->repository
-			->shouldReceive( 'find_referencing_entries' )
-			->once()
-			->andReturn( array( $orphan1, $orphan2 ) );
 
 		// Orphans should be force-deleted.
 		$this->repository
@@ -390,12 +380,12 @@ final class EntryServiceTest extends TestCase {
 	public function test_update_author_with_user(): void {
 		$author   = $this->create_mock_user( 2, 'Jane Doe' );
 		$entry_id = EntryId::from_int( 100 );
-		$comment  = $this->create_mock_comment( 100 );
+		$post     = $this->create_mock_post( 100 );
 
 		$this->repository
 			->shouldReceive( 'find_by_id' )
 			->once()
-			->andReturn( $comment );
+			->andReturn( $post );
 
 		$this->repository
 			->shouldReceive( 'update' )
@@ -430,12 +420,12 @@ final class EntryServiceTest extends TestCase {
 	 */
 	public function test_update_author_with_null_hides(): void {
 		$entry_id = EntryId::from_int( 100 );
-		$comment  = $this->create_mock_comment( 100 );
+		$post     = $this->create_mock_post( 100 );
 
 		$this->repository
 			->shouldReceive( 'find_by_id' )
 			->once()
-			->andReturn( $comment );
+			->andReturn( $post );
 
 		$this->repository
 			->shouldReceive( 'set_authors_hidden' )
@@ -456,12 +446,12 @@ final class EntryServiceTest extends TestCase {
 	 */
 	public function test_set_contributors(): void {
 		$entry_id = EntryId::from_int( 100 );
-		$comment  = $this->create_mock_comment( 100 );
+		$post     = $this->create_mock_post( 100 );
 
 		$this->repository
 			->shouldReceive( 'find_by_id' )
 			->once()
-			->andReturn( $comment );
+			->andReturn( $post );
 
 		$this->repository
 			->shouldReceive( 'set_contributors' )
@@ -527,16 +517,16 @@ final class EntryServiceTest extends TestCase {
 	}
 
 	/**
-	 * Create a mock WP_Comment object.
+	 * Create a mock WP_Post object.
 	 *
-	 * @param int $id Comment ID.
-	 * @return WP_Comment
+	 * @param int $id Post ID.
+	 * @return WP_Post
 	 */
-	private function create_mock_comment( int $id ): WP_Comment {
-		$comment             = Mockery::mock( WP_Comment::class );
-		$comment->comment_ID = $id;
+	private function create_mock_post( int $id ): WP_Post {
+		$post     = Mockery::mock( WP_Post::class );
+		$post->ID = $id;
 
-		return $comment;
+		return $post;
 	}
 
 	/**

@@ -165,22 +165,16 @@ final class ArchiveOldCommandTest extends CliTestCase {
 		$post_id = $this->create_liveblog();
 
 		// Add entry dated 15 days ago.
-		global $wpdb;
 		$entry_date = gmdate( 'Y-m-d H:i:s', strtotime( '-15 days' ) );
-		$this->add_entry( $post_id, 'Entry from 15 days ago' );
-		// Update the comment date directly.
-		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->comments,
+		$entry_id   = $this->add_entry( $post_id, 'Entry from 15 days ago' );
+		// Update the entry (child post) date directly.
+		wp_update_post(
 			array(
-				'comment_date'     => $entry_date,
-				'comment_date_gmt' => $entry_date,
-			),
-			array(
-				'comment_post_ID'  => $post_id,
-				'comment_approved' => 'liveblog',
+				'ID'            => $entry_id,
+				'post_date'     => $entry_date,
+				'post_date_gmt' => $entry_date,
 			)
 		);
-		clean_comment_cache( $post_id );
 
 		$command = new ArchiveOldCommand();
 

@@ -43,23 +43,24 @@ final class AddCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test add creates comment in database.
+	 * Test add creates entry post in database.
 	 */
-	public function test_add_creates_comment(): void {
+	public function test_add_creates_entry_post(): void {
 		$post_id = $this->create_liveblog();
 		$command = new AddCommand( $this->container()->entry_service() );
 
 		$this->invoke_expecting_success( $command, array( (string) $post_id, 'Test entry content' ) );
 
-		$comments = get_comments(
+		$entries = get_posts(
 			array(
-				'post_id' => $post_id,
-				'status'  => 'liveblog',
+				'post_parent' => $post_id,
+				'post_type'   => 'post',
+				'post_status' => 'publish',
 			)
 		);
 
-		$this->assertCount( 1, $comments );
-		$this->assertSame( 'Test entry content', $comments[0]->comment_content );
+		$this->assertCount( 1, $entries );
+		$this->assertSame( 'Test entry content', $entries[0]->post_content );
 	}
 
 	/**
@@ -76,14 +77,15 @@ final class AddCommandTest extends CliTestCase {
 			array( 'author' => (string) $user->ID )
 		);
 
-		$comments = get_comments(
+		$entries = get_posts(
 			array(
-				'post_id' => $post_id,
-				'status'  => 'liveblog',
+				'post_parent' => $post_id,
+				'post_type'   => 'post',
+				'post_status' => 'publish',
 			)
 		);
 
-		$this->assertSame( (int) $user->ID, (int) $comments[0]->user_id );
+		$this->assertSame( (int) $user->ID, (int) $entries[0]->post_author );
 	}
 
 	/**
@@ -101,14 +103,15 @@ final class AddCommandTest extends CliTestCase {
 			array( 'contributors' => sprintf( '%d,%d', $user1->ID, $user2->ID ) )
 		);
 
-		$comments = get_comments(
+		$entries = get_posts(
 			array(
-				'post_id' => $post_id,
-				'status'  => 'liveblog',
+				'post_parent' => $post_id,
+				'post_type'   => 'post',
+				'post_status' => 'publish',
 			)
 		);
 
-		$contributors = get_comment_meta( $comments[0]->comment_ID, 'liveblog_contributors', true );
+		$contributors = get_post_meta( $entries[0]->ID, 'liveblog_contributors', true );
 		$this->assertContains( (int) $user1->ID, $contributors );
 		$this->assertContains( (int) $user2->ID, $contributors );
 	}
@@ -126,41 +129,16 @@ final class AddCommandTest extends CliTestCase {
 			array( 'hide-authors' => true )
 		);
 
-		$comments = get_comments(
+		$entries = get_posts(
 			array(
-				'post_id' => $post_id,
-				'status'  => 'liveblog',
+				'post_parent' => $post_id,
+				'post_type'   => 'post',
+				'post_status' => 'publish',
 			)
 		);
 
-		$hide_authors = get_comment_meta( $comments[0]->comment_ID, 'liveblog_hide_authors', true );
+		$hide_authors = get_post_meta( $entries[0]->ID, 'liveblog_hide_authors', true );
 		$this->assertSame( '1', $hide_authors );
-	}
-
-	/**
-	 * Test adding entry with --key-event flag.
-	 */
-	public function test_add_with_key_event(): void {
-		$post_id = $this->create_liveblog();
-		$command = new AddCommand( $this->container()->entry_service() );
-
-		$this->invoke_expecting_success(
-			$command,
-			array( (string) $post_id, 'Test entry' ),
-			array( 'key-event' => true )
-		);
-
-		$this->assert_success_contains( 'Key event' );
-
-		$comments = get_comments(
-			array(
-				'post_id' => $post_id,
-				'status'  => 'liveblog',
-			)
-		);
-
-		$key_event = get_comment_meta( $comments[0]->comment_ID, 'liveblog_key_entry', true );
-		$this->assertSame( '1', $key_event );
 	}
 
 	/**

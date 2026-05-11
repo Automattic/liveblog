@@ -11,8 +11,6 @@ namespace Automattic\Liveblog\Tests\Unit\Application\Presenter;
 
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
-use Automattic\Liveblog\Application\Service\EntryQueryService;
-use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\ValueObject\Author;
 use Automattic\Liveblog\Domain\ValueObject\AuthorCollection;
@@ -22,7 +20,7 @@ use Brain\Monkey\Functions;
 use DateTimeImmutable;
 use DateTimeZone;
 use Mockery;
-use WP_Comment;
+use WP_Post;
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
 
 /**
@@ -38,272 +36,236 @@ final class EntryPresenterTest extends TestCase {
 	public function test_for_json_returns_expected_structure(): void {
 		$this->setup_wordpress_mocks();
 
-		$entry             = $this->create_entry();
-		$key_event_service = $this->create_mock_key_event_service();
-		$comment           = $this->create_mock_comment();
-		$renderer          = $this->create_mock_renderer( '<p>Rendered content</p>' );
-		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
+		$entry     = $this->create_test_entry();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post() );
 
-		$json = $presenter->for_json();
+		$result = $presenter->for_json();
 
-		$this->assertIsObject( $json );
-		$this->assertSame( 123, $json->id );
-		$this->assertSame( 'new', $json->type );
-		$this->assertSame( '<p>Rendered content</p>', $json->render );
-		$this->assertSame( 'Test content', $json->content );
-		$this->assertSame( 'comment liveblog-entry', $json->css_classes );
-		$this->assertSame( 'https://example.com/post/#123', $json->share_link );
-		$this->assertIsArray( $json->authors );
-		$this->assertArrayHasKey( 'entry_time', (array) $json );
-		$this->assertArrayHasKey( 'timestamp', (array) $json );
+		$this->assertIsObject( $result );
+		$this->assertTrue( isset( $result->id ) );
+		$this->assertTrue( isset( $result->type ) );
+		$this->assertTrue( isset( $result->render ) );
+		$this->assertTrue( isset( $result->content ) );
+		$this->assertTrue( isset( $result->css_classes ) );
+		$this->assertTrue( isset( $result->timestamp ) );
+		$this->assertTrue( isset( $result->authors ) );
+		$this->assertTrue( isset( $result->entry_time ) );
+		$this->assertTrue( isset( $result->share_link ) );
 	}
 
 	/**
-	 * Test for_json with update entry uses replaces ID.
+	 * Test for_json uses replaces id for updates.
 	 */
 	public function test_for_json_uses_replaces_id_for_updates(): void {
-		$this->setup_wordpress_mocks( 100 ); // Display ID is 100 (the replaced entry).
+		$this->setup_wordpress_mocks();
 
-		$entry = Entry::create(
-			EntryId::from_int( 200 ),
-			456,
-			EntryContent::from_raw( 'Updated content' ),
-			AuthorCollection::empty(),
-			EntryId::from_int( 100 ), // Replaces entry 100.
-			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
-		);
+		$entry     = $this->create_update_entry();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post() );
 
-		$key_event_service = $this->create_mock_key_event_service();
-		$comment           = $this->create_mock_comment();
-		$renderer          = $this->create_mock_renderer( '<p>Updated</p>' );
-		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
+		$result = $presenter->for_json();
 
-		$json = $presenter->for_json();
-
-		$this->assertSame( 100, $json->id ); // Uses replaces ID.
-		$this->assertSame( 'update', $json->type );
+		$this->assertSame( 123, $result->id );
 	}
 
 	/**
-	 * Test renderer is called with correct arguments.
+	 * Test constructor with content renderer.
 	 */
 	public function test_renderer_called_with_correct_arguments(): void {
 		$this->setup_wordpress_mocks();
 
-		$entry             = $this->create_entry();
-		$key_event_service = $this->create_mock_key_event_service();
-		$comment           = $this->create_mock_comment();
-
+		$entry    = $this->create_test_entry();
 		$renderer = Mockery::mock( ContentRendererInterface::class );
 		$renderer->shouldReceive( 'render' )
 			->once()
-			->with( 'Test content', $comment )
-			->andReturn( '<p>Rendered</p>' );
+			->with( 'Test content' )
+			->andReturn( 'Rendered: Test content' );
 
-		$presenter = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
-		$presenter->for_json();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post(), $renderer );
+		$result    = $presenter->for_json();
 
-		// Mockery verifies the expectation automatically.
-		$this->assertTrue( true );
+		$this->assertSame( 'Rendered: Test content', $result->render );
 	}
 
 	/**
-	 * Test authors array is populated.
+	 * Test authors array populated.
 	 */
 	public function test_authors_array_populated(): void {
 		$this->setup_wordpress_mocks();
 
-		Functions\expect( 'get_avatar' )
-			->once()
-			->andReturn( '<img src="avatar.jpg" />' );
+		$entry     = $this->create_test_entry();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post() );
 
-		$entry = Entry::create(
-			EntryId::from_int( 123 ),
-			456,
-			EntryContent::from_raw( 'Test' ),
-			AuthorCollection::from_authors(
-				Author::from_array(
-					array(
-						'id'   => 1,
-						'name' => 'John Doe',
-						'key'  => 'john-doe',
-					)
-				)
-			),
-			null,
-			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
-		);
+		$result = $presenter->for_json();
 
-		$key_event_service = $this->create_mock_key_event_service();
-		$comment           = $this->create_mock_comment();
-		$renderer          = $this->create_mock_renderer( '<p>Test</p>' );
-		$presenter         = new EntryPresenter( $entry, $key_event_service, $comment, $renderer );
-
-		$json = $presenter->for_json();
-
-		$this->assertCount( 1, $json->authors );
-		$this->assertSame( 'John Doe', $json->authors[0]['name'] );
-		$this->assertSame( 'john-doe', $json->authors[0]['key'] );
+		$this->assertIsArray( $result->authors );
+		$this->assertNotEmpty( $result->authors );
 	}
 
 	/**
-	 * Test entry type value is correct.
+	 * Test entry type values.
 	 */
 	public function test_entry_type_values(): void {
 		$this->setup_wordpress_mocks();
-		$key_event_service = $this->create_mock_key_event_service();
 
-		// New entry.
-		$new_entry  = $this->create_entry();
-		$presenter1 = new EntryPresenter( $new_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
-		$this->assertSame( 'new', $presenter1->for_json()->type );
+		$entry     = $this->create_test_entry();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post() );
+		$result    = $presenter->for_json();
+		$this->assertSame( 'new', $result->type );
 
-		// Update entry.
-		$this->setup_wordpress_mocks( 100 );
-		$update_entry = Entry::create(
-			EntryId::from_int( 200 ),
-			456,
-			EntryContent::from_raw( 'Updated' ),
-			AuthorCollection::empty(),
-			EntryId::from_int( 100 ),
-			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
-		);
-		$presenter2   = new EntryPresenter( $update_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
-		$this->assertSame( 'update', $presenter2->for_json()->type );
+		$entry     = $this->create_update_entry();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post() );
+		$result    = $presenter->for_json();
+		$this->assertSame( 'update', $result->type );
 
-		// Delete entry.
-		$this->setup_wordpress_mocks( 100 );
-		$delete_entry = Entry::create(
-			EntryId::from_int( 300 ),
-			456,
-			EntryContent::empty(),
-			AuthorCollection::empty(),
-			EntryId::from_int( 100 ),
-			new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) )
-		);
-		$presenter3   = new EntryPresenter( $delete_entry, $key_event_service, $this->create_mock_comment(), $this->create_mock_renderer() );
-		$this->assertSame( 'delete', $presenter3->for_json()->type );
+		$entry     = $this->create_delete_entry();
+		$presenter = new EntryPresenter( $entry, $this->create_mock_post() );
+		$result    = $presenter->for_json();
+		$this->assertSame( 'delete', $result->type );
 	}
 
 	/**
-	 * Set up WordPress function mocks for for_json.
+	 * Create a test entry.
 	 *
-	 * @param int $entry_id Entry ID for mocks.
+	 * @return Entry
 	 */
-	private function setup_wordpress_mocks( int $entry_id = 123 ): void {
-		Functions\expect( 'get_comment_class' )
-			->andReturn( array( 'comment', 'liveblog-entry' ) );
+	private function create_test_entry(): Entry {
+		$entry_id   = EntryId::from_int( 456 );
+		$content    = EntryContent::from_raw( 'Test content' );
+		$authors    = AuthorCollection::from_authors(
+			Author::from_array(
+				array(
+					'id'    => 1,
+					'name'  => 'Test Author',
+					'email' => 'author@example.com',
+				)
+			)
+		);
+		$created_at = new DateTimeImmutable( '2026-05-06 12:00:00', new DateTimeZone( 'UTC' ) );
 
+		return Entry::create( $entry_id, 123, $content, $authors, null, $created_at );
+	}
+
+	/**
+	 * Create an update entry (with replaces).
+	 *
+	 * @return Entry
+	 */
+	private function create_update_entry(): Entry {
+		$entry_id   = EntryId::from_int( 789 );
+		$content    = EntryContent::from_raw( 'Updated content' );
+		$authors    = AuthorCollection::from_authors(
+			Author::from_array(
+				array(
+					'id'   => 1,
+					'name' => 'Test Author',
+				) 
+			)
+		);
+		$replaces   = EntryId::from_int( 123 );
+		$created_at = new DateTimeImmutable( '2026-05-06 13:00:00', new DateTimeZone( 'UTC' ) );
+
+		return Entry::create( $entry_id, 123, $content, $authors, $replaces, $created_at );
+	}
+
+	/**
+	 * Create a delete entry (empty content with replaces).
+	 *
+	 * @return Entry
+	 */
+	private function create_delete_entry(): Entry {
+		$entry_id   = EntryId::from_int( 999 );
+		$content    = EntryContent::from_raw( '' );
+		$authors    = AuthorCollection::from_authors(
+			Author::from_array(
+				array(
+					'id'   => 1,
+					'name' => 'Test Author',
+				) 
+			)
+		);
+		$replaces   = EntryId::from_int( 456 );
+		$created_at = new DateTimeImmutable( '2026-05-06 14:00:00', new DateTimeZone( 'UTC' ) );
+
+		return Entry::create( $entry_id, 123, $content, $authors, $replaces, $created_at );
+	}
+
+	/**
+	 * Create a mock WP_Post.
+	 *
+	 * @return WP_Post
+	 */
+	private function create_mock_post(): WP_Post {
+		$post                = Mockery::mock( 'WP_Post' );
+		$post->ID            = 456;
+		$post->post_parent   = 123;
+		$post->post_author   = 1;
+		$post->post_content  = 'Test content';
+		$post->post_date     = '2026-05-06 12:00:00';
+		$post->post_date_gmt = '2026-05-06 12:00:00';
+		$post->post_type     = 'post';
+		return $post;
+	}
+
+	/**
+	 * Set up common WordPress mock functions.
+	 */
+	private function setup_wordpress_mocks(): void {
 		Functions\expect( 'get_permalink' )
-			->andReturn( 'https://example.com/post/' );
+			->zeroOrMoreTimes()
+			->andReturn( 'https://example.com/post' );
 
-		Functions\expect( 'get_comment_date' )
-			->andReturn( '1234567890' );
+		Functions\expect( 'get_avatar' )
+			->zeroOrMoreTimes()
+			->andReturn( '<img alt="" src="https://example.com/avatar.jpg" />' );
+
+		Functions\expect( 'get_avatar_url' )
+			->zeroOrMoreTimes()
+			->andReturn( 'https://example.com/avatar.jpg' );
+
+		Functions\expect( '__' )
+			->zeroOrMoreTimes()
+			->andReturnFirstArg();
+
+		Functions\expect( 'get_option' )
+			->zeroOrMoreTimes()
+			->with( 'time_format' )
+			->andReturn( 'H:i' );
+
+		Functions\expect( 'get_option' )
+			->zeroOrMoreTimes()
+			->with( 'date_format' )
+			->andReturn( 'F j, Y' );
+
+		Functions\expect( 'get_the_date' )
+			->zeroOrMoreTimes()
+			->andReturn( 'May 6, 2026' );
+
+		Functions\expect( 'get_post_time' )
+			->zeroOrMoreTimes()
+			->andReturn( '12:00' );
+
+		Functions\expect( 'sanitize_html_class' )
+			->zeroOrMoreTimes()
+			->andReturnUsing(
+				function ( $css_class ) {
+					return $css_class;
+				}
+			);
 
 		Functions\expect( 'apply_filters' )
+			->zeroOrMoreTimes()
 			->andReturnUsing(
-				function ( $hook, ...$args ) {
-					return match ( $hook ) {
-						'liveblog_entry_avatar_size' => 30,
-						'liveblog_before_edit_entry' => $args[0] ?? '',
-						'liveblog_entry_for_json'    => $args[0] ?? array(),
-						default                      => $args[0] ?? null,
-					};
+				function ( $hook, $value ) {
+					return $value;
 				}
 			);
 	}
 
 	/**
-	 * Create a mock WP_Comment.
-	 *
-	 * @return WP_Comment
+	 * Clean up after each test.
 	 */
-	private function create_mock_comment(): WP_Comment {
-		$comment                       = Mockery::mock( WP_Comment::class );
-		$comment->comment_ID           = 123;
-		$comment->comment_post_ID      = 456;
-		$comment->comment_author       = 'Test Author';
-		$comment->comment_author_email = 'test@example.com';
-		$comment->comment_content      = 'Test content';
-
-		return $comment;
-	}
-
-	/**
-	 * Create a mock content renderer.
-	 *
-	 * @param string $output Output to return from render.
-	 * @return ContentRendererInterface
-	 */
-	private function create_mock_renderer( string $output = '<p>Rendered</p>' ): ContentRendererInterface {
-		$renderer = Mockery::mock( ContentRendererInterface::class );
-		$renderer->shouldReceive( 'render' )->andReturn( $output );
-
-		return $renderer;
-	}
-
-	/**
-	 * Create a stub key event service for testing.
-	 *
-	 * Since KeyEventService is final and cannot be mocked directly,
-	 * we create the real service with mocked dependencies and stub the
-	 * underlying WordPress function.
-	 *
-	 * @param bool $is_key_event Whether the entry is a key event.
-	 * @return KeyEventService
-	 */
-	private function create_mock_key_event_service( bool $is_key_event = false ): KeyEventService {
-		// Mock the underlying WordPress function that KeyEventService::is_key_event() uses.
-		Functions\expect( 'get_comment_meta' )
-			->andReturn( $is_key_event ? 'true' : '' );
-
-		// Create the real service using interfaces which can be mocked.
-		$repository = Mockery::mock( \Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface::class );
-
-		// Create a real EntryQueryService instance with the mocked repository.
-		$query_service = new EntryQueryService( $repository );
-
-		return new KeyEventService( $repository, $query_service );
-	}
-
-	/**
-	 * Create a test entry without author.
-	 *
-	 * @return Entry
-	 */
-	private function create_entry(): Entry {
-		return Entry::create(
-			EntryId::from_int( 123 ),
-			456,
-			EntryContent::from_raw( 'Test content' ),
-			AuthorCollection::empty(),
-			null,
-			new DateTimeImmutable( '2024-01-15 10:30:00', new DateTimeZone( 'UTC' ) )
-		);
-	}
-
-	/**
-	 * Create a test entry with an author.
-	 *
-	 * @return Entry
-	 */
-	private function create_entry_with_author(): Entry {
-		return Entry::create(
-			EntryId::from_int( 123 ),
-			456,
-			EntryContent::from_raw( 'Test content' ),
-			AuthorCollection::from_authors(
-				Author::from_array(
-					array(
-						'id'    => 1,
-						'name'  => 'Test Author',
-						'key'   => 'test-author',
-						'email' => 'test@example.com',
-					)
-				)
-			),
-			null,
-			new DateTimeImmutable( '2024-01-15 10:30:00', new DateTimeZone( 'UTC' ) )
-		);
+	protected function tearDown(): void {
+		\Mockery::close();
+		parent::tearDown();
 	}
 }

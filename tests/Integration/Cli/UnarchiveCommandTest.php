@@ -37,16 +37,16 @@ final class UnarchiveCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test unarchive sets correct meta.
+	 * Test unarchive sets correct taxonomy state.
 	 */
-	public function test_unarchive_sets_liveblog_meta(): void {
+	public function test_unarchive_sets_liveblog_state(): void {
 		$post_id = $this->create_liveblog();
 		$this->archive_liveblog( $post_id );
 		$command = new UnarchiveCommand();
 
 		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
-		$this->assertSame( 'enable', $this->get_liveblog_meta( $post_id ) );
+		$this->assertSame( 'enable', $this->get_liveblog_state( $post_id ) );
 	}
 
 	/**

@@ -161,20 +161,24 @@ final class EntryTest extends IntegrationTestCase {
 	}
 
 	/**
-	 * Test that shortcode filter strips restricted shortcodes.
+	 * Test that shortcode filter supports custom restricted shortcodes.
 	 *
-	 * This tests the ShortcodeFilter service directly.
-	 * In production, this filter is applied via WordPress hooks.
+	 * The ShortcodeFilter has an empty default restricted list. Plugins
+	 * register restricted shortcodes via the liveblog_entry_restrict_shortcodes filter.
 	 */
-	public function test_shortcode_filter_strips_restricted_shortcodes(): void {
+	public function test_shortcode_filter_with_custom_restrictions(): void {
+		add_filter(
+			'liveblog_entry_restrict_shortcodes',
+			function () {
+				return array( 'restricted_shortcode' => '' );
+			}
+		);
+
 		$shortcode_filter = new ShortcodeFilter();
 		$formats          = array(
-			'[liveblog_key_events]',
-			'[liveblog_key_events][/liveblog_key_events]',
-			'[liveblog_key_events arg="30"]',
-			'[liveblog_key_events arg="30"][/liveblog_key_events]',
-			'[liveblog_key_events]Test Input Inbetween Tags[/liveblog_key_events]',
-			'[liveblog_key_events arg="30"]Test Input Inbetween Tags[/liveblog_key_events]',
+			'[restricted_shortcode]',
+			'[restricted_shortcode][/restricted_shortcode]',
+			'[restricted_shortcode]Test Content[/restricted_shortcode]',
 		);
 
 		foreach ( $formats as $shortcode ) {
@@ -182,6 +186,8 @@ final class EntryTest extends IntegrationTestCase {
 			$filtered = $shortcode_filter->filter( $args );
 			$this->assertSame( '', $filtered['content'] );
 		}
+
+		remove_all_filters( 'liveblog_entry_restrict_shortcodes' );
 	}
 
 	/**

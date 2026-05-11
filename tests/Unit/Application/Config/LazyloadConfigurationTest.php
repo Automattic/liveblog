@@ -64,11 +64,10 @@ final class LazyloadConfigurationTest extends TestCase {
 			->with( 'post', 'liveblog' )
 			->andReturn( true );
 
-		// Mock get_post_meta() to return 'enable' state.
-		Functions\expect( 'get_post_meta' )
+		// Mock wp_get_post_terms() to return 'enabled' slug.
+		Functions\expect( 'wp_get_post_terms' )
 			->zeroOrMoreTimes()
-			->with( 123, 'liveblog', true )
-			->andReturn( 'enable' );
+			->andReturn( array( 'enabled' ) );
 	}
 
 	/**

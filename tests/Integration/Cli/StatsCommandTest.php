@@ -98,23 +98,6 @@ final class StatsCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test stats shows key events count.
-	 */
-	public function test_stats_shows_key_events(): void {
-		$post_id = $this->create_liveblog();
-		$this->add_entry( $post_id, 'Regular entry' );
-		$this->add_entry( $post_id, 'Key event 1', array( 'key_event' => true ) );
-		$this->add_entry( $post_id, 'Key event 2', array( 'key_event' => true ) );
-		$command = new StatsCommand();
-
-		$this->invoke_expecting_success( $command, array(), array( 'format' => 'json' ) );
-
-		$logs = $this->output->get_logs();
-		$json = json_decode( implode( '', $logs ), true );
-		$this->assertSame( '2', $json['Key Events'] );
-	}
-
-	/**
 	 * Test stats shows unique authors.
 	 */
 	public function test_stats_shows_unique_authors(): void {

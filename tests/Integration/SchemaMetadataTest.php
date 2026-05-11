@@ -264,7 +264,7 @@ final class SchemaMetadataTest extends IntegrationTestCase {
 		);
 
 		// Add contributor meta.
-		add_comment_meta( $entry_id->to_int(), 'liveblog_contributors', array( $user2->ID ) );
+		update_post_meta( $entry_id->to_int(), 'liveblog_contributors', array( $user2->ID ) );
 
 		$metadata_presenter = Container::instance()->metadata_presenter();
 		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );

@@ -70,9 +70,13 @@ final class FilterSupportedPostTypesTest extends TestCase {
 	 * Test that is_viewing_liveblog_post uses supported post types.
 	 */
 	public function test_is_viewing_liveblog_post_uses_supported_types(): void {
-		// Create a page with liveblog enabled.
+		// Create a page with liveblog enabled via taxonomy.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		update_post_meta( $page_id, LiveblogConfiguration::KEY, 'enable' );
+		$page    = LiveblogPost::from_id( $page_id );
+
+		// Need page support temporarily to enable the liveblog state.
+		LiveblogConfiguration::set_supported_post_types( array( 'post', 'page' ) );
+		$page->enable();
 
 		// Set the global post.
 		$GLOBALS['post'] = get_post( $page_id );
@@ -93,9 +97,13 @@ final class FilterSupportedPostTypesTest extends TestCase {
 	 * Test that LiveblogPost::state() uses supported post types.
 	 */
 	public function test_liveblog_state_uses_supported_types(): void {
-		// Create a page with liveblog enabled.
+		// Create a page with liveblog enabled via taxonomy.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		update_post_meta( $page_id, LiveblogConfiguration::KEY, 'enable' );
+
+		// Enable page support temporarily to turn on liveblog state.
+		LiveblogConfiguration::set_supported_post_types( array( 'post', 'page' ) );
+		$page = LiveblogPost::from_id( $page_id );
+		$page->enable();
 
 		// Set the global post.
 		$GLOBALS['post'] = get_post( $page_id );

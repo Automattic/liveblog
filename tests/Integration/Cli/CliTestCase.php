@@ -334,10 +334,6 @@ abstract class CliTestCase extends IntegrationTestCase {
 		$entry_service = $this->container()->entry_service();
 		$entry_id      = $entry_service->create( $post_id, $content, $user );
 
-		if ( ! empty( $args['key_event'] ) ) {
-			update_comment_meta( $entry_id->to_int(), 'liveblog_key_entry', '1' );
-		}
-
 		return $entry_id->to_int();
 	}
 
@@ -352,12 +348,13 @@ abstract class CliTestCase extends IntegrationTestCase {
 	}
 
 	/**
-	 * Get liveblog meta value.
+	 * Get liveblog state from taxonomy.
 	 *
 	 * @param int $post_id Post ID.
-	 * @return string|false Meta value or false if not set.
+	 * @return string Liveblog state (enabled, archived, or disabled).
 	 */
-	protected function get_liveblog_meta( int $post_id ) {
-		return get_post_meta( $post_id, 'liveblog', true );
+	protected function get_liveblog_state( int $post_id ): string {
+		$liveblog = LiveblogPost::from_id( $post_id );
+		return $liveblog ? $liveblog->state() : '';
 	}
 }

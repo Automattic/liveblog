@@ -99,22 +99,6 @@ final class EntriesCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test listing entries with --key-events filter.
-	 */
-	public function test_entries_key_events_filter(): void {
-		$post_id = $this->create_liveblog();
-		$this->add_entry( $post_id, 'Regular entry' );
-		$this->add_entry( $post_id, 'Key event entry', array( 'key_event' => true ) );
-		$command = new EntriesCommand( $this->container()->entry_query_service() );
-
-		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'key-events' => true ) );
-
-		$format_calls = $this->output->get_format_items_calls();
-		$this->assertNotEmpty( $format_calls );
-		$this->assertCount( 1, $format_calls[0]['items'] );
-	}
-
-	/**
 	 * Test listing entries from non-liveblog post.
 	 */
 	public function test_entries_from_non_liveblog(): void {
@@ -156,24 +140,6 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->assertContains( 'author', $columns );
 		$this->assertContains( 'date', $columns );
 		$this->assertContains( 'content', $columns );
-		$this->assertContains( 'key_event', $columns );
-	}
-
-	/**
-	 * Test key-events filter excludes key_event column.
-	 */
-	public function test_key_events_filter_excludes_key_event_column(): void {
-		$post_id = $this->create_liveblog();
-		$this->add_entry( $post_id, 'Key event', array( 'key_event' => true ) );
-		$command = new EntriesCommand( $this->container()->entry_query_service() );
-
-		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'key-events' => true ) );
-
-		$format_calls = $this->output->get_format_items_calls();
-		$this->assertNotEmpty( $format_calls );
-
-		$columns = $format_calls[0]['columns'];
-		$this->assertNotContains( 'key_event', $columns );
 	}
 
 	/**
@@ -185,19 +151,6 @@ final class EntriesCommandTest extends CliTestCase {
 		$this->invoke_expecting_error( $command, array( '0' ) );
 
 		$this->assert_error_contains( 'valid post ID' );
-	}
-
-	/**
-	 * Test empty key events returns appropriate warning.
-	 */
-	public function test_empty_key_events_returns_warning(): void {
-		$post_id = $this->create_liveblog();
-		$this->add_entry( $post_id, 'Regular entry' ); // Not a key event.
-		$command = new EntriesCommand( $this->container()->entry_query_service() );
-
-		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'key-events' => true ) );
-
-		$this->assert_command_warning( 'No key events found' );
 	}
 
 	/**

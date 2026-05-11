@@ -51,17 +51,17 @@ final class DisableCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test disabling liveblog removes meta.
+	 * Test disabling liveblog removes taxonomy state.
 	 */
-	public function test_disable_removes_liveblog_meta(): void {
+	public function test_disable_removes_liveblog_state(): void {
 		$post_id = $this->create_liveblog();
 		$command = new DisableCommand();
 
 		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
-		// Meta should be removed after disable.
-		$meta = $this->get_liveblog_meta( $post_id );
-		$this->assertEmpty( $meta );
+		$liveblog = LiveblogPost::from_id( $post_id );
+		$this->assertFalse( $liveblog->is_liveblog() );
+		$this->assertFalse( $liveblog->is_enabled() );
 	}
 
 	/**
@@ -108,10 +108,10 @@ final class DisableCommandTest extends CliTestCase {
 
 		$this->invoke_expecting_success( $command, array( (string) $post_id ), array( 'yes' => true ) );
 
-		// Entry should still exist.
-		$comment = get_comment( $entry_id );
-		$this->assertNotNull( $comment );
-		$this->assertSame( 'Test entry content', $comment->comment_content );
+		// Entry should still exist as a child post.
+		$entry_post = get_post( $entry_id );
+		$this->assertNotNull( $entry_post );
+		$this->assertSame( 'Test entry content', $entry_post->post_content );
 	}
 
 	/**

@@ -35,15 +35,15 @@ final class ArchiveCommandTest extends CliTestCase {
 	}
 
 	/**
-	 * Test archive verifies meta is set correctly.
+	 * Test archive verifies taxonomy state is set correctly.
 	 */
-	public function test_archive_sets_liveblog_meta(): void {
+	public function test_archive_sets_liveblog_state(): void {
 		$post_id = $this->create_liveblog();
 		$command = new ArchiveCommand();
 
 		$this->invoke_expecting_success( $command, array( (string) $post_id ) );
 
-		$this->assertSame( 'archive', $this->get_liveblog_meta( $post_id ) );
+		$this->assertSame( 'archive', $this->get_liveblog_state( $post_id ) );
 	}
 
 	/**

@@ -311,27 +311,9 @@ final class RestApiTest extends IntegrationTestCase {
 		$entry_operations->do_crud( 'delete', $this->build_entry_args( $args ), $user );
 
 		// Check that it was sent to the trash.
-		$deleted_entry = get_comment( $new_entry_id );
+		$deleted_entry = get_post( $new_entry_id );
 
-		$this->assertEquals( 'trash', $deleted_entry->comment_approved );
-	}
-
-	/**
-	 * Test the delete_key CRUD action.
-	 */
-	public function test_crud_action_delete_key(): void {
-		// First create an entry with a key.
-		$new_entry    = $this->setup_entry_test_state( 1, array( 'content' => 'Test Liveblog entry with /key' ) );
-		$new_entry_id = $new_entry[0]->id()->to_int();
-		$user         = wp_get_current_user();
-
-		// Then delete the key.
-		$args             = array( 'entry_id' => $new_entry_id );
-		$entry_operations = Container::instance()->entry_operations();
-		$entry            = $entry_operations->do_crud( 'delete_key', $this->build_entry_args( $args ), $user );
-
-		// $entry will be an instance of WP_Error if the entry didn't contain a key or there was another error.
-		$this->assertNotInstanceOf( 'WP_Error', $entry );
+		$this->assertEquals( 'trash', $deleted_entry->post_status );
 	}
 
 	/**
@@ -1121,8 +1103,6 @@ final class RestApiTest extends IntegrationTestCase {
 			$base . '/lazyload/' . $max_ts . '/' . $min_ts,
 			$base . '/entry/' . $entry_id,
 			$base . '/get-entries/1/' . $last_id,
-			$base . '/get-key-events/' . $last_id,
-			$base . '/jump-to-key-event/' . $entry_id . '/' . $last_id,
 		);
 	}
 }
