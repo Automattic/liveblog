@@ -9,16 +9,9 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure\WordPress;
 
-use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use Automattic\Liveblog\Application\Filter\AuthorFilter;
-use Automattic\Liveblog\Application\Filter\CommandFilter;
-use Automattic\Liveblog\Application\Filter\EmojiFilter;
-use Automattic\Liveblog\Application\Filter\HashtagFilter;
-use Automattic\Liveblog\Application\Service\ArchiveRepairService;
 use Automattic\Liveblog\Application\Service\ShortcodeFilter;
-use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\CLI\AddCommand;
 use Automattic\Liveblog\Infrastructure\CLI\ArchiveCommand;
@@ -26,8 +19,8 @@ use Automattic\Liveblog\Infrastructure\CLI\ArchiveOldCommand;
 use Automattic\Liveblog\Infrastructure\CLI\DisableCommand;
 use Automattic\Liveblog\Infrastructure\CLI\EnableCommand;
 use Automattic\Liveblog\Infrastructure\CLI\EntriesCommand;
-use Automattic\Liveblog\Infrastructure\CLI\FixArchiveCommand;
 use Automattic\Liveblog\Infrastructure\CLI\ListCommand;
+use Automattic\Liveblog\Infrastructure\CLI\MigrateToTaxonomyCommand;
 use Automattic\Liveblog\Infrastructure\CLI\StatsCommand;
 use Automattic\Liveblog\Infrastructure\CLI\StatusCommand;
 use Automattic\Liveblog\Infrastructure\CLI\UnarchiveCommand;
@@ -68,14 +61,11 @@ final class PluginBootstrapper {
 	public function init(): void {
 		$this->load_textdomain();
 		$this->init_core();
-		$this->init_socketio();
+		$this->init_taxonomy();
 		$this->init_cli();
-		$this->init_amp();
 		$this->init_shortcode_filter();
-		$this->init_content_filters();
-		$this->init_key_events();
+		$this->init_settings_page();
 		$this->init_lazyload();
-		$this->init_auto_archive();
 		$this->init_rest_api();
 		$this->init_frontend();
 		$this->init_admin();
@@ -100,6 +90,28 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_core(): void {
+		// Enable hierarchical for 'post' post type after registration.
+		add_action(
+			'registered_post_type',
+			function ( string $post_type ): void {
+				// Return if not post type 'post'.
+				if ( 'post' !== $post_type ) {
+					return;
+				}
+
+				// Access $wp_post_types global variable.
+				global $wp_post_types;
+
+				// Set post type "post" to be hierarchical.
+				$wp_post_types['post']->hierarchical = true;
+
+				// Add page attributes support for parent dropdown in admin.
+				add_post_type_support( 'post', 'page-attributes' );
+			},
+			10,
+			1
+		);
+
 		add_action( 'init', array( $this, 'register_post_type_support' ) );
 		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
 		add_action( 'permalink_structure_changed', array( $this, 'add_rewrite_rules' ) );
@@ -138,10 +150,6 @@ final class PluginBootstrapper {
 			add_post_type_support( $post_type, LiveblogConfiguration::KEY );
 		}
 
-		// Initialize auto-archive days from filter.
-		$auto_archive_days = apply_filters( 'liveblog_auto_archive_days', null );
-		LiveblogConfiguration::set_auto_archive_days( $auto_archive_days );
-
 		do_action( 'after_liveblog_init' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy hook name.
 	}
 
@@ -168,12 +176,61 @@ final class PluginBootstrapper {
 	}
 
 	/**
-	 * Initialize Socket.IO support if enabled.
+	 * Initialize the hidden taxonomy for liveblog state.
+	 *
+	 * Registers a non-public taxonomy with idempotent term creation
+	 * so terms self-heal if accidentally deleted.
 	 *
 	 * @return void
 	 */
-	private function init_socketio(): void {
-		$this->container->socketio_manager()->initialize();
+	private function init_taxonomy(): void {
+		add_action(
+			'init',
+			function () {
+				$this->register_liveblog_taxonomy();
+			},
+			9
+		);
+	}
+
+	/**
+	 * Register the liveblog state taxonomy and ensure terms exist.
+	 *
+	 * @return void
+	 */
+	public function register_liveblog_taxonomy(): void {
+		register_taxonomy(
+			LiveblogConfiguration::TAXONOMY,
+			$this->get_supported_post_types(),
+			array(
+				'label'              => __( 'Liveblog State', 'liveblog' ),
+				'public'             => false,
+				'show_ui'            => false,
+				'show_in_nav_menus'  => false,
+				'show_in_quick_edit' => false,
+				'show_admin_column'  => false,
+				'hierarchical'       => false,
+				'rewrite'            => false,
+				'query_var'          => false,
+			)
+		);
+
+		wp_insert_term( __( 'Enabled', 'liveblog' ), LiveblogConfiguration::TAXONOMY, array( 'slug' => LiveblogConfiguration::TERM_ENABLED ) );
+		wp_insert_term( __( 'Archived', 'liveblog' ), LiveblogConfiguration::TAXONOMY, array( 'slug' => LiveblogConfiguration::TERM_ARCHIVED ) );
+	}
+
+	/**
+	 * Get supported post types for liveblog.
+	 *
+	 * @return string[] Array of post type names.
+	 */
+	private function get_supported_post_types(): array {
+		/**
+		 * Filters the post types that support liveblog functionality.
+		 *
+		 * @param string[] $post_types Array of post type names.
+		 */
+		return apply_filters( 'liveblog_supported_post_types', array( 'post' ) );
 	}
 
 	/**
@@ -213,28 +270,8 @@ final class PluginBootstrapper {
 		// Bulk operations.
 		WP_CLI::add_command( 'liveblog archive-old', new ArchiveOldCommand() );
 
-		// Maintenance commands.
-		WP_CLI::add_command(
-			'liveblog fix-archive',
-			new FixArchiveCommand( new ArchiveRepairService() )
-		);
-	}
-
-	/**
-	 * Initialize AMP integration.
-	 *
-	 * Uses amp_init hook so code only runs when AMP plugin is active.
-	 * This is cleaner than checking for function existence.
-	 *
-	 * @return void
-	 */
-	private function init_amp(): void {
-		add_action(
-			'amp_init',
-			function () {
-				$this->container->amp_integration()->init();
-			}
-		);
+		// Migration commands.
+		WP_CLI::add_command( 'liveblog migrate-to-taxonomy', new MigrateToTaxonomyCommand() );
 	}
 
 	/**
@@ -263,160 +300,6 @@ final class PluginBootstrapper {
 	}
 
 	/**
-	 * Initialize the DDD-based content filter system.
-	 *
-	 * Registers all content filters with the ContentFilterRegistry and sets up
-	 * the input sanitizer hooks. Handles commands, emojis, hashtags, and authors.
-	 *
-	 * @return void
-	 */
-	private function init_content_filters(): void {
-		// Register all content filters with the registry.
-		// Filters are created directly here - they're stateless with no dependencies.
-		$registry = $this->container->content_filter_registry();
-		$registry->register( new CommandFilter() );
-		$registry->register( new EmojiFilter() );
-		$registry->register( new HashtagFilter() );
-		$registry->register( new AuthorFilter() );
-
-		// Initialise the registry (sets up prefixes, regex, loads filters).
-		$registry->initialise( 'commands, emojis, hashtags, authors' );
-
-		// Add input sanitizer hooks (runs before content filters).
-		$input_sanitizer = $this->container->input_sanitizer();
-		add_filter( 'liveblog_before_insert_entry', array( $input_sanitizer, 'sanitize' ), 1 );
-		add_filter( 'liveblog_before_update_entry', array( $input_sanitizer, 'sanitize' ), 1 );
-		add_filter( 'liveblog_before_insert_entry', array( $input_sanitizer, 'fix_links_wrapped_in_div' ), 1 );
-		add_filter( 'liveblog_before_update_entry', array( $input_sanitizer, 'fix_links_wrapped_in_div' ), 1 );
-		add_filter( 'liveblog_before_preview_entry', array( $input_sanitizer, 'fix_links_wrapped_in_div' ), 1 );
-
-		// Add content filter hooks (processes commands, emojis, hashtags, authors).
-		add_filter( 'liveblog_before_insert_entry', array( $registry, 'apply_filters' ), 10 );
-		add_filter( 'liveblog_before_update_entry', array( $registry, 'apply_filters' ), 10 );
-		add_filter( 'liveblog_before_preview_entry', array( $registry, 'apply_filters' ), 10 );
-
-		// Add revert filter hook (for edit mode).
-		add_filter( 'liveblog_before_edit_entry', array( $registry, 'revert_all' ), 10 );
-
-		// Allow emoji image attributes (class, width, height, data-emoji) to pass through.
-		add_filter(
-			'liveblog_image_allowed_attributes',
-			function ( $attrs ) {
-				return array_merge( $attrs, array( 'class', 'width', 'height', 'data-emoji' ) );
-			}
-		);
-	}
-
-	/**
-	 * Initialize the DDD-based key events system.
-	 *
-	 * Sets up the key event configuration, shortcode, and all related hooks.
-	 *
-	 * @return void
-	 */
-	private function init_key_events(): void {
-		// Create configuration directly - it just reads options, no dependencies.
-		$configuration     = new KeyEventConfiguration();
-		$key_event_service = $this->container->key_event_service();
-		$shortcode_handler = $this->container->key_event_shortcode_handler();
-
-		// Register the key events widget.
-		add_action(
-			'widgets_init',
-			function () {
-				register_widget( \Automattic\Liveblog\Infrastructure\WordPress\Widget\KeyEventsWidget::class );
-			}
-		);
-
-		// Initialize key event configuration (sets up templates/formats).
-		add_action( 'init', array( $configuration, 'initialize' ), 11 );
-
-		// Register the /key command.
-		add_filter(
-			'liveblog_active_commands',
-			function ( $commands ) {
-				$commands[] = 'key';
-				return $commands;
-			}
-		);
-
-		// Strip the /key command span from displayed content.
-		// This runs during save via liveblog_command_key_before.
-		add_filter( 'liveblog_command_key_before', array( $key_event_service, 'strip_key_command_from_content' ) );
-
-		// Also strip during display via comment_text filter (content is already saved with span).
-		add_filter( 'comment_text', array( $key_event_service, 'strip_key_command_from_content' ), 5 );
-
-		// Enrich entry JSON with key event data.
-		add_filter(
-			'liveblog_entry_for_json',
-			function ( $entry, $entry_object ) use ( $key_event_service ) {
-				if ( ! $entry_object instanceof Entry ) {
-					return $entry;
-				}
-
-				$post_id = $entry_object->post_id();
-
-				return $key_event_service->enrich_entry_for_json( $entry, $entry_object, $post_id );
-			},
-			10,
-			2
-		);
-
-		// Handle /key command action (add meta when command is used).
-		add_action(
-			'liveblog_command_key_after',
-			function ( $content, $entry_id, $post_id ) use ( $key_event_service ) {
-				$key_event_service->handle_key_command( $content, $entry_id, $post_id );
-			},
-			10,
-			3
-		);
-
-		// Sync key event meta when entry is updated.
-		add_action(
-			'liveblog_update_entry',
-			array( $key_event_service, 'sync_key_event_meta' ),
-			10,
-			2
-		);
-
-		// Add admin options for key event settings.
-		add_filter(
-			'liveblog_admin_add_settings',
-			function ( $extra_fields, $post_id ) use ( $shortcode_handler ) {
-				$extra_fields[] = $shortcode_handler->get_admin_options( (int) $post_id );
-				return $extra_fields;
-			},
-			10,
-			2
-		);
-
-		// Save admin options.
-		add_action(
-			'liveblog_admin_settings_update',
-			function ( $response, $post_id ) use ( $shortcode_handler ) {
-				$shortcode_handler->save_admin_options( $response, (int) $post_id );
-			},
-			10,
-			2
-		);
-
-		// Register the shortcode.
-		$shortcode_handler->register();
-
-		// Hook configuration for content formatting.
-		add_filter(
-			'liveblog_key_event_content',
-			function ( $content, $post_id ) use ( $configuration ) {
-				return $configuration->format_content( $content, (int) $post_id );
-			},
-			10,
-			2
-		);
-	}
-
-	/**
 	 * Initialize the DDD-based lazyload configuration.
 	 *
 	 * Sets up lazy loading configuration for entries including initial
@@ -430,35 +313,6 @@ final class PluginBootstrapper {
 
 		// Initialize on template_redirect when liveblog state is available.
 		add_action( 'template_redirect', array( $configuration, 'initialize' ) );
-	}
-
-	/**
-	 * Initialize the auto-archive cron handler.
-	 *
-	 * @return void
-	 */
-	private function init_auto_archive(): void {
-		$this->container->auto_archive_cron_handler()->register();
-
-		// Extend auto-archive expiry when entries are inserted.
-		add_filter(
-			'liveblog_before_insert_entry',
-			function ( $args ) {
-				$post_id = $args['post_id'] ?? 0;
-				if ( $post_id && LiveblogConfiguration::is_auto_archive_enabled() ) {
-					$liveblog_post = LiveblogPost::from_id( (int) $post_id );
-					if ( null !== $liveblog_post ) {
-						$days = LiveblogConfiguration::get_auto_archive_days();
-						if ( null !== $days ) {
-							$liveblog_post->extend_auto_archive_expiry( $days );
-						}
-					}
-				}
-				return $args;
-			},
-			10,
-			1
-		);
 	}
 
 	/**
@@ -497,32 +351,42 @@ final class PluginBootstrapper {
 
 		// Add liveblog content filter.
 		add_filter( 'the_content', array( $template_renderer, 'filter_the_content' ) );
+	}
 
-		// Add comment CSS class filter.
-		add_filter(
-			'comment_class',
-			function ( $classes, $css_class, $comment_id ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by filter signature.
-				if ( LiveblogPost::is_viewing_liveblog_post() ) {
-					$classes[] = 'liveblog-entry';
-				}
-				return $classes;
-			},
-			10,
-			3
+	/**
+	 * Get IDs of child posts belonging to liveblog-enabled parents.
+	 *
+	 * Uses a direct DB query with object cache (transient not needed; wp_cache is fine).
+	 *
+	 * @return int[] Child post IDs to exclude.
+	 */
+	private function get_liveblog_child_ids(): array {
+		global $wpdb;
+
+		$cache_key = 'liveblog_child_post_ids';
+		$child_ids = wp_cache_get( $cache_key, 'liveblog' );
+
+		if ( false !== $child_ids ) {
+			return $child_ids;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Result is object-cached.
+		$child_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT p.ID FROM $wpdb->posts p
+				INNER JOIN $wpdb->term_relationships tr ON p.post_parent = tr.object_id
+				INNER JOIN $wpdb->term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+				WHERE p.post_type = %s AND p.post_parent > 0
+				AND tt.taxonomy = %s",
+				'post',
+				LiveblogConfiguration::TAXONOMY
+			)
 		);
 
-		// Protect liveblog meta key.
-		add_filter(
-			'is_protected_meta',
-			function ( $is_protected, $meta_key ) {
-				if ( LiveblogConfiguration::KEY === $meta_key ) {
-					return true;
-				}
-				return $is_protected;
-			},
-			10,
-			2
-		);
+		$child_ids = array_map( 'intval', is_array( $child_ids ) ? $child_ids : array() );
+		wp_cache_set( $cache_key, $child_ids, 'liveblog', HOUR_IN_SECONDS );
+
+		return $child_ids;
 	}
 
 	/**
@@ -550,42 +414,38 @@ final class PluginBootstrapper {
 			}
 		);
 
-		// Add meta box.
+		// Add combined meta box (toggle + entries DataViews).
 		add_action( 'add_meta_boxes', array( $admin_controller, 'add_meta_box' ) );
 
-		// Handle AJAX state change.
-		add_action(
-			'wp_ajax_set_liveblog_state_for_post',
-			function () use ( $admin_controller ) {
-				// Verify nonce first.
-				$nonce = isset( $_REQUEST['_ajax_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
-					? sanitize_text_field( wp_unslash( $_REQUEST['_ajax_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					: '';
+		// Hide metaboxes on child posts.
+		add_action( 'add_meta_boxes', array( $admin_controller, 'hide_metaboxes_on_child_posts' ), 99 );
 
-				if ( ! wp_verify_nonce( $nonce, 'liveblog_admin_nonce' ) ) {
-					wp_send_json_error( 'Invalid nonce' );
-				}
+		// Add breakout settings metabox for child posts.
+		add_action( 'add_meta_boxes', array( $admin_controller, 'add_breakout_metabox' ) );
+		add_action( 'save_post', array( $admin_controller, 'save_breakout_settings' ) );
 
-				// Now safe to access other request data.
-				$post_id   = isset( $_REQUEST['post_id'] ) ? (int) $_REQUEST['post_id'] : 0;
-				$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
+		// Store parent ID from URL for use during auto-draft creation.
+		add_action( 'admin_init', array( $admin_controller, 'store_parent_from_url' ) );
 
-				if ( ! AdminController::current_user_can_edit_for_post( $post_id ) ) {
-					wp_send_json_error( 'Unauthorized' );
-				}
+		// Bump entry post_modified when a breakout post is published so the
+		// poller re-delivers the entry with breakout badge/footer/classes.
+		add_action( 'transition_post_status', array( $admin_controller, 'bump_entry_on_breakout_publish' ), 10, 3 );
 
-				$result = $admin_controller->set_liveblog_state( $post_id, $new_state, $_REQUEST );
-				if ( false === $result ) {
-					wp_send_json_error( 'Failed to update state' );
-				}
-				wp_send_json_success( $result );
-			}
-		);
+		// Set post_parent on auto-draft creation.
+		add_filter( 'wp_insert_post_data', array( $admin_controller, 'set_parent_on_auto_draft' ), 10, 2 );
 
-		// Admin list filters.
-		add_filter( 'display_post_states', array( $admin_controller, 'add_display_post_state' ), 10, 2 );
-		add_filter( 'query_vars', array( $admin_controller, 'add_query_var' ) );
-		add_action( 'restrict_manage_posts', array( $admin_controller, 'render_filter_dropdown' ) );
-		add_action( 'pre_get_posts', array( $admin_controller, 'handle_filter_query' ) );
+		// Liveblog state filter dropdown on admin post list.
+		add_action( 'restrict_manage_posts', array( $admin_controller, 'add_liveblog_state_filter' ) );
+		add_filter( 'parse_query', array( $admin_controller, 'apply_liveblog_state_filter' ) );
+	}
+
+	/**
+	 * Initialize settings page.
+	 *
+	 * @return void
+	 */
+	private function init_settings_page(): void {
+		$settings_controller = $this->container->settings_controller();
+		$settings_controller->init();
 	}
 }

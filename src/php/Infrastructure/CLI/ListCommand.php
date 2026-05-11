@@ -69,15 +69,25 @@ final class ListCommand {
 			'post_type'      => $this->get_supported_post_types(),
 			'posts_per_page' => -1,
 			'post_status'    => 'any',
-			'meta_key'       => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding liveblogs.
 			'orderby'        => 'modified',
 			'order'          => 'DESC',
+			'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Expected to be fast with proper indexing and limited results.
+				array(
+					'taxonomy' => \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TAXONOMY,
+					'field'    => 'slug',
+					'terms'    => array(
+						\Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ENABLED,
+						\Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ARCHIVED,
+					),
+				),
+			),
 		);
 
 		// Filter by state if specified.
 		if ( 'all' !== $state ) {
-			$meta_value               = 'enabled' === $state ? 'enable' : 'archive';
-			$query_args['meta_value'] = $meta_value; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for filtering by state.
+			$query_args['tax_query'][0]['terms'] = 'enabled' === $state
+				? array( \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ENABLED )
+				: array( \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ARCHIVED );
 		}
 
 		$query = new WP_Query( $query_args );
@@ -135,7 +145,7 @@ final class ListCommand {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command for counting entries.
 		$count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = 'liveblog'",
+				"SELECT COUNT(*) FROM $wpdb->posts WHERE post_parent = %d AND post_type = 'post' AND post_status = 'publish'",
 				$post_id
 			)
 		);

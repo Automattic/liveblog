@@ -55,9 +55,6 @@ final class AddCommand {
 	 * [--hide-authors]
 	 * : Hide the author name on this entry.
 	 *
-	 * [--key-event]
-	 * : Mark this entry as a key event.
-	 *
 	 * [--porcelain]
 	 * : Output only the new entry ID.
 	 *
@@ -72,8 +69,8 @@ final class AddCommand {
 	 *     # Add entry with multiple contributors
 	 *     wp liveblog add 123 "Team report" --author=5 --contributors=6,7,8
 	 *
-	 *     # Add anonymous key event
-	 *     wp liveblog add 123 "Major development!" --hide-authors --key-event
+	 *     # Add anonymous entry
+	 *     wp liveblog add 123 "Major development!" --hide-authors
 	 *
 	 *     # Get just the entry ID for scripting
 	 *     wp liveblog add 123 "New entry" --porcelain
@@ -118,7 +115,6 @@ final class AddCommand {
 
 		// Parse options.
 		$hide_authors = isset( $assoc_args['hide-authors'] );
-		$key_event    = isset( $assoc_args['key-event'] );
 		$contributors = $this->parse_contributors( $assoc_args['contributors'] ?? '' );
 
 		// Apply content filters (commands, emojis, etc.).
@@ -137,11 +133,6 @@ final class AddCommand {
 			WP_CLI::error( 'Failed to create entry.' );
 		}
 
-		// Mark as key event if requested.
-		if ( $key_event ) {
-			update_comment_meta( $entry_id->to_int(), 'liveblog_key_entry', '1' );
-		}
-
 		if ( $porcelain ) {
 			WP_CLI::log( (string) $entry_id->to_int() );
 			return;
@@ -149,10 +140,9 @@ final class AddCommand {
 
 		WP_CLI::success(
 			sprintf(
-				'Entry %d added to liveblog %d.%s',
+				'Entry %d added to liveblog %d.',
 				$entry_id->to_int(),
-				$post_id,
-				$key_event ? ' (Key event)' : ''
+				$post_id
 			)
 		);
 	}

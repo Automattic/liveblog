@@ -9,31 +9,21 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Infrastructure\DI;
 
-use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
 use Automattic\Liveblog\Application\Presenter\MetadataPresenter;
-use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
-use Automattic\Liveblog\Application\Renderer\EmbedHandlerInterface;
-use Automattic\Liveblog\Application\Service\AutoArchiveService;
 use Automattic\Liveblog\Application\Service\ContentProcessor;
 use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\EntryService;
 use Automattic\Liveblog\Application\Service\InputSanitizer;
-use Automattic\Liveblog\Application\Service\KeyEventService;
-use Automattic\Liveblog\Application\Service\KeyEventShortcodeHandler;
+use Automattic\Liveblog\Application\Service\SettingsService;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
-use Automattic\Liveblog\Infrastructure\Cron\AutoArchiveCronHandler;
-use Automattic\Liveblog\Infrastructure\Renderer\WordPressContentRenderer;
-use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
+use Automattic\Liveblog\Infrastructure\Repository\PostEntryRepository;
 use Automattic\Liveblog\Infrastructure\WordPress\AdminController;
-use Automattic\Liveblog\Infrastructure\SocketIO\SocketioManager;
-use Automattic\Liveblog\Infrastructure\WordPress\AmpIntegration;
 use Automattic\Liveblog\Infrastructure\WordPress\AssetManager;
-use Automattic\Liveblog\Infrastructure\WordPress\CommentEmbed;
 use Automattic\Liveblog\Infrastructure\WordPress\RequestRouter;
 use Automattic\Liveblog\Infrastructure\WordPress\RestApiController;
+use Automattic\Liveblog\Infrastructure\WordPress\SettingsPageController;
 use Automattic\Liveblog\Infrastructure\WordPress\TemplateRenderer;
 
 /**
@@ -78,25 +68,11 @@ final class Container {
 	private ?EntryService $entry_service = null;
 
 	/**
-	 * Cached embed handler instance.
-	 *
-	 * @var EmbedHandlerInterface|null
-	 */
-	private ?EmbedHandlerInterface $embed_handler = null;
-
-	/**
 	 * Cached content processor instance.
 	 *
 	 * @var ContentProcessor|null
 	 */
 	private ?ContentProcessor $content_processor = null;
-
-	/**
-	 * Cached content renderer instance.
-	 *
-	 * @var ContentRendererInterface|null
-	 */
-	private ?ContentRendererInterface $content_renderer = null;
 
 	/**
 	 * Cached entry query service instance.
@@ -106,46 +82,11 @@ final class Container {
 	private ?EntryQueryService $entry_query_service = null;
 
 	/**
-	 * Cached content filter registry instance.
-	 *
-	 * @var ContentFilterRegistry|null
-	 */
-	private ?ContentFilterRegistry $content_filter_registry = null;
-
-	/**
 	 * Cached input sanitizer instance.
 	 *
 	 * @var InputSanitizer|null
 	 */
 	private ?InputSanitizer $input_sanitizer = null;
-
-	/**
-	 * Cached key event service instance.
-	 *
-	 * @var KeyEventService|null
-	 */
-	private ?KeyEventService $key_event_service = null;
-
-	/**
-	 * Cached key event shortcode handler instance.
-	 *
-	 * @var KeyEventShortcodeHandler|null
-	 */
-	private ?KeyEventShortcodeHandler $key_event_shortcode_handler = null;
-
-	/**
-	 * Cached auto-archive service instance.
-	 *
-	 * @var AutoArchiveService|null
-	 */
-	private ?AutoArchiveService $auto_archive_service = null;
-
-	/**
-	 * Cached auto-archive cron handler instance.
-	 *
-	 * @var AutoArchiveCronHandler|null
-	 */
-	private ?AutoArchiveCronHandler $auto_archive_cron_handler = null;
 
 	/**
 	 * Cached entry operations instance.
@@ -176,6 +117,20 @@ final class Container {
 	private ?TemplateRenderer $template_renderer = null;
 
 	/**
+	 * Cached settings service instance.
+	 *
+	 * @var SettingsService|null
+	 */
+	private ?SettingsService $settings_service = null;
+
+	/**
+	 * Cached settings page controller instance.
+	 *
+	 * @var SettingsPageController|null
+	 */
+	private ?SettingsPageController $settings_controller = null;
+
+	/**
 	 * Cached admin controller instance.
 	 *
 	 * @var AdminController|null
@@ -195,20 +150,6 @@ final class Container {
 	 * @var RequestRouter|null
 	 */
 	private ?RequestRouter $request_router = null;
-
-	/**
-	 * Cached AMP integration instance.
-	 *
-	 * @var AmpIntegration|null
-	 */
-	private ?AmpIntegration $amp_integration = null;
-
-	/**
-	 * Cached Socket.IO manager instance.
-	 *
-	 * @var SocketioManager|null
-	 */
-	private ?SocketioManager $socketio_manager = null;
 
 	/**
 	 * Private constructor to enforce singleton.
@@ -274,7 +215,7 @@ final class Container {
 		}
 
 		if ( null === $this->entry_repository ) {
-			$this->entry_repository = new CommentEntryRepository();
+			$this->entry_repository = new PostEntryRepository();
 		}
 
 		return $this->entry_repository;
@@ -298,23 +239,6 @@ final class Container {
 	}
 
 	/**
-	 * Get the embed handler.
-	 *
-	 * @return EmbedHandlerInterface
-	 */
-	public function embed_handler(): EmbedHandlerInterface {
-		if ( isset( $this->overrides['embed_handler'] ) ) {
-			return ( $this->overrides['embed_handler'] )();
-		}
-
-		if ( null === $this->embed_handler ) {
-			$this->embed_handler = new CommentEmbed();
-		}
-
-		return $this->embed_handler;
-	}
-
-	/**
 	 * Get the content processor.
 	 *
 	 * @return ContentProcessor
@@ -325,29 +249,10 @@ final class Container {
 		}
 
 		if ( null === $this->content_processor ) {
-			$this->content_processor = new ContentProcessor(
-				$this->embed_handler()
-			);
+			$this->content_processor = new ContentProcessor( null );
 		}
 
 		return $this->content_processor;
-	}
-
-	/**
-	 * Get the content renderer.
-	 *
-	 * @return ContentRendererInterface
-	 */
-	public function content_renderer(): ContentRendererInterface {
-		if ( isset( $this->overrides['content_renderer'] ) ) {
-			return ( $this->overrides['content_renderer'] )();
-		}
-
-		if ( null === $this->content_renderer ) {
-			$this->content_renderer = new WordPressContentRenderer( $this->content_processor() );
-		}
-
-		return $this->content_renderer;
 	}
 
 	/**
@@ -368,23 +273,6 @@ final class Container {
 	}
 
 	/**
-	 * Get the content filter registry.
-	 *
-	 * @return ContentFilterRegistry
-	 */
-	public function content_filter_registry(): ContentFilterRegistry {
-		if ( isset( $this->overrides['content_filter_registry'] ) ) {
-			return ( $this->overrides['content_filter_registry'] )();
-		}
-
-		if ( null === $this->content_filter_registry ) {
-			$this->content_filter_registry = new ContentFilterRegistry();
-		}
-
-		return $this->content_filter_registry;
-	}
-
-	/**
 	 * Get the input sanitizer.
 	 *
 	 * @return InputSanitizer
@@ -402,83 +290,6 @@ final class Container {
 	}
 
 	/**
-	 * Get the key event service.
-	 *
-	 * @return KeyEventService
-	 */
-	public function key_event_service(): KeyEventService {
-		if ( isset( $this->overrides['key_event_service'] ) ) {
-			return ( $this->overrides['key_event_service'] )();
-		}
-
-		if ( null === $this->key_event_service ) {
-			$this->key_event_service = new KeyEventService(
-				$this->entry_repository(),
-				$this->entry_query_service()
-			);
-		}
-
-		return $this->key_event_service;
-	}
-
-	/**
-	 * Get the key event shortcode handler.
-	 *
-	 * @return KeyEventShortcodeHandler
-	 */
-	public function key_event_shortcode_handler(): KeyEventShortcodeHandler {
-		if ( isset( $this->overrides['key_event_shortcode_handler'] ) ) {
-			return ( $this->overrides['key_event_shortcode_handler'] )();
-		}
-
-		if ( null === $this->key_event_shortcode_handler ) {
-			$this->key_event_shortcode_handler = new KeyEventShortcodeHandler(
-				$this->key_event_service(),
-				new KeyEventConfiguration()
-			);
-		}
-
-		return $this->key_event_shortcode_handler;
-	}
-
-	/**
-	 * Get the auto-archive service.
-	 *
-	 * @return AutoArchiveService
-	 */
-	public function auto_archive_service(): AutoArchiveService {
-		if ( isset( $this->overrides['auto_archive_service'] ) ) {
-			return ( $this->overrides['auto_archive_service'] )();
-		}
-
-		if ( null === $this->auto_archive_service ) {
-			$auto_archive_days          = LiveblogConfiguration::get_auto_archive_days();
-			$this->auto_archive_service = new AutoArchiveService( $auto_archive_days );
-		}
-
-		return $this->auto_archive_service;
-	}
-
-	/**
-	 * Get the auto-archive cron handler.
-	 *
-	 * @return AutoArchiveCronHandler
-	 */
-	public function auto_archive_cron_handler(): AutoArchiveCronHandler {
-		if ( isset( $this->overrides['auto_archive_cron_handler'] ) ) {
-			return ( $this->overrides['auto_archive_cron_handler'] )();
-		}
-
-		if ( null === $this->auto_archive_cron_handler ) {
-			$this->auto_archive_cron_handler = new AutoArchiveCronHandler(
-				$this->auto_archive_service()
-			);
-		}
-
-		return $this->auto_archive_cron_handler;
-	}
-
-	/**
 	 * Get the entry operations service.
 	 *
 	 * @return EntryOperations
@@ -491,7 +302,6 @@ final class Container {
 		if ( null === $this->entry_operations ) {
 			$this->entry_operations = new EntryOperations(
 				$this->entry_service(),
-				$this->key_event_service(),
 				$this->entry_repository(),
 				$this->content_processor()
 			);
@@ -514,7 +324,6 @@ final class Container {
 			$this->rest_api_controller = new RestApiController(
 				$this->entry_query_service(),
 				$this->entry_operations(),
-				$this->key_event_service(),
 				$this->request_router(),
 				$this->admin_controller()
 			);
@@ -536,9 +345,7 @@ final class Container {
 		if ( null === $this->asset_manager ) {
 			$this->asset_manager = new AssetManager(
 				$this->entry_query_service(),
-				$this->content_filter_registry(),
-				defined( 'LIVEBLOG_FILE' ) ? LIVEBLOG_FILE : '',
-				$this->socketio_manager()
+				defined( 'LIVEBLOG_FILE' ) ? LIVEBLOG_FILE : ''
 			);
 		}
 
@@ -575,9 +382,7 @@ final class Container {
 		}
 
 		if ( null === $this->admin_controller ) {
-			$this->admin_controller = new AdminController(
-				$this->template_renderer()
-			);
+			$this->admin_controller = new AdminController( $this->template_renderer(), $this->entry_query_service() );
 		}
 
 		return $this->admin_controller;
@@ -595,8 +400,7 @@ final class Container {
 
 		if ( null === $this->metadata_presenter ) {
 			$this->metadata_presenter = new MetadataPresenter(
-				$this->entry_query_service(),
-				$this->key_event_service()
+				$this->entry_query_service()
 			);
 		}
 
@@ -616,58 +420,13 @@ final class Container {
 		if ( null === $this->request_router ) {
 			$this->request_router = new RequestRouter(
 				$this->entry_query_service(),
-				$this->entry_operations(),
-				$this->key_event_service()
+				$this->entry_operations()
 			);
 		}
 
 		return $this->request_router;
 	}
-
-	/**
-	 * Get the AMP integration.
-	 *
-	 * @return AmpIntegration
-	 */
-	public function amp_integration(): AmpIntegration {
-		if ( isset( $this->overrides['amp_integration'] ) ) {
-			return ( $this->overrides['amp_integration'] )();
-		}
-
-		if ( null === $this->amp_integration ) {
-			$plugin_dir = defined( 'LIVEBLOG_FILE' ) ? dirname( LIVEBLOG_FILE ) : '';
-
-			$this->amp_integration = new AmpIntegration(
-				$this->template_renderer(),
-				$this->asset_manager(),
-				$this->request_router(),
-				$this->metadata_presenter(),
-				$plugin_dir
-			);
-		}
-
-		return $this->amp_integration;
-	}
-
-	/**
-	 * Get the Socket.IO manager.
-	 *
-	 * @return SocketioManager
-	 */
-	public function socketio_manager(): SocketioManager {
-		if ( isset( $this->overrides['socketio_manager'] ) ) {
-			return ( $this->overrides['socketio_manager'] )();
-		}
-
-		if ( null === $this->socketio_manager ) {
-			$this->socketio_manager = new SocketioManager(
-				$this->template_renderer()
-			);
-		}
-
-		return $this->socketio_manager;
-	}
-
+	
 	/**
 	 * Set a custom entry repository (for testing or alternative implementations).
 	 *
@@ -694,5 +453,38 @@ final class Container {
 		$this->entry_service = $service;
 
 		return $this;
+	}
+	/**
+	 * Get the settings service.
+	 *
+	 * @return SettingsService
+	 */
+	public function settings_service(): SettingsService {
+		if ( isset( $this->overrides['settings_service'] ) ) {
+			return ( $this->overrides['settings_service'] )();
+		}
+
+		if ( null === $this->settings_service ) {
+			$this->settings_service = new SettingsService();
+		}
+
+		return $this->settings_service;
+	}
+
+	/**
+	 * Get the settings page controller.
+	 *
+	 * @return SettingsPageController
+	 */
+	public function settings_controller(): SettingsPageController {
+		if ( isset( $this->overrides['settings_controller'] ) ) {
+			return ( $this->overrides['settings_controller'] )();
+		}
+
+		if ( null === $this->settings_controller ) {
+			$this->settings_controller = new SettingsPageController( $this->settings_service() );
+		}
+
+		return $this->settings_controller;
 	}
 }

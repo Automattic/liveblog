@@ -11,12 +11,9 @@ namespace Automattic\Liveblog\Infrastructure\WordPress;
 
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use Automattic\Liveblog\Application\Filter\CommandFilter;
-use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
-use Automattic\Liveblog\Infrastructure\SocketIO\SocketioManager;
 use WP_Post;
 
 /**
@@ -51,13 +48,6 @@ final class AssetManager {
 	private EntryQueryService $entry_query_service;
 
 	/**
-	 * Content filter registry.
-	 *
-	 * @var ContentFilterRegistry
-	 */
-	private ContentFilterRegistry $content_filter_registry;
-
-	/**
 	 * The plugin file path.
 	 *
 	 * @var string
@@ -65,30 +55,17 @@ final class AssetManager {
 	private string $plugin_file;
 
 	/**
-	 * Socket.IO manager.
-	 *
-	 * @var SocketioManager
-	 */
-	private SocketioManager $socketio_manager;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param EntryQueryService     $entry_query_service     The entry query service.
-	 * @param ContentFilterRegistry $content_filter_registry The content filter registry.
-	 * @param string                $plugin_file             The main plugin file path.
-	 * @param SocketioManager       $socketio_manager        The Socket.IO manager.
+	 * @param EntryQueryService $entry_query_service The entry query service.
+	 * @param string            $plugin_file         The main plugin file path.
 	 */
 	public function __construct(
 		EntryQueryService $entry_query_service,
-		ContentFilterRegistry $content_filter_registry,
-		string $plugin_file,
-		SocketioManager $socketio_manager
+		string $plugin_file
 	) {
-		$this->entry_query_service     = $entry_query_service;
-		$this->content_filter_registry = $content_filter_registry;
-		$this->plugin_file             = $plugin_file;
-		$this->socketio_manager        = $socketio_manager;
+		$this->entry_query_service = $entry_query_service;
+		$this->plugin_file         = $plugin_file;
 	}
 
 	/**
@@ -108,29 +85,38 @@ final class AssetManager {
 			return;
 		}
 
-		$endpoint_url = '';
-		$use_rest_api = 0;
-
-		if ( LiveblogConfiguration::use_rest_api() ) {
-			$endpoint_url = RestApiController::build_endpoint_base() . $post_id . '/post_state';
-			$use_rest_api = 1;
+		// Don't enqueue scripts on child posts (entries).
+		if ( $post_id > 0 ) {
+			$post = get_post( $post_id );
+			if ( $post instanceof WP_Post && $post->post_parent > 0 ) {
+				return;
+			}
 		}
 
-		$asset = $this->load_asset_file( 'admin' );
+		// Also check URL parameter for new posts.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( 'post-new.php' === $hook_suffix && isset( $_GET['post_parent'] ) ) {
+			// This is a child post being created.
+			return;
+		}
+
+		$endpoint_url = RestApiController::build_endpoint_base() . $post_id . '/post_state';
+
+		$asset = $this->load_asset_file( 'admin/admin' );
 
 		wp_enqueue_style(
 			LiveblogConfiguration::KEY,
-			plugins_url( 'build/admin.css', $this->plugin_file ),
+			plugins_url( 'build/admin/admin.css', $this->plugin_file ),
 			array(),
 			$asset['version']
 		);
 
 		wp_enqueue_script(
 			'liveblog-admin',
-			plugins_url( 'build/admin.js', $this->plugin_file ),
+			plugins_url( 'build/admin/admin.js', $this->plugin_file ),
 			$asset['dependencies'],
 			$asset['version'],
-			false
+			true
 		);
 
 		wp_localize_script(
@@ -141,7 +127,6 @@ final class AssetManager {
 				'nonce'                        => wp_create_nonce( LiveblogConfiguration::NONCE_ACTION ),
 				'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
-				'use_rest_api'                 => $use_rest_api,
 				'endpoint_url'                 => $endpoint_url,
 			)
 		);
@@ -159,7 +144,7 @@ final class AssetManager {
 	 * Hook callback for wp_enqueue_scripts action.
 	 *
 	 * This method can be added/removed via add_action/remove_action,
-	 * unlike closures. Used by AMP to disable standard liveblog scripts.
+	 * unlike closures.
 	 *
 	 * @return void
 	 */
@@ -196,7 +181,15 @@ final class AssetManager {
 		bool $is_editable,
 		string $endpoint_url
 	): void {
-		$asset = $this->load_asset_file( 'app' );
+		$asset = $this->load_asset_file( 'frontend/app' );
+
+		wp_enqueue_script(
+			LiveblogConfiguration::KEY,
+			plugins_url( 'build/frontend/app.js', $this->plugin_file ),
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
 
 		/**
 		 * Filters whether to load default liveblog styles.
@@ -204,21 +197,15 @@ final class AssetManager {
 		 * @param bool $load Whether to load default styles. Default true.
 		 */
 		if ( apply_filters( 'liveblog_load_default_styles', true ) ) {
+			$style_asset = $this->load_asset_file( 'frontend/style' );
+
 			wp_enqueue_style(
 				LiveblogConfiguration::KEY,
-				plugins_url( 'build/app.css', $this->plugin_file ),
+				plugins_url( 'build/frontend/style.css', $this->plugin_file ),
 				array(),
-				$asset['version']
+				$style_asset['version']
 			);
 		}
-
-		wp_enqueue_script(
-			LiveblogConfiguration::KEY,
-			plugins_url( 'build/app.js', $this->plugin_file ),
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
 
 		if ( $is_editable ) {
 			$this->add_plupload_settings();
@@ -239,6 +226,19 @@ final class AssetManager {
 		);
 
 		wp_localize_script( LiveblogConfiguration::KEY, 'liveblog_settings', $settings );
+
+		// Pass polling interval for vanilla JS poller.
+		$container        = \Automattic\Liveblog\Infrastructure\DI\Container::instance();
+		$settings_service = $container->settings_service();
+		$polling_interval = $settings_service->get_polling_interval();
+
+		wp_localize_script(
+			LiveblogConfiguration::KEY,
+			'liveblogPollingConfig',
+			array(
+				'polling_interval' => $polling_interval,
+			)
+		);
 
 		wp_localize_script(
 			'liveblog-publisher',
@@ -281,7 +281,6 @@ final class AssetManager {
 			'state'                        => $state,
 			'is_liveblog_editable'         => $is_editable,
 			'current_user'                 => $this->get_current_user_data(),
-			'socketio_enabled'             => $this->socketio_manager->is_enabled(),
 
 			'key'                          => LiveblogConfiguration::KEY,
 			'nonce_key'                    => LiveblogConfiguration::NONCE_KEY,
@@ -311,13 +310,11 @@ final class AssetManager {
 			'endpoint_url'                 => $endpoint_url,
 			'cross_domain'                 => false,
 
-			'features'                     => $this->content_filter_registry->get_enabled_features(),
-			'autocomplete'                 => $this->content_filter_registry->get_autocomplete_config(),
-			'command_class'                => apply_filters( 'liveblog_command_class', CommandFilter::DEFAULT_CLASS_PREFIX ),
+			'features'                     => array(),
+			'autocomplete'                 => array(),
 
 			// Internationalization strings.
 			'delete_confirmation'          => __( 'Do you really want to delete this entry? There is no way back.', 'liveblog' ),
-			'delete_key_confirm'           => __( 'Do you want to delete this key entry?', 'liveblog' ),
 			'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 			'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
 			'new_update'                   => __( 'Liveblog: {number} new update', 'liveblog' ),
@@ -449,10 +446,10 @@ final class AssetManager {
 	}
 
 	/**
-	 * Enqueue social embed SDKs on liveblog posts.
+	 * Enqueue social embed SDKs.
 	 *
-	 * As entries are rendered in React, social embeds require their SDKs
-	 * to be loaded on page load rather than dynamically.
+	 * As entries are rendered with server-side rendering, social embeds require their SDKs
+	 * to be loaded for proper rendering of embedded content (tweets, Instagram, etc.).
 	 *
 	 * @return void
 	 */
@@ -481,5 +478,54 @@ final class AssetManager {
 		}
 
 		return str_replace( ' src', ' async="async" src', $tag );
+	}
+
+	/**
+	 * Enqueue the React DataViews component for the entries metabox.
+	 *
+	 * Loads the compiled entries-view bundle along with the required
+	 *
+	 * @wordpress/components and @wordpress/dataviews stylesheets.
+	 *
+	 * @return void
+	 */
+	public function enqueue_entries_dataview_assets(): void {
+		$asset_file = $this->load_asset_file( 'admin/entries-view' );
+
+		wp_enqueue_style(
+			'liveblog-entries-dataview',
+			plugins_url( 'build/admin/entries-view.css', $this->plugin_file ),
+			array(),
+			$asset_file['version']
+		);
+
+		wp_enqueue_script(
+			'liveblog-entries-dataview',
+			plugins_url( 'build/admin/entries-view.js', $this->plugin_file ),
+			$this->filter_registered_dependencies( $asset_file['dependencies'] ),
+			$asset_file['version'],
+			true
+		);
+	}
+
+	/**
+	 * Filter out script dependencies that are not registered in WordPress.
+	 *
+	 * The @wordpress/dependency-extraction-webpack-plugin can include handles
+	 * for packages that exist on disk but haven't yet had their script
+	 * registration added to the WordPress version in use.
+	 *
+	 * @param string[] $dependencies Script dependency handles.
+	 * @return string[] Only registered dependency handles.
+	 */
+	private function filter_registered_dependencies( array $dependencies ): array {
+		global $wp_scripts;
+
+		return array_filter(
+			$dependencies,
+			function ( string $handle ) use ( $wp_scripts ): bool {
+				return isset( $wp_scripts->registered[ $handle ] );
+			}
+		);
 	}
 }

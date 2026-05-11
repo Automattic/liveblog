@@ -14,7 +14,6 @@ use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
-use Automattic\Liveblog\Application\Service\KeyEventService;
 
 /**
  * Routes liveblog AJAX requests to appropriate handlers.
@@ -38,27 +37,17 @@ final class RequestRouter {
 	private EntryOperations $entry_operations;
 
 	/**
-	 * Key event service.
-	 *
-	 * @var KeyEventService
-	 */
-	private KeyEventService $key_event_service;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param EntryQueryService $entry_query_service The entry query service.
 	 * @param EntryOperations   $entry_operations    The entry operations service.
-	 * @param KeyEventService   $key_event_service   The key event service.
 	 */
 	public function __construct(
 		EntryQueryService $entry_query_service,
-		EntryOperations $entry_operations,
-		KeyEventService $key_event_service
+		EntryOperations $entry_operations
 	) {
 		$this->entry_query_service = $entry_query_service;
 		$this->entry_operations    = $entry_operations;
-		$this->key_event_service   = $key_event_service;
 	}
 
 	/**
@@ -348,7 +337,7 @@ final class RequestRouter {
 		$result = array();
 
 		foreach ( $entries as $entry ) {
-			$presenter = EntryPresenter::from_entry( $entry, $this->key_event_service );
+			$presenter = EntryPresenter::from_entry( $entry );
 			$result[]  = $presenter->for_json();
 		}
 

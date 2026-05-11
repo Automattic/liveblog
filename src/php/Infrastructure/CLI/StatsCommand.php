@@ -59,32 +59,24 @@ final class StatsCommand {
 		// Count total entries.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
 		$total_entries = (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM $wpdb->comments WHERE comment_approved = 'liveblog'"
-		);
-
-		// Count key events.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
-		$key_events = (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM $wpdb->comments c
-			INNER JOIN $wpdb->commentmeta cm ON c.comment_ID = cm.comment_id
-			WHERE c.comment_approved = 'liveblog'
-			AND cm.meta_key = 'liveblog_key_entry'
-			AND cm.meta_value = '1'"
+			"SELECT COUNT(*) FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' AND post_parent > 0"
 		);
 
 		// Count unique authors.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
 		$unique_authors = (int) $wpdb->get_var(
-			"SELECT COUNT(DISTINCT user_id) FROM $wpdb->comments WHERE comment_approved = 'liveblog' AND user_id > 0"
+			"SELECT COUNT(DISTINCT post_author) FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' AND post_parent > 0 AND post_author > 0"
 		);
 
 		// Get most active liveblog.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
 		$most_active = $wpdb->get_row(
-			"SELECT comment_post_ID, COUNT(*) as entry_count
-			FROM $wpdb->comments
-			WHERE comment_approved = 'liveblog'
-			GROUP BY comment_post_ID
+			"SELECT post_parent, COUNT(*) as entry_count
+			FROM $wpdb->posts
+			WHERE post_type = 'post'
+			AND post_status = 'publish'
+			AND post_parent > 0
+			GROUP BY post_parent
 			ORDER BY entry_count DESC
 			LIMIT 1"
 		);
@@ -92,7 +84,7 @@ final class StatsCommand {
 		$most_active_title = '';
 		$most_active_count = 0;
 		if ( $most_active ) {
-			$post              = get_post( $most_active->comment_post_ID );
+			$post              = get_post( $most_active->post_parent );
 			$most_active_title = $post ? $post->post_title : 'Unknown';
 			$most_active_count = (int) $most_active->entry_count;
 		}
@@ -100,7 +92,7 @@ final class StatsCommand {
 		// Get date of most recent entry.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
 		$most_recent_entry = $wpdb->get_var(
-			"SELECT MAX(comment_date) FROM $wpdb->comments WHERE comment_approved = 'liveblog'"
+			"SELECT MAX(post_date) FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' AND post_parent > 0"
 		);
 
 		$stats = array(
@@ -109,7 +101,6 @@ final class StatsCommand {
 			array( 'Enabled', (string) $enabled_count ),
 			array( 'Archived', (string) $archived_count ),
 			array( 'Total Entries', number_format( $total_entries ) ),
-			array( 'Key Events', number_format( $key_events ) ),
 			array( 'Unique Authors', (string) $unique_authors ),
 			array( 'Avg Entries/Liveblog', $total_count > 0 ? number_format( $total_entries / $total_count, 1 ) : '0' ),
 			array( 'Most Active Liveblog', $most_active_title ? sprintf( '%s (%d entries)', $most_active_title, $most_active_count ) : 'None' ),
@@ -155,14 +146,23 @@ final class StatsCommand {
 	 * @return int
 	 */
 	private function count_liveblogs_by_state( string $state ): int {
+		$slug = 'enable' === $state
+			? \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ENABLED
+			: \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ARCHIVED;
+
 		$query = new WP_Query(
 			array(
 				'post_type'      => $this->get_supported_post_types(),
 				'posts_per_page' => -1,
 				'post_status'    => 'any',
-				'meta_key'       => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding liveblogs.
-				'meta_value'     => $state, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for counting by state.
 				'fields'         => 'ids',
+				'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Expected to be fast with proper indexing and limited results.
+					array(
+						'taxonomy' => \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TAXONOMY,
+						'field'    => 'slug',
+						'terms'    => $slug,
+					),
+				),
 			)
 		);
 

@@ -81,13 +81,17 @@ final class TemplateRenderer {
 		'entry_timestamp',
 		'timestamp',
 		'share_link',
-		'key_event',
 		'is_liveblog_editable',
 		'allowed_tags_for_entry',
-		// DDD services.
-		'key_event_service',
-		// Feature flags.
-		'socketio_enabled',
+		'is_archived',
+		'is_editable',
+		'has_more_entries',
+		// Entity objects for entry template rendering.
+		'entry',
+		'liveblog_post',
+		// Pre-rendered entries.
+		'entries_html',
+		'last_timestamp',
 	);
 
 	/**
@@ -190,12 +194,26 @@ final class TemplateRenderer {
 	}
 
 	/**
+	 * Guard flag to prevent infinite recursion in filter_the_content().
+	 *
+	 * When entry.php applies 'the_content' to entry content,
+	 * filter_the_content() fires again and would re-render entries.
+	 *
+	 * @var bool
+	 */
+	private static bool $rendering_liveblog = false;
+
+	/**
 	 * Filter the_content to add liveblog output.
 	 *
 	 * @param string $content The post content.
 	 * @return string Modified content with liveblog container.
 	 */
 	public function filter_the_content( string $content ): string {
+		if ( self::$rendering_liveblog ) {
+			return $content;
+		}
+
 		if ( ! LiveblogPost::is_viewing_liveblog_post() ) {
 			return $content;
 		}
@@ -205,14 +223,14 @@ final class TemplateRenderer {
 			return $content;
 		}
 
-		$liveblog_output = '<div id="wpcom-liveblog-container" class="' . esc_attr( (string) $post->ID ) . '"></div>';
+		self::$rendering_liveblog = true;
+
+		$liveblog_output = $this->get_all_entry_output( $post->ID );
 		$liveblog_output = apply_filters( 'liveblog_add_to_content', $liveblog_output, $content, $post->ID );
 
-		/**
-		 * Filters whether the liveblog output should appear at the top of the post content.
-		 *
-		 * @param bool $at_top Whether to display the liveblog at the top. Default false.
-		 */
+		self::$rendering_liveblog = false;
+
+		/** This filter is documented above. */
 		if ( true === apply_filters( 'liveblog_output_at_top', false ) ) {
 			return wp_kses_post( $liveblog_output ) . $content;
 		}
@@ -242,9 +260,8 @@ final class TemplateRenderer {
 	 * @return string The rendered entries output.
 	 */
 	public function get_all_entry_output( int $post_id ): string {
-		$container         = Container::instance();
-		$query_service     = $container->entry_query_service();
-		$key_event_service = $container->key_event_service();
+		$container     = Container::instance();
+		$query_service = $container->entry_query_service();
 
 		$liveblog_post = LiveblogPost::from_id( $post_id );
 		$state         = $liveblog_post ? $liveblog_post->state() : '';
@@ -254,16 +271,41 @@ final class TemplateRenderer {
 			$args['order'] = 'ASC';
 		}
 
-		$args                  = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
-		$entries               = (array) $query_service->get_all( $post_id, 0, $args );
+		$args             = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
+		$entries_per_page = ( new \Automattic\Liveblog\Application\Config\LazyloadConfiguration() )->get_entries_per_page();
+		$all_entries      = (array) $query_service->get_all( $post_id, 0, $args );
+		
+		// Only show limited entries initially; rest loaded via "Load More".
+		$entries          = array_slice( $all_entries, 0, $entries_per_page );
+		$has_more_entries = count( $all_entries ) > $entries_per_page;
+		
 		$show_archived_message = LiveblogPost::STATE_ARCHIVED === $state
 			&& $liveblog_post
 			&& $liveblog_post->current_user_can_edit();
-		$socketio_enabled      = $container->socketio_manager()->is_enabled();
+
+		$is_archived = LiveblogPost::STATE_ARCHIVED === $state;
+		$is_editable = $liveblog_post && $liveblog_post->is_editable();
+
+		// Render each entry through the entry.php template for consistent markup.
+		$entries_html   = '';
+		$last_timestamp = 0;
+		foreach ( $entries as $entry ) {
+			$entries_html .= $this->render(
+				'entry.php',
+				array(
+					'entry'         => $entry,
+					'liveblog_post' => $liveblog_post,
+				)
+			);
+			$entry_ts      = $entry->timestamp();
+			if ( $entry_ts > $last_timestamp ) {
+				$last_timestamp = $entry_ts;
+			}
+		}
 
 		return $this->render(
 			'liveblog-loop.php',
-			compact( 'entries', 'show_archived_message', 'key_event_service', 'socketio_enabled' )
+			compact( 'post_id', 'entries_html', 'last_timestamp', 'show_archived_message', 'is_archived', 'is_editable', 'has_more_entries' )
 		);
 	}
 }

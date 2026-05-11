@@ -127,8 +127,13 @@ final class ArchiveOldCommand {
 				'post_type'      => $this->get_supported_post_types(),
 				'posts_per_page' => -1,
 				'post_status'    => 'any',
-				'meta_key'       => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding liveblogs.
-				'meta_value'     => 'enable', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Only enabled liveblogs.
+				'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Expected to be fast with proper indexing and limited results.
+					array(
+						'taxonomy' => \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TAXONOMY,
+						'field'    => 'slug',
+						'terms'    => \Automattic\Liveblog\Application\Config\LiveblogConfiguration::TERM_ENABLED,
+					),
+				),
 			)
 		);
 
@@ -171,8 +176,8 @@ final class ArchiveOldCommand {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
 		$date = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT MAX(comment_date) FROM $wpdb->comments
-				WHERE comment_post_ID = %d AND comment_approved = 'liveblog'",
+				"SELECT MAX(post_date) FROM $wpdb->posts
+				WHERE post_parent = %d AND post_type = 'post' AND post_status = 'publish'",
 				$post_id
 			)
 		);

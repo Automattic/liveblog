@@ -69,10 +69,7 @@ final class StatusCommand {
 			WP_CLI::error( sprintf( 'Post %d is not a liveblog.', $post_id ) );
 		}
 
-		$entry_stats       = $this->get_entry_stats( $post_id );
-		$key_event_count   = $this->get_key_event_count( $post_id );
-		$auto_archive      = $liveblog_post->auto_archive_expiry();
-		$auto_archive_date = $auto_archive ? $auto_archive->format( 'Y-m-d H:i:s' ) : 'Not set';
+		$entry_stats = $this->get_entry_stats( $post_id );
 
 		$status_data = array(
 			array( 'Property', 'Value' ),
@@ -81,11 +78,10 @@ final class StatusCommand {
 			array( 'State', $liveblog_post->state() ),
 			array( 'URL', get_permalink( $post_id ) ),
 			array( 'Total Entries', (string) $entry_stats['total'] ),
-			array( 'Key Events', (string) $key_event_count ),
 			array( 'Unique Authors', (string) $entry_stats['authors'] ),
 			array( 'First Entry', $entry_stats['first'] ?? 'None' ),
 			array( 'Last Entry', $entry_stats['last'] ?? 'None' ),
-			array( 'Auto-archive Expiry', $auto_archive_date ),
+			array( 'Auto-archive Expiry', 'Not available in v2' ),
 			array( 'Created', $post->post_date ),
 			array( 'Last Modified', $post->post_modified ),
 		);
@@ -136,12 +132,13 @@ final class StatusCommand {
 			$wpdb->prepare(
 				"SELECT
 					COUNT(*) as total,
-					COUNT(DISTINCT user_id) as authors,
-					MIN(comment_date) as first_date,
-					MAX(comment_date) as last_date
-				FROM $wpdb->comments
-				WHERE comment_post_ID = %d
-				AND comment_approved = 'liveblog'",
+					COUNT(DISTINCT post_author) as authors,
+					MIN(post_date) as first_date,
+					MAX(post_date) as last_date
+				FROM $wpdb->posts
+				WHERE post_parent = %d
+				AND post_type = 'post'
+				AND post_status = 'publish'",
 				$post_id
 			)
 		);
@@ -152,30 +149,5 @@ final class StatusCommand {
 			'first'   => $stats->first_date ?? null,
 			'last'    => $stats->last_date ?? null,
 		);
-	}
-
-	/**
-	 * Get key event count for a liveblog.
-	 *
-	 * @param int $post_id Post ID.
-	 * @return int
-	 */
-	private function get_key_event_count( int $post_id ): int {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- CLI command.
-		$count = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $wpdb->comments c
-				INNER JOIN $wpdb->commentmeta cm ON c.comment_ID = cm.comment_id
-				WHERE c.comment_post_ID = %d
-				AND c.comment_approved = 'liveblog'
-				AND cm.meta_key = 'liveblog_key_entry'
-				AND cm.meta_value = '1'",
-				$post_id
-			)
-		);
-
-		return (int) $count;
 	}
 }

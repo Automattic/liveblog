@@ -10,12 +10,9 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Infrastructure\WordPress;
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-use Automattic\Liveblog\Application\Filter\AuthorFilter;
-use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
-use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
 use Automattic\Liveblog\Domain\Entity\LiveblogPost;
 use WP_Error;
@@ -71,13 +68,6 @@ final class RestApiController {
 	private EntryOperations $entry_operations;
 
 	/**
-	 * Key event service.
-	 *
-	 * @var KeyEventService
-	 */
-	private KeyEventService $key_event_service;
-
-	/**
 	 * Request router for formatting responses.
 	 *
 	 * @var RequestRouter
@@ -101,25 +91,22 @@ final class RestApiController {
 	/**
 	 * Constructor.
 	 *
-	 * @param EntryQueryService $query_service     Entry query service.
-	 * @param EntryOperations   $entry_operations  Entry operations service.
-	 * @param KeyEventService   $key_event_service Key event service.
-	 * @param RequestRouter     $request_router    Request router.
-	 * @param AdminController   $admin_controller  Admin controller.
+	 * @param EntryQueryService $query_service    Entry query service.
+	 * @param EntryOperations   $entry_operations Entry operations service.
+	 * @param RequestRouter     $request_router   Request router.
+	 * @param AdminController   $admin_controller Admin controller.
 	 */
 	public function __construct(
 		EntryQueryService $query_service,
 		EntryOperations $entry_operations,
-		KeyEventService $key_event_service,
 		RequestRouter $request_router,
 		AdminController $admin_controller
 	) {
-		$this->query_service     = $query_service;
-		$this->entry_operations  = $entry_operations;
-		$this->key_event_service = $key_event_service;
-		$this->request_router    = $request_router;
-		$this->admin_controller  = $admin_controller;
-		$this->api_namespace     = 'liveblog/v' . self::API_VERSION;
+		$this->api_namespace    = 'liveblog/v' . self::API_VERSION;
+		$this->query_service    = $query_service;
+		$this->entry_operations = $entry_operations;
+		$this->request_router   = $request_router;
+		$this->admin_controller = $admin_controller;
 	}
 
 	/**
@@ -168,8 +155,7 @@ final class RestApiController {
 	/**
 	 * Permission callback for the public read REST endpoints.
 	 *
-	 * Public read endpoints (entries, lazyload, single entry, paged entries, key
-	 * events, jump-to-key-event) accept a post_id from the URL, so they are the
+	 * Public read endpoints (entries, lazyload, single entry, paged entries) accept
 	 * gateway for CWE-639 (IDOR). Without this check, an unauthenticated caller
 	 * could retrieve entries from a draft, private, future or trashed parent
 	 * post simply by enumerating post IDs.
@@ -407,11 +393,8 @@ final class RestApiController {
 				'callback'            => array( $this, 'update_post_state' ),
 				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
-					'post_id'         => array( 'required' => true ),
-					'state'           => array( 'required' => true ),
-					'template_name'   => array( 'required' => true ),
-					'template_format' => array( 'required' => true ),
-					'limit'           => array( 'required' => true ),
+					'post_id' => array( 'required' => true ),
+					'state'   => array( 'required' => true ),
 				),
 			)
 		);
@@ -432,33 +415,33 @@ final class RestApiController {
 			)
 		);
 
-		// Key events.
+		// Get entries as HTML (for vanilla JS polling).
 		register_rest_route(
 			$this->api_namespace,
-			'/(?P<post_id>\d+)/get-key-events/(?P<last_known_entry>[^\/]+)',
+			'/(?P<post_id>\d+)/entries-html/(?P<timestamp>\d+)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_key_events' ),
+				'callback'            => array( $this, 'get_entries_html' ),
 				'args'                => array(
-					'last_known_entry' => array( 'required' => true ),
+					'post_id'   => array( 'required' => true ),
+					'timestamp' => array( 'required' => true ),
 				),
 				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 
-		// Jump to key event.
+		// Breakout entry into standalone post.
 		register_rest_route(
 			$this->api_namespace,
-			'/(?P<post_id>\d+)/jump-to-key-event/(?P<id>\d+)/(?P<last_known_entry>[^\/]+)',
+			'/(?P<post_id>\d+)/breakout/(?P<entry_id>\d+)',
 			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'jump_to_key_event' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'breakout_entry' ),
+				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
-					'post_id'          => array( 'required' => true ),
-					'id'               => array( 'required' => true ),
-					'last_known_entry' => array( 'required' => true ),
+					'post_id'  => array( 'required' => true ),
+					'entry_id' => array( 'required' => true ),
 				),
-				'permission_callback' => array( self::class, 'can_read_liveblog' ),
 			)
 		);
 	}
@@ -508,10 +491,25 @@ final class RestApiController {
 		$url_params = $request->get_url_params();
 		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
 
+		$entry_id_value = $this->get_json_param( 'entry_id', $json );
+
+		// For update and delete actions, verify that the entry belongs to
+		// the URL's post_id to prevent cross-parent IDOR.
+		if ( false !== $entry_id_value && 'insert' !== $crud_action ) {
+			$entry_post = get_post( (int) $entry_id_value );
+			if ( ! $entry_post || (int) $entry_post->post_parent !== $post_id ) {
+				return new WP_Error(
+					'rest_liveblog_entry_not_found',
+					__( 'Entry not found.', 'liveblog' ),
+					array( 'status' => 404 )
+				);
+			}
+		}
+
 		$args = array(
 			'post_id'         => $post_id,
 			'content'         => $this->get_json_param( 'content', $json ),
-			'entry_id'        => $this->get_json_param( 'entry_id', $json ),
+			'entry_id'        => $entry_id_value,
 			'author_id'       => $this->get_json_param( 'author_id', $json ),
 			'contributor_ids' => $this->get_json_param( 'contributor_ids', $json ),
 		);
@@ -520,7 +518,11 @@ final class RestApiController {
 
 		$user = wp_get_current_user();
 		if ( ! $user || ! $user->exists() ) {
-			return new WP_Error( 'user-invalid', __( 'Invalid user', 'liveblog' ) );
+			return new WP_Error(
+				'rest_liveblog_invalid_user',
+				__( 'Invalid user.', 'liveblog' ),
+				array( 'status' => 401 )
+			);
 		}
 
 		$result = $this->entry_operations->do_crud( $crud_action, $args, $user );
@@ -596,10 +598,40 @@ final class RestApiController {
 	 * @return array
 	 */
 	public function get_authors( WP_REST_Request $request ): array {
-		$term          = $request->get_param( 'term' );
-		$author_filter = new AuthorFilter();
+		$term = $request->get_param( 'term' );
+		$term = is_string( $term ) ? $term : '';
 
-		return $author_filter->get_authors( $term );
+		$query_args = array(
+			'search'         => '*' . $term . '*',
+			'search_columns' => array( 'display_name', 'user_nicename' ),
+			'orderby'        => 'display_name',
+			'order'          => 'ASC',
+		);
+
+		/**
+		 * Filters the user query arguments for author autocomplete.
+		 *
+		 * @param array  $query_args The WP_User_Query arguments.
+		 * @param string $term       The search term.
+		 */
+		$query_args = apply_filters( 'liveblog_author_autocomplete_query_args', $query_args, $term );
+
+		$users  = get_users( $query_args );
+		$result = array();
+
+		foreach ( $users as $user ) {
+			$result[] = array(
+				'value'      => $user->ID,
+				'label'      => $user->display_name,
+				'label_html' => sprintf(
+					'<span class="liveblog-author-suggestion">%1$s <span class="liveblog-meta">(%2$s)</span></span>',
+					esc_html( $user->display_name ),
+					esc_html( $user->user_nicename )
+				),
+			);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -609,10 +641,36 @@ final class RestApiController {
 	 * @return array
 	 */
 	public function get_hashtag_terms( WP_REST_Request $request ): array {
-		$term           = $request->get_param( 'term' );
-		$hashtag_filter = new HashtagFilter();
+		$term = $request->get_param( 'term' );
+		$term = is_string( $term ) ? $term : '';
 
-		return $hashtag_filter->get_hashtag_terms( $term );
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'post_tag',
+				'search'     => $term,
+				'hide_empty' => false,
+				'number'     => 20,
+			)
+		);
+
+		if ( is_wp_error( $terms ) ) {
+			return array();
+		}
+
+		$result = array();
+		foreach ( $terms as $term_obj ) {
+			$result[] = array(
+				'value'      => '#' . $term_obj->name,
+				'label'      => '#' . $term_obj->name,
+				'label_html' => sprintf(
+					'<span class="liveblog-hashtag-suggestion">#%1$s <span class="liveblog-meta">(%2$s)</span></span>',
+					esc_html( $term_obj->name ),
+					esc_html( (string) $term_obj->count )
+				),
+			);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -621,7 +679,7 @@ final class RestApiController {
 	 * @param WP_REST_Request $request REST request.
 	 * @return string
 	 */
-	public function update_post_state( WP_REST_Request $request ): string {
+	public function update_post_state( WP_REST_Request $request ): array {
 		$post_id = (int) $request->get_param( 'post_id' );
 		$state   = $request->get_param( 'state' );
 
@@ -634,11 +692,11 @@ final class RestApiController {
 
 		$this->set_liveblog_vars( $post_id );
 
-		$meta_box = $this->admin_controller->set_liveblog_state( $post_id, $state, $request_vars );
+		$result = $this->admin_controller->set_liveblog_state( $post_id, $state, $request_vars );
 
 		HttpResponseHelper::prevent_caching_if_needed();
 
-		return is_string( $meta_box ) ? $meta_box : '';
+		return $result;
 	}
 
 	/**
@@ -658,50 +716,6 @@ final class RestApiController {
 			$post_id,
 			$page,
 			is_string( $last_known_entry ) ? $last_known_entry : null
-		);
-
-		HttpResponseHelper::prevent_caching_if_needed();
-
-		return $entries;
-	}
-
-	/**
-	 * Get key events.
-	 *
-	 * @param WP_REST_Request $request REST request.
-	 * @return array
-	 */
-	public function get_key_events( WP_REST_Request $request ): array {
-		$post_id = (int) $request->get_param( 'post_id' );
-
-		$this->set_liveblog_vars( $post_id );
-
-		$key_events       = $this->key_event_service->get_key_events( $post_id );
-		$entries_for_json = $this->entries_for_json( $key_events );
-
-		HttpResponseHelper::prevent_caching_if_needed();
-
-		return $entries_for_json;
-	}
-
-	/**
-	 * Jump to page containing key event.
-	 *
-	 * @param WP_REST_Request $request REST request.
-	 * @return array
-	 */
-	public function jump_to_key_event( WP_REST_Request $request ): array {
-		$post_id          = (int) $request->get_param( 'post_id' );
-		$id               = (int) $request->get_param( 'id' );
-		$last_known_entry = $request->get_param( 'last_known_entry' );
-
-		$this->set_liveblog_vars( $post_id );
-
-		$entries = $this->request_router->get_entries_paged(
-			$post_id,
-			0,
-			is_string( $last_known_entry ) ? $last_known_entry : null,
-			$id
 		);
 
 		HttpResponseHelper::prevent_caching_if_needed();
@@ -730,7 +744,7 @@ final class RestApiController {
 
 		foreach ( $entries as $entry ) {
 			if ( $entry instanceof Entry ) {
-				$presenter          = EntryPresenter::from_entry( $entry, $this->key_event_service );
+				$presenter          = EntryPresenter::from_entry( $entry );
 				$entries_for_json[] = $presenter->for_json();
 			}
 		}
@@ -786,5 +800,168 @@ final class RestApiController {
 		}
 
 		return is_string( $value ) ? html_entity_decode( $value ) : $value;
+	}
+	/**
+	 * Get entries as rendered HTML after a timestamp.
+	 *
+	 * Used for polling in vanilla JS.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response|\WP_Error Response or error.
+	 */
+	public function get_entries_html( WP_REST_Request $request ) {
+		$post_id   = (int) $request->get_param( 'post_id' );
+		$timestamp = (int) $request->get_param( 'timestamp' );
+
+		$container  = \Automattic\Liveblog\Infrastructure\DI\Container::instance();
+		$repository = $container->entry_repository();
+		$renderer   = $container->template_renderer();
+
+		$liveblog_post = LiveblogPost::from_id( $post_id );
+
+		// Convert timestamp to UTC date for post query.
+		$date = gmdate( 'Y-m-d H:i:s', $timestamp );
+
+		$args = array(
+			'post_parent'    => $post_id,
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'date_query'     => array(
+				array(
+					'column' => 'post_modified_gmt',
+					'after'  => $date,
+				),
+			),
+			'orderby'        => 'modified',
+			'order'          => 'ASC',
+			'posts_per_page' => 50,
+		);
+
+		$posts = get_posts( $args );
+
+		$html      = '';
+		$newest_ts = 0;
+
+		foreach ( $posts as $post ) {
+			$entry_id = \Automattic\Liveblog\Domain\ValueObject\EntryId::from_int( $post->ID );
+			$entry    = $repository->get_entry( $entry_id );
+
+			if ( ! $entry instanceof Entry ) {
+				continue;
+			}
+
+			$entry_html = $renderer->render(
+				'entry.php',
+				array(
+					'entry'         => $entry,
+					'liveblog_post' => $liveblog_post,
+				)
+			);
+
+			$html .= $entry_html;
+
+			$modified_ts = (int) strtotime( $post->post_modified_gmt );
+			if ( $modified_ts > $newest_ts ) {
+				$newest_ts = $modified_ts;
+			}
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'html'      => $html,
+				'count'     => count( $posts ),
+				'timestamp' => $newest_ts,
+			),
+			200
+		);
+	}
+
+	/**
+	 * Break out a liveblog entry into a standalone draft post.
+	 *
+	 * Copies entry content, inherits parent taxonomies and featured image,
+	 * creates a new draft post, and links back via liveblog_breakout_post_id meta.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function breakout_entry( WP_REST_Request $request ) {
+		$post_id  = (int) $request->get_param( 'post_id' );
+		$entry_id = (int) $request->get_param( 'entry_id' );
+
+		$entry_post = get_post( $entry_id );
+		if ( ! $entry_post || $entry_post->post_parent !== $post_id ) {
+			return new WP_Error(
+				'rest_liveblog_entry_not_found',
+				__( 'Entry not found.', 'liveblog' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$existing_breakout = get_post_meta( $entry_id, 'liveblog_breakout_post_id', true );
+		if ( $existing_breakout ) {
+			return new WP_Error(
+				'rest_liveblog_already_broken_out',
+				__( 'Entry is already broken out.', 'liveblog' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$parent_post = get_post( $post_id );
+		if ( ! $parent_post ) {
+			return new WP_Error(
+				'rest_liveblog_parent_not_found',
+				__( 'Parent post not found.', 'liveblog' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		// Build new post data from the entry.
+		$new_post = array(
+			'post_type'    => 'post',
+			'post_status'  => 'draft',
+			'post_title'   => wp_trim_words( wp_strip_all_tags( $entry_post->post_content ), 10, '…' ),
+			'post_content' => $entry_post->post_content,
+			'post_author'  => get_current_user_id(),
+			'post_parent'  => 0,
+		);
+
+		$new_post_id = wp_insert_post( $new_post, true );
+		if ( is_wp_error( $new_post_id ) ) {
+			return $new_post_id;
+		}
+
+		// Inherit categories from parent liveblog post.
+		$categories = wp_get_post_categories( $post_id );
+		if ( ! empty( $categories ) ) {
+			wp_set_post_categories( $new_post_id, $categories );
+		}
+
+		// Inherit tags from parent.
+		$tags = wp_get_post_tags( $post_id, array( 'fields' => 'ids' ) );
+		if ( ! empty( $tags ) ) {
+			wp_set_post_tags( $new_post_id, $tags );
+		}
+
+		// Inherit featured image from parent.
+		$thumbnail_id = get_post_thumbnail_id( $post_id );
+		if ( $thumbnail_id ) {
+			set_post_thumbnail( $new_post_id, $thumbnail_id );
+		}
+
+		// Store breakout link on original entry.
+		update_post_meta( $entry_id, 'liveblog_breakout_post_id', $new_post_id );
+
+		// Store reverse link on breakout post so we can find the source entry
+		// when the breakout gets published (for polling re-delivery).
+		update_post_meta( $new_post_id, '_liveblog_breakout_source_entry', $entry_id );
+
+		return new \WP_REST_Response(
+			array(
+				'breakout_post_id' => $new_post_id,
+				'edit_link'        => get_edit_post_link( $new_post_id, 'raw' ),
+			),
+			200
+		);
 	}
 }

@@ -11,7 +11,7 @@ namespace Automattic\Liveblog\Infrastructure\Renderer;
 
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\ContentProcessor;
-use WP_Comment;
+use WP_Post;
 
 /**
  * Renders entry content using WordPress and the liveblog content pipeline.
@@ -43,11 +43,11 @@ final class WordPressContentRenderer implements ContentRendererInterface {
 	 * Delegates to the ContentProcessor service which handles embeds,
 	 * shortcodes, and content filters.
 	 *
-	 * @param string          $content The raw content to render.
-	 * @param WP_Comment|null $comment Optional comment for embed context.
+	 * @param string       $content The raw content to render.
+	 * @param WP_Post|null $post  Optional post for embed context.
 	 * @return string The rendered HTML.
 	 */
-	public function render( string $content, ?WP_Comment $comment = null ): string {
-		return $this->content_processor->render( $content, $comment );
+	public function render( string $content, ?WP_Post $post = null ): string {
+		return $this->content_processor->render( $content, $post );
 	}
 }
