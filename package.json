@@ -5,8 +5,8 @@
   "author": "Automattic",
   "private": true,
   "devDependencies": {
-    "@wordpress/i18n": "^6.17.0",
-    "@wordpress/scripts": "^32.0.0",
+    "@wordpress/i18n": "^6.18.0",
+    "@wordpress/scripts": "^32.1.0",
     "sass-module-importer": "^1.4.0",
     "sass-mq": "^7.0.0"
   },
