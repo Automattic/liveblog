@@ -11,6 +11,7 @@ namespace Automattic\Liveblog\Tests\Integration;
 
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 use WPCOM_Liveblog_Entry;
+use WPCOM_Liveblog_Entry_Key_Events;
 use WPCOM_Liveblog_Entry_Query;
 use ReflectionProperty;
 
@@ -157,6 +158,103 @@ final class EntryTest extends TestCase {
 		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
 		$query = new WPCOM_Liveblog_Entry_Query( $entry->get_post_id(), 'liveblog' );
 		$this->assertNull( $query->get_by_id( $entry->get_id() ) );
+	}
+
+	/**
+	 * The update() method must reject an entry that belongs to a different post.
+	 *
+	 * Defence-in-depth at the mutation sink for HackerOne #3742849 (CWE-639
+	 * IDOR): the CRUD permission check authorises a post id, but the entry id is
+	 * supplied separately and must be bound to that post before wp_update_comment()
+	 * runs.
+	 */
+	public function test_update_rejects_entry_belonging_to_another_post(): void {
+		$entry            = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id         = (int) $entry->get_id();
+		$original_content = get_comment( $entry_id )->comment_content;
+
+		$result = WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 200,
+					'entry_id' => $entry_id,
+					'content'  => 'tampered',
+				)
+			)
+		);
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertEquals( $original_content, get_comment( $entry_id )->comment_content );
+	}
+
+	/**
+	 * The delete() method must reject an entry that belongs to a different post.
+	 */
+	public function test_delete_rejects_entry_belonging_to_another_post(): void {
+		$entry    = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id = (int) $entry->get_id();
+
+		$result = WPCOM_Liveblog_Entry::delete(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 200,
+					'entry_id' => $entry_id,
+				)
+			)
+		);
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertNotEquals( 'trash', get_comment( $entry_id )->comment_approved );
+	}
+
+	/**
+	 * The delete_key() method must reject an entry that belongs to a different
+	 * post before it strips the key-event comment meta. remove_key_action()
+	 * mutates the referenced entry, so the post-binding guard has to run first.
+	 */
+	public function test_delete_key_rejects_entry_belonging_to_another_post(): void {
+		$entry    = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id = (int) $entry->get_id();
+		add_comment_meta( $entry_id, WPCOM_Liveblog_Entry_Key_Events::META_KEY, WPCOM_Liveblog_Entry_Key_Events::META_VALUE );
+
+		$result = WPCOM_Liveblog_Entry::delete_key(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 200,
+					'entry_id' => $entry_id,
+					'content'  => 'tampered',
+				)
+			)
+		);
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		// The key-event meta on the foreign entry must be untouched.
+		$this->assertEquals(
+			WPCOM_Liveblog_Entry_Key_Events::META_VALUE,
+			get_comment_meta( $entry_id, WPCOM_Liveblog_Entry_Key_Events::META_KEY, true )
+		);
+	}
+
+	/**
+	 * A legitimate update on an entry that belongs to the supplied post is
+	 * still allowed. Guards against the post-binding check over-reaching.
+	 */
+	public function test_update_allows_entry_belonging_to_the_same_post(): void {
+		$entry    = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id = (int) $entry->get_id();
+
+		$result = WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 100,
+					'entry_id' => $entry_id,
+					'content'  => 'legitimately updated',
+				)
+			)
+		);
+
+		$this->assertInstanceOf( WPCOM_Liveblog_Entry::class, $result );
+		$this->assertEquals( 'legitimately updated', get_comment( $entry_id )->comment_content );
 	}
 
 	/**
