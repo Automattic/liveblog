@@ -1210,6 +1210,50 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * A request body `post_id` must not override the URL post_id for the
+	 * post_state route.
+	 *
+	 * The permission callback authorises against the URL post, so the state change
+	 * must land on that post — never on a victim post supplied in the request body
+	 * or query string. Covers a cross-post IDOR (CWE-639) analogous to HackerOne
+	 * #3742849: an Author authorised on their own liveblog could otherwise enable,
+	 * archive, or disable the liveblog on any post by passing its id in the body.
+	 */
+	public function test_endpoint_update_post_state_body_post_id_cannot_override_url(): void {
+		// Victim post owned by another author, with an enabled liveblog.
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+
+		// Attacker authorises against their own enabled liveblog post.
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		// URL path targets the attacker's own post (permission passes); the body
+		// tries to redirect the state change at the victim post.
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/post_state' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'post_id'         => $victim_post_id,
+				'state'           => 'archive',
+				'template_name'   => 'list',
+				'template_format' => 'full',
+				'limit'           => '5',
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		// The request is authorised against the attacker's own post, so it succeeds.
+		$this->assertEquals( 200, $response->get_status() );
+
+		// The victim's liveblog state is untouched (still 'enable', not 'archive').
+		$this->assertEquals( 'enable', get_post_meta( $victim_post_id, WPCOM_Liveblog::KEY, true ) );
+
+		// The state change landed on the URL post (the attacker's own post).
+		$this->assertEquals( 'archive', get_post_meta( $attacker_post_id, WPCOM_Liveblog::KEY, true ) );
+	}
+
+	/**
 	 * Build the list of public read endpoint URLs that accept a post_id for testing.
 	 *
 	 * @param int $post_id  Post ID to embed.
