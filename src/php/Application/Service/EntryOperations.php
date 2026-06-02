@@ -203,6 +203,11 @@ final class EntryOperations {
 	 * @return EntryId The new entry ID.
 	 */
 	private function execute_update( array $args, int $post_id ): EntryId {
+		// Bind the entry to the authorised post before any mutation runs:
+		// handle_update_metadata() reassigns the original entry's author and
+		// contributors, so the check has to come first.
+		$this->assert_entry_belongs_to_post( (int) ( $args['entry_id'] ?? 0 ), $post_id );
+
 		// Handle author selection and contributors on the original entry.
 		$this->handle_update_metadata( $args );
 
@@ -233,6 +238,8 @@ final class EntryOperations {
 	 * @return EntryId The delete marker entry ID.
 	 */
 	private function execute_delete( array $args, WP_User $user, int $post_id ): EntryId {
+		$this->assert_entry_belongs_to_post( (int) ( $args['entry_id'] ?? 0 ), $post_id );
+
 		$entry_id = $this->entry_service->delete(
 			$post_id,
 			EntryId::from_int( (int) $args['entry_id'] ),
@@ -256,6 +263,10 @@ final class EntryOperations {
 	 * @return EntryId The entry ID.
 	 */
 	private function execute_delete_key( array $args, int $post_id ): EntryId {
+		// Guard before remove_key_action() runs: it deletes the referenced
+		// entry's key-event meta, so the post-binding check must happen first.
+		$this->assert_entry_belongs_to_post( (int) ( $args['entry_id'] ?? 0 ), $post_id );
+
 		$entry_id = EntryId::from_int( (int) $args['entry_id'] );
 
 		// Re-save the entry under its original author.
@@ -299,6 +310,39 @@ final class EntryOperations {
 		}
 
 		return $author;
+	}
+
+	/**
+	 * Ensure the entry being mutated belongs to the authorised post.
+	 *
+	 * The CRUD entry points authorise the caller against the post id taken from
+	 * the route URL (REST) or the permalink (admin-ajax), but the entry id
+	 * arrives separately in the request body and is not otherwise re-validated
+	 * against that post. Without binding the two together, a caller authorised to
+	 * edit their own liveblog could pass the entry id of an entry belonging to
+	 * another user's post and have the update/delete/delete_key flow mutate it
+	 * (CWE-639 IDOR, HackerOne #3742849).
+	 *
+	 * The entry must exist, be a liveblog entry (so the endpoint cannot be used
+	 * to edit or trash arbitrary non-liveblog comments), and be attached to the
+	 * authorised post. The message is deliberately generic so the endpoint cannot
+	 * be used to probe for entries on other posts.
+	 *
+	 * @param int $entry_id The entry (comment) ID supplied by the caller.
+	 * @param int $post_id  The authorised post ID.
+	 * @return void
+	 * @throws \InvalidArgumentException If the entry does not belong to the post.
+	 */
+	private function assert_entry_belongs_to_post( int $entry_id, int $post_id ): void {
+		$comment = get_comment( $entry_id );
+
+		if (
+			! $comment instanceof WP_Comment
+			|| CommentEntryRepository::COMMENT_TYPE !== $comment->comment_type
+			|| (int) $comment->comment_post_ID !== $post_id
+		) {
+			throw new \InvalidArgumentException( 'Entry not found in this liveblog.' );
+		}
 	}
 
 	/**

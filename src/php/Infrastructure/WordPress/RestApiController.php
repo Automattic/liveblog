@@ -516,15 +516,19 @@ final class RestApiController {
 		// Use the URL post_id as the authoritative target. The permission
 		// callback authorises against the URL post_id, so the JSON body must
 		// not be allowed to redirect the action at a different post.
-		$url_params = $request->get_url_params();
-		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+		$post_id = $this->get_authorised_post_id( $request );
+
+		// Coerce the free-form content to a string and the contributor IDs to an
+		// array, so a non-string / non-array JSON body value cannot reach the
+		// entry sinks unscalarised and raise a TypeError (HTTP 500).
+		$content = $this->get_json_param( 'content', $json );
 
 		$args = array(
 			'post_id'         => $post_id,
-			'content'         => $this->get_json_param( 'content', $json ),
+			'content'         => is_string( $content ) ? $content : '',
 			'entry_id'        => $this->get_json_param( 'entry_id', $json ),
 			'author_id'       => $this->get_json_param( 'author_id', $json ),
-			'contributor_ids' => $this->get_json_param( 'contributor_ids', $json ),
+			'contributor_ids' => $this->normalize_contributor_ids( $this->get_json_param( 'contributor_ids', $json ) ),
 		);
 
 		$this->set_liveblog_vars( $post_id );
@@ -587,7 +591,9 @@ final class RestApiController {
 	 * @return array
 	 */
 	public function format_preview_entry( WP_REST_Request $request ): array {
-		$post_id       = (int) $request->get_param( 'post_id' );
+		// The URL path post_id is authoritative; read it from the same source as
+		// the permission callback so a body/query value cannot change the context.
+		$post_id       = $this->get_authorised_post_id( $request );
 		$json          = $request->get_json_params();
 		$entry_content = $this->get_json_param( 'entry_content', $json );
 
@@ -633,14 +639,25 @@ final class RestApiController {
 	 * @return string
 	 */
 	public function update_post_state( WP_REST_Request $request ): string {
-		$post_id = (int) $request->get_param( 'post_id' );
-		$state   = $request->get_param( 'state' );
+		// The URL path post_id is authoritative for the target post; the
+		// permission callback authorises against the same source. Reading it from
+		// get_param() would let a JSON body or query `post_id` re-target the state
+		// change at a post the caller is not authorised to edit (CWE-639).
+		$post_id = $this->get_authorised_post_id( $request );
+
+		// Coerce to strings so a non-string body value cannot raise a TypeError at
+		// the set_liveblog_state() or key-event template sinks.
+		$state           = $request->get_param( 'state' );
+		$state           = is_string( $state ) ? $state : '';
+		$template_name   = $request->get_param( 'template_name' );
+		$template_format = $request->get_param( 'template_format' );
+		$limit           = $request->get_param( 'limit' );
 
 		$request_vars = array(
 			'state'                        => $state,
-			'liveblog-key-template-name'   => $request->get_param( 'template_name' ),
-			'liveblog-key-template-format' => $request->get_param( 'template_format' ),
-			'liveblog-key-limit'           => $request->get_param( 'limit' ),
+			'liveblog-key-template-name'   => is_string( $template_name ) ? $template_name : '',
+			'liveblog-key-template-format' => is_string( $template_format ) ? $template_format : '',
+			'liveblog-key-limit'           => is_scalar( $limit ) ? (string) $limit : '',
 		);
 
 		$this->set_liveblog_vars( $post_id );
@@ -771,6 +788,45 @@ final class RestApiController {
 	 */
 	public function sanitize_numeric( $param, $request, $key ): int { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by REST API sanitize_callback signature.
 		return ( ! empty( $param ) && is_numeric( $param ) ? (int) $param : 0 );
+	}
+
+	/**
+	 * Get the authorised target post ID for a write request from the URL path.
+	 *
+	 * Write routes are scoped to the post in the route URL, and the write
+	 * permission callback ({@see current_user_can_edit_liveblog_for_request()})
+	 * authorises against that same value. Handlers must therefore read the post ID
+	 * from the URL path parameters and never from get_param(): WP_REST_Request
+	 * resolves JSON body, POST body, and query-string parameters ahead of URL path
+	 * parameters, so a body or query `post_id` could otherwise re-target the action
+	 * at a post the caller is not authorised to edit (CWE-639).
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return int The post ID from the URL path, or 0 when absent.
+	 */
+	private function get_authorised_post_id( WP_REST_Request $request ): int {
+		$url_params = $request->get_url_params();
+		return isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+	}
+
+	/**
+	 * Normalise contributor IDs from the JSON body to an array of positive ints.
+	 *
+	 * The value arrives verbatim from the decoded JSON body, where it could be a
+	 * scalar or absent rather than the expected array. Anything that is not an
+	 * array becomes `false` (treated downstream as "no contributors"), and array
+	 * members are coerced to positive integers so arbitrary strings cannot be
+	 * persisted as contributor meta.
+	 *
+	 * @param mixed $value The raw contributor_ids value from the JSON body.
+	 * @return array<int>|false The sanitised contributor IDs, or false when absent/invalid.
+	 */
+	private function normalize_contributor_ids( $value ) {
+		if ( ! is_array( $value ) ) {
+			return false;
+		}
+
+		return array_values( array_filter( array_map( 'absint', $value ) ) );
 	}
 
 	/**

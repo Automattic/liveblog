@@ -910,6 +910,130 @@ final class RestApiTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * A request body `post_id` must not override the URL post_id for the
+	 * post_state route (CWE-639). The permission callback authorises against the
+	 * URL post, so the state change must land on that post, not a victim post
+	 * named in the body.
+	 */
+	public function test_endpoint_update_post_state_body_post_id_cannot_override_url(): void {
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		// URL targets the attacker's own post (permission passes); the body tries
+		// to redirect the state change at the victim post.
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/post_state' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'post_id'         => $victim_post_id,
+				'state'           => 'archive',
+				'template_name'   => 'list',
+				'template_format' => 'full',
+				'limit'           => '5',
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertSame( 'enable', get_post_meta( $victim_post_id, LiveblogConfiguration::KEY, true ) );
+		$this->assertSame( 'archive', get_post_meta( $attacker_post_id, LiveblogConfiguration::KEY, true ) );
+	}
+
+	/**
+	 * A caller authorised on their own liveblog must not update an entry that
+	 * belongs to another user's post by supplying that entry's id in the body
+	 * (CWE-639 IDOR, HackerOne #3742849).
+	 */
+	public function test_endpoint_crud_update_denies_entry_on_another_post(): void {
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+		$victim_entry_id  = $this->insert_entries( 1, array( 'post_id' => $victim_post_id ) )[0]->id()->to_int();
+		$original_content = get_comment( $victim_entry_id )->comment_content;
+
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'crud_action' => 'update',
+					'entry_id'    => $victim_entry_id,
+					'content'     => 'tampered by attacker',
+				)
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		$this->assertNotEquals( 200, $response->get_status() );
+		$this->assertSame( $original_content, get_comment( $victim_entry_id )->comment_content );
+	}
+
+	/**
+	 * A caller authorised on their own liveblog must not delete an entry that
+	 * belongs to another user's post by supplying that entry's id in the body.
+	 */
+	public function test_endpoint_crud_delete_denies_entry_on_another_post(): void {
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+		$victim_entry_id  = $this->insert_entries( 1, array( 'post_id' => $victim_post_id ) )[0]->id()->to_int();
+
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'crud_action' => 'delete',
+					'entry_id'    => $victim_entry_id,
+				)
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		$this->assertNotEquals( 200, $response->get_status() );
+		$comment = get_comment( $victim_entry_id );
+		$this->assertInstanceOf( 'WP_Comment', $comment );
+		$this->assertNotEquals( 'trash', $comment->comment_approved );
+	}
+
+	/**
+	 * A non-string `content`, a non-array `contributor_ids`, and a non-string
+	 * `state` in the request must be coerced rather than reaching a typed sink
+	 * and raising a PHP TypeError / HTTP 500 (CWE-20).
+	 */
+	public function test_endpoint_rejects_malformed_param_types_without_fatal(): void {
+		$author_id = $this->set_author_user();
+		$post_id   = $this->create_liveblog_post( array( 'post_author' => $author_id ) );
+
+		// Array content and a scalar contributor_ids on insert.
+		$crud = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+		$crud->add_header( 'content-type', 'application/json' );
+		$crud->set_body(
+			wp_json_encode(
+				array(
+					'crud_action'     => 'insert',
+					'content'         => array( '<p>array content</p>' ),
+					'contributor_ids' => 'not-an-array',
+				)
+			)
+		);
+		$this->assertEquals( 200, $this->server->dispatch( $crud )->get_status() );
+
+		// Array state on post_state.
+		$state = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/post_state' );
+		$state->add_header( 'content-type', 'application/json' );
+		$state->set_body( wp_json_encode( array( 'state' => array( 'enable' ) ) ) );
+		$this->assertNotEquals( 500, $this->server->dispatch( $state )->get_status() );
+	}
+
+	/**
 	 * Setup entry test state.
 	 *
 	 * @param int   $number_of_entries Number of entries to create.

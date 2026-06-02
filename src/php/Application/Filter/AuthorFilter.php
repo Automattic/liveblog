@@ -345,6 +345,14 @@ final class AuthorFilter implements ContentFilterInterface {
 
 		if ( strlen( trim( $term ) ) > 0 ) {
 			$args['search'] = $term . '*';
+
+			// Restrict the search to non-PII columns. Without an explicit
+			// search_columns, WP_User_Query matches the term against user_email
+			// (exclusively when the term contains an '@'), which turns this
+			// autocomplete into a blind email-existence oracle for users holding
+			// `edit_posts` (CWE-203). The picker only ever needs to match on
+			// login, nicename, and display name.
+			$args['search_columns'] = array( 'user_login', 'user_nicename', 'display_name' );
 		}
 
 		/**
