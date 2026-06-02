@@ -428,41 +428,9 @@ final class PluginBootstrapper {
 		add_action(
 			'template_redirect',
 			function () {
-				$this->handle_deprecated_lazyload_plugin();
 				$this->container->lazyload_configuration()->initialize();
 			}
 		);
-	}
-
-	/**
-	 * Disable the deprecated Lazyload Liveblog Entries plugin and surface a notice.
-	 *
-	 * The standalone plugin is now superseded by built-in lazyload support, so we
-	 * unhook its `init` callback and prompt admins to remove it.
-	 *
-	 * @return void
-	 */
-	private function handle_deprecated_lazyload_plugin(): void {
-		if ( ! has_action( 'init', 'Lazyload_Liveblog_Entries' ) ) {
-			return;
-		}
-
-		if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
-			$template_renderer = $this->container->template_renderer();
-			add_action(
-				'admin_notices',
-				static function () use ( $template_renderer ) {
-					echo wp_kses_post(
-						$template_renderer->render(
-							'lazyload-notice.php',
-							array( 'plugin' => 'Lazyload Liveblog Entries' )
-						)
-					);
-				}
-			);
-		}
-
-		remove_action( 'init', 'Lazyload_Liveblog_Entries' );
 	}
 
 	/**
