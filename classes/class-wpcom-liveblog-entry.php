@@ -626,16 +626,28 @@ class WPCOM_Liveblog_Entry {
 		// Runs the restricted shortcode array through the filter before being applied.
 		self::$restricted_shortcodes = apply_filters( 'liveblog_entry_restrict_shortcodes', self::$restricted_shortcodes );
 
-		// For each lookup key, does it exist in the content.
+		// Strip every restricted shortcode, re-applying the whole set until the
+		// content stabilises. A single pass is bypassable by nesting a restricted
+		// shortcode inside fragments of a tag name, so that removing the inner
+		// match reconstructs a working shortcode. That happens both within one tag
+		// (`[liveblog_key[liveblog_key_events]_events]` -> `[liveblog_key_events]`)
+		// and across tags when more than one is restricted (removing `[embed]`
+		// from `[gall[embed]ery]` reconstructs `[gallery]`). Looping the whole set
+		// rather than each tag in isolation removes the order dependence between
+		// tags. The loop only continues while the content strictly shrinks, so a
+		// replacement that is the same length or longer than the match (an unusual
+		// configuration) cannot make it spin.
 		if ( is_array( self::$restricted_shortcodes ) ) {
-			foreach ( self::$restricted_shortcodes as $key => $value ) {
+			do {
+				$previous = $args['content'];
 
-				// Regex pattern will match all shortcode formats.
-				$pattern = get_shortcode_regex( array( $key ) );
+				foreach ( self::$restricted_shortcodes as $key => $value ) {
+					$pattern         = '/' . get_shortcode_regex( array( $key ) ) . '/s';
+					$args['content'] = preg_replace( $pattern, $value, $args['content'] );
+				}
 
-				// If there's a match we replace it with the configured replacement.
-				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
-			}
+				$shrank = ( null !== $args['content'] && strlen( $args['content'] ) < strlen( $previous ) );
+			} while ( $shrank );
 		}
 
 		// Return the original entry arguments with any modifications.
