@@ -108,13 +108,7 @@ final class AssetManager {
 			return;
 		}
 
-		$endpoint_url = '';
-		$use_rest_api = 0;
-
-		if ( LiveblogConfiguration::use_rest_api() ) {
-			$endpoint_url = RestApiController::build_endpoint_base() . $post_id . '/post_state';
-			$use_rest_api = 1;
-		}
+		$endpoint_url = RestApiController::build_endpoint_base() . $post_id . '/post_state';
 
 		$asset = $this->load_asset_file( 'admin' );
 
@@ -141,7 +135,6 @@ final class AssetManager {
 				'nonce'                        => wp_create_nonce( LiveblogConfiguration::NONCE_ACTION ),
 				'error_message_template'       => __( 'Error {error-code}: {error-message}', 'liveblog' ),
 				'short_error_message_template' => __( 'Error: {error-message}', 'liveblog' ),
-				'use_rest_api'                 => $use_rest_api,
 				'endpoint_url'                 => $endpoint_url,
 			)
 		);
@@ -307,7 +300,6 @@ final class AssetManager {
 			'delay_multiplier'             => LiveblogConfiguration::DELAY_MULTIPLIER,
 			'fade_out_duration'            => LiveblogConfiguration::FADE_OUT_DURATION,
 
-			'use_rest_api'                 => intval( LiveblogConfiguration::use_rest_api() ),
 			'endpoint_url'                 => $endpoint_url,
 			'cross_domain'                 => false,
 

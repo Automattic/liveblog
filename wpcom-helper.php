@@ -5,8 +5,6 @@
  * @package Liveblog
  */
 
-use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
-
 /*
  * Disable Socket support.
  */
@@ -24,45 +22,6 @@ function wpcom_vip_liveblog_bump_stats_extras( $stat, $extra ) { // phpcs:ignore
 		bump_stats_extras( $stat, $extra );
 	}
 }
-
-// Use an AJAX URL, which is easier to match in server configs.
-// Using an endpoint can be ambiguous.
-add_action(
-	'after_liveblog_init',
-	function () {
-
-		// No need to use an Ajax URL if we're using the REST API.
-		if ( LiveblogConfiguration::use_rest_api() ) {
-			return;
-		}
-
-		add_filter(
-			'liveblog_endpoint_url',
-			function ( $url, $post_id ) {
-				return home_url( '__liveblog_' . $post_id . '/' );
-			},
-			10,
-			2
-		);
-		add_rewrite_rule( '^__liveblog_([0-9]+)/(.*)/?', 'index.php?p=$matches[1]&liveblog=$matches[2]', 'top' );
-
-		add_filter(
-			'liveblog_refresh_interval',
-			function ( $refresh_interval ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Required by filter signature.
-				return 3; // More frequent updates; we can handle it.
-			}
-		);
-		// If a site's permalink structure does not end with a trailing slash the URL created by liveblog will redirect.
-		if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '__liveblog_' ) ) { // Input var ok.
-			add_action(
-				'wp',
-				function () {
-					remove_action( 'template_redirect', 'redirect_canonical' );
-				}
-			);
-		}
-	}
-);
 
 // Load the Twitter scripts on every page.
 // The sacrifice of a script is better than

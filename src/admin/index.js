@@ -1,9 +1,8 @@
 import './styles.scss';
 
-/* global ajaxurl, liveblog_admin_settings, jQuery */
+/* global liveblog_admin_settings, jQuery */
 jQuery( function( $ ) {
 	var $meta_box = $( '#liveblog' ),
-		post_id = $( '#post_ID' ).val(),
 		show_error = function( status, code ) {
 			var template = code? liveblog_admin_settings.error_message_template : liveblog_admin_settings.short_error_message_template,
 				message = template.replace( '{error-message}', status ).replace( '{error-code}', code );
@@ -13,25 +12,17 @@ jQuery( function( $ ) {
 		e.preventDefault();
 		var data = {};
 
-		if (liveblog_admin_settings.use_rest_api == 1) {
-			var url = liveblog_admin_settings.endpoint_url;
-			data['state']                           = encodeURIComponent( $( this ).val() );
-			data['template_name']                   = encodeURIComponent( $( '#liveblog-key-template-name' ).val() );
-			data['template_format']                 = encodeURIComponent( $( '#liveblog-key-template-format' ).val() );
-			data['limit']                           = encodeURIComponent( $( '#liveblog-key-limit' ).val() );
-			data[liveblog_admin_settings.nonce_key] = liveblog_admin_settings.nonce;
-			var method = 'POST';
-
-		} else {
-			var url    = ajaxurl + '?action=set_liveblog_state_for_post&post_id=' + encodeURIComponent( post_id ) + '&state=' + encodeURIComponent( $( this ).val() ) + '&' + liveblog_admin_settings.nonce_key + '=' + liveblog_admin_settings.nonce;
-			url       += '&' + $('input, textarea, select', $meta_box).serialize();
-			var method = 'GET';
-		}
+		var url = liveblog_admin_settings.endpoint_url;
+		data['state']                           = encodeURIComponent( $( this ).val() );
+		data['template_name']                   = encodeURIComponent( $( '#liveblog-key-template-name' ).val() );
+		data['template_format']                 = encodeURIComponent( $( '#liveblog-key-template-format' ).val() );
+		data['limit']                           = encodeURIComponent( $( '#liveblog-key-limit' ).val() );
+		data[liveblog_admin_settings.nonce_key] = liveblog_admin_settings.nonce;
 
 		$.ajax( url, {
 			dataType: 'json',
 			data: data,
-			method: method,
+			method: 'POST',
 			success: function( response, status, xhr ) {
 				// Replace the metabox
 				$( '.inside', $meta_box ).empty().append( response );

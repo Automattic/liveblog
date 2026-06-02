@@ -184,9 +184,6 @@ final class HashtagFilter implements ContentFilterInterface {
 
 		// Register the hashtag taxonomy.
 		add_action( 'init', array( $this, 'add_hashtag_taxonomy' ) );
-
-		// Add AJAX endpoint for autocomplete.
-		add_action( 'wp_ajax_liveblog_terms', array( $this, 'ajax_terms' ) );
 	}
 
 	/**
@@ -282,11 +279,7 @@ final class HashtagFilter implements ContentFilterInterface {
 	 * @return array<string, mixed>|null
 	 */
 	public function get_autocomplete_config(): ?array {
-		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_terms';
-
-		if ( LiveblogConfiguration::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'hashtags' );
-		}
+		$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'hashtags' );
 
 		/**
 		 * Filter the hashtag autocomplete config.
@@ -333,29 +326,6 @@ final class HashtagFilter implements ContentFilterInterface {
 		);
 
 		return array_merge( $classes, $terms[0] );
-	}
-
-	/**
-	 * AJAX handler for hashtag autocomplete.
-	 *
-	 * @return void
-	 */
-	public function ajax_terms(): void {
-		// Mirrors the REST hashtag endpoint's permission check. Without this any
-		// authenticated user could scrape the full hashtag taxonomy.
-		if ( ! RestApiController::current_user_can_edit_liveblog() ) {
-			wp_send_json_error( null, 403 );
-		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
-		$search_term = isset( $_GET['autocomplete'] ) ? sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ) : '';
-
-		$terms = $this->get_hashtag_terms( $search_term );
-
-		header( 'Content-Type: application/json' );
-		echo wp_json_encode( $terms );
-
-		exit;
 	}
 
 	/**
