@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.12.1] - 2026-06-02
+
+### Security
+
+* fix: bind liveblog entry CRUD to the authorised post by @GaryJones in https://github.com/Automattic/liveblog/pull/895 (CWE-639 IDOR)
+* fix: bind the post_state write route to the URL post by @GaryJones in https://github.com/Automattic/liveblog/pull/896 (CWE-639 IDOR)
+* fix: stop the author autocomplete matching on email by @GaryJones in https://github.com/Automattic/liveblog/pull/897 (CWE-203 information exposure)
+* fix: strip nested restricted shortcodes idempotently by @GaryJones in https://github.com/Automattic/liveblog/pull/898 (CWE-94 via CWE-185)
+* fix: coerce REST entry content to a string by @GaryJones in https://github.com/Automattic/liveblog/pull/899 (CWE-20)
+
+### Maintenance
+
+* npm(deps): bump qs and express by @dependabot in https://github.com/Automattic/liveblog/pull/893
+* npm(deps): bump js-cookie from 3.0.5 to 3.0.7 by @dependabot in https://github.com/Automattic/liveblog/pull/892
+* Actions(deps): bump shivammathur/setup-php from 2.37.0 to 2.37.1 in the actions group by @dependabot in https://github.com/Automattic/liveblog/pull/891
+* npm(deps-dev): bump axios from 1.15.0 to 1.16.1 by @dependabot in https://github.com/Automattic/liveblog/pull/890
+* npm(deps-dev): bump @babel/plugin-transform-modules-systemjs from 7.28.5 to 7.29.4 by @dependabot in https://github.com/Automattic/liveblog/pull/888
+* npm(deps-dev): bump fast-uri from 3.1.0 to 3.1.2 by @dependabot in https://github.com/Automattic/liveblog/pull/887
+* npm(deps-dev): bump ip-address from 10.1.0 to 10.2.0 by @dependabot in https://github.com/Automattic/liveblog/pull/885
+* npm(deps): bump @lexical/list from 0.43.0 to 0.44.0 by @dependabot in https://github.com/Automattic/liveblog/pull/884
+* npm(deps-dev): bump the dev-dependencies group with 2 updates by @dependabot in https://github.com/Automattic/liveblog/pull/883
+* npm(deps): bump @lexical/rich-text from 0.43.0 to 0.44.0 by @dependabot in https://github.com/Automattic/liveblog/pull/882
+* npm(deps): bump @lexical/link from 0.43.0 to 0.44.0 by @dependabot in https://github.com/Automattic/liveblog/pull/881
+* npm(deps): bump lexical from 0.43.0 to 0.44.0 by @dependabot in https://github.com/Automattic/liveblog/pull/880
+* npm(deps): bump @lexical/react from 0.43.0 to 0.44.0 by @dependabot in https://github.com/Automattic/liveblog/pull/879
+* npm(deps): bump @lexical/html from 0.43.0 to 0.44.0 by @dependabot in https://github.com/Automattic/liveblog/pull/878
+* npm(deps-dev): bump postcss from 8.5.6 to 8.5.12 by @dependabot in https://github.com/Automattic/liveblog/pull/877
+
 ## [1.12.0] - 2026-04-27
 
 **Breaking change (security fix):** The pre-1.12.0 `/liveblog/v1/authors/<term>` and `/liveblog/v1/hashtags/<term>` REST routes, and the matching admin-ajax `liveblog_authors` and `liveblog_terms` actions, only checked a global capability. That allowed any user holding `publish_posts` to enumerate every editor on the site and every entry in the `hashtags` taxonomy, regardless of which post — if any — they were editing (CWE-863). Closing that gap requires scoping the permission check to a specific post, which forces the post id to appear in the URL or the query string. The new shapes are `/liveblog/v1/<post_id>/authors/<term>`, `/liveblog/v1/<post_id>/hashtags/<term>`, and `admin-ajax.php?action=liveblog_authors&post_id=…` (likewise for `liveblog_terms`). The bundled JavaScript client has been updated. Anything else calling these endpoints — bespoke integrations, custom blocks, headless clients — needs to be updated to include the target post id.
@@ -326,6 +354,7 @@ Fixed problems:
 * Initial release
 
 
+[1.12.1]: https://github.com/Automattic/liveblog/compare/1.12.0...1.12.1
 [1.12.0]: https://github.com/Automattic/liveblog/compare/1.11.1...1.12.0
 [1.11.1]: https://github.com/Automattic/liveblog/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/Automattic/liveblog/compare/1.10.0...1.11.0
