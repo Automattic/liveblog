@@ -318,6 +318,71 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * Restricted shortcodes nested inside fragments of their own tag must be
+	 * stripped, not reconstructed.
+	 *
+	 * A single replacement pass is bypassable: removing the inner match from
+	 * `[liveblog_key[liveblog_key_events]_events]` leaves a working
+	 * `[liveblog_key_events]` behind, which `do_shortcode()` would then execute
+	 * at render time. The strip must repeat until no valid restricted shortcode
+	 * remains (CWE-94 via CWE-185).
+	 */
+	public function test_nested_restricted_shortcodes_are_fully_stripped(): void {
+		$key     = 'liveblog_key_events';
+		$pattern = '/' . get_shortcode_regex( array( $key ) ) . '/s';
+
+		$cases = array(
+			'[liveblog_key[liveblog_key_events]_events]',
+			'prefix [liveblog_key[liveblog_key_events]_events] suffix',
+			'[liveblog_key[liveblog_key[liveblog_key_events]_events]_events]',
+		);
+
+		foreach ( $cases as $input ) {
+			$result = WPCOM_Liveblog_Entry::handle_restricted_shortcodes( array( 'content' => $input ) );
+
+			$this->assertSame(
+				0,
+				preg_match( $pattern, $result['content'] ),
+				sprintf( 'A valid [%s] shortcode survived stripping of: %s', $key, $input )
+			);
+		}
+	}
+
+	/**
+	 * Removing one restricted shortcode must not reconstruct a different
+	 * restricted shortcode.
+	 *
+	 * When more than one shortcode is restricted, removing the inner one can
+	 * join the surrounding fragments into the other — e.g. stripping [embed]
+	 * from [gall[embed]ery] yields [gallery]. Stripping must therefore re-apply
+	 * the whole restricted set until the content stabilises, independently of the
+	 * order the tags appear in. The order here ('gallery' before 'embed') is the
+	 * one that a per-tag strip would fail to clean.
+	 */
+	public function test_cross_tag_restricted_shortcode_reconstruction_is_stripped(): void {
+		$original = WPCOM_Liveblog_Entry::$restricted_shortcodes;
+
+		$filter = static function () {
+			return array(
+				'gallery' => '',
+				'embed'   => '',
+			);
+		};
+		add_filter( 'liveblog_entry_restrict_shortcodes', $filter );
+
+		$result = WPCOM_Liveblog_Entry::handle_restricted_shortcodes( array( 'content' => 'before [gall[embed]ery] after' ) );
+
+		remove_filter( 'liveblog_entry_restrict_shortcodes', $filter );
+		WPCOM_Liveblog_Entry::$restricted_shortcodes = $original;
+
+		$this->assertSame(
+			0,
+			preg_match( '/' . get_shortcode_regex( array( 'gallery' ) ) . '/s', $result['content'] ),
+			'A restricted [gallery] reconstructed from a different restricted tag survived stripping.'
+		);
+	}
+
+	/**
 	 * `author_id` for a user with `edit_posts` is accepted and the resulting
 	 * comment is attributed to that user. This is the legitimate co-author
 	 * flow and must keep working.
