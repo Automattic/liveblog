@@ -304,7 +304,7 @@ final class AssetManager {
 			'cross_domain'                 => false,
 
 			'features'                     => $this->content_filter_registry->get_enabled_features(),
-			'autocomplete'                 => $this->content_filter_registry->get_autocomplete_config(),
+			'autocomplete'                 => $this->post_scope_autocomplete_urls( $this->content_filter_registry->get_autocomplete_config(), $post_id ),
 			'command_class'                => apply_filters( 'liveblog_command_class', CommandFilter::DEFAULT_CLASS_PREFIX ),
 
 			// Internationalization strings.
@@ -328,6 +328,31 @@ final class AssetManager {
 		);
 
 		return apply_filters( 'liveblog_settings', $settings );
+	}
+
+	/**
+	 * Substitute the post id into the autocomplete endpoint URLs.
+	 *
+	 * The author and hashtag autocomplete configs are post-scoped REST routes
+	 * (`/<post_id>/authors`, `/<post_id>/hashtags`) whose permission check
+	 * requires `edit_post` on the target post. Their configs are built with a
+	 * `%POST_ID%` placeholder because they are produced without a post in scope;
+	 * this fills it in for the post being rendered. The bundled client appends the
+	 * search term to the URL, so the post id must already be baked in here.
+	 *
+	 * @param array $configs The autocomplete configs.
+	 * @param int   $post_id The current post ID.
+	 * @return array The configs with post-scoped URLs.
+	 */
+	private function post_scope_autocomplete_urls( array $configs, int $post_id ): array {
+		foreach ( $configs as &$config ) {
+			if ( isset( $config['url'] ) && is_string( $config['url'] ) ) {
+				$config['url'] = str_replace( '%POST_ID%', (string) $post_id, $config['url'] );
+			}
+		}
+		unset( $config );
+
+		return $configs;
 	}
 
 	/**

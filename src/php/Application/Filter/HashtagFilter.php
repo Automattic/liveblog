@@ -279,7 +279,10 @@ final class HashtagFilter implements ContentFilterInterface {
 	 * @return array<string, mixed>|null
 	 */
 	public function get_autocomplete_config(): ?array {
-		$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'hashtags' );
+		// Post-scoped REST route (`/<post_id>/hashtags`). The config is built
+		// without a post in scope, so the `%POST_ID%` placeholder is substituted
+		// by AssetManager when the config is localised for a specific post.
+		$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . '%POST_ID%/hashtags' );
 
 		/**
 		 * Filter the hashtag autocomplete config.

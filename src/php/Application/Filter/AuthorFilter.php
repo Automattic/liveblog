@@ -250,7 +250,10 @@ final class AuthorFilter implements ContentFilterInterface {
 	 * @return array<string, mixed>|null
 	 */
 	public function get_autocomplete_config(): ?array {
-		$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'authors' );
+		// Post-scoped REST route (`/<post_id>/authors`). The config is built
+		// without a post in scope, so the `%POST_ID%` placeholder is substituted
+		// by AssetManager when the config is localised for a specific post.
+		$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . '%POST_ID%/authors' );
 
 		/**
 		 * Filter the author autocomplete config.

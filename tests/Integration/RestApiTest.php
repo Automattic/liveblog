@@ -572,8 +572,9 @@ final class RestApiTest extends IntegrationTestCase {
 	 * Integration test - Test accessing the get authors endpoint.
 	 */
 	public function test_endpoint_get_authors(): void {
-		// Create an author and set as the current user.
-		$this->set_author_user();
+		// Create an author who owns the post being edited.
+		$author_id = $this->set_author_user();
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
 
 		// Create 2 authors.
 		self::factory()->user->create(
@@ -590,7 +591,7 @@ final class RestApiTest extends IntegrationTestCase {
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/authors/jo' );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/authors/jo' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -604,8 +605,9 @@ final class RestApiTest extends IntegrationTestCase {
 	 * Integration test - Test accessing the get hashtags endpoint.
 	 */
 	public function test_endpoint_get_hashtags(): void {
-		// Create an author and set as the current user.
-		$this->set_author_user();
+		// Create an author who owns the post being edited.
+		$author_id = $this->set_author_user();
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
 
 		// Create 2 hashtags.
 		self::factory()->term->create(
@@ -623,7 +625,7 @@ final class RestApiTest extends IntegrationTestCase {
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/hashtags/cool' );
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/hashtags/cool' );
 		$response = $this->server->dispatch( $request );
 
 		// Assert successful response.
@@ -631,6 +633,40 @@ final class RestApiTest extends IntegrationTestCase {
 
 		// The array should contain 2 authors.
 		$this->assertCount( 2, $response->get_data() );
+	}
+
+	/**
+	 * The authors autocomplete must be denied for a user who cannot edit the
+	 * target post. The route is post-scoped so a global capability is not enough
+	 * (CWE-863 user enumeration).
+	 */
+	public function test_endpoint_get_authors_denied_for_non_owner(): void {
+		$owner_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id  = self::factory()->post->create( array( 'post_author' => $owner_id ) );
+
+		// A different author, who holds publish_posts but cannot edit the post.
+		$this->set_author_user();
+
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/authors/jo' );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
+	}
+
+	/**
+	 * The hashtags autocomplete must be denied for a user who cannot edit the
+	 * target post.
+	 */
+	public function test_endpoint_get_hashtags_denied_for_non_owner(): void {
+		$owner_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id  = self::factory()->post->create( array( 'post_author' => $owner_id ) );
+
+		$this->set_author_user();
+
+		$request  = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/hashtags/cool' );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertTrue( $response->get_status() === 403 || $response->get_status() === 401 );
 	}
 
 	/**
