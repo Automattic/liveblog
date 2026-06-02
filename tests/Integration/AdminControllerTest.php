@@ -9,7 +9,10 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Tests\Integration;
 
+use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
+use Automattic\Liveblog\Infrastructure\DI\Container;
 use Automattic\Liveblog\Infrastructure\WordPress\AdminController;
+use WP_Error;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
@@ -124,5 +127,77 @@ final class AdminControllerTest extends TestCase {
 		remove_filter( 'liveblog_current_user_can_edit_liveblog', '__return_false' );
 
 		$this->assertFalse( $result );
+	}
+
+	/**
+	 * The admin-ajax state change accepts the nonce the editor client actually
+	 * sends — the NONCE_KEY request value carrying a NONCE_ACTION nonce — and
+	 * applies the state change.
+	 *
+	 * Regression guard for the previous handler, which verified a key/action
+	 * (`_ajax_nonce` / `liveblog_admin_nonce`) the client never sends, so the
+	 * admin-ajax fallback always failed the nonce check.
+	 */
+	public function test_process_state_change_accepts_client_nonce_and_applies_state(): void {
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => $editor_id ) );
+
+		$result = Container::instance()->admin_controller()->process_state_change(
+			array(
+				LiveblogConfiguration::NONCE_KEY => wp_create_nonce( LiveblogConfiguration::NONCE_ACTION ),
+				'post_id'                        => $post_id,
+				'state'                          => 'enable',
+			)
+		);
+
+		$this->assertIsString( $result );
+		$this->assertSame( 'enable', get_post_meta( $post_id, LiveblogConfiguration::KEY, true ) );
+	}
+
+	/**
+	 * A request with a missing or invalid nonce is rejected and does not change
+	 * the liveblog state.
+	 */
+	public function test_process_state_change_rejects_invalid_nonce(): void {
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => $editor_id ) );
+
+		$result = Container::instance()->admin_controller()->process_state_change(
+			array(
+				LiveblogConfiguration::NONCE_KEY => 'not-a-valid-nonce',
+				'post_id'                        => $post_id,
+				'state'                          => 'enable',
+			)
+		);
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'invalid_nonce', $result->get_error_code() );
+		$this->assertSame( '', get_post_meta( $post_id, LiveblogConfiguration::KEY, true ) );
+	}
+
+	/**
+	 * A valid nonce from a user who cannot edit the target post is still
+	 * rejected by the post-scoped capability check, and the state is unchanged.
+	 */
+	public function test_process_state_change_rejects_non_owner(): void {
+		$owner_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id  = self::factory()->post->create( array( 'post_author' => $owner_id ) );
+
+		$attacker_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $attacker_id );
+
+		$result = Container::instance()->admin_controller()->process_state_change(
+			array(
+				LiveblogConfiguration::NONCE_KEY => wp_create_nonce( LiveblogConfiguration::NONCE_ACTION ),
+				'post_id'                        => $post_id,
+				'state'                          => 'enable',
+			)
+		);
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'unauthorized', $result->get_error_code() );
+		$this->assertSame( '', get_post_meta( $post_id, LiveblogConfiguration::KEY, true ) );
 	}
 }

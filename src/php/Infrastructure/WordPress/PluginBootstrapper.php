@@ -554,33 +554,10 @@ final class PluginBootstrapper {
 		// Add meta box.
 		add_action( 'add_meta_boxes', array( $admin_controller, 'add_meta_box' ) );
 
-		// Handle AJAX state change.
+		// Handle AJAX state change (fallback when the REST API is unavailable).
 		add_action(
 			'wp_ajax_set_liveblog_state_for_post',
-			function () use ( $admin_controller ) {
-				// Verify nonce first.
-				$nonce = isset( $_REQUEST['_ajax_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
-					? sanitize_text_field( wp_unslash( $_REQUEST['_ajax_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					: '';
-
-				if ( ! wp_verify_nonce( $nonce, 'liveblog_admin_nonce' ) ) {
-					wp_send_json_error( 'Invalid nonce' );
-				}
-
-				// Now safe to access other request data.
-				$post_id   = isset( $_REQUEST['post_id'] ) ? (int) $_REQUEST['post_id'] : 0;
-				$new_state = isset( $_REQUEST['state'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['state'] ) ) : '';
-
-				if ( ! AdminController::current_user_can_edit_for_post( $post_id ) ) {
-					wp_send_json_error( 'Unauthorized' );
-				}
-
-				$result = $admin_controller->set_liveblog_state( $post_id, $new_state, $_REQUEST );
-				if ( false === $result ) {
-					wp_send_json_error( 'Failed to update state' );
-				}
-				wp_send_json_success( $result );
-			}
+			array( $admin_controller, 'handle_state_change_ajax' )
 		);
 
 		// Admin list filters.

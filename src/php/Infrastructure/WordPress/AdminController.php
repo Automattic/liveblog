@@ -11,6 +11,7 @@ namespace Automattic\Liveblog\Infrastructure\WordPress;
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
+use WP_Error;
 use WP_Post;
 use WP_Query;
 
@@ -181,6 +182,70 @@ final class AdminController {
 		}
 
 		return $this->get_meta_box_content( $post );
+	}
+
+	/**
+	 * Handle the admin-ajax liveblog state change request.
+	 *
+	 * Thin wrapper around {@see process_state_change()} that adapts the request
+	 * superglobal and the result to an admin-ajax JSON response. Fallback for
+	 * environments without the REST API.
+	 *
+	 * @return void
+	 */
+	public function handle_state_change_ajax(): void {
+		// Nonce and capability are verified inside process_state_change(); the
+		// whole request is forwarded so no single key is read here.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified in process_state_change().
+		$result = $this->process_state_change( (array) wp_unslash( $_REQUEST ) );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result->get_error_message() );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * Validate and apply an admin-ajax liveblog state change.
+	 *
+	 * Verifies the nonce the editor client actually sends — the `NONCE_KEY`
+	 * (`_wpnonce`) request value carrying a `NONCE_ACTION` (`wp_rest`) nonce, as
+	 * localised by AssetManager and the same nonce the REST path uses — then
+	 * re-checks `edit_post` on the target post before changing its state.
+	 *
+	 * The flow takes the request data as an argument (rather than reading the
+	 * superglobal) so it is testable without the ajax response/die machinery, and
+	 * so the nonce contract cannot silently drift from the client again. The
+	 * previous handler verified a key/action (`_ajax_nonce` / `liveblog_admin_nonce`)
+	 * that the client never sends, so the fallback always failed the nonce check.
+	 *
+	 * @param array $request The unslashed request data.
+	 * @return string|WP_Error The meta box markup on success, or a WP_Error.
+	 */
+	public function process_state_change( array $request ) {
+		$nonce = isset( $request[ LiveblogConfiguration::NONCE_KEY ] )
+			? sanitize_text_field( (string) $request[ LiveblogConfiguration::NONCE_KEY ] )
+			: '';
+
+		if ( ! wp_verify_nonce( $nonce, LiveblogConfiguration::NONCE_ACTION ) ) {
+			return new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'liveblog' ) );
+		}
+
+		$post_id = isset( $request['post_id'] ) ? (int) $request['post_id'] : 0;
+
+		if ( ! self::current_user_can_edit_for_post( $post_id ) ) {
+			return new WP_Error( 'unauthorized', __( 'Unauthorized', 'liveblog' ) );
+		}
+
+		$new_state = isset( $request['state'] ) ? sanitize_text_field( (string) $request['state'] ) : '';
+
+		$result = $this->set_liveblog_state( $post_id, $new_state, $request );
+		if ( false === $result ) {
+			return new WP_Error( 'update_failed', __( 'Failed to update state', 'liveblog' ) );
+		}
+
+		return $result;
 	}
 
 	/**
