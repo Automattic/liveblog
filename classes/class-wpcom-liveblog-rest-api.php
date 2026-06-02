@@ -556,7 +556,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 		$args = array(
 			'post_id'         => $post_id,
-			'content'         => self::get_json_param( 'content', $json ),
+			'content'         => self::coerce_content_to_string( self::get_json_param( 'content', $json ) ),
 			'entry_id'        => self::get_json_param( 'entry_id', $json ),
 			'author_id'       => self::get_json_param( 'author_id', $json ),
 			'contributor_ids' => self::get_json_param( 'contributor_ids', $json ),
@@ -635,7 +635,7 @@ class WPCOM_Liveblog_Rest_Api {
 		// permission callback so a body/query value cannot change the post context.
 		$post_id       = self::get_authorised_post_id( $request );
 		$json          = $request->get_json_params();
-		$entry_content = self::get_json_param( 'entry_content', $json );
+		$entry_content = self::coerce_content_to_string( self::get_json_param( 'entry_content', $json ) );
 
 		self::set_liveblog_vars( $post_id );
 
@@ -847,5 +847,23 @@ class WPCOM_Liveblog_Rest_Api {
 			return $json[ $param ];
 		}
 		return false;
+	}
+
+	/**
+	 * Coerce a free-form entry content value from the JSON body to a string.
+	 *
+	 * The `content` and `entry_content` parameters are read straight from the
+	 * decoded JSON body, which can supply an array or object. Such a value would
+	 * otherwise flow unchanged into `wp_filter_post_kses()` and raise a TypeError
+	 * (HTTP 500) on PHP 8. Casting non-scalars to an empty string mirrors the
+	 * coercion the legacy admin-ajax path performs via `sanitize_text_field()`,
+	 * so both entry points behave the same. A missing value (`get_json_param()`
+	 * returns false) likewise becomes an empty string.
+	 *
+	 * @param mixed $content The raw content value from the JSON body.
+	 * @return string The content as a string.
+	 */
+	private static function coerce_content_to_string( $content ) {
+		return is_scalar( $content ) ? (string) $content : '';
 	}
 }
