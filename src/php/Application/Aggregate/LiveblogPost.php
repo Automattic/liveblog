@@ -1,23 +1,26 @@
 <?php
 /**
- * LiveblogPost entity representing a post with liveblog functionality.
+ * LiveblogPost aggregate representing a post with liveblog functionality.
  *
- * @package Automattic\Liveblog\Domain\Entity
+ * @package Automattic\Liveblog\Application\Aggregate
  */
 
 declare( strict_types=1 );
 
-namespace Automattic\Liveblog\Domain\Entity;
+namespace Automattic\Liveblog\Application\Aggregate;
 
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use DateTimeImmutable;
 use WP_Post;
 
 /**
- * Domain entity wrapping WP_Post with liveblog-specific behaviour.
+ * Aggregate wrapping WP_Post with liveblog-specific state and behaviour.
  *
- * Encapsulates the liveblog state and operations for a WordPress post,
- * providing a clean domain interface for working with liveblog posts.
+ * Encapsulates the liveblog state and operations for a WordPress post.
+ * Lives in the Application layer because state and capability checks are
+ * read and written through WordPress functions (post meta, post type
+ * support, capability checks). Pure persistence-agnostic types belong in
+ * the Domain layer; this aggregate is intentionally WordPress-aware.
  */
 final class LiveblogPost {
 

@@ -13,11 +13,12 @@ use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Filter\AuthorFilter;
 use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -92,6 +93,13 @@ final class RestApiController {
 	private AdminController $admin_controller;
 
 	/**
+	 * Content renderer used by the entry presenter.
+	 *
+	 * @var ContentRendererInterface
+	 */
+	private ContentRendererInterface $content_renderer;
+
+	/**
 	 * Current post ID for the request.
 	 *
 	 * @var int
@@ -101,24 +109,27 @@ final class RestApiController {
 	/**
 	 * Constructor.
 	 *
-	 * @param EntryQueryService $query_service     Entry query service.
-	 * @param EntryOperations   $entry_operations  Entry operations service.
-	 * @param KeyEventService   $key_event_service Key event service.
-	 * @param RequestRouter     $request_router    Request router.
-	 * @param AdminController   $admin_controller  Admin controller.
+	 * @param EntryQueryService        $query_service     Entry query service.
+	 * @param EntryOperations          $entry_operations  Entry operations service.
+	 * @param KeyEventService          $key_event_service Key event service.
+	 * @param RequestRouter            $request_router    Request router.
+	 * @param AdminController          $admin_controller  Admin controller.
+	 * @param ContentRendererInterface $content_renderer  Content renderer used by the entry presenter.
 	 */
 	public function __construct(
 		EntryQueryService $query_service,
 		EntryOperations $entry_operations,
 		KeyEventService $key_event_service,
 		RequestRouter $request_router,
-		AdminController $admin_controller
+		AdminController $admin_controller,
+		ContentRendererInterface $content_renderer
 	) {
 		$this->query_service     = $query_service;
 		$this->entry_operations  = $entry_operations;
 		$this->key_event_service = $key_event_service;
 		$this->request_router    = $request_router;
 		$this->admin_controller  = $admin_controller;
+		$this->content_renderer  = $content_renderer;
 		$this->api_namespace     = 'liveblog/v' . self::API_VERSION;
 	}
 
@@ -730,7 +741,7 @@ final class RestApiController {
 
 		foreach ( $entries as $entry ) {
 			if ( $entry instanceof Entry ) {
-				$presenter          = EntryPresenter::from_entry( $entry, $this->key_event_service );
+				$presenter          = EntryPresenter::from_entry( $entry, $this->key_event_service, $this->content_renderer );
 				$entries_for_json[] = $presenter->for_json();
 			}
 		}

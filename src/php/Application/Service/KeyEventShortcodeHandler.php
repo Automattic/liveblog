@@ -10,8 +10,8 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Application\Service;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
-use Automattic\Liveblog\Infrastructure\DI\Container;
+use Automattic\Liveblog\Application\Renderer\TemplateRendererInterface;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 
 /**
  * Handles the [liveblog_key_events] shortcode.
@@ -35,17 +35,27 @@ final class KeyEventShortcodeHandler {
 	private KeyEventConfiguration $configuration;
 
 	/**
+	 * Template renderer.
+	 *
+	 * @var TemplateRendererInterface
+	 */
+	private TemplateRendererInterface $template_renderer;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param KeyEventService       $key_event_service The key event service.
-	 * @param KeyEventConfiguration $configuration     The configuration.
+	 * @param KeyEventService           $key_event_service The key event service.
+	 * @param KeyEventConfiguration     $configuration     The configuration.
+	 * @param TemplateRendererInterface $template_renderer The template renderer.
 	 */
 	public function __construct(
 		KeyEventService $key_event_service,
-		KeyEventConfiguration $configuration
+		KeyEventConfiguration $configuration,
+		TemplateRendererInterface $template_renderer
 	) {
 		$this->key_event_service = $key_event_service;
 		$this->configuration     = $configuration;
+		$this->template_renderer = $template_renderer;
 	}
 
 	/**
@@ -90,7 +100,7 @@ final class KeyEventShortcodeHandler {
 
 		// Render using the existing template system.
 		// Note: The template renders a container div; key events are loaded via JS.
-		return Container::instance()->template_renderer()->render(
+		return $this->template_renderer->render(
 			'liveblog-key-events.php',
 			array(
 				'title'    => $atts['title'],
@@ -108,7 +118,7 @@ final class KeyEventShortcodeHandler {
 	 * @return string The admin options HTML.
 	 */
 	public function get_admin_options( int $post_id ): string {
-		return Container::instance()->template_renderer()->render(
+		return $this->template_renderer->render(
 			'liveblog-key-admin.php',
 			array(
 				'current_key_template' => get_post_meta( $post_id, KeyEventConfiguration::META_KEY_TEMPLATE, true ),

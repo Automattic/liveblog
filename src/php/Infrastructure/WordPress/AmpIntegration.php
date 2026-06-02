@@ -13,7 +13,7 @@ use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Presenter\MetadataPresenter;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use WP_Post;
 
 /**

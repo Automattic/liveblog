@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Infrastructure\DI;
 
 use Automattic\Liveblog\Application\Config\KeyEventConfiguration;
+use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Filter\ContentFilterRegistry;
 use Automattic\Liveblog\Application\Presenter\MetadataPresenter;
@@ -209,6 +210,13 @@ final class Container {
 	 * @var SocketioManager|null
 	 */
 	private ?SocketioManager $socketio_manager = null;
+
+	/**
+	 * Cached lazyload configuration instance.
+	 *
+	 * @var LazyloadConfiguration|null
+	 */
+	private ?LazyloadConfiguration $lazyload_configuration = null;
 
 	/**
 	 * Private constructor to enforce singleton.
@@ -434,11 +442,29 @@ final class Container {
 		if ( null === $this->key_event_shortcode_handler ) {
 			$this->key_event_shortcode_handler = new KeyEventShortcodeHandler(
 				$this->key_event_service(),
-				new KeyEventConfiguration()
+				new KeyEventConfiguration(),
+				$this->template_renderer()
 			);
 		}
 
 		return $this->key_event_shortcode_handler;
+	}
+
+	/**
+	 * Get the lazyload configuration.
+	 *
+	 * @return LazyloadConfiguration
+	 */
+	public function lazyload_configuration(): LazyloadConfiguration {
+		if ( isset( $this->overrides['lazyload_configuration'] ) ) {
+			return ( $this->overrides['lazyload_configuration'] )();
+		}
+
+		if ( null === $this->lazyload_configuration ) {
+			$this->lazyload_configuration = new LazyloadConfiguration();
+		}
+
+		return $this->lazyload_configuration;
 	}
 
 	/**
@@ -493,7 +519,8 @@ final class Container {
 				$this->entry_service(),
 				$this->key_event_service(),
 				$this->entry_repository(),
-				$this->content_processor()
+				$this->content_processor(),
+				$this->content_renderer()
 			);
 		}
 
@@ -516,7 +543,8 @@ final class Container {
 				$this->entry_operations(),
 				$this->key_event_service(),
 				$this->request_router(),
-				$this->admin_controller()
+				$this->admin_controller(),
+				$this->content_renderer()
 			);
 		}
 
@@ -596,7 +624,9 @@ final class Container {
 		if ( null === $this->metadata_presenter ) {
 			$this->metadata_presenter = new MetadataPresenter(
 				$this->entry_query_service(),
-				$this->key_event_service()
+				$this->key_event_service(),
+				$this->content_renderer(),
+				$this->lazyload_configuration()
 			);
 		}
 
@@ -617,7 +647,8 @@ final class Container {
 			$this->request_router = new RequestRouter(
 				$this->entry_query_service(),
 				$this->entry_operations(),
-				$this->key_event_service()
+				$this->key_event_service(),
+				$this->content_renderer()
 			);
 		}
 

@@ -13,8 +13,7 @@ use Automattic\Liveblog\Application\Config\AllowedTagsConfiguration;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\KeyEventService;
 use Automattic\Liveblog\Domain\Entity\Entry;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
-use Automattic\Liveblog\Infrastructure\DI\Container;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use WP_Comment;
 
 /**
@@ -68,38 +67,44 @@ final class EntryPresenter {
 	/**
 	 * Constructor.
 	 *
-	 * @param Entry                         $entry             The entry to present.
-	 * @param KeyEventService               $key_event_service Service for key event operations.
-	 * @param WP_Comment|null               $comment           Optional comment for additional WordPress data.
-	 * @param ContentRendererInterface|null $renderer          Optional content renderer (defaults to container renderer).
+	 * @param Entry                    $entry             The entry to present.
+	 * @param KeyEventService          $key_event_service Service for key event operations.
+	 * @param ContentRendererInterface $renderer          Content renderer for transforming raw content to HTML.
+	 * @param WP_Comment|null          $comment           Optional comment for additional WordPress data.
 	 */
 	public function __construct(
 		Entry $entry,
 		KeyEventService $key_event_service,
-		?WP_Comment $comment = null,
-		?ContentRendererInterface $renderer = null
+		ContentRendererInterface $renderer,
+		?WP_Comment $comment = null
 	) {
 		$this->entry             = $entry;
 		$this->key_event_service = $key_event_service;
+		$this->renderer          = $renderer;
 		$this->comment           = $comment;
-		$this->renderer          = $renderer ?? Container::instance()->content_renderer();
 	}
 
 	/**
 	 * Create a presenter from an Entry.
 	 *
-	 * Fetches the comment automatically and uses the default WordPress renderer.
+	 * Fetches the comment automatically.
 	 *
-	 * @param Entry           $entry             The entry to present.
-	 * @param KeyEventService $key_event_service Service for key event operations.
+	 * @param Entry                    $entry             The entry to present.
+	 * @param KeyEventService          $key_event_service Service for key event operations.
+	 * @param ContentRendererInterface $renderer          Content renderer for transforming raw content to HTML.
 	 * @return self
 	 */
-	public static function from_entry( Entry $entry, KeyEventService $key_event_service ): self {
+	public static function from_entry(
+		Entry $entry,
+		KeyEventService $key_event_service,
+		ContentRendererInterface $renderer
+	): self {
 		$comment = get_comment( $entry->id()->to_int() );
 
 		return new self(
 			$entry,
 			$key_event_service,
+			$renderer,
 			$comment instanceof WP_Comment ? $comment : null
 		);
 	}
@@ -171,15 +176,6 @@ final class EntryPresenter {
 			'is_liveblog_editable'   => self::is_liveblog_editable( $this->entry->post_id() ),
 			'allowed_tags_for_entry' => AllowedTagsConfiguration::get(),
 		);
-	}
-
-	/**
-	 * Render the entry to HTML using the template.
-	 *
-	 * @return string
-	 */
-	public function render(): string {
-		return Container::instance()->template_renderer()->render( 'liveblog-single-entry.php', $this->for_render() );
 	}
 
 	/**

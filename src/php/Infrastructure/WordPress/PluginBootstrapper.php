@@ -19,7 +19,7 @@ use Automattic\Liveblog\Application\Filter\HashtagFilter;
 use Automattic\Liveblog\Application\Service\ArchiveRepairService;
 use Automattic\Liveblog\Application\Service\ShortcodeFilter;
 use Automattic\Liveblog\Domain\Entity\Entry;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use Automattic\Liveblog\Infrastructure\CLI\AddCommand;
 use Automattic\Liveblog\Infrastructure\CLI\ArchiveCommand;
 use Automattic\Liveblog\Infrastructure\CLI\ArchiveOldCommand;
@@ -425,11 +425,44 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_lazyload(): void {
-		// Create configuration directly - it just reads options, no dependencies.
-		$configuration = new LazyloadConfiguration();
+		add_action(
+			'template_redirect',
+			function () {
+				$this->handle_deprecated_lazyload_plugin();
+				$this->container->lazyload_configuration()->initialize();
+			}
+		);
+	}
 
-		// Initialize on template_redirect when liveblog state is available.
-		add_action( 'template_redirect', array( $configuration, 'initialize' ) );
+	/**
+	 * Disable the deprecated Lazyload Liveblog Entries plugin and surface a notice.
+	 *
+	 * The standalone plugin is now superseded by built-in lazyload support, so we
+	 * unhook its `init` callback and prompt admins to remove it.
+	 *
+	 * @return void
+	 */
+	private function handle_deprecated_lazyload_plugin(): void {
+		if ( ! has_action( 'init', 'Lazyload_Liveblog_Entries' ) ) {
+			return;
+		}
+
+		if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
+			$template_renderer = $this->container->template_renderer();
+			add_action(
+				'admin_notices',
+				static function () use ( $template_renderer ) {
+					echo wp_kses_post(
+						$template_renderer->render(
+							'lazyload-notice.php',
+							array( 'plugin' => 'Lazyload Liveblog Entries' )
+						)
+					);
+				}
+			);
+		}
+
+		remove_action( 'init', 'Lazyload_Liveblog_Entries' );
 	}
 
 	/**

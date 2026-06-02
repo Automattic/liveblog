@@ -9,8 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\Liveblog\Application\Config;
 
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
-use Automattic\Liveblog\Infrastructure\DI\Container;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 
 /**
  * Configuration for lazy loading liveblog entries.
@@ -140,8 +139,6 @@ final class LazyloadConfiguration {
 	 * @return void
 	 */
 	public function initialize(): void {
-		$this->check_deprecated_plugin();
-
 		if ( ! $this->is_enabled() ) {
 			return;
 		}
@@ -159,40 +156,6 @@ final class LazyloadConfiguration {
 		$args['number'] = $this->get_initial_entries();
 
 		return $args;
-	}
-
-	/**
-	 * Check for and disable the deprecated Lazyload Liveblog Entries plugin.
-	 *
-	 * @return void
-	 */
-	private function check_deprecated_plugin(): void {
-		if ( ! has_action( 'init', 'Lazyload_Liveblog_Entries' ) ) {
-			return;
-		}
-
-		if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
-			add_action( 'admin_notices', array( $this, 'render_deprecated_plugin_notice' ) );
-		}
-
-		// Disable the deprecated plugin.
-		remove_action( 'init', 'Lazyload_Liveblog_Entries' );
-	}
-
-	/**
-	 * Render the admin notice for deprecated plugin.
-	 *
-	 * @return void
-	 */
-	public function render_deprecated_plugin_notice(): void {
-		echo wp_kses_post(
-			Container::instance()->template_renderer()->render(
-				'lazyload-notice.php',
-				array(
-					'plugin' => 'Lazyload Liveblog Entries',
-				)
-			)
-		);
 	}
 
 	/**

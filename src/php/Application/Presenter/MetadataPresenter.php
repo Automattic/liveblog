@@ -10,9 +10,10 @@ declare( strict_types=1 );
 namespace Automattic\Liveblog\Application\Presenter;
 
 use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
+use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\KeyEventService;
-use Automattic\Liveblog\Domain\Entity\LiveblogPost;
+use Automattic\Liveblog\Application\Aggregate\LiveblogPost;
 use WP_Post;
 
 /**
@@ -39,17 +40,37 @@ final class MetadataPresenter {
 	private KeyEventService $key_event_service;
 
 	/**
+	 * Content renderer.
+	 *
+	 * @var ContentRendererInterface
+	 */
+	private ContentRendererInterface $content_renderer;
+
+	/**
+	 * Lazyload configuration.
+	 *
+	 * @var LazyloadConfiguration
+	 */
+	private LazyloadConfiguration $lazyload_configuration;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param EntryQueryService $entry_query_service Entry query service.
-	 * @param KeyEventService   $key_event_service   Key event service.
+	 * @param EntryQueryService        $entry_query_service    Entry query service.
+	 * @param KeyEventService          $key_event_service      Key event service.
+	 * @param ContentRendererInterface $content_renderer       Content renderer used by the entry presenter.
+	 * @param LazyloadConfiguration    $lazyload_configuration Lazyload configuration.
 	 */
 	public function __construct(
 		EntryQueryService $entry_query_service,
-		KeyEventService $key_event_service
+		KeyEventService $key_event_service,
+		ContentRendererInterface $content_renderer,
+		LazyloadConfiguration $lazyload_configuration
 	) {
-		$this->entry_query_service = $entry_query_service;
-		$this->key_event_service   = $key_event_service;
+		$this->entry_query_service    = $entry_query_service;
+		$this->key_event_service      = $key_event_service;
+		$this->content_renderer       = $content_renderer;
+		$this->lazyload_configuration = $lazyload_configuration;
 	}
 
 	/**
@@ -135,8 +156,7 @@ final class MetadataPresenter {
 	 */
 	private function get_paginated_entries( int $post_id ): array {
 		$request_data = $this->get_request_data();
-		$lazyload     = new LazyloadConfiguration();
-		$per_page     = $lazyload->get_entries_per_page();
+		$per_page     = $this->lazyload_configuration->get_entries_per_page();
 
 		$result = $this->entry_query_service->get_entries_paged(
 			$post_id,
@@ -149,7 +169,7 @@ final class MetadataPresenter {
 		$entries_for_json = array();
 
 		foreach ( $result['entries'] as $entry ) {
-			$presenter          = EntryPresenter::from_entry( $entry, $this->key_event_service );
+			$presenter          = EntryPresenter::from_entry( $entry, $this->key_event_service, $this->content_renderer );
 			$entries_for_json[] = $presenter->for_json();
 		}
 
