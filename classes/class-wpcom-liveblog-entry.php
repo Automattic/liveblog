@@ -403,6 +403,11 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
+		$entry_post_check = self::validate_entry_belongs_to_post( $args );
+		if ( is_wp_error( $entry_post_check ) ) {
+			return $entry_post_check;
+		}
+
 		// Always use the original author for the update entry, otherwise until refresh
 		// users will see the user who edited the entry as the author.
 		$args['user'] = self::user_object_from_comment_id( $args['entry_id'] );
@@ -447,6 +452,12 @@ class WPCOM_Liveblog_Entry {
 		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
+
+		$entry_post_check = self::validate_entry_belongs_to_post( $args );
+		if ( is_wp_error( $entry_post_check ) ) {
+			return $entry_post_check;
+		}
+
 		$args['content'] = '';
 		$comment         = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -485,10 +496,52 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
+		// Guard before remove_key_action() runs: it deletes comment meta on the
+		// referenced entry, so the post-binding check must happen first.
+		$entry_post_check = self::validate_entry_belongs_to_post( $args );
+		if ( is_wp_error( $entry_post_check ) ) {
+			return $entry_post_check;
+		}
+
 		$args['content'] = WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
 
 		$entry = self::update( $args );
 		return $entry;
+	}
+
+	/**
+	 * Verify that the entry being mutated belongs to the authorised post.
+	 *
+	 * The CRUD entry points authorise the caller against the post id taken from
+	 * the route URL (REST) or the permalink (admin-ajax), but the entry id
+	 * arrives separately in the request body and is not re-validated against
+	 * that post. Without binding the two together, a caller authorised to edit
+	 * their own liveblog can pass the entry id of an entry belonging to another
+	 * user's post and have the update/delete sink mutate it (CWE-639 IDOR,
+	 * HackerOne #3742849, an incomplete-fix follow-up to the 1.12.0 post-scoped
+	 * authorisation work).
+	 *
+	 * The entry must exist, be a liveblog entry (so the endpoint cannot be used
+	 * to trash arbitrary non-liveblog comments), and be attached to the
+	 * authorised post. The error message is deliberately generic so the endpoint
+	 * cannot be used to probe for entries on other posts.
+	 *
+	 * @param array $args The entry properties. Requires `entry_id` and `post_id`.
+	 * @return true|WP_Error True when the entry belongs to the post, otherwise an error.
+	 */
+	private static function validate_entry_belongs_to_post( $args ) {
+		$post_id = isset( $args['post_id'] ) ? (int) $args['post_id'] : 0;
+		$comment = get_comment( $args['entry_id'] );
+
+		if (
+			$comment instanceof WP_Comment
+			&& 'liveblog' === $comment->comment_type
+			&& (int) $comment->comment_post_ID === $post_id
+		) {
+			return true;
+		}
+
+		return new WP_Error( 'entry-not-found', __( 'Entry not found in this liveblog.', 'liveblog' ) );
 	}
 
 	/**
