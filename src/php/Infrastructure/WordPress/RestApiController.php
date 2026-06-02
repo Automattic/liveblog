@@ -134,22 +134,6 @@ final class RestApiController {
 	}
 
 	/**
-	 * Check if the current user can edit the liveblog.
-	 *
-	 * Static method for REST API permission callbacks that have no post in the URL
-	 * (e.g. authors and hashtags autocomplete). Gates on the configured global
-	 * editor capability without any post context.
-	 *
-	 * @return bool True if the current user can edit.
-	 */
-	public static function current_user_can_edit_liveblog(): bool {
-		$cap    = LiveblogConfiguration::get_edit_capability();
-		$retval = current_user_can( $cap );
-
-		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
-	}
-
-	/**
 	 * Permission callback for REST write routes that target a specific post.
 	 *
 	 * The CRUD, preview and post_state routes all live under
@@ -381,30 +365,34 @@ final class RestApiController {
 			)
 		);
 
-		// Authors autocomplete.
+		// Authors autocomplete. Post-scoped so the permission check can require
+		// `edit_post` on the target post rather than a global capability that any
+		// `publish_posts` holder satisfies (CWE-863 user enumeration).
 		register_rest_route(
 			$this->api_namespace,
-			'/authors([/]*)(?P<term>.*)',
+			'/(?P<post_id>\d+)/authors([/]*)(?P<term>.*)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_authors' ),
-				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
-					'term' => array( 'required' => false ),
+					'post_id' => array( 'required' => true ),
+					'term'    => array( 'required' => false ),
 				),
 			)
 		);
 
-		// Hashtags autocomplete.
+		// Hashtags autocomplete. Post-scoped for the same reason as the authors route.
 		register_rest_route(
 			$this->api_namespace,
-			'/hashtags([/]*)(?P<term>.*)',
+			'/(?P<post_id>\d+)/hashtags([/]*)(?P<term>.*)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_hashtag_terms' ),
-				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog' ),
+				'permission_callback' => array( self::class, 'current_user_can_edit_liveblog_for_request' ),
 				'args'                => array(
-					'term' => array( 'required' => false ),
+					'post_id' => array( 'required' => true ),
+					'term'    => array( 'required' => false ),
 				),
 			)
 		);
