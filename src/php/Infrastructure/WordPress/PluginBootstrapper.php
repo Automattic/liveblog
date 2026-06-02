@@ -425,10 +425,18 @@ final class PluginBootstrapper {
 	 * @return void
 	 */
 	private function init_lazyload(): void {
+		// Disable the deprecated standalone Lazyload Liveblog Entries plugin early
+		// on init, before its own (default-priority) callback fires. This cannot
+		// sit on template_redirect: that hook is front-end only, so is_admin() is
+		// always false there (the admin notice never shows) and it runs after init
+		// (too late to unhook the deprecated plugin).
+		add_action( 'init', array( $this, 'handle_deprecated_lazyload_plugin' ), 0 );
+
+		// Initialise lazyload config on template_redirect, once the liveblog query
+		// state is available.
 		add_action(
 			'template_redirect',
 			function () {
-				$this->handle_deprecated_lazyload_plugin();
 				$this->container->lazyload_configuration()->initialize();
 			}
 		);
@@ -437,12 +445,14 @@ final class PluginBootstrapper {
 	/**
 	 * Disable the deprecated Lazyload Liveblog Entries plugin and surface a notice.
 	 *
-	 * The standalone plugin is now superseded by built-in lazyload support, so we
-	 * unhook its `init` callback and prompt admins to remove it.
+	 * Runs early on `init` (priority 0) so the deprecated plugin's own init
+	 * callback is unhooked before it fires, and so the admin notice is evaluated
+	 * in admin context. The standalone plugin is superseded by built-in lazyload
+	 * support. Public because it is registered as an `init` hook callback.
 	 *
 	 * @return void
 	 */
-	private function handle_deprecated_lazyload_plugin(): void {
+	public function handle_deprecated_lazyload_plugin(): void {
 		if ( ! has_action( 'init', 'Lazyload_Liveblog_Entries' ) ) {
 			return;
 		}
