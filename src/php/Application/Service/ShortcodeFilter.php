@@ -53,15 +53,28 @@ final class ShortcodeFilter {
 			self::DEFAULT_RESTRICTED_SHORTCODES
 		);
 
-		// For each lookup key, check if it exists in the content.
+		// Strip every restricted shortcode, re-applying the whole set until the
+		// content stabilises. A single pass is bypassable by nesting a restricted
+		// shortcode inside fragments of a tag name, so that removing the inner
+		// match reconstructs a working shortcode. That happens both within one tag
+		// (`[liveblog_key[liveblog_key_events]_events]` -> `[liveblog_key_events]`)
+		// and across tags when more than one is restricted (removing `[embed]`
+		// from `[gall[embed]ery]` reconstructs `[gallery]`). Looping the whole set
+		// rather than each tag in isolation removes the order dependence between
+		// tags. The loop only continues while the content strictly shrinks, so a
+		// replacement that is the same length or longer than the match (an unusual
+		// configuration) cannot make it spin.
 		if ( is_array( $restricted_shortcodes ) ) {
-			foreach ( $restricted_shortcodes as $shortcode => $replacement ) {
-				// Regex pattern will match all shortcode formats.
-				$pattern = get_shortcode_regex( array( $shortcode ) );
+			do {
+				$previous = $args['content'];
 
-				// Replace matches with the configured replacement string.
-				$args['content'] = preg_replace( '/' . $pattern . '/s', $replacement, $args['content'] );
-			}
+				foreach ( $restricted_shortcodes as $shortcode => $replacement ) {
+					$pattern         = '/' . get_shortcode_regex( array( $shortcode ) ) . '/s';
+					$args['content'] = preg_replace( $pattern, $replacement, $args['content'] );
+				}
+
+				$shrank = ( null !== $args['content'] && strlen( $args['content'] ) < strlen( $previous ) );
+			} while ( $shrank );
 		}
 
 		return $args;

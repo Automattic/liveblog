@@ -55,6 +55,39 @@ final class ExtendFeatureAuthorsTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * The author autocomplete must not match the search term against user_email.
+	 *
+	 * Without an explicit search_columns, WP_User_Query searches user_email when
+	 * the term contains an '@', turning the picker into a blind email-existence
+	 * oracle for users holding `edit_posts` (CWE-203). An email-prefix search must
+	 * therefore return nothing, while a nicename / display-name search must still
+	 * resolve the user.
+	 *
+	 * @covers \Automattic\Liveblog\Application\Filter\AuthorFilter::get_authors()
+	 */
+	public function test_get_authors_does_not_match_on_email(): void {
+		$user_id = self::factory()->user->create(
+			array(
+				'role'          => 'author',
+				'user_login'    => 'liveblogeditor',
+				'user_email'    => 'secret.address@example.com',
+				'display_name'  => 'Liveblog Editor',
+				'user_nicename' => 'liveblog-editor',
+			)
+		);
+
+		$filter = new AuthorFilter();
+
+		// An email-prefix search must not reveal the user.
+		$by_email = array_map( 'intval', wp_list_pluck( $filter->get_authors( 'secret.address@example' ), 'id' ) );
+		$this->assertNotContains( (int) $user_id, $by_email, 'Author autocomplete must not match on user_email.' );
+
+		// A legitimate nicename / display-name search must still find the user.
+		$by_name = array_map( 'intval', wp_list_pluck( $filter->get_authors( 'liveblog' ), 'id' ) );
+		$this->assertContains( (int) $user_id, $by_name, 'Author autocomplete should still match on nicename and display name.' );
+	}
+
+	/**
 	 * Defines a test filter to check filters are being executed correctly.
 	 *
 	 * @param mixed $example The example value.
