@@ -3,7 +3,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.12.0
+ * Version:     1.12.1
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
@@ -33,7 +33,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 *
 		 * @var string
 		 */
-		const VERSION = '1.12.0';
+		const VERSION = '1.12.1';
 
 		/**
 		 * Rewrites version for flushing rewrite rules.
@@ -388,9 +388,12 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			add_filter( 'is_protected_meta', array( __CLASS__, 'protect_liveblog_meta_key' ), 10, 2 );
 
 			// Add In the Filter hooks to Strip any Restricted Shortcodes before a new post or updating a post.
-			// Called from the WPCOM_Liveblog_Entry Class.
+			// Called from the WPCOM_Liveblog_Entry Class. Preview is included so the
+			// rendered preview matches what would be stored, and so the restriction
+			// cannot be sidestepped by rendering through the preview endpoint.
 			add_filter( 'liveblog_before_insert_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
 			add_filter( 'liveblog_before_update_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
+			add_filter( 'liveblog_before_preview_entry', array( 'WPCOM_Liveblog_Entry', 'handle_restricted_shortcodes' ), 10, 1 );
 
 			// We need to check the Liveblog autoarchive date on each time a new entry is added or updated to
 			// ensure we extend the date out correctly to the next archive point based on the configured offset.

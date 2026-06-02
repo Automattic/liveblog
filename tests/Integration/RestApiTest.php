@@ -1105,6 +1105,87 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * An Author authorised on their own liveblog must not update an entry that
+	 * belongs to another user's post by supplying that entry's id in the body.
+	 *
+	 * Covers HackerOne report #3742849 (CWE-639 IDOR): an incomplete-fix
+	 * follow-up to the 1.12.0 post-scoped authorisation. The permission check
+	 * passes against the attacker-owned URL post, but the entry id must still be
+	 * bound to that post before the update sink runs.
+	 */
+	public function test_endpoint_crud_update_denied_for_entry_on_another_post(): void {
+		// Victim post (owned by another author) with a seeded entry.
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+		$victim_entry     = $this->insert_entries( 1, array( 'post_id' => $victim_post_id ) )[0];
+		$victim_entry_id  = (int) $victim_entry->get_id();
+		$original_content = get_comment( $victim_entry_id )->comment_content;
+
+		// Attacker authorises against their own liveblog post.
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'crud_action' => 'update',
+					'entry_id'    => $victim_entry_id,
+					'content'     => 'Tampered by attacker.',
+				)
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		// The request must not succeed in mutating the victim entry.
+		$this->assertNotEquals( 200, $response->get_status() );
+
+		// The victim entry content is unchanged and it has not been replaced.
+		$this->assertEquals( $original_content, get_comment( $victim_entry_id )->comment_content );
+		$replacements = get_comments(
+			array(
+				'meta_key'   => WPCOM_Liveblog_Entry::REPLACES_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value' => $victim_entry_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+		$this->assertEmpty( $replacements, 'No replacement entry should have been created for the victim entry.' );
+	}
+
+	/**
+	 * An Author authorised on their own liveblog must not delete an entry that
+	 * belongs to another user's post by supplying that entry's id in the body.
+	 *
+	 * Covers HackerOne report #3742849 (CWE-639 IDOR).
+	 */
+	public function test_endpoint_crud_delete_denied_for_entry_on_another_post(): void {
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+		$victim_entry     = $this->insert_entries( 1, array( 'post_id' => $victim_post_id ) )[0];
+		$victim_entry_id  = (int) $victim_entry->get_id();
+
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'crud_action' => 'delete',
+					'entry_id'    => $victim_entry_id,
+				)
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		$this->assertNotEquals( 200, $response->get_status() );
+
+		// The victim entry must still be present and not trashed.
+		$this->assertNotEquals( 'trash', get_comment( $victim_entry_id )->comment_approved );
+	}
+
+	/**
 	 * The update_post_state route must be denied for an Author who does not own the post.
 	 */
 	public function test_endpoint_update_post_state_denied_for_non_owner_author(): void {
@@ -1126,6 +1207,79 @@ final class RestApiTest extends TestCase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 403, $response->get_status() );
+	}
+
+	/**
+	 * A request body `post_id` must not override the URL post_id for the
+	 * post_state route.
+	 *
+	 * The permission callback authorises against the URL post, so the state change
+	 * must land on that post — never on a victim post supplied in the request body
+	 * or query string. Covers a cross-post IDOR (CWE-639) analogous to HackerOne
+	 * #3742849: an Author authorised on their own liveblog could otherwise enable,
+	 * archive, or disable the liveblog on any post by passing its id in the body.
+	 */
+	public function test_endpoint_update_post_state_body_post_id_cannot_override_url(): void {
+		// Victim post owned by another author, with an enabled liveblog.
+		$victim_author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$victim_post_id   = $this->create_liveblog_post( array( 'post_author' => $victim_author_id ) );
+
+		// Attacker authorises against their own enabled liveblog post.
+		$attacker_id      = $this->set_author_user();
+		$attacker_post_id = $this->create_liveblog_post( array( 'post_author' => $attacker_id ) );
+
+		// URL path targets the attacker's own post (permission passes); the body
+		// tries to redirect the state change at the victim post.
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $attacker_post_id . '/post_state' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'post_id'         => $victim_post_id,
+				'state'           => 'archive',
+				'template_name'   => 'list',
+				'template_format' => 'full',
+				'limit'           => '5',
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		// The request is authorised against the attacker's own post, so it succeeds.
+		$this->assertEquals( 200, $response->get_status() );
+
+		// The victim's liveblog state is untouched (still 'enable', not 'archive').
+		$this->assertEquals( 'enable', get_post_meta( $victim_post_id, WPCOM_Liveblog::KEY, true ) );
+
+		// The state change landed on the URL post (the attacker's own post).
+		$this->assertEquals( 'archive', get_post_meta( $attacker_post_id, WPCOM_Liveblog::KEY, true ) );
+	}
+
+	/**
+	 * A non-string `content` value in the JSON body must be handled gracefully.
+	 *
+	 * The REST handlers read content straight from the decoded JSON body. An
+	 * array value would otherwise reach wp_filter_post_kses() unscalarised and
+	 * raise a PHP TypeError (HTTP 500) on PHP 8 (CWE-20). It must be coerced to a
+	 * string and the request handled without a server error.
+	 */
+	public function test_endpoint_crud_insert_with_array_content_does_not_error(): void {
+		$author_id = $this->set_author_user();
+		$post_id   = $this->create_liveblog_post( array( 'post_author' => $author_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'crud_action' => 'insert',
+					'content'     => array( '<p>array content</p>' ),
+				)
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		// The malformed content is coerced to a string rather than fatally
+		// erroring; the insert succeeds with empty content.
+		$this->assertEquals( 200, $response->get_status() );
 	}
 
 	/**

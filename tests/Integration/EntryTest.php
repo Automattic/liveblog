@@ -11,6 +11,7 @@ namespace Automattic\Liveblog\Tests\Integration;
 
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 use WPCOM_Liveblog_Entry;
+use WPCOM_Liveblog_Entry_Key_Events;
 use WPCOM_Liveblog_Entry_Query;
 use ReflectionProperty;
 
@@ -160,6 +161,103 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * The update() method must reject an entry that belongs to a different post.
+	 *
+	 * Defence-in-depth at the mutation sink for HackerOne #3742849 (CWE-639
+	 * IDOR): the CRUD permission check authorises a post id, but the entry id is
+	 * supplied separately and must be bound to that post before wp_update_comment()
+	 * runs.
+	 */
+	public function test_update_rejects_entry_belonging_to_another_post(): void {
+		$entry            = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id         = (int) $entry->get_id();
+		$original_content = get_comment( $entry_id )->comment_content;
+
+		$result = WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 200,
+					'entry_id' => $entry_id,
+					'content'  => 'tampered',
+				)
+			)
+		);
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertEquals( $original_content, get_comment( $entry_id )->comment_content );
+	}
+
+	/**
+	 * The delete() method must reject an entry that belongs to a different post.
+	 */
+	public function test_delete_rejects_entry_belonging_to_another_post(): void {
+		$entry    = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id = (int) $entry->get_id();
+
+		$result = WPCOM_Liveblog_Entry::delete(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 200,
+					'entry_id' => $entry_id,
+				)
+			)
+		);
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertNotEquals( 'trash', get_comment( $entry_id )->comment_approved );
+	}
+
+	/**
+	 * The delete_key() method must reject an entry that belongs to a different
+	 * post before it strips the key-event comment meta. remove_key_action()
+	 * mutates the referenced entry, so the post-binding guard has to run first.
+	 */
+	public function test_delete_key_rejects_entry_belonging_to_another_post(): void {
+		$entry    = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id = (int) $entry->get_id();
+		add_comment_meta( $entry_id, WPCOM_Liveblog_Entry_Key_Events::META_KEY, WPCOM_Liveblog_Entry_Key_Events::META_VALUE );
+
+		$result = WPCOM_Liveblog_Entry::delete_key(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 200,
+					'entry_id' => $entry_id,
+					'content'  => 'tampered',
+				)
+			)
+		);
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		// The key-event meta on the foreign entry must be untouched.
+		$this->assertEquals(
+			WPCOM_Liveblog_Entry_Key_Events::META_VALUE,
+			get_comment_meta( $entry_id, WPCOM_Liveblog_Entry_Key_Events::META_KEY, true )
+		);
+	}
+
+	/**
+	 * A legitimate update on an entry that belongs to the supplied post is
+	 * still allowed. Guards against the post-binding check over-reaching.
+	 */
+	public function test_update_allows_entry_belonging_to_the_same_post(): void {
+		$entry    = WPCOM_Liveblog_Entry::insert( $this->build_entry_args( array( 'post_id' => 100 ) ) );
+		$entry_id = (int) $entry->get_id();
+
+		$result = WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'post_id'  => 100,
+					'entry_id' => $entry_id,
+					'content'  => 'legitimately updated',
+				)
+			)
+		);
+
+		$this->assertInstanceOf( WPCOM_Liveblog_Entry::class, $result );
+		$this->assertEquals( 'legitimately updated', get_comment( $entry_id )->comment_content );
+	}
+
+	/**
 	 * Test that dangerous script tags are stripped by wp_filter_post_kses().
 	 */
 	public function test_user_input_sanity_check(): void {
@@ -217,6 +315,71 @@ final class EntryTest extends TestCase {
 			// Assert we have a match. If we do then the shortcode was successfully stripped.
 			$this->assertTrue( $check );
 		}
+	}
+
+	/**
+	 * Restricted shortcodes nested inside fragments of their own tag must be
+	 * stripped, not reconstructed.
+	 *
+	 * A single replacement pass is bypassable: removing the inner match from
+	 * `[liveblog_key[liveblog_key_events]_events]` leaves a working
+	 * `[liveblog_key_events]` behind, which `do_shortcode()` would then execute
+	 * at render time. The strip must repeat until no valid restricted shortcode
+	 * remains (CWE-94 via CWE-185).
+	 */
+	public function test_nested_restricted_shortcodes_are_fully_stripped(): void {
+		$key     = 'liveblog_key_events';
+		$pattern = '/' . get_shortcode_regex( array( $key ) ) . '/s';
+
+		$cases = array(
+			'[liveblog_key[liveblog_key_events]_events]',
+			'prefix [liveblog_key[liveblog_key_events]_events] suffix',
+			'[liveblog_key[liveblog_key[liveblog_key_events]_events]_events]',
+		);
+
+		foreach ( $cases as $input ) {
+			$result = WPCOM_Liveblog_Entry::handle_restricted_shortcodes( array( 'content' => $input ) );
+
+			$this->assertSame(
+				0,
+				preg_match( $pattern, $result['content'] ),
+				sprintf( 'A valid [%s] shortcode survived stripping of: %s', $key, $input )
+			);
+		}
+	}
+
+	/**
+	 * Removing one restricted shortcode must not reconstruct a different
+	 * restricted shortcode.
+	 *
+	 * When more than one shortcode is restricted, removing the inner one can
+	 * join the surrounding fragments into the other — e.g. stripping [embed]
+	 * from [gall[embed]ery] yields [gallery]. Stripping must therefore re-apply
+	 * the whole restricted set until the content stabilises, independently of the
+	 * order the tags appear in. The order here ('gallery' before 'embed') is the
+	 * one that a per-tag strip would fail to clean.
+	 */
+	public function test_cross_tag_restricted_shortcode_reconstruction_is_stripped(): void {
+		$original = WPCOM_Liveblog_Entry::$restricted_shortcodes;
+
+		$filter = static function () {
+			return array(
+				'gallery' => '',
+				'embed'   => '',
+			);
+		};
+		add_filter( 'liveblog_entry_restrict_shortcodes', $filter );
+
+		$result = WPCOM_Liveblog_Entry::handle_restricted_shortcodes( array( 'content' => 'before [gall[embed]ery] after' ) );
+
+		remove_filter( 'liveblog_entry_restrict_shortcodes', $filter );
+		WPCOM_Liveblog_Entry::$restricted_shortcodes = $original;
+
+		$this->assertSame(
+			0,
+			preg_match( '/' . get_shortcode_regex( array( 'gallery' ) ) . '/s', $result['content'] ),
+			'A restricted [gallery] reconstructed from a different restricted tag survived stripping.'
+		);
 	}
 
 	/**

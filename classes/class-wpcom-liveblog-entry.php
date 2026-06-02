@@ -403,6 +403,11 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
+		$entry_post_check = self::validate_entry_belongs_to_post( $args );
+		if ( is_wp_error( $entry_post_check ) ) {
+			return $entry_post_check;
+		}
+
 		// Always use the original author for the update entry, otherwise until refresh
 		// users will see the user who edited the entry as the author.
 		$args['user'] = self::user_object_from_comment_id( $args['entry_id'] );
@@ -447,6 +452,12 @@ class WPCOM_Liveblog_Entry {
 		if ( ! $args['entry_id'] ) {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
+
+		$entry_post_check = self::validate_entry_belongs_to_post( $args );
+		if ( is_wp_error( $entry_post_check ) ) {
+			return $entry_post_check;
+		}
+
 		$args['content'] = '';
 		$comment         = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
@@ -485,10 +496,52 @@ class WPCOM_Liveblog_Entry {
 			return new WP_Error( 'entry-delete', __( 'Missing entry ID', 'liveblog' ) );
 		}
 
+		// Guard before remove_key_action() runs: it deletes comment meta on the
+		// referenced entry, so the post-binding check must happen first.
+		$entry_post_check = self::validate_entry_belongs_to_post( $args );
+		if ( is_wp_error( $entry_post_check ) ) {
+			return $entry_post_check;
+		}
+
 		$args['content'] = WPCOM_Liveblog_Entry_Key_Events::remove_key_action( $args['content'], $args['entry_id'] );
 
 		$entry = self::update( $args );
 		return $entry;
+	}
+
+	/**
+	 * Verify that the entry being mutated belongs to the authorised post.
+	 *
+	 * The CRUD entry points authorise the caller against the post id taken from
+	 * the route URL (REST) or the permalink (admin-ajax), but the entry id
+	 * arrives separately in the request body and is not re-validated against
+	 * that post. Without binding the two together, a caller authorised to edit
+	 * their own liveblog can pass the entry id of an entry belonging to another
+	 * user's post and have the update/delete sink mutate it (CWE-639 IDOR,
+	 * HackerOne #3742849, an incomplete-fix follow-up to the 1.12.0 post-scoped
+	 * authorisation work).
+	 *
+	 * The entry must exist, be a liveblog entry (so the endpoint cannot be used
+	 * to trash arbitrary non-liveblog comments), and be attached to the
+	 * authorised post. The error message is deliberately generic so the endpoint
+	 * cannot be used to probe for entries on other posts.
+	 *
+	 * @param array $args The entry properties. Requires `entry_id` and `post_id`.
+	 * @return true|WP_Error True when the entry belongs to the post, otherwise an error.
+	 */
+	private static function validate_entry_belongs_to_post( $args ) {
+		$post_id = isset( $args['post_id'] ) ? (int) $args['post_id'] : 0;
+		$comment = get_comment( $args['entry_id'] );
+
+		if (
+			$comment instanceof WP_Comment
+			&& 'liveblog' === $comment->comment_type
+			&& (int) $comment->comment_post_ID === $post_id
+		) {
+			return true;
+		}
+
+		return new WP_Error( 'entry-not-found', __( 'Entry not found in this liveblog.', 'liveblog' ) );
 	}
 
 	/**
@@ -573,16 +626,28 @@ class WPCOM_Liveblog_Entry {
 		// Runs the restricted shortcode array through the filter before being applied.
 		self::$restricted_shortcodes = apply_filters( 'liveblog_entry_restrict_shortcodes', self::$restricted_shortcodes );
 
-		// For each lookup key, does it exist in the content.
+		// Strip every restricted shortcode, re-applying the whole set until the
+		// content stabilises. A single pass is bypassable by nesting a restricted
+		// shortcode inside fragments of a tag name, so that removing the inner
+		// match reconstructs a working shortcode. That happens both within one tag
+		// (`[liveblog_key[liveblog_key_events]_events]` -> `[liveblog_key_events]`)
+		// and across tags when more than one is restricted (removing `[embed]`
+		// from `[gall[embed]ery]` reconstructs `[gallery]`). Looping the whole set
+		// rather than each tag in isolation removes the order dependence between
+		// tags. The loop only continues while the content strictly shrinks, so a
+		// replacement that is the same length or longer than the match (an unusual
+		// configuration) cannot make it spin.
 		if ( is_array( self::$restricted_shortcodes ) ) {
-			foreach ( self::$restricted_shortcodes as $key => $value ) {
+			do {
+				$previous = $args['content'];
 
-				// Regex pattern will match all shortcode formats.
-				$pattern = get_shortcode_regex( array( $key ) );
+				foreach ( self::$restricted_shortcodes as $key => $value ) {
+					$pattern         = '/' . get_shortcode_regex( array( $key ) ) . '/s';
+					$args['content'] = preg_replace( $pattern, $value, $args['content'] );
+				}
 
-				// If there's a match we replace it with the configured replacement.
-				$args['content'] = preg_replace( '/' . $pattern . '/s', $value, $args['content'] );
-			}
+				$shrank = ( null !== $args['content'] && strlen( $args['content'] ) < strlen( $previous ) );
+			} while ( $shrank );
 		}
 
 		// Return the original entry arguments with any modifications.

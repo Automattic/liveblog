@@ -472,9 +472,8 @@ class WPCOM_Liveblog_Rest_Api {
 	 * @return true|WP_Error True when the request is permitted, otherwise a 403 error.
 	 */
 	public static function can_edit_liveblog_entries( WP_REST_Request $request ) {
-		$url_params = $request->get_url_params();
-		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
-		$post       = $post_id > 0 ? get_post( $post_id ) : null;
+		$post_id = self::get_authorised_post_id( $request );
+		$post    = $post_id > 0 ? get_post( $post_id ) : null;
 
 		$allowed = ( $post instanceof WP_Post && current_user_can( 'edit_post', $post_id ) );
 
@@ -490,6 +489,25 @@ class WPCOM_Liveblog_Rest_Api {
 			__( 'Sorry, you are not allowed to edit this liveblog.', 'liveblog' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
+	}
+
+	/**
+	 * Get the authorised target post ID for a write request from the URL path.
+	 *
+	 * Write routes are scoped to the post in the route URL, and the write
+	 * permission callback ({@see can_edit_liveblog_entries()}) authorises against
+	 * that same value. Handlers must therefore read the post ID from the URL path
+	 * parameters and never from get_param(): WP_REST_Request::get_param() resolves
+	 * JSON body, POST body, and query-string parameters ahead of URL path
+	 * parameters, so a body or query `post_id` could otherwise re-target the action
+	 * at a post the caller is not authorised to edit (CWE-639).
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return int The post ID from the URL path, or 0 when absent.
+	 */
+	private static function get_authorised_post_id( WP_REST_Request $request ) {
+		$url_params = $request->get_url_params();
+		return isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
 	}
 
 	/**
@@ -534,12 +552,11 @@ class WPCOM_Liveblog_Rest_Api {
 		// The URL path post_id is authoritative for the target post; the permission
 		// callback uses the same source. JSON body `post_id` is ignored so a caller
 		// cannot target a different post than the one authorised by the route.
-		$url_params = $request->get_url_params();
-		$post_id    = isset( $url_params['post_id'] ) ? (int) $url_params['post_id'] : 0;
+		$post_id = self::get_authorised_post_id( $request );
 
 		$args = array(
 			'post_id'         => $post_id,
-			'content'         => self::get_json_param( 'content', $json ),
+			'content'         => self::coerce_content_to_string( self::get_json_param( 'content', $json ) ),
 			'entry_id'        => self::get_json_param( 'entry_id', $json ),
 			'author_id'       => self::get_json_param( 'author_id', $json ),
 			'contributor_ids' => self::get_json_param( 'contributor_ids', $json ),
@@ -614,10 +631,11 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function format_preview_entry( WP_REST_Request $request ) {
 
-		// Get required parameters from the request.
-		$post_id       = $request->get_param( 'post_id' );
+		// The URL path post_id is authoritative; read it from the same source as the
+		// permission callback so a body/query value cannot change the post context.
+		$post_id       = self::get_authorised_post_id( $request );
 		$json          = $request->get_json_params();
-		$entry_content = self::get_json_param( 'entry_content', $json );
+		$entry_content = self::coerce_content_to_string( self::get_json_param( 'entry_content', $json ) );
 
 		self::set_liveblog_vars( $post_id );
 
@@ -677,8 +695,11 @@ class WPCOM_Liveblog_Rest_Api {
 	 */
 	public static function update_post_state( WP_REST_Request $request ) {
 
-		// Get required parameters from the request.
-		$post_id = $request->get_param( 'post_id' );
+		// The URL path post_id is authoritative for the target post; the permission
+		// callback authorises against the same source. Reading it from get_param()
+		// would let a JSON body or query `post_id` re-target the state change at a
+		// post the caller is not authorised to edit (CWE-639).
+		$post_id = self::get_authorised_post_id( $request );
 		$state   = $request->get_param( 'state' );
 
 		// Additional request variables used in the liveblog_admin_settings_update action.
@@ -826,5 +847,23 @@ class WPCOM_Liveblog_Rest_Api {
 			return $json[ $param ];
 		}
 		return false;
+	}
+
+	/**
+	 * Coerce a free-form entry content value from the JSON body to a string.
+	 *
+	 * The `content` and `entry_content` parameters are read straight from the
+	 * decoded JSON body, which can supply an array or object. Such a value would
+	 * otherwise flow unchanged into `wp_filter_post_kses()` and raise a TypeError
+	 * (HTTP 500) on PHP 8. Casting non-scalars to an empty string mirrors the
+	 * coercion the legacy admin-ajax path performs via `sanitize_text_field()`,
+	 * so both entry points behave the same. A missing value (`get_json_param()`
+	 * returns false) likewise becomes an empty string.
+	 *
+	 * @param mixed $content The raw content value from the JSON body.
+	 * @return string The content as a string.
+	 */
+	private static function coerce_content_to_string( $content ) {
+		return is_scalar( $content ) ? (string) $content : '';
 	}
 }
