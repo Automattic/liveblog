@@ -1254,6 +1254,35 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * A non-string `content` value in the JSON body must be handled gracefully.
+	 *
+	 * The REST handlers read content straight from the decoded JSON body. An
+	 * array value would otherwise reach wp_filter_post_kses() unscalarised and
+	 * raise a PHP TypeError (HTTP 500) on PHP 8 (CWE-20). It must be coerced to a
+	 * string and the request handled without a server error.
+	 */
+	public function test_endpoint_crud_insert_with_array_content_does_not_error(): void {
+		$author_id = $this->set_author_user();
+		$post_id   = $this->create_liveblog_post( array( 'post_author' => $author_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post_id . '/crud' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'crud_action' => 'insert',
+					'content'     => array( '<p>array content</p>' ),
+				)
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		// The malformed content is coerced to a string rather than fatally
+		// erroring; the insert succeeds with empty content.
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	/**
 	 * Build the list of public read endpoint URLs that accept a post_id for testing.
 	 *
 	 * @param int $post_id  Post ID to embed.
