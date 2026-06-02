@@ -14,6 +14,7 @@ use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
 use Automattic\Liveblog\Domain\Repository\EntryRepositoryInterface;
 use Automattic\Liveblog\Domain\ValueObject\EntryId;
 use Automattic\Liveblog\Infrastructure\Repository\CommentEntryRepository;
+use WP_Comment;
 use WP_Error;
 use WP_User;
 
@@ -208,9 +209,8 @@ final class EntryOperations {
 		// Apply filter before update.
 		$args = apply_filters( 'liveblog_before_update_entry', $args );
 
-		// Get original author for the update.
-		$original_comment = get_comment( $args['entry_id'] );
-		$user             = get_userdata( $original_comment->user_id );
+		// Re-save the entry under its original author.
+		$user = $this->get_original_author( (int) $args['entry_id'] );
 
 		$entry_id = $this->entry_service->update(
 			$post_id,
@@ -256,11 +256,11 @@ final class EntryOperations {
 	 * @return EntryId The entry ID.
 	 */
 	private function execute_delete_key( array $args, int $post_id ): EntryId {
-		// Get the original author.
-		$original_comment = get_comment( $args['entry_id'] );
-		$user             = get_userdata( $original_comment->user_id );
+		$entry_id = EntryId::from_int( (int) $args['entry_id'] );
 
-		$entry_id        = EntryId::from_int( (int) $args['entry_id'] );
+		// Re-save the entry under its original author.
+		$user = $this->get_original_author( $entry_id->to_int() );
+
 		$updated_content = $this->key_event_service->remove_key_action(
 			$args['content'] ?? '',
 			$entry_id->to_int()
@@ -272,6 +272,33 @@ final class EntryOperations {
 			$updated_content,
 			$user
 		);
+	}
+
+	/**
+	 * Resolve the original author of an existing entry.
+	 *
+	 * Updates and key-event removals re-save the entry under its original
+	 * author rather than the editor performing the action. If the entry or its
+	 * author can no longer be resolved (for example a stale or anonymous entry
+	 * ID), this throws so do_crud() returns a clean WP_Error instead of letting
+	 * a TypeError surface from the typed EntryService::update() signature.
+	 *
+	 * @param int $entry_id The entry (comment) ID.
+	 * @return WP_User The original author.
+	 * @throws \InvalidArgumentException If the entry or its author cannot be found.
+	 */
+	private function get_original_author( int $entry_id ): WP_User {
+		$comment = get_comment( $entry_id );
+		if ( ! $comment instanceof WP_Comment ) {
+			throw new \InvalidArgumentException( 'Entry not found: ' . esc_html( (string) $entry_id ) );
+		}
+
+		$author = get_userdata( (int) $comment->user_id );
+		if ( ! $author instanceof WP_User ) {
+			throw new \InvalidArgumentException( 'Entry author not found for entry: ' . esc_html( (string) $entry_id ) );
+		}
+
+		return $author;
 	}
 
 	/**

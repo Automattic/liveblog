@@ -335,6 +335,37 @@ final class RestApiTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * A delete_key action for a non-existent entry returns a WP_Error, not a fatal.
+	 *
+	 * Guards the original-author lookup: a stale or invalid entry ID must not
+	 * reach the typed EntryService::update() and raise a TypeError.
+	 */
+	public function test_crud_action_delete_key_returns_error_for_unknown_entry(): void {
+		$user             = wp_get_current_user();
+		$args             = array( 'entry_id' => 999999 );
+		$entry_operations = Container::instance()->entry_operations();
+
+		$result = $entry_operations->do_crud( 'delete_key', $this->build_entry_args( $args ), $user );
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertSame( 'entry-invalid-args', $result->get_error_code() );
+	}
+
+	/**
+	 * An update action for a non-existent entry returns a WP_Error, not a fatal.
+	 */
+	public function test_crud_action_update_returns_error_for_unknown_entry(): void {
+		$user             = wp_get_current_user();
+		$args             = array( 'entry_id' => 999999 );
+		$entry_operations = Container::instance()->entry_operations();
+
+		$result = $entry_operations->do_crud( 'update', $this->build_entry_args( $args ), $user );
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertSame( 'entry-invalid-args', $result->get_error_code() );
+	}
+
+	/**
 	 * Test getting a preview of an entry.
 	 */
 	public function test_preview_entry(): void {
