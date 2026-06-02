@@ -149,9 +149,6 @@ final class AuthorFilter implements ContentFilterInterface {
 
 		// Add CSS classes to entries.
 		add_filter( 'comment_class', array( $this, 'add_author_class_to_entry' ), 10, 3 );
-
-		// Add AJAX endpoint for autocomplete.
-		add_action( 'wp_ajax_liveblog_authors', array( $this, 'ajax_authors' ) );
 	}
 
 	/**
@@ -253,11 +250,7 @@ final class AuthorFilter implements ContentFilterInterface {
 	 * @return array<string, mixed>|null
 	 */
 	public function get_autocomplete_config(): ?array {
-		$endpoint_url = admin_url( 'admin-ajax.php' ) . '?action=liveblog_authors';
-
-		if ( LiveblogConfiguration::use_rest_api() ) {
-			$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'authors' );
-		}
+		$endpoint_url = trailingslashit( trailingslashit( RestApiController::build_endpoint_base() ) . 'authors' );
 
 		/**
 		 * Filter the author autocomplete config.
@@ -305,29 +298,6 @@ final class AuthorFilter implements ContentFilterInterface {
 		);
 
 		return array_merge( $classes, $authors[0] );
-	}
-
-	/**
-	 * AJAX handler for author autocomplete.
-	 *
-	 * @return void
-	 */
-	public function ajax_authors(): void {
-		// Only users who can edit a liveblog should be able to enumerate the
-		// author list. Without this any authenticated user (including
-		// subscribers) could scrape every user holding `edit_posts`.
-		if ( ! RestApiController::current_user_can_edit_liveblog() ) {
-			wp_send_json_error( null, 403 );
-		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public autocomplete endpoint.
-		$term = isset( $_GET['autocomplete'] ) ? sanitize_text_field( wp_unslash( $_GET['autocomplete'] ) ) : '';
-
-		$users = $this->get_authors( $term );
-
-		header( 'Content-Type: application/json' );
-		echo wp_json_encode( $users );
-		exit;
 	}
 
 	/**

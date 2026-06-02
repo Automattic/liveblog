@@ -32,11 +32,6 @@ final class LiveblogConfiguration {
 	public const MIN_WP_VERSION = '4.4';
 
 	/**
-	 * Minimum WordPress REST API version required.
-	 */
-	public const MIN_WP_REST_API_VERSION = '4.4';
-
-	/**
 	 * Meta key for liveblog state.
 	 */
 	public const KEY = 'liveblog';
@@ -105,11 +100,6 @@ final class LiveblogConfiguration {
 	 * Cache-Control max-age value for cacheable JSON responses.
 	 */
 	public const RESPONSE_CACHE_MAX_AGE = DAY_IN_SECONDS;
-
-	/**
-	 * Whether to use the REST API.
-	 */
-	public const USE_REST_API = true;
 
 	/**
 	 * The default image size to use when inserting media from the media library.
@@ -246,25 +236,6 @@ final class LiveblogConfiguration {
 		}
 
 		self::$supported_post_types = $post_types;
-	}
-
-	/**
-	 * Check if REST API should be used.
-	 *
-	 * @return bool True if REST API should be used.
-	 */
-	public static function use_rest_api(): bool {
-		return self::USE_REST_API && self::can_use_rest_api();
-	}
-
-	/**
-	 * Check if WordPress version supports REST API.
-	 *
-	 * @return bool True if REST API is supported.
-	 */
-	public static function can_use_rest_api(): bool {
-		global $wp_version;
-		return version_compare( $wp_version, self::MIN_WP_REST_API_VERSION, '>=' );
 	}
 
 	/**
