@@ -919,6 +919,79 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * Anonymous requests must not retrieve liveblog entries for a password-protected post.
+	 *
+	 * A password-protected post keeps post_status = 'publish', so the status gate alone
+	 * lets it through. Covers HackerOne report #3710276 (CWE-639/CWE-200, password
+	 * boundary bypass via the public read routes).
+	 */
+	public function test_public_read_endpoints_deny_anonymous_for_password_protected_post(): void {
+		$post_id = $this->create_liveblog_post( array( 'post_password' => 'secret-3710276' ) );
+		$entry   = $this->insert_entries( 1, array( 'post_id' => $post_id ) )[0];
+
+		foreach ( $this->public_read_urls_for_post( $post_id, (int) $entry->get_id() ) as $url ) {
+			$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
+
+			$this->assertEquals(
+				404,
+				$response->get_status(),
+				sprintf( 'Expected 404 on %s for a password-protected post', $url )
+			);
+		}
+	}
+
+	/**
+	 * A logged-in subscriber must not read entries for a password-protected post.
+	 *
+	 * `read_post` resolves to the bare `read` capability for published posts, so a
+	 * subscriber would bypass the password boundary if the gate relied on capability
+	 * alone. Access must require the password, not merely being logged in.
+	 */
+	public function test_public_read_endpoints_deny_subscriber_for_password_protected_post(): void {
+		$post_id = $this->create_liveblog_post( array( 'post_password' => 'secret-3710276' ) );
+		$entry   = $this->insert_entries( 1, array( 'post_id' => $post_id ) )[0];
+
+		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		foreach ( $this->public_read_urls_for_post( $post_id, (int) $entry->get_id() ) as $url ) {
+			$response = $this->server->dispatch( new WP_REST_Request( 'GET', $url ) );
+
+			$this->assertEquals(
+				404,
+				$response->get_status(),
+				sprintf( 'Expected 404 on %s for a logged-in subscriber without the password', $url )
+			);
+		}
+	}
+
+	/**
+	 * Satisfying the post password requirement unlocks the public read routes.
+	 *
+	 * Confirms the gate does not permanently lock out legitimate readers once the password
+	 * boundary is satisfied. The `post_password_required` filter stands in for a visitor who
+	 * has supplied the correct password (the same mechanism WordPress core consults), which
+	 * keeps the test independent of cookie-hashing internals. The permission callback is
+	 * exercised directly so the assertion focuses on the gate rather than the route handler.
+	 */
+	public function test_can_read_liveblog_allows_when_password_satisfied(): void {
+		$post_id = $this->create_liveblog_post( array( 'post_password' => 'secret-3710276' ) );
+		$this->insert_entries( 1, array( 'post_id' => $post_id ) );
+
+		// Without the password satisfied, the gate denies (404).
+		$request = new WP_REST_Request( 'GET', self::ENDPOINT_BASE . '/' . $post_id . '/entry/1' );
+		$request->set_param( 'post_id', $post_id );
+		$this->assertWPError( WPCOM_Liveblog_Rest_Api::can_read_liveblog( $request ) );
+
+		// With the password satisfied, the gate allows.
+		add_filter( 'post_password_required', '__return_false' );
+		$allowed = WPCOM_Liveblog_Rest_Api::can_read_liveblog( $request );
+		remove_filter( 'post_password_required', '__return_false' );
+
+		$this->assertTrue( $allowed );
+	}
+
+	/**
 	 * An editor user can read liveblog entries on a draft post they have permission to read.
 	 */
 	public function test_public_read_endpoints_allow_editor_on_draft_post(): void {

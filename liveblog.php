@@ -3,7 +3,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.12.1
+ * Version:     1.12.2
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
@@ -33,7 +33,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 *
 		 * @var string
 		 */
-		const VERSION = '1.12.1';
+		const VERSION = '1.12.2';
 
 		/**
 		 * Rewrites version for flushing rewrite rules.
@@ -2219,6 +2219,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			// If we are not viewing a liveblog post then exit the filter.
 			if ( self::is_liveblog_post( $post->ID ) === false ) {
+				return $metadata;
+			}
+
+			// Do not expose entry bodies for a password-protected post until the password
+			// has been supplied. WordPress renders the password form (not the content) to
+			// such visitors, so the JSON-LD/AMP metadata must not become a side channel that
+			// discloses the protected entries.
+			if ( post_password_required( $post ) ) {
 				return $metadata;
 			}
 
