@@ -174,6 +174,8 @@ final class RestApiController {
 	 * - The post exists and its post type supports liveblog.
 	 * - Liveblog is enabled or archived on the post.
 	 * - The post is published, or the current user has `read_post` for it.
+	 * - The post password requirement is satisfied for the current request, so a
+	 *   password-protected published post does not leak its entries.
 	 *
 	 * All failure paths return a 404 so the endpoint cannot be used as an oracle
 	 * for post existence, status or liveblog-ness.
@@ -185,10 +187,21 @@ final class RestApiController {
 		$post_id       = (int) $request->get_param( 'post_id' );
 		$liveblog_post = $post_id > 0 ? LiveblogPost::from_id( $post_id ) : null;
 
+		// The status check is necessary but not sufficient: a password-protected post
+		// keeps post_status = 'publish', and `read_post` resolves to the bare `read`
+		// capability for published posts, so both anonymous and logged-in callers would
+		// otherwise bypass the password boundary. Require the password to be satisfied
+		// too, mirroring core's front-end content gating.
+		$status_allowed = (
+			$liveblog_post instanceof LiveblogPost
+			&& ( $liveblog_post->is_published() || current_user_can( 'read_post', $post_id ) )
+		);
+
 		$allowed = (
 			$liveblog_post instanceof LiveblogPost
 			&& $liveblog_post->is_liveblog()
-			&& ( $liveblog_post->is_published() || current_user_can( 'read_post', $post_id ) )
+			&& $status_allowed
+			&& ! $liveblog_post->requires_password()
 		);
 
 		/**

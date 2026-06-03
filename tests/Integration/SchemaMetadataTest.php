@@ -344,6 +344,62 @@ final class SchemaMetadataTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * Test that no entry metadata is emitted for a password-protected post.
+	 *
+	 * WordPress renders the password form (not the content) to visitors who have not
+	 * supplied the password, so the JSON-LD/AMP metadata must not disclose the protected
+	 * entries. Covers HackerOne report #3710276 (Vector 2, structured-data side channel).
+	 *
+	 * @covers ::generate
+	 */
+	public function test_no_entries_for_password_protected_post_without_password(): void {
+		wp_update_post(
+			array(
+				'ID'            => $this->post_id,
+				'post_password' => 'secret-3710276',
+			)
+		);
+
+		$this->insert_entry( array( 'content' => '<p>Protected entry body</p>' ) );
+
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
+
+		// The presenter bails before adding any liveblog metadata, so the passed-in array
+		// is returned untouched: no entry bodies and none of the LiveBlogPosting properties.
+		$this->assertArrayNotHasKey( 'liveBlogUpdate', $metadata );
+		$this->assertArrayNotHasKey( '@type', $metadata );
+	}
+
+	/**
+	 * Test that entry metadata is emitted once the password requirement is satisfied.
+	 *
+	 * The `post_password_required` filter stands in for a visitor who has supplied the
+	 * correct password (the same mechanism WordPress core consults), keeping the test
+	 * independent of cookie-hashing internals.
+	 *
+	 * @covers ::generate
+	 */
+	public function test_entries_present_for_password_protected_post_with_password(): void {
+		wp_update_post(
+			array(
+				'ID'            => $this->post_id,
+				'post_password' => 'secret-3710276',
+			)
+		);
+
+		$this->insert_entry( array( 'content' => '<p>Protected entry body</p>' ) );
+
+		add_filter( 'post_password_required', '__return_false' );
+		$metadata_presenter = Container::instance()->metadata_presenter();
+		$metadata           = $metadata_presenter->generate( get_post( $this->post_id ), array() );
+		remove_filter( 'post_password_required', '__return_false' );
+
+		$this->assertArrayHasKey( 'liveBlogUpdate', $metadata );
+		$this->assertNotEmpty( $metadata['liveBlogUpdate'] );
+	}
+
+	/**
 	 * Insert a liveblog entry.
 	 *
 	 * @param array $args Arguments for entry.

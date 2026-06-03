@@ -324,6 +324,20 @@ final class LiveblogPost {
 	}
 
 	/**
+	 * Check whether the post password requirement is unmet for the current request.
+	 *
+	 * A password-protected post keeps post_status = 'publish', so {@see is_published()}
+	 * alone is not a sufficient access boundary. This wraps WordPress core's
+	 * post_password_required() (which also honours the `post_password_required` filter)
+	 * so callers can refuse to disclose entries until the password has been supplied.
+	 *
+	 * @return bool True when a password is required but has not been satisfied.
+	 */
+	public function requires_password(): bool {
+		return post_password_required( $this->post );
+	}
+
+	/**
 	 * Check if we're currently viewing a liveblog post.
 	 *
 	 * This static helper checks if the current request is viewing a

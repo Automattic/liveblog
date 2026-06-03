@@ -87,6 +87,14 @@ final class MetadataPresenter {
 			return $existing_metadata;
 		}
 
+		// Do not expose entry bodies for a password-protected post until the password
+		// has been supplied. WordPress renders the password form (not the content) to
+		// such visitors, so the JSON-LD/AMP metadata must not become a side channel that
+		// discloses the protected entries.
+		if ( $liveblog_post->requires_password() ) {
+			return $existing_metadata;
+		}
+
 		$entries        = $this->get_paginated_entries( $post->ID );
 		$blog_updates   = $this->build_blog_updates( $entries, $existing_metadata );
 		$liveblog_state = $liveblog_post->state();
