@@ -2222,6 +2222,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				return $metadata;
 			}
 
+			// Do not expose entry bodies for a password-protected post until the password
+			// has been supplied. WordPress renders the password form (not the content) to
+			// such visitors, so the JSON-LD/AMP metadata must not become a side channel that
+			// discloses the protected entries.
+			if ( post_password_required( $post ) ) {
+				return $metadata;
+			}
+
 			$request = self::get_request_data();
 
 			$entries = self::get_entries_paged( $request->page, $request->last );

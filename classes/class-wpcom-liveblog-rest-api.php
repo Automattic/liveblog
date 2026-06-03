@@ -406,6 +406,8 @@ class WPCOM_Liveblog_Rest_Api {
 	 * - Liveblog to be enabled (or archived) on the post.
 	 * - The post to be published, or the current user to have the `read_post` capability
 	 *   for it.
+	 * - The post password requirement to be satisfied for the current request, so that
+	 *   password-protected published posts do not leak their entries.
 	 *
 	 * All failure paths return a 404 so the endpoint cannot be used as an oracle for
 	 * post existence or status.
@@ -426,10 +428,22 @@ class WPCOM_Liveblog_Rest_Api {
 		$post_id = (int) $request->get_param( 'post_id' );
 		$post    = $post_id > 0 ? get_post( $post_id ) : null;
 
+		// The post-status gate is necessary but not sufficient: a password-protected post
+		// keeps post_status = 'publish', and `read_post` resolves to the bare `read`
+		// capability for published posts, so both anonymous and logged-in callers would
+		// otherwise bypass the password boundary. Require the password to be satisfied for
+		// the current request as well, mirroring core's front-end content gating via
+		// post_password_required() (which also honours the `post_password_required` filter).
+		$status_allowed = (
+			$post instanceof WP_Post
+			&& ( 'publish' === $post->post_status || current_user_can( 'read_post', $post_id ) )
+		);
+
 		$allowed = (
 			$post instanceof WP_Post
 			&& WPCOM_Liveblog::is_liveblog_post( $post_id )
-			&& ( 'publish' === $post->post_status || current_user_can( 'read_post', $post_id ) )
+			&& $status_allowed
+			&& ! post_password_required( $post )
 		);
 
 		/**
