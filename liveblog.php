@@ -2304,20 +2304,29 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
 			}
 
-			$metadata['@context']      = 'https://schema.org';
-			$metadata['@type']         = 'LiveBlogPosting';
-			$metadata['headline']      = get_the_title( $post );
-			$metadata['url']           = get_permalink( $post );
-			$metadata['datePublished'] = get_post_datetime( $post, 'date', 'gmt' )->format( 'c' );
-			$metadata['dateModified']  = get_post_datetime( $post, 'modified', 'gmt' )->format( 'c' );
+			$metadata['@context'] = 'https://schema.org';
+			$metadata['@type']    = 'LiveBlogPosting';
+			$metadata['headline'] = get_the_title( $post );
+			$metadata['url']      = get_permalink( $post );
+			// Unpublished posts (drafts, pending, auto-drafts) store a `0000-00-00 00:00:00`
+			// GMT date, for which get_post_datetime() returns false. Guard against calling
+			// format() on false to avoid a fatal when such a post is previewed.
+			$published_datetime = get_post_datetime( $post, 'date', 'gmt' );
+			if ( false !== $published_datetime ) {
+				$metadata['datePublished'] = $published_datetime->format( 'c' );
 
-			// Add coverage times for LiveBlogPosting (helps with Google's "LIVE" badge).
-			$metadata['coverageStartTime'] = $metadata['datePublished'];
+				// Add coverage times for LiveBlogPosting (helps with Google's "LIVE" badge).
+				$metadata['coverageStartTime'] = $metadata['datePublished'];
+			}
 
-			// Add coverageEndTime only if the liveblog is archived.
-			$liveblog_state = self::get_liveblog_state( $post->ID );
-			if ( 'archive' === $liveblog_state ) {
-				$metadata['coverageEndTime'] = $metadata['dateModified'];
+			$modified_datetime = get_post_datetime( $post, 'modified', 'gmt' );
+			if ( false !== $modified_datetime ) {
+				$metadata['dateModified'] = $modified_datetime->format( 'c' );
+
+				// Add coverageEndTime only if the liveblog is archived.
+				if ( 'archive' === self::get_liveblog_state( $post->ID ) ) {
+					$metadata['coverageEndTime'] = $metadata['dateModified'];
+				}
 			}
 
 			$metadata['liveBlogUpdate'] = $blog_updates;

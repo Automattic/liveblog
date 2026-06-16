@@ -359,6 +359,51 @@ final class SchemaMetadataTest extends TestCase {
 	}
 
 	/**
+	 * Test that metadata generation does not fatal for an unpublished post.
+	 *
+	 * Drafts (and pending/auto-draft posts) store a `0000-00-00 00:00:00` GMT
+	 * date, for which get_post_datetime() returns false. Previously this caused
+	 * a fatal `Call to a member function format() on false` when such a post was
+	 * previewed. See https://github.com/Automattic/liveblog/issues/919.
+	 */
+	public function test_metadata_omits_dates_for_unpublished_post(): void {
+		$draft_id = self::factory()->post->create(
+			array(
+				'post_title'  => 'Draft Liveblog',
+				'post_status' => 'draft',
+			)
+		);
+		update_post_meta( $draft_id, WPCOM_Liveblog::KEY, 'enable' );
+
+		// Confirm the fixture reproduces the original conditions: the GMT date is
+		// unavailable, so get_post_datetime() returns false.
+		$this->assertFalse( get_post_datetime( $draft_id, 'date', 'gmt' ) );
+
+		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $draft_id ) );
+
+		// The metadata is still generated (proving the date code did not fatal)...
+		$this->assertEquals( 'LiveBlogPosting', $metadata['@type'] );
+
+		// ...but the date-derived properties are omitted rather than fatalling.
+		$this->assertArrayNotHasKey( 'datePublished', $metadata );
+		$this->assertArrayNotHasKey( 'dateModified', $metadata );
+		$this->assertArrayNotHasKey( 'coverageStartTime', $metadata );
+	}
+
+	/**
+	 * Test that a published post still includes the date-derived properties.
+	 */
+	public function test_metadata_includes_dates_for_published_post(): void {
+		$this->insert_entry( array( 'content' => '<p>Test entry</p>' ) );
+
+		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+
+		$this->assertArrayHasKey( 'datePublished', $metadata );
+		$this->assertArrayHasKey( 'dateModified', $metadata );
+		$this->assertArrayHasKey( 'coverageStartTime', $metadata );
+	}
+
+	/**
 	 * Insert a liveblog entry.
 	 *
 	 * @param array $args Arguments for entry.
