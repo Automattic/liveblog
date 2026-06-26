@@ -5,25 +5,22 @@ import updatePollingInterval from '../middleware/updatePollingInterval';
 import rootReducer from '../reducers';
 import rootEpic from '../epics';
 
-function configureStore(initialState) {
-  const epicMiddleware = createEpicMiddleware();
+function configureStore( initialState ) {
+	const epicMiddleware = createEpicMiddleware();
 
-  const enhancers = composeWithDevTools(
-    applyMiddleware(
-      epicMiddleware,
-      updatePollingInterval,
-    ),
-  );
+	const enhancers = composeWithDevTools(
+		applyMiddleware( epicMiddleware, updatePollingInterval )
+	);
 
-  const store = createStore(
-    combineReducers(rootReducer),
-    initialState,
-    enhancers,
-  );
+	const store = createStore(
+		combineReducers( rootReducer ),
+		initialState,
+		enhancers
+	);
 
-  epicMiddleware.run(rootEpic);
+	epicMiddleware.run( rootEpic );
 
-  return store;
+	return store;
 }
 
 export default configureStore;

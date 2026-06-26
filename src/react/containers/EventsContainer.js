@@ -12,101 +12,120 @@ import Event from '../components/Event';
 import DeleteConfirmation from '../components/DeleteConfirmation';
 
 class EventsContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showPopup: false,
-      keyEventToRemove: null,
-    };
+	constructor( props ) {
+		super( props );
+		this.state = {
+			showPopup: false,
+			keyEventToRemove: null,
+		};
 
-    this.delete = (key) => {
-      /* eslint no-alert: 0 */
-      if (window.confirm( __( 'Are you sure you want to delete this entry?', 'liveblog' ) )) {
-        this.props.deleteEvent(key);
-      }
-    };
-  }
+		this.delete = ( key ) => {
+			/* eslint no-alert: 0 */
+			if (
+				window.confirm(
+					__(
+						'Are you sure you want to delete this entry?',
+						'liveblog'
+					)
+				)
+			) {
+				this.props.deleteEvent( key );
+			}
+		};
+	}
 
-  confirmDeletion(key) {
-    this.setState({
-      keyEventToRemove: key,
-    });
+	confirmDeletion( key ) {
+		this.setState( {
+			keyEventToRemove: key,
+		} );
 
-    this.togglePopup(); // Keep key here to bind to render of delete popup
-  }
+		this.togglePopup(); // Keep key here to bind to render of delete popup
+	}
 
-  deleteKeyEvent() {
-    this.props.deleteEvent(this.state.keyEventToRemove);
+	deleteKeyEvent() {
+		this.props.deleteEvent( this.state.keyEventToRemove );
 
-    this.setState({
-      showPopup: !this.state.showPopup,
-    });
-  }
+		this.setState( {
+			showPopup: ! this.state.showPopup,
+		} );
+	}
 
-  togglePopup() {
-    this.setState({
-      showPopup: !this.state.showPopup,
-    });
-  }
+	togglePopup() {
+		this.setState( {
+			showPopup: ! this.state.showPopup,
+		} );
+	}
 
-  renderEvents() {
-    const { events, jumpToEvent, canEdit, locale, title } = this.props;
+	renderEvents() {
+		const { events, jumpToEvent, canEdit, locale, title } = this.props;
 
-    return (
-      <div>
-        { (title !== '') ? <h2 className="widget-title">{title}</h2> : null }
-        <ul className="liveblog-events">
-          {Object.keys(events).map((key, i) =>
-            <Event
-              key={i}
-              event={events[key]}
-              click={() => jumpToEvent(events[key].id)}
-              onDelete={() => this.confirmDeletion(events[key])}
-              canEdit={canEdit}
-              locale={locale}
-            />,
-          )}
-        </ul>
-        {this.state.showPopup ?
-          <DeleteConfirmation
-            text={ __( 'Are you sure you want to remove this entry as a key event?', 'liveblog' ) }
-            onConfirmDelete={() => this.deleteKeyEvent()}
-            onCancel={this.togglePopup.bind(this)}
-          />
-          : null
-        }
-      </div>
-    );
-  }
+		return (
+			<div>
+				{ title !== '' ? (
+					<h2 className="widget-title">{ title }</h2>
+				) : null }
+				<ul className="liveblog-events">
+					{ Object.keys( events ).map( ( key, i ) => (
+						<Event
+							key={ i }
+							event={ events[ key ] }
+							click={ () => jumpToEvent( events[ key ].id ) }
+							onDelete={ () =>
+								this.confirmDeletion( events[ key ] )
+							}
+							canEdit={ canEdit }
+							locale={ locale }
+						/>
+					) ) }
+				</ul>
+				{ this.state.showPopup ? (
+					<DeleteConfirmation
+						text={ __(
+							'Are you sure you want to remove this entry as a key event?',
+							'liveblog'
+						) }
+						onConfirmDelete={ () => this.deleteKeyEvent() }
+						onCancel={ this.togglePopup.bind( this ) }
+					/>
+				) : null }
+			</div>
+		);
+	}
 
-  render() {
-    return ReactDOM.createPortal(
-      this.renderEvents(),
-      this.props.container,
-    );
-  }
+	render() {
+		return ReactDOM.createPortal(
+			this.renderEvents(),
+			this.props.container
+		);
+	}
 }
 
 EventsContainer.propTypes = {
-  getEvents: PropTypes.func,
-  deleteEvent: PropTypes.func,
-  jumpToEvent: PropTypes.func,
-  events: PropTypes.object,
-  container: PropTypes.any,
-  canEdit: PropTypes.bool,
-  locale: PropTypes.string,
-  title: PropTypes.string,
+	getEvents: PropTypes.func,
+	deleteEvent: PropTypes.func,
+	jumpToEvent: PropTypes.func,
+	events: PropTypes.object,
+	container: PropTypes.any,
+	canEdit: PropTypes.bool,
+	locale: PropTypes.string,
+	title: PropTypes.string,
 };
 
-const mapStateToProps = state => ({
-  locale: state.config.locale,
-  events: state.events.entries,
-  canEdit: state.config.is_liveblog_editable === '1',
-});
+const mapStateToProps = ( state ) => ( {
+	locale: state.config.locale,
+	events: state.events.entries,
+	canEdit: state.config.is_liveblog_editable === '1',
+} );
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({
-    ...eventsActions,
-  }, dispatch);
+const mapDispatchToProps = ( dispatch ) =>
+	bindActionCreators(
+		{
+			...eventsActions,
+		},
+		dispatch
+	);
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventsContainer);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( EventsContainer );
