@@ -426,29 +426,109 @@ export const getPollingPages = ( current, next ) => {
 };
 
 /**
- * Fires of any oembed triggers need and adds an event listener that
- * can used to extend oembed support.
- * @param {HTMLElement} element
+ * Per-provider embed handling.
+ *
+ * Each provider declares:
+ *  - hasMarkup: detects whether an entry element contains that provider's embed.
+ *  - isLoaded:  whether the provider SDK is already available on the page.
+ *  - process:   re-parse the given element once the SDK is available (used when
+ *               the SDK was already loaded by an earlier entry).
+ *
+ * When a provider's markup is present but its SDK has not been loaded yet, the
+ * SDK is injected on demand (see loadEmbedSdk). The SDKs auto-process any markup
+ * present in the document when they first load, so we only need to call `process`
+ * for entries rendered after the SDK is already available.
+ */
+export const embedProviders = {
+	facebook: {
+		// Modern HTML5 format (<div class="fb-post">) and legacy XFBML (<fb:post>)
+		// from older cached embeds.
+		hasMarkup: ( element ) =>
+			!! element.querySelector(
+				'.fb-post, .fb-video, .fb-page, .fb-comments'
+			) ||
+			element.getElementsByTagName( 'fb:post' ).length > 0 ||
+			element.getElementsByTagName( 'fb:video' ).length > 0,
+		isLoaded: () => !! ( window.FB && window.FB.XFBML ),
+		process: ( element ) => window.FB.XFBML.parse( element ),
+	},
+	twitter: {
+		hasMarkup: ( element ) =>
+			!! element.querySelector( '.twitter-tweet, .twitter-timeline' ),
+		isLoaded: () => !! ( window.twttr && window.twttr.widgets ),
+		process: ( element ) => {
+			Array.from( element.querySelectorAll( '.twitter-tweet' ) ).forEach(
+				( ele ) => {
+					window.twttr.widgets.load( ele );
+				}
+			);
+		},
+	},
+	instagram: {
+		hasMarkup: ( element ) =>
+			!! element.querySelector( '.instagram-media' ),
+		isLoaded: () => !! ( window.instgrm && window.instgrm.Embeds ),
+		process: () => window.instgrm.Embeds.process(),
+	},
+	reddit: {
+		hasMarkup: ( element ) =>
+			!! element.querySelector( '.reddit-embed, .reddit-card' ),
+		// Reddit's widgets.js exposes no reliable re-process API; it scans the
+		// document when it loads, so we only inject it on demand and never re-process.
+		isLoaded: () => false,
+		process: () => {},
+	},
+};
+
+/**
+ * Inject a provider SDK script once. The SDK auto-processes any matching markup
+ * already in the document when it loads. Re-uses the same `${name}-js` handle
+ * WordPress would have used, so the script is only ever injected a single time.
+ *
+ * @param {string} name The provider name (e.g. 'twitter').
+ * @param {string} src  The SDK script URL.
+ */
+export const loadEmbedSdk = ( name, src ) => {
+	if ( document.getElementById( `${ name }-js` ) ) {
+		return;
+	}
+
+	const script = document.createElement( 'script' );
+	script.id = `${ name }-js`;
+	script.async = true;
+	script.src = src;
+	document.body.appendChild( script );
+};
+
+/**
+ * Lazy-load provider SDKs and process embeds for a rendered entry element.
+ *
+ * Only loads a provider's SDK when that provider's embed markup is actually
+ * present, and only loads each SDK once. Provider SDK URLs come from the
+ * server-side `liveblog_embed_sdks` filter via window.liveblog_settings.
+ *
+ * @param {HTMLElement} element The rendered entry element to scan.
  */
 export const triggerOembedLoad = ( element ) => {
-	if ( window.instgrm && element.querySelector( '.instagram-media' ) ) {
-		window.instgrm.Embeds.process();
-	}
+	const sdks =
+		( window.liveblog_settings && window.liveblog_settings.embed_sdks ) ||
+		{};
 
-	if ( window.twttr && element.querySelector( '.twitter-tweet' ) ) {
-		Array.from( element.querySelectorAll( '.twitter-tweet' ) ).forEach(
-			( ele ) => {
-				window.twttr.widgets.load( ele );
-			}
-		);
-	}
+	Object.keys( embedProviders ).forEach( ( name ) => {
+		const provider = embedProviders[ name ];
 
-	// Parse Facebook embeds when SDK is available.
-	// Uses element parameter to scope parsing and handles both modern HTML5 format
-	// (<div class="fb-post">) and legacy XFBML format (<fb:post>) from older cached embeds.
-	if ( window.FB ) {
-		window.FB.XFBML.parse( element );
-	}
+		if ( ! element || ! provider.hasMarkup( element ) ) {
+			return;
+		}
+
+		if ( provider.isLoaded() ) {
+			// SDK already on the page: process this newly rendered entry.
+			provider.process( element );
+		} else if ( sdks[ name ] ) {
+			// SDK not loaded yet: inject it. It will process existing markup on load.
+			loadEmbedSdk( name, sdks[ name ] );
+		}
+	} );
 
 	window.dispatchEvent( new CustomEvent( 'omembedTrigger' ) );
 };
