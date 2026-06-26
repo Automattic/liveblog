@@ -27,7 +27,6 @@ import {
 	$isQuoteNode,
 	$createQuoteNode,
 } from '@lexical/rich-text';
-import { ListNode, ListItemNode } from '@lexical/list';
 import {
 	LinkNode,
 	AutoLinkNode,
@@ -39,6 +38,8 @@ import {
 	INSERT_UNORDERED_LIST_COMMAND,
 	REMOVE_LIST_COMMAND,
 	$isListNode,
+	ListNode,
+	ListItemNode,
 } from '@lexical/list';
 
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
