@@ -23,7 +23,7 @@ describe( 'utils', () => {
 		expect( getLastOfObject( dummyObj ) ).toEqual( { data: 'Test 3' } );
 	} );
 
-	it( 'getLastObjectOf should return the last item in an object', () => {
+	it( 'getFirstOfObject should return the first item in an object', () => {
 		expect( getFirstOfObject( dummyObj ) ).toEqual( { data: 'Test 1' } );
 	} );
 
