@@ -222,7 +222,7 @@ const getTimezoneOffsetForTimestamp = ( timestamp, timezoneString ) => {
 
 		// Return offset in minutes
 		return ( localDate - utcDate ) / 60000;
-	} catch ( e ) {
+	} catch {
 		// Invalid timezone string or other error
 		return null;
 	}

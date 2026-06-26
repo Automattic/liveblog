@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import AceEditor from 'react-ace';
 import { config } from 'ace-builds';

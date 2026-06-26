@@ -50,7 +50,7 @@ jQuery( function ( $ ) {
 			dataType: 'json',
 			data,
 			method,
-			success( response, status, xhr ) {
+			success( response, status ) {
 				// Replace the metabox
 				$( '.inside', $meta_box ).empty().append( response );
 
@@ -61,7 +61,7 @@ jQuery( function ( $ ) {
 						.hide( 0 );
 				}
 			},
-			error( xhr, status, error ) {
+			error( xhr, status ) {
 				if ( xhr.status && xhr.status > 200 ) {
 					show_error( xhr.statusText, xhr.status );
 				} else {
