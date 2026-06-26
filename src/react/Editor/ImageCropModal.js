@@ -21,7 +21,7 @@ import { getCroppedImage, scaleToNaturalDimensions } from './cropUtils';
  * @param {Function} props.onCropComplete Called with the cropped File when user confirms.
  * @param {Function} props.onCancel       Called when user cancels the crop.
  * @param {number}   props.aspectRatio    Optional fixed aspect ratio for the crop.
- * @return {JSX.Element|null} The modal component or null if no image.
+ * @return {import('react').ReactNode} The modal component or null if no image.
  */
 function ImageCropModal( {
 	imageFile,
