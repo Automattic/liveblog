@@ -98,4 +98,5 @@ if ( $is_integration ) {
 	// Load plugin classes needed for unit tests.
 	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry.php';
 	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry-query.php';
+	require_once dirname( __DIR__ ) . '/classes/class-wpcom-liveblog-entry-embed-sdks.php';
 }
