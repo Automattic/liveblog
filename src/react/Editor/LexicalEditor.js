@@ -887,7 +887,9 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 			return;
 		}
 
-		const selection = window.getSelection();
+		const rootElement = editor.getRootElement();
+		const selection =
+			rootElement?.ownerDocument.defaultView?.getSelection();
 		if ( selection && selection.rangeCount > 0 ) {
 			const range = selection.getRangeAt( 0 );
 			const rect = range.getBoundingClientRect();
@@ -898,7 +900,7 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 				left: rect.left,
 			} );
 		}
-	}, [ triggerMatch, suggestions ] );
+	}, [ editor, triggerMatch, suggestions ] );
 
 	// Don't render if no trigger match or no suggestions
 	if ( ! triggerMatch || ! suggestions || suggestions.length === 0 ) {
