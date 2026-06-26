@@ -17,7 +17,7 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 		const data = {};
 
-		if ( liveblog_admin_settings.use_rest_api == 1 ) {
+		if ( liveblog_admin_settings.use_rest_api === '1' ) {
 			var url = liveblog_admin_settings.endpoint_url;
 			data.state = encodeURIComponent( $( this ).val() );
 			data.template_name = encodeURIComponent(
