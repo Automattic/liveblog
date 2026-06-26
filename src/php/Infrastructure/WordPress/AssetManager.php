@@ -30,7 +30,7 @@ final class AssetManager {
 	 * @var array<string, string>
 	 */
 	private const DEFAULT_EMBED_SDKS = array(
-		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
+		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5',
 		'twitter'   => 'https://platform.twitter.com/widgets.js',
 		'instagram' => 'https://www.instagram.com/embed.js',
 		'reddit'    => 'https://embed.reddit.com/widgets.js',
@@ -303,6 +303,9 @@ final class AssetManager {
 			'endpoint_url'                 => $endpoint_url,
 			'cross_domain'                 => false,
 
+			// Provider SDK URLs, lazy-loaded client-side only when a matching embed is rendered.
+			'embed_sdks'                   => $this->embed_sdks,
+
 			'features'                     => $this->content_filter_registry->get_enabled_features(),
 			'autocomplete'                 => $this->post_scope_autocomplete_urls( $this->content_filter_registry->get_autocomplete_config(), $post_id ),
 			'command_class'                => apply_filters( 'liveblog_command_class', CommandFilter::DEFAULT_CLASS_PREFIX ),
@@ -452,7 +455,10 @@ final class AssetManager {
 	/**
 	 * Initialise embed SDKs with filter support.
 	 *
-	 * Should be called once during plugin initialisation.
+	 * Should be called once during plugin initialisation. The resulting map is
+	 * exposed to the front-end app (see build_frontend_settings), which
+	 * lazy-loads each SDK only when an entry containing a matching embed is
+	 * rendered, rather than enqueuing every SDK on every liveblog post.
 	 *
 	 * @return void
 	 */
@@ -460,43 +466,21 @@ final class AssetManager {
 		/**
 		 * Filters the social embed SDKs to load on liveblog posts.
 		 *
+		 * Return an empty array to disable all third-party SDK loading, or
+		 * remove individual providers (by handle) to prevent their SDK from
+		 * ever being loaded.
+		 *
 		 * @param array<string, string> $sdks Map of handle => URL.
 		 */
 		$this->embed_sdks = apply_filters( 'liveblog_embed_sdks', self::DEFAULT_EMBED_SDKS );
 	}
 
 	/**
-	 * Enqueue social embed SDKs on liveblog posts.
+	 * Get the (filtered) list of provider SDK URLs.
 	 *
-	 * As entries are rendered in React, social embeds require their SDKs
-	 * to be loaded on page load rather than dynamically.
-	 *
-	 * @return void
+	 * @return array<string, string> Map of handle => URL.
 	 */
-	public function enqueue_embed_sdks(): void {
-		if ( ! LiveblogPost::is_viewing_liveblog_post() ) {
-			return;
-		}
-
-		foreach ( $this->embed_sdks as $handle => $url ) {
-			// Reddit's JS fails with version query string - returns 404.
-			$version = 'reddit' === $handle ? null : LiveblogConfiguration::VERSION;
-			wp_enqueue_script( $handle, esc_url( $url ), array(), $version, false );
-		}
-	}
-
-	/**
-	 * Add async attribute to embed SDK scripts.
-	 *
-	 * @param string $tag    The script tag HTML.
-	 * @param string $handle The script handle.
-	 * @return string Modified script tag.
-	 */
-	public function add_async_to_embed_sdks( string $tag, string $handle ): string {
-		if ( ! array_key_exists( $handle, $this->embed_sdks ) ) {
-			return $tag;
-		}
-
-		return str_replace( ' src', ' async="async" src', $tag );
+	public function get_embed_sdks(): array {
+		return $this->embed_sdks;
 	}
 }

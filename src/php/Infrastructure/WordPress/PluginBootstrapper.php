@@ -470,15 +470,13 @@ final class PluginBootstrapper {
 		$metadata_presenter = $this->container->metadata_presenter();
 		$template_renderer  = $this->container->template_renderer();
 
-		// Initialise embed SDKs (applies filter for customisation).
+		// Initialise embed SDKs (applies filter for customisation). The SDK URL
+		// map is passed to the front-end, which lazy-loads each SDK on demand
+		// only when a matching embed is rendered, rather than enqueuing them all.
 		$asset_manager->init_embed_sdks();
 
 		// Enqueue frontend scripts (uses named method so AMP can remove it).
 		add_action( 'wp_enqueue_scripts', array( $asset_manager, 'maybe_enqueue_frontend_scripts' ) );
-
-		// Enqueue social embed SDKs (Facebook, Twitter, Instagram, Reddit).
-		add_action( 'wp_enqueue_scripts', array( $asset_manager, 'enqueue_embed_sdks' ) );
-		add_filter( 'script_loader_tag', array( $asset_manager, 'add_async_to_embed_sdks' ), 10, 2 );
 
 		// Print liveblog metadata in head.
 		add_action(
