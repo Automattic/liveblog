@@ -1,8 +1,10 @@
 /**
  * Image crop modal component.
  *
- * @package Liveblog
+ * @package
  */
+
+/* global FileReader */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -14,14 +16,19 @@ import { getCroppedImage, scaleToNaturalDimensions } from './cropUtils';
 /**
  * Modal component for cropping images before upload.
  *
- * @param {Object}   props               Component props.
- * @param {File}     props.imageFile     The image file to crop.
+ * @param {Object}   props                Component props.
+ * @param {File}     props.imageFile      The image file to crop.
  * @param {Function} props.onCropComplete Called with the cropped File when user confirms.
- * @param {Function} props.onCancel      Called when user cancels the crop.
- * @param {number}   props.aspectRatio   Optional fixed aspect ratio for the crop.
- * @return {JSX.Element|null} The modal component or null if no image.
+ * @param {Function} props.onCancel       Called when user cancels the crop.
+ * @param {number}   props.aspectRatio    Optional fixed aspect ratio for the crop.
+ * @return {import('react').ReactNode} The modal component or null if no image.
  */
-function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) {
+function ImageCropModal( {
+	imageFile,
+	onCropComplete,
+	onCancel,
+	aspectRatio,
+} ) {
 	const [ crop, setCrop ] = useState();
 	const [ imageSrc, setImageSrc ] = useState( '' );
 	const [ isProcessing, setIsProcessing ] = useState( false );
@@ -54,7 +61,12 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 		}
 
 		// If no crop selected or crop is too small, use original image.
-		if ( ! crop?.width || ! crop?.height || crop.width < 10 || crop.height < 10 ) {
+		if (
+			! crop?.width ||
+			! crop?.height ||
+			crop.width < 10 ||
+			crop.height < 10
+		) {
 			onCropComplete( imageFile );
 			return;
 		}
@@ -62,7 +74,10 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 		setIsProcessing( true );
 		try {
 			// Scale crop from displayed size to natural image dimensions.
-			const pixelCrop = scaleToNaturalDimensions( crop, imageRef.current );
+			const pixelCrop = scaleToNaturalDimensions(
+				crop,
+				imageRef.current
+			);
 
 			const croppedFile = await getCroppedImage(
 				imageRef.current,
@@ -156,7 +171,10 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 						/>
 					</ReactCrop>
 					<p className="liveblog-crop-modal-hint">
-						{ __( 'Drag to select the area you want to keep. Click Apply to use the full image without cropping.', 'liveblog' ) }
+						{ __(
+							'Drag to select the area you want to keep. Click Apply to use the full image without cropping.',
+							'liveblog'
+						) }
 					</p>
 				</div>
 
@@ -175,7 +193,9 @@ function ImageCropModal( { imageFile, onCropComplete, onCancel, aspectRatio } ) 
 						onClick={ handleApplyCrop }
 						disabled={ isProcessing }
 					>
-						{ isProcessing ? __( 'Processing…', 'liveblog' ) : __( 'Apply', 'liveblog' ) }
+						{ isProcessing
+							? __( 'Processing…', 'liveblog' )
+							: __( 'Apply', 'liveblog' ) }
 					</button>
 				</div>
 			</div>

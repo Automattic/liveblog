@@ -3,8 +3,4 @@ import apiEpics from './api';
 import pollingEpics from './polling';
 import eventsEpics from './events';
 
-export default combineEpics(
-  apiEpics,
-  pollingEpics,
-  eventsEpics,
-);
+export default combineEpics( apiEpics, pollingEpics, eventsEpics );
