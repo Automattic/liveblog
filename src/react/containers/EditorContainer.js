@@ -174,9 +174,8 @@ class EditorContainer extends Component {
 
 						resolve( { options } );
 					},
-					error: ( err ) => {
+					error: () => {
 						// Fail gracefully with empty options on error (e.g., 401)
-						console.warn( 'Authors API error:', err );
 						resolve( { options: [] } );
 					},
 				} );
