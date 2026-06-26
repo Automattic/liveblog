@@ -16,9 +16,10 @@ jQuery( function ( $ ) {
 	$meta_box.on( 'click', 'button', function ( e ) {
 		e.preventDefault();
 		const data = {};
+		let url, method;
 
 		if ( liveblog_admin_settings.use_rest_api === '1' ) {
-			var url = liveblog_admin_settings.endpoint_url;
+			url = liveblog_admin_settings.endpoint_url;
 			data.state = encodeURIComponent( $( this ).val() );
 			data.template_name = encodeURIComponent(
 				$( '#liveblog-key-template-name' ).val()
@@ -29,9 +30,9 @@ jQuery( function ( $ ) {
 			data.limit = encodeURIComponent( $( '#liveblog-key-limit' ).val() );
 			data[ liveblog_admin_settings.nonce_key ] =
 				liveblog_admin_settings.nonce;
-			var method = 'POST';
+			method = 'POST';
 		} else {
-			var url =
+			url =
 				ajaxurl +
 				'?action=set_liveblog_state_for_post&post_id=' +
 				encodeURIComponent( post_id ) +
@@ -42,7 +43,7 @@ jQuery( function ( $ ) {
 				'=' +
 				liveblog_admin_settings.nonce;
 			url += '&' + $( 'input, textarea, select', $meta_box ).serialize();
-			var method = 'GET';
+			method = 'GET';
 		}
 
 		$.ajax( url, {
