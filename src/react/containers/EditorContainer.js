@@ -16,7 +16,7 @@ import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 import HTMLInput from '../components/HTMLInput';
 
-import { getImageSize } from '../Editor/utils';
+import { getImageSize } from '../utils/utils';
 
 // Lazy load LexicalEditor for code splitting
 const LexicalEditor = React.lazy( () => import( '../Editor/LexicalEditor' ) );

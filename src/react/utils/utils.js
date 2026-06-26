@@ -469,3 +469,21 @@ export const getScrollToId = ( entries, key ) => {
 
 	return `id_${ entries[ 0 ].id }`;
 };
+
+/**
+ * Get the most suitable image size.
+ * @param {Object} sizes
+ * @param {string} defaultSize
+ */
+export const getImageSize = ( sizes, defaultSize ) => {
+	if ( ! sizes ) {
+		return '';
+	}
+	if ( sizes[ defaultSize ] ) {
+		return sizes[ defaultSize ].source_url || sizes[ defaultSize ].url;
+	}
+	if ( sizes.full ) {
+		return sizes.full.source_url || sizes.full.url;
+	}
+	return '';
+};
