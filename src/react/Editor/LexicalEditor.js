@@ -6,6 +6,8 @@
  * @see https://lexical.dev/
  */
 
+/* global HTMLImageElement, DOMParser */
+
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { __ } from '@wordpress/i18n';
