@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 /**
  * Custom Option component for react-select author picker.
  * Must spread innerProps and use innerRef for keyboard navigation to work.
- * @param root0
- * @param root0.innerRef
- * @param root0.innerProps
- * @param root0.data
- * @param root0.isFocused
- * @param root0.isSelected
- * @param root0.isDisabled
+ * @param {Object}   root0
+ * @param {Function} root0.innerRef
+ * @param {Object}   root0.innerProps
+ * @param {Object}   root0.data
+ * @param {boolean}  root0.isFocused
+ * @param {boolean}  root0.isSelected
+ * @param {boolean}  root0.isDisabled
  */
 const AuthorSelectOption = ( {
 	innerRef,

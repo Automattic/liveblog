@@ -137,9 +137,8 @@ export const shouldRenderNewEntries = ( page, entries, polling ) => {
 /**
  * Determine the newest entry from current and updated entries
  * @param {Object} current
- * @param {Array}  updates
- * @param          update
- * @param          entries
+ * @param {Object} update
+ * @param {Array}  entries
  */
 export const getNewestEntry = ( current, update, entries = false ) => {
 	if ( ! current && ! update ) {
@@ -429,7 +428,7 @@ export const getPollingPages = ( current, next ) => {
 /**
  * Fires of any oembed triggers need and adds an event listener that
  * can used to extend oembed support.
- * @param element
+ * @param {HTMLElement} element
  */
 export const triggerOembedLoad = ( element ) => {
 	if ( window.instgrm && element.querySelector( '.instagram-media' ) ) {
@@ -456,8 +455,8 @@ export const triggerOembedLoad = ( element ) => {
 
 /**
  * Get the correct id of which entry to scroll to on pagination
- * @param entries
- * @param key
+ * @param {Array}  entries
+ * @param {string} key
  */
 export const getScrollToId = ( entries, key ) => {
 	if ( key === 'first' ) {

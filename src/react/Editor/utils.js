@@ -1,7 +1,7 @@
 /**
  * Returns the highest last index of an array of characters.
- * @param string
- * @param characters
+ * @param {string}   string
+ * @param {string[]} characters
  */
 export const getLastIndexOf = ( string, characters = [] ) =>
 	characters.reduce(
@@ -12,9 +12,9 @@ export const getLastIndexOf = ( string, characters = [] ) =>
 
 /**
  * Simple templating function that replaces ${data} with a key value.
- * @param path
- * @param obj
- * @param fb
+ * @param {string} path
+ * @param {Object} obj
+ * @param {string} fb
  */
 const get = ( path, obj, fb = `$\{${ path }}` ) =>
 	path.split( '.' ).reduce( ( res, key ) => res[ key ] || fb, obj );
@@ -27,8 +27,8 @@ export const parseTemplate = ( template, map, fallback ) =>
 
 /**
  * Returns boolean if selection contains entity
- * @param editorState
- * @param selectionState
+ * @param {Object} editorState
+ * @param {Object} selectionState
  */
 export const hasEntityAtSelection = ( editorState, selectionState = false ) => {
 	const selection = selectionState || editorState.getSelection();
@@ -47,7 +47,7 @@ export const hasEntityAtSelection = ( editorState, selectionState = false ) => {
 /**
  * Gets the range of an autocomplete trigger from the trigger character to where
  * the user is typing.
- * @param triggers
+ * @param {string[]} triggers
  */
 export const getTriggerRange = ( triggers ) => {
 	const selection = window.getSelection();
@@ -79,8 +79,8 @@ export const getTriggerRange = ( triggers ) => {
 
 /**
  * Gets the autocomplete insert range to replace the trigger range with an enitity.
- * @param autocompleteState
- * @param editorState
+ * @param {Object} autocompleteState
+ * @param {Object} editorState
  */
 export const getInsertRange = ( autocompleteState, editorState ) => {
 	const currentSelectionState = editorState.getSelection();
@@ -101,8 +101,8 @@ export const getInsertRange = ( autocompleteState, editorState ) => {
 
 /**
  * Returns a number of the top position of trigger range to poistion the suggestion popover.
- * @param range
- * @param parent
+ * @param {Object}      range
+ * @param {HTMLElement} parent
  */
 export const getTopPosition = ( range, parent ) => {
 	const tempRange = window.getSelection().getRangeAt( 0 ).cloneRange();
@@ -114,8 +114,8 @@ export const getTopPosition = ( range, parent ) => {
 
 /**
  * If an element is hidden in a scrollable box then make it visible.
- * @param childElement
- * @param parentElement
+ * @param {HTMLElement} childElement
+ * @param {HTMLElement} parentElement
  */
 export const scrollElementIfNotInView = ( childElement, parentElement ) => {
 	const parentClientRect = parentElement.getBoundingClientRect();
@@ -135,9 +135,9 @@ export const scrollElementIfNotInView = ( childElement, parentElement ) => {
 
 /**
  * Returns an array of all the blocks at a selection given a start and end key.
- * @param contentState
- * @param anchorKey
- * @param focusKey
+ * @param {Object} contentState
+ * @param {string} anchorKey
+ * @param {string} focusKey
  */
 export const getSelectedBlocks = ( contentState, anchorKey, focusKey ) => {
 	const isSameBlock = anchorKey === focusKey;
@@ -159,7 +159,7 @@ export const getSelectedBlocks = ( contentState, anchorKey, focusKey ) => {
 
 /**
  * Check if a focusable block is focused/selected
- * @param editorState
+ * @param {Object} editorState
  */
 export const focusableBlockIsSelected = ( editorState ) => {
 	const selection = editorState.getSelection();
@@ -176,10 +176,8 @@ export const focusableBlockIsSelected = ( editorState ) => {
 
 /**
  * Get the most suitable image size.
- * @param {Object} image
- * @param {string} selectedSize
- * @param          sizes
- * @param          defaultSize
+ * @param {Object} sizes
+ * @param {string} defaultSize
  */
 export const getImageSize = ( sizes, defaultSize ) => {
 	if ( ! sizes ) {
@@ -197,8 +195,7 @@ export const getImageSize = ( sizes, defaultSize ) => {
 /**
  * Map a NamedNodeMap to an object and map the class attribute to className
  * for React.
- * @param {namedNodeMap} attributes
- * @param                namedNodeMap
+ * @param {NamedNodeMap} namedNodeMap
  */
 export const namedNodeMapToObject = ( namedNodeMap ) =>
 	Array.from( namedNodeMap ).reduce(

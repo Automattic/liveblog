@@ -404,8 +404,8 @@ const nodes = [
 /**
  * Plugin to load initial HTML content into the editor.
  * Only loads content once on mount to avoid cursor position issues.
- * @param root0
- * @param root0.initialContent
+ * @param {Object} root0
+ * @param {string} root0.initialContent
  */
 function InitialContentPlugin( { initialContent } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -472,8 +472,8 @@ function cleanLexicalHtml( html ) {
 
 /**
  * Plugin to export HTML when content changes.
- * @param root0
- * @param root0.onChange
+ * @param {Object}   root0
+ * @param {Function} root0.onChange
  */
 function HtmlExportPlugin( { onChange } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -498,8 +498,8 @@ function HtmlExportPlugin( { onChange } ) {
 
 /**
  * Plugin to handle image insertion and drag-drop.
- * @param root0
- * @param root0.handleImageUpload
+ * @param {Object}   root0
+ * @param {Function} root0.handleImageUpload
  */
 function ImagePlugin( { handleImageUpload } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -664,9 +664,9 @@ function getTriggerMatch( editor ) {
 
 /**
  * Plugin to handle autocomplete suggestions.
- * @param root0
- * @param root0.suggestions
- * @param root0.onSearch
+ * @param {Object}   root0
+ * @param {Array}    root0.suggestions
+ * @param {Function} root0.onSearch
  */
 function AutocompletePlugin( { suggestions, onSearch } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -977,12 +977,12 @@ AutocompletePlugin.propTypes = {
 
 /**
  * Toolbar button component using Dashicons.
- * @param root0
- * @param root0.onClick
- * @param root0.icon
- * @param root0.title
- * @param root0.isActive
- * @param root0.disabled
+ * @param {Object}   root0
+ * @param {Function} root0.onClick
+ * @param {string}   root0.icon
+ * @param {string}   root0.title
+ * @param {boolean}  root0.isActive
+ * @param {boolean}  root0.disabled
  */
 function ToolbarButton( {
 	onClick,
@@ -1015,11 +1015,11 @@ ToolbarButton.propTypes = {
 
 /**
  * Link input modal component.
- * @param root0
- * @param root0.url
- * @param root0.onChange
- * @param root0.onConfirm
- * @param root0.onCancel
+ * @param {Object}   root0
+ * @param {string}   root0.url
+ * @param {Function} root0.onChange
+ * @param {Function} root0.onConfirm
+ * @param {Function} root0.onCancel
  */
 function LinkInput( { url, onChange, onConfirm, onCancel } ) {
 	return (
@@ -1070,7 +1070,7 @@ LinkInput.propTypes = {
 
 /**
  * Get the current selection state for toolbar active states.
- * @param editor
+ * @param {Object} editor
  */
 function getSelectionState( editor ) {
 	const state = {
@@ -1127,9 +1127,9 @@ function getSelectionState( editor ) {
 
 /**
  * Complete toolbar for text formatting.
- * @param root0
- * @param root0.readOnly
- * @param root0.handleImageUpload
+ * @param {Object}   root0
+ * @param {boolean}  root0.readOnly
+ * @param {Function} root0.handleImageUpload
  */
 function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 	const [ editor ] = useLexicalComposerContext();
