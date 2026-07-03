@@ -5,10 +5,13 @@
   "author": "Automattic",
   "private": true,
   "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
     "@wordpress/i18n": "^6.21.1",
     "@wordpress/scripts": "^32.4.1",
     "sass-module-importer": "^1.4.0",
-    "sass-mq": "^7.0.0"
+    "sass-mq": "^7.0.0",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "@lexical/html": "^0.45.0",
@@ -40,7 +43,8 @@
     "start": "wp-scripts start",
     "lint:js": "wp-scripts lint-js ./src",
     "lint:css": "wp-scripts lint-style \"src/**/*.scss\"",
-    "test": "wp-scripts test-unit-js"
+    "test": "wp-scripts test-unit-js",
+    "check-types": "tsc --noEmit"
   },
   "overrides": {
     "webpack-dev-server": "^5.2.1"

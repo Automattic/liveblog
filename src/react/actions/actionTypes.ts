@@ -1,9 +1,12 @@
 /**
  * Convert list of strings and map them to constants.
- * @param {...any} args
+ * @param args Action type names.
  */
-const createTypes = ( ...args ) =>
-	args.reduce( ( obj, item ) => ( { ...obj, [ item ]: item } ), {} );
+const createTypes = ( ...args: string[] ): Record< string, string > =>
+	args.reduce(
+		( obj, item ) => ( { ...obj, [ item ]: item } ),
+		{} as Record< string, string >
+	);
 
 export default createTypes(
 	'LOAD_CONFIG',
