@@ -25,7 +25,7 @@ import { scrollToEntry } from '../actions/userActions';
 
 import { shouldRenderNewEntries } from '../utils/utils';
 
-const startPollingEpic = ( action$, state$ ) =>
+export const startPollingEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.START_POLLING ),
 		switchMap( () =>
@@ -54,7 +54,7 @@ const startPollingEpic = ( action$, state$ ) =>
 		)
 	);
 
-const mergePollingEpic = ( action$, state$ ) =>
+export const mergePollingEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.MERGE_POLLING ),
 		switchMap( () => {
