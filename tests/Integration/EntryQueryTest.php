@@ -59,9 +59,6 @@ final class EntryQueryTest extends TestCase {
 		foreach ( $existing_comments as $comment ) {
 			wp_delete_comment( $comment->comment_ID, true );
 		}
-
-		// Clear the cache to ensure tests start with a clean slate.
-		wp_cache_delete( 'liveblog_entries_asc_5', 'liveblog' );
 	}
 
 	/**
@@ -221,6 +218,75 @@ final class EntryQueryTest extends TestCase {
 	}
 
 	/**
+	 * Test count_entries counts all entries.
+	 */
+	public function test_count_entries_should_count_all_entries(): void {
+		$this->create_comment();
+		$this->create_comment();
+		$this->assertEquals( 2, $this->entry_query->count_entries() );
+	}
+
+	/**
+	 * Test count_entries returns 0 on no entries.
+	 */
+	public function test_count_entries_should_return_0_on_no_entries(): void {
+		$this->assertEquals( 0, $this->entry_query->count_entries() );
+	}
+
+	/**
+	 * Test count_entries excludes deletions, which are stored as comments
+	 * with empty content.
+	 */
+	public function test_count_entries_should_exclude_deletions(): void {
+		$this->create_comment();
+		$this->create_comment( array( 'comment_content' => '' ) );
+		$this->assertEquals( 1, $this->entry_query->count_entries() );
+	}
+
+	/**
+	 * Test count_entries counts a real delete() only once, not once for the
+	 * original entry plus once for its (empty content) tombstone comment.
+	 */
+	public function test_count_entries_should_count_a_real_delete_once(): void {
+		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args() );
+		WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
+
+		$this->assertEquals( 0, $this->entry_query->count_entries() );
+	}
+
+	/**
+	 * Test count_entries counts an updated entry once, not twice. An update
+	 * inserts a new comment but also overwrites the original entry's content,
+	 * so both comments end up with non-empty content.
+	 */
+	public function test_count_entries_should_count_an_updated_entry_once(): void {
+		$entry = WPCOM_Liveblog_Entry::insert( $this->build_entry_args() );
+		WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'entry_id' => $entry->get_id(),
+					'content'  => 'updated',
+				)
+			)
+		);
+
+		$this->assertEquals( 1, $this->entry_query->count_entries() );
+	}
+
+	/**
+	 * Test count_entries picks up new entries added after the first call, even
+	 * when both land within the same second (the cache key is busted by the
+	 * latest comment ID, not the timestamp, so it can't collide here).
+	 */
+	public function test_count_entries_reflects_newly_added_entries(): void {
+		$this->create_comment();
+		$this->assertEquals( 1, $this->entry_query->count_entries() );
+
+		$this->create_comment();
+		$this->assertEquals( 2, $this->entry_query->count_entries() );
+	}
+
+	/**
 	 * Create a comment.
 	 *
 	 * @param array $args Comment arguments.
@@ -234,6 +300,21 @@ final class EntryQueryTest extends TestCase {
 		);
 		$args     = array_merge( $defaults, $args );
 		return self::factory()->comment->create( $args );
+	}
+
+	/**
+	 * Build entry args for WPCOM_Liveblog_Entry::insert()/update()/delete().
+	 *
+	 * @param array $args Arguments to merge.
+	 * @return array Merged arguments.
+	 */
+	private function build_entry_args( array $args = array() ): array {
+		$defaults = array(
+			'post_id' => $this->entry_query->post_id,
+			'content' => 'Test Liveblog entry',
+			'user'    => self::factory()->user->create_and_get(),
+		);
+		return array_merge( $defaults, $args );
 	}
 
 	/**
