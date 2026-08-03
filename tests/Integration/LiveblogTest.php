@@ -18,6 +18,15 @@ use WPCOM_Liveblog;
 final class LiveblogTest extends TestCase {
 
 	/**
+	 * Reset the shared static post context mutated by the password-gate tests so
+	 * it cannot bleed into other cases.
+	 */
+	public function tear_down(): void {
+		WPCOM_Liveblog::$post_id = null;
+		parent::tear_down();
+	}
+
+	/**
 	 * Test that liveblog meta is protected.
 	 */
 	public function test_protected_liveblog_meta_should_return_true(): void {
@@ -134,5 +143,78 @@ final class LiveblogTest extends TestCase {
 		remove_filter( 'liveblog_current_user_can_edit_liveblog', '__return_false' );
 
 		$this->assertFalse( $result );
+	}
+
+	/**
+	 * A password-protected post must not disclose its liveblog entries through the
+	 * legacy AJAX/permalink JSON read endpoints until the password is satisfied,
+	 * while the self-authorising write endpoints stay reachable so authoring a
+	 * protected post's liveblog still works.
+	 *
+	 * Covers GHSA-w34c-54x5-vm9p (CWE-862 / CWE-200, legacy read-path disclosure).
+	 */
+	public function test_password_gate_denies_legacy_reads_for_password_protected_post(): void {
+		WPCOM_Liveblog::$post_id = $this->create_liveblog_post( array( 'post_password' => 'secret-w34c' ) );
+
+		foreach ( array( 'ajax_entries_between', 'ajax_single_entry', 'ajax_lazyload_entries', 'ajax_unknown' ) as $method ) {
+			$this->assertFalse(
+				WPCOM_Liveblog::ajax_request_passes_password_gate( $method ),
+				sprintf( '%s must be blocked on a password-protected post', $method )
+			);
+		}
+
+		foreach ( array( 'ajax_crud_entry', 'ajax_preview_entry' ) as $method ) {
+			$this->assertTrue(
+				WPCOM_Liveblog::ajax_request_passes_password_gate( $method ),
+				sprintf( '%s self-authorises and must remain reachable', $method )
+			);
+		}
+	}
+
+	/**
+	 * Once the post password requirement is satisfied for the request, the legacy
+	 * read endpoints are permitted again. The `post_password_required` filter
+	 * stands in for a visitor who has supplied the correct password (the same
+	 * mechanism WordPress core consults), keeping the test independent of
+	 * cookie-hashing internals.
+	 */
+	public function test_password_gate_allows_legacy_reads_once_password_satisfied(): void {
+		WPCOM_Liveblog::$post_id = $this->create_liveblog_post( array( 'post_password' => 'secret-w34c' ) );
+
+		add_filter( 'post_password_required', '__return_false' );
+
+		try {
+			$this->assertTrue( WPCOM_Liveblog::ajax_request_passes_password_gate( 'ajax_entries_between' ) );
+			$this->assertTrue( WPCOM_Liveblog::ajax_request_passes_password_gate( 'ajax_single_entry' ) );
+			$this->assertTrue( WPCOM_Liveblog::ajax_request_passes_password_gate( 'ajax_lazyload_entries' ) );
+		} finally {
+			remove_filter( 'post_password_required', '__return_false' );
+		}
+	}
+
+	/**
+	 * A liveblog post with no password is unaffected: the legacy read endpoints
+	 * remain reachable, so the fix does not regress ordinary public liveblogs.
+	 */
+	public function test_password_gate_allows_legacy_reads_for_unprotected_post(): void {
+		WPCOM_Liveblog::$post_id = $this->create_liveblog_post();
+
+		$this->assertTrue( WPCOM_Liveblog::ajax_request_passes_password_gate( 'ajax_entries_between' ) );
+		$this->assertTrue( WPCOM_Liveblog::ajax_request_passes_password_gate( 'ajax_single_entry' ) );
+		$this->assertTrue( WPCOM_Liveblog::ajax_request_passes_password_gate( 'ajax_lazyload_entries' ) );
+	}
+
+	/**
+	 * Create a published post with liveblog enabled and return its ID.
+	 *
+	 * @param array<string, mixed> $post_args Optional overrides for the created post.
+	 * @return int The new post ID.
+	 */
+	private function create_liveblog_post( array $post_args = array() ): int {
+		$post_id = self::factory()->post->create( $post_args );
+
+		WPCOM_Liveblog::admin_set_liveblog_state_for_post( $post_id, 'enable', array( 'state' => 'enable' ) );
+
+		return $post_id;
 	}
 }
