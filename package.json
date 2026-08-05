@@ -19,7 +19,7 @@
     "@lexical/selection": "^0.44.0",
     "@lexical/utils": "^0.44.0",
     "ace-builds": "^1.43.5",
-    "js-beautify": "^1.7.5",
+    "js-beautify": "^2.0.3",
     "lexical": "^0.44.0",
     "lodash-es": "^4.18.1",
     "prop-types": "^15.6.0",
