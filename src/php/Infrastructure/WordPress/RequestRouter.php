@@ -1,6 +1,6 @@
 <?php
 /**
- * Request router for liveblog endpoints.
+ * Entry read facade for liveblog endpoints.
  *
  * @package Automattic\Liveblog\Infrastructure\WordPress
  */
@@ -13,14 +13,11 @@ use Automattic\Liveblog\Application\Config\LazyloadConfiguration;
 use Automattic\Liveblog\Application\Config\LiveblogConfiguration;
 use Automattic\Liveblog\Application\Presenter\EntryPresenter;
 use Automattic\Liveblog\Application\Renderer\ContentRendererInterface;
-use Automattic\Liveblog\Application\Service\EntryOperations;
 use Automattic\Liveblog\Application\Service\EntryQueryService;
 use Automattic\Liveblog\Application\Service\KeyEventService;
 
 /**
- * Routes liveblog AJAX requests to appropriate handlers.
- *
- * Handles the non-REST-API legacy endpoints for backwards compatibility.
+ * Builds the JSON-ready entry payloads consumed by the REST API and AMP render path.
  */
 final class RequestRouter {
 
@@ -30,13 +27,6 @@ final class RequestRouter {
 	 * @var EntryQueryService
 	 */
 	private EntryQueryService $entry_query_service;
-
-	/**
-	 * Entry operations service.
-	 *
-	 * @var EntryOperations
-	 */
-	private EntryOperations $entry_operations;
 
 	/**
 	 * Key event service.
@@ -56,64 +46,17 @@ final class RequestRouter {
 	 * Constructor.
 	 *
 	 * @param EntryQueryService        $entry_query_service The entry query service.
-	 * @param EntryOperations          $entry_operations    The entry operations service.
 	 * @param KeyEventService          $key_event_service   The key event service.
 	 * @param ContentRendererInterface $content_renderer    Content renderer used by the entry presenter.
 	 */
 	public function __construct(
 		EntryQueryService $entry_query_service,
-		EntryOperations $entry_operations,
 		KeyEventService $key_event_service,
 		ContentRendererInterface $content_renderer
 	) {
 		$this->entry_query_service = $entry_query_service;
-		$this->entry_operations    = $entry_operations;
 		$this->key_event_service   = $key_event_service;
 		$this->content_renderer    = $content_renderer;
-	}
-
-	/**
-	 * Check if this is an initial page request (not AJAX).
-	 *
-	 * @return bool True if this is an initial page request.
-	 */
-	public function is_initial_page_request(): bool {
-		global $wp_query;
-
-		return ! isset( $wp_query->query_vars[ LiveblogConfiguration::KEY ] );
-	}
-
-	/**
-	 * Check if this is an entries AJAX request.
-	 *
-	 * @return bool True if this is an entries AJAX request.
-	 */
-	public function is_entries_ajax_request(): bool {
-		return (bool) get_query_var( LiveblogConfiguration::URL_ENDPOINT );
-	}
-
-	/**
-	 * Get the AJAX method name for the current request.
-	 *
-	 * @param string $endpoint_suffix The endpoint suffix from the URL.
-	 * @return string The method name to call.
-	 */
-	public function get_ajax_method( string $endpoint_suffix ): string {
-		$suffix_to_method = array(
-			'\d+/\d+'  => 'entries_between',
-			'crud'     => 'crud_entry',
-			'entry'    => 'single_entry',
-			'lazyload' => 'lazyload_entries',
-			'preview'  => 'preview_entry',
-		);
-
-		foreach ( $suffix_to_method as $suffix_re => $method ) {
-			if ( preg_match( "%^$suffix_re/?%", $endpoint_suffix ) ) {
-				return $method;
-			}
-		}
-
-		return 'unknown';
 	}
 
 	/**
@@ -283,16 +226,6 @@ final class RequestRouter {
 	}
 
 	/**
-	 * Format a preview entry.
-	 *
-	 * @param string $content The content to preview.
-	 * @return array The preview response.
-	 */
-	public function preview_entry( string $content ): array {
-		return $this->entry_operations->format_preview( $content );
-	}
-
-	/**
 	 * Get request data for pagination.
 	 *
 	 * @return object Request data with page, last, and id properties.
@@ -303,50 +236,6 @@ final class RequestRouter {
 			'last' => get_query_var( 'liveblog_last', false ),
 			'id'   => get_query_var( 'liveblog_id', false ),
 		);
-	}
-
-	/**
-	 * Parse timestamps from the URL query var.
-	 *
-	 * @return array{0: int, 1: int} Array of [start_timestamp, end_timestamp].
-	 */
-	public function get_timestamps_from_query(): array {
-		$original_timestamps = explode( '/', get_query_var( LiveblogConfiguration::URL_ENDPOINT ) );
-
-		$start_timestamp = isset( $original_timestamps[0] ) ? (int) $original_timestamps[0] : 0;
-		$end_timestamp   = isset( $original_timestamps[1] ) ? (int) $original_timestamps[1] : 0;
-
-		return array( $start_timestamp, $end_timestamp );
-	}
-
-	/**
-	 * Check if the current user can edit liveblog.
-	 *
-	 * @return bool True if user can edit.
-	 */
-	public function current_user_can_edit(): bool {
-		$cap    = LiveblogConfiguration::get_edit_capability();
-		$retval = current_user_can( $cap );
-
-		return (bool) apply_filters( 'liveblog_current_user_can_edit_liveblog', $retval );
-	}
-
-	/**
-	 * Verify the nonce for a request.
-	 *
-	 * @param string $action The nonce action.
-	 * @return bool True if nonce is valid.
-	 */
-	public function verify_nonce( string $action = LiveblogConfiguration::NONCE_ACTION ): bool {
-		$nonce_key = LiveblogConfiguration::NONCE_KEY;
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This method performs the verification.
-		if ( ! isset( $_REQUEST[ $nonce_key ] ) ) {
-			return false;
-		}
-
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Recommended
-		return (bool) wp_verify_nonce( wp_unslash( $_REQUEST[ $nonce_key ] ), $action );
 	}
 
 	/**

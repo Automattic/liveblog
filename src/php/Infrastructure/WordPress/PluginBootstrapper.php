@@ -101,8 +101,6 @@ final class PluginBootstrapper {
 	 */
 	private function init_core(): void {
 		add_action( 'init', array( $this, 'register_post_type_support' ) );
-		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
-		add_action( 'permalink_structure_changed', array( $this, 'add_rewrite_rules' ) );
 		add_action( 'init', array( $this, 'flush_rewrite_rules' ), 1000 );
 
 		// Register image embed handler.
@@ -143,15 +141,6 @@ final class PluginBootstrapper {
 		LiveblogConfiguration::set_auto_archive_days( $auto_archive_days );
 
 		do_action( 'after_liveblog_init' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy hook name.
-	}
-
-	/**
-	 * Add rewrite rules for liveblog endpoints.
-	 *
-	 * @return void
-	 */
-	public function add_rewrite_rules(): void {
-		add_rewrite_endpoint( LiveblogConfiguration::URL_ENDPOINT, EP_PERMALINK );
 	}
 
 	/**
