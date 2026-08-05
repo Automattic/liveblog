@@ -165,6 +165,13 @@ class WPCOM_Liveblog_AMP {
 			return;
 		}
 
+		// A password-protected post must not leak entry content through the AMP
+		// social meta tags (og:title/og:description) until the password has been
+		// satisfied.
+		if ( post_password_required( $post ) ) {
+			return;
+		}
+
 		$request = WPCOM_Liveblog::get_request_data();
 
 		// If no entry id set then not on single entry.
@@ -243,6 +250,15 @@ class WPCOM_Liveblog_AMP {
 		global $post;
 
 		if ( WPCOM_Liveblog::is_liveblog_post( $post->ID ) === false ) {
+			return $content;
+		}
+
+		// Do not render liveblog entries on the AMP view of a password-protected
+		// post until the visitor has satisfied the password. Otherwise the entries
+		// would be appended to the AMP output even though WordPress renders the
+		// password form (not the content) for such visitors. Mirrors the guards on
+		// the REST, JSON-LD/AMP metadata, and legacy AJAX read paths.
+		if ( post_password_required( $post ) ) {
 			return $content;
 		}
 
