@@ -158,7 +158,7 @@ final class StatsCommand {
 		$query = new WP_Query(
 			array(
 				'post_type'      => $this->get_supported_post_types(),
-				'posts_per_page' => -1,
+				'posts_per_page' => -1, // phpcs:ignore WordPressVIPMinimum.Performance.NoPaging.posts_per_page_posts_per_page -- CLI command; counts all liveblogs in the given state (ids only).
 				'post_status'    => 'any',
 				'meta_key'       => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding liveblogs.
 				'meta_value'     => $state, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for counting by state.

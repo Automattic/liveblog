@@ -41,7 +41,7 @@ final class ArchiveRepairService implements ArchiveRepairServiceInterface {
 			array(
 				'order'          => 'ASC',
 				'orderby'        => 'ID',
-				'posts_per_page' => -1,
+				'posts_per_page' => -1, // phpcs:ignore WordPressVIPMinimum.Performance.NoPaging.posts_per_page_posts_per_page -- CLI-only repair operation; must process every liveblog post.
 				'meta_key'       => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding liveblogs.
 			)
 		);
