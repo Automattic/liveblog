@@ -67,7 +67,7 @@ final class ListCommand {
 
 		$query_args = array(
 			'post_type'      => $this->get_supported_post_types(),
-			'posts_per_page' => -1,
+			'posts_per_page' => -1, // phpcs:ignore WordPressVIPMinimum.Performance.NoPaging.posts_per_page_posts_per_page -- CLI command; lists all liveblogs on demand.
 			'post_status'    => 'any',
 			'meta_key'       => 'liveblog', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for finding liveblogs.
 			'orderby'        => 'modified',
