@@ -646,7 +646,6 @@ final class Container {
 		if ( null === $this->request_router ) {
 			$this->request_router = new RequestRouter(
 				$this->entry_query_service(),
-				$this->entry_operations(),
 				$this->key_event_service(),
 				$this->content_renderer()
 			);

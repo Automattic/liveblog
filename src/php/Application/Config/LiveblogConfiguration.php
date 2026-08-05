@@ -24,7 +24,7 @@ final class LiveblogConfiguration {
 	/**
 	 * Rewrites version for flushing rewrite rules.
 	 */
-	public const REWRITES_VERSION = 1;
+	public const REWRITES_VERSION = 2;
 
 	/**
 	 * Minimum WordPress version required.
@@ -35,11 +35,6 @@ final class LiveblogConfiguration {
 	 * Meta key for liveblog state.
 	 */
 	public const KEY = 'liveblog';
-
-	/**
-	 * URL endpoint for liveblog.
-	 */
-	public const URL_ENDPOINT = 'liveblog';
 
 	/**
 	 * Capability required to edit liveblog entries.
