@@ -24,7 +24,7 @@ import { polling as pollingApi, getEntries } from '../services/api';
 import { scrollToEntry } from '../actions/userActions';
 
 import { shouldRenderNewEntries } from '../utils/utils';
-import { filterRenderedNewEntries } from '../utils/polling';
+import { filterKnownNewEntries } from '../utils/polling';
 
 const startPollingEpic = ( action$, state$ ) =>
 	action$.pipe(
@@ -41,9 +41,10 @@ const startPollingEpic = ( action$, state$ ) =>
 						map( ( res ) => {
 							const response = {
 								...res.response,
-								entries: filterRenderedNewEntries(
+								entries: filterKnownNewEntries(
 									res.response.entries,
-									state$.value.api.entries
+									state$.value.api.entries,
+									state$.value.polling.newestEntry
 								),
 							};
 
