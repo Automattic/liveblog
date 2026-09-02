@@ -24,6 +24,7 @@ import { polling as pollingApi, getEntries } from '../services/api';
 import { scrollToEntry } from '../actions/userActions';
 
 import { shouldRenderNewEntries } from '../utils/utils';
+import { filterKnownNewEntries } from '../utils/polling';
 
 const startPollingEpic = ( action$, state$ ) =>
 	action$.pipe(
@@ -37,16 +38,25 @@ const startPollingEpic = ( action$, state$ ) =>
 						state$.value.config
 					).pipe(
 						timeout( 10000 ),
-						map( ( res ) =>
-							pollingSuccess(
-								res.response,
+						map( ( res ) => {
+							const response = {
+								...res.response,
+								entries: filterKnownNewEntries(
+									res.response.entries,
+									state$.value.api.entries,
+									state$.value.polling.newestEntry
+								),
+							};
+
+							return pollingSuccess(
+								response,
 								shouldRenderNewEntries(
 									state$.value.pagination.page,
 									state$.value.api.entries,
 									state$.value.polling.entries
 								)
-							)
-						),
+							);
+						} ),
 						catchError( ( error ) => of( pollingFailed( error ) ) )
 					)
 				)
