@@ -672,10 +672,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			// Get liveblog entries within the start and end boundaries.
-			$all_entries = self::$entry_query->get_all_entries_asc();
-			$entries     = self::$entry_query->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
-			$pages       = false;
-			$per_page    = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
+			$entries  = self::$entry_query->get_between_timestamps( $start_timestamp, $end_timestamp );
+			$pages    = false;
+			$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
 			if ( ! empty( $entries ) ) {
 				/**
@@ -687,7 +686,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$entries_for_json[] = $entry->for_json();
 				}
 
-				$pages = ceil( count( self::flatten_entries( $all_entries ) ) / $per_page );
+				$pages = ceil( self::$entry_query->count_entries() / $per_page );
 			}
 
 			// Create the result array.
@@ -1067,7 +1066,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$per_page = WPCOM_Liveblog_Lazyloader::get_number_of_entries();
 
-			$entries = self::$entry_query->get_all_entries_asc();
+			// Query the full ASC list directly instead of caching it as a single
+			// object, so it doesn't fall over on Liveblog posts with a lot of entries.
+			$entries = self::$entry_query->get( array( 'order' => 'ASC' ) );
 			$entries = self::flatten_entries( $entries );
 
 			if ( $last_known_entry ) {
