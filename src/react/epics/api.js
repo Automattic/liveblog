@@ -29,7 +29,7 @@ import { shouldRenderNewEntries, getScrollToId } from '../utils/utils';
 
 import { scrollToEntry } from '../actions/userActions';
 
-const getEntriesEpic = ( action$, state$ ) =>
+export const getEntriesEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.GET_ENTRIES ),
 		switchMap( ( { page, hash } ) => {
@@ -66,7 +66,7 @@ const getEntriesEpic = ( action$, state$ ) =>
 		} )
 	);
 
-const getPaginatedEntriesEpic = ( action$, state$ ) =>
+export const getPaginatedEntriesEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.GET_ENTRIES_PAGINATED ),
 		switchMap( ( { page, scrollTo } ) =>
@@ -100,7 +100,7 @@ const getPaginatedEntriesEpic = ( action$, state$ ) =>
 		)
 	);
 
-const createEntryEpic = ( action$, state$ ) =>
+export const createEntryEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.CREATE_ENTRY ),
 		switchMap( ( { payload } ) =>
@@ -116,7 +116,7 @@ const createEntryEpic = ( action$, state$ ) =>
 		)
 	);
 
-const updateEntryEpic = ( action$, state$ ) =>
+export const updateEntryEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.UPDATE_ENTRY ),
 		switchMap( ( { payload } ) =>
@@ -132,7 +132,7 @@ const updateEntryEpic = ( action$, state$ ) =>
 		)
 	);
 
-const deleteEntryEpic = ( action$, state$ ) =>
+export const deleteEntryEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.DELETE_ENTRY ),
 		switchMap( ( { payload } ) =>
@@ -148,7 +148,7 @@ const deleteEntryEpic = ( action$, state$ ) =>
 		)
 	);
 
-const getEntriesAfterChangeEpic = ( action$ ) =>
+export const getEntriesAfterChangeEpic = ( action$ ) =>
 	action$.pipe(
 		ofType(
 			types.CREATE_ENTRY_SUCCESS,
