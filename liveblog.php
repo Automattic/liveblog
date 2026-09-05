@@ -2386,7 +2386,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			);
 		}
 	}
-	WPCOM_Liveblog::load();
+
+	// Hooked instead of called directly so that other plugins get a chance to
+	// register their own callbacks (e.g. on `liveblog_features`) before we run.
+	add_action( 'plugins_loaded', array( 'WPCOM_Liveblog', 'load' ), 0 );
 
 	/** Plupload Helpers */
 	if ( ! function_exists( 'wp_convert_hr_to_bytes' ) ) {
