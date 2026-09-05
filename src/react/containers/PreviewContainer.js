@@ -1,60 +1,57 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { timeout, map } from 'rxjs/operators';
 
 import { getPreview } from '../services/api';
 import Loader from '../components/Loader';
 
-class PreviewContainer extends Component {
-	constructor( props ) {
-		super( props );
+/**
+ * Pull the rendered HTML out of a preview ajax response.
+ * @param {Object} res
+ */
+export const getResponseHtml = ( res ) => res.response.html;
 
-		this.state = {
-			loading: true,
-			error: false,
-			entryContent: false,
-		};
-	}
+const PreviewContainer = ( { config, getEntryContent } ) => {
+	const [ loading, setLoading ] = useState( true );
+	const [ entryContent, setEntryContent ] = useState( false );
 
-	componentDidMount() {
-		const { config, getEntryContent } = this.props;
+	useEffect( () => {
+		const subscription = getPreview( getEntryContent(), config )
+			.pipe( timeout( 10000 ), map( getResponseHtml ) )
+			.subscribe( {
+				next: ( html ) => {
+					setEntryContent( html );
+					setLoading( false );
+				},
+				error: () => {
+					setEntryContent( false );
+					setLoading( false );
+				},
+			} );
 
-		getPreview( getEntryContent(), config )
-			.pipe(
-				timeout( 10000 ),
-				map( ( res ) => res.response )
-			)
-			.subscribe( ( res ) =>
-				this.setState( {
-					entryContent: res.html,
-					loading: false,
-				} )
-			);
-	}
+		return () => subscription.unsubscribe();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
-	render() {
-		const { entryContent, loading } = this.state;
-
-		if ( loading ) {
-			return (
-				<div className="liveblog-preview">
-					<Loader />
-				</div>
-			);
-		}
-
-		if ( ! entryContent ) {
-			return false;
-		}
-
+	if ( loading ) {
 		return (
-			<div
-				className="liveblog-preview"
-				dangerouslySetInnerHTML={ { __html: entryContent } }
-			/>
+			<div className="liveblog-preview">
+				<Loader />
+			</div>
 		);
 	}
-}
+
+	if ( ! entryContent ) {
+		return false;
+	}
+
+	return (
+		<div
+			className="liveblog-preview"
+			dangerouslySetInnerHTML={ { __html: entryContent } }
+		/>
+	);
+};
 
 PreviewContainer.propTypes = {
 	getEntryContent: PropTypes.func,
