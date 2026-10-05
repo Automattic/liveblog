@@ -55,7 +55,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			// Increment the count so we get a more human readable index, initial value becomes 1 rather than 0.
 			++$current_liveblog;
 
-			// Tell the user what we are doing, but let's colour this one so we can see it's a new Liveblog in the console output.
+			// Tell the user what we are doing, but let's color this one so we can see it's a new Liveblog in the console output.
 			WP_CLI::log( WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n" ) );
 
 			// Define the post ID.
@@ -155,7 +155,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 				// Counter.
 				$replaced = 0;
 
-				// The edited entry is accurate so we don't need to do anything.
+				// Replace each broken entry's content with the correct content.
 				WP_CLI::log( 'Total of ' . count( $entries_replace ) . ' need action..' );
 
 				foreach ( $entries_replace as $entry_replace ) {
