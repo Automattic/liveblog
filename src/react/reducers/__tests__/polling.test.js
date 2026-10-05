@@ -119,4 +119,14 @@ describe( 'polling reducer', () => {
 		expect( result.entries ).toEqual( {} );
 		expect( result.knownEntryIds ).toEqual( { id_300: true } );
 	} );
+
+	it( 'queues a repeated new ID within one polling response once', () => {
+		const entry = { id: 400, type: 'new', timestamp: 2004 };
+		const result = polling(
+			initialState,
+			pollingSuccess( { entries: [ entry, entry ] }, false )
+		);
+
+		expect( result.entries ).toEqual( { id_400: entry } );
+	} );
 } );
