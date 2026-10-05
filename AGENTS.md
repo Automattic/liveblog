@@ -51,7 +51,7 @@ liveblog/
 
 * **Runtime PHP**: `composer/installers`. WebSocket users also pull in `predis/predis` and `rase/socket.io-emitter`.
 * **Dev**: `automattic/vipwpcs`, `phpunit/phpunit`, `yoast/wp-test-utils`, `php-parallel-lint`, `phpcompatibility/phpcompatibility-wp`.
-* **Front end**: React 18, Lexical 0.43.x, Redux + Redux-Observable, `@wordpress/scripts` for builds.
+* **Front end**: React 18, Lexical 0.46.x (keep every `@lexical/*` package and `lexical` on the same version), Redux + Redux-Observable, `@wordpress/scripts` for builds.
 
 ## Commands
 
