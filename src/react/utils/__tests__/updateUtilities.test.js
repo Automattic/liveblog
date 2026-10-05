@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { applyUpdate, eventsApplyUpdate, pollingApplyUpdate } from '../utils';
 import {
 	currentEntries,

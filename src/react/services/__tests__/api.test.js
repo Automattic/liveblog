@@ -1,13 +1,14 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { polling, getEntries } from '../api';
 
 // Mock rxjs/ajax
-jest.mock( 'rxjs/ajax', () => ( {
-	ajax: jest.fn( ( settings ) => settings ),
+vi.mock( 'rxjs/ajax', () => ( {
+	ajax: vi.fn( ( settings ) => settings ),
 } ) );
 
 // Mock getCurrentTimestamp
-jest.mock( '../../utils/utils', () => ( {
-	getCurrentTimestamp: jest.fn(),
+vi.mock( '../../utils/utils', () => ( {
+	getCurrentTimestamp: vi.fn(),
 } ) );
 
 import { getCurrentTimestamp } from '../../utils/utils';
@@ -60,7 +61,7 @@ describe( 'api service', () => {
 		};
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should round both start and end timestamps to bucket boundaries', () => {

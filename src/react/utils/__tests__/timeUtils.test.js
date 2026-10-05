@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { formattedTime, timeAgo, getCurrentTimestamp } from '../utils';
 
 describe( 'time utils', () => {
