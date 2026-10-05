@@ -1,9 +1,16 @@
 import { applyUpdate, getNewestEntry } from '../utils/utils';
+import {
+	filterKnownNewEntries,
+	rememberPolledEntries,
+	rememberRenderedEntries,
+	removeRenderedPendingEntries,
+} from '../utils/polling';
 
 export const initialState = {
 	error: false,
 	newestEntry: false,
 	entries: {},
+	knownEntryIds: {},
 	pages: 1,
 };
 
@@ -17,10 +24,15 @@ export const polling = ( state = initialState, action ) => {
 					? {}
 					: applyUpdate(
 							state.entries,
-							action.payload.entries.filter(
-								( entry ) => entry.type === 'new'
+							filterKnownNewEntries(
+								action.payload.entries,
+								state.knownEntryIds
 							)
 					  ),
+				knownEntryIds: rememberPolledEntries(
+					state.knownEntryIds,
+					action.payload.entries
+				),
 				newestEntry: getNewestEntry(
 					state.newestEntry,
 					action.payload.entries[ action.payload.entries.length - 1 ]
@@ -36,15 +48,27 @@ export const polling = ( state = initialState, action ) => {
 				error: true,
 			};
 
-		case 'GET_ENTRIES_SUCCESS':
+		case 'GET_ENTRIES_SUCCESS': {
+			const knownEntryIds = rememberRenderedEntries(
+				state.knownEntryIds,
+				action.payload.entries
+			);
+
 			return {
 				...state,
 				newestEntry: getNewestEntry(
 					state.newestEntry,
 					action.payload.entries[ 0 ]
 				),
-				entries: action.renderNewEntries ? {} : state.entries,
+				entries: action.renderNewEntries
+					? {}
+					: removeRenderedPendingEntries(
+							state.entries,
+							action.payload.entries
+					  ),
+				knownEntryIds,
 			};
+		}
 
 		case 'MERGE_POLLING_INTO_ENTRIES':
 			return {
