@@ -22,6 +22,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 
 import {
 	HeadingNode,
@@ -49,16 +50,14 @@ import {
 	$getRoot,
 	$insertNodes,
 	$getSelection,
-	$setSelection,
 	$isRangeSelection,
-	$isNodeSelection,
 	$getNodeByKey,
-	$createNodeSelection,
 	$createParagraphNode,
+	CLICK_COMMAND,
 	FORMAT_TEXT_COMMAND,
-	SELECTION_CHANGE_COMMAND,
 	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_EDITOR,
+	COMMAND_PRIORITY_LOW,
 	createCommand,
 	DecoratorNode,
 	DRAGOVER_COMMAND,
@@ -94,51 +93,28 @@ function ResizableImage( { src, alt, width, height, nodeKey } ) {
 	const [ editor ] = useLexicalComposerContext();
 	const imageRef = useRef( null );
 	const [ isResizing, setIsResizing ] = useState( false );
-	const [ isSelected, setIsSelected ] = useState( false );
+	const [ isSelected, setSelected, clearSelection ] =
+		useLexicalNodeSelection( nodeKey );
 	const startSize = useRef( { width: 0, height: 0 } );
 	const startPos = useRef( { x: 0, y: 0 } );
 	const aspectRatio = useRef( 1 );
 
-	// Track selection state.
+	// Select the image on click. This must be a CLICK_COMMAND handler that
+	// outranks the rich-text plugin's, which otherwise clears node selections.
 	useEffect( () => {
 		return editor.registerCommand(
-			SELECTION_CHANGE_COMMAND,
-			() => {
-				editor.getEditorState().read( () => {
-					const selection = $getSelection();
-					if ( $isNodeSelection( selection ) ) {
-						const nodes = selection.getNodes();
-						const selected = nodes.some(
-							( node ) =>
-								$isImageNode( node ) &&
-								node.getKey() === nodeKey
-						);
-						setIsSelected( selected );
-					} else {
-						setIsSelected( false );
-					}
-				} );
-				return false;
-			},
-			COMMAND_PRIORITY_HIGH
-		);
-	}, [ editor, nodeKey ] );
-
-	// Handle click to select image.
-	const handleClick = useCallback(
-		( event ) => {
-			event.preventDefault();
-			editor.update( () => {
-				const node = $getNodeByKey( nodeKey );
-				if ( node ) {
-					const selection = $createNodeSelection();
-					selection.add( nodeKey );
-					$setSelection( selection );
+			CLICK_COMMAND,
+			( event ) => {
+				if ( event.target !== imageRef.current ) {
+					return false;
 				}
-			} );
-		},
-		[ editor, nodeKey ]
-	);
+				clearSelection();
+				setSelected( true );
+				return true;
+			},
+			COMMAND_PRIORITY_LOW
+		);
+	}, [ editor, clearSelection, setSelected ] );
 
 	// Start resize on mousedown.
 	const handleResizeStart = useCallback( ( event ) => {
@@ -211,7 +187,6 @@ function ResizableImage( { src, alt, width, height, nodeKey } ) {
 				alt={ alt }
 				className="liveblog-lexical-image"
 				style={ style }
-				onClick={ handleClick }
 				draggable={ false }
 			/>
 			{ isSelected && (
