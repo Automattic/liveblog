@@ -57,7 +57,6 @@ import {
 	$createParagraphNode,
 	FORMAT_TEXT_COMMAND,
 	SELECTION_CHANGE_COMMAND,
-	COMMAND_PRIORITY_CRITICAL,
 	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_EDITOR,
 	createCommand,
@@ -460,6 +459,13 @@ function cleanLexicalHtml( html ) {
 
 	// Remove empty spans
 	cleaned = cleaned.replace( /<span>([^<]*)<\/span>/g, '$1' );
+
+	// Remove the extra <br> Lexical 0.52+ adds after a trailing line break.
+	// Lexical drops it again on import; without the marker it would not.
+	cleaned = cleaned.replace(
+		/<br data-lexical-managed-linebreak="true">/g,
+		''
+	);
 
 	// Clean up image wrapper spans
 	cleaned = cleaned.replace(
@@ -1150,16 +1156,13 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 	const [ pendingImageFile, setPendingImageFile ] = useState( null );
 	const fileInputRef = useRef( null );
 
-	// Update selection state when selection changes
+	// Refresh button states after every commit. SELECTION_CHANGE_COMMAND is
+	// not used because, from Lexical 0.52, it runs before the commit, when
+	// getSelectionState() would still read the previous selection.
 	useEffect( () => {
-		return editor.registerCommand(
-			SELECTION_CHANGE_COMMAND,
-			() => {
-				setSelectionState( getSelectionState( editor ) );
-				return false;
-			},
-			COMMAND_PRIORITY_CRITICAL
-		);
+		return editor.registerUpdateListener( () => {
+			setSelectionState( getSelectionState( editor ) );
+		} );
 	}, [ editor ] );
 
 	const formatBold = useCallback( () => {
