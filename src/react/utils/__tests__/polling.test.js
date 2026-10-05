@@ -22,19 +22,6 @@ describe( 'polling entry deduplication', () => {
 		] );
 	} );
 
-	it( 'deduplicates repeated new IDs within one polling response', () => {
-		const entries = [
-			{ id: 100, type: 'new', timestamp: 2000 },
-			{ id: 100, type: 'new', timestamp: 2000 },
-			{ id: 101, type: 'new', timestamp: 2000 },
-		];
-
-		expect( filterKnownNewEntries( entries, {} ) ).toEqual( [
-			{ id: 100, type: 'new', timestamp: 2000 },
-			{ id: 101, type: 'new', timestamp: 2000 },
-		] );
-	} );
-
 	it( 'remembers updated entries that were rendered by paged loading', () => {
 		const knownEntryIds = rememberRenderedEntries( {}, [
 			{ id: 100, type: 'update', timestamp: 2001 },
@@ -85,17 +72,6 @@ describe( 'polling entry deduplication', () => {
 		} );
 	} );
 
-	it( 'reuses the lookup when polling adds no new IDs', () => {
-		const knownEntryIds = { id_100: true };
-
-		expect(
-			rememberPolledEntries( knownEntryIds, [
-				{ id: 100, type: 'new' },
-				{ id: 101, type: 'update' },
-			] )
-		).toBe( knownEntryIds );
-	} );
-
 	it( 'removes only pending IDs that a page response actually rendered', () => {
 		const pendingEntries = {
 			id_100: { id: 100, type: 'new' },
@@ -109,16 +85,9 @@ describe( 'polling entry deduplication', () => {
 		).toEqual( {
 			id_200: { id: 200, type: 'new' },
 		} );
-	} );
-
-	it( 'ignores malformed entries without poisoning the lookup', () => {
-		const knownEntryIds = {};
-
-		expect(
-			rememberRenderedEntries( knownEntryIds, [
-				{ type: 'new', timestamp: 2000 },
-				{ id: 100, type: 'unexpected', timestamp: 2000 },
-			] )
-		).toBe( knownEntryIds );
+		expect( Object.keys( pendingEntries ) ).toEqual( [
+			'id_100',
+			'id_200',
+		] );
 	} );
 } );

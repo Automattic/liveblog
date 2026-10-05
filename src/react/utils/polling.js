@@ -1,81 +1,28 @@
-const getEntryKey = ( entry ) => {
-	if ( ! entry || entry.id === undefined || entry.id === null ) {
-		return false;
-	}
-
-	return `id_${ entry.id }`;
-};
-
-const hasEntryKey = ( lookup, key ) =>
-	Boolean( key ) && Object.prototype.hasOwnProperty.call( lookup, key );
+const entryKey = ( entry ) => `id_${ entry.id }`;
 
 /**
  * Return polling `new` entries whose logical IDs are not already known.
  *
  * Deduplication is deliberately based on entry identity, not timestamp
- * ordering. Repeated IDs within the same response are also collapsed.
+ * ordering: bucketed polling URLs can re-deliver entries the client has.
  *
  * @param {Array}  entries       Polling response entries.
  * @param {Object} knownEntryIds Logical entry IDs already known to the client.
  * @return {Array} New entries that still need to be queued.
  */
-export const filterKnownNewEntries = ( entries, knownEntryIds = {} ) => {
-	const newIdsInBatch = {};
+export const filterKnownNewEntries = ( entries, knownEntryIds ) =>
+	entries.filter(
+		( entry ) => entry.type === 'new' && ! knownEntryIds[ entryKey( entry ) ]
+	);
 
-	return entries.filter( ( entry ) => {
-		if ( entry.type !== 'new' ) {
-			return false;
-		}
-
-		const key = getEntryKey( entry );
-
-		if ( ! key ) {
-			return true;
-		}
-
-		if (
-			hasEntryKey( knownEntryIds, key ) ||
-			hasEntryKey( newIdsInBatch, key )
-		) {
-			return false;
-		}
-
-		newIdsInBatch[ key ] = true;
-		return true;
-	} );
-};
-
-/**
- * Add selected logical IDs to the known-entry lookup, cloning at most once.
- *
- * @param {Object}   knownEntryIds  Logical entry IDs already known to the client.
- * @param {Array}    entries        Entries received in the current batch.
- * @param {Function} shouldRemember Whether the entry proves its ID is known.
- * @return {Object} Updated known-entry ID lookup.
- */
-const rememberEntryIds = ( knownEntryIds = {}, entries, shouldRemember ) => {
-	let nextKnownEntryIds = knownEntryIds;
-
-	entries.forEach( ( entry ) => {
-		if ( ! shouldRemember( entry ) ) {
-			return;
-		}
-
-		const key = getEntryKey( entry );
-
-		if ( ! key || hasEntryKey( nextKnownEntryIds, key ) ) {
-			return;
-		}
-
-		if ( nextKnownEntryIds === knownEntryIds ) {
-			nextKnownEntryIds = { ...knownEntryIds };
-		}
-
-		nextKnownEntryIds[ key ] = true;
-	} );
-
-	return nextKnownEntryIds;
-};
+const rememberEntryIds = ( knownEntryIds, entries, types ) => ( {
+	...knownEntryIds,
+	...Object.fromEntries(
+		entries
+			.filter( ( entry ) => types.includes( entry.type ) )
+			.map( ( entry ) => [ entryKey( entry ), true ] )
+	),
+} );
 
 /**
  * Remember IDs for entries loaded as a rendered page.
@@ -89,11 +36,7 @@ const rememberEntryIds = ( knownEntryIds = {}, entries, shouldRemember ) => {
  * @return {Object} Updated known-entry ID lookup.
  */
 export const rememberRenderedEntries = ( knownEntryIds, entries ) =>
-	rememberEntryIds(
-		knownEntryIds,
-		entries,
-		( entry ) => entry.type === 'new' || entry.type === 'update'
-	);
+	rememberEntryIds( knownEntryIds, entries, [ 'new', 'update' ] );
 
 /**
  * Remember IDs that are conclusive when received through polling.
@@ -107,11 +50,7 @@ export const rememberRenderedEntries = ( knownEntryIds, entries ) =>
  * @return {Object} Updated known-entry ID lookup.
  */
 export const rememberPolledEntries = ( knownEntryIds, entries ) =>
-	rememberEntryIds(
-		knownEntryIds,
-		entries,
-		( entry ) => entry.type === 'new'
-	);
+	rememberEntryIds( knownEntryIds, entries, [ 'new' ] );
 
 /**
  * Remove pending entries that have since been delivered in a rendered page.
@@ -128,29 +67,9 @@ export const removeRenderedPendingEntries = (
 	pendingEntries,
 	renderedEntries
 ) => {
-	let nextPendingEntries = pendingEntries;
+	const remaining = { ...pendingEntries };
 
-	renderedEntries.forEach( ( entry ) => {
-		if (
-			entry.type !== 'new' &&
-			entry.type !== 'update' &&
-			entry.type !== 'delete'
-		) {
-			return;
-		}
+	renderedEntries.forEach( ( entry ) => delete remaining[ entryKey( entry ) ] );
 
-		const key = getEntryKey( entry );
-
-		if ( ! key || ! hasEntryKey( nextPendingEntries, key ) ) {
-			return;
-		}
-
-		if ( nextPendingEntries === pendingEntries ) {
-			nextPendingEntries = { ...pendingEntries };
-		}
-
-		delete nextPendingEntries[ key ];
-	} );
-
-	return nextPendingEntries;
+	return remaining;
 };

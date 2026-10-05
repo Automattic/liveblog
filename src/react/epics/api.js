@@ -148,14 +148,27 @@ const deleteEntryEpic = ( action$, state$ ) =>
 		)
 	);
 
-const getEntriesAfterChangeEpic = ( action$ ) =>
+export const getEntriesAfterChangeEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType(
 			types.CREATE_ENTRY_SUCCESS,
 			types.UPDATE_ENTRY_SUCCESS,
 			types.DELETE_ENTRY_SUCCESS
 		),
-		map( ( { payload } ) => pollingSuccess( payload, true ) )
+		// Forcing a render clears the pending queue, so render the queued
+		// (older) entries along with the change rather than dropping them.
+		map( ( { payload } ) =>
+			pollingSuccess(
+				{
+					...payload,
+					entries: [
+						...Object.values( state$.value.polling.entries ),
+						...payload.entries,
+					],
+				},
+				true
+			)
+		)
 	);
 
 export default combineEpics(
