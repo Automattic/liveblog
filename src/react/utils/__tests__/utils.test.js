@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	getLastOfObject,
 	getFirstOfObject,
@@ -86,7 +87,7 @@ describe( 'utils', () => {
 			mockElement = document.createElement( 'div' );
 
 			// Mock dispatchEvent
-			window.dispatchEvent = jest.fn();
+			window.dispatchEvent = vi.fn();
 		} );
 
 		afterEach( () => {
@@ -109,7 +110,7 @@ describe( 'utils', () => {
 		} );
 
 		it( 'should call FB.XFBML.parse with the element when the SDK is loaded and markup is present', () => {
-			const mockParse = jest.fn();
+			const mockParse = vi.fn();
 			window.FB = {
 				XFBML: {
 					parse: mockParse,
@@ -126,10 +127,10 @@ describe( 'utils', () => {
 		} );
 
 		it( 'should not process any provider when no embed markup is present', () => {
-			const mockParse = jest.fn();
+			const mockParse = vi.fn();
 			window.FB = { XFBML: { parse: mockParse } };
-			window.twttr = { widgets: { load: jest.fn() } };
-			window.instgrm = { Embeds: { process: jest.fn() } };
+			window.twttr = { widgets: { load: vi.fn() } };
+			window.instgrm = { Embeds: { process: vi.fn() } };
 
 			triggerOembedLoad( mockElement );
 
@@ -146,7 +147,7 @@ describe( 'utils', () => {
 		} );
 
 		it( 'should handle elements with fb:post (legacy XFBML format)', () => {
-			const mockParse = jest.fn();
+			const mockParse = vi.fn();
 			window.FB = {
 				XFBML: {
 					parse: mockParse,
@@ -173,7 +174,7 @@ describe( 'utils', () => {
 		} );
 
 		it( 'should call Twitter widgets.load when Twitter SDK is available', () => {
-			const mockLoad = jest.fn();
+			const mockLoad = vi.fn();
 			window.twttr = {
 				widgets: {
 					load: mockLoad,
@@ -190,7 +191,7 @@ describe( 'utils', () => {
 		} );
 
 		it( 'should call Instagram Embeds.process when Instagram SDK is available', () => {
-			const mockProcess = jest.fn();
+			const mockProcess = vi.fn();
 			window.instgrm = {
 				Embeds: {
 					process: mockProcess,

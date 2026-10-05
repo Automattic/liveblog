@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import pollingData from '../../mockData/reducers/polling';
 import eventsData from '../../mockData/reducers/events';
 

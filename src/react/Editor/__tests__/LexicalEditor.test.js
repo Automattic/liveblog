@@ -2,6 +2,8 @@
  * Tests for LexicalEditor drop handling logic
  */
 
+import { describe, expect, it, vi } from 'vitest';
+
 describe( 'LexicalEditor image drop handling', () => {
 	describe( 'image file filtering', () => {
 		it( 'filters only image files from dropped files', () => {
@@ -60,7 +62,7 @@ describe( 'LexicalEditor image drop handling', () => {
 	describe( 'sequential upload processing', () => {
 		it( 'processes all dropped images sequentially', async () => {
 			const uploadedImages = [];
-			const mockUpload = jest.fn().mockImplementation( ( file ) => {
+			const mockUpload = vi.fn().mockImplementation( ( file ) => {
 				return new Promise( ( resolve ) => {
 					setTimeout( () => {
 						uploadedImages.push( file.name );
@@ -93,7 +95,7 @@ describe( 'LexicalEditor image drop handling', () => {
 			const uploadedImages = [];
 			let callCount = 0;
 
-			const mockUpload = jest.fn().mockImplementation( ( file ) => {
+			const mockUpload = vi.fn().mockImplementation( ( file ) => {
 				return new Promise( ( resolve, reject ) => {
 					callCount++;
 					if ( callCount === 2 ) {
