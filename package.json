@@ -6,7 +6,7 @@
   "private": true,
   "devDependencies": {
     "@wordpress/i18n": "^6.21.1",
-    "@wordpress/scripts": "^32.4.1",
+    "@wordpress/scripts": "^36.0.0",
     "sass-module-importer": "^1.4.0",
     "sass-mq": "^7.0.1"
   },
