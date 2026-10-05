@@ -91,7 +91,7 @@ final class RestApiTest extends TestCase {
 
 		$this->assertArrayHasKey( 'WPCOM_Liveblog_Rest_Api::register_routes', $test_array );
 
-		// Lets test the existing endpoint base. Should return the same one as above.
+		// Let's test the existing endpoint base. Should return the same one as above.
 		$existing_endpoint_base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
 		$this->assertSame( $base, $existing_endpoint_base );
 	}
@@ -127,16 +127,16 @@ final class RestApiTest extends TestCase {
 		// Empty the base so we can generate one.
 		WPCOM_Liveblog_Rest_Api::$endpoint_base = null;
 
-		// Lets define the known API namespace.
+		// Let's define the known API namespace.
 		$api_namespace = 'liveblog/v1';
 
-		// Lets set a pretty URL Permalink Structure.
+		// Let's set a pretty URL Permalink Structure.
 		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 
 		// Now lest fire the method again and see what we get as the method should now detect the new permalink structure and return the pretty endpoint.
 		$base = WPCOM_Liveblog_Rest_Api::build_endpoint_base();
 
-		// Lets make sure something is returned.
+		// Let's make sure something is returned.
 		$this->assertNotNull( $base );
 
 		// Now assert the return matches the expected return.
@@ -731,7 +731,7 @@ final class RestApiTest extends TestCase {
 	 */
 	public function test_endpoint_entry_preview_bad_request(): void {
 		// The "entry_content" POST data is required for the preview endpoint.
-		// Lets leave it out and expect a 400 bad request response.
+		// Let's leave it out and expect a 400 bad request response.
 
 		// Create an author and set as the current user so the post-scoped permission
 		// check passes and the request is evaluated against argument validation.

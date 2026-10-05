@@ -79,7 +79,7 @@ class WPCOM_Liveblog_Entry_Extend {
 			$regex = $regex_prefix . implode( '|', $feature->get_prefixes() ) . $regex_postfix;
 			$feature->set_regex( apply_filters( 'liveblog_' . $name . '_regex', $regex ) );
 
-			// Finally, simply load the feature as it may have it's
+			// Finally, simply load the feature as it may have its
 			// own setup that it is required to complete.
 			$feature->load();
 		}

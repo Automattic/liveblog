@@ -29,7 +29,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 	public function fix_archive( $args, $assoc_args ) {
 		global $wpdb;
 
-		// Grab the dryrun flag from the assoc arguments if its there and define our flag as required.
+		// Grab the dryrun flag from the assoc arguments if it's there and define our flag as required.
 		$is_dryrun = ( isset( $assoc_args['dryrun'] ) ) ? true : false;
 
 		// Find all liveblogs.
@@ -52,10 +52,10 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 
 		foreach ( $posts->posts as $post ) {
 
-			// Increment the count so we get a more human readable index, inital value becomes 1 rather than 0.
+			// Increment the count so we get a more human readable index, initial value becomes 1 rather than 0.
 			++$current_liveblog;
 
-			// Tell the user what we are doing, but lets colour this one se we can see its a new Liveblog in the console output.
+			// Tell the user what we are doing, but let's color this one so we can see it's a new Liveblog in the console output.
 			WP_CLI::log( WP_CLI::colorize( "%4 Processing Liveblog {$current_liveblog} of {$total_liveblogs} %n" ) );
 
 			// Define the post ID.
@@ -84,7 +84,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 			// Replace incorrect meta_value with correct one.
 			if ( count( $edit_entries ) > 0 ) {
 
-				// SHow the User how many Edited Entries we've found.
+				// Show the User how many Edited Entries we've found.
 				WP_CLI::log( 'Found ' . count( $edit_entries ) . ' edited entries..' );
 
 				foreach ( $edit_entries as $edit_entry ) {
@@ -93,7 +93,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 					// Look for replaces property in $correct_ids.
 					if ( in_array( $edit_entry->replaces, $correct_ids, true ) ) {
 
-						// The edited entry is accurate so we dont need to do anything.
+						// The edited entry is accurate so we don't need to do anything.
 						WP_CLI::log( 'No action required.. skipping Entry ' . $entry_id );
 						continue;
 					} else {
@@ -106,7 +106,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 								// The edited entry needs updating to reflect the correct IDs.
 								WP_CLI::log( 'Correcting Entry ' . $entry_id . '...' );
 
-								// If this isnt a dry run we can run the database Update.
+								// If this isn't a dry run we can run the database Update.
 								if ( false === $is_dryrun ) {
 									$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- WP-CLI bulk repair operation.
 										$wpdb->commentmeta,
@@ -155,7 +155,7 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 				// Counter.
 				$replaced = 0;
 
-				// THe edited entry is accurate so we dont need to do anything.
+				// Replace each broken entry's content with the correct content.
 				WP_CLI::log( 'Total of ' . count( $entries_replace ) . ' need action..' );
 
 				foreach ( $entries_replace as $entry_replace ) {
@@ -170,14 +170,14 @@ class WPCOM_Liveblog_WP_CLI extends WP_CLI_Command {
 						clean_comment_cache( $entry_replace->meta_value );
 					}
 
-					// Lets update the user with what we are doing.
+					// Let's update the user with what we are doing.
 					WP_CLI::log( 'Replaced Content in ' . $replaced . ' Entry(ies) so far..' );
 
 					++$replaced;
 				}
 			}
 
-			// If we have a dry run flag lets just output what we would be looking to do on a live run.
+			// If we have a dry run flag let's just output what we would be looking to do on a live run.
 			if ( true === $is_dryrun ) {
 				WP_CLI::log( 'Found ' . count( $edit_entries ) . ' Edited Entries on Post ID ' . $post_id );
 			}

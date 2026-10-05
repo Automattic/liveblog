@@ -304,7 +304,7 @@ final class EntryTest extends TestCase {
 			// Create a new entry.
 			$entry = $this->insert_entry( array( 'content' => $shortcode ) );
 
-			// Lets setup a Reflection class so we can access the private object properties and check our comment body.
+			// Let's set up a Reflection class so we can access the private object properties and check our comment body.
 			$comment = new ReflectionProperty( $entry, 'comment' );
 			$comment->setAccessible( true );
 			$comment_content = $comment->getValue( $entry );
