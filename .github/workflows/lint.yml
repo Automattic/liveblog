@@ -39,7 +39,6 @@ jobs:
 
       - name: Run eslint on React files
         run: npm run lint:js
-        continue-on-error: true
 
       - name: Run stylelint on SCSS files
         run: npm run lint:css
