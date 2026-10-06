@@ -467,6 +467,49 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * A new entry posted with an empty author field hides its authors. The
+	 * comment still falls back to the inserting user, because a comment must
+	 * have one, but that user is not shown as the entry's author.
+	 */
+	public function test_insert_without_author_id_hides_authors(): void {
+		$entry = $this->insert_entry( array( 'author_id' => false ) );
+
+		$this->assertSame( array(), WPCOM_Liveblog_Entry::get_authors( $entry->get_id() ) );
+	}
+
+	/**
+	 * Clearing the author field on an existing entry hides its authors.
+	 */
+	public function test_update_without_author_id_hides_authors(): void {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$entry     = $this->insert_entry( array( 'author_id' => $author_id ) );
+
+		WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'entry_id'  => $entry->get_id(),
+					'author_id' => false,
+				)
+			)
+		);
+
+		$this->assertSame( array(), WPCOM_Liveblog_Entry::get_authors( $entry->get_id() ) );
+	}
+
+	/**
+	 * A new entry posted with an author shows that author.
+	 */
+	public function test_insert_with_author_id_shows_author(): void {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$entry     = $this->insert_entry( array( 'author_id' => $author_id ) );
+
+		$authors = WPCOM_Liveblog_Entry::get_authors( $entry->get_id() );
+
+		$this->assertCount( 1, $authors );
+		$this->assertSame( $author_id, $authors[0]['id'] );
+	}
+
+	/**
 	 * Set liveblog hook fired global.
 	 */
 	public static function set_liveblog_hook_fired(): void {
