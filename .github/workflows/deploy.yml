@@ -1,57 +1,140 @@
 name: Deploy to WordPress.org
 
+# Triggered by the tag, not by `release: [released]`. release.yml publishes the
+# release with the default GITHUB_TOKEN, and events raised by the GITHUB_TOKEN
+# do not start further workflow runs, so a release-typed trigger would never
+# fire, and silently: no run appears at all. See
+# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow
+#
+# workflow_dispatch is the manual recovery route: it can dry-run against SVN,
+# or redeploy a tag whose automatic run failed.
 on:
-  release:
-    types: [released]
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g. 1.13.0)'
+        required: true
+      dry_run:
+        description: 'Build and diff against SVN without committing'
+        type: boolean
+        default: true
 
 # Workflow-level permissions set to none; jobs declare their own minimal permissions
 permissions: {}
 
-# Cancels all previous workflow runs for the same branch that have not yet completed.
+# Never cancel a deploy part-way through an SVN commit; queue the next one.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
-  release:
+  deploy:
     name: Deploy to WordPress.org
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write # Required to upload release assets to the GitHub release
+      contents: read
 
     steps:
-      - name: Checkout code
+      - name: Decide whether this tag ships to WordPress.org
+        id: gate
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -eu
+
+          # The tag is interpolated into checkout's `ref:`, and on
+          # workflow_dispatch it is free text. Constrain it to a version.
+          case "$TAG" in
+            *[!0-9A-Za-z.-]* | '' )
+              echo "::error::'${TAG}' is not a valid version tag"
+              exit 1
+              ;;
+          esac
+
+          VERSION="${TAG#v}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+          # A hyphen marks a pre-release (1.14.0-rc.1). WordPress.org has no
+          # concept of one: an SVN tag there is immediately installable.
+          case "$VERSION" in
+            *-*)
+              echo "ship=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::${VERSION} is a pre-release; skipping WordPress.org."
+              ;;
+            *)
+              echo "ship=true" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - name: Checkout the tag
+        if: steps.gate.outputs.ship == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: refs/tags/${{ steps.gate.outputs.tag }}
           persist-credentials: false
 
+      - name: Check the plugin version and Stable tag match the tag
+        if: steps.gate.outputs.ship == 'true'
+        env:
+          VERSION: ${{ steps.gate.outputs.version }}
+        run: |
+          set -eu
+
+          HEADER="$(sed -n 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*//p' liveblog.php | head -n1 | tr -d '[:space:]')"
+          CONSTANT="$(sed -n "s/.*const VERSION[[:space:]]*=[[:space:]]*'\([^']*\)'.*/\1/p" liveblog.php | head -n1)"
+          # WordPress.org serves whatever Stable tag points at, so a stale one
+          # silently publishes the previous release under the new version.
+          STABLE="$(sed -n 's/^Stable tag:[[:space:]]*//p' README.md | head -n1 | tr -d '[:space:]')"
+
+          # release.yml checks the version as well, but runs in parallel, so
+          # its failure would not stop this deploy.
+          FAILED=0
+          for pair in "plugin header:${HEADER}" "VERSION constant:${CONSTANT}" "README.md Stable tag:${STABLE}"; do
+            if [ "${pair#*:}" != "$VERSION" ]; then
+              echo "::error::${pair%%:*} is '${pair#*:}' but the tag is '${VERSION}'"
+              FAILED=1
+            fi
+          done
+          [ "$FAILED" -eq 0 ]
+
       - name: Set up Node.js
+        if: steps.gate.outputs.ship == 'true'
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
           # Disabled to prevent cache poisoning in release workflows
           package-manager-cache: false
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Build assets
-        run: npm run build
+        if: steps.gate.outputs.ship == 'true'
+        run: |
+          npm ci
+          npm run build
 
+          # A missing bundle ships a plugin whose editor or front end silently
+          # never loads, so fail loudly here instead.
+          for f in build/app.js build/app.asset.php build/app.css build/amp.css build/admin.js build/admin.asset.php build/admin.css; do
+            if [ ! -s "$f" ]; then
+              echo "::error::npm run build did not produce $f"
+              exit 1
+            fi
+          done
+
+      # No generate-zip: release.yml attaches the ZIP to the GitHub Release.
       - name: Deploy to WordPress.org
-        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # v2.3.0
+        if: steps.gate.outputs.ship == 'true'
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # 2.3.0
         with:
-          generate-zip: true
+          dry-run: ${{ inputs.dry_run || false }}
         env:
           SLUG: liveblog
+          # Set explicitly: on workflow_dispatch GITHUB_REF is a branch, not
+          # the tag, so the action cannot derive it.
+          VERSION: ${{ steps.gate.outputs.version }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-
-      - name: Upload release asset
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        with:
-          files: ${{ github.workspace }}/${{ github.event.repository.name }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
