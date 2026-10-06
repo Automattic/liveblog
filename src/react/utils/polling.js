@@ -12,7 +12,8 @@ const entryKey = ( entry ) => `id_${ entry.id }`;
  */
 export const filterKnownNewEntries = ( entries, knownEntryIds ) =>
 	entries.filter(
-		( entry ) => entry.type === 'new' && ! knownEntryIds[ entryKey( entry ) ]
+		( entry ) =>
+			entry.type === 'new' && ! knownEntryIds[ entryKey( entry ) ]
 	);
 
 const rememberEntryIds = ( knownEntryIds, entries, types ) => ( {
@@ -69,7 +70,9 @@ export const removeRenderedPendingEntries = (
 ) => {
 	const remaining = { ...pendingEntries };
 
-	renderedEntries.forEach( ( entry ) => delete remaining[ entryKey( entry ) ] );
+	renderedEntries.forEach(
+		( entry ) => delete remaining[ entryKey( entry ) ]
+	);
 
 	return remaining;
 };

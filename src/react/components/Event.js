@@ -1,6 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { __ } from '@wordpress/i18n';
 import { timeAgo } from '../utils/utils';
+
+// Key event content may be raw entry HTML, so it can't live inside a <button>.
+const onActivateKey = ( callback ) => ( e ) => {
+	if ( e.key === 'Enter' || e.key === ' ' ) {
+		e.preventDefault();
+		callback();
+	}
+};
 
 const Event = ( { event, click, onDelete, canEdit, locale } ) => (
 	<li className="liveblog-event">
@@ -10,14 +19,19 @@ const Event = ( { event, click, onDelete, canEdit, locale } ) => (
 			</div>
 			<div>
 				{ canEdit && (
-					<span
+					<button
+						type="button"
 						className="dashicons dashicons-no-alt liveblog-editor-delete"
+						aria-label={ __( 'Remove key event', 'liveblog' ) }
 						onClick={ onDelete }
 					/>
 				) }
 				<span
 					className="liveblog-event-content"
+					role="button"
+					tabIndex={ 0 }
 					onClick={ click }
+					onKeyDown={ onActivateKey( click ) }
 					dangerouslySetInnerHTML={ {
 						__html: event.key_event_content,
 					} }

@@ -71,7 +71,7 @@ describe( 'api reducer', () => {
 			? getNewestEntry(
 					stateAfterGetEntriesSuccess.newestEntry,
 					pollingData.entries[ 0 ]
-			  )
+				)
 			: stateAfterGetEntriesSuccess.newestEntry,
 	};
 

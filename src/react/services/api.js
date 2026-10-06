@@ -21,7 +21,7 @@ export function getEntries( page, config, newestEntry ) {
 			? 'latest'
 			: `${ newestEntry.id || config.latest_entry_id }-${
 					newestEntry.timestamp || config.latest_entry_timestamp
-			  }`;
+				}`;
 
 	const settings = {
 		url: `${ config.endpoint_url }get-entries/${ page }/${ lastKnownEntry }`,

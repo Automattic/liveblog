@@ -191,7 +191,9 @@ function ResizableImage( { src, alt, width, height, nodeKey } ) {
 			/>
 			{ isSelected && (
 				<>
+					{ /* Pointer-only drag affordance; hidden from assistive tech. */ }
 					<span
+						aria-hidden="true"
 						className="liveblog-resize-handle liveblog-resize-handle-se"
 						onMouseDown={ handleResizeStart }
 					/>
@@ -899,7 +901,7 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 				zIndex: 1000,
 			} }
 		>
-			<ul className="liveblog-autocomplete-list">
+			<ul className="liveblog-autocomplete-list" role="listbox">
 				{ suggestions.map( ( suggestion, index ) => {
 					// Handle different suggestion types
 					let displayText;
@@ -922,8 +924,12 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 					}
 
 					return (
+						// Arrow keys and Enter are handled by the editor, which keeps focus.
+						// eslint-disable-next-line jsx-a11y/click-events-have-key-events
 						<li
 							key={ index }
+							role="option"
+							aria-selected={ index === selectedIndex }
 							className={ `liveblog-autocomplete-item${
 								index === selectedIndex ? ' is-selected' : ''
 							}` }

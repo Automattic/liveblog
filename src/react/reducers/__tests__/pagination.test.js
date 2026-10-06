@@ -32,7 +32,7 @@ describe( 'pagination reducer', () => {
 			? getPollingPages(
 					stateAfterGetEntriesSuccess.pages,
 					pollingData.pages
-			  )
+				)
 			: pollingData.pages,
 	};
 
