@@ -1,6 +1,6 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { composeWithDevTools } from '@redux-devtools/extension';
 import updatePollingInterval from '../middleware/updatePollingInterval';
 import rootReducer from '../reducers';
 import rootEpic from '../epics';

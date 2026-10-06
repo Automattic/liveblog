@@ -21,6 +21,7 @@
     "@lexical/rich-text": "^0.52.0",
     "@lexical/selection": "^0.52.0",
     "@lexical/utils": "^0.52.0",
+    "@redux-devtools/extension": "^4.0.0",
     "ace-builds": "^1.43.5",
     "js-beautify": "^2.0.3",
     "lexical": "^0.52.0",
@@ -34,7 +35,6 @@
     "react-select": "^5.8.0",
     "react-select-async-paginate": "^0.7.11",
     "redux": "^4.2.1",
-    "redux-devtools-extension": "^2.13.2",
     "redux-observable": "^2.0.0",
     "rxjs": "^7.8.0"
   },
