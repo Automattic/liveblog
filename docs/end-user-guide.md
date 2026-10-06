@@ -40,7 +40,7 @@ While a liveblog is enabled, you can edit previous entries by clicking the "Edit
 
 ## Archiving a Liveblog
 
-Once the event has wrapped up, you can archive your liveblog. Visitors still see the entries, but the editing tools go away and the post stops polling for updates. You can archive and re-enable a liveblog from the Edit Post page.
+Once the event has wrapped up, you can archive your liveblog. Visitors still see the entries, newest first as on a live liveblog, but the editing tools go away and the post stops polling for updates. You can archive and re-enable a liveblog from the Edit Post page.
 
 When a liveblog is archived, editors see a notification that the liveblog must be enabled to accept new entries.
 
