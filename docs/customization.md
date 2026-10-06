@@ -8,9 +8,10 @@ The entry system supports `#hashtags`, `/commands`, `@authors` and `:emoji:` wit
 
 ### Commands
 
-The command system has one built-in command:
+The command system has two built-in commands:
 
 * `/key` marks an entry as a key event. It adds the meta key `liveblog_key_entry` to the entry. A key event can be styled using the `.type-key` class.
+* `/pin` pins an entry to the top of the first page. A pinned entry has `"pinned": true` in its JSON and the `.is-pinned` class. To unpin it, edit the entry and remove `/pin`. More than one entry can be pinned at a time. Pinned entries are shown above the normal page of entries and do not count towards the entries per page.
 
 To display a key event box you can add the `[liveblog_key_events]` shortcode in your theme (e.g. in the sidebar), or use the Liveblog Key Events widget. Entries used with `/key` are inserted into both this box and the main feed. The key events box also acts as an anchor system for jumping to parts of the main feed. The shortcode is not required for `/key` to work.
 

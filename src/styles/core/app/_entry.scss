@@ -43,8 +43,16 @@
 	margin-right: 0.5rem;
 }
 
-.liveblog-entry .type-key {
+.liveblog-entry .type-key,
+.liveblog-entry .type-pin {
 	display: none;
+}
+
+.liveblog-entry-pinned {
+	margin-bottom: 0.5rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
 }
 
 .liveblog-emoji {

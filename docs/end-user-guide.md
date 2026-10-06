@@ -38,6 +38,10 @@ Links pasted directly into the posting box are automatically hyperlinked.
 
 While a liveblog is enabled, you can edit previous entries by clicking the "Edit" button next to the entry.
 
+## Pinning an Entry
+
+To keep an entry at the top of the liveblog, add `/pin` anywhere in it, either when you post it or later by editing it. The entry shows a "Pinned" label and stays above newer entries. To unpin it, edit the entry and remove `/pin`.
+
 ## Archiving a Liveblog
 
 Once the event has wrapped up, you can archive your liveblog. Visitors still see the entries, but the editing tools go away and the post stops polling for updates. You can archive and re-enable a liveblog from the Edit Post page.
