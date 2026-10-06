@@ -2,22 +2,22 @@
 # This file is distributed under the same license as the Liveblog plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Liveblog 1.12.2\n"
+"Project-Id-Version: Liveblog 1.13.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/liveblog\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-03T13:11:49+00:00\n"
+"POT-Creation-Date: 2026-10-06T21:51:35+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: liveblog\n"
 
 #. Plugin Name of the plugin
 #: liveblog.php
-#: liveblog.php:1607
-#: liveblog.php:1843
+#: liveblog.php:1623
+#: liveblog.php:1859
 msgid "Liveblog"
 msgstr ""
 
@@ -123,32 +123,32 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:403
-#: classes/class-wpcom-liveblog-entry.php:453
-#: classes/class-wpcom-liveblog-entry.php:496
+#: classes/class-wpcom-liveblog-entry.php:416
+#: classes/class-wpcom-liveblog-entry.php:466
+#: classes/class-wpcom-liveblog-entry.php:509
 msgid "Missing entry ID"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:544
+#: classes/class-wpcom-liveblog-entry.php:557
 msgid "Entry not found in this liveblog."
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:573
+#: classes/class-wpcom-liveblog-entry.php:586
 msgid "Error posting entry"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:577
-#: classes/class-wpcom-liveblog-entry.php:608
+#: classes/class-wpcom-liveblog-entry.php:590
+#: classes/class-wpcom-liveblog-entry.php:621
 msgid "Error retrieving comment"
 msgstr ""
 
 #. translators: 1: argument.
-#: classes/class-wpcom-liveblog-entry.php:593
+#: classes/class-wpcom-liveblog-entry.php:606
 #, php-format
 msgid "Missing entry argument: %s"
 msgstr ""
 
-#: classes/class-wpcom-liveblog-entry.php:612
+#: classes/class-wpcom-liveblog-entry.php:625
 msgid "Error retrieving user"
 msgstr ""
 
@@ -182,177 +182,183 @@ msgstr ""
 msgid "No Liveblog post ID is set yet"
 msgstr ""
 
-#: liveblog.php:640
+#: liveblog.php:623
+msgid "This liveblog is password protected. Enter the post password to view its entries."
+msgstr ""
+
+#: liveblog.php:680
 msgid "A timestamp is missing. Correct URL: <permalink>/liveblog/<from>/</to>/"
 msgstr ""
 
 #. translators: 1: crud action.
-#: liveblog.php:836
+#: liveblog.php:876
 #, php-format
 msgid "Invalid entry crud_action: %s"
 msgstr ""
 
-#: liveblog.php:1208
+#: liveblog.php:1248
 msgid "Unknown liveblog action"
 msgstr ""
 
-#: liveblog.php:1262
-#: liveblog.php:1369
+#: liveblog.php:1302
+#: liveblog.php:1409
 msgid "Error {error-code}: {error-message}"
 msgstr ""
 
-#: liveblog.php:1263
-#: liveblog.php:1370
+#: liveblog.php:1303
+#: liveblog.php:1410
 msgid "Error: {error-message}"
 msgstr ""
 
-#: liveblog.php:1367
+#: liveblog.php:1407
 msgid "Do you really want to delete this entry? There is no way back."
 msgstr ""
 
-#: liveblog.php:1368
+#: liveblog.php:1408
 msgid "Do you want to delete this key entry?"
 msgstr ""
 
-#: liveblog.php:1371
+#: liveblog.php:1411
 msgid "Liveblog: {number} new update"
 msgstr ""
 
-#: liveblog.php:1372
+#: liveblog.php:1412
 msgid "Liveblog: {number} new updates"
 msgstr ""
 
-#: liveblog.php:1373
+#: liveblog.php:1413
 msgid "Provide URL for link:"
 msgstr ""
 
-#: liveblog.php:1376
+#: liveblog.php:1416
 msgid "term-"
 msgstr ""
 
-#: liveblog.php:1377
+#: liveblog.php:1417
 msgid "type-alert"
 msgstr ""
 
-#: liveblog.php:1378
+#: liveblog.php:1418
 msgid "type-key"
 msgstr ""
 
-#: liveblog.php:1395
+#: liveblog.php:1435
 msgid "Loading preview…"
 msgstr ""
 
-#: liveblog.php:1396
+#: liveblog.php:1436
 msgid "New Entry"
 msgstr ""
 
-#: liveblog.php:1397
-#: src/react/containers/EditorContainer.js:357
+#: liveblog.php:1437
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:400
+#: build/163.bundle.js:573
 msgid "Publish Update"
 msgstr ""
 
-#: liveblog.php:1398
+#: liveblog.php:1438
 msgid "Edit Entry"
 msgstr ""
 
-#: liveblog.php:1399
+#: liveblog.php:1439
 msgid "Update"
 msgstr ""
 
-#: liveblog.php:1422
+#: liveblog.php:1462
 msgid "Allowed Files"
 msgstr ""
 
-#: liveblog.php:1647
+#: liveblog.php:1663
 msgid "Visit the liveblog &rarr;"
 msgstr ""
 
-#: liveblog.php:1653
+#: liveblog.php:1669
 msgid "Enable"
 msgstr ""
 
-#: liveblog.php:1654
+#: liveblog.php:1670
 msgid "Enables liveblog on this post. Posting tools are enabled for editors, visitors get the latest updates."
 msgstr ""
 
 #. translators: %s: optional link to view the liveblog
-#: liveblog.php:1657
+#: liveblog.php:1673
 #, php-format
 msgid "There is an <strong>enabled</strong> liveblog on this post.%s"
 msgstr ""
 
-#: liveblog.php:1665
+#: liveblog.php:1681
 msgid "Archive"
 msgstr ""
 
-#: liveblog.php:1666
+#: liveblog.php:1682
 msgid "Archives the liveblog on this post. Visitors still see the liveblog entries, but posting tools are hidden."
 msgstr ""
 
 #. translators: %s: optional link to view the liveblog archive
-#: liveblog.php:1669
+#: liveblog.php:1685
 #, php-format
 msgid "There is an <strong>archived</strong> liveblog on this post.%s"
 msgstr ""
 
-#: liveblog.php:1677
+#: liveblog.php:1693
 msgid "Disable"
 msgstr ""
 
-#: liveblog.php:1678
+#: liveblog.php:1694
 msgid "Removes liveblog from this post. Existing entries are kept as comments."
 msgstr ""
 
-#: liveblog.php:1688
+#: liveblog.php:1704
 msgid "This is a normal WordPress post, without a liveblog."
 msgstr ""
 
-#: liveblog.php:1692
+#: liveblog.php:1708
 msgid "Settings have been successfully updated."
 msgstr ""
 
 #. translators: 1: post ID.
-#: liveblog.php:1718
+#: liveblog.php:1734
 #, php-format
 msgid "The post is a revision: %s"
 msgstr ""
 
 #. translators: 1: post ID.
-#: liveblog.php:1722
+#: liveblog.php:1738
 #, php-format
 msgid "Non-existing post ID: %s"
 msgstr ""
 
-#: liveblog.php:1845
+#: liveblog.php:1861
 msgid "Liveblog (archived)"
 msgstr ""
 
-#: liveblog.php:1876
+#: liveblog.php:1892
 msgid "Filter liveblogs"
 msgstr ""
 
-#: liveblog.php:1877
+#: liveblog.php:1893
 msgid "Any liveblogs"
 msgstr ""
 
-#: liveblog.php:1878
+#: liveblog.php:1894
 msgid "Enabled liveblogs"
 msgstr ""
 
-#: liveblog.php:1879
+#: liveblog.php:1895
 msgid "Archived liveblogs"
 msgstr ""
 
-#: liveblog.php:1880
+#: liveblog.php:1896
 msgid "No liveblogs"
 msgstr ""
 
-#: liveblog.php:1953
-#: liveblog.php:1988
+#: liveblog.php:1969
+#: liveblog.php:2004
 msgid "Cheatin', uh?"
 msgstr ""
 
-#: liveblog.php:2000
+#: liveblog.php:2016
 msgid "Sorry, we could not authenticate you."
 msgstr ""
 
@@ -361,18 +367,26 @@ msgid "You have updates"
 msgstr ""
 
 #: templates/amp/pagination.php:15
+#: build/app.js:1
+#: src/react/containers/PaginationContainer.js:35
 msgid "First"
 msgstr ""
 
 #: templates/amp/pagination.php:16
+#: build/app.js:1
+#: src/react/containers/PaginationContainer.js:46
 msgid "Prev"
 msgstr ""
 
 #: templates/amp/pagination.php:23
+#: build/app.js:1
+#: src/react/containers/PaginationContainer.js:62
 msgid "Next"
 msgstr ""
 
 #: templates/amp/pagination.php:24
+#: build/app.js:1
+#: src/react/containers/PaginationContainer.js:73
 msgid "Last"
 msgstr ""
 
@@ -383,7 +397,9 @@ msgid "Please <a href=\"%2$s\">deactivate the %1$s plugin</a> as Liveblog itself
 msgstr ""
 
 #: templates/liveblog-form.php:17
-#: src/react/containers/EditorContainer.js:299
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:327
+#: build/163.bundle.js:500
 msgid "Preview"
 msgstr ""
 
@@ -421,11 +437,11 @@ msgid "Underline"
 msgstr ""
 
 #: templates/liveblog-form.php:32
-msgid "Srike-through (Ctrl/Cmd + S)"
+msgid "Strike-through (Ctrl/Cmd + S)"
 msgstr ""
 
 #: templates/liveblog-form.php:32
-msgid "Srike-through"
+msgid "Strike-through"
 msgstr ""
 
 #: templates/liveblog-form.php:33
@@ -453,30 +469,26 @@ msgid "Remove formatting"
 msgstr ""
 
 #: templates/liveblog-form.php:45
+#: build/390.bundle.js:1
+#: build/app.js:1
 #: src/react/components/DeleteConfirmation.js:13
-#: src/react/Editor/ImageCropModal.js:170
-#: src/react/Editor/LexicalEditor.js:977
+#: src/react/Editor/ImageCropModal.js:188
+#: src/react/Editor/LexicalEditor.js:1045
+#: build/390.bundle.js:188
+#: build/390.bundle.js:1390
 msgid "Cancel"
 msgstr ""
 
 #: templates/liveblog-form.php:46
 #: templates/liveblog-single-entry.php:20
-#: src/react/containers/EntryContainer.js:73
+#: build/app.js:1
+#: src/react/containers/EntryContainer.js:88
 msgid "Delete"
 msgstr ""
 
-#. translators: 1: edit post url.
-#: templates/liveblog-loop.php:12
-#, php-format
-msgid "<strong>This liveblog is archived.</strong> If you need to publish new updates or edit or delete the old ones, you need to <a href=\"%s\">enable it first</a>."
-msgstr ""
-
-#: templates/liveblog-loop.php:27
-msgid "Load more entries&hellip;"
-msgstr ""
-
 #: templates/liveblog-single-entry.php:20
-#: src/react/containers/EntryContainer.js:67
+#: build/app.js:1
+#: src/react/containers/EntryContainer.js:81
 msgid "Edit"
 msgstr ""
 
@@ -486,136 +498,204 @@ msgstr ""
 msgid "Your current WordPress is version %1$s, which is too old to run the liveblog plugin. The minimum required version is %2$s. Please, either <a href=\"%3$s\">update WordPress</a>, or <a href=\"%4$s\">deactivate the liveblog plugin</a>."
 msgstr ""
 
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:167
+#: build/163.bundle.js:340
+msgid "Type to search for more authors…"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:301
+#: build/163.bundle.js:474
+msgid "Add New Entry"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:311
+#: build/163.bundle.js:484
+msgid "Visual"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:319
+#: build/163.bundle.js:492
+msgid "Text"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: build/app.js:1
+#: src/react/containers/EditorContainer.js:341
+#: src/react/containers/EntryContainer.js:166
+#: build/163.bundle.js:514
+msgid "Loading editor…"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:373
+#: build/163.bundle.js:546
+msgid "Authors:"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:377
+#: build/163.bundle.js:550
+msgid "Entry authors"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:391
+#: build/163.bundle.js:564
+msgid "No authors matched"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:392
+#: build/163.bundle.js:565
+msgid "Loading authors…"
+msgstr ""
+
+#: build/163.bundle.js:1
+#: src/react/containers/EditorContainer.js:401
+#: build/163.bundle.js:574
+msgid "Publish New Entry"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/ImageCropModal.js:146
+#: build/390.bundle.js:146
+msgid "Crop Image"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/ImageCropModal.js:152
+#: build/390.bundle.js:152
+msgid "Close"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/ImageCropModal.js:169
+#: build/390.bundle.js:169
+msgid "Crop preview"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/ImageCropModal.js:174
+#: build/390.bundle.js:174
+msgid "Drag to select the area you want to keep. Click Apply to use the full image without cropping."
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/ImageCropModal.js:197
+#: build/390.bundle.js:197
+msgid "Processing…"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/ImageCropModal.js:198
+#: build/390.bundle.js:198
+msgid "Apply"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1037
+#: build/390.bundle.js:1382
+msgid "Add link"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1288
+#: build/390.bundle.js:1633
+msgid "Bold (Ctrl+B)"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1295
+#: build/390.bundle.js:1640
+msgid "Italic (Ctrl+I)"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1302
+#: build/390.bundle.js:1647
+msgid "Underline (Ctrl+U)"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1309
+#: build/390.bundle.js:1654
+msgid "Ordered List"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1316
+#: build/390.bundle.js:1661
+msgid "Unordered List"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1323
+#: build/390.bundle.js:1668
+msgid "Blockquote"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1333
+#: build/390.bundle.js:1678
+msgid "Add Link"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1349
+#: build/390.bundle.js:1694
+msgid "Remove Link"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1359
+#: build/390.bundle.js:1704
+msgid "Uploading…"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1360
+#: build/390.bundle.js:1705
+msgid "Insert Image"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1436
+#: build/390.bundle.js:1781
+msgid "Liveblog entry content"
+msgstr ""
+
+#: build/390.bundle.js:1
+#: src/react/Editor/LexicalEditor.js:1444
+#: build/390.bundle.js:1789
+msgid "Start writing your liveblog entry…"
+msgstr ""
+
+#: build/app.js:1
 #: src/react/components/DeleteConfirmation.js:19
 msgid "Confirm"
 msgstr ""
 
-#: src/react/containers/EditorContainer.js:164
-msgid "Type to search for more authors…"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:281
-msgid "Add New Entry"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:287
-msgid "Visual"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:293
-msgid "Text"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:312
-#: src/react/containers/EntryContainer.js:125
-msgid "Loading editor…"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:337
-msgid "Authors:"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:340
-msgid "Entry authors"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:353
-msgid "No authors matched"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:353
-msgid "Loading authors…"
-msgstr ""
-
-#: src/react/containers/EditorContainer.js:357
-msgid "Publish New Entry"
-msgstr ""
-
-#: src/react/containers/EntryContainer.js:64
+#: build/app.js:1
+#: src/react/containers/EntryContainer.js:74
 msgid "Close Editor"
 msgstr ""
 
-#: src/react/containers/EntryContainer.js:97
-#: src/react/containers/EventsContainer.js:24
+#: build/app.js:1
+#: src/react/containers/EntryContainer.js:128
+#: src/react/containers/EventsContainer.js:26
 msgid "Are you sure you want to delete this entry?"
 msgstr ""
 
-#: src/react/containers/EventsContainer.js:72
+#: build/app.js:1
+#: src/react/components/Event.js:25
+msgid "Remove key event"
+msgstr ""
+
+#: build/app.js:1
+#: src/react/containers/EventsContainer.js:83
 msgid "Are you sure you want to remove this entry as a key event?"
-msgstr ""
-
-#: src/react/Editor/ImageCropModal.js:131
-msgid "Crop Image"
-msgstr ""
-
-#: src/react/Editor/ImageCropModal.js:137
-msgid "Close"
-msgstr ""
-
-#: src/react/Editor/ImageCropModal.js:154
-msgid "Crop preview"
-msgstr ""
-
-#: src/react/Editor/ImageCropModal.js:159
-msgid "Drag to select the area you want to keep. Click Apply to use the full image without cropping."
-msgstr ""
-
-#: src/react/Editor/ImageCropModal.js:178
-msgid "Processing…"
-msgstr ""
-
-#: src/react/Editor/ImageCropModal.js:178
-msgid "Apply"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:969
-msgid "Add link"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1215
-msgid "Bold (Ctrl+B)"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1222
-msgid "Italic (Ctrl+I)"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1229
-msgid "Underline (Ctrl+U)"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1236
-msgid "Ordered List"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1243
-msgid "Unordered List"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1250
-msgid "Blockquote"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1258
-msgid "Add Link"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1274
-msgid "Remove Link"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1282
-msgid "Uploading…"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1282
-msgid "Insert Image"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1354
-msgid "Liveblog entry content"
-msgstr ""
-
-#: src/react/Editor/LexicalEditor.js:1359
-msgid "Start writing your liveblog entry…"
 msgstr ""
