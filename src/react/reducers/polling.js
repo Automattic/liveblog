@@ -28,7 +28,7 @@ export const polling = ( state = initialState, action ) => {
 								action.payload.entries,
 								state.knownEntryIds
 							)
-					  ),
+						),
 				knownEntryIds: rememberPolledEntries(
 					state.knownEntryIds,
 					action.payload.entries
@@ -65,7 +65,7 @@ export const polling = ( state = initialState, action ) => {
 					: removeRenderedPendingEntries(
 							state.entries,
 							action.payload.entries
-					  ),
+						),
 				knownEntryIds,
 			};
 		}

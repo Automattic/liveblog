@@ -46,7 +46,7 @@ describe( 'polling reducer', () => {
 					pollingData.entries.filter(
 						( entry ) => entry.type === 'new'
 					)
-			  ),
+				),
 		knownEntryIds: {
 			...stateAfterGetEntriesSuccess.knownEntryIds,
 			id_3250: true,

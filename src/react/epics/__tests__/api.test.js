@@ -71,7 +71,9 @@ describe( 'getEntriesAfterChangeEpic', () => {
 			} ),
 			{
 				polling: {
-					entries: { id_10: { id: 10, type: 'new', timestamp: 1000 } },
+					entries: {
+						id_10: { id: 10, type: 'new', timestamp: 1000 },
+					},
 				},
 			}
 		);
