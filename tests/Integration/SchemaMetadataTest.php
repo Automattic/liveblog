@@ -227,14 +227,20 @@ final class SchemaMetadataTest extends TestCase {
 	 */
 	public function test_multiple_authors_listed_as_array(): void {
 		// Create users.
-		$user1 = self::factory()->user->create_and_get( array( 'display_name' => 'Author One' ) );
+		$user1 = self::factory()->user->create_and_get(
+			array(
+				'role'         => 'author',
+				'display_name' => 'Author One',
+			)
+		);
 		$user2 = self::factory()->user->create_and_get( array( 'display_name' => 'Author Two' ) );
 
 		// Insert entry with contributor.
 		$entry = $this->insert_entry(
 			array(
-				'content' => '<p>Multi-author entry</p>',
-				'user'    => $user1,
+				'content'   => '<p>Multi-author entry</p>',
+				'user'      => $user1,
+				'author_id' => $user1->ID,
 			)
 		);
 
@@ -256,12 +262,18 @@ final class SchemaMetadataTest extends TestCase {
 	 * Test that single author is object not array.
 	 */
 	public function test_single_author_is_object(): void {
-		$user = self::factory()->user->create_and_get( array( 'display_name' => 'Single Author' ) );
+		$user = self::factory()->user->create_and_get(
+			array(
+				'role'         => 'author',
+				'display_name' => 'Single Author',
+			)
+		);
 
 		$this->insert_entry(
 			array(
-				'content' => '<p>Single author entry</p>',
-				'user'    => $user,
+				'content'   => '<p>Single author entry</p>',
+				'user'      => $user,
+				'author_id' => $user->ID,
 			)
 		);
 
