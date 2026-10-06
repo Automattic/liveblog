@@ -52,10 +52,25 @@ If the reader has scrolled down to catch up on previous updates, the liveblog wa
 
 Post times are relative ("2 minutes ago") and update every minute.
 
-## Manually embed a Liveblog
+## Where the Liveblog appears in your theme
 
-If you need to insert the liveblog into your theme manually, the plugin provides a function that outputs the liveblog HTML on a post where the liveblog is enabled:
+The plugin does not provide a template tag for embedding a liveblog. Instead, it adds the liveblog to the post content automatically, through the `the_content` filter, on single views of a post where the liveblog is enabled. Your theme's single post template only needs to call `the_content()`.
+
+By default, the liveblog appears after the post content. To show it before the post content instead:
 
 ```php
-wpcom_liveblog_get_output( $post_id );
+add_filter( 'liveblog_output_at_top', '__return_true' );
+```
+
+To change the markup around the liveblog, use the `liveblog_add_to_content` filter. It receives the liveblog HTML, the post content and the post ID. Keep the `<div id="wpcom-liveblog-container">` element in the returned HTML, because the liveblog loads into that element.
+
+```php
+add_filter(
+	'liveblog_add_to_content',
+	function ( $liveblog_output, $content, $post_id ) {
+		return '<section class="my-liveblog">' . $liveblog_output . '</section>';
+	},
+	10,
+	3
+);
 ```
