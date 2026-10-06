@@ -615,6 +615,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 			}
 
+			// A password-protected post must not disclose its liveblog entries through
+			// the legacy AJAX/permalink JSON endpoints until the visitor has satisfied
+			// the post password. Deny any request that has not cleared the gate before
+			// it is announced, dispatched, or has any entry data fetched or returned.
+			if ( ! self::ajax_request_passes_password_gate( $response_method ) ) {
+				self::send_forbidden_error( __( 'This liveblog is password protected. Enter the post password to view its entries.', 'liveblog' ) );
+			}
+
 			/**
 			 * Fires just before the Liveblog's ajax request is handled by one of the methods
 			 *
@@ -623,6 +631,38 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			do_action( 'liveblog_ajax_request', $response_method );
 
 			self::$response_method();
+		}
+
+		/**
+		 * Whether a legacy AJAX request clears the post-password gate.
+		 *
+		 * The legacy permalink/AJAX JSON read endpoints (entries-between, single
+		 * entry, lazyload, and any future read handler) return liveblog entry
+		 * content, so they must not disclose it for a password-protected post until
+		 * the visitor has satisfied the password. This mirrors the REST read gate
+		 * (WPCOM_Liveblog_Rest_Api::can_read_liveblog) and core's own front-end
+		 * content gating via post_password_required(), which also honours the
+		 * `post_password_required` filter so any site-level policy stays consistent.
+		 *
+		 * The write endpoints (crud, preview) run their own capability and nonce
+		 * checks downstream and legitimately operate on protected posts, so they are
+		 * exempt from this gate. Every other handler is subject to the password
+		 * requirement by default, so a newly added read handler stays protected even
+		 * if a developer forgets to revisit this method (fail closed).
+		 *
+		 * @param string $response_method The resolved AJAX handler method name.
+		 * @return bool True when the request may proceed past the password gate.
+		 */
+		public static function ajax_request_passes_password_gate( $response_method ) {
+			// Write endpoints authorise themselves via capability and nonce checks
+			// and may legitimately operate on password-protected posts.
+			$self_authorizing_methods = array( 'ajax_crud_entry', 'ajax_preview_entry' );
+
+			if ( in_array( $response_method, $self_authorizing_methods, true ) ) {
+				return true;
+			}
+
+			return ! post_password_required( self::$post_id );
 		}
 
 		/**
