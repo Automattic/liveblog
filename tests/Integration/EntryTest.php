@@ -597,7 +597,7 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
-	 * Test that filter_image_attributes preserves only src and alt by default.
+	 * Test that filter_image_attributes preserves src, alt and dimensions by default.
 	 */
 	public function test_filter_image_attributes_default(): void {
 		$content  = '<p>Text</p><img src="test.jpg" alt="Test" class="wp-image" width="100" height="50" data-id="123">';
@@ -605,9 +605,9 @@ final class EntryTest extends TestCase {
 
 		$this->assertStringContainsString( 'src="test.jpg"', $filtered );
 		$this->assertStringContainsString( 'alt="Test"', $filtered );
+		$this->assertStringContainsString( 'width="100"', $filtered );
+		$this->assertStringContainsString( 'height="50"', $filtered );
 		$this->assertStringNotContainsString( 'class=', $filtered );
-		$this->assertStringNotContainsString( 'width=', $filtered );
-		$this->assertStringNotContainsString( 'height=', $filtered );
 		$this->assertStringNotContainsString( 'data-id=', $filtered );
 		$this->assertStringContainsString( '<p>Text</p>', $filtered );
 	}
@@ -619,7 +619,7 @@ final class EntryTest extends TestCase {
 		add_filter(
 			'liveblog_image_allowed_attributes',
 			function ( $attrs ) {
-				return array_merge( $attrs, array( 'class', 'width', 'height' ) );
+				return array_merge( $attrs, array( 'class' ) );
 			}
 		);
 
@@ -685,8 +685,21 @@ final class EntryTest extends TestCase {
 		$this->assertStringContainsString( 'alt="One"', $filtered );
 		$this->assertStringContainsString( 'src="two.jpg"', $filtered );
 		$this->assertStringContainsString( 'alt="Two"', $filtered );
+		$this->assertStringContainsString( 'width="200"', $filtered );
 		$this->assertStringNotContainsString( 'class=', $filtered );
-		$this->assertStringNotContainsString( 'width=', $filtered );
+	}
+
+	/**
+	 * Test that sites can still drop dimensions via the filter.
+	 */
+	public function test_filter_image_attributes_can_remove_dimensions(): void {
+		add_filter( 'liveblog_image_allowed_attributes', fn() => array( 'src', 'alt' ) );
+
+		$filtered = WPCOM_Liveblog_Entry::filter_image_attributes( '<img src="test.jpg" alt="Test" width="100" height="50">' );
+
+		$this->assertSame( '<img src="test.jpg" alt="Test">', $filtered );
+
+		remove_all_filters( 'liveblog_image_allowed_attributes' );
 	}
 
 	/**
