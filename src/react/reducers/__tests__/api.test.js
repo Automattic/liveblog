@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	applyUpdate,
 	pollingApplyUpdate,
@@ -70,7 +71,7 @@ describe( 'api reducer', () => {
 			? getNewestEntry(
 					stateAfterGetEntriesSuccess.newestEntry,
 					pollingData.entries[ 0 ]
-			  )
+				)
 			: stateAfterGetEntriesSuccess.newestEntry,
 	};
 

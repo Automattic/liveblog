@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.12.2] - 2026-06-03
+
+### Security
+
+* fix: gate liveblog reads on the post password requirement by @GaryJones in https://github.com/Automattic/liveblog/pull/910 (CWE-639 / CWE-200)
+
 ## [1.12.1] - 2026-06-02
 
 ### Security
@@ -354,6 +360,7 @@ Fixed problems:
 * Initial release
 
 
+[1.12.2]: https://github.com/Automattic/liveblog/compare/1.12.1...1.12.2
 [1.12.1]: https://github.com/Automattic/liveblog/compare/1.12.0...1.12.1
 [1.12.0]: https://github.com/Automattic/liveblog/compare/1.11.1...1.12.0
 [1.11.1]: https://github.com/Automattic/liveblog/compare/1.11.0...1.11.1

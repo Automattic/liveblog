@@ -1,10 +1,11 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { lastValueFrom, of, throwError } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 
-jest.mock( '../../services/api', () => ( {
-	polling: jest.fn(),
-	getEntries: jest.fn(),
+vi.mock( '../../services/api', () => ( {
+	polling: vi.fn(),
+	getEntries: vi.fn(),
 } ) );
 
 import { polling as pollingApi, getEntries } from '../../services/api';
@@ -26,7 +27,7 @@ import pollingData from '../../mockData/reducers/polling';
 import apiData from '../../mockData/reducers/api';
 
 afterEach( () => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 } );
 
 describe( 'startPollingEpic', () => {
@@ -44,7 +45,7 @@ describe( 'startPollingEpic', () => {
 		testScheduler.run( marbles );
 	};
 
-	// eslint-disable-next-line jest/expect-expect -- assertion happens inside TestScheduler's comparator via expectObservable().toBe()
+	// eslint-disable-next-line vitest/expect-expect -- assertion happens inside TestScheduler's comparator via expectObservable().toBe()
 	it( 'polls on the configured interval and stops after CANCEL_POLLING', () => {
 		pollingApi.mockReturnValue( of( { response: pollingData } ) );
 
@@ -66,7 +67,7 @@ describe( 'startPollingEpic', () => {
 		} );
 	} );
 
-	// eslint-disable-next-line jest/expect-expect -- assertion happens inside TestScheduler's comparator via expectObservable().toBe()
+	// eslint-disable-next-line vitest/expect-expect -- assertion happens inside TestScheduler's comparator via expectObservable().toBe()
 	it( 'emits pollingFailed when the request errors', () => {
 		pollingApi.mockReturnValue( throwError( () => new Error( 'boom' ) ) );
 

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { initialState, pagination } from '../pagination';
 import { getEntriesSuccess, pollingSuccess } from '../../actions/apiActions';
 import apiData from '../../mockData/reducers/api';
@@ -31,7 +32,7 @@ describe( 'pagination reducer', () => {
 			? getPollingPages(
 					stateAfterGetEntriesSuccess.pages,
 					pollingData.pages
-			  )
+				)
 			: pollingData.pages,
 	};
 

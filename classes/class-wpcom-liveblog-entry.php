@@ -279,8 +279,9 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Filter image attributes based on an allowed list.
 	 *
-	 * By default, only 'src' and 'alt' attributes are preserved on <img> tags.
-	 * Developers can extend this using the 'liveblog_image_allowed_attributes' filter.
+	 * By default, 'src', 'alt', 'width' and 'height' are preserved on <img> tags,
+	 * so sizes set by resizing an image in the editor are honoured.
+	 * Developers can change this using the 'liveblog_image_allowed_attributes' filter.
 	 *
 	 * @param string $content The HTML content to filter.
 	 * @return string The filtered HTML content.
@@ -288,16 +289,19 @@ class WPCOM_Liveblog_Entry {
 	 * @example
 	 * // Allow additional attributes:
 	 * add_filter( 'liveblog_image_allowed_attributes', function( $attrs ) {
-	 *     return array_merge( $attrs, [ 'class', 'width', 'height', 'loading', 'data-*' ] );
+	 *     return array_merge( $attrs, [ 'class', 'loading', 'data-*' ] );
 	 * } );
+	 *
+	 * @example
+	 * // Ignore sizes set in the editor:
+	 * add_filter( 'liveblog_image_allowed_attributes', fn() => [ 'src', 'alt' ] );
 	 *
 	 * @example
 	 * // Allow all attributes:
 	 * add_filter( 'liveblog_image_allowed_attributes', fn() => [ '*' ] );
 	 */
 	public static function filter_image_attributes( $content ) {
-		// Get allowed attributes. Default to src and alt for backwards compatibility.
-		$allowed_attributes = apply_filters( 'liveblog_image_allowed_attributes', array( 'src', 'alt' ) );
+		$allowed_attributes = apply_filters( 'liveblog_image_allowed_attributes', array( 'src', 'alt', 'width', 'height' ) );
 
 		// If wildcard is present, return content unchanged.
 		if ( in_array( '*', $allowed_attributes, true ) ) {

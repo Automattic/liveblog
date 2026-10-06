@@ -8,7 +8,7 @@ Real-time liveblogging plugin for WordPress with a React-based editor and a comm
 |----------|-------|
 | **Main file** | `liveblog.php` |
 | **Text domain** | `liveblog` |
-| **Version** | 1.12.1 |
+| **Version** | 1.12.2 |
 | **Requires PHP** | 7.4+ |
 | **Requires WP** | 6.4+ |
 | **Default branch** | `develop` |
@@ -51,7 +51,7 @@ liveblog/
 
 * **Runtime PHP**: `composer/installers`. WebSocket users also pull in `predis/predis` and `rase/socket.io-emitter`.
 * **Dev**: `automattic/vipwpcs`, `phpunit/phpunit`, `yoast/wp-test-utils`, `php-parallel-lint`, `phpcompatibility/phpcompatibility-wp`.
-* **Front end**: React 18, Lexical 0.43.x, Redux + Redux-Observable, `@wordpress/scripts` for builds.
+* **Front end**: React 18, Lexical 0.46.x (keep every `@lexical/*` package and `lexical` on the same version), Redux + Redux-Observable, `@wordpress/scripts` for builds.
 
 ## Commands
 

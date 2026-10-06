@@ -47,6 +47,7 @@ TESTING_CHECKLIST.md
 
 # Test configuration
 phpunit.xml.dist
+vitest.config.mjs
 
 # WP.com specific
 wpcom-helper.php

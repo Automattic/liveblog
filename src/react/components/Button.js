@@ -8,11 +8,12 @@ const addModifiers = ( modifiers ) =>
 		.join( ' ' );
 
 const Button = ( { children, click, type, modifiers, onMouseDown } ) => (
-	<span onMouseDown={ onMouseDown ? ( e ) => e.preventDefault() : null }>
+	<span>
 		<button
 			className={ `liveblog-btn ${
 				type && `liveblog-btn--${ type }`
 			} ${ addModifiers( modifiers ) }` }
+			onMouseDown={ onMouseDown ? ( e ) => e.preventDefault() : null }
 			onClick={ onMouseDown || click }
 		>
 			{ children }

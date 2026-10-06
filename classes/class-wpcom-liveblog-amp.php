@@ -178,7 +178,7 @@ class WPCOM_Liveblog_AMP {
 		$url         = self::build_single_entry_permalink( amp_get_permalink( $post->ID ), $entry->id );
 		$image       = self::get_entry_image( $entry );
 
-		// If the entry doesn't contain images, lets see if the post has featured image.
+		// If the entry doesn't contain images, let's see if the post has a featured image.
 		if ( false === $image ) {
 			$image = get_the_post_thumbnail_url( $post->ID );
 		}
@@ -188,7 +188,7 @@ class WPCOM_Liveblog_AMP {
 		echo '<meta property="og:url" content="' . esc_url( $url ) . '">';
 		echo '<meta name="twitter:card" content="' . esc_attr( $description ) . '">';
 
-		// If we have an image, lets use it.
+		// If we have an image, let's use it.
 		if ( $image ) {
 				echo '<meta property="og:image" content="' . esc_url( $image ) . '">';
 		}

@@ -1,11 +1,12 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { lastValueFrom, of, throwError } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 
-jest.mock( '../../services/api', () => ( {
-	getEntries: jest.fn(),
-	createEntry: jest.fn(),
-	updateEntry: jest.fn(),
-	deleteEntry: jest.fn(),
+vi.mock( '../../services/api', () => ( {
+	getEntries: vi.fn(),
+	createEntry: vi.fn(),
+	updateEntry: vi.fn(),
+	deleteEntry: vi.fn(),
 } ) );
 
 import {
@@ -23,7 +24,6 @@ import {
 	deleteEntryEpic,
 	getEntriesAfterChangeEpic,
 } from '../api';
-
 import {
 	getEntries as getEntriesAction,
 	getEntriesPaginated,
@@ -42,11 +42,84 @@ import {
 } from '../../actions/apiActions';
 import { jumpToEvent } from '../../actions/eventsActions';
 import { scrollToEntry } from '../../actions/userActions';
+import { api } from '../../reducers/api';
 import { getScrollToId } from '../../utils/utils';
 
 import apiData from '../../mockData/reducers/api';
 
-const runEpic = ( epic, action, state ) =>
+const runEpic = ( action, state ) =>
+	lastValueFrom(
+		getEntriesAfterChangeEpic( of( action ), { value: state } ).pipe(
+			toArray()
+		)
+	);
+
+describe( 'getEntriesAfterChangeEpic', () => {
+	const own = { id: 30, type: 'new', timestamp: 3000 };
+
+	it( 'renders the change directly when nothing is queued', async () => {
+		const payload = { entries: [ own ], nonce: 'abc' };
+
+		const emitted = await runEpic( createEntrySuccess( payload ), {
+			polling: { entries: {} },
+		} );
+
+		expect( emitted ).toEqual( [ pollingSuccess( payload, true ) ] );
+	} );
+
+	it( 'renders queued entries beneath the change instead of dropping them', async () => {
+		const queued = {
+			id_10: { id: 10, type: 'new', timestamp: 1000 },
+			id_20: { id: 20, type: 'new', timestamp: 2000 },
+		};
+
+		const [ action ] = await runEpic(
+			createEntrySuccess( { entries: [ own ], nonce: 'abc' } ),
+			{ polling: { entries: queued } }
+		);
+
+		expect( action ).toEqual(
+			pollingSuccess(
+				{
+					entries: [ queued.id_10, queued.id_20, own ],
+					nonce: 'abc',
+				},
+				true
+			)
+		);
+
+		const rendered = api(
+			{ entries: { id_5: { id: 5, type: 'new', timestamp: 500 } } },
+			action
+		);
+
+		expect( Object.keys( rendered.entries ) ).toEqual( [
+			'id_30',
+			'id_20',
+			'id_10',
+			'id_5',
+		] );
+	} );
+
+	it( 'does not render a queued entry that the change deletes', async () => {
+		const [ action ] = await runEpic(
+			deleteEntrySuccess( {
+				entries: [ { id: 10, type: 'delete', timestamp: 3000 } ],
+			} ),
+			{
+				polling: {
+					entries: {
+						id_10: { id: 10, type: 'new', timestamp: 1000 },
+					},
+				},
+			}
+		);
+
+		expect( api( { entries: {} }, action ).entries ).toEqual( {} );
+	} );
+} );
+
+const runEpicWith = ( epic, action, state ) =>
 	lastValueFrom( epic( of( action ), { value: state } ).pipe( toArray() ) );
 
 const baseState = {
@@ -60,12 +133,12 @@ const baseState = {
 };
 
 afterEach( () => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 } );
 
 describe( 'getEntriesEpic', () => {
 	it( 'jumps to the event when the action carries a numeric hash', async () => {
-		const emitted = await runEpic(
+		const emitted = await runEpicWith(
 			getEntriesEpic,
 			getEntriesAction( 1, '#2977' ),
 			baseState
@@ -78,7 +151,7 @@ describe( 'getEntriesEpic', () => {
 	it( 'fetches entries and emits success when there is no hash', async () => {
 		getEntries.mockReturnValue( of( { response: apiData } ) );
 
-		const emitted = await runEpic(
+		const emitted = await runEpicWith(
 			getEntriesEpic,
 			getEntriesAction( 1 ),
 			baseState
@@ -95,7 +168,7 @@ describe( 'getEntriesEpic', () => {
 	it( 'emits getEntriesFailed when the request errors', async () => {
 		getEntries.mockReturnValue( throwError( () => new Error( 'boom' ) ) );
 
-		const emitted = await runEpic(
+		const emitted = await runEpicWith(
 			getEntriesEpic,
 			getEntriesAction( 1 ),
 			baseState
@@ -109,7 +182,7 @@ describe( 'getPaginatedEntriesEpic', () => {
 	it( 'emits success then scrolls to the requested entry', async () => {
 		getEntries.mockReturnValue( of( { response: apiData } ) );
 
-		const emitted = await runEpic(
+		const emitted = await runEpicWith(
 			getPaginatedEntriesEpic,
 			getEntriesPaginated( 2, 'first' ),
 			baseState
@@ -124,7 +197,7 @@ describe( 'getPaginatedEntriesEpic', () => {
 	it( 'emits getEntriesFailed when the request errors', async () => {
 		getEntries.mockReturnValue( throwError( () => new Error( 'boom' ) ) );
 
-		const emitted = await runEpic(
+		const emitted = await runEpicWith(
 			getPaginatedEntriesEpic,
 			getEntriesPaginated( 2, 'first' ),
 			baseState
@@ -167,7 +240,7 @@ describe.each( [
 		it( 'calls the service and emits success', async () => {
 			service.mockReturnValue( of( { response: payload } ) );
 
-			const emitted = await runEpic(
+			const emitted = await runEpicWith(
 				epic,
 				actionCreator( payload ),
 				baseState
@@ -184,7 +257,7 @@ describe.each( [
 		it( 'emits the failed action when the request errors', async () => {
 			service.mockReturnValue( throwError( () => new Error( 'boom' ) ) );
 
-			const emitted = await runEpic(
+			const emitted = await runEpicWith(
 				epic,
 				actionCreator( payload ),
 				baseState
@@ -194,24 +267,3 @@ describe.each( [
 		} );
 	}
 );
-
-describe( 'getEntriesAfterChangeEpic', () => {
-	it.each( [
-		[ 'CREATE_ENTRY_SUCCESS', createEntrySuccess ],
-		[ 'UPDATE_ENTRY_SUCCESS', updateEntrySuccess ],
-		[ 'DELETE_ENTRY_SUCCESS', deleteEntrySuccess ],
-	] )(
-		'turns %s into a pollingSuccess with renderNewEntries true',
-		async ( label, actionCreator ) => {
-			const payload = { id: '2977' };
-
-			const emitted = await runEpic(
-				getEntriesAfterChangeEpic,
-				actionCreator( payload ),
-				baseState
-			);
-
-			expect( emitted ).toEqual( [ pollingSuccess( payload, true ) ] );
-		}
-	);
-} );
