@@ -78,6 +78,9 @@
 }
 
 .liveblog-editor-delete {
+	padding: 0;
+	border: 0;
+	background: none;
 	color: $color-warning;
 	cursor: pointer;
 	transition: none;

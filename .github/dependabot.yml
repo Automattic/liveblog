@@ -56,6 +56,17 @@ updates:
           - "eslint*"
           - "prettier*"
           - "@types/*"
+      # Lexical requires every package at the same version; mixed versions
+      # bundle several copies of core and break the editor at runtime.
+      lexical:
+        patterns:
+          - "lexical"
+          - "@lexical/*"
+      lexical-security:
+        applies-to: security-updates
+        patterns:
+          - "lexical"
+          - "@lexical/*"
     ignore:
       # React 19 not yet supported by @wordpress/scripts
       - dependency-name: "react"

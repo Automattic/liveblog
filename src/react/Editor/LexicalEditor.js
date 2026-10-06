@@ -6,6 +6,8 @@
  * @see https://lexical.dev/
  */
 
+/* global HTMLImageElement, DOMParser */
+
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { __ } from '@wordpress/i18n';
@@ -20,15 +22,27 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 
-import { HeadingNode, QuoteNode, $isQuoteNode, $createQuoteNode } from '@lexical/rich-text';
-import { ListNode, ListItemNode } from '@lexical/list';
-import { LinkNode, AutoLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
+import {
+	HeadingNode,
+	QuoteNode,
+	$isQuoteNode,
+	$createQuoteNode,
+} from '@lexical/rich-text';
+import {
+	LinkNode,
+	AutoLinkNode,
+	$isLinkNode,
+	TOGGLE_LINK_COMMAND,
+} from '@lexical/link';
 import {
 	INSERT_ORDERED_LIST_COMMAND,
 	INSERT_UNORDERED_LIST_COMMAND,
 	REMOVE_LIST_COMMAND,
 	$isListNode,
+	ListNode,
+	ListItemNode,
 } from '@lexical/list';
 
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
@@ -36,17 +50,14 @@ import {
 	$getRoot,
 	$insertNodes,
 	$getSelection,
-	$setSelection,
 	$isRangeSelection,
-	$isNodeSelection,
 	$getNodeByKey,
-	$createNodeSelection,
 	$createParagraphNode,
+	CLICK_COMMAND,
 	FORMAT_TEXT_COMMAND,
-	SELECTION_CHANGE_COMMAND,
-	COMMAND_PRIORITY_CRITICAL,
 	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_EDITOR,
+	COMMAND_PRIORITY_LOW,
 	createCommand,
 	DecoratorNode,
 	DRAGOVER_COMMAND,
@@ -71,82 +82,58 @@ const INSERT_IMAGE_COMMAND = createCommand( 'INSERT_IMAGE_COMMAND' );
 /**
  * ResizableImage - Component for displaying images with resize handles.
  *
- * @param {Object} props           Component props.
- * @param {string} props.src       Image source URL.
- * @param {string} props.alt       Image alt text.
- * @param {number} props.width     Image width (0 = auto).
- * @param {number} props.height    Image height (0 = auto).
- * @param {string} props.nodeKey   Lexical node key for updates.
+ * @param {Object} props         Component props.
+ * @param {string} props.src     Image source URL.
+ * @param {string} props.alt     Image alt text.
+ * @param {number} props.width   Image width (0 = auto).
+ * @param {number} props.height  Image height (0 = auto).
+ * @param {string} props.nodeKey Lexical node key for updates.
  */
 function ResizableImage( { src, alt, width, height, nodeKey } ) {
 	const [ editor ] = useLexicalComposerContext();
 	const imageRef = useRef( null );
 	const [ isResizing, setIsResizing ] = useState( false );
-	const [ isSelected, setIsSelected ] = useState( false );
+	const [ isSelected, setSelected, clearSelection ] =
+		useLexicalNodeSelection( nodeKey );
 	const startSize = useRef( { width: 0, height: 0 } );
 	const startPos = useRef( { x: 0, y: 0 } );
 	const aspectRatio = useRef( 1 );
 
-	// Track selection state.
+	// Select the image on click. This must be a CLICK_COMMAND handler that
+	// outranks the rich-text plugin's, which otherwise clears node selections.
 	useEffect( () => {
 		return editor.registerCommand(
-			SELECTION_CHANGE_COMMAND,
-			() => {
-				editor.getEditorState().read( () => {
-					const selection = $getSelection();
-					if ( $isNodeSelection( selection ) ) {
-						const nodes = selection.getNodes();
-						const selected = nodes.some(
-							( node ) => $isImageNode( node ) && node.getKey() === nodeKey
-						);
-						setIsSelected( selected );
-					} else {
-						setIsSelected( false );
-					}
-				} );
-				return false;
-			},
-			COMMAND_PRIORITY_HIGH
-		);
-	}, [ editor, nodeKey ] );
-
-	// Handle click to select image.
-	const handleClick = useCallback(
-		( event ) => {
-			event.preventDefault();
-			editor.update( () => {
-				const node = $getNodeByKey( nodeKey );
-				if ( node ) {
-					const selection = $createNodeSelection();
-					selection.add( nodeKey );
-					$setSelection( selection );
+			CLICK_COMMAND,
+			( event ) => {
+				if ( event.target !== imageRef.current ) {
+					return false;
 				}
-			} );
-		},
-		[ editor, nodeKey ]
-	);
+				clearSelection();
+				setSelected( true );
+				return true;
+			},
+			COMMAND_PRIORITY_LOW
+		);
+	}, [ editor, clearSelection, setSelected ] );
 
 	// Start resize on mousedown.
-	const handleResizeStart = useCallback(
-		( event ) => {
-			event.preventDefault();
-			event.stopPropagation();
+	const handleResizeStart = useCallback( ( event ) => {
+		event.preventDefault();
+		event.stopPropagation();
 
-			const img = imageRef.current;
-			if ( ! img ) {
-				return;
-			}
+		const img = imageRef.current;
+		if ( ! img ) {
+			return;
+		}
 
-			setIsResizing( true );
-			startSize.current = {
-				width: img.offsetWidth,
-				height: img.offsetHeight,
-			};
-			startPos.current = { x: event.clientX, y: event.clientY };
-			aspectRatio.current = img.offsetWidth / img.offsetHeight;
-		},
-		[]
-	);
+		setIsResizing( true );
+		startSize.current = {
+			width: img.offsetWidth,
+			height: img.offsetHeight,
+		};
+		startPos.current = { x: event.clientX, y: event.clientY };
+		aspectRatio.current = img.offsetWidth / img.offsetHeight;
+	}, [] );
 
 	// Handle resize drag.
 	useEffect( () => {
@@ -200,12 +187,13 @@ function ResizableImage( { src, alt, width, height, nodeKey } ) {
 				alt={ alt }
 				className="liveblog-lexical-image"
 				style={ style }
-				onClick={ handleClick }
 				draggable={ false }
 			/>
 			{ isSelected && (
 				<>
+					{ /* Pointer-only drag affordance; hidden from assistive tech. */ }
 					<span
+						aria-hidden="true"
 						className="liveblog-resize-handle liveblog-resize-handle-se"
 						onMouseDown={ handleResizeStart }
 					/>
@@ -229,7 +217,12 @@ class ImageNode extends DecoratorNode {
 	}
 
 	static clone( node ) {
-		return new ImageNode( node.__src, node.__alt, node.__attributes, node.__key );
+		return new ImageNode(
+			node.__src,
+			node.__alt,
+			node.__attributes,
+			node.__key
+		);
 	}
 
 	constructor( src, alt = '', attributes = {}, key ) {
@@ -387,6 +380,8 @@ const nodes = [
 /**
  * Plugin to load initial HTML content into the editor.
  * Only loads content once on mount to avoid cursor position issues.
+ * @param {Object} root0
+ * @param {string} root0.initialContent
  */
 function InitialContentPlugin( { initialContent } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -442,14 +437,26 @@ function cleanLexicalHtml( html ) {
 	// Remove empty spans
 	cleaned = cleaned.replace( /<span>([^<]*)<\/span>/g, '$1' );
 
+	// Remove the extra <br> Lexical 0.52+ adds after a trailing line break.
+	// Lexical drops it again on import; without the marker it would not.
+	cleaned = cleaned.replace(
+		/<br data-lexical-managed-linebreak="true">/g,
+		''
+	);
+
 	// Clean up image wrapper spans
-	cleaned = cleaned.replace( /<span class="liveblog-lexical-image-wrapper">(<img[^>]*>)<\/span>/g, '$1' );
+	cleaned = cleaned.replace(
+		/<span class="liveblog-lexical-image-wrapper">(<img[^>]*>)<\/span>/g,
+		'$1'
+	);
 
 	return cleaned;
 }
 
 /**
  * Plugin to export HTML when content changes.
+ * @param {Object}   root0
+ * @param {Function} root0.onChange
  */
 function HtmlExportPlugin( { onChange } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -474,6 +481,8 @@ function HtmlExportPlugin( { onChange } ) {
 
 /**
  * Plugin to handle image insertion and drag-drop.
+ * @param {Object}   root0
+ * @param {Function} root0.handleImageUpload
  */
 function ImagePlugin( { handleImageUpload } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -533,15 +542,23 @@ function ImagePlugin( { handleImageUpload } ) {
 							// Upload all images sequentially to maintain order
 							imageFiles.reduce( ( promise, file ) => {
 								return promise.then( () =>
-									handleImageUpload( file ).then( ( src ) => {
-										editor.dispatchCommand( INSERT_IMAGE_COMMAND, {
-											src,
-											alt: file.name,
-										} );
-									} ).catch( ( err ) => {
-										// eslint-disable-next-line no-console
-										console.error( 'Image upload failed:', err );
-									} )
+									handleImageUpload( file )
+										.then( ( src ) => {
+											editor.dispatchCommand(
+												INSERT_IMAGE_COMMAND,
+												{
+													src,
+													alt: file.name,
+												}
+											);
+										} )
+										.catch( ( err ) => {
+											// eslint-disable-next-line no-console
+											console.error(
+												'Image upload failed:',
+												err
+											);
+										} )
 								);
 							}, Promise.resolve() );
 						}
@@ -608,7 +625,11 @@ function getTriggerMatch( editor ) {
 			// Found a trigger
 			if ( AUTOCOMPLETE_TRIGGERS.includes( char ) ) {
 				// Check if trigger is at start of text or preceded by space
-				if ( i === 0 || textContent[ i - 1 ] === ' ' || textContent[ i - 1 ] === '\n' ) {
+				if (
+					i === 0 ||
+					textContent[ i - 1 ] === ' ' ||
+					textContent[ i - 1 ] === '\n'
+				) {
 					result = {
 						trigger: char,
 						text: textContent.slice( i + 1, offset ),
@@ -626,6 +647,9 @@ function getTriggerMatch( editor ) {
 
 /**
  * Plugin to handle autocomplete suggestions.
+ * @param {Object}   root0
+ * @param {Array}    root0.suggestions
+ * @param {Function} root0.onSearch
  */
 function AutocompletePlugin( { suggestions, onSearch } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -650,84 +674,91 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 	 *
 	 * @param {Object|string} suggestion - The suggestion to insert.
 	 */
-	const selectSuggestion = useCallback( ( suggestion ) => {
-		const match = triggerMatchRef.current;
-		if ( ! match ) {
-			return;
-		}
-
-		editor.update( () => {
-			const selection = $getSelection();
-			if ( ! $isRangeSelection( selection ) ) {
+	const selectSuggestion = useCallback(
+		( suggestion ) => {
+			const match = triggerMatchRef.current;
+			if ( ! match ) {
 				return;
 			}
 
-			const anchor = selection.anchor;
-			const anchorNode = anchor.getNode();
+			editor.update( () => {
+				const selection = $getSelection();
+				if ( ! $isRangeSelection( selection ) ) {
+					return;
+				}
 
-			if ( anchorNode.getType() !== 'text' ) {
-				return;
-			}
+				const anchor = selection.anchor;
+				const anchorNode = anchor.getNode();
 
-			const textContent = anchorNode.getTextContent();
-			const { trigger, startOffset, endOffset } = match;
+				if ( anchorNode.getType() !== 'text' ) {
+					return;
+				}
 
-			// Build replacement text based on trigger type
-			let replacementText;
+				const textContent = anchorNode.getTextContent();
+				const { trigger, startOffset, endOffset } = match;
 
-			switch ( trigger ) {
-				case '@':
-					// Author mention - use key (user_nicename) for the @mention
-					// Server-side PHP will convert @key to a link
-					replacementText = suggestion.key
-						? `@${ suggestion.key } `
-						: `@${ suggestion } `;
-					break;
-				case '#':
-					// Hashtag - use name property
-					// Server-side PHP will convert #hashtag to a link
-					replacementText = suggestion.name
-						? `#${ suggestion.name } `
-						: `#${ suggestion } `;
-					break;
-				case '/':
-					// Command - insert the command text
-					replacementText = suggestion + ' ';
-					break;
-				case ':':
-					// Emoji - insert :key: format (e.g., :smile:)
-					// Server-side PHP will convert :key: to an emoji image
-					replacementText = suggestion.key
-						? `:${ suggestion.key }: `
-						: `:${ suggestion }: `;
-					break;
-				default:
-					replacementText = suggestion + ' ';
-			}
+				// Build replacement text based on trigger type
+				let replacementText;
 
-			// Replace the trigger + search text with the replacement
-			const beforeText = textContent.slice( 0, startOffset );
-			const afterText = textContent.slice( endOffset );
-			const newText = beforeText + replacementText + afterText;
+				switch ( trigger ) {
+					case '@':
+						// Author mention - use key (user_nicename) for the @mention
+						// Server-side PHP will convert @key to a link
+						replacementText = suggestion.key
+							? `@${ suggestion.key } `
+							: `@${ suggestion } `;
+						break;
+					case '#':
+						// Hashtag - use name property
+						// Server-side PHP will convert #hashtag to a link
+						replacementText = suggestion.name
+							? `#${ suggestion.name } `
+							: `#${ suggestion } `;
+						break;
+					case '/':
+						// Command - insert the command text
+						replacementText = suggestion + ' ';
+						break;
+					case ':':
+						// Emoji - insert :key: format (e.g., :smile:)
+						// Server-side PHP will convert :key: to an emoji image
+						replacementText = suggestion.key
+							? `:${ suggestion.key }: `
+							: `:${ suggestion }: `;
+						break;
+					default:
+						replacementText = suggestion + ' ';
+				}
 
-			// Update the text node
-			anchorNode.setTextContent( newText );
+				// Replace the trigger + search text with the replacement
+				const beforeText = textContent.slice( 0, startOffset );
+				const afterText = textContent.slice( endOffset );
+				const newText = beforeText + replacementText + afterText;
 
-			// Move cursor to end of inserted text
-			const newOffset = startOffset + replacementText.length;
-			selection.anchor.set( anchorNode.getKey(), newOffset, 'text' );
-			selection.focus.set( anchorNode.getKey(), newOffset, 'text' );
-		} );
+				// Update the text node
+				anchorNode.setTextContent( newText );
 
-		setTriggerMatch( null );
-	}, [ editor ] );
+				// Move cursor to end of inserted text
+				const newOffset = startOffset + replacementText.length;
+				selection.anchor.set( anchorNode.getKey(), newOffset, 'text' );
+				selection.focus.set( anchorNode.getKey(), newOffset, 'text' );
+			} );
+
+			setTriggerMatch( null );
+		},
+		[ editor ]
+	);
 
 	// Register keyboard commands with Lexical
 	useEffect( () => {
 		const unregisterEnter = editor.registerCommand(
 			KEY_ENTER_COMMAND,
 			( event ) => {
-				if ( triggerMatchRef.current && suggestions && suggestions.length > 0 ) {
+				if (
+					triggerMatchRef.current &&
+					suggestions &&
+					suggestions.length > 0
+				) {
 					event.preventDefault();
 					selectSuggestion( suggestions[ selectedIndexRef.current ] );
 					return true;
@@ -740,7 +771,11 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 		const unregisterTab = editor.registerCommand(
 			KEY_TAB_COMMAND,
 			( event ) => {
-				if ( triggerMatchRef.current && suggestions && suggestions.length > 0 ) {
+				if (
+					triggerMatchRef.current &&
+					suggestions &&
+					suggestions.length > 0
+				) {
 					event.preventDefault();
 					selectSuggestion( suggestions[ selectedIndexRef.current ] );
 					return true;
@@ -753,7 +788,11 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 		const unregisterArrowDown = editor.registerCommand(
 			KEY_ARROW_DOWN_COMMAND,
 			( event ) => {
-				if ( triggerMatchRef.current && suggestions && suggestions.length > 0 ) {
+				if (
+					triggerMatchRef.current &&
+					suggestions &&
+					suggestions.length > 0
+				) {
 					event.preventDefault();
 					setSelectedIndex( ( prev ) =>
 						prev < suggestions.length - 1 ? prev + 1 : 0
@@ -768,7 +807,11 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 		const unregisterArrowUp = editor.registerCommand(
 			KEY_ARROW_UP_COMMAND,
 			( event ) => {
-				if ( triggerMatchRef.current && suggestions && suggestions.length > 0 ) {
+				if (
+					triggerMatchRef.current &&
+					suggestions &&
+					suggestions.length > 0
+				) {
 					event.preventDefault();
 					setSelectedIndex( ( prev ) =>
 						prev > 0 ? prev - 1 : suggestions.length - 1
@@ -827,7 +870,9 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 			return;
 		}
 
-		const selection = window.getSelection();
+		const rootElement = editor.getRootElement();
+		const selection =
+			rootElement?.ownerDocument.defaultView?.getSelection();
 		if ( selection && selection.rangeCount > 0 ) {
 			const range = selection.getRangeAt( 0 );
 			const rect = range.getBoundingClientRect();
@@ -838,7 +883,7 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 				left: rect.left,
 			} );
 		}
-	}, [ triggerMatch, suggestions ] );
+	}, [ editor, triggerMatch, suggestions ] );
 
 	// Don't render if no trigger match or no suggestions
 	if ( ! triggerMatch || ! suggestions || suggestions.length === 0 ) {
@@ -856,7 +901,7 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 				zIndex: 1000,
 			} }
 		>
-			<ul className="liveblog-autocomplete-list">
+			<ul className="liveblog-autocomplete-list" role="listbox">
 				{ suggestions.map( ( suggestion, index ) => {
 					// Handle different suggestion types
 					let displayText;
@@ -879,8 +924,12 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 					}
 
 					return (
+						// Arrow keys and Enter are handled by the editor, which keeps focus.
+						// eslint-disable-next-line jsx-a11y/click-events-have-key-events
 						<li
 							key={ index }
+							role="option"
+							aria-selected={ index === selectedIndex }
 							className={ `liveblog-autocomplete-item${
 								index === selectedIndex ? ' is-selected' : ''
 							}` }
@@ -890,7 +939,9 @@ function AutocompletePlugin( { suggestions, onSearch } ) {
 							{ avatarHtml && (
 								<span
 									className="liveblog-autocomplete-avatar"
-									dangerouslySetInnerHTML={ { __html: avatarHtml } }
+									dangerouslySetInnerHTML={ {
+										__html: avatarHtml,
+									} }
 								/>
 							) }
 							<span className="liveblog-autocomplete-text">
@@ -915,8 +966,20 @@ AutocompletePlugin.propTypes = {
 
 /**
  * Toolbar button component using Dashicons.
+ * @param {Object}   root0
+ * @param {Function} root0.onClick
+ * @param {string}   root0.icon
+ * @param {string}   root0.title
+ * @param {boolean}  root0.isActive
+ * @param {boolean}  root0.disabled
  */
-function ToolbarButton( { onClick, icon, title, isActive = false, disabled = false } ) {
+function ToolbarButton( {
+	onClick,
+	icon,
+	title,
+	isActive = false,
+	disabled = false,
+} ) {
 	return (
 		<button
 			type="button"
@@ -941,6 +1004,11 @@ ToolbarButton.propTypes = {
 
 /**
  * Link input modal component.
+ * @param {Object}   root0
+ * @param {string}   root0.url
+ * @param {Function} root0.onChange
+ * @param {Function} root0.onConfirm
+ * @param {Function} root0.onCancel
  */
 function LinkInput( { url, onChange, onConfirm, onCancel } ) {
 	return (
@@ -991,6 +1059,7 @@ LinkInput.propTypes = {
 
 /**
  * Get the current selection state for toolbar active states.
+ * @param {Object} editor
  */
 function getSelectionState( editor ) {
 	const state = {
@@ -1013,9 +1082,10 @@ function getSelectionState( editor ) {
 		state.isUnderline = selection.hasFormat( 'underline' );
 
 		const anchorNode = selection.anchor.getNode();
-		const element = anchorNode.getKey() === 'root'
-			? anchorNode
-			: anchorNode.getTopLevelElementOrThrow();
+		const element =
+			anchorNode.getKey() === 'root'
+				? anchorNode
+				: anchorNode.getTopLevelElementOrThrow();
 
 		// Check for quote
 		if ( $isQuoteNode( element ) ) {
@@ -1046,6 +1116,9 @@ function getSelectionState( editor ) {
 
 /**
  * Complete toolbar for text formatting.
+ * @param {Object}   root0
+ * @param {boolean}  root0.readOnly
+ * @param {Function} root0.handleImageUpload
  */
 function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 	const [ editor ] = useLexicalComposerContext();
@@ -1064,16 +1137,13 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 	const [ pendingImageFile, setPendingImageFile ] = useState( null );
 	const fileInputRef = useRef( null );
 
-	// Update selection state when selection changes
+	// Refresh button states after every commit. SELECTION_CHANGE_COMMAND is
+	// not used because, from Lexical 0.52, it runs before the commit, when
+	// getSelectionState() would still read the previous selection.
 	useEffect( () => {
-		return editor.registerCommand(
-			SELECTION_CHANGE_COMMAND,
-			() => {
-				setSelectionState( getSelectionState( editor ) );
-				return false;
-			},
-			COMMAND_PRIORITY_CRITICAL
-		);
+		return editor.registerUpdateListener( () => {
+			setSelectionState( getSelectionState( editor ) );
+		} );
 	}, [ editor ] );
 
 	const formatBold = useCallback( () => {
@@ -1178,28 +1248,31 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 		}
 	}, [] );
 
-	const handleCropComplete = useCallback( ( croppedFile ) => {
-		setShowCropModal( false );
-		setPendingImageFile( null );
+	const handleCropComplete = useCallback(
+		( croppedFile ) => {
+			setShowCropModal( false );
+			setPendingImageFile( null );
 
-		if ( handleImageUpload ) {
-			setIsUploading( true );
-			handleImageUpload( croppedFile )
-				.then( ( src ) => {
-					editor.dispatchCommand( INSERT_IMAGE_COMMAND, {
-						src,
-						alt: croppedFile.name,
+			if ( handleImageUpload ) {
+				setIsUploading( true );
+				handleImageUpload( croppedFile )
+					.then( ( src ) => {
+						editor.dispatchCommand( INSERT_IMAGE_COMMAND, {
+							src,
+							alt: croppedFile.name,
+						} );
+					} )
+					.catch( ( err ) => {
+						// eslint-disable-next-line no-console
+						console.error( 'Image upload failed:', err );
+					} )
+					.finally( () => {
+						setIsUploading( false );
 					} );
-				} )
-				.catch( ( err ) => {
-					// eslint-disable-next-line no-console
-					console.error( 'Image upload failed:', err );
-				} )
-				.finally( () => {
-					setIsUploading( false );
-				} );
-		}
-	}, [ editor, handleImageUpload ] );
+			}
+		},
+		[ editor, handleImageUpload ]
+	);
 
 	const handleCropCancel = useCallback( () => {
 		setShowCropModal( false );
@@ -1251,7 +1324,9 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 					isActive={ selectionState.isQuote }
 					disabled={ readOnly }
 				/>
-				<div style={ { position: 'relative', display: 'inline-block' } }>
+				<div
+					style={ { position: 'relative', display: 'inline-block' } }
+				>
 					<ToolbarButton
 						onClick={ openLinkModal }
 						icon="admin-links"
@@ -1279,7 +1354,11 @@ function ToolbarPlugin( { readOnly, handleImageUpload } ) {
 						<ToolbarButton
 							onClick={ handleImageButtonClick }
 							icon="format-image"
-							title={ isUploading ? __( 'Uploading…', 'liveblog' ) : __( 'Insert Image', 'liveblog' ) }
+							title={
+								isUploading
+									? __( 'Uploading…', 'liveblog' )
+									: __( 'Insert Image', 'liveblog' )
+							}
 							disabled={ readOnly || isUploading }
 						/>
 						<input
@@ -1345,18 +1424,27 @@ const LexicalEditor = ( {
 	return (
 		<div className="liveblog-lexical-editor">
 			<LexicalComposer initialConfig={ initialConfig }>
-				<ToolbarPlugin readOnly={ readOnly } handleImageUpload={ handleImageUpload } />
+				<ToolbarPlugin
+					readOnly={ readOnly }
+					handleImageUpload={ handleImageUpload }
+				/>
 				<div className="liveblog-lexical-editor-inner">
 					<RichTextPlugin
 						contentEditable={
 							<ContentEditable
 								className="liveblog-lexical-content-editable"
-								aria-label={ __( 'Liveblog entry content', 'liveblog' ) }
+								aria-label={ __(
+									'Liveblog entry content',
+									'liveblog'
+								) }
 							/>
 						}
 						placeholder={
 							<div className="liveblog-lexical-placeholder">
-								{ __( 'Start writing your liveblog entry…', 'liveblog' ) }
+								{ __(
+									'Start writing your liveblog entry…',
+									'liveblog'
+								) }
 							</div>
 						}
 						ErrorBoundary={ LexicalErrorBoundary }

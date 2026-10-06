@@ -8,7 +8,14 @@
 /**
  * Class WPCOM_Liveblog_Entry_Embed_SDKs
  *
- * As we're render posts in React it requires some SDKs to pulled in on page load
+ * Provider SDKs (Facebook, Twitter/X, Instagram, Reddit) are no longer enqueued
+ * unconditionally on every Liveblog post. Instead, the list of provider SDK URLs
+ * is passed to the front-end app, which lazy-loads each SDK on demand the first
+ * time an entry containing that provider's embed markup is rendered. This avoids
+ * contacting third-party domains when no matching embed is present, and correctly
+ * handles embeds arriving in entries polled after the initial page load.
+ *
+ * @see triggerOembedLoad() in src/react/utils/utils.js for the client-side loader.
  */
 class WPCOM_Liveblog_Entry_Embed_SDKs {
 
@@ -18,7 +25,7 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * @var array
 	 */
 	protected static $sdks = array(
-		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5',
+		'facebook'  => 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5',
 		'twitter'   => 'https://platform.twitter.com/widgets.js',
 		'instagram' => 'https://www.instagram.com/embed.js',
 		'reddit'    => 'https://embed.reddit.com/widgets.js',
@@ -29,40 +36,37 @@ class WPCOM_Liveblog_Entry_Embed_SDKs {
 	 * acts as a constructor
 	 */
 	public static function load() {
+		/**
+		 * Filters the list of provider embed SDKs made available to the front-end.
+		 *
+		 * Return an empty array to disable all third-party SDK loading, or remove
+		 * individual providers (by key) to prevent their SDK from ever being loaded.
+		 *
+		 * @param array $sdks Map of provider name => SDK script URL.
+		 */
 		self::$sdks = apply_filters( 'liveblog_embed_sdks', self::$sdks );
 
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
-		add_filter( 'script_loader_tag', array( __CLASS__, 'add_async_attribute' ), 10, 2 );
+		add_filter( 'liveblog_settings', array( __CLASS__, 'add_sdks_to_settings' ) );
 	}
 
 	/**
-	 * Loop through provider SDKs and enqueue them
+	 * Expose the provider SDK URLs to the front-end app so it can lazy-load
+	 * each SDK only when a matching embed is actually rendered.
 	 *
-	 * @return void
+	 * @param array $settings The liveblog front-end settings array.
+	 * @return array Settings with the `embed_sdks` map added.
 	 */
-	public static function enqueue() {
-		if ( ! WPCOM_Liveblog::is_viewing_liveblog_post() ) {
-			return;
-		}
-
-		foreach ( self::$sdks as $name => $url ) {
-			// Don't attach version with Reddit JS script file, it will generate 404 error.
-			$version = 'reddit' === $name ? null : WPCOM_Liveblog::VERSION;
-			wp_enqueue_script( $name, esc_url( $url ), array(), $version, false );
-		}
+	public static function add_sdks_to_settings( $settings ) {
+		$settings['embed_sdks'] = self::get_sdks();
+		return $settings;
 	}
 
 	/**
-	 * Set scripts to use async.
+	 * Get the (filtered) list of provider SDK URLs.
 	 *
-	 * @param string $tag    The script tag.
-	 * @param string $handle The script handle.
-	 * @return string Modified script tag.
+	 * @return array Map of provider name => SDK script URL.
 	 */
-	public static function add_async_attribute( $tag, $handle ) {
-		if ( ! in_array( $handle, array_keys( self::$sdks ), true ) ) {
-			return $tag;
-		}
-		return str_replace( ' src', ' async="async" src', $tag );
+	public static function get_sdks() {
+		return self::$sdks;
 	}
 }

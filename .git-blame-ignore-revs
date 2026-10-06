@@ -1,0 +1,8 @@
+# Revisions to ignore when running `git blame`.
+#
+# Configure locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub applies this file automatically.
+
+# style: normalise src JS to tab indentation
+9538960d14e575b1e915b1dae80d7fd9ab27de57

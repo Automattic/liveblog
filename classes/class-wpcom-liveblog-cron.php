@@ -55,12 +55,12 @@ class WPCOM_Liveblog_Cron {
 			foreach ( $posts->posts as $post ) {
 				$post_id = $post->ID;
 
-				// Lets grab todays day, convert it to a timestamp and look for any set auto archive date.
+				// Let's grab today's date, convert it to a timestamp and look for any set auto archive date.
 				$today  = strtotime( gmdate( 'Y-m-d H:i:s' ) );
 				$expiry = get_post_meta( $post_id, WPCOM_Liveblog::$auto_archive_expiry_key, true );
 
-				// if we have an expiry date lets compare them and if the
-				// expiry is less than today i.e. its in the past lets archive the liveblog.
+				// if we have an expiry date let's compare them and if the
+				// expiry is less than today i.e. it's in the past, let's archive the liveblog.
 				if ( $expiry ) {
 					if ( (int) $expiry < $today ) {
 						WPCOM_Liveblog::set_liveblog_state( $post_id, 'archive' );

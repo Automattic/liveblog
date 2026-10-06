@@ -20,13 +20,6 @@ class WPCOM_Liveblog_Lazyloader {
 	private static $enabled;
 
 	/**
-	 * Number of default entries to display.
-	 *
-	 * @var int
-	 */
-	private static $number_of_default_entries;
-
-	/**
 	 * Number of entries to load.
 	 *
 	 * @var int
@@ -55,30 +48,6 @@ class WPCOM_Liveblog_Lazyloader {
 		}
 
 		return self::$enabled;
-	}
-
-	/**
-	 * Returns the number of initially displayed Liveblog entries.
-	 *
-	 * @return int
-	 */
-	private static function get_number_of_default_entries() {
-
-		if ( ! isset( self::$number_of_default_entries ) ) {
-			self::$number_of_default_entries = 5;
-
-			/**
-			 * Filters the number of initially displayed Liveblog entries.
-			 *
-			 * @param int $number_of_default_entries Number of initially displayed Liveblog entries.
-			 */
-			$number = (int) apply_filters( 'liveblog_number_of_default_entries', self::$number_of_default_entries );
-			if ( $number >= 0 ) {
-				self::$number_of_default_entries = $number;
-			}
-		}
-
-		return self::$number_of_default_entries;
 	}
 
 	/**
@@ -133,12 +102,6 @@ class WPCOM_Liveblog_Lazyloader {
 			// Disable the Lazyload Liveblog Entries plugin.
 			remove_action( 'init', 'Lazyload_Liveblog_Entries' );
 		}
-
-		if ( ! self::is_enabled() ) {
-			return;
-		}
-
-		add_filter( 'liveblog_display_archive_query_args', array( __CLASS__, 'display_archive_query_args' ), 20 );
 	}
 
 	/**
@@ -158,19 +121,5 @@ class WPCOM_Liveblog_Lazyloader {
 				)
 			)
 		);
-	}
-
-	/**
-	 * Limits the initially displayed Liveblog entries.
-	 *
-	 * @param array $args Query args.
-	 *
-	 * @return array
-	 */
-	public static function display_archive_query_args( $args ) {
-
-		$args['number'] = (int) self::get_number_of_default_entries();
-
-		return $args;
 	}
 }

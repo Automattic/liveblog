@@ -6,10 +6,10 @@ import { polling } from './polling';
 import { pagination } from './pagination';
 
 export default {
-  config,
-  api,
-  polling,
-  user,
-  events,
-  pagination,
+	config,
+	api,
+	polling,
+	user,
+	events,
+	pagination,
 };

@@ -1,7 +1,7 @@
 /**
  * Canvas-based image cropping utilities.
  *
- * @package Liveblog
+ * @package
  */
 
 /**

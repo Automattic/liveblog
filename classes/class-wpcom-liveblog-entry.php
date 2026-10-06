@@ -279,8 +279,9 @@ class WPCOM_Liveblog_Entry {
 	/**
 	 * Filter image attributes based on an allowed list.
 	 *
-	 * By default, only 'src' and 'alt' attributes are preserved on <img> tags.
-	 * Developers can extend this using the 'liveblog_image_allowed_attributes' filter.
+	 * By default, 'src', 'alt', 'width' and 'height' are preserved on <img> tags,
+	 * so sizes set by resizing an image in the editor are honoured.
+	 * Developers can change this using the 'liveblog_image_allowed_attributes' filter.
 	 *
 	 * @param string $content The HTML content to filter.
 	 * @return string The filtered HTML content.
@@ -288,16 +289,19 @@ class WPCOM_Liveblog_Entry {
 	 * @example
 	 * // Allow additional attributes:
 	 * add_filter( 'liveblog_image_allowed_attributes', function( $attrs ) {
-	 *     return array_merge( $attrs, [ 'class', 'width', 'height', 'loading', 'data-*' ] );
+	 *     return array_merge( $attrs, [ 'class', 'loading', 'data-*' ] );
 	 * } );
+	 *
+	 * @example
+	 * // Ignore sizes set in the editor:
+	 * add_filter( 'liveblog_image_allowed_attributes', fn() => [ 'src', 'alt' ] );
 	 *
 	 * @example
 	 * // Allow all attributes:
 	 * add_filter( 'liveblog_image_allowed_attributes', fn() => [ '*' ] );
 	 */
 	public static function filter_image_attributes( $content ) {
-		// Get allowed attributes. Default to src and alt for backwards compatibility.
-		$allowed_attributes = apply_filters( 'liveblog_image_allowed_attributes', array( 'src', 'alt' ) );
+		$allowed_attributes = apply_filters( 'liveblog_image_allowed_attributes', array( 'src', 'alt', 'width', 'height' ) );
 
 		// If wildcard is present, return content unchanged.
 		if ( in_array( '*', $allowed_attributes, true ) ) {
@@ -374,11 +378,20 @@ class WPCOM_Liveblog_Entry {
 	public static function insert( $args ) {
 		$args = apply_filters( 'liveblog_before_insert_entry', $args );
 
-		$args['user'] = self::handle_author_select( $args, false );
+		$author = self::get_selected_author( $args );
+		if ( $author ) {
+			$args['user'] = $author;
+		}
 
 		$comment = self::insert_comment( $args );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
+		}
+
+		// A comment must have a user, so an entry without a selected author is
+		// stored as the inserting user and its authors are hidden.
+		if ( ! $author ) {
+			add_comment_meta( $comment->comment_ID, self::HIDE_AUTHORS_KEY, true );
 		}
 
 		if ( isset( $args['contributor_ids'] ) ) {
@@ -655,44 +668,51 @@ class WPCOM_Liveblog_Entry {
 	}
 
 	/**
-	 * Return the user using author_id, if user not found then set as current
-	 * user as a fallback, we store a meta to show that authors are hidden as
-	 * a comment must have an author.
+	 * Return the user selected as the entry's author.
 	 *
-	 * If an entry_id is supplied we should update it as it is the
-	 * original entry which is used for displaying author information.
+	 * @param array $args The entry arguments.
+	 * @return WP_User|false The selected author, or false when `author_id` is
+	 *                       empty or not an assignable user.
+	 */
+	private static function get_selected_author( $args ) {
+		if ( empty( $args['author_id'] ) || ! self::is_user_assignable_as_author( (int) $args['author_id'] ) ) {
+			return false;
+		}
+
+		return self::get_userdata_with_filter( $args['author_id'] );
+	}
+
+	/**
+	 * Apply the selected author to the original entry being updated, which is
+	 * the entry used for displaying author information.
 	 *
-	 * @param array    $args     The new Liveblog entry.
-	 * @param int|bool $entry_id If set we should update the original entry.
-	 * @return WP_User The user object.
+	 * When no author is selected the original author is kept, as a comment must
+	 * have one, and a meta flag is stored to hide the entry's authors.
+	 *
+	 * @param array $args     The entry arguments.
+	 * @param int   $entry_id The ID of the original entry.
+	 * @return WP_User The user to insert the replacement entry as.
 	 */
 	private static function handle_author_select( $args, $entry_id ) {
-		if ( isset( $args['author_id'] ) && $args['author_id'] && self::is_user_assignable_as_author( (int) $args['author_id'] ) ) {
-			$user_object = self::get_userdata_with_filter( $args['author_id'] );
-			if ( $user_object ) {
-				$args['user'] = $user_object;
-
-				wp_update_comment(
-					array(
-						'comment_ID'           => $entry_id,
-						'user_id'              => $args['user']->ID,
-						'comment_author'       => $args['user']->display_name,
-						'comment_author_email' => $args['user']->user_email,
-						'comment_author_url'   => $args['user']->user_url,
-					)
-				);
-
-				update_comment_meta( $entry_id, self::HIDE_AUTHORS_KEY, false );
-			}
-		} else {
+		$author = self::get_selected_author( $args );
+		if ( ! $author ) {
 			update_comment_meta( $entry_id, self::HIDE_AUTHORS_KEY, true );
+			return $args['user'];
 		}
 
-		if ( isset( $args['contributor_ids'] ) ) {
-			self::add_contributors( $entry_id, $args['contributor_ids'] );
-		}
+		wp_update_comment(
+			array(
+				'comment_ID'           => $entry_id,
+				'user_id'              => $author->ID,
+				'comment_author'       => $author->display_name,
+				'comment_author_email' => $author->user_email,
+				'comment_author_url'   => $author->user_url,
+			)
+		);
 
-		return $args['user'];
+		update_comment_meta( $entry_id, self::HIDE_AUTHORS_KEY, false );
+
+		return $author;
 	}
 
 	/**

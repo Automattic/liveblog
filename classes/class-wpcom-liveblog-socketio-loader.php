@@ -117,7 +117,7 @@ class WPCOM_Liveblog_Socketio_Loader {
 	}
 
 	/**
-	 * Display message to warn the user that the PHP version is to old to run socket.io-php-emitter.
+	 * Display message to warn the user that the PHP version is too old to run socket.io-php-emitter.
 	 *
 	 * @return void
 	 */

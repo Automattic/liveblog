@@ -34,7 +34,7 @@ class WPCOM_Liveblog_AMP_Template {
 	public $data = array();
 
 	/**
-	 * Contrustor
+	 * Constructor
 	 *
 	 * @return void
 	 */

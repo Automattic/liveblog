@@ -3,7 +3,7 @@
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
  * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
- * Version:     1.12.2
+ * Version:     1.13.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
@@ -33,7 +33,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 *
 		 * @var string
 		 */
-		const VERSION = '1.12.2';
+		const VERSION = '1.13.0';
 
 		/**
 		 * Rewrites version for flushing rewrite rules.
@@ -615,6 +615,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				}
 			}
 
+			// A password-protected post must not disclose its liveblog entries through
+			// the legacy AJAX/permalink JSON endpoints until the visitor has satisfied
+			// the post password. Deny any request that has not cleared the gate before
+			// it is announced, dispatched, or has any entry data fetched or returned.
+			if ( ! self::ajax_request_passes_password_gate( $response_method ) ) {
+				self::send_forbidden_error( __( 'This liveblog is password protected. Enter the post password to view its entries.', 'liveblog' ) );
+			}
+
 			/**
 			 * Fires just before the Liveblog's ajax request is handled by one of the methods
 			 *
@@ -623,6 +631,38 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			do_action( 'liveblog_ajax_request', $response_method );
 
 			self::$response_method();
+		}
+
+		/**
+		 * Whether a legacy AJAX request clears the post-password gate.
+		 *
+		 * The legacy permalink/AJAX JSON read endpoints (entries-between, single
+		 * entry, lazyload, and any future read handler) return liveblog entry
+		 * content, so they must not disclose it for a password-protected post until
+		 * the visitor has satisfied the password. This mirrors the REST read gate
+		 * (WPCOM_Liveblog_Rest_Api::can_read_liveblog) and core's own front-end
+		 * content gating via post_password_required(), which also honours the
+		 * `post_password_required` filter so any site-level policy stays consistent.
+		 *
+		 * The write endpoints (crud, preview) run their own capability and nonce
+		 * checks downstream and legitimately operate on protected posts, so they are
+		 * exempt from this gate. Every other handler is subject to the password
+		 * requirement by default, so a newly added read handler stays protected even
+		 * if a developer forgets to revisit this method (fail closed).
+		 *
+		 * @param string $response_method The resolved AJAX handler method name.
+		 * @return bool True when the request may proceed past the password gate.
+		 */
+		public static function ajax_request_passes_password_gate( $response_method ) {
+			// Write endpoints authorise themselves via capability and nonce checks
+			// and may legitimately operate on password-protected posts.
+			$self_authorizing_methods = array( 'ajax_crud_entry', 'ajax_preview_entry' );
+
+			if ( in_array( $response_method, $self_authorizing_methods, true ) ) {
+				return true;
+			}
+
+			return ! post_password_required( self::$post_id );
 		}
 
 		/**
@@ -1507,29 +1547,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
-		 * Get all the liveblog entries for this post.
-		 *
-		 * @return string The rendered entries output.
-		 */
-		private static function get_all_entry_output() {
-
-			// Get liveblog entries.
-			$args  = array();
-			$state = self::get_liveblog_state();
-
-			if ( 'archive' === $state ) {
-				$args['order'] = 'ASC';
-			}
-
-			$args                  = apply_filters( 'liveblog_display_archive_query_args', $args, $state );
-			$entries               = (array) self::$entry_query->get_all( $args );
-			$show_archived_message = 'archive' === $state && self::current_user_can_edit_liveblog();
-
-			// Get the template part.
-			return self::get_template_part( 'liveblog-loop.php', compact( 'entries', 'show_archived_message' ) );
-		}
-
-		/**
 		 * Get the template part in an output buffer and return it.
 		 *
 		 * @param string $template_name      Template file name.
@@ -1543,7 +1560,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'wp_version',
 				'min_version',
 				'entries',
-				'show_archived_message',
 				'active_text',
 				'buttons',
 				'update_text',
@@ -2304,20 +2320,29 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$blog_updates[] = json_decode( wp_json_encode( $blog_item ) );
 			}
 
-			$metadata['@context']      = 'https://schema.org';
-			$metadata['@type']         = 'LiveBlogPosting';
-			$metadata['headline']      = get_the_title( $post );
-			$metadata['url']           = get_permalink( $post );
-			$metadata['datePublished'] = get_post_datetime( $post, 'date', 'gmt' )->format( 'c' );
-			$metadata['dateModified']  = get_post_datetime( $post, 'modified', 'gmt' )->format( 'c' );
+			$metadata['@context'] = 'https://schema.org';
+			$metadata['@type']    = 'LiveBlogPosting';
+			$metadata['headline'] = get_the_title( $post );
+			$metadata['url']      = get_permalink( $post );
+			// Unpublished posts (drafts, pending, auto-drafts) store a `0000-00-00 00:00:00`
+			// GMT date, for which get_post_datetime() returns false. Guard against calling
+			// format() on false to avoid a fatal when such a post is previewed.
+			$published_datetime = get_post_datetime( $post, 'date', 'gmt' );
+			if ( false !== $published_datetime ) {
+				$metadata['datePublished'] = $published_datetime->format( 'c' );
 
-			// Add coverage times for LiveBlogPosting (helps with Google's "LIVE" badge).
-			$metadata['coverageStartTime'] = $metadata['datePublished'];
+				// Add coverage times for LiveBlogPosting (helps with Google's "LIVE" badge).
+				$metadata['coverageStartTime'] = $metadata['datePublished'];
+			}
 
-			// Add coverageEndTime only if the liveblog is archived.
-			$liveblog_state = self::get_liveblog_state( $post->ID );
-			if ( 'archive' === $liveblog_state ) {
-				$metadata['coverageEndTime'] = $metadata['dateModified'];
+			$modified_datetime = get_post_datetime( $post, 'modified', 'gmt' );
+			if ( false !== $modified_datetime ) {
+				$metadata['dateModified'] = $modified_datetime->format( 'c' );
+
+				// Add coverageEndTime only if the liveblog is archived.
+				if ( 'archive' === self::get_liveblog_state( $post->ID ) ) {
+					$metadata['coverageEndTime'] = $metadata['dateModified'];
+				}
 			}
 
 			$metadata['liveBlogUpdate'] = $blog_updates;

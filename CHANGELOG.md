@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.13.0] - 2026-10-06
+
+### Security
+
+* fix: gate legacy AJAX and AMP reads on the post password by @GaryJones in https://github.com/Automattic/liveblog/pull/992 (reported by lbao47 via HackerOne #3784474 / CWE-862 / CWE-200)
+
+### Fixed
+
+* fix: prevent a fatal error when previewing unpublished liveblog posts by @GaryJones in https://github.com/Automattic/liveblog/pull/921
+* fix: deduplicate pending polling entries by ID by @lstamellos in https://github.com/Automattic/liveblog/pull/959
+* fix: keep queued entries when an editor publishes, and simplify polling dedup by @GaryJones in https://github.com/Automattic/liveblog/pull/978
+* fix: resolve the front-end editor crash caused by mixed Lexical versions by @GaryJones in https://github.com/Automattic/liveblog/pull/980
+* fix: resolve editor regressions ahead of the Lexical 0.52 upgrade by @GaryJones in https://github.com/Automattic/liveblog/pull/986
+* fix: keep image sizes set in the editor when rendering entries by @GaryJones in https://github.com/Automattic/liveblog/pull/987
+* fix: correct typos in comments and the strike-through label by @Avicennasis in https://github.com/Automattic/liveblog/pull/969
+* fix(entry): hide authors on new entries posted without an author by @faisalahammad in https://github.com/Automattic/liveblog/pull/1001 (integrations that call `WPCOM_Liveblog_Entry::insert()` or the CRUD endpoints without an `author_id` now get an entry with hidden authors rather than one attributed to the inserting user)
+
+### Changed
+
+* perf: lazy-load social SDKs only when an embed is present by @GaryJones in https://github.com/Automattic/liveblog/pull/928
+
+### Maintenance
+
+* refactor: remove the dead archived-liveblog output path by @faisalahammad in https://github.com/Automattic/liveblog/pull/998 (drops the `liveblog_display_archive_query_args` and `liveblog_number_of_default_entries` filters and the `liveblog-loop.php` template, none of which had been reached since 2017)
+* chore(deps): replace deprecated redux-devtools-extension with @redux-devtools/extension by @faisalahammad in https://github.com/Automattic/liveblog/pull/996
+* build: remove the unused moment IgnorePlugin from the webpack config by @faisalahammad in https://github.com/Automattic/liveblog/pull/991
+* ci: fix JS lint errors and enforce JS linting in CI by @GaryJones in https://github.com/Automattic/liveblog/pull/990
+* test: fix JS unit tests broken by the Vitest migration race by @GaryJones in https://github.com/Automattic/liveblog/pull/985
+* ci: group Lexical packages in Dependabot updates by @GaryJones in https://github.com/Automattic/liveblog/pull/981
+* build: upgrade @wordpress/scripts to 36 and move JS tests to Vitest by @GaryJones in https://github.com/Automattic/liveblog/pull/979
+* refactor(react): migrate PaginationContainer and PreviewContainer to hooks by @faisalahammad in https://github.com/Automattic/liveblog/pull/932
+* test(epics): add unit tests for redux-observable epics by @faisalahammad in https://github.com/Automattic/liveblog/pull/931
+* style: make `npm run lint:js` pass across ./src by @GaryJones in https://github.com/Automattic/liveblog/pull/930
+* chore(deps): routine npm and GitHub Actions dependency updates by @dependabot (including the Lexical 0.44 → 0.52 upgrade)
+
+### Documentation
+
+* docs: replace nonexistent embed function in end-user guide by @faisalahammad in https://github.com/Automattic/liveblog/pull/994
+* docs: sync AGENTS.md with current tooling and code by @faisalahammad in https://github.com/Automattic/liveblog/pull/995
+
 ## [1.12.2] - 2026-06-03
 
 ### Security
@@ -360,6 +400,7 @@ Fixed problems:
 * Initial release
 
 
+[1.13.0]: https://github.com/Automattic/liveblog/compare/1.12.2...1.13.0
 [1.12.2]: https://github.com/Automattic/liveblog/compare/1.12.1...1.12.2
 [1.12.1]: https://github.com/Automattic/liveblog/compare/1.12.0...1.12.1
 [1.12.0]: https://github.com/Automattic/liveblog/compare/1.11.1...1.12.0

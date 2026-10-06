@@ -1,70 +1,94 @@
+import { applyUpdate, getNewestEntry } from '../utils/utils';
 import {
-  applyUpdate,
-  getNewestEntry,
-} from '../utils/utils';
+	filterKnownNewEntries,
+	rememberPolledEntries,
+	rememberRenderedEntries,
+	removeRenderedPendingEntries,
+} from '../utils/polling';
 
 export const initialState = {
-  error: false,
-  newestEntry: false,
-  entries: {},
-  pages: 1,
+	error: false,
+	newestEntry: false,
+	entries: {},
+	knownEntryIds: {},
+	pages: 1,
 };
 
-export const polling = (state = initialState, action) => {
-  switch (action.type) {
-    case 'POLLING_SUCCESS':
-      return {
-        ...state,
-        error: false,
-        entries: action.renderNewEntries
-          ? {}
-          : applyUpdate(
-            state.entries,
-            action.payload.entries.filter(entry => entry.type === 'new'),
-          ),
-        newestEntry: getNewestEntry(
-          state.newestEntry,
-          action.payload.entries[action.payload.entries.length - 1],
-        ),
-        pages: action.payload.pages
-          ? action.payload.pages
-          : state.pages,
-      };
+export const polling = ( state = initialState, action ) => {
+	switch ( action.type ) {
+		case 'POLLING_SUCCESS':
+			return {
+				...state,
+				error: false,
+				entries: action.renderNewEntries
+					? {}
+					: applyUpdate(
+							state.entries,
+							filterKnownNewEntries(
+								action.payload.entries,
+								state.knownEntryIds
+							)
+						),
+				knownEntryIds: rememberPolledEntries(
+					state.knownEntryIds,
+					action.payload.entries
+				),
+				newestEntry: getNewestEntry(
+					state.newestEntry,
+					action.payload.entries[ action.payload.entries.length - 1 ]
+				),
+				pages: action.payload.pages
+					? action.payload.pages
+					: state.pages,
+			};
 
-    case 'POLLING_FAILED':
-      return {
-        ...state,
-        error: true,
-      };
+		case 'POLLING_FAILED':
+			return {
+				...state,
+				error: true,
+			};
 
-    case 'GET_ENTRIES_SUCCESS':
-      return {
-        ...state,
-        newestEntry: getNewestEntry(
-          state.newestEntry,
-          action.payload.entries[0],
-        ),
-        entries: action.renderNewEntries
-          ? {}
-          : state.entries,
-      };
+		case 'GET_ENTRIES_SUCCESS': {
+			const knownEntryIds = rememberRenderedEntries(
+				state.knownEntryIds,
+				action.payload.entries
+			);
 
-    case 'MERGE_POLLING_INTO_ENTRIES':
-      return {
-        ...state,
-        entries: {},
-      };
+			return {
+				...state,
+				newestEntry: getNewestEntry(
+					state.newestEntry,
+					action.payload.entries[ 0 ]
+				),
+				entries: action.renderNewEntries
+					? {}
+					: removeRenderedPendingEntries(
+							state.entries,
+							action.payload.entries
+						),
+				knownEntryIds,
+			};
+		}
 
-    case 'LOAD_CONFIG':
-      return {
-        ...state,
-        newestEntry: {
-          id: action.payload.latest_entry_id,
-          timestamp: parseInt(action.payload.latest_entry_timestamp, 10),
-        },
-      };
+		case 'MERGE_POLLING_INTO_ENTRIES':
+			return {
+				...state,
+				entries: {},
+			};
 
-    default:
-      return state;
-  }
+		case 'LOAD_CONFIG':
+			return {
+				...state,
+				newestEntry: {
+					id: action.payload.latest_entry_id,
+					timestamp: parseInt(
+						action.payload.latest_entry_timestamp,
+						10
+					),
+				},
+			};
+
+		default:
+			return state;
+	}
 };

@@ -8,7 +8,7 @@ Real-time liveblogging plugin for WordPress with a React-based editor and a comm
 |----------|-------|
 | **Main file** | `liveblog.php` |
 | **Text domain** | `liveblog` |
-| **Version** | 1.12.2 |
+| **Version** | 1.13.0 |
 | **Requires PHP** | 7.4+ |
 | **Requires WP** | 6.4+ |
 | **Default branch** | `develop` |
@@ -51,7 +51,7 @@ liveblog/
 
 * **Runtime PHP**: `composer/installers`. WebSocket users also pull in `predis/predis` and `rase/socket.io-emitter`.
 * **Dev**: `automattic/vipwpcs`, `phpunit/phpunit`, `yoast/wp-test-utils`, `php-parallel-lint`, `phpcompatibility/phpcompatibility-wp`.
-* **Front end**: React 18, Lexical 0.43.x, Redux + Redux-Observable, `@wordpress/scripts` for builds.
+* **Front end**: React 18, Lexical 0.52.x (keep every `@lexical/*` package and `lexical` on the same version), Redux + Redux-Observable, `@wordpress/scripts` for builds.
 
 ## Commands
 
@@ -66,7 +66,7 @@ composer coverage             # tests with HTML coverage report
 npm run build                 # build front-end assets via wp-scripts
 npm run lint:js               # ESLint
 npm run lint:css              # Stylelint
-npm test                      # JavaScript unit tests (Jest)
+npm test                      # JavaScript unit tests (Vitest, via wp-scripts test-unit-js)
 npx wp-env start              # start local WordPress on http://localhost:8888
 ```
 
@@ -95,6 +95,6 @@ npx wp-env start              # start local WordPress on http://localhost:8888
 * **Run `composer cs` before committing.** CI rejects PHPCS violations.
 * **Integration tests require `npx wp-env start` to be running.** Otherwise they fail at bootstrap.
 * **Comment storage conflicts.** Entries are comments, so be careful with comment moderation, filtering, or other plugins that modify comment queries.
-* **Two version sources.** Versions live in `liveblog.php` (header + `LIVEBLOG_VERSION` constant) and `package.json`. Keep them in sync at release time.
-* **Template tags are public API.** Helper functions exposed to themes (e.g. `wpcom_liveblog_get_output()`) are part of the public surface; do not rename or remove without a deprecation cycle.
+* **Several version sources.** Versions live in `liveblog.php` (header + `WPCOM_Liveblog::VERSION` constant), the `Stable tag` in `README.md`, and `package.json`. Keep them in sync at release time.
+* **Hooks and shortcodes are public API.** Themes and integrations rely on the `liveblog_*` actions and filters and on the `[liveblog_key_events]` shortcode; do not rename or remove them without a deprecation cycle.
 * **Static state in `WPCOM_Liveblog`.** The class holds static state (`$post_id`, `$is_rest_api_call`, cached `$entry_query`). Reset these explicitly in tests that need a clean slate.
