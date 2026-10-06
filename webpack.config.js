@@ -66,11 +66,6 @@ module.exports = function (env, argv) {
 			__DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
 			__PROD__: JSON.stringify(process.env.NODE_ENV === 'production'),
 			__TEST__: JSON.stringify(process.env.NODE_ENV === 'test'),
-		}),
-		// Ignore moment locales to reduce bundle size
-		new webpack.IgnorePlugin({
-			resourceRegExp: /^\.\/locale$/,
-			contextRegExp: /moment$/,
 		})
 	);
 
