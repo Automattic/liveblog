@@ -197,15 +197,31 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Get entries between two timestamps from all entries.
+	 * Get entries between two timestamps, queried directly from the database.
+	 *
+	 * Replaces the old approach of caching the full list of entries and
+	 * slicing out the requested range in PHP. That breaks down on large
+	 * Liveblog posts, since the cached list can exceed the memcache object
+	 * size limit and gets dropped on every write.
 	 *
 	 * @param int $start_timestamp The start timestamp.
 	 * @param int $end_timestamp   The end timestamp.
 	 * @return array Filtered entries.
 	 */
 	public function get_between_timestamps( $start_timestamp, $end_timestamp ) {
-		$all_entries = $this->get_all_entries_asc();
-		return $this->find_between_timestamps( $all_entries, $start_timestamp, $end_timestamp );
+		$args = array(
+			'order'      => 'ASC',
+			'date_query' => array(
+				'column'    => 'comment_date_gmt',
+				'after'     => gmdate( 'Y-m-d H:i:s', $start_timestamp ),
+				'before'    => gmdate( 'Y-m-d H:i:s', $end_timestamp ),
+				'inclusive' => true,
+			),
+		);
+
+		$entries = $this->get( $args );
+
+		return self::remove_replaced_entries( $entries );
 	}
 
 	/**
@@ -218,19 +234,51 @@ class WPCOM_Liveblog_Entry_Query {
 	}
 
 	/**
-	 * Get all entries in ascending order.
+	 * Get the total number of entries for a Liveblog post.
 	 *
-	 * @return array Entries in ascending order.
+	 * This matches what WPCOM_Liveblog::flatten_entries() would count: an
+	 * update or delete inserts a new comment that "replaces" the original,
+	 * so the original is excluded once something else replaces it, and a
+	 * delete's own (empty content) tombstone comment is excluded too.
+	 *
+	 * @return int Number of entries.
 	 */
-	public function get_all_entries_asc() {
-		$cached_entries_asc_key = $this->key . '_entries_asc_' . $this->post_id;
-		$cached_entries_asc     = wp_cache_get( $cached_entries_asc_key, 'liveblog' );
-		if ( false !== $cached_entries_asc ) {
-			return $cached_entries_asc;
+	public function count_entries() {
+		global $wpdb;
+
+		// Key the cache off the highest comment ID rather than the latest
+		// timestamp: IDs are strictly monotonic, so this can't collide when
+		// several entries land within the same second.
+		$latest_id = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- result only used as a cache key.
+			$wpdb->prepare(
+				"SELECT MAX(comment_ID) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_type = %s",
+				$this->post_id,
+				$this->key
+			)
+		);
+
+		$cache_key = $this->key . '_entries_count_' . $this->post_id . '_' . $latest_id;
+
+		$count = wp_cache_get( $cache_key, 'liveblog' );
+
+		if ( false !== $count ) {
+			return $count;
 		}
-		$all_entries_asc = $this->get( array( 'order' => 'ASC' ) );
-		wp_cache_set( $cached_entries_asc_key, $all_entries_asc, 'liveblog' );
-		return $all_entries_asc;
+
+		$count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- result is cached above.
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_type = %s AND comment_approved = %s AND comment_content != %s AND comment_ID NOT IN ( SELECT meta_value FROM $wpdb->commentmeta WHERE meta_key = %s )",
+				$this->post_id,
+				$this->key,
+				$this->key,
+				'',
+				'liveblog_replaces'
+			)
+		);
+
+		wp_cache_set( $cache_key, $count, 'liveblog' );
+
+		return $count;
 	}
 
 	/**
