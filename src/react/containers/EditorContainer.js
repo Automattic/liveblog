@@ -290,6 +290,8 @@ class EditorContainer extends Component {
 		const { isEditing, config } = this.props;
 
 		return (
+			// Catches Ctrl/Cmd+Enter bubbling up from the focusable fields inside.
+			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div
 				className="liveblog-editor-container"
 				onKeyDown={ this.handleKeyDown.bind( this ) }
