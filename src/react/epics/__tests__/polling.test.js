@@ -148,6 +148,60 @@ describe( 'mergePollingEpic', () => {
 		] );
 	} );
 
+	it( 'merges polling entries straight in when oldest first and on the last page', async () => {
+		const state = {
+			pagination: { page: 3, pages: 3 },
+			polling: {
+				entries: { [ `id_${ pollingEntry.id }` ]: pollingEntry },
+				pages: 3,
+				newestEntry: pollingEntry,
+			},
+			config: { entry_order: 'asc' },
+		};
+
+		const emitted = await runEpic(
+			mergePollingEpic,
+			mergePolling(),
+			state
+		);
+
+		expect( getEntries ).not.toHaveBeenCalled();
+		expect( emitted ).toEqual( [
+			mergePollingIntoEntries( [ pollingEntry ], 3 ),
+			scrollToEntry( `id_${ pollingEntry.id }` ),
+		] );
+	} );
+
+	it( 're-fetches the last page when oldest first and not on it', async () => {
+		getEntries.mockReturnValue( of( { response: apiData } ) );
+
+		const state = {
+			pagination: { page: 1, pages: 3 },
+			polling: {
+				entries: { [ `id_${ pollingEntry.id }` ]: pollingEntry },
+				pages: 4,
+				newestEntry: pollingEntry,
+			},
+			config: { entry_order: 'asc' },
+		};
+
+		const emitted = await runEpic(
+			mergePollingEpic,
+			mergePolling(),
+			state
+		);
+
+		expect( getEntries ).toHaveBeenCalledWith(
+			4,
+			state.config,
+			pollingEntry
+		);
+		expect( emitted ).toEqual( [
+			getEntriesSuccess( apiData, true ),
+			scrollToEntry( `id_${ pollingEntry.id }` ),
+		] );
+	} );
+
 	it( 'emits getEntriesFailed when the re-fetch errors', async () => {
 		getEntries.mockReturnValue( throwError( () => new Error( 'boom' ) ) );
 

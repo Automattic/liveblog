@@ -64,6 +64,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		const KEY = 'liveblog';
 
 		/**
+		 * Meta key for the entry display order.
+		 *
+		 * @since 1.13.0
+		 *
+		 * @var string
+		 */
+		const ENTRY_ORDER_META_KEY = '_liveblog_entry_order';
+
+		/**
 		 * URL endpoint for liveblog.
 		 *
 		 * @var string
@@ -801,6 +810,37 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		}
 
 		/**
+		 * Get the order entries are displayed in for a post.
+		 *
+		 * @since 1.13.0
+		 *
+		 * @param int|null $post_id The post ID. Defaults to the current liveblog post.
+		 * @return string Either 'asc' (oldest first) or 'desc' (newest first).
+		 */
+		public static function get_entry_order( $post_id = null ) {
+			if ( empty( $post_id ) ) {
+				$post_id = self::$post_id ? self::$post_id : get_the_ID();
+			}
+
+			$order = get_post_meta( $post_id, self::ENTRY_ORDER_META_KEY, true );
+			if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
+				return $order;
+			}
+
+			/**
+			 * Filters the default entry order for posts that have no order saved.
+			 *
+			 * @since 1.13.0
+			 *
+			 * @param string $order   Either 'desc' (newest first) or 'asc' (oldest first).
+			 * @param int    $post_id The post ID.
+			 */
+			$order = apply_filters( 'liveblog_default_entry_order', 'desc', $post_id );
+
+			return 'asc' === $order ? 'asc' : 'desc';
+		}
+
+		/**
 		 * Is this the initial page request?
 		 *
 		 * Note that we do not use get_query_var() - it returns '' for all requests,
@@ -1097,9 +1137,10 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 		 * @param int          $page             Requested page.
 		 * @param string|false $last_known_entry ID-timestamp of the last rendered entry.
 		 * @param int|false    $id               Entry ID.
+		 * @param string|null  $order            'asc' or 'desc'. Defaults to the post's entry order.
 		 * @return array An array of json encoded results.
 		 */
-		public static function get_entries_paged( $page, $last_known_entry = false, $id = false ) {
+		public static function get_entries_paged( $page, $last_known_entry = false, $id = false, $order = null ) {
 
 			if ( empty( self::$entry_query ) ) {
 				self::$entry_query = new WPCOM_Liveblog_Entry_Query( self::$post_id, self::KEY );
@@ -1117,6 +1158,15 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					$index         = array_search( $last_entry_id, array_keys( $entries ), true );
 					$entries       = array_slice( $entries, $index, null, true );
 				}
+			}
+
+			if ( null === $order ) {
+				$order = self::get_entry_order();
+			}
+
+			// Entries are newest first here, so the anchor above still drops anything newer than it.
+			if ( 'asc' === $order ) {
+				$entries = array_reverse( $entries, true );
 			}
 
 			$total = count( $entries );
@@ -1387,6 +1437,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => get_option( 'time_format' ),
 						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
+						'entry_order'                  => self::get_entry_order(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
 						'focus_refresh_interval'       => self::FOCUS_REFRESH_INTERVAL,
@@ -1607,6 +1658,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				'class',
 				'new_label',
 				'new_button',
+				'entry_order',
 			);
 
 			foreach ( $template_variables as $key => $value ) {
@@ -1730,7 +1782,14 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				$buttons['disable']['disabled'] = true;
 			}
 			$update_text  = __( 'Settings have been successfully updated.', 'liveblog' );
-			$extra_fields = array();
+			$extra_fields = array(
+				self::get_template_part(
+					'liveblog-entry-order-admin.php',
+					array(
+						'entry_order' => self::get_entry_order( $post->ID ),
+					)
+				),
+			);
 			$extra_fields = apply_filters( 'liveblog_admin_add_settings', $extra_fields, $post->ID );
 
 			return self::get_template_part( 'meta-box.php', compact( 'active_text', 'buttons', 'update_text', 'extra_fields' ) );
@@ -1783,6 +1842,11 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			do_action( 'liveblog_admin_settings_update', $request_vars, $post_id );
+
+			// The order select is sent with every metabox button, so save it on any click.
+			if ( isset( $request_vars['liveblog-entry-order'] ) && in_array( $request_vars['liveblog-entry-order'], array( 'asc', 'desc' ), true ) ) {
+				update_post_meta( $post_id, self::ENTRY_ORDER_META_KEY, $request_vars['liveblog-entry-order'] );
+			}
 
 			self::set_liveblog_state( $post_id, $new_state );
 
@@ -2272,7 +2336,8 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$request = self::get_request_data();
 
-			$entries = self::get_entries_paged( $request->page, $request->last );
+			// Schema should list the latest updates, and AMP pages newest first too.
+			$entries = self::get_entries_paged( $request->page, $request->last, false, 'desc' );
 
 			$blog_updates = array();
 
