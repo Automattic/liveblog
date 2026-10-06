@@ -49,8 +49,10 @@ export const applyUpdate = ( currentEntries, newEntries ) =>
  * @param {Object} currentEntries
  * @param {Array}  newEntries
  */
-export const eventsApplyUpdate = ( currentEntries, newEntries ) =>
-	newEntries.reduce(
+export const eventsApplyUpdate = ( currentEntries, newEntries ) => {
+	let promoted = false;
+
+	const events = newEntries.reduce(
 		( accumulator, entry ) => {
 			const id = `id_${ entry.id }`;
 
@@ -61,7 +63,17 @@ export const eventsApplyUpdate = ( currentEntries, newEntries ) =>
 				};
 			}
 
-			if ( Object.prototype.hasOwnProperty.call( accumulator, id ) ) {
+			const isListed = Object.prototype.hasOwnProperty.call(
+				accumulator,
+				id
+			);
+
+			// An existing entry can be made a key event by editing it.
+			if ( entry.type === 'update' && entry.key_event && ! isListed ) {
+				promoted = true;
+			}
+
+			if ( isListed || entry.key_event ) {
 				accumulator[ id ] = entry;
 			}
 
@@ -73,6 +85,18 @@ export const eventsApplyUpdate = ( currentEntries, newEntries ) =>
 		},
 		{ ...currentEntries }
 	);
+
+	if ( ! promoted ) {
+		return events;
+	}
+
+	// Keep the newest event first after adding an older entry.
+	return Object.fromEntries(
+		Object.entries( events ).sort(
+			( [ , a ], [ , b ] ) => b.entry_time - a.entry_time
+		)
+	);
+};
 
 /**
  * Apply updates from polling to current entries
@@ -566,4 +590,50 @@ export const getImageSize = ( sizes, defaultSize ) => {
 		return sizes.full.source_url || sizes.full.url;
 	}
 	return '';
+};
+
+// Matches a standalone /key command at the start of the content,
+// after whitespace or straight after a tag, but not inside a tag.
+const keyCommandRegex = /(^|[\s>])(?<!<[^<>]*)\/key(?![\w-])/;
+
+/**
+ * Check if the content contains the /key command.
+ * @param {string} content
+ */
+export const hasKeyCommand = ( content ) =>
+	keyCommandRegex.test( content || '' );
+
+/**
+ * Remove the /key command from the content, along with a
+ * paragraph that holds nothing else.
+ * @param {string} content
+ */
+export const stripKeyCommand = ( content ) =>
+	( content || '' )
+		.replace(
+			/<p(?:\s[^>]*)?>\s*(?:<span[^>]*>)?\s*\/key\s*(?:<\/span>)?\s*<\/p>/g,
+			''
+		)
+		.replace(
+			new RegExp( `${ keyCommandRegex.source }[ \\t]?`, 'g' ),
+			'$1'
+		);
+
+/**
+ * Add the /key command to the content. It goes inside the first
+ * paragraph so the key event summary still starts with the text.
+ * @param {string} content
+ */
+export const addKeyCommand = ( content ) => {
+	if ( hasKeyCommand( content ) ) {
+		return content;
+	}
+
+	const firstParagraph = /^\s*<p(?:\s[^>]*)?>/.exec( content );
+	if ( firstParagraph ) {
+		const index = firstParagraph[ 0 ].length;
+		return `${ content.slice( 0, index ) }/key ${ content.slice( index ) }`;
+	}
+
+	return `/key ${ content }`;
 };

@@ -432,8 +432,10 @@ class WPCOM_Liveblog_Entry {
 			return $comment;
 		}
 
-		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
+		// Store which entry this replaces before firing the action, so
+		// listeners can find the original entry.
 		add_comment_meta( $comment->comment_ID, self::REPLACES_META_KEY, $args['entry_id'] );
+		do_action( 'liveblog_update_entry', $comment->comment_ID, $args['post_id'] );
 		wp_update_comment(
 			array(
 				'comment_ID'      => $args['entry_id'],
