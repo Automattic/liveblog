@@ -22,7 +22,7 @@
     "@lexical/selection": "^0.52.0",
     "@lexical/utils": "^0.52.0",
     "@redux-devtools/extension": "^4.0.0",
-    "ace-builds": "^1.43.5",
+    "ace-builds": "^1.44.0",
     "js-beautify": "^2.0.3",
     "lexical": "^0.52.0",
     "lodash-es": "^4.18.1",
