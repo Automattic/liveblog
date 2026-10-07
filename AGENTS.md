@@ -30,7 +30,7 @@ liveblog/
 │   ├── Unit/             # Unit tests (no WordPress dependency)
 │   └── Integration/      # Integration tests (require wp-env)
 ├── docs/                 # End-user and developer reference
-└── .github/workflows/    # CI: cs-lint, unit, integration, js-unit, lint, build, deploy
+└── .github/workflows/    # CI: cs-lint, unit, integration, js-unit, lint, build, release, deploy
 ```
 
 ### Key classes and files
@@ -86,7 +86,7 @@ npx wp-env start              # start local WordPress on http://localhost:8888
 * **Timestamp-bounded polling URLs.** Endpoints take the form `/liveblog/<start>/<end>/`, returning entries in that window. Closed ranges are cacheable forever.
 * **AJAX polling by default, WebSockets optional.** The plugin polls for updates by default. WebSocket support via Redis and Socket.IO is opt-in (`LIVEBLOG_USE_SOCKETIO`) and only used for public posts.
 * **Two parallel branches.** `develop` is the legacy-architecture mainline. `2.x` is a parallel modernized branch (DDD layout under `src/php/`, DI container, namespaced classes). Security fixes and important bug fixes are typically backported by hand. Architectural changes do **not** cross-port automatically.
-* **WordPress.org deployment.** A GitHub Actions workflow deploys to the WordPress.org SVN repository. Do not modify SVN assets manually.
+* **Tag-triggered releases.** Merge the release PR, push the signed tag; the GitHub Release and wp.org deploy follow automatically. `release.yml` builds `liveblog.zip` and publishes the release from the matching `CHANGELOG.md` section; `deploy.yml` pushes the same tag to WordPress.org SVN. Do not create the GitHub Release by hand (it makes `release.yml` fail), and do not modify SVN assets manually. Hyphenated tags (`1.14.0-rc.1`) become GitHub pre-releases and skip wp.org.
 
 ## Common pitfalls
 
