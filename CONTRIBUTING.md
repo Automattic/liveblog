@@ -61,6 +61,8 @@ npm run lint:css              # Stylelint
 5. Run `composer cs`, `composer test:unit` and `composer test:integration` before pushing.
 6. Open a pull request against `develop`.
 
+Every commit must be signed. A pull request containing an unsigned commit can't be merged until you re-sign the commits and force-push the branch. See GitHub's guide to [signing commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits).
+
 Reviews can take a little time — we're [busy people](https://automattic.com/work-with-us). Thanks for your patience.
 
 ## Codebase orientation
