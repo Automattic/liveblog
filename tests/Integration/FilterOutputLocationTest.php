@@ -82,7 +82,8 @@ final class FilterOutputLocationTest extends TestCase {
 		$result = WPCOM_Liveblog::add_liveblog_to_content( $content );
 
 		// Liveblog should come before content when filter returns true.
-		$this->assertStringStartsWith( '<div id="wpcom-liveblog-container"', $result );
+		// Match the attribute anywhere in the tag, as kses doesn't preserve attribute order.
+		$this->assertMatchesRegularExpression( '/^<div\b[^>]*\bid="wpcom-liveblog-container"/', $result );
 		$this->assertStringEndsWith( '<p>Post content</p>', $result );
 	}
 
