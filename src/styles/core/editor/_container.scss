@@ -74,3 +74,14 @@
 		margin-bottom: 0;
 	}
 }
+
+.liveblog-editor-key-event {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 1rem;
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: $color-grey-dark;
+	cursor: pointer;
+}

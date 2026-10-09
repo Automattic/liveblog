@@ -132,6 +132,108 @@ final class EntryTest extends TestCase {
 	}
 
 	/**
+	 * Test that update fires liveblog_update_entry after the replaces meta is stored.
+	 */
+	public function test_update_should_store_replaces_meta_before_firing_liveblog_update_entry(): void {
+		$replaces = null;
+		$callback = static function ( $id ) use ( &$replaces ) {
+			$replaces = get_comment_meta( $id, WPCOM_Liveblog_Entry::REPLACES_META_KEY, true );
+		};
+		add_action( 'liveblog_update_entry', $callback );
+
+		$entry = $this->insert_entry();
+		WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'entry_id' => $entry->get_id(),
+					'content'  => 'updated',
+				)
+			)
+		);
+		remove_action( 'liveblog_update_entry', $callback );
+
+		$this->assertEquals( $entry->get_id(), $replaces );
+	}
+
+	/**
+	 * Test that update marks the original entry as a key event when /key is added.
+	 */
+	public function test_update_should_add_key_event_when_key_command_is_added(): void {
+		$entry = $this->insert_entry();
+		$this->assertFalse( WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry->get_id() ) );
+
+		WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'entry_id' => $entry->get_id(),
+					'content'  => '<span class="liveblog-command type-key">key</span> updated',
+				)
+			)
+		);
+
+		$this->assertTrue( WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry->get_id() ) );
+		$this->assertCount( 1, get_comment_meta( $entry->get_id(), WPCOM_Liveblog_Entry_Key_Events::META_KEY, false ) );
+	}
+
+	/**
+	 * Test that update does not add the key event meta twice.
+	 */
+	public function test_update_should_keep_single_key_event_meta_when_key_command_stays(): void {
+		$entry = $this->insert_entry();
+		add_comment_meta( $entry->get_id(), WPCOM_Liveblog_Entry_Key_Events::META_KEY, WPCOM_Liveblog_Entry_Key_Events::META_VALUE );
+
+		WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'entry_id' => $entry->get_id(),
+					'content'  => '<span class="liveblog-command type-key">key</span> updated',
+				)
+			)
+		);
+
+		$this->assertTrue( WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry->get_id() ) );
+		$this->assertCount( 1, get_comment_meta( $entry->get_id(), WPCOM_Liveblog_Entry_Key_Events::META_KEY, false ) );
+	}
+
+	/**
+	 * Test that delete_key removes the key event status even when the content has the rendered span.
+	 */
+	public function test_delete_key_should_remove_key_event_when_content_has_rendered_span(): void {
+		$entry = $this->insert_entry();
+		add_comment_meta( $entry->get_id(), WPCOM_Liveblog_Entry_Key_Events::META_KEY, WPCOM_Liveblog_Entry_Key_Events::META_VALUE );
+
+		WPCOM_Liveblog_Entry::delete_key(
+			$this->build_entry_args(
+				array(
+					'entry_id' => $entry->get_id(),
+					'content'  => '<span class="liveblog-command type-key">key</span> updated',
+				)
+			)
+		);
+
+		$this->assertFalse( WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry->get_id() ) );
+	}
+
+	/**
+	 * Test that update removes the key event status when /key is removed.
+	 */
+	public function test_update_should_remove_key_event_when_key_command_is_removed(): void {
+		$entry = $this->insert_entry();
+		add_comment_meta( $entry->get_id(), WPCOM_Liveblog_Entry_Key_Events::META_KEY, WPCOM_Liveblog_Entry_Key_Events::META_VALUE );
+
+		WPCOM_Liveblog_Entry::update(
+			$this->build_entry_args(
+				array(
+					'entry_id' => $entry->get_id(),
+					'content'  => 'updated',
+				)
+			)
+		);
+
+		$this->assertFalse( WPCOM_Liveblog_Entry_Key_Events::is_key_event( $entry->get_id() ) );
+	}
+
+	/**
 	 * Test that delete replaces the content in the query.
 	 */
 	public function test_delete_should_replace_the_content_in_the_query(): void {
