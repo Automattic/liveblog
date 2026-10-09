@@ -722,6 +722,7 @@ class WPCOM_Liveblog_Rest_Api {
 			'liveblog-key-template-name'   => $request->get_param( 'template_name' ),
 			'liveblog-key-template-format' => $request->get_param( 'template_format' ),
 			'liveblog-key-limit'           => $request->get_param( 'limit' ),
+			'liveblog-entry-order'         => $request->get_param( 'entry_order' ),
 		);
 
 		self::set_liveblog_vars( $post_id );

@@ -10,6 +10,7 @@ export const initialState = {
 	entries: {},
 	newestEntry: false,
 	nonce: false,
+	entryOrder: 'desc',
 };
 
 export const api = ( state = initialState, action ) => {
@@ -29,9 +30,14 @@ export const api = ( state = initialState, action ) => {
 				error: false,
 				loading: false,
 				entries: applyUpdate( {}, action.payload.entries ),
+				// The newest entry on the page is last when oldest first.
 				newestEntry: getNewestEntry(
 					state.newestEntry,
-					action.payload.entries[ 0 ]
+					action.payload.entries[
+						state.entryOrder === 'asc'
+							? action.payload.entries.length - 1
+							: 0
+					]
 				),
 			};
 
@@ -49,7 +55,8 @@ export const api = ( state = initialState, action ) => {
 				entries: pollingApplyUpdate(
 					state.entries,
 					action.payload.entries,
-					action.renderNewEntries
+					action.renderNewEntries,
+					state.entryOrder === 'asc'
 				),
 				newestEntry: action.renderNewEntries
 					? getNewestEntry(
@@ -57,7 +64,8 @@ export const api = ( state = initialState, action ) => {
 							action.payload.entries[
 								action.payload.entries.length - 1
 							],
-							state.entries
+							state.entries,
+							state.entryOrder === 'asc'
 						)
 					: state.newestEntry,
 			};
@@ -107,7 +115,8 @@ export const api = ( state = initialState, action ) => {
 				entries: pollingApplyUpdate(
 					state.entries,
 					action.payload,
-					true
+					true,
+					state.entryOrder === 'asc'
 				),
 				newestEntry: action.payload[ action.payload.length - 1 ],
 			};
@@ -139,6 +148,7 @@ export const api = ( state = initialState, action ) => {
 		case 'LOAD_CONFIG':
 			return {
 				...state,
+				entryOrder: action.payload.entry_order,
 				newestEntry: {
 					id: action.payload.latest_entry_id,
 					timestamp: parseInt(
