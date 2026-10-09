@@ -266,6 +266,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			self::register_embed_handlers();
 
 			WPCOM_Liveblog_Entry_Key_Events::load();
+			WPCOM_Liveblog_Entry_Pinned::load();
 			WPCOM_Liveblog_Entry_Key_Events_Widget::load();
 			WPCOM_Liveblog_Entry_Extend::load();
 			WPCOM_Liveblog_Lazyloader::load();
@@ -329,6 +330,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-query.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-key-events.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-key-events-widget.php';
+			require __DIR__ . '/classes/class-wpcom-liveblog-entry-pinned.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature.php';
 			require __DIR__ . '/classes/class-wpcom-liveblog-entry-extend-feature-hashtags.php';
@@ -1109,6 +1111,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 
 			$entries = self::$entry_query->get_all_entries_asc();
 			$entries = self::flatten_entries( $entries );
+			$pinned  = WPCOM_Liveblog_Entry_Pinned::filter_pinned( $entries );
 
 			if ( $last_known_entry ) {
 				$last_known_entry = explode( '-', $last_known_entry );
@@ -1130,7 +1133,16 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			}
 
 			$offset  = $per_page * ( $page - 1 );
-			$entries = array_slice( $entries, $offset, $per_page );
+			$entries = array_slice( $entries, $offset, $per_page, true );
+
+			// Pinned entries always show on the first page. They are added after
+			// the page entries so the first entry is still the newest one, which
+			// clients use as their pagination anchor. Keys dedupe entries that
+			// are already on the page.
+			if ( 1 === (int) $page ) {
+				$entries += $pinned;
+			}
+
 			$entries = self::entries_for_json( $entries );
 
 			$result = array(
@@ -2260,9 +2272,9 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 				// Process content for schema output.
 				$content = $entry->content;
 
-				// Strip /key command (plain and span versions) from content.
-				$content = preg_replace( '/<span[^>]*class="[^"]*type-key[^"]*"[^>]*>[^<]*<\/span>\s*/i', '', $content );
-				$content = preg_replace( '/(^|[>\s])\/key\s*/i', '$1', $content );
+				// Strip /key and /pin commands (plain and span versions) from content.
+				$content = preg_replace( '/<span[^>]*class="[^"]*type-(?:key|pin)[^"]*"[^>]*>[^<]*<\/span>\s*/i', '', $content );
+				$content = preg_replace( '/(^|[>\s])\/(?:key|pin)\b\s*/i', '$1', $content );
 
 				// Replace HTML tags with spaces to preserve word boundaries, then strip.
 				$article_body = preg_replace( '/<[^>]+>/', ' ', $content );

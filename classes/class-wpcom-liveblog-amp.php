@@ -378,10 +378,16 @@ class WPCOM_Liveblog_AMP {
 		// AMP live-list requires a minimum poll interval of 15 seconds.
 		$refresh_interval = max( self::AMP_MIN_REFRESH_INTERVAL, WPCOM_Liveblog::get_refresh_interval() );
 
+		// Pinned entries come last in the page data, show them first.
+		$feed = array_merge(
+			wp_list_filter( $entries['entries'], array( 'pinned' => true ) ),
+			wp_list_filter( $entries['entries'], array( 'pinned' => true ), 'NOT' )
+		);
+
 		$rendered = self::get_template(
 			'feed',
 			array(
-				'entries'  => self::filter_entries( $entries['entries'], $post_id ),
+				'entries'  => self::filter_entries( $feed, $post_id ),
 				'post_id'  => $post_id,
 				'page'     => $entries['page'],
 				'pages'    => $entries['pages'],
