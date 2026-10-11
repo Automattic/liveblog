@@ -217,4 +217,39 @@ final class LiveblogTest extends TestCase {
 
 		return $post_id;
 	}
+
+	/**
+	 * The front end uses page links unless a site opts in to load more.
+	 */
+	public function test_pagination_type_defaults_to_page(): void {
+		$this->assertSame( 'page', WPCOM_Liveblog::get_pagination_type() );
+	}
+
+	/**
+	 * The liveblog_pagination_type filter can switch to load more.
+	 */
+	public function test_pagination_type_filter_can_enable_load_more(): void {
+		$load_more = static function () {
+			return 'load-more';
+		};
+		add_filter( 'liveblog_pagination_type', $load_more );
+
+		$this->assertSame( 'load-more', WPCOM_Liveblog::get_pagination_type() );
+
+		remove_filter( 'liveblog_pagination_type', $load_more );
+	}
+
+	/**
+	 * An unknown pagination type falls back to page links.
+	 */
+	public function test_pagination_type_falls_back_to_page_for_unknown_values(): void {
+		$unknown = static function () {
+			return 'infinite';
+		};
+		add_filter( 'liveblog_pagination_type', $unknown );
+
+		$this->assertSame( 'page', WPCOM_Liveblog::get_pagination_type() );
+
+		remove_filter( 'liveblog_pagination_type', $unknown );
+	}
 }

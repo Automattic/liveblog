@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getPaginationState } from '../PaginationContainer';
+import {
+	getPaginationState,
+	getLoadMorePage,
+	isLoadMore,
+} from '../PaginationContainer';
 
 describe( 'getPaginationState', () => {
 	it( 'flags the first page', () => {
@@ -28,5 +32,31 @@ describe( 'getPaginationState', () => {
 			isFirstPage: false,
 			isLastPage: false,
 		} );
+	} );
+} );
+
+describe( 'isLoadMore', () => {
+	it( 'is on for load-more while showing the newest entries', () => {
+		expect( isLoadMore( 'load-more', 1 ) ).toBe( true );
+	} );
+
+	it( 'falls back to page links after jumping to a later page', () => {
+		expect( isLoadMore( 'load-more', 3 ) ).toBe( false );
+	} );
+
+	it( 'is off for the default page type', () => {
+		expect( isLoadMore( 'page', 1 ) ).toBe( false );
+		expect( isLoadMore( undefined, 1 ) ).toBe( false );
+	} );
+} );
+
+describe( 'getLoadMorePage', () => {
+	it( 'asks for the page after the ones shown', () => {
+		expect( getLoadMorePage( 5, 5 ) ).toBe( 2 );
+		expect( getLoadMorePage( 10, 5 ) ).toBe( 3 );
+	} );
+
+	it( 'rounds down when new entries were added above', () => {
+		expect( getLoadMorePage( 7, 5 ) ).toBe( 2 );
 	} );
 } );

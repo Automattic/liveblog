@@ -1,12 +1,20 @@
 import { combineEpics, ofType } from 'redux-observable';
 import { of, concat } from 'rxjs';
-import { switchMap, timeout, map, catchError, mergeMap } from 'rxjs/operators';
+import {
+	switchMap,
+	exhaustMap,
+	timeout,
+	map,
+	catchError,
+	mergeMap,
+} from 'rxjs/operators';
 
 import types from '../actions/actionTypes';
 
 import {
 	getEntriesSuccess,
 	getEntriesFailed,
+	loadMoreEntriesSuccess,
 	pollingSuccess,
 	createEntrySuccess,
 	createEntryFailed,
@@ -100,6 +108,23 @@ export const getPaginatedEntriesEpic = ( action$, state$ ) =>
 		)
 	);
 
+export const loadMoreEntriesEpic = ( action$, state$ ) =>
+	action$.pipe(
+		ofType( types.LOAD_MORE_ENTRIES ),
+		// Ignore extra clicks while a page is still loading.
+		exhaustMap( ( { page } ) =>
+			getEntries(
+				page,
+				state$.value.config,
+				state$.value.api.newestEntry
+			).pipe(
+				timeout( 10000 ),
+				map( ( res ) => loadMoreEntriesSuccess( res.response ) ),
+				catchError( ( error ) => of( getEntriesFailed( error ) ) )
+			)
+		)
+	);
+
 export const createEntryEpic = ( action$, state$ ) =>
 	action$.pipe(
 		ofType( types.CREATE_ENTRY ),
@@ -174,6 +199,7 @@ export const getEntriesAfterChangeEpic = ( action$, state$ ) =>
 export default combineEpics(
 	getEntriesEpic,
 	getPaginatedEntriesEpic,
+	loadMoreEntriesEpic,
 	createEntryEpic,
 	updateEntryEpic,
 	deleteEntryEpic,
