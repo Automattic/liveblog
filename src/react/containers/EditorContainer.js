@@ -16,7 +16,12 @@ import PreviewContainer from './PreviewContainer';
 import AuthorSelectOption from '../components/AuthorSelectOption';
 import HTMLInput from '../components/HTMLInput';
 
-import { getImageSize } from '../utils/utils';
+import {
+	getImageSize,
+	hasKeyCommand,
+	stripKeyCommand,
+	addKeyCommand,
+} from '../utils/utils';
 
 // Lazy load LexicalEditor for code splitting
 const LexicalEditor = React.lazy( () => import( '../Editor/LexicalEditor' ) );
@@ -29,15 +34,25 @@ class EditorContainer extends Component {
 			? props.entry.authors
 			: [ props.config.current_user ];
 
+		// The key event status is shown as a checkbox, so the /key
+		// command is taken out of the content while editing.
+		const initialContent = props.entry
+			? stripKeyCommand( props.entry.content )
+			: '';
+		const isKeyEvent = props.entry
+			? !! props.entry.key_event || hasKeyCommand( props.entry.content )
+			: false;
+
 		this.state = {
 			suggestions: [],
 			authors: initialAuthors,
 			mode: 'editor',
 			readOnly: false,
-			rawText: props.entry ? props.entry.content : '',
+			rawText: initialContent,
 			previewKey: 0,
 			// Store the HTML content for the editor
-			editorContent: props.entry ? props.entry.content : '',
+			editorContent: initialContent,
+			isKeyEvent,
 		};
 	}
 
@@ -90,7 +105,7 @@ class EditorContainer extends Component {
 	publish() {
 		const { updateEntry, entry, entryEditClose, createEntry, isEditing } =
 			this.props;
-		const { authors, editorContent } = this.state;
+		const { authors, editorContent, isKeyEvent } = this.state;
 
 		// We don't want an editor publishing empty entries
 		// So we must check if there is any text within the editor
@@ -103,7 +118,9 @@ class EditorContainer extends Component {
 			return;
 		}
 
-		const content = this.getContent();
+		const content = isKeyEvent
+			? addKeyCommand( this.getContent() )
+			: this.getContent();
 		const authorIds = authors.map( ( author ) => author.id );
 		const author = authorIds.length > 0 ? authorIds[ 0 ] : false;
 		const contributors =
@@ -133,6 +150,7 @@ class EditorContainer extends Component {
 			editorContent: '',
 			rawText: '',
 			readOnly: false,
+			isKeyEvent: false,
 			previewKey: prevState.previewKey + 1,
 		} ) );
 	}
@@ -285,9 +303,11 @@ class EditorContainer extends Component {
 	}
 
 	render() {
-		const { suggestions, mode, authors, readOnly, previewKey } = this.state;
+		const { suggestions, mode, authors, readOnly, previewKey, isKeyEvent } =
+			this.state;
 
-		const { isEditing, config } = this.props;
+		const { isEditing, config, entry } = this.props;
+		const keyEventId = `liveblog-key-event-${ entry ? entry.id : 'new' }`;
 
 		return (
 			// Catches Ctrl/Cmd+Enter bubbling up from the focusable fields inside.
@@ -392,6 +412,22 @@ class EditorContainer extends Component {
 							: __( 'Loading authors…', 'liveblog' )
 					}
 				/>
+				<label
+					className="liveblog-editor-key-event"
+					htmlFor={ keyEventId }
+				>
+					<input
+						id={ keyEventId }
+						type="checkbox"
+						checked={ isKeyEvent }
+						onChange={ ( event ) =>
+							this.setState( {
+								isKeyEvent: event.target.checked,
+							} )
+						}
+					/>
+					{ __( 'Key event', 'liveblog' ) }
+				</label>
 				<button
 					className="liveblog-btn liveblog-publish-btn"
 					onClick={ this.publish.bind( this ) }
