@@ -52,6 +52,14 @@ If the reader has scrolled down to catch up on previous updates, the liveblog wa
 
 Post times are relative ("2 minutes ago") and update every minute.
 
+## Changing the Entry Order
+
+By default the newest entry is shown first. To tell the story from the start instead, open the Liveblog box on the Edit Post page, set "Entry order" to "Oldest first" and click "Save". The setting is also saved when you click any other button in the box.
+
+With "Oldest first", page 1 holds the first entries and the latest entries are on the last page. New entries appear at the bottom of the last page, and the posting box is shown there too. Readers on an earlier page see the notification bar instead, and clicking it takes them to the last page.
+
+AMP pages always show the newest entry first.
+
 ## Where the Liveblog appears in your theme
 
 The plugin does not provide a template tag for embedding a liveblog. Instead, it adds the liveblog to the post content automatically, through the `the_content` filter, on single views of a post where the liveblog is enabled. Your theme's single post template only needs to call `the_content()`.

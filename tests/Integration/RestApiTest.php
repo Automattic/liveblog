@@ -665,6 +665,30 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * Integration test - The update post state endpoint saves the entry order.
+	 */
+	public function test_endpoint_update_post_state_saves_entry_order(): void {
+		$author_id = $this->set_author_user();
+		$post      = self::factory()->post->create_and_get( array( 'post_author' => $author_id ) );
+
+		$request = new WP_REST_Request( 'POST', self::ENDPOINT_BASE . '/' . $post->ID . '/post_state' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'state'           => 'liveblog-entry-order-save',
+				'template_name'   => 'list',
+				'template_format' => 'full',
+				'limit'           => '5',
+				'entry_order'     => 'asc',
+			)
+		);
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertSame( 'asc', WPCOM_Liveblog::get_entry_order( $post->ID ) );
+	}
+
+	/**
 	 * Integration test - Test accessing the update post state endpoint when not logged in as an author. Should be forbidden.
 	 */
 	public function test_endpoint_update_post_state_forbidden(): void {

@@ -43,7 +43,9 @@ export const startPollingEpic = ( action$, state$ ) =>
 								shouldRenderNewEntries(
 									state$.value.pagination.page,
 									state$.value.api.entries,
-									state$.value.polling.entries
+									state$.value.polling.entries,
+									state$.value.pagination.pages,
+									state$.value.config.entry_order === 'asc'
 								)
 							)
 						),
@@ -63,8 +65,10 @@ export const mergePollingEpic = ( action$, state$ ) =>
 				( key ) => polling.entries[ key ]
 			);
 			const pages = Math.max( pagination.pages, polling.pages );
+			// New entries live on the last page when shown oldest first.
+			const targetPage = config.entry_order === 'asc' ? pages : 1;
 
-			if ( pagination.page === 1 ) {
+			if ( pagination.page === targetPage ) {
 				return concat(
 					of( mergePollingIntoEntries( entries, pages ) ),
 					of(
@@ -75,7 +79,7 @@ export const mergePollingEpic = ( action$, state$ ) =>
 				);
 			}
 
-			return getEntries( 1, config, polling.newestEntry ).pipe(
+			return getEntries( targetPage, config, polling.newestEntry ).pipe(
 				timeout( 10000 ),
 				mergeMap( ( res ) =>
 					concat(
