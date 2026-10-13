@@ -90,7 +90,11 @@ export const getPaginatedEntriesEpic = ( action$, state$ ) =>
 						),
 						of(
 							scrollToEntry(
-								getScrollToId( res.response.entries, scrollTo )
+								getScrollToId(
+									res.response.entries,
+									scrollTo,
+									res.response.page
+								)
 							)
 						)
 					)

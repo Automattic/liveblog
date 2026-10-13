@@ -16,6 +16,10 @@
 	border-top: 2px solid $color-grey-x-dark;
 }
 
+.liveblog-entry.is-pinned {
+	border-left: 4px solid $color-grey-x-dark;
+}
+
 .liveblog-entry-edit {
 	margin-left: 60px;
 
