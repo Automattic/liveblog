@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { lastValueFrom, of, throwError } from 'rxjs';
+import { lastValueFrom, of, Subject, throwError } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 
 vi.mock( '../../services/api', () => ( {
@@ -19,6 +19,7 @@ import {
 import {
 	getEntriesEpic,
 	getPaginatedEntriesEpic,
+	loadMoreEntriesEpic,
 	createEntryEpic,
 	updateEntryEpic,
 	deleteEntryEpic,
@@ -29,6 +30,8 @@ import {
 	getEntriesPaginated,
 	getEntriesSuccess,
 	getEntriesFailed,
+	loadMoreEntries,
+	loadMoreEntriesSuccess,
 	createEntry as createEntryAction,
 	createEntrySuccess,
 	createEntryFailed,
@@ -204,6 +207,60 @@ describe( 'getPaginatedEntriesEpic', () => {
 		);
 
 		expect( emitted ).toEqual( [ getEntriesFailed() ] );
+	} );
+} );
+
+describe( 'loadMoreEntriesEpic', () => {
+	const anchor = { id: 2977, timestamp: 1511873011 };
+	const state = {
+		...baseState,
+		api: { ...baseState.api, newestEntry: anchor },
+	};
+
+	it( 'fetches the requested page from the anchor and emits success', async () => {
+		getEntries.mockReturnValue( of( { response: apiData } ) );
+
+		const emitted = await runEpicWith(
+			loadMoreEntriesEpic,
+			loadMoreEntries( 2 ),
+			state
+		);
+
+		expect( getEntries ).toHaveBeenCalledWith( 2, state.config, anchor );
+		expect( emitted ).toEqual( [ loadMoreEntriesSuccess( apiData ) ] );
+	} );
+
+	it( 'emits getEntriesFailed when the request errors', async () => {
+		getEntries.mockReturnValue( throwError( () => new Error( 'boom' ) ) );
+
+		const emitted = await runEpicWith(
+			loadMoreEntriesEpic,
+			loadMoreEntries( 2 ),
+			baseState
+		);
+
+		expect( emitted ).toEqual( [ getEntriesFailed() ] );
+	} );
+
+	it( 'ignores clicks while a page is still loading', async () => {
+		const response = new Subject();
+		getEntries.mockReturnValue( response );
+
+		const actions = new Subject();
+		const emitted = lastValueFrom(
+			loadMoreEntriesEpic( actions, { value: state } ).pipe( toArray() )
+		);
+
+		actions.next( loadMoreEntries( 2 ) );
+		actions.next( loadMoreEntries( 2 ) );
+		response.next( { response: apiData } );
+		response.complete();
+		actions.complete();
+
+		expect( getEntries ).toHaveBeenCalledTimes( 1 );
+		expect( await emitted ).toEqual( [
+			loadMoreEntriesSuccess( apiData ),
+		] );
 	} );
 } );
 

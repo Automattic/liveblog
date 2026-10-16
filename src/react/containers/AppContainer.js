@@ -7,7 +7,9 @@ import * as apiActions from '../actions/apiActions';
 import * as configActions from '../actions/configActions';
 import * as eventsActions from '../actions/eventsActions';
 import Entries from '../components/Entries';
-import PaginationContainer from '../containers/PaginationContainer';
+import PaginationContainer, {
+	isLoadMore,
+} from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
 import Editor from '../components/Editor';
@@ -35,6 +37,7 @@ class AppContainer extends Component {
 		const { page, loading, entries, polling, mergePolling, config, total } =
 			this.props;
 		const canEdit = config.is_liveblog_editable === '1';
+		const loadMore = isLoadMore( config.pagination_type, page );
 
 		return (
 			<div style={ { position: 'relative' } }>
@@ -52,7 +55,7 @@ class AppContainer extends Component {
 						Updates: { total }
 					</div>
 				) }
-				<PaginationContainer />
+				{ ! loadMore && <PaginationContainer /> }
 				<Entries loading={ loading } entries={ entries } />
 				<PaginationContainer />
 				{ this.eventsContainer && (
@@ -83,16 +86,25 @@ AppContainer.propTypes = {
 	total: PropTypes.number,
 };
 
-const mapStateToProps = ( state ) => ( {
-	page: state.pagination.page,
-	loading: state.api.loading,
-	entries: Object.keys( state.api.entries )
-		.map( ( key ) => state.api.entries[ key ] )
-		.slice( 0, state.config.entries_per_page ),
-	polling: Object.keys( state.polling.entries ),
-	config: state.config,
-	total: state.pagination.total,
-} );
+const mapStateToProps = ( state ) => {
+	const entries = Object.keys( state.api.entries ).map(
+		( key ) => state.api.entries[ key ]
+	);
+
+	return {
+		page: state.pagination.page,
+		loading: state.api.loading,
+		entries: isLoadMore(
+			state.config.pagination_type,
+			state.pagination.page
+		)
+			? entries
+			: entries.slice( 0, state.config.entries_per_page ),
+		polling: Object.keys( state.polling.entries ),
+		config: state.config,
+		total: state.pagination.total,
+	};
+};
 
 const mapDispatchToProps = ( dispatch ) =>
 	bindActionCreators(

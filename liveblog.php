@@ -1387,6 +1387,7 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'date_format'                  => get_option( 'date_format' ),
 						'time_format'                  => get_option( 'time_format' ),
 						'entries_per_page'             => WPCOM_Liveblog_Lazyloader::get_number_of_entries(),
+						'pagination_type'              => self::get_pagination_type(),
 
 						'refresh_interval'             => self::get_refresh_interval(),
 						'focus_refresh_interval'       => self::FOCUS_REFRESH_INTERVAL,
@@ -2222,6 +2223,26 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 			$refresh_interval = apply_filters( 'liveblog_refresh_interval', $refresh_interval );
 			$refresh_interval = apply_filters( 'liveblog_post_' . self::$post_id . '_refresh_interval', $refresh_interval );
 			return $refresh_interval;
+		}
+
+		/**
+		 * Returns how the front end pages through entries.
+		 *
+		 * @return string Either 'page' or 'load-more'.
+		 */
+		public static function get_pagination_type() {
+			/**
+			 * Filters the front end pagination type.
+			 *
+			 * Use 'load-more' to show a single "Load more" button that appends
+			 * older entries, instead of the default page navigation.
+			 *
+			 * @since 1.14.0
+			 *
+			 * @param string $type Pagination type, 'page' or 'load-more'.
+			 */
+			$type = apply_filters( 'liveblog_pagination_type', 'page' );
+			return 'load-more' === $type ? 'load-more' : 'page';
 		}
 
 		/**
