@@ -8,7 +8,7 @@ Reference material for theme and plugin developers integrating with Liveblog.
 
 ## Developer reference
 
-* [Customization](customization.md) — entry features (`#hashtags`, `/commands`, `@authors`, `:emoji:`), key event templates and formats, restricting shortcodes, overriding templates.
+* [Customization](customization.md) — entry features (`#hashtags`, `/commands`, `@authors`, `:emoji:`), key event templates and formats, restricting shortcodes, overriding templates, disabling AMP support.
 * [Extending the admin meta box](admin-meta-box.md) — adding custom fields and capturing their input.
 * [Hooking into entries](entry-hooks.md) — filters for the entry lifecycle (insert, update, preview, edit, JSON output).
 * [Auto-archiving](auto-archive.md) — configuring automatic archival of stale liveblogs.
