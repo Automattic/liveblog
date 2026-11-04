@@ -188,6 +188,20 @@ public static function filter( $class_prefix ) {
 }
 ```
 
+## Author field for new entries
+
+By default the author field in the editor starts with the current user, and the authors you pick stay selected for the next entry. On a liveblog with several writers this makes it easy to post an update under the wrong name.
+
+To start each new entry with an empty author field, and clear the field after each new entry is published:
+
+```php
+add_filter( 'liveblog_prefill_author_field', '__return_false' );
+```
+
+Editing an existing entry is not affected. The editor still shows that entry's saved authors.
+
+If a new entry is published with the author field left empty, it is credited to the user who published it.
+
 ## Restricting shortcodes in entries
 
 You can exclude shortcodes from being used within the content of a live entry. By default the built-in `[liveblog_key_events]` shortcode is excluded. Add others from your theme's `functions.php`:

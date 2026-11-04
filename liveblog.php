@@ -1369,6 +1369,20 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 						'state'                        => self::get_liveblog_state(),
 						'is_liveblog_editable'         => self::is_liveblog_editable(),
 						'current_user'                 => self::get_current_user(),
+
+						/**
+						 * Filters whether the author field is prefilled with the current user
+						 * when writing a new entry.
+						 *
+						 * Return false to start each new entry with an empty author field. The
+						 * field is also cleared after each new entry is published, so the next
+						 * entry does not reuse the previous author by mistake.
+						 *
+						 * @since 1.13.0
+						 *
+						 * @param bool $prefill Whether to prefill the author field. Default true.
+						 */
+						'prefill_author_field'         => (bool) apply_filters( 'liveblog_prefill_author_field', true ),
 						'socketio_enabled'             => WPCOM_Liveblog_Socketio_Loader::is_enabled(),
 
 						'key'                          => self::KEY,

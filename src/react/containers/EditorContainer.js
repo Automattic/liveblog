@@ -21,17 +21,48 @@ import { getImageSize } from '../utils/utils';
 // Lazy load LexicalEditor for code splitting
 const LexicalEditor = React.lazy( () => import( '../Editor/LexicalEditor' ) );
 
+/**
+ * Whether new entries should start with the current user as author.
+ * Controlled by the `liveblog_prefill_author_field` PHP filter.
+ *
+ * @param {Object} config Liveblog config.
+ * @return {boolean} True when the author field should be prefilled.
+ */
+const shouldPrefillAuthor = ( config ) => config.prefill_author_field === '1';
+
+/**
+ * Get the authors the editor starts with.
+ *
+ * @param {Object|undefined} entry  Entry being edited, if any.
+ * @param {Object}           config Liveblog config.
+ * @return {Array} Initial authors.
+ */
+export const getInitialAuthors = ( entry, config ) => {
+	if ( entry ) {
+		return entry.authors;
+	}
+	return shouldPrefillAuthor( config ) ? [ config.current_user ] : [];
+};
+
+/**
+ * Get the authors to keep in the editor after a new entry is published.
+ * When prefill is off the field is cleared so the next entry does not
+ * reuse the previous author by mistake.
+ *
+ * @param {Array}  authors Authors used for the entry just published.
+ * @param {Object} config  Liveblog config.
+ * @return {Array} Authors for the next entry.
+ */
+export const getAuthorsAfterPublish = ( authors, config ) =>
+	shouldPrefillAuthor( config ) ? authors : [];
+
 class EditorContainer extends Component {
 	constructor( props ) {
 		super( props );
 
-		const initialAuthors = props.entry
-			? props.entry.authors
-			: [ props.config.current_user ];
-
 		this.state = {
 			suggestions: [],
-			authors: initialAuthors,
+			authors: getInitialAuthors( props.entry, props.config ),
 			mode: 'editor',
 			readOnly: false,
 			rawText: props.entry ? props.entry.content : '',
@@ -134,6 +165,10 @@ class EditorContainer extends Component {
 			rawText: '',
 			readOnly: false,
 			previewKey: prevState.previewKey + 1,
+			authors: getAuthorsAfterPublish(
+				prevState.authors,
+				this.props.config
+			),
 		} ) );
 	}
 
