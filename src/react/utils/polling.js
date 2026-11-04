@@ -2,6 +2,8 @@ const entryKey = ( entry ) => `id_${ entry.id }`;
 
 /**
  * Return polling `new` entries whose logical IDs are not already known.
+ * Pinned updates are kept too, so an older entry pinned while new entries
+ * are held back still shows once they are merged.
  *
  * Deduplication is deliberately based on entry identity, not timestamp
  * ordering: bucketed polling URLs can re-deliver entries the client has.
@@ -13,7 +15,8 @@ const entryKey = ( entry ) => `id_${ entry.id }`;
 export const filterKnownNewEntries = ( entries, knownEntryIds ) =>
 	entries.filter(
 		( entry ) =>
-			entry.type === 'new' && ! knownEntryIds[ entryKey( entry ) ]
+			( entry.type === 'new' || entry.pinned ) &&
+			! knownEntryIds[ entryKey( entry ) ]
 	);
 
 const rememberEntryIds = ( knownEntryIds, entries, types ) => ( {

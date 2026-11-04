@@ -4,6 +4,9 @@ import {
 	getFirstOfObject,
 	getPollingPages,
 	getNewestEntry,
+	getVisibleEntries,
+	getScrollToId,
+	pollingApplyUpdate,
 	triggerOembedLoad,
 } from '../utils';
 
@@ -266,6 +269,70 @@ describe( 'utils', () => {
 			triggerOembedLoad( mockElement );
 
 			expect( injectedScript( 'twitter' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getVisibleEntries', () => {
+		const entries = {
+			id_5: { id: 5 },
+			id_4: { id: 4, pinned: true },
+			id_3: { id: 3 },
+			id_1: { id: 1, pinned: true },
+		};
+
+		it( 'puts pinned entries first on page one without counting them', () => {
+			expect(
+				getVisibleEntries( entries, 1, 2 ).map( ( entry ) => entry.id )
+			).toEqual( [ 4, 1, 5, 3 ] );
+		} );
+
+		it( 'keeps the stored order on other pages', () => {
+			expect(
+				getVisibleEntries( entries, 2, 2 ).map( ( entry ) => entry.id )
+			).toEqual( [ 5, 4 ] );
+		} );
+	} );
+
+	describe( 'getScrollToId', () => {
+		const entries = [ { id: 5 }, { id: 4 }, { id: 1, pinned: true } ];
+
+		it( 'uses the shown order on page one', () => {
+			expect( getScrollToId( entries, 'first', 1 ) ).toBe( 'id_1' );
+			expect( getScrollToId( entries, 'last', 1 ) ).toBe( 'id_4' );
+		} );
+
+		it( 'keeps the response order on other pages', () => {
+			expect( getScrollToId( entries, 'first', 2 ) ).toBe( 'id_5' );
+			expect( getScrollToId( entries, 'last', 2 ) ).toBe( 'id_1' );
+		} );
+	} );
+
+	describe( 'pollingApplyUpdate', () => {
+		const current = { id_2: { id: 2, type: 'new' } };
+
+		it( 'adds an unknown entry that was just pinned', () => {
+			const update = { id: 1, type: 'update', pinned: true };
+
+			expect( pollingApplyUpdate( current, [ update ], true ) ).toEqual( {
+				...current,
+				id_1: update,
+			} );
+		} );
+
+		it( 'ignores an unknown pinned entry when new entries are not rendered', () => {
+			const update = { id: 1, type: 'update', pinned: true };
+
+			expect( pollingApplyUpdate( current, [ update ], false ) ).toEqual(
+				current
+			);
+		} );
+
+		it( 'ignores an unknown entry that is not pinned', () => {
+			const update = { id: 1, type: 'update', pinned: false };
+
+			expect( pollingApplyUpdate( current, [ update ], true ) ).toEqual(
+				current
+			);
 		} );
 	} );
 } );

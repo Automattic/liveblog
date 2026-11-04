@@ -191,6 +191,31 @@ final class SchemaMetadataTest extends TestCase {
 	}
 
 	/**
+	 * Test that /pin is stripped from articleBody without touching longer words.
+	 */
+	public function test_pin_command_stripped_from_article_body(): void {
+		$this->insert_entry( array( 'content' => '<p>/pin Follow us on /pinterest</p>' ) );
+
+		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$entry    = $metadata['liveBlogUpdate'][0];
+
+		$this->assertSame( 'Follow us on /pinterest', $entry->articleBody );
+	}
+
+	/**
+	 * Test that /pin span is stripped from articleBody.
+	 */
+	public function test_pin_span_stripped_from_article_body(): void {
+		$this->insert_entry( array( 'content' => '<p><span class="liveblog-command type-pin">pin</span> Breaking news!</p>' ) );
+
+		$metadata = WPCOM_Liveblog::get_liveblog_metadata( array(), get_post( $this->post_id ) );
+		$entry    = $metadata['liveBlogUpdate'][0];
+
+		$this->assertStringNotContainsString( 'pin', $entry->articleBody );
+		$this->assertStringContainsString( 'Breaking news', $entry->articleBody );
+	}
+
+	/**
 	 * Test that HTML tags are replaced with spaces to preserve word boundaries.
 	 */
 	public function test_html_tags_replaced_with_spaces(): void {

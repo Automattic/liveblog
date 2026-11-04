@@ -11,6 +11,7 @@ import PaginationContainer from '../containers/PaginationContainer';
 import EventsContainer from '../containers/EventsContainer';
 import UpdateButton from '../components/UpdateButton';
 import Editor from '../components/Editor';
+import { getVisibleEntries } from '../utils/utils';
 
 class AppContainer extends Component {
 	constructor() {
@@ -86,9 +87,11 @@ AppContainer.propTypes = {
 const mapStateToProps = ( state ) => ( {
 	page: state.pagination.page,
 	loading: state.api.loading,
-	entries: Object.keys( state.api.entries )
-		.map( ( key ) => state.api.entries[ key ] )
-		.slice( 0, state.config.entries_per_page ),
+	entries: getVisibleEntries(
+		state.api.entries,
+		state.pagination.page,
+		state.config.entries_per_page
+	),
 	polling: Object.keys( state.polling.entries ),
 	config: state.config,
 	total: state.pagination.total,
