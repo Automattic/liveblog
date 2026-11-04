@@ -269,12 +269,13 @@ class WPCOM_Liveblog_AMP {
 			$request->last = false;
 		}
 
+		// amp-live-list only polls page 1 and adds new items at the top, so AMP stays newest first.
 		if ( $request->id ) {
-			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id );
+			$entries  = WPCOM_Liveblog::get_entries_paged( false, false, $request->id, 'desc' );
 			$request  = self::set_request_last_from_entries( $entries, $request );
 			$content .= self::build_single_entry( $entries, $request, $post->post_id );
 		} else {
-			$entries  = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last );
+			$entries  = WPCOM_Liveblog::get_entries_paged( $request->page, $request->last, false, 'desc' );
 			$request  = self::set_request_last_from_entries( $entries, $request );
 			$content .= self::build_entries_feed( $entries, $request, $post->post_id );
 		}
@@ -345,7 +346,7 @@ class WPCOM_Liveblog_AMP {
 	 */
 	public static function get_entry( $id, $post_id, $entries = false ) {
 		if ( false === $entries ) {
-			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $id );
+			$entries = WPCOM_Liveblog::get_entries_paged( false, false, $id, 'desc' );
 		}
 
 		$entries['entries'] = self::filter_entries( $entries['entries'], $post_id );

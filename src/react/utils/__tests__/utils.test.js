@@ -4,6 +4,7 @@ import {
 	getFirstOfObject,
 	getPollingPages,
 	getNewestEntry,
+	shouldRenderNewEntries,
 	triggerOembedLoad,
 } from '../utils';
 
@@ -48,6 +49,78 @@ describe( 'utils', () => {
 		expect( getNewestEntry( newerEntry, olderEntry ) ).toEqual(
 			newerEntry
 		);
+	} );
+
+	it( 'getNewestEntry should fall back to the next newest entry when the newest is deleted', () => {
+		const first = { id: 1, timestamp: 1 };
+		const second = { id: 2, timestamp: 2 };
+		const third = { id: 3, timestamp: 3 };
+		const fourth = { id: 4, timestamp: 4 };
+		const deleteFourth = { id: 4, type: 'delete', timestamp: 5 };
+
+		expect(
+			getNewestEntry(
+				fourth,
+				deleteFourth,
+				{ id_4: fourth, id_3: third, id_2: second, id_1: first },
+				false
+			)
+		).toEqual( third );
+		expect(
+			getNewestEntry(
+				fourth,
+				deleteFourth,
+				{ id_1: first, id_2: second, id_3: third, id_4: fourth },
+				true
+			)
+		).toEqual( third );
+	} );
+
+	describe( 'shouldRenderNewEntries', () => {
+		it( 'renders newest first entries only on page 1', () => {
+			expect( shouldRenderNewEntries( 2, {}, {}, 3, false ) ).toBe(
+				false
+			);
+			expect( shouldRenderNewEntries( 1, {}, {}, 3, false ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'renders oldest first entries only on the last page', () => {
+			expect( shouldRenderNewEntries( 1, {}, {}, 3, true ) ).toBe(
+				false
+			);
+			expect( shouldRenderNewEntries( 3, {}, {}, 3, true ) ).toBe( true );
+		} );
+
+		it( 'ignores the scroll position when oldest first', () => {
+			const element = document.createElement( 'div' );
+			element.id = 'id_1';
+			element.getBoundingClientRect = () => ( { y: -500 } );
+			document.body.appendChild( element );
+
+			const entries = { id_1: { id: 1 } };
+
+			expect( shouldRenderNewEntries( 1, entries, {}, 1, false ) ).toBe(
+				false
+			);
+			expect( shouldRenderNewEntries( 1, entries, {}, 1, true ) ).toBe(
+				true
+			);
+
+			element.remove();
+		} );
+
+		it( 'does not render while updates are waiting to be merged', () => {
+			const pending = { id_9: { id: 9 } };
+
+			expect( shouldRenderNewEntries( 3, {}, pending, 3, true ) ).toBe(
+				false
+			);
+			expect( shouldRenderNewEntries( 1, {}, pending, 1, false ) ).toBe(
+				false
+			);
+		} );
 	} );
 
 	describe( 'triggerOembedLoad', () => {

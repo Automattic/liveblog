@@ -226,6 +226,18 @@ To override this default:
 $restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output for the shortcode! <a href="/">Click Here to Find Out More!</a>';
 ```
 
+## Default entry order
+
+Entries are shown newest first unless an editor picks a different order in the Liveblog box. To show entries oldest first on every liveblog that has no order saved, use the `liveblog_default_entry_order` filter:
+
+```php
+add_filter( 'liveblog_default_entry_order', function () {
+	return 'asc';
+} );
+```
+
+The filter also gets the post ID as a second argument. Return `'asc'` for oldest first or `'desc'` for newest first. Any other value falls back to `'desc'`.
+
 ## Overriding default templates
 
 Templates used by the plugin live in the [`templates/` directory](https://github.com/Automattic/liveblog/tree/develop/templates).

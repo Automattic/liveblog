@@ -36,4 +36,25 @@ describe( 'update utilities', () => {
 			pollingApplyUpdate( currentEntries, newEntries, false )
 		).toEqual( expectedEntriesPolling );
 	} );
+
+	it( 'pollingApplyUpdate should add new entries at the top when newest first', () => {
+		const current = { id_1: { id: 1, type: 'new' } };
+		const added = [ { id: 2, type: 'new' } ];
+
+		expect(
+			Object.keys( pollingApplyUpdate( current, added, true ) )
+		).toEqual( [ 'id_2', 'id_1' ] );
+	} );
+
+	it( 'pollingApplyUpdate should add new entries at the bottom when oldest first', () => {
+		const current = { id_1: { id: 1, type: 'new' } };
+		const added = [
+			{ id: 2, type: 'new' },
+			{ id: 3, type: 'new' },
+		];
+
+		expect(
+			Object.keys( pollingApplyUpdate( current, added, true, true ) )
+		).toEqual( [ 'id_1', 'id_2', 'id_3' ] );
+	} );
 } );
