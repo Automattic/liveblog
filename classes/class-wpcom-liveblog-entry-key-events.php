@@ -102,6 +102,10 @@ class WPCOM_Liveblog_Entry_Key_Events {
 		// command to run the key command.
 		add_action( 'liveblog_command_key_after', array( __CLASS__, 'add_key_action' ), 10, 3 );
 
+		// The command only runs on new entries, so keep the key
+		// event status in sync when an entry is updated.
+		add_action( 'liveblog_update_entry', array( __CLASS__, 'sync_key_event_meta' ), 10, 1 );
+
 		// Hook into the liveblog_admin_settings_update action
 		// to save the key event template.
 		add_action( 'liveblog_admin_settings_update', array( __CLASS__, 'save_template_option' ), 10, 3 );
@@ -166,6 +170,31 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	}
 
 	/**
+	 * Adds or removes the key event meta on the original entry
+	 * when an entry is updated, based on the /key command in
+	 * the updated content.
+	 *
+	 * @param int $id The ID of the entry that replaces the original.
+	 * @return void
+	 */
+	public static function sync_key_event_meta( $id ) {
+		$original_id = get_comment_meta( $id, WPCOM_Liveblog_Entry::REPLACES_META_KEY, true );
+		if ( ! $original_id ) {
+			return;
+		}
+
+		// Look for the span the commands feature puts in place of /key.
+		$class  = apply_filters( 'liveblog_command_class', WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ) . 'key';
+		$is_key = false !== strpos( get_comment_text( $id ), '<span class="liveblog-command ' . $class . '">' );
+
+		if ( $is_key && ! self::is_key_event( $original_id ) ) {
+			add_comment_meta( $original_id, self::META_KEY, self::META_VALUE );
+		} elseif ( ! $is_key ) {
+			delete_comment_meta( $original_id, self::META_KEY, self::META_VALUE );
+		}
+	}
+
+	/**
 	 * Remove key event entry.
 	 *
 	 * @param string $content The entry content.
@@ -174,7 +203,11 @@ class WPCOM_Liveblog_Entry_Key_Events {
 	 */
 	public static function remove_key_action( $content, $id ) {
 		delete_comment_meta( $id, self::META_KEY, self::META_VALUE );
-		return str_replace( '/key', '', $content );
+
+		// Remove the rendered span too, so the update that follows
+		// does not mark the entry as a key event again.
+		$class = apply_filters( 'liveblog_command_class', WPCOM_Liveblog_Entry_Extend_Feature_Commands::$class_prefix ) . 'key';
+		return str_replace( array( '/key', '<span class="liveblog-command ' . $class . '">key</span>' ), '', $content );
 	}
 
 	/**

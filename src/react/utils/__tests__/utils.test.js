@@ -5,6 +5,9 @@ import {
 	getPollingPages,
 	getNewestEntry,
 	triggerOembedLoad,
+	hasKeyCommand,
+	stripKeyCommand,
+	addKeyCommand,
 } from '../utils';
 
 describe( 'utils', () => {
@@ -267,5 +270,84 @@ describe( 'utils', () => {
 
 			expect( injectedScript( 'twitter' ) ).toBeNull();
 		} );
+	} );
+} );
+
+describe( 'key command helpers', () => {
+	it( 'should find the /key command', () => {
+		expect( hasKeyCommand( '/key Goal!' ) ).toBe( true );
+		expect( hasKeyCommand( '<p>/key Goal!</p>' ) ).toBe( true );
+		expect( hasKeyCommand( '<p>Goal! /key</p>' ) ).toBe( true );
+		expect( hasKeyCommand( '<p>Goal!</p>' ) ).toBe( false );
+		expect( hasKeyCommand( '<p>/keyboard</p>' ) ).toBe( false );
+		expect(
+			hasKeyCommand( '<a href="https://example.com/key">x</a>' )
+		).toBe( false );
+		expect( hasKeyCommand( undefined ) ).toBe( false );
+	} );
+
+	it( 'should strip the /key command', () => {
+		expect( stripKeyCommand( '/key Goal!' ) ).toBe( 'Goal!' );
+		expect( stripKeyCommand( '<p>/key Goal!</p>' ) ).toBe( '<p>Goal!</p>' );
+		expect( stripKeyCommand( '<p>Goal! /key</p>' ) ).toBe(
+			'<p>Goal! </p>'
+		);
+		expect( stripKeyCommand( '<p>/key</p><p>Goal!</p>' ) ).toBe(
+			'<p>Goal!</p>'
+		);
+		expect(
+			stripKeyCommand(
+				'<p dir="ltr"><span style="white-space: pre-wrap;">/key</span></p><p>Goal!</p>'
+			)
+		).toBe( '<p>Goal!</p>' );
+		expect( stripKeyCommand( '<p>/keyboard</p>' ) ).toBe(
+			'<p>/keyboard</p>'
+		);
+	} );
+
+	it( 'should keep blank paragraphs that were already there', () => {
+		const content = '<p>/key Goal!</p><p><br></p><p>More</p>';
+		expect( stripKeyCommand( content ) ).toBe(
+			'<p>Goal!</p><p><br></p><p>More</p>'
+		);
+		expect( stripKeyCommand( '<p>One</p><p><br></p><p>Two</p>' ) ).toBe(
+			'<p>One</p><p><br></p><p>Two</p>'
+		);
+	} );
+
+	it( 'should ignore /key inside tag attributes', () => {
+		const content = '<p><img src="a.jpg" alt="Goal /key moment"></p>';
+		expect( hasKeyCommand( content ) ).toBe( false );
+		expect( stripKeyCommand( content ) ).toBe( content );
+	} );
+
+	it( 'should find /key in plain text that has a > after it', () => {
+		expect( hasKeyCommand( '/key 2 > 1' ) ).toBe( true );
+		expect( stripKeyCommand( '/key 2 > 1' ) ).toBe( '2 > 1' );
+	} );
+
+	it( 'should only treat <p> as the first paragraph', () => {
+		expect( addKeyCommand( '<pre>x</pre>' ) ).toBe( '/key <pre>x</pre>' );
+	} );
+
+	it( 'should add the /key command to the first paragraph', () => {
+		expect( addKeyCommand( '<p dir="ltr">Goal!</p><p>More</p>' ) ).toBe(
+			'<p dir="ltr">/key Goal!</p><p>More</p>'
+		);
+		expect( addKeyCommand( 'Goal!' ) ).toBe( '/key Goal!' );
+		expect( addKeyCommand( '<h2>Goal!</h2>' ) ).toBe(
+			'/key <h2>Goal!</h2>'
+		);
+	} );
+
+	it( 'should not add the /key command twice', () => {
+		expect( addKeyCommand( '<p>/key Goal!</p>' ) ).toBe(
+			'<p>/key Goal!</p>'
+		);
+	} );
+
+	it( 'should round trip through strip and add', () => {
+		const content = '<p>/key Goal!</p>';
+		expect( addKeyCommand( stripKeyCommand( content ) ) ).toBe( content );
 	} );
 } );
