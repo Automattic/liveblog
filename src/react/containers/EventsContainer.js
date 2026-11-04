@@ -7,9 +7,13 @@ import { connect } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 
 import * as eventsActions from '../actions/eventsActions';
+import { scrollToEntry } from '../actions/userActions';
+import { isLoadMore } from './PaginationContainer';
 
 import Event from '../components/Event';
 import DeleteConfirmation from '../components/DeleteConfirmation';
+
+const noEntries = {};
 
 class EventsContainer extends Component {
 	constructor( props ) {
@@ -56,8 +60,17 @@ class EventsContainer extends Component {
 		} );
 	}
 
+	jumpTo( id ) {
+		// With load more the entry may already be on screen, so skip the fetch.
+		if ( this.props.loadedEntries[ `id_${ id }` ] ) {
+			this.props.scrollToEntry( `id_${ id }` );
+			return;
+		}
+		this.props.jumpToEvent( id );
+	}
+
 	renderEvents() {
-		const { events, jumpToEvent, canEdit, locale, title } = this.props;
+		const { events, canEdit, locale, title } = this.props;
 
 		return (
 			<div>
@@ -69,7 +82,7 @@ class EventsContainer extends Component {
 						<Event
 							key={ i }
 							event={ events[ key ] }
-							click={ () => jumpToEvent( events[ key ].id ) }
+							click={ () => this.jumpTo( events[ key ].id ) }
 							onDelete={ () =>
 								this.confirmDeletion( events[ key ] )
 							}
@@ -104,6 +117,8 @@ EventsContainer.propTypes = {
 	getEvents: PropTypes.func,
 	deleteEvent: PropTypes.func,
 	jumpToEvent: PropTypes.func,
+	scrollToEntry: PropTypes.func,
+	loadedEntries: PropTypes.object,
 	events: PropTypes.object,
 	container: PropTypes.any,
 	canEdit: PropTypes.bool,
@@ -115,12 +130,19 @@ const mapStateToProps = ( state ) => ( {
 	locale: state.config.locale,
 	events: state.events.entries,
 	canEdit: state.config.is_liveblog_editable === '1',
+	loadedEntries: isLoadMore(
+		state.config.pagination_type,
+		state.pagination.page
+	)
+		? state.api.entries
+		: noEntries,
 } );
 
 const mapDispatchToProps = ( dispatch ) =>
 	bindActionCreators(
 		{
 			...eventsActions,
+			scrollToEntry,
 		},
 		dispatch
 	);

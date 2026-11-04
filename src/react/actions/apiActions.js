@@ -23,6 +23,16 @@ export const getEntriesFailed = () => ( {
 	error: true,
 } );
 
+export const loadMoreEntries = ( page ) => ( {
+	type: types.LOAD_MORE_ENTRIES,
+	page,
+} );
+
+export const loadMoreEntriesSuccess = ( payload ) => ( {
+	type: types.LOAD_MORE_ENTRIES_SUCCESS,
+	payload,
+} );
+
 export const startPolling = ( payload ) => ( {
 	type: types.START_POLLING,
 	payload,

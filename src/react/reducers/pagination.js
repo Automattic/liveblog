@@ -4,6 +4,7 @@ export const initialState = {
 	page: 1,
 	pages: 1,
 	total: 0,
+	hasMore: false,
 };
 
 export const pagination = ( state = initialState, action ) => {
@@ -20,6 +21,15 @@ export const pagination = ( state = initialState, action ) => {
 				pages: Math.max( action.payload.pages, 1 ),
 				page: action.payload.page,
 				total: action.payload.total || 0,
+				hasMore: action.payload.page < action.payload.pages,
+			};
+
+		// Only says whether older entries remain. Its total is counted from
+		// the anchor at request time, so it can miss entries polled since.
+		case 'LOAD_MORE_ENTRIES_SUCCESS':
+			return {
+				...state,
+				hasMore: action.payload.page < action.payload.pages,
 			};
 
 		case 'MERGE_POLLING_INTO_ENTRIES':
