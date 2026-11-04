@@ -181,8 +181,14 @@ class WPCOM_Liveblog_Entry {
 	public function get_comment_date_gmt( $d = '', $comment_id = 0 ) {
 		$comment = get_comment( $comment_id );
 
+		// The referenced comment can be gone. For example, the original of a deleted entry
+		// is removed for good once the comment trash is emptied. Use this entry's own date then.
+		if ( ! $comment ) {
+			$comment = $this->comment;
+		}
+
 		// For Unix timestamp format, use DateTimeImmutable to avoid timezone issues with mysql2date.
-		// Fall through to mysql2date if the date is empty or malformed (e.g. deleted entries).
+		// Fall through to mysql2date if the date is empty or malformed.
 		if ( 'U' === $d || 'G' === $d ) {
 			$datetime = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $comment->comment_date_gmt, new DateTimeZone( 'UTC' ) );
 			if ( false !== $datetime ) {
