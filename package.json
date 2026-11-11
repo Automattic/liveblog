@@ -11,7 +11,7 @@
     "sass-module-importer": "^1.4.0",
     "sass-mq": "^7.0.1",
     "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "dependencies": {
     "@lexical/html": "^0.53.0",
