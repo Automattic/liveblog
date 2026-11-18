@@ -21,7 +21,7 @@
     "@lexical/rich-text": "^0.53.0",
     "@lexical/selection": "^0.53.0",
     "@lexical/utils": "^0.53.0",
-    "@redux-devtools/extension": "^4.0.0",
+    "@redux-devtools/extension": "^4.0.1",
     "ace-builds": "^1.45.2",
     "js-beautify": "^2.0.3",
     "lexical": "^0.53.0",
