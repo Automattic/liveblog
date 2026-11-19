@@ -34,12 +34,68 @@ class WPCOM_Liveblog_AMP {
 
 		// Add query vars to support pagination and single entries.
 		add_filter( 'query_vars', array( __CLASS__, 'add_custom_query_vars' ), 10 );
+
+		// Serve liveblogs as normal pages when AMP support is turned off.
+		add_filter( 'amp_skip_post', array( __CLASS__, 'skip_liveblog_post' ), 10, 2 );
+	}
+
+	/**
+	 * Checks if Liveblog AMP support is enabled.
+	 *
+	 * The filter is read on each call, not in load(), so a theme can
+	 * still change it from functions.php.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled() {
+		/**
+		 * Enables/Disables Liveblog AMP support.
+		 *
+		 * When disabled, liveblog posts are not served as AMP pages and
+		 * readers get the standard Liveblog instead.
+		 *
+		 * Example usage:
+		 *     add_filter( 'liveblog_enable_amp', '__return_false' );
+		 *
+		 * @since 1.14.0
+		 *
+		 * @param bool $enabled Enable Liveblog AMP support? Default true.
+		 */
+		return (bool) apply_filters( 'liveblog_enable_amp', true );
+	}
+
+	/**
+	 * Opts liveblog posts out of AMP when Liveblog AMP support is disabled.
+	 *
+	 * Without this, the AMP version of a liveblog would show an empty
+	 * container, as the standard Liveblog needs JavaScript to render.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @param bool $skip    Whether to skip AMP for this post.
+	 * @param int  $post_id The post ID.
+	 * @return bool
+	 */
+	public static function skip_liveblog_post( $skip, $post_id ) {
+		// Read the meta directly, as is_liveblog_post() returns false in REST requests made by the AMP plugin.
+		if ( ! self::is_enabled() && get_post_meta( $post_id, WPCOM_Liveblog::KEY, true ) ) {
+			return true;
+		}
+
+		return $skip;
 	}
 
 	/**
 	 * AMP Setup by removing and adding new hooks.
 	 */
 	public static function setup() {
+		// If Liveblog AMP support is turned off then bail.
+		if ( ! self::is_enabled() ) {
+			return;
+		}
+
 		// If we're not on an AMP page then bail.
 		if ( ! is_amp_endpoint() ) {
 			return;

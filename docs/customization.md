@@ -237,3 +237,13 @@ For example, to override a single entry template, copy [`templates/liveblog-sing
 ### Custom location for Liveblog templates
 
 If `liveblog/` in the root of your theme doesn't suit your needs, use the `liveblog_template_path` filter to pass an absolute path (without a trailing slash) for template lookup.
+
+## Disabling AMP support
+
+When the [AMP plugin](https://wordpress.org/plugins/amp/) is active, Liveblog serves an AMP version of each liveblog. To turn this off, add the following to your theme's `functions.php` or a plugin:
+
+```php
+add_filter( 'liveblog_enable_amp', '__return_false' );
+```
+
+With AMP support off, liveblog posts are opted out of AMP through the AMP plugin's `amp_skip_post` filter, so readers get the standard Liveblog. Other posts are not affected.
