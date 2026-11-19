@@ -12,7 +12,6 @@ Real-time liveblogging plugin for WordPress with a React-based editor and a comm
 | **Requires PHP** | 7.4+ |
 | **Requires WP** | 6.4+ |
 | **Default branch** | `develop` |
-| **Maintenance branch** | `2.x` (parallel modernized line; do not cross-port without checking) |
 
 ### Directory structure
 
@@ -87,13 +86,11 @@ See `CONTRIBUTING.md` for setup, checks and the contribution workflow. Key point
 * **Each entry change is a new entry.** Updates and deletions insert a new entry that "replaces" the old one. This lets us cache the timestamp-bounded polling endpoints indefinitely without per-edit invalidation.
 * **Timestamp-bounded polling URLs.** Endpoints take the form `/liveblog/<start>/<end>/`, returning entries in that window. Closed ranges are cacheable forever.
 * **AJAX polling by default, WebSockets optional.** The plugin polls for updates by default. WebSocket support via Redis and Socket.IO is opt-in (`LIVEBLOG_USE_SOCKETIO`) and only used for public posts.
-* **Two parallel branches.** `develop` is the legacy-architecture mainline. `2.x` is a parallel modernized branch (DDD layout under `src/php/`, DI container, namespaced classes). Security fixes and important bug fixes are typically backported by hand. Architectural changes do **not** cross-port automatically.
 * **Tag-triggered releases.** Merge the release PR, push the signed tag; the GitHub Release and wp.org deploy follow automatically. `release.yml` builds `liveblog.zip` and publishes the release from the matching `CHANGELOG.md` section; `deploy.yml` pushes the same tag to WordPress.org SVN. Do not create the GitHub Release by hand (it makes `release.yml` fail), and do not modify SVN assets manually. Hyphenated tags (`1.14.0-rc.1`) become GitHub pre-releases and skip wp.org.
 
 ## Common pitfalls
 
 * **Do not edit `vendor/`, `node_modules/` or `build/`.** They are regenerated.
-* **Do not bring 2.x architecture (DI container, namespaced services, DDD layers) into `develop`.** The two branches are intentionally separate.
 * **Run `composer cs` before committing.** CI rejects PHPCS violations.
 * **Integration tests require `npx wp-env start` to be running.** Otherwise they fail at bootstrap.
 * **Comment storage conflicts.** Entries are comments, so be careful with comment moderation, filtering, or other plugins that modify comment queries.
