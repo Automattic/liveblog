@@ -5,6 +5,7 @@
   "author": "Automattic",
   "private": true,
   "devDependencies": {
+    "@wordpress/env": "^12.2.0",
     "@wordpress/i18n": "^7.1.0",
     "@wordpress/scripts": "^37.1.0",
     "jsdom": "^31.0.1",
