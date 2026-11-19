@@ -72,12 +72,14 @@ npx wp-env start              # start local WordPress on http://localhost:8888
 
 ## Conventions
 
-* **Branch from `develop`.** Use `feature/<thing>` or `fix/<thing>` naming. PRs target `develop`.
-* **Commits.** Use the `/commit` skill. Conventional Commits format. Explain *why* over *what*.
-* **PRs.** Use the `/pr` skill. The repo uses merge commits (not squash).
-* **Code style.** WordPress + VIP standards via PHPCS. Tabs for indentation. Run `composer cs` before pushing.
-* **Tests.** Unit tests for isolated logic, integration tests for anything that touches WordPress. Use the `Yoast\WPTestUtils` base classes.
-* **i18n.** All user-facing strings use the `liveblog` text domain.
+See `CONTRIBUTING.md` for setup, checks and the contribution workflow. Key points:
+
+* **Branches**: Branch from `develop`, named `feature/<thing>` or `fix/<thing>`.
+* **Commits**: Every commit must be signed; `develop` rejects unsigned commits. Use a [Conventional Commits](https://www.conventionalcommits.org/) prefix (`fix:`, `feat:`, `test:`, `docs:`, `ci:`, `chore:` and so on) with an imperative subject of about 50 characters, and a body that explains why the change was needed rather than what changed. One concern per commit.
+* **PRs**: Open against `develop`. The title describes the outcome in sentence case, without a conventional commit prefix. The description explains the problem first, then how the PR solves it. PRs land as merge commits (squash and rebase merging are disabled), so every commit message reaches `develop` as written.
+* **Testing**: Write integration tests for WordPress-dependent behavior, unit tests for isolated logic. Use the `Yoast\WPTestUtils` base classes.
+* **Code style**: WordPress and VIP coding standards via PHPCS. Tabs for indentation. Run `composer cs` before pushing.
+* **i18n**: All user-facing strings must use the `liveblog` text domain.
 
 ## Architectural decisions
 
