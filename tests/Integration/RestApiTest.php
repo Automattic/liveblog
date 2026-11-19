@@ -44,7 +44,9 @@ final class RestApiTest extends TestCase {
 		// would otherwise see zero entries via the stale query.
 		$reflection  = new ReflectionClass( WPCOM_Liveblog::class );
 		$entry_query = $reflection->getProperty( 'entry_query' );
-		$entry_query->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$entry_query->setAccessible( true );
+		}
 		$entry_query->setValue( null, null );
 
 		WPCOM_Liveblog::$post_id          = null;

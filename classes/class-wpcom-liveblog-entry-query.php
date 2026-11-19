@@ -13,6 +13,20 @@
 class WPCOM_Liveblog_Entry_Query {
 
 	/**
+	 * The liveblog post ID.
+	 *
+	 * @var int
+	 */
+	public $post_id;
+
+	/**
+	 * The comment type and status key of the entries.
+	 *
+	 * @var string
+	 */
+	public $key;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param int    $post_id The post ID.

@@ -46,6 +46,13 @@ class WPCOM_Liveblog_Entry {
 	private $comment;
 
 	/**
+	 * The ID of the entry this one replaces, or an empty string if it replaces none.
+	 *
+	 * @var string|int
+	 */
+	public $replaces;
+
+	/**
 	 * The entry type (new, update, delete).
 	 *
 	 * @var string
