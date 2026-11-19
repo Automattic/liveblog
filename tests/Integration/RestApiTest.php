@@ -193,6 +193,50 @@ final class RestApiTest extends TestCase {
 	}
 
 	/**
+	 * Test that get_entries_paged returns entries sliced to the requested page.
+	 */
+	public function test_get_entries_paged_returns_requested_page(): void {
+		// Default page size is 5, so 7 entries span 2 pages.
+		$this->setup_entry_test_state( 7 );
+
+		$page_one = WPCOM_Liveblog::get_entries_paged( 1 );
+
+		$this->assertCount( 5, $page_one['entries'] );
+		$this->assertSame( 1, $page_one['page'] );
+		$this->assertSame( 2, $page_one['pages'] );
+		$this->assertSame( 7, $page_one['total'] );
+
+		$page_two = WPCOM_Liveblog::get_entries_paged( 2 );
+
+		$this->assertCount( 2, $page_two['entries'] );
+	}
+
+	/**
+	 * Test that get_entries_paged returns an empty result when there are no entries.
+	 */
+	public function test_get_entries_paged_is_empty(): void {
+		$this->set_liveblog_vars();
+
+		$result = WPCOM_Liveblog::get_entries_paged( 1 );
+
+		$this->assertEmpty( $result['entries'] );
+		$this->assertSame( 0, $result['total'] );
+	}
+
+	/**
+	 * Test that get_entries_paged excludes entries removed via the delete CRUD action.
+	 */
+	public function test_get_entries_paged_excludes_deleted_entries(): void {
+		$entries = $this->setup_entry_test_state( 3 );
+
+		WPCOM_Liveblog::do_crud_entry( 'delete', $this->build_entry_args( array( 'entry_id' => $entries[0]->get_id() ) ) );
+
+		$result = WPCOM_Liveblog::get_entries_paged( 1 );
+
+		$this->assertSame( 2, $result['total'] );
+	}
+
+	/**
 	 * Test for valid return values when getting a single entry.
 	 */
 	public function test_get_single_entry_not_empty(): void {
