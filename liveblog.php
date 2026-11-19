@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Liveblog
  * Plugin URI: http://wordpress.org/extend/plugins/liveblog/
- * Description: Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
+ * Description: Adds a live blog to a post: short, timestamped updates that appear for readers without reloading the page.
  * Version:     1.13.0
  * Requires at least: 6.4
  * Requires PHP: 7.4

@@ -9,7 +9,7 @@ Stable tag: 1.13.0
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience.
+Adds a live blog to a post: short, timestamped updates that appear for readers without reloading the page.
 
 ## Description
 
