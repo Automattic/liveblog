@@ -5,9 +5,12 @@
  * Description: Adds a live blog to a post: short, timestamped updates that appear for readers without reloading the page.
  * Version:     1.13.0
  * Requires at least: 6.4
+ * Tested up to: 7.1
  * Requires PHP: 7.4
  * Author:      WordPress.com VIP, Big Bite Creative and contributors
  * Author URI: https://github.com/Automattic/liveblog/graphs/contributors
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: liveblog
  *
  * @package Liveblog
