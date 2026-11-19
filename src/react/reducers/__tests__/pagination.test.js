@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { initialState, pagination } from '../pagination';
-import { getEntriesSuccess, pollingSuccess } from '../../actions/apiActions';
+import {
+	getEntriesSuccess,
+	loadMoreEntriesSuccess,
+	pollingSuccess,
+} from '../../actions/apiActions';
 import apiData from '../../mockData/reducers/api';
 import pollingData from '../../mockData/reducers/polling';
 import { getPollingPages } from '../../utils/utils';
@@ -15,6 +19,7 @@ describe( 'pagination reducer', () => {
 		...initialState,
 		pages: Math.max( apiData.pages, 1 ),
 		page: apiData.page,
+		hasMore: apiData.page < apiData.pages,
 	};
 
 	it( 'should handle GET_ENTRIES_SUCCESS', () => {
@@ -43,5 +48,23 @@ describe( 'pagination reducer', () => {
 				pollingSuccess( pollingData, shouldRenderNewEntries )
 			)
 		).toEqual( stateAfterPollingSuccess );
+	} );
+
+	it( 'should only update hasMore on LOAD_MORE_ENTRIES_SUCCESS', () => {
+		const state = { page: 1, pages: 3, total: 15, hasMore: true };
+
+		expect(
+			pagination(
+				state,
+				loadMoreEntriesSuccess( { page: 2, pages: 3, total: 14 } )
+			)
+		).toEqual( state );
+
+		expect(
+			pagination(
+				state,
+				loadMoreEntriesSuccess( { page: 3, pages: 3, total: 14 } )
+			)
+		).toEqual( { ...state, hasMore: false } );
 	} );
 } );

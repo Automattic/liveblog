@@ -12,6 +12,8 @@ import {
 	getEntries,
 	getEntriesSuccess,
 	getEntriesFailed,
+	loadMoreEntries,
+	loadMoreEntriesSuccess,
 	pollingSuccess,
 } from '../../actions/apiActions';
 
@@ -82,5 +84,67 @@ describe( 'api reducer', () => {
 				pollingSuccess( pollingData, shouldRenderNewEntries )
 			)
 		).toEqual( stateAfterPollingSuccess );
+	} );
+
+	it( 'should handle LOAD_MORE_ENTRIES without marking the feed as loading', () => {
+		expect( api( initialState, loadMoreEntries( 2 ) ) ).toEqual( {
+			...initialState,
+			loadingMore: true,
+		} );
+	} );
+
+	it( 'should append older entries on LOAD_MORE_ENTRIES_SUCCESS', () => {
+		const state = {
+			...initialState,
+			loadingMore: true,
+			entries: {
+				id_3: { id: 3, type: 'new' },
+				id_2: { id: 2, type: 'new' },
+			},
+		};
+
+		const next = api(
+			state,
+			loadMoreEntriesSuccess( {
+				entries: [
+					{ id: 2, type: 'new' },
+					{ id: 1, type: 'new' },
+				],
+			} )
+		);
+
+		expect( next.loadingMore ).toBe( false );
+		expect( Object.keys( next.entries ) ).toEqual( [
+			'id_3',
+			'id_2',
+			'id_1',
+		] );
+	} );
+
+	it( 'should skip entries newer than the anchor on LOAD_MORE_ENTRIES_SUCCESS', () => {
+		const state = {
+			...initialState,
+			newestEntry: { id: '20', timestamp: 2000 },
+			entries: { id_20: { id: '20', type: 'new' } },
+		};
+
+		const next = api(
+			state,
+			loadMoreEntriesSuccess( {
+				entries: [
+					{ id: '30', type: 'new' },
+					{ id: '10', type: 'new' },
+				],
+			} )
+		);
+
+		expect( Object.keys( next.entries ) ).toEqual( [ 'id_20', 'id_10' ] );
+	} );
+
+	it( 'should clear loadingMore on GET_ENTRIES_FAILED', () => {
+		expect(
+			api( { ...initialState, loadingMore: true }, getEntriesFailed() )
+				.loadingMore
+		).toBe( false );
 	} );
 } );

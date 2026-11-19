@@ -6,6 +6,7 @@ import {
 
 export const initialState = {
 	loading: false,
+	loadingMore: false,
 	error: false,
 	entries: {},
 	newestEntry: false,
@@ -39,7 +40,32 @@ export const api = ( state = initialState, action ) => {
 			return {
 				...state,
 				loading: false,
+				loadingMore: false,
 				error: true,
+			};
+
+		case 'LOAD_MORE_ENTRIES':
+			return {
+				...state,
+				error: false,
+				loadingMore: true,
+			};
+
+		case 'LOAD_MORE_ENTRIES_SUCCESS':
+			return {
+				...state,
+				error: false,
+				loadingMore: false,
+				// Drop anything newer than the anchor, which polling handles.
+				entries: applyUpdate(
+					state.entries,
+					action.payload.entries.filter(
+						( entry ) =>
+							! state.newestEntry ||
+							parseInt( entry.id, 10 ) <=
+								parseInt( state.newestEntry.id, 10 )
+					)
+				),
 			};
 
 		case 'POLLING_SUCCESS':

@@ -226,6 +226,20 @@ To override this default:
 $restricted_shortcodes['liveblog_key_events'] = 'Here is my alternative output for the shortcode! <a href="/">Click Here to Find Out More!</a>';
 ```
 
+## Pagination
+
+By default readers move through older entries with First, Prev, Next and Last buttons. To show a single "Load more" button that adds the next batch of older entries below the ones already on the page, add this to your theme's `functions.php`:
+
+```php
+add_filter( 'liveblog_pagination_type', function () {
+	return 'load-more';
+} );
+```
+
+Accepted values are `page` (the default) and `load-more`. The number of entries added per click comes from the `liveblog_number_of_entries` filter.
+
+Clicking a key event that is already loaded scrolls to it. If it is not loaded yet, the liveblog shows the page that holds it with the normal page buttons, and the First button takes the reader back to the "Load more" view.
+
 ## Overriding default templates
 
 Templates used by the plugin live in the [`templates/` directory](https://github.com/Automattic/liveblog/tree/develop/templates).
