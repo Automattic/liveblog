@@ -108,4 +108,4 @@ Reviews can take a little time — we're [busy people](https://automattic.com/wo
 * **Tests.** Add unit tests for isolated logic and integration tests for anything that touches WordPress.
 * **i18n.** All user-facing strings use the `liveblog` text domain.
 * **Commits.** Conventional Commits format (`feat:`, `fix:`, `test:`, `chore:`, etc.). Explain *why*, not just what.
-* **Branches.** Branch from `develop`. The `2.x` branch is a parallel maintenance line; backports are handled separately by maintainers.
+* **Branches.** Branch from `develop`.
