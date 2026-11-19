@@ -31,7 +31,7 @@ Liveblog uses [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) (
 git clone git@github.com:Automattic/liveblog.git
 cd liveblog
 composer install
-npm install
+npm ci
 npm run build       # build front-end assets
 npx wp-env start    # start local WordPress on http://localhost:8888
 ```

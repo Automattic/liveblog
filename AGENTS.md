@@ -66,7 +66,7 @@ npm run build                 # build front-end assets via wp-scripts
 npm run lint:js               # ESLint
 npm run lint:css              # Stylelint
 npm test                      # JavaScript unit tests (Vitest, via wp-scripts test-unit-js)
-npx wp-env start              # start local WordPress on http://localhost:8888
+npx --no wp-env start         # start local WordPress on http://localhost:8888
 ```
 
 ## Conventions
@@ -92,7 +92,7 @@ See `CONTRIBUTING.md` for setup, checks and the contribution workflow. Key point
 
 * **Do not edit `vendor/`, `node_modules/` or `build/`.** They are regenerated.
 * **Run `composer cs` before committing.** CI rejects PHPCS violations.
-* **Integration tests require `npx wp-env start` to be running.** Otherwise they fail at bootstrap.
+* **Integration tests require `npx --no wp-env start` to be running.** Otherwise they fail at bootstrap. Run `npm ci` before it, so `npx` uses the `@wordpress/env` pinned in `package.json`. Always keep `--no`: without an installed `@wordpress/env`, plain `npx wp-env` fetches the unrelated `wp-env` package from npm.
 * **Comment storage conflicts.** Entries are comments, so be careful with comment moderation, filtering, or other plugins that modify comment queries.
 * **Several version sources.** Versions live in `liveblog.php` (header + `WPCOM_Liveblog::VERSION` constant), the `Stable tag` in `README.md`, and `package.json`. Keep them in sync at release time.
 * **Hooks and shortcodes are public API.** Themes and integrations rely on the `liveblog_*` actions and filters and on the `[liveblog_key_events]` shortcode; do not rename or remove them without a deprecation cycle.
