@@ -306,7 +306,9 @@ final class EntryTest extends TestCase {
 
 			// Let's set up a Reflection class so we can access the private object properties and check our comment body.
 			$comment = new ReflectionProperty( $entry, 'comment' );
-			$comment->setAccessible( true );
+			if ( PHP_VERSION_ID < 80100 ) {
+				$comment->setAccessible( true );
+			}
 			$comment_content = $comment->getValue( $entry );
 
 			// Define a check variable and see if the returned object content has been set as the default string replacement.
