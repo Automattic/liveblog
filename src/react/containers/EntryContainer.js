@@ -100,7 +100,7 @@ class EntryContainer extends Component {
 				ref={ ( node ) => ( this.node = node ) }
 				className={ `liveblog-entry ${
 					entry.key_event ? 'is-key-event' : ''
-				} ${ entry.css_classes }` }
+				} ${ entry.pinned ? 'is-pinned' : '' } ${ entry.css_classes }` }
 			>
 				<aside className="liveblog-entry-aside">
 					<a
@@ -133,6 +133,11 @@ class EntryContainer extends Component {
 							onCancel={ this.togglePopup.bind( this ) }
 						/>
 					) : null }
+					{ entry.pinned && (
+						<div className="liveblog-entry-pinned">
+							{ __( 'Pinned', 'liveblog' ) }
+						</div>
+					) }
 					{ entry.authors && entry.authors.length > 0 && (
 						<header className="liveblog-meta-authors">
 							{ entry.authors.map( ( author ) => (

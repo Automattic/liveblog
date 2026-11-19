@@ -96,9 +96,11 @@ export const pollingApplyUpdate = (
 				};
 			}
 
+			// An older entry that was just pinned is not loaded yet, so add it.
 			if (
 				entry.type === 'update' &&
-				Object.prototype.hasOwnProperty.call( accumulator, id )
+				( Object.prototype.hasOwnProperty.call( accumulator, id ) ||
+					( entry.pinned && renderNewEntries ) )
 			) {
 				accumulator[ id ] = entry;
 			}
@@ -111,6 +113,26 @@ export const pollingApplyUpdate = (
 		},
 		{ ...currentEntries }
 	);
+
+/**
+ * Get the entries to show on the current page. On the first page pinned
+ * entries go on top and do not count towards the page size.
+ * @param {Object} entries
+ * @param {number} page
+ * @param {number} perPage
+ */
+export const getVisibleEntries = ( entries, page, perPage ) => {
+	const list = Object.values( entries );
+
+	if ( page !== 1 ) {
+		return list.slice( 0, perPage );
+	}
+
+	return [
+		...list.filter( ( entry ) => entry.pinned ),
+		...list.filter( ( entry ) => ! entry.pinned ).slice( 0, perPage ),
+	];
+};
 
 /**
  * Determine whether we should render new entries or prompt the user that a new entry is available.
@@ -537,17 +559,17 @@ export const triggerOembedLoad = ( element ) => {
  * Get the correct id of which entry to scroll to on pagination
  * @param {Array}  entries
  * @param {string} key
+ * @param {number} page
  */
-export const getScrollToId = ( entries, key ) => {
-	if ( key === 'first' ) {
-		return `id_${ entries[ 0 ].id }`;
-	}
+export const getScrollToId = ( entries, key, page = 0 ) => {
+	// Use the order the entries are shown in, pinned entries are moved up on page one.
+	const shown = getVisibleEntries( entries, page, entries.length );
 
 	if ( key === 'last' ) {
-		return `id_${ entries[ entries.length - 1 ].id }`;
+		return `id_${ shown[ shown.length - 1 ].id }`;
 	}
 
-	return `id_${ entries[ 0 ].id }`;
+	return `id_${ shown[ 0 ].id }`;
 };
 
 /**

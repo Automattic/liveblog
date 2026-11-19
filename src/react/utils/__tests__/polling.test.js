@@ -23,6 +23,17 @@ describe( 'polling entry deduplication', () => {
 		] );
 	} );
 
+	it( 'keeps unknown pinned updates so they show after a merge', () => {
+		const pinned = { id: 50, type: 'update', pinned: true };
+
+		expect(
+			filterKnownNewEntries(
+				[ pinned, { id: 100, type: 'update', pinned: true } ],
+				{ id_100: true }
+			)
+		).toEqual( [ pinned ] );
+	} );
+
 	it( 'remembers updated entries that were rendered by paged loading', () => {
 		const knownEntryIds = rememberRenderedEntries( {}, [
 			{ id: 100, type: 'update', timestamp: 2001 },
