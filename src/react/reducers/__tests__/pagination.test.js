@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { initialState, pagination } from '../pagination';
 import { getEntriesSuccess, pollingSuccess } from '../../actions/apiActions';
+import { loadConfig } from '../../actions/configActions';
 import apiData from '../../mockData/reducers/api';
 import pollingData from '../../mockData/reducers/polling';
 import { getPollingPages } from '../../utils/utils';
@@ -43,5 +44,19 @@ describe( 'pagination reducer', () => {
 				pollingSuccess( pollingData, shouldRenderNewEntries )
 			)
 		).toEqual( stateAfterPollingSuccess );
+	} );
+
+	it( 'should keep the current page as the last page when oldest first', () => {
+		const state = pagination(
+			{ ...initialState, page: 2, pages: 2 },
+			loadConfig( { entry_order: 'asc' } )
+		);
+
+		expect(
+			pagination(
+				state,
+				pollingSuccess( { entries: [], pages: 3 }, true )
+			).pages
+		).toEqual( 2 );
 	} );
 } );

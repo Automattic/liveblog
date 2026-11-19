@@ -57,7 +57,9 @@ export const getEntriesEpic = ( action$, state$ ) =>
 						shouldRenderNewEntries(
 							state$.value.pagination.page,
 							state$.value.api.entries,
-							state$.value.polling.entries
+							state$.value.polling.entries,
+							state$.value.pagination.pages,
+							state$.value.config.entry_order === 'asc'
 						)
 					)
 				),
@@ -84,7 +86,9 @@ export const getPaginatedEntriesEpic = ( action$, state$ ) =>
 								shouldRenderNewEntries(
 									state$.value.pagination.page,
 									state$.value.api.entries,
-									state$.value.polling.entries
+									state$.value.polling.entries,
+									state$.value.pagination.pages,
+									state$.value.config.entry_order === 'asc'
 								)
 							)
 						),

@@ -29,6 +29,9 @@ jQuery( function ( $ ) {
 				$( '#liveblog-key-template-format' ).val()
 			);
 			data.limit = encodeURIComponent( $( '#liveblog-key-limit' ).val() );
+			data.entry_order = encodeURIComponent(
+				$( '#liveblog-entry-order' ).val()
+			);
 			data[ settings.nonce_key ] = settings.nonce;
 			method = 'POST';
 		} else {

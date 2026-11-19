@@ -32,13 +32,24 @@ class AppContainer extends Component {
 	}
 
 	render() {
-		const { page, loading, entries, polling, mergePolling, config, total } =
-			this.props;
+		const {
+			page,
+			pages,
+			loading,
+			entries,
+			polling,
+			mergePolling,
+			config,
+			total,
+		} = this.props;
 		const canEdit = config.is_liveblog_editable === '1';
+		// New entries are added to the last page when oldest first, so the editor goes there.
+		const showEditor =
+			canEdit && page === ( config.entry_order === 'asc' ? pages : 1 );
 
 		return (
 			<div style={ { position: 'relative' } }>
-				{ page === 1 && canEdit && (
+				{ showEditor && (
 					<Suspense fallback={ <div>Loading editor...</div> }>
 						<Editor isEditing={ false } />
 					</Suspense>
@@ -76,6 +87,7 @@ AppContainer.propTypes = {
 	api: PropTypes.object,
 	entries: PropTypes.array,
 	page: PropTypes.number,
+	pages: PropTypes.number,
 	loading: PropTypes.bool,
 	polling: PropTypes.array,
 	mergePolling: PropTypes.func,
@@ -83,12 +95,25 @@ AppContainer.propTypes = {
 	total: PropTypes.number,
 };
 
+export const getVisibleEntries = ( state ) => {
+	const entries = Object.keys( state.api.entries ).map(
+		( key ) => state.api.entries[ key ]
+	);
+
+	// Oldest first adds new entries at the bottom. Trimming the top would move the
+	// content the reader is looking at, so keep them all until the page changes.
+	if ( state.config.entry_order === 'asc' ) {
+		return entries;
+	}
+
+	return entries.slice( 0, state.config.entries_per_page );
+};
+
 const mapStateToProps = ( state ) => ( {
 	page: state.pagination.page,
+	pages: state.pagination.pages,
 	loading: state.api.loading,
-	entries: Object.keys( state.api.entries )
-		.map( ( key ) => state.api.entries[ key ] )
-		.slice( 0, state.config.entries_per_page ),
+	entries: getVisibleEntries( state ),
 	polling: Object.keys( state.polling.entries ),
 	config: state.config,
 	total: state.pagination.total,

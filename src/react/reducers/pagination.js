@@ -4,6 +4,7 @@ export const initialState = {
 	page: 1,
 	pages: 1,
 	total: 0,
+	entryOrder: 'desc',
 };
 
 export const pagination = ( state = initialState, action ) => {
@@ -46,11 +47,20 @@ export const pagination = ( state = initialState, action ) => {
 			};
 
 		case 'POLLING_SUCCESS':
+			// Oldest first keeps adding to the page the reader is on, so keep it as the
+			// last page. Otherwise live updates would stop once that page is full.
 			return {
 				...state,
-				pages: action.renderNewEntries
-					? getPollingPages( state.pages, action.payload.pages )
-					: state.pages,
+				pages:
+					action.renderNewEntries && state.entryOrder !== 'asc'
+						? getPollingPages( state.pages, action.payload.pages )
+						: state.pages,
+			};
+
+		case 'LOAD_CONFIG':
+			return {
+				...state,
+				entryOrder: action.payload.entry_order,
 			};
 
 		default:

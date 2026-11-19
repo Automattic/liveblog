@@ -79,21 +79,22 @@ export const eventsApplyUpdate = ( currentEntries, newEntries ) =>
  * @param {Object}  currentEntries
  * @param {Array}   newEntries
  * @param {boolean} renderNewEntries
+ * @param {boolean} asc              Whether entries are shown oldest first.
  */
 export const pollingApplyUpdate = (
 	currentEntries,
 	newEntries,
-	renderNewEntries
+	renderNewEntries,
+	asc = false
 ) =>
 	newEntries.reduce(
 		( accumulator, entry ) => {
 			const id = `id_${ entry.id }`;
 
 			if ( entry.type === 'new' && renderNewEntries ) {
-				accumulator = {
-					[ id ]: entry,
-					...accumulator,
-				};
+				accumulator = asc
+					? { ...accumulator, [ id ]: entry }
+					: { [ id ]: entry, ...accumulator };
 			}
 
 			if (
@@ -116,16 +117,29 @@ export const pollingApplyUpdate = (
  * Determine whether we should render new entries or prompt the user that a new entry is available.
  * Will return false if the user is not on page one or if the user is on page 1 but the latest
  * entry is not on the screen.
- * @param {number} page
- * @param {Object} entries
- * @param {Object} polling
+ * When entries are shown oldest first, new entries render on the last page instead. They are
+ * added below the reader, so the scroll position does not matter.
+ * @param {number}  page
+ * @param {Object}  entries
+ * @param {Object}  polling
+ * @param {number}  pages
+ * @param {boolean} asc     Whether entries are shown oldest first.
  */
-export const shouldRenderNewEntries = ( page, entries, polling ) => {
-	if ( page !== 1 ) {
+export const shouldRenderNewEntries = (
+	page,
+	entries,
+	polling,
+	pages = 1,
+	asc = false
+) => {
+	if ( page !== ( asc ? pages : 1 ) ) {
 		return false;
 	}
 	if ( Object.keys( polling ).length > 0 ) {
 		return false;
+	}
+	if ( asc ) {
+		return true;
 	}
 	const element = document.getElementById( Object.keys( entries )[ 0 ] );
 	if ( ! element ) {
@@ -136,11 +150,17 @@ export const shouldRenderNewEntries = ( page, entries, polling ) => {
 
 /**
  * Determine the newest entry from current and updated entries
- * @param {Object} current
- * @param {Object} update
- * @param {Array}  entries
+ * @param {Object}  current
+ * @param {Object}  update
+ * @param {Array}   entries
+ * @param {boolean} asc     Whether entries are shown oldest first.
  */
-export const getNewestEntry = ( current, update, entries = false ) => {
+export const getNewestEntry = (
+	current,
+	update,
+	entries = false,
+	asc = false
+) => {
 	if ( ! current && ! update ) {
 		return false;
 	}
@@ -151,7 +171,11 @@ export const getNewestEntry = ( current, update, entries = false ) => {
 		return update;
 	}
 	if ( update.type === 'delete' && update.id === current.id && entries ) {
-		return getItemOfObject( entries, 1 );
+		// The deleted entry is first when newest first and last when oldest first.
+		return getItemOfObject(
+			entries,
+			asc ? Object.keys( entries ).length - 2 : 1
+		);
 	}
 	if ( current.timestamp > update.timestamp ) {
 		return current;
