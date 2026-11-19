@@ -591,9 +591,9 @@ final class EntryTest extends TestCase {
 	/**
 	 * Test that get_comment_date_gmt falls back to mysql2date when date is empty.
 	 *
-	 * Regression test for https://github.com/Automattic/liveblog/pull/829 — deleted
-	 * entries have an empty comment_date_gmt, which caused a fatal error when passed
-	 * to DateTimeImmutable::createFromFormat(). The DB schema coerces empty values
+	 * Regression test for https://github.com/Automattic/liveblog/pull/829 — an empty
+	 * comment_date_gmt caused a fatal error when passed to
+	 * DateTimeImmutable::createFromFormat(). The DB schema coerces empty values
 	 * back to '0000-00-00 00:00:00', so the scenario is forced via the get_comment
 	 * filter instead.
 	 */
@@ -611,8 +611,7 @@ final class EntryTest extends TestCase {
 
 		try {
 			// The important assertion is that this does not fatal. mysql2date() returns
-			// false for an empty input; the exact return contract for deleted entries
-			// is the subject of the follow-up root-cause work.
+			// false for an empty input.
 			$timestamp = ( new WPCOM_Liveblog_Entry( get_comment( $comment_id ) ) )
 				->get_comment_date_gmt( 'U', $comment_id );
 
@@ -620,6 +619,27 @@ final class EntryTest extends TestCase {
 		} finally {
 			remove_filter( 'get_comment', $blank_date );
 		}
+	}
+
+	/**
+	 * A delete entry whose original comment has been removed for good (for example
+	 * after the comment trash is emptied) must still report an integer entry_time.
+	 *
+	 * @see https://github.com/Automattic/liveblog/issues/859
+	 */
+	public function test_for_json_entry_time_uses_delete_entry_date_when_original_is_gone(): void {
+		$entry        = $this->insert_entry();
+		$delete_entry = WPCOM_Liveblog_Entry::delete( $this->build_entry_args( array( 'entry_id' => $entry->get_id() ) ) );
+
+		// Simulate the trash being emptied.
+		wp_delete_comment( $entry->get_id(), true );
+		$this->assertNull( get_comment( $entry->get_id() ) );
+
+		$json     = $delete_entry->for_json();
+		$expected = ( new \DateTimeImmutable( get_comment( $delete_entry->get_id() )->comment_date_gmt, new \DateTimeZone( 'UTC' ) ) )->getTimestamp();
+
+		$this->assertSame( 'delete', $json->type );
+		$this->assertSame( $expected, $json->entry_time );
 	}
 
 	/**
