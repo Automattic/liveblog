@@ -28,7 +28,7 @@ msgstr ""
 
 #. Description of the plugin
 #: liveblog.php
-msgid "Empowers website owners to provide rich and engaging live event coverage to a large, distributed audience."
+msgid "Adds a live blog to a post: short, timestamped updates that appear for readers without reloading the page."
 msgstr ""
 
 #. Author of the plugin
