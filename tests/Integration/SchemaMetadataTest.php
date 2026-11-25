@@ -50,7 +50,9 @@ final class SchemaMetadataTest extends TestCase {
 
 		// Set the static post_id on WPCOM_Liveblog.
 		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'post_id' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$reflection->setValue( null, $this->post_id );
 	}
 
@@ -60,12 +62,16 @@ final class SchemaMetadataTest extends TestCase {
 	public function tear_down(): void {
 		// Reset the static post_id on WPCOM_Liveblog.
 		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'post_id' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$reflection->setValue( null, null );
 
 		// Reset the static entry_query to ensure fresh queries per test.
 		$reflection = new \ReflectionProperty( WPCOM_Liveblog::class, 'entry_query' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$reflection->setValue( null, null );
 
 		parent::tear_down();
