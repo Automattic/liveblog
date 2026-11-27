@@ -6,8 +6,8 @@
   "private": true,
   "devDependencies": {
     "@wordpress/env": "^12.2.0",
-    "@wordpress/i18n": "^7.1.0",
-    "@wordpress/scripts": "^37.1.0",
+    "@wordpress/i18n": "^7.2.0",
+    "@wordpress/scripts": "^37.2.0",
     "jsdom": "^31.0.1",
     "sass-module-importer": "^1.4.0",
     "sass-mq": "^7.0.1",
